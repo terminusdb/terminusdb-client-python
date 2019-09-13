@@ -2,6 +2,7 @@
 
 #  Helper class for parsing and decomposing Terminus URLs /
 #  dealing with prefixed URLs
+import re
 
 class IDParser:
 	"""Implements a socket stream."""

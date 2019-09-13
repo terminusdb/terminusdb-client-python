@@ -1,6 +1,7 @@
 import pytest
 from woqlclient.idParser import IDParser
 
+
 def idParserTest():
 
 	servURL="http://localhost:6363/"
@@ -12,3 +13,4 @@ def idParserTest():
 	assert idParser.parseServerURL(servURL)== servURL
 	assert idParser.serverURL == servURL
 
+idParserTest()
