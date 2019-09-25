@@ -1,10 +1,12 @@
 # woqlClient.py
 
-import constants
-import dispatchRequest
+#build package python setup.py bdist_wheel
+
 import errorMessage
 import connectionCapabilities
 import connectionConfig
+import dispatchRequest
+import const
 from .errors import (InvalidURIError)
 
 	# WOQL client object

@@ -1,5 +1,6 @@
-import constants
+#from .woqlClient import (errorMessage)
 import errorMessage
+import const
 import requests
 
 class DispatchRequest:

@@ -2,6 +2,7 @@
 
 #  Helper class for parsing and decomposing Terminus URLs /
 #  dealing with prefixed URLs
+# package_dir={'src': 'woqlclient'},
 import re
 
 class IDParser:
@@ -28,12 +29,13 @@ class IDParser:
 		if(isinstance(strURL,str)==False):
 			return False
 		regex = re.compile(
-		r'^(https?:\\/\\/)?' # http:// or https://
-		r'localhost|((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' #domain...
-		r'((\\d{1,3}\\.){3}\\d{1,3}))' 
-		r'(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' # ...or ip
-		r'(\\?[;&a-z\\d%_.~+=-]*)?' # optional port
-		r'(\\#[-a-z\\d_]*)?$', re.IGNORECASE)
+	    r'^(?:http)s?://' # http:// or https://
+	    r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' # domain...
+	    r'localhost|' # localhost...
+	    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|' # ...or ipv4
+	    r'\[?[A-F0-9]*:[A-F0-9:]+\]?)' # ...or ipv6
+	    r'(?::\d+)?' # optional port
+	    r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
 		if re.match(regex, strURL) is not None:
 			return True
@@ -50,7 +52,7 @@ class IDParser:
 		if (self._server_url and self._server_url.rfind('/') != (len(self._server_url) - 1)):
 			self._server_url= self._server_url + '/'
 
-		#print('IDParser'+self._server_url)
+		print('IDParser'+self._server_url)
 		return self._server_url;
 
 
@@ -64,9 +66,9 @@ class IDParser:
 			if (strDBID.find('/') == (len(strDBID)- 1)):
 				strDBID = strDBID[0:(len(strDBID) - 1)] # trim trailing slash
 				
-			surl = strDBID[0:strDBID.rfind('/')]
+			serverUrl = strDBID[0:strDBID.rfind('/')]
 			dbid = strDBID[(strDBID.rfind('/') + 1):];
-			if (self.parseServerURL(surl)):
+			if (self.parseServerURL(serverUrl)):
 				self._db = dbid
 		
 		elif (self.__validIDString(strDBID)):
@@ -74,22 +76,22 @@ class IDParser:
 
 		return self._db
 
-	# @param {string} docURL Terminus Document URL or Terminus Document ID
-	def parseDocumentURL(self,docURL):
+	# @param {string} docName Terminus Document URL or Terminus Document ID
+	def parseDocumentURL(self,docName):
 		self._doc=False;
-		if (self._context and self.__validPrefixedURL(docURL, self._context)):
-			docURL = self.__expandPrefixed(docURL, self._context)
+		if (self._context and self.__validPrefixedURL(docName, self._context)):
+			docName = self.__expandPrefixed(docName, self._context)
 
-		if (self.validURL(docURL)):
-			if (docURL.rfind('/document/') != -1):
-				self._doc = docURL[docURL.rfind('/document/') + 11:]
-				docURL = docURL[0: docURL.rfing('/document/')];
-		
-			return self.parseDBID(docURL)
+		if (self.validURL(docName)):
+			docPos=docName.rfind('/document/')
+			if (docPos != -1):				
+				docURL = docName[0: docPos]
+				docName = docName[docPos+10:]
+				if(self.parseDBID(docURL)==False):return False
 
-		if (self.__validIDString(docURL)):
-			self._doc = docURL
-			
+		if (self.__validIDString(docName)):
+			self._doc = docName
+
 		return self._doc
 
 

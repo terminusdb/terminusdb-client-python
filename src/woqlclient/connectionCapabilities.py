@@ -1,7 +1,8 @@
-#const UTILS = require('./utils.js');
+# connectionCapabilities.py
 
-import errorMessage
-import constants
+#const UTILS = require('./utils.js');
+ErrorMessage = __import__('errorMessage')
+import const
 from .errors import (AccessDeniedError)
 
 """

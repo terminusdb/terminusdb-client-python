@@ -1,6 +1,7 @@
 	
 CONNECT='connect'
 GET_SCHEMA='get_schema'
+UPDATE_SCHEMA= 'update_schema'
 CLASS_FRAME='class_frame'
 WOQL_SELECT='woql_select'
 GET_DOCUMENT='get_document'

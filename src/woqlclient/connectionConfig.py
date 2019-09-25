@@ -1,3 +1,4 @@
+# connectionConfig.py
 import idParser
 
 class ConnectionConfig:

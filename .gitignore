@@ -1,5 +1,16 @@
 .pytest_cache
-src/__pycache__
 .coverage
 woqlClientP.sublime-project  
 woqlClientP.sublime-workspace
+
+src/build/
+src/dist/
+src/*.egg-info/
+src/*.egg
+src/*.py[cod]
+src/__pycache__/
+*.so
+*~
+
+# due to using tox and pytest
+.tox
