@@ -97,7 +97,7 @@ class WOQLClient:
 	 
 	   if dburl is omitted, the current server and database will be used
 	"""
-	def deleteDatabase(dburl, opts):
+	def deleteDatabase(self, dburl, opts):
 		if(dburl and self.connectionConfig.setDB(dburl)==False):
 			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(dburl, "Delete Database"))
 		
@@ -156,7 +156,7 @@ class WOQLClient:
 		return self.dispatch(self.connectionConfig.docURL(), constants.CREATE_DOCUMENT, doc);
 
 
-	def __checkDocumentURI(msg, docurl, doc=None):
+	def __checkDocumentURI(self, msg, docurl, doc=None):
 		if (docurl and self.connectionConfig.setDocument(docurl)==False):
 			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(docurl, msg))
 		if (doc and '@id' in doc and 
@@ -174,7 +174,7 @@ class WOQLClient:
 	  		opts.shape is frame | *document
 	"""
 
-	def getDocument(docurl, opts):
+	def getDocument(self, docurl, opts):
 		self.__checkDocumentURI("Get Document",docurl);
 		return self.dispatch(self.connectionConfig.docURL(), constants.GET_DOCUMENT, opts)
 
