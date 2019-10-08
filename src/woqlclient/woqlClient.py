@@ -1,7 +1,5 @@
 # woqlClient.py
 
-#build package python setup.py bdist_wheel
-
 import errorMessage
 import connectionCapabilities
 import connectionConfig
@@ -154,6 +152,8 @@ class WOQLClient:
 		self.__checkDocumentURI("Create Document",docurl,doc);
 		doc = self.addOptionsToDocument(self.makeDocumentConsistentWithURL(docurl, doc),opts)
 		return self.dispatch(self.connectionConfig.docURL(), constants.CREATE_DOCUMENT, doc);
+
+
 
 
 	def __checkDocumentURI(self, msg, docurl, doc=None):
