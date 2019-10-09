@@ -1,10 +1,11 @@
 # connectionCapabilities.py
 
 #const UTILS = require('./utils.js');
-ErrorMessage = __import__('errorMessage')
+from errorMessage import ErrorMessage
 import const
-from .errors import (AccessDeniedError)
-
+from errors import (AccessDeniedError)
+from connectionConfig import ConnectionConfig
+from errors import (InvalidURIError)
 """
 	Creates an entry in the connection registry for the server
 	and all the databases that the client has access to
@@ -18,23 +19,25 @@ class ConnectionCapabilities:
 	def __init__(self,connectionConfig,key=None):
 		self.connection = {};
 		self.connectionConfig = connectionConfig
-		if ('server' in self.connectionConfig and key): 
-			self.setClientKey(self.connectionConfig['server'], key)
+		self.setClientKey(key)
 
 
 	"""
 		Utility functions for changing the state of connections with Terminus servers
 	"""
-	def setClientKey(self,curl, key):
-		if(isinstance(key,str) and key.strip()):
+	def setClientKey(self, key):
+		curl=self.connectionConfig.serverURL;
+		if(curl and (isinstance(key,str) and key.strip())):
 			if (curl not in self.connection): 
 				self.connection[curl] = {}
-			self.connection[curl][key] = key.strip()
+			self.connection[curl]['key'] = key.strip()
 
 
 	def getClientKey(self,serverURL=None):
 		if(serverURL==None): serverURL=self.connectionConfig.serverURL
-		if(serverURL in self.connection): return self.connection[serverURL].key
+		if((serverURL in self.connection) and ('key' in  self.connection[serverURL])): 
+			return self.connection[serverURL]['key']
+		return False
 	
 
 	def __actionToArray(self,actions):
@@ -49,47 +52,54 @@ class ConnectionCapabilities:
 		@params {string} curl a valid terminusDB server URL
 		@params {object} capabilities it is the connect call response
 	"""
-	def addConnection(self,curl, capabilities):
-		if (curl not in self.connection): 
-			self.connection[curl] = {}
+	def addConnection(self,capabilities):
+		if(self.connectionConfig.serverURL!=False):
+			curl=self.connectionConfig.serverURL;
+			
+			if (curl not in self.connection): 
+				self.connection[curl] = {}
 
-		if(isinstance(capabilities,dict)):
+			if(isinstance(capabilities,dict)):
 
-			for key, value in thisdict.items():
-				if(key == 'terminus:authority'):
-					if(isinstance(value,dict)): value=[value]
-					for item in value:
-						scope=item['terminus:authority_scope']
-						actions=item['terminus:action']
-						if(isinstance(scope,dict)):
-							scope=[scope]
+				for key, value in capabilities.items():
+					if(key == 'terminus:authority'):
+						if(isinstance(value,dict)): value=[value]
+						for item in value:
+							scope=item['terminus:authority_scope']
+							actions=item['terminus:action']
+							if(isinstance(scope,dict)):
+								scope=[scope]
 
-						actionList=self.__actionToArray(actions)
+							actionList=self.__actionToArray(actions)
 
-						for scopeItem in scope:
-							dbName=scopeItem['@id'];
-							if (dbName not in self.connection[curl]):
-								self.connection[curl][dbName] = scopeItem
+							for scopeItem in scope:
+								dbName=scopeItem['@id'];
+								if (dbName not in self.connection[curl]):
+									self.connection[curl][dbName] = scopeItem
 
-							self.connection[curl][dbName]['terminus:authority'] = actionList
-				else:
-					self.connection[curl][key] = value
+								self.connection[curl][dbName]['terminus:authority'] = actionList
+					else:
+						self.connection[curl][key] = value
+		else:
+			raise InvalidURIError(ErrorMessage.getInvalidURIMessage('Set A Valid Server Url', "Add Connection"))
+	    
 
 	def serverConnected(self):
-		if(self.connectionsConfig.serverURL!=False):
-			return self.connectionsConfig.serverURL in self.connection
+		if(self.connectionConfig.serverURL!=False):
+			return self.connectionConfig.serverURL in self.connection
 		return False
 
-	def capabilitiesPermit(self,action, dbid, server):
+
+	def capabilitiesPermit(self, action, dbid, server):
 		if (self.connectionConfig.connectedMode == False
 			or self.connectionConfig.checkCapabilities == False
-			or action == constants.CONNECT): return True
+			or action == const.CONNECT): return True
 
 		server = server if server else self.connectionConfig.serverURL
 		dbid = dbid if dbid else self.connectionConfig.dbID
 
 		rec=None
-		if (action == constants.CREATE_DATABASE):
+		if (action == const.CREATE_DATABASE):
 			rec = self.getServerRecord(server)
 		else:
 			rec = self.getDBRecord(dbid)
@@ -101,19 +111,22 @@ class ConnectionCapabilities:
 		raise AccessDeniedError(ErrorMessage.getAccessDeniedMessage(url, action, dbid, server))
 
 
-	def getServerRecord(self,srvr):
-		url = srvr if srvr else self.connectionConfig.serverURL
-		connectionObj = self.connection[url] if self.connection[url] else {}
-		for oid in connectionObj: 
-			if (oid['@type'] == 'terminus:Server'):
-				return oid
-		return False;
+	def __getServerRecord(self,serverURL):
+		if (serverURL in self.connection):
+			connectionObj=self.connection[serverURL]
 
-	def getDBRecord(self,dbid, srvr):
-		url = srvr if srvr else self.connectionConfig.serverURL
-		dbid = dbid if dbid else self.connectionConfig.dbID
+			if isinstance(connectionObj,dict)==False:
+				return None
+			
+			for oid in connectionObj.values(): 
+				if (isinstance(oid,dict) && oid['@type'] == 'terminus:Server'):
+					return oid
+		return None;
+
+
+	def __getDBRecord(self,dbid, url):
 		if isinstance(self.connection[url],dict)==False:
-			return False
+			return None
 
 		if dbid in self.connection[url]:
 			return self.connection[url][dbid]
@@ -124,18 +137,6 @@ class ConnectionCapabilities:
 			return self.connection[url][dbidCap]
 
 		return None;
-
-
-	def getServerDBRecords(self,srvr):
-		url = srvr if srvr else self.connectionConfig.serverURL
-		dbrecs = {}
-		connectionObj = self.connection[url] if self.connection[url] else {}
-
-		for oid in connectionObj:
-			if oid['@type'] == 'terminus:Database':
-				dbrecs[oid] = oid
-	
-		return dbrecs;
 
 	"""
 	  removes a database record from the connection registry (after deletion, for example)
@@ -148,21 +149,7 @@ class ConnectionCapabilities:
 		self.connection[url].pop(dbidCap)
 
 
-	def dbCapabilityID(self,dbid):
+	def __dbCapabilityID(self,dbid):
 		return 'doc:'+dbid
 
-	def getDBRecord(self,dbid, srvr):
-		url = srvr if srvr else self.connectionConfig.serverURL
-		dbid = dbid if dbid else self.connectionConfig.dbID
-		if isinstance(self.connection[url] ,dict):
-			return False
-
-		if dbid in self.connection[url]: 
-			return self.connection[url][dbid]
-
-		dbidCap = self.dbCapabilityID(dbid);
-
-		if dbidCap in self.connection[url]:
-			return self.connection[url][dbidCap]
-
-		return None
+	

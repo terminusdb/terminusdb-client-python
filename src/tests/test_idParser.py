@@ -1,7 +1,8 @@
-#python -m pytest tests/
-#/home/francesca/.local/share/virtualenvs/woql-client-p-8xHZxgu2/lib
 import pytest
-from woqlclient.idParser import IDParser
+import sys
+sys.path.append('woqlclient')
+
+from idParser import IDParser
 
 def test_idParser01():
 	servURL="http://localhost:6363/"	
@@ -19,7 +20,7 @@ def test_parseServerURL():
 
 def test_parseDBID():
 	servURL="http://localhost:6363/"
-	dbName="terminus"
+	dbName="myFirstTerminusDB"
 	idParser=IDParser()
 	#check db as TerminusDB name
 	assert idParser.parseDBID(dbName)==dbName
@@ -32,10 +33,10 @@ def test_parseDBID():
 
 #@param {string} docURL Terminus Document URL or Terminus Document ID
 def test_parseDocumentURL():
-	docURL="http://localhost:6363/masterdb/document/admin"
+	docURL="http://localhost:6363/myFirstTerminusDB/document/chess"
 	serverURL="http://localhost:6363/"
-	dbName="masterdb"
-	documentName="admin"
+	dbName="myFirstTerminusDB"
+	documentName="chess"
 
 	idParser=IDParser()
 	assert idParser.parseDocumentURL(docURL)==documentName
@@ -52,21 +53,35 @@ def test_parseDocumentURL():
 
 #check if the url of get schema is corrects
 def test_parseSchemaURL():
-	schemaFullUrl="http://localhost:6363/masterdb/schema"
+	schemaFullUrl="http://localhost:6363/myFirstTerminusDB/schema"
 	serverURL="http://localhost:6363/"
-	dbName="masterdb"
+	dbName="myFirstTerminusDB"
 	idParser=IDParser()
 	idParser.parseSchemaURL(schemaFullUrl)==dbName
 	assert idParser.serverURL== serverURL
 	assert idParser.dbID == dbName
 
+def test_validURL():
+	fullURL="http://localhost:6363/myFirstTerminusDB/woql";
+	idParser=IDParser()
+	assert idParser.validURL(fullURL)== True;
+
 #check if the url of get schema is corrects
 def test_parseQueryURL():
-	woqlclientFullURL="http://localhost:6363/terminus/woql"
-    serverURL="http://localhost:6363/"
-	dbName="masterdb"
+	woqlclientFullURL="http://localhost:6363/myFirstTerminusDB/woql"
+	serverURL="http://localhost:6363/"
+	dbName="myFirstTerminusDB"
 	idParser=IDParser()
-	idParser.parseSchemaURL(woqlclientFullURL)==dbName
+	idParser.parseQueryURL(woqlclientFullURL)==dbName
 	assert idParser.serverURL== serverURL
 	assert idParser.dbID == dbName
 
+#check if the url of get frame is corrects
+def test_parseClassFrameURL():
+	frameFullUrl="http://localhost:6363/myFirstTerminusDB/frame"
+	serverURL="http://localhost:6363/"
+	dbName="myFirstTerminusDB"
+	idParser=IDParser()
+	idParser.parseClassFrameURL(frameFullUrl)==dbName
+	assert idParser.serverURL== serverURL
+	assert idParser.dbID == dbName

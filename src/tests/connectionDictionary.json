@@ -1,0 +1,115 @@
+{
+   "http://localhost:6363/":{
+      "key":"mykey",
+      "@context":{
+         "doc":"http://localhost:6363/terminus/document/",
+         "owl":"http://www.w3.org/2002/07/owl#",
+         "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+         "rdfs":"http://www.w3.org/2000/01/rdf-schema#",
+         "scm":"http://localhost:6363/terminus/schema#",
+         "tbs":"http://terminusdb.com/schema/tbs#",
+         "tcs":"http://terminusdb.com/schema/tcs#",
+         "terminus":"http://terminusdb.com/schema/terminus#",
+         "vio":"http://terminusdb.com/schema/vio#",
+         "xdd":"http://terminusdb.com/schema/xdd#",
+         "xsd":"http://www.w3.org/2001/XMLSchema#"
+      },
+      "@id":"doc:admin",
+      "@type":"terminus:User",
+      "rdfs:comment":{
+         "@language":"en",
+         "@value":"This is the server super user account"
+      },
+      "rdfs:label":{
+         "@language":"en",
+         "@value":"Server Admin User"
+      },
+      "doc:myFirstTerminusDB":{
+         "@id":"doc:myFirstTerminusDB",
+         "@type":"terminus:Database",
+         "rdfs:comment":{
+            "@language":"en",
+            "@value":"this is my first terminus DB"
+         },
+         "rdfs:label":{
+            "@language":"en",
+            "@value":"my first Terminus DB"
+         },
+         "terminus:allow_origin":{
+            "@type":"xsd:string",
+            "@value":"*"
+         },
+         "terminus:id":{
+            "@type":"xsd:anyURI",
+            "@value":"http://localhost:6363/myFirstTerminusDB"
+         },
+         "terminus:instance":{
+            "@type":"xsd:string",
+            "@value":"http://localhost:6363/myFirstTerminusDB/document"
+         },
+         "terminus:schema":{
+            "@type":"xsd:string",
+            "@value":"http://localhost:6363/myFirstTerminusDB/schema"
+         },
+         "terminus:authority":[
+
+         ]
+      },
+      "doc:terminus":{
+         "@id":"doc:terminus",
+         "@type":"terminus:Database",
+         "rdfs:comment":{
+            "@language":"en",
+            "@value":"The master database contains the meta-data about databases, users and roles"
+         },
+         "rdfs:label":{
+            "@language":"en",
+            "@value":"Master Database"
+         },
+         "terminus:allow_origin":{
+            "@type":"xsd:string",
+            "@value":"*"
+         },
+         "terminus:id":{
+            "@type":"xsd:anyURI",
+            "@value":"http://localhost:6363/terminus"
+         },
+         "terminus:authority":[
+
+         ]
+      },
+      "doc:server":{
+         "@id":"doc:server",
+         "@type":"terminus:Server",
+         "rdfs:comment":{
+            "@language":"en",
+            "@value":"The current Database Server itself"
+         },
+         "rdfs:label":{
+            "@language":"en",
+            "@value":"The DB server"
+         },
+         "terminus:allow_origin":{
+            "@type":"xsd:string",
+            "@value":"*"
+         },
+         "terminus:id":{
+            "@type":"xsd:anyURI",
+            "@value":"http://localhost:6363"
+         },
+         "terminus:resource_includes":[
+            {
+               "@id":"doc:myFirstTerminusDB",
+               "@type":"terminus:Database"
+            },
+            {
+               "@id":"doc:terminus",
+               "@type":"terminus:Database"
+            }
+         ],
+         "terminus:authority":[
+
+         ]
+      }
+   }
+}

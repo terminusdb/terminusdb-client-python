@@ -248,8 +248,9 @@ class WOQLClient:
 		2) omitted - the current database will be used
 		the second argument (cls) is the URL / ID of a document class that exists in the database schema
 		the third argument (opts) is an options json - opts.key is an optional API key
+		cls "http://terminusdb.com/schema/tcs#Person"
 	"""
-
+	
 	def getClassFrame(self,cfurl, cls, opts=None):
 		if (cfurl and self.connectionConfig.setClassFrameURL(cfurl)==False):
 			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(docurl, "Get Class Frame"))
@@ -295,9 +296,10 @@ class WOQLClient:
 			doc['@id'] = dburl
 		return doc
 
+
 	def dispatch(self, url, action, payload):
 		if (action != constants.CONNECT
-			and self.connectionConfig.connectionMode()
+			and self.connectionConfig.connectedMode
 			and self.connection.serverConnected()==False):
 			
 			key = payload.key if isinstance(payload,dict) and key in payload else False

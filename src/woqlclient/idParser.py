@@ -52,7 +52,6 @@ class IDParser:
 		if (self._server_url and self._server_url.rfind('/') != (len(self._server_url) - 1)):
 			self._server_url= self._server_url + '/'
 
-		print('IDParser'+self._server_url)
 		return self._server_url;
 
 
@@ -63,11 +62,13 @@ class IDParser:
 			strDBID = self.__expandPrefixed(strDBID, self._context)
 
 		if (self.validURL(strDBID)):
-			if (strDBID.find('/') == (len(strDBID)- 1)):
+			if (strDBID.rfind('/') == (len(strDBID)- 1)):
 				strDBID = strDBID[0:(len(strDBID) - 1)] # trim trailing slash
-				
+
 			serverUrl = strDBID[0:strDBID.rfind('/')]
 			dbid = strDBID[(strDBID.rfind('/') + 1):];
+
+
 			if (self.parseServerURL(serverUrl)):
 				self._db = dbid
 		
@@ -101,7 +102,6 @@ class IDParser:
 	
 		if (self.validURL(schemaURL)):
 			schemaURL = self.__stripOptionalPath(schemaURL, 'schema')
-	
 		return self.parseDBID(schemaURL)
 
 
@@ -121,14 +121,15 @@ class IDParser:
 			frameURL = self.__expandPrefixed(frameURL, self._context)
 		
 		if (self.validURL(frameURL)):
-			frameURL = self.__stripOptionalPath(frameURL, 'schema')
+			frameURL = self.__stripOptionalPath(frameURL, 'frame')
 
 		return self.parseDBID(frameURL)
 
 
 	def __stripOptionalPath(self, strOp, bit):
-		if (strOp.find(bit) != -1): 
-			strOp = strOp[0:strOp.find(bit)];
+		#print("__stripOptionalPath")
+		if (strOp.rfind(bit) != -1): 
+			strOp = strOp[0:strOp.rfind(bit)];	
 		return strOp;
 
 	def __validPrefixedURL(self,preURL,context=None):

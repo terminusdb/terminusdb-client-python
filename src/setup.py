@@ -12,14 +12,14 @@ test_requirements = [
 ]
 
 setuptools.setup(
-    name="woql-client-p",
+    name="terminus-client-python",
     version="0.0.1",
     author="Francesca Bitto",
     author_email="francesca@datachemist.com",
     description="woql client for Terminus DB",
-    long_description_content_type="woql client for DB",
+    long_description_content_type="terminus client for DB",
     package_data={'': ['LICENSE']},
-    url="https://github.com/terminusdb/woql-client-p",
+    url="https://github.com/terminusdb/terminus-client-python",
     packages=setuptools.find_packages(exclude=['tests']),
     include_package_data=True,
     install_requires=requires,

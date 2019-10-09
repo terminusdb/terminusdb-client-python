@@ -17,5 +17,7 @@ src/woqlclient/*.egg-info/
 *.so
 *~
 
+venv/
+
 # due to using tox and pytest
 .tox
