@@ -58,6 +58,9 @@ def test_setDB():
 	assert connectionConfig.serverURL== "http://localhost:6363/"
 	assert connectionConfig.dbID== "myFirstTerminusDB"
 
+	connectionConfig.deletedbID("myFirstTerminusDB")
+	assert connectionConfig.dbID == False
+
 def test_setSchemaURL():
 	connectionConfig=ConnectionConfig()
 	connectionConfig.setSchemaURL("http://localhost:6363/myFirstTerminusDB/schema")

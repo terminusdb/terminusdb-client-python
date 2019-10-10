@@ -52,7 +52,17 @@
             "@value":"http://localhost:6363/myFirstTerminusDB/schema"
          },
          "terminus:authority":[
-
+            "terminus:class_frame",
+            "terminus:create_database",
+            "terminus:create_document",
+            "terminus:delete_database",
+            "terminus:delete_document",
+            "terminus:get_document",
+            "terminus:get_schema",
+            "terminus:update_document",
+            "terminus:update_schema",
+            "terminus:woql_select",
+            "terminus:woql_update"
          ]
       },
       "doc:terminus":{
@@ -75,7 +85,17 @@
             "@value":"http://localhost:6363/terminus"
          },
          "terminus:authority":[
-
+            "terminus:class_frame",
+            "terminus:create_database",
+            "terminus:create_document",
+            "terminus:delete_database",
+            "terminus:delete_document",
+            "terminus:get_document",
+            "terminus:get_schema",
+            "terminus:update_document",
+            "terminus:update_schema",
+            "terminus:woql_select",
+            "terminus:woql_update"
          ]
       },
       "doc:server":{
@@ -108,7 +128,17 @@
             }
          ],
          "terminus:authority":[
-
+            "terminus:class_frame",
+            "terminus:create_database",
+            "terminus:create_document",
+            "terminus:delete_database",
+            "terminus:delete_document",
+            "terminus:get_document",
+            "terminus:get_schema",
+            "terminus:update_document",
+            "terminus:update_schema",
+            "terminus:woql_select",
+            "terminus:woql_update"
          ]
       }
    }

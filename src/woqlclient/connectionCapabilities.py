@@ -3,9 +3,9 @@
 #const UTILS = require('./utils.js');
 from errorMessage import ErrorMessage
 import const
-from errors import (AccessDeniedError)
+from errors import (AccessDeniedError,InvalidURIError)
 from connectionConfig import ConnectionConfig
-from errors import (InvalidURIError)
+
 """
 	Creates an entry in the connection registry for the server
 	and all the databases that the client has access to
@@ -20,7 +20,6 @@ class ConnectionCapabilities:
 		self.connection = {};
 		self.connectionConfig = connectionConfig
 		self.setClientKey(key)
-
 
 	"""
 		Utility functions for changing the state of connections with Terminus servers
@@ -41,7 +40,7 @@ class ConnectionCapabilities:
 	
 
 	def __actionToArray(self,actions):
-		if(isinstance(actions,list)): return []
+		if(isinstance(actions,list)==False): return []
 		actionList=[];
 		for item in actions:
 			actionList.append(item['@id']);
@@ -60,13 +59,13 @@ class ConnectionCapabilities:
 				self.connection[curl] = {}
 
 			if(isinstance(capabilities,dict)):
-
 				for key, value in capabilities.items():
 					if(key == 'terminus:authority'):
 						if(isinstance(value,dict)): value=[value]
 						for item in value:
 							scope=item['terminus:authority_scope']
 							actions=item['terminus:action']
+
 							if(isinstance(scope,dict)):
 								scope=[scope]
 
@@ -81,7 +80,8 @@ class ConnectionCapabilities:
 					else:
 						self.connection[curl][key] = value
 		else:
-			raise InvalidURIError(ErrorMessage.getInvalidURIMessage('Set A Valid Server Url', "Add Connection"))
+			raise InvalidURIError(ErrorMessage.getInvalidURIMessage('Undefined', "Add Connection"))
+		#print(self.connection)
 	    
 
 	def serverConnected(self):
@@ -90,7 +90,7 @@ class ConnectionCapabilities:
 		return False
 
 
-	def capabilitiesPermit(self, action, dbid, server):
+	def capabilitiesPermit(self, action, dbid=None, server=None):
 		if (self.connectionConfig.connectedMode == False
 			or self.connectionConfig.checkCapabilities == False
 			or action == const.CONNECT): return True
@@ -100,15 +100,17 @@ class ConnectionCapabilities:
 
 		rec=None
 		if (action == const.CREATE_DATABASE):
-			rec = self.getServerRecord(server)
+			rec = self.__getServerRecord(server)
 		else:
-			rec = self.getDBRecord(dbid)
+			rec = self.__getDBRecord(dbid,server)
 		
 		if (rec): 
-			auths = rec['terminus:authority']
-			if (auths and auths.find('terminus:'+action) != -1): return True
+			auths = rec.get('terminus:authority')
+			terminusActionName='terminus:'+action
+			if (auths and terminusActionName in auths): 
+				return True
 
-		raise AccessDeniedError(ErrorMessage.getAccessDeniedMessage(url, action, dbid, server))
+		raise AccessDeniedError(ErrorMessage.getAccessDeniedMessage(action, dbid, server))
 
 
 	def __getServerRecord(self,serverURL):
@@ -118,20 +120,20 @@ class ConnectionCapabilities:
 			if isinstance(connectionObj,dict)==False:
 				return None
 			
-			for oid in connectionObj.values(): 
-				if (isinstance(oid,dict) && oid['@type'] == 'terminus:Server'):
+			for oid in connectionObj.values():
+				if (isinstance(oid,dict) and oid.get("@type") == 'terminus:Server'):
 					return oid
 		return None;
 
 
 	def __getDBRecord(self,dbid, url):
-		if isinstance(self.connection[url],dict)==False:
+		if isinstance(self.connection.get(url),dict)==False:
 			return None
 
 		if dbid in self.connection[url]:
 			return self.connection[url][dbid]
 
-		dbidCap = self.dbCapabilityID(dbid);
+		dbidCap = self.__dbCapabilityID(dbid);
 
 		if dbidCap in self.connection[url]:
 			return self.connection[url][dbidCap]
@@ -141,12 +143,12 @@ class ConnectionCapabilities:
 	"""
 	  removes a database record from the connection registry (after deletion, for example)
 	""" 
-	def removeDB(self, dbid, srvr):
+	def removeDB(self, dbid=None, srvr=None):
 		dbid = dbid if dbid else self.connectionConfig.dbID
 		self.connectionConfig.deletedbID(dbid)
 		url = srvr if srvr else self.connectionConfig.serverURL
-		dbidCap = self.dbCapabilityID(dbid)
-		self.connection[url].pop(dbidCap)
+		dbidCap = self.__dbCapabilityID(dbid)
+		if(url in self.connection)self.connection[url].pop(dbidCap)
 
 
 	def __dbCapabilityID(self,dbid):

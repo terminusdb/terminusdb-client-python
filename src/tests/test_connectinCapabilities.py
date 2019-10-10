@@ -5,6 +5,8 @@ from  connectionConfig import ConnectionConfig
 from  connectionCapabilities import ConnectionCapabilities
 import pytest
 import json
+import const
+from errors import (AccessDeniedError,InvalidURIError)
 
 def test_connectionCapabilities_noParameter():
 	conConfig=ConnectionConfig()
@@ -15,6 +17,11 @@ def test_connectionCapabilities_noParameter():
 	"""
 	conCapabilities.getClientKey()==False
 	assert conCapabilities.serverConnected() == False
+
+	with pytest.raises(InvalidURIError):
+		with open('tests/capabilitiesResponse.json') as json_file:
+			capResponse = json.load(json_file)
+			conCapabilities.addConnection(capResponse);
 
 
 def test_addConnection():
@@ -52,7 +59,37 @@ def test_set_getClientKey():
 
 
 def test_capabilitiesPermit():
-	
-	self.connection.capabilitiesPermit(action);	
+	conConfig=ConnectionConfig({"server":"http://localhost:6363","db":"myFirstTerminusDB"})
+	conCapabilities=ConnectionCapabilities(conConfig,'mykey')
 
+	with open('tests/capabilitiesResponseNoAllAction.json') as json_file:
+		capResponse = json.load(json_file)
+		conCapabilities.addConnection(capResponse)
+
+	"""
+	 if the action are not permits the method raise an Exception
+	"""
+	with pytest.raises(AccessDeniedError):
+		conCapabilities.capabilitiesPermit(const.DELETE_DATABASE)
+
+	with pytest.raises(AccessDeniedError):
+		conCapabilities.capabilitiesPermit(const.DELETE_DOCUMENT)	
+
+	
+	assert conCapabilities.capabilitiesPermit(const.CREATE_DATABASE)==True
+	assert conCapabilities.capabilitiesPermit(const.CREATE_DOCUMENT)==True	
+
+def test_deleteDatabaseForTheConnectionList():
+	conConfig=ConnectionConfig({"server":"http://localhost:6363","db":"myFirstTerminusDB"})
+	conCapabilities=ConnectionCapabilities(conConfig,'mykey')
+
+	with open('tests/capabilitiesResponse.json') as json_file:
+		capResponse = json.load(json_file)
+		conCapabilities.addConnection(capResponse)
+
+	assert ("doc:myFirstTerminusDB" in conCapabilities.connection["http://localhost:6363/"]) == True
+
+	conCapabilities.removeDB();
+
+	assert ("doc:myFirstTerminusDB" in conCapabilities.connection["http://localhost:6363/"]) == False
 

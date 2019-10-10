@@ -6,24 +6,24 @@ class ErrorMessage:
 		pass
 
 	@staticmethod	
-	def getErrorAsMessage(self,url, api, err):
+	def getErrorAsMessage(url, api, err):
 		print('getErrorAsMessage')
-		str = 'Code: '+ err['status']
-		if('body' in err): str += ', Message: '+ err['body']
-		if('action' in err): str += ', Action: '+ err['action']
-		if('type' in err): str += ', Type: '+ err['type']
-		if(url): str += ', url: '+url
-		if(api and "method" in api): str += ', method: '+api['method'];
-		return str;
+		message = 'Code: '+ str(err['status'])
+		if('body' in err): message += ', Message: '+ err['body']
+		if('action' in err): message += ', Action: '+ err['action']
+		if('type' in err): message += ', Type: '+ err['type']
+		if(url): message += ', url: '+url
+		if(api and "method" in api): message += ', method: '+api['method'];
+		return message;
 
 	@staticmethod	
-	def accessDeniedErrObj(self, action, db, server):
+	def accessDeniedErrObj(action, db, server):
 		err = {}
-		err.status = 403
-		err.url = (server or '') + (db or '')
-		err.type = 'client'
-		err.action = action
-		err.body = err['action']+ ' not permitted for'+ err['url']
+		err['status'] = 403
+		err['url'] = (server or '') + (db or '')
+		err['type'] = 'client'
+		err['action'] = action
+		err['body'] = err['action']+ ' not permitted for'+ err['url']
 		return err
 
 	@classmethod
@@ -31,17 +31,17 @@ class ErrorMessage:
 		return 'API Error'+ self.getErrorAsMessage(url, api, err)
 
 	@classmethod	
-	def getAccessDeniedMessage(self,url, action, dbid, server):
+	def getAccessDeniedMessage(self,action, dbid, server):
 		errorObj= self.accessDeniedErrObj(action, dbid, server)
-		return 'Access Denied' + self.getErrorAsMessage(url, None, errorObj)
+		return 'Access Denied' + self.getErrorAsMessage(None, None, errorObj)
 
 	@staticmethod	
 	def getInvalidURIMessage(url, call):
-		str = ('Invalid argument to'
-				+call+
-				+url+
-			'is not a valid Terminus DB API endpoint')
-		return str
+		message = ('Invalid argument to '+
+			call+' '+
+			url+
+			' is not a valid Terminus DB API endpoint')
+		return message
 
 	"""
 	Utility functions for generating and retrieving error messages
@@ -60,7 +60,7 @@ class ErrorMessage:
 				msg = response.json();
 				#msg = response.toString()
 		
-			err.body = msg;
+			err['body'] = msg;
 			#elif (data in response.data) err.body = response.data;
 		err['url'] = response.url;
 		err['headers'] = response.headers;

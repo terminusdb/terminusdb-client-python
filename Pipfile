@@ -8,6 +8,7 @@ verify_ssl = true
 [packages]
 request = "*"
 pytest = "*"
+pytest-mock = "*"
 
 [requires]
 python_version = "3.6"
