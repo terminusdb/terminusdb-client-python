@@ -2,6 +2,9 @@
 import errorMessage
 import const
 import requests
+
+from utils import Utils
+
 from base64 import b64encode
 
 class DispatchRequest:
@@ -10,30 +13,35 @@ class DispatchRequest:
 		pass
 		#header= {'user-agent': 'my-app/0.0.1'}
 #json.dumps
+
 	def getCall(self,url,payload):
-		headers=self._autorizationHeader(payload);
+		headers=self._autorizationHeader(payload)
 		params={}
-		if(payload):
-			params={params:payload}
-		return requests.get(url,params)
+
+		url=Utils.addParamsToUrl(url,payload)
+
+		return requests.get(url,headers=headers)
 
 	def postCall(self,options,payload,url):
-		headers = {'content-type': 'application/json'}
+		headers=self._autorizationHeader(payload);
+		headers['content-type']= 'application/json'
 		return requests.post(url,json=payload,headers=headers);
 
 	def deleteCall(self,url):
-		return requests.delete(url);
+		url=Utils.addParamsToUrl(url,payload)
+		headers=self._autorizationHeader(payload);
+		return requests.delete(url,headers=headers);
 
 	def _autorizationHeader(self,payload):
 		headers={}
 
-		if (payload && ('terminus:user_key' in  payload)):
-			headers = { Authorization: 'Basic %s' % b64encode((':' + payload['terminus:user_key']).encode('utf-8')).decode('utf-8')}
+		if (payload and ('terminus:user_key' in  payload)):
+			headers = { 'Authorization: Basic %s' % b64encode(payload['terminus:user_key']).encode('utf-8')}#Utils.encodeURIComponent(payload['terminus:user_key'])}
 			payload.pop('terminus:user_key')
 		return headers
 
 	def sendRequestByAction(self, url, action, payload):
-
+		print("sendRequestByAction")
 		try:
 			requestResponse=None
 			if (action == const.CONNECT 
@@ -54,6 +62,7 @@ class DispatchRequest:
 				requestResponse=self.postCall(url,payload)
 
 			if(requestResponse.status_code==200):
+				print(requestResponse.url);
 				return requestResponse.json() #if not a json not it raises an error
 			#requestCall.raise_for_status()
 		except requests.exceptions.RequestException as err:
@@ -63,4 +72,4 @@ class DispatchRequest:
 		except requests.exceptions.ConnectionError as errc:
 			print ("Error Connecting:",errc)
 		except requests.exceptions.Timeout as errt:
-			print ("Timeout Error:",errt)     e
+			print ("Timeout Error:",errt)

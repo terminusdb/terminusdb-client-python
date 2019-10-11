@@ -21,3 +21,7 @@ venv/
 
 # due to using tox and pytest
 .tox
+
+*.pyc
+*.swp
+*.egg

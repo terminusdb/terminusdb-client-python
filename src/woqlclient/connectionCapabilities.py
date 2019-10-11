@@ -148,7 +148,7 @@ class ConnectionCapabilities:
 		self.connectionConfig.deletedbID(dbid)
 		url = srvr if srvr else self.connectionConfig.serverURL
 		dbidCap = self.__dbCapabilityID(dbid)
-		if(url in self.connection)self.connection[url].pop(dbidCap)
+		if(url in self.connection):self.connection[url].pop(dbidCap)
 
 
 	def __dbCapabilityID(self,dbid):
