@@ -1,0 +1,65 @@
+{
+  "bindings": [
+    {
+      "http://terminusdb.com/woql/variable/Abstract":"http://terminusdb.com/schema/tcs#abstract",
+      "http://terminusdb.com/woql/variable/Comment": {
+	"@language":"en",
+	"@value":"An entity with agency which can be considered to have the capacity to act as a coherent unit"
+      },
+      "http://terminusdb.com/woql/variable/Element":"http://terminusdb.com/schema/tcs#Agent",
+      "http://terminusdb.com/woql/variable/Label": {"@language":"en", "@value":"Agent"}
+    },
+    {
+      "http://terminusdb.com/woql/variable/Abstract":"unknown",
+      "http://terminusdb.com/woql/variable/Comment": {
+	"@language":"en",
+	"@value":"Tags that can be added to classes to add meta information"
+      },
+      "http://terminusdb.com/woql/variable/Element":"http://terminusdb.com/schema/tcs#ClassTag",
+      "http://terminusdb.com/woql/variable/Label": {"@language":"en", "@value":"Class Tags"}
+    },
+    {
+      "http://terminusdb.com/woql/variable/Abstract":"http://terminusdb.com/schema/tcs#abstract",
+      "http://terminusdb.com/woql/variable/Comment": {
+	"@language":"en",
+	"@value":"A class used to designate the primary data objects managed by the system - relationships and entities"
+      },
+      "http://terminusdb.com/woql/variable/Element":"http://terminusdb.com/schema/tcs#Document",
+      "http://terminusdb.com/woql/variable/Label": {"@language":"en", "@value":"Document Class"}
+    },
+    {
+      "http://terminusdb.com/woql/variable/Abstract":"http://terminusdb.com/schema/tcs#abstract",
+      "http://terminusdb.com/woql/variable/Comment": {
+	"@language":"en",
+	"@value":"The class of entities (business objects / documents) managed by the system"
+      },
+      "http://terminusdb.com/woql/variable/Element":"http://terminusdb.com/schema/tcs#Entity",
+      "http://terminusdb.com/woql/variable/Label": {"@language":"en", "@value":"Entity Class"}
+    },
+    {
+      "http://terminusdb.com/woql/variable/Abstract":"unknown",
+      "http://terminusdb.com/woql/variable/Comment": {
+	"@language":"en",
+	"@value":"A grouping of humans that has some identifiable membership requirement."
+      },
+      "http://terminusdb.com/woql/variable/Element":"http://terminusdb.com/schema/tcs#Group",
+      "http://terminusdb.com/woql/variable/Label": {"@language":"en", "@value":"Group"}
+    },
+    {
+      "http://terminusdb.com/woql/variable/Abstract":"unknown",
+      "http://terminusdb.com/woql/variable/Comment": {
+	"@language":"en",
+	"@value":"A property by which an agent can be identified."
+      },
+      "http://terminusdb.com/woql/variable/Element":"http://terminusdb.com/schema/tcs#Identifier",
+      "http://terminusdb.com/woql/variable/Label": {"@language":"en", "@value":"Identifier"}
+    },
+    {
+      "http://terminusdb.com/woql/variable/Abstract":"unknown",
+      "http://terminusdb.com/woql/variable/Comment": {"@language":"en", "@value":"A human bean ;-)"},
+      "http://terminusdb.com/woql/variable/Element":"http://terminusdb.com/schema/tcs#Person",
+      "http://terminusdb.com/woql/variable/Label": {"@language":"en", "@value":"Person"}
+    }
+  ],
+  "graphs": {}
+}

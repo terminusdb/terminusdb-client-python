@@ -19,7 +19,7 @@ class Utils:
 				"""
 				 	if dictionary inside dictionary
 				"""
-				if instance(value,dict): 
+				if isinstance(value,dict): 
 					#for keyElement,valueElement in value.items():
 					payloadArr.append(self.encodeURIComponent(value))
 				else:
@@ -27,10 +27,10 @@ class Utils:
 
 		return '&'.join(payloadArr)
 
-		@classmethod
-		def addParamsToUrl(self,url,payload):
-			if (payload):
-				params = self.URIEncodePayload(payload)
-				if (params): url = ('%s?%s' % url,params)
-			return url;
+	@classmethod
+	def addParamsToUrl(self,url,payload):
+		if (payload):
+			params = self.URIEncodePayload(payload)
+			if (params): url = ('%s?%s' % (url,params))
+		return url;
 

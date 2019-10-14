@@ -1,6 +1,3 @@
-import sys
-sys.path.append('woqlclient')
-
 from  connectionConfig import ConnectionConfig
 import pytest
 

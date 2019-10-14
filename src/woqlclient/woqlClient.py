@@ -5,7 +5,7 @@ import connectionCapabilities
 import connectionConfig
 import dispatchRequest
 import const
-from .errors import (InvalidURIError)
+from errors import (InvalidURIError)
 
 	# WOQL client object
 	#license Apache Version 2

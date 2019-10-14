@@ -15,6 +15,7 @@ class DispatchRequest:
 #json.dumps
 
 	def getCall(self,url,payload):
+		print('getCall')
 		headers=self._autorizationHeader(payload)
 		params={}
 
@@ -22,12 +23,12 @@ class DispatchRequest:
 
 		return requests.get(url,headers=headers)
 
-	def postCall(self,options,payload,url):
+	def postCall(self,url,payload):
 		headers=self._autorizationHeader(payload);
 		headers['content-type']= 'application/json'
 		return requests.post(url,json=payload,headers=headers);
 
-	def deleteCall(self,url):
+	def deleteCall(self,url,payload):
 		url=Utils.addParamsToUrl(url,payload)
 		headers=self._autorizationHeader(payload);
 		return requests.delete(url,headers=headers);
@@ -36,7 +37,7 @@ class DispatchRequest:
 		headers={}
 
 		if (payload and ('terminus:user_key' in  payload)):
-			headers = { 'Authorization: Basic %s' % b64encode(payload['terminus:user_key']).encode('utf-8')}#Utils.encodeURIComponent(payload['terminus:user_key'])}
+			headers = { 'Authorization' : 'Basic %s' % b64encode((':' + payload['terminus:user_key']).encode('utf-8')).decode('utf-8')}#Utils.encodeURIComponent(payload['terminus:user_key'])}
 			payload.pop('terminus:user_key')
 		return headers
 
@@ -53,7 +54,7 @@ class DispatchRequest:
 			
 			elif(action==const.DELETE_DATABASE or
 				action==const.DELETE_DOCUMENT):
-				requestResponse= self.deleteCall(url)
+				requestResponse= self.deleteCall(url,payload)
 
 			elif(action==const.CREATE_DATABASE or
 				action==const.UPDATE_SCHEMA or
@@ -62,9 +63,12 @@ class DispatchRequest:
 				requestResponse=self.postCall(url,payload)
 
 			if(requestResponse.status_code==200):
-				print(requestResponse.url);
 				return requestResponse.json() #if not a json not it raises an error
 			#requestCall.raise_for_status()
+		except ValueError as err:
+			"if the response type is not a json"
+			print("Value Error",err)
+			return requestResponse.text
 		except requests.exceptions.RequestException as err:
 			print ("Request Error",err)
 		except requests.exceptions.HTTPError as errh:

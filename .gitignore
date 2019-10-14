@@ -1,7 +1,9 @@
-.pytest_cache/
-.coverage/
+src/.pytest_cache/
+src/.coverage/
 woqlClientP.sublime-project  
 woqlClientP.sublime-workspace
+
+src/tests/__pycache__/
 
 src/build/
 src/dist/

@@ -1,6 +1,6 @@
 import pytest
-import sys
-sys.path.append('woqlclient')
+#import sys
+#sys.path.append('woqlclient')
 
 from idParser import IDParser
 
