@@ -58,6 +58,7 @@ class IDParser:
     # @param {string} str Terminus server URI or a TerminusID or None
 	def parseDBID(self, strDBID):
 		self._db=False
+
 		if (self._context and self.__validPrefixedURL(strDBID, self._context)):
 			strDBID = self.__expandPrefixed(strDBID, self._context)
 
@@ -132,8 +133,11 @@ class IDParser:
 			strOp = strOp[0:strOp.rfind(bit)];	
 		return strOp;
 
+	"""
+		valid preURL like doc:document or return false;
+	"""
 	def __validPrefixedURL(self,preURL,context=None):
-		if(isinstance(preURL,preURL)==False):return False
+		if(isinstance(preURL,str)==False):return False
 		parts = preURL.split(':')
 		if (len(parts)!= 2): return False
 		if (len(parts[0]) < 1 or len(parts[1]) < 1): return False

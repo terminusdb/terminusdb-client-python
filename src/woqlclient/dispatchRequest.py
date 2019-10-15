@@ -69,11 +69,13 @@ class DispatchRequest:
 			"if the response type is not a json"
 			print("Value Error",err)
 			return requestResponse.text
+		"""
 		except requests.exceptions.RequestException as err:
 			print ("Request Error",err)
-		except requests.exceptions.HTTPError as errh:
-			print ("Http Error:",errh)
-		except requests.exceptions.ConnectionError as errc:
-			print ("Error Connecting:",errc)
-		except requests.exceptions.Timeout as errt:
-			print ("Timeout Error:",errt)
+		except requests.exceptions.HTTPError as err:
+			print ("Http Error:",err)
+		except requests.exceptions.ConnectionError as err:
+			print ("Error Connecting:",err)
+		except requests.exceptions.Timeout as err:
+			print ("Timeout Error:",err)
+		"""

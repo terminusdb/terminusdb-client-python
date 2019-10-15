@@ -32,8 +32,9 @@ def mocked_requests(*args,**kwargs):
             self._content='cont'
             self._url=url
             # add json data if provided
+            print('ACTION TYPE', actionType)
             if actionType==const.CONNECT:
-                with open('tests/capabilitiesResponse.json') as json_file:
+                with open('tests/capabilitiesResponse.json') as json_file:                 
                     json_data = json.load(json_file)
                     self._json_data=json_data
                     json_file.close()
@@ -48,15 +49,16 @@ def mocked_requests(*args,**kwargs):
                     json_data = json.load(json_file)
                     self._json_data=json_data
                     json_file.close()
+
             elif actionType==const.CREATE_DATABASE or actionType==const.DELETE_DATABASE:
                 self._json_data={"terminus:status":"terminus:success"}
     
-    if args[0] == 'http://localhost:6363':
-        return MockResponse(args[0],200,const.CONNECT)
-    elif args[0] == 'http://localhost:6363/myFirstTerminusDB/schema?terminus%3Aencoding=terminus%3Aturtle':
+    if args[0] == 'http://localhost:6363/myFirstTerminusDB/schema?terminus%3Aencoding=terminus%3Aturtle':
         return MockResponse(args[0], 200,const.GET_SCHEMA)
-    elif args[0].find("http://localhost:6363/myFirstTerminusDB/woql"):
+
+    elif (args[0].find("http://localhost:6363/myFirstTerminusDB/woql")!=-1):
         return MockResponse(args[0], 200,const.WOQL_SELECT)
+
     elif args[0] == "http://localhost:6363/myFirstTerminusDB" :
         return MockResponse(args[0], 200,const.DELETE_DATABASE)
 

@@ -75,14 +75,14 @@ class ConnectionConfig:
 	# url swizzling to talk to platform using server/dbid/platform/ pattern..
 		if(self._server == False or self._dbid== False): 
 			return False
-
+		"""
 		if (self.platformEndpoint()):
 			baseURL=self._server[0:self._server.rfind('/platform/')]
 			if(call == None or call != 'create'):
 				return baseURL+'/'+self._dbid+'/platform'
 			elif( call == 'platform'):
 				return baseURL+'/'+self._dbid
-
+		"""
 		return self._server + self._dbid
 
 
@@ -102,7 +102,7 @@ class ConnectionConfig:
 		if (parser.parseServerURL(inputStr)):
 			self._server = parser.serverURL;
 			self._dbid=False
-			self._docid = False
+			self._docid =False
 			return True
 		return False
 

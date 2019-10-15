@@ -1,10 +1,12 @@
 # woqlClient.py
+from dispatchRequest import DispatchRequest
 
 import errorMessage
-import connectionCapabilities
-import connectionConfig
-import dispatchRequest
+from  connectionConfig import ConnectionConfig
+from  connectionCapabilities import ConnectionCapabilities
+
 import const
+from errorMessage import ErrorMessage
 from errors import (InvalidURIError)
 
 	# WOQL client object
@@ -13,21 +15,21 @@ from errors import (InvalidURIError)
 
 class WOQLClient:
 
-	def __init__(self,params):
-	#current connection context variables
-		self.dispatchRequest=dispatchRequest();
+	def __init__(self,params={}):
+	#current conCapabilities context variables
+		self.dispatchRequest=DispatchRequest();
 		key = params.key if params else None
-		self.connectionConfig = ConnectionConfig(params);
-		self.connection = ConnectionCapabilities(self.connectionConfig, key)
+		self.conConfig = ConnectionConfig(params);
+		self.conCapabilities = ConnectionCapabilities(self.conConfig, key)
 
 	"""
 		Connect to a Terminus server at the given URI with an API key
 	 	Stores the terminus:ServerCapability document returned
-	 	in the connection register which stores, the url, key, capabilities,
+	 	in the conCapabilities register which stores, the url, key, capabilities,
 	 	and database meta-data for the connected server
 	 
 	 	If the curl argument is false or null,
-	 	this.connectionConfig.serverURL will be used if present,
+	 	this.conConfig.serverURL will be used if present,
 	 	or it raises an error.
 
 	  	@param  {string} curl Terminus server URI
@@ -35,17 +37,17 @@ class WOQLClient:
 	 	@return dict or raise an InvalidURIError
 	 	@public
 	"""
-	def connect(self,serverURL, key=None):	
-		if (serverURL and self.connectionConfig.setServer(serverURL)==False):
+	def connect(self,serverURL=None, key=None):	
+		if (serverURL and self.conConfig.setServer(serverURL)==False):
 			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(serverURL, "Connect"))
 
-		serverURL = self.connectionConfig.serverURL()
+		serverURL = self.conConfig.serverURL
 		if(serverURL):
 			if (key):
-				self.connection.setClientKey(serverURL, key)
+				self.conCapabilities.setClientKey(key)
 			
-			jsonObj=self.dispatch(serverURL, constants.CONNECT);
-			self.connection.addConnection(serverURL, jsonObj);
+			jsonObj=self.dispatch(serverURL, const.CONNECT);
+			self.conCapabilities.addConnection(jsonObj);
 			return jsonObj;
 		else:
 			raise InvalidURIError(ErrorMessage.getInvalidURIMessage('Server Url Undefined', "Connect"))
@@ -72,20 +74,20 @@ class WOQLClient:
 	@public //{"terminus:status":"terminus:success"}
  	"""
 	def createDatabase(self,dburl, details, key):
-		if (dburl and self.connectionConfig.setDB(dburl)==False):
+		if (dburl and self.conConfig.setDB(dburl)==False):
 			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(dburl, "Create Database"))
 		
-		if (details and '@id'in details and
-			self.connectionConfig.setDB(details['@id'], details['@context'])):
+		if (details and ('@id'in details) and
+			self.conConfig.setDB(details['@id'], details['@context'])):
 			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(details['@id'], "Create Database"))
 
-		details = self.makeDocumentConsistentWithURL(details, self.connectionConfig.dbURL())
+		details = self.makeDocumentConsistentWithURL(details, self.conConfig.dbURL())
 		opts = {}
 		if (key):
-			opts.key = key
+			opts['key'] = key
 
 		doc = self.addOptionsToDocument(details, opts)
-		return self.dispatch(self.connectionConfig.dbURL('create'), CONST.CREATE_DATABASE, doc)
+		return self.dispatch(self.conConfig.dbURL, const.CREATE_DATABASE, doc)
 
 	"""
 	 	Delete a Database
@@ -96,12 +98,12 @@ class WOQLClient:
 	   if dburl is omitted, the current server and database will be used
 	"""
 	def deleteDatabase(self, dburl, opts):
-		if(dburl and self.connectionConfig.setDB(dburl)==False):
+		if(dburl and self.conConfig.setDB(dburl)==False):
 			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(dburl, "Delete Database"))
 		
-		jsonResponse=self.dispatch(self.connectionConfig.dbURL()+'/', CONST.DELETE_DATABASE, opts)
+		jsonResponse=self.dispatch(self.conConfig.dbURL()+'/', const.DELETE_DATABASE, opts)
 		
-		self.connection.removeDB()
+		self.conCapabilities.removeDB()
 		return jsonResponse
 
 	"""
@@ -115,9 +117,9 @@ class WOQLClient:
 		opts.key is an optional API key
 	"""
 	def getSchema(self,schurl, opts):
-		if (schurl and self.connectionConfig.setSchemaURL(schurl)==False):
+		if (schurl and self.conConfig.setSchemaURL(schurl)==False):
 			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(schurl, "Get Schema"))
-		return self.dispatch(self.connectionConfig.schemaURL(), CONST.GET_SCHEMA, opts)
+		return self.dispatch(self.conConfig.schemaURL(), const.GET_SCHEMA, opts)
 
 	"""
  		Updates the Schema of the specified database
@@ -131,11 +133,11 @@ class WOQLClient:
  		opts.key is an optional API key
  	"""
 	def updateSchema(self,schurl, doc, opts):
-		if (schurl and self.connectionConfig.setSchemaURL(schurl)==False):
+		if (schurl and self.conConfig.setSchemaURL(schurl)==False):
 			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(schurl, "Update schema"))
 	
 		doc = this.addOptionsToDocument(doc, opts);
-		return this.dispatch(this.connectionConfig.schemaURL(),constants.woql_update, doc)
+		return this.dispatch(this.conConfig.schemaURL(),const.woql_update, doc)
 
 	"""
 		Creates a new document in the specified database
@@ -151,16 +153,16 @@ class WOQLClient:
 	def createDocument(self,docurl, doc, opts):
 		self.__checkDocumentURI("Create Document",docurl,doc);
 		doc = self.addOptionsToDocument(self.makeDocumentConsistentWithURL(docurl, doc),opts)
-		return self.dispatch(self.connectionConfig.docURL(), constants.CREATE_DOCUMENT, doc);
+		return self.dispatch(self.conConfig.docURL(), const.CREATE_DOCUMENT, doc);
 
 
 
 
 	def __checkDocumentURI(self, msg, docurl, doc=None):
-		if (docurl and self.connectionConfig.setDocument(docurl)==False):
+		if (docurl and self.conConfig.setDocument(docurl)==False):
 			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(docurl, msg))
 		if (doc and '@id' in doc and 
-			self.connectionConfig.setDocument(doc['@id'], doc['@context'])==False):
+			self.conConfig.setDocument(doc['@id'], doc['@context'])==False):
 			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(docurl, msg))
 
 	"""
@@ -176,7 +178,7 @@ class WOQLClient:
 
 	def getDocument(self, docurl, opts):
 		self.__checkDocumentURI("Get Document",docurl);
-		return self.dispatch(self.connectionConfig.docURL(), constants.GET_DOCUMENT, opts)
+		return self.dispatch(self.conConfig.docURL(), const.GET_DOCUMENT, opts)
 
 	"""
 	 	Updates a document in the specified database with a new version
@@ -192,7 +194,7 @@ class WOQLClient:
 	def updateDocument(self,docurl, doc, opts):
 		self.__checkDocumentURI('Upadate document',docurl,doc);
 		doc = self.addOptionsToDocument(self.makeDocumentConsistentWithURL(docurl, doc),opts)
-		return self.dispatch(this.connectionConfig.docURL(), 'update_document', doc)
+		return self.dispatch(this.conConfig.docURL(), 'update_document', doc)
 
 	"""
 		Deletes a document from the specified database
@@ -205,10 +207,10 @@ class WOQLClient:
 	"""
 
 	def deleteDocument(self,docurl, opts):
-		if (docurl and (self.connectionConfig.setDocument(docurl)==False or 
-			self.connectionConfig.docID==False)):
+		if (docurl and (self.conConfig.setDocument(docurl)==False or 
+			self.conConfig.docID==False)):
 			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(docurl, "Delete Document"))
-		return self.dispatch(self.connectionConfig.docURL(), constants.DELETE_DOCUMENT, opts)
+		return self.dispatch(self.conConfig.docURL(), const.DELETE_DOCUMENT, opts)
 
 	"""
 		Executes a read-only WOQL query on the specified database and returns the results
@@ -218,11 +220,11 @@ class WOQLClient:
 		@param {dict} opts it can contents the API key (opts.key)	
 	"""
 	def select(qurl, woql, opts):
-		if (qurl and self.connectionConfig.setQueryURL(qurl)==True):
+		if (qurl and self.conConfig.setQueryURL(qurl)==True):
 			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(docurl, "Select"))
 		q = { query: woql }
 		q = self.addOptionsToWOQL(q, opts)
-		return self.dispatch(self.connectionConfig.queryURL(), CONST.WOQL_SELECT, q)
+		return self.dispatch(self.conConfig.queryURL(), const.WOQL_SELECT, q)
 
 	"""
 		Executes a WOQL query on the specified database which updates the state and returns the results
@@ -234,11 +236,11 @@ class WOQLClient:
 		the third argument (opts) is an options json - opts.key is an optional API key
 	"""
 	def update(self,qurl=None, woql=None, opts=None):
-		if (qurl and self.connectionConfig.setQueryURL(qurl)==False):
+		if (qurl and self.conConfig.setQueryURL(qurl)==False):
 			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(docurl, "Update"))
 
 		woql = self.addOptionsToWOQL(woql, opts);
-		return self.dispatch(self.connectionConfig.queryURL(), 'woql_update', woql)
+		return self.dispatch(self.conConfig.queryURL(), 'woql_update', woql)
 
 	"""
 		Retrieves a WOQL query on the specified database which updates the state and returns the results
@@ -252,19 +254,19 @@ class WOQLClient:
 	"""
 	
 	def getClassFrame(self,cfurl, cls, opts=None):
-		if (cfurl and self.connectionConfig.setClassFrameURL(cfurl)==False):
+		if (cfurl and self.conConfig.setClassFrameURL(cfurl)==False):
 			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(docurl, "Get Class Frame"))
 	
 		if (isinstance(opts,dict)==False): opts = {};
 		opts['class'] = cls;
-		return self.dispatch(self.connectionConfig.frameURL(), constants.CLASS_FRAME, opts)
+		return self.dispatch(self.conConfig.frameURL(), const.CLASS_FRAME, opts)
 
 
 
  	#Utility functions for adding standard fields to API arguments
 	def addOptionsToWOQL(self, woql, options=None):
 		if (options and 'key' in options):
-			woql.key = options.key
+			woql['key'] = options['key']
 		return woql
 
 
@@ -274,9 +276,35 @@ class WOQLClient:
 		document['terminus:document'].pop('@context')
 		document['@type'] = 'terminus:APIUpdate'
 		if options and 'key' in options :  
-			document.key = options.key
+			document['key'] = options['key']
 
 		return document
+
+
+	def addOptionsToDocument(self, doc, options=None):
+		document = {};
+		document['@context'] = doc['@context'];
+		if ('@context' in doc) and ('@id' in doc): # add blank node prefix as document base url
+			document['@context']['_'] = doc['@id']
+
+		if (options and options.get('terminus:encoding') and options['terminus:encoding'] == 'terminus:turtle'):
+			document['terminus:turtle'] = doc
+			document['terminus:schema'] = self.conConfig.schemaURL()
+			del document['terminus:turtle']['@context']
+		else:
+			document['terminus:document'] = doc
+			del document['terminus:document']['@context']
+	
+		document['@type'] = 'terminus:APIUpdate'
+		if options:
+			if 'terminus:user_key' in options: 
+				document['terminus:user_key'] = options['terminus:user_key'];
+	
+			if 'key' in options:
+				document['terminus:user_key'] = options['key']
+		print(document)
+		return document
+
 
 	def addKeyToPayload(self,payload):
 		if isinstance(payload,dict)==False:
@@ -285,8 +313,8 @@ class WOQLClient:
 		if 'key' in  payload :
 			payload['terminus:user_key'] = payload.key
 			payload.pop('key')
-		elif(self.connection.getClientKey()):
-			payload['terminus:user_key'] = self.connection.getClientKey()
+		elif(self.conCapabilities.getClientKey()):
+			payload['terminus:user_key'] = self.conCapabilities.getClientKey()
 	
 		return payload
 
@@ -297,23 +325,23 @@ class WOQLClient:
 		return doc
 
 
-	def dispatch(self, url, action, payload):
-		if (action != constants.CONNECT
-			and self.connectionConfig.connectedMode
-			and self.connection.serverConnected()==False):
+	def dispatch(self, url, action, payload={}):
+		if (action != const.CONNECT
+			and self.conConfig.connectedMode
+			and self.conCapabilities.serverConnected()==False):
 			
 			key = payload.key if isinstance(payload,dict) and key in payload else False
-			self.connect(self.connectionConfig.serverURL, key)
+			self.connect(self.conConfig.serverURL, key)
 
 			if (key in payload):payload.pop('key')
 			#self.dispatch(url, action, payload);
 			#return response;
 
 			#check if we can perform this action or raise an AccessDeniedError error
-			self.connection.capabilitiesPermit(action);		
+			self.conCapabilities.capabilitiesPermit(action);		
 
-		if (self.connectionConfig.includeKey):
+		if (self.conConfig.includeKey):
 			payload = self.addKeyToPayload(payload)
 
-		return self.dispatchRequest(url, action, payload)
+		return self.dispatchRequest.sendRequestByAction(url, action, payload)
 

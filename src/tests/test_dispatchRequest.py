@@ -8,11 +8,6 @@ import requests
 import mockResponse
 from pytest_mock import mocker
 
-
-@pytest.fixture(scope="function", autouse=True)
-def beforeEach():
-	print("BEFORE EVERY TEST")
-
 def sendDispatchRequest(url,actionType,payload):
 	dispatch = DispatchRequest()  
 	return dispatch.sendRequestByAction(url, actionType, payload)
@@ -80,3 +75,4 @@ def test_deleteDatabase(mocker):
 		json_data = sendDispatchRequest(fullUrl, const.DELETE_DATABASE, payload)
 		requests.delete.assert_called_once_with('http://localhost:6363/myFirstTerminusDB?terminus%3Auser_key=mykey', headers={'Authorization': 'Basic Om15a2V5'})
 		#print("call_args_list", requests.delete.call_args_list)
+
