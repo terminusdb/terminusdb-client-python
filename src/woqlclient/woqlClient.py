@@ -9,6 +9,8 @@ import const
 from errorMessage import ErrorMessage
 from errors import (InvalidURIError)
 
+from createDatabaseTemplate import CreateDBTemplate
+
 	# WOQL client object
 	#license Apache Version 2
 	#summary Python module for accessing the Terminus DB API
@@ -18,7 +20,7 @@ class WOQLClient:
 	def __init__(self,params={}):
 	#current conCapabilities context variables
 		self.dispatchRequest=DispatchRequest();
-		key = params.key if params else None
+		key = params.get('key')
 		self.conConfig = ConnectionConfig(params);
 		self.conCapabilities = ConnectionCapabilities(self.conConfig, key)
 
@@ -46,7 +48,7 @@ class WOQLClient:
 			if (key):
 				self.conCapabilities.setClientKey(key)
 			
-			jsonObj=self.dispatch(serverURL, const.CONNECT);
+			jsonObj=self.dispatch(serverURL, const.CONNECT,key);
 			self.conCapabilities.addConnection(jsonObj);
 			return jsonObj;
 		else:
@@ -73,21 +75,13 @@ class WOQLClient:
 	@return {???} 
 	@public //{"terminus:status":"terminus:success"}
  	"""
-	def createDatabase(self,dburl, details, key):
-		if (dburl and self.conConfig.setDB(dburl)==False):
-			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(dburl, "Create Database"))
+	def createDatabase(self,dbID,label,key=None,**kwargs):
+		if(self.conConfig.setDB(dbID)==False):
+			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(dbID, "Create Database"))
 		
-		if (details and ('@id'in details) and
-			self.conConfig.setDB(details['@id'], details['@context'])):
-			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(details['@id'], "Create Database"))
+		createDBTemplate=CreateDBTemplate.getTemplate(self.conConfig.serverURL,self.conConfig.dbID,label,**kwargs);
 
-		details = self.makeDocumentConsistentWithURL(details, self.conConfig.dbURL())
-		opts = {}
-		if (key):
-			opts['key'] = key
-
-		doc = self.addOptionsToDocument(details, opts)
-		return self.dispatch(self.conConfig.dbURL, const.CREATE_DATABASE, doc)
+		return self.dispatch(self.conConfig.dbURL, const.CREATE_DATABASE, key, createDBTemplate)
 
 	"""
 	 	Delete a Database
@@ -97,11 +91,11 @@ class WOQLClient:
 	 
 	   if dburl is omitted, the current server and database will be used
 	"""
-	def deleteDatabase(self, dburl, opts):
-		if(dburl and self.conConfig.setDB(dburl)==False):
-			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(dburl, "Delete Database"))
+	def deleteDatabase(self, dbID, key=None):
+		if(self.conConfig.setDB(dbID)==False):
+			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(dbID, "Delete Database"))
 		
-		jsonResponse=self.dispatch(self.conConfig.dbURL()+'/', const.DELETE_DATABASE, opts)
+		jsonResponse=self.dispatch(self.conConfig.dbURL()+'/', const.DELETE_DATABASE, key)
 		
 		self.conCapabilities.removeDB()
 		return jsonResponse
@@ -305,19 +299,6 @@ class WOQLClient:
 		print(document)
 		return document
 
-
-	def addKeyToPayload(self,payload):
-		if isinstance(payload,dict)==False:
-			payload = {}
-
-		if 'key' in  payload :
-			payload['terminus:user_key'] = payload.key
-			payload.pop('key')
-		elif(self.conCapabilities.getClientKey()):
-			payload['terminus:user_key'] = self.conCapabilities.getClientKey()
-	
-		return payload
-
 	#raise an error bad document...!!
 	def makeDocumentConsistentWithURL(self, doc, dburl):
 		if(isinstance(doc,dict)):
@@ -325,23 +306,23 @@ class WOQLClient:
 		return doc
 
 
-	def dispatch(self, url, action, payload={}):
+	def dispatch(self, url, action, connectionKey, payload={}):
+		if connectionKey==None :
+			print('getClientKey',self.conCapabilities.getClientKey())
+			connectionKey=self.conCapabilities.getClientKey()
+		
+		print("connectedModeMMMMMMMMMMMMMMMMMMMM",self.conConfig.connectedMode)
+		print("self.conCapabilities.serverConnected()",self.conCapabilities.serverConnected())
 		if (action != const.CONNECT
 			and self.conConfig.connectedMode
 			and self.conCapabilities.serverConnected()==False):
 			
-			key = payload.key if isinstance(payload,dict) and key in payload else False
-			self.connect(self.conConfig.serverURL, key)
+			#key = payload.key if isinstance(payload,dict) and key in payload else False
+			self.connect(self.conConfig.serverURL, connectionKey)
+			print("CONNCT BEFORE ACTION",action)
 
-			if (key in payload):payload.pop('key')
-			#self.dispatch(url, action, payload);
-			#return response;
-
-			#check if we can perform this action or raise an AccessDeniedError error
-			self.conCapabilities.capabilitiesPermit(action);		
-
-		if (self.conConfig.includeKey):
-			payload = self.addKeyToPayload(payload)
-
-		return self.dispatchRequest.sendRequestByAction(url, action, payload)
+		#check if we can perform this action or raise an AccessDeniedError error
+		self.conCapabilities.capabilitiesPermit(action);		
+		print('getClientKey',connectionKey)
+		return self.dispatchRequest.sendRequestByAction(url, action, connectionKey,payload)
 

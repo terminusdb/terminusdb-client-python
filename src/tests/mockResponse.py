@@ -53,6 +53,7 @@ def mocked_requests(*args,**kwargs):
             elif actionType==const.CREATE_DATABASE or actionType==const.DELETE_DATABASE:
                 self._json_data={"terminus:status":"terminus:success"}
     
+   
     if args[0] == 'http://localhost:6363/myFirstTerminusDB/schema?terminus%3Aencoding=terminus%3Aturtle':
         return MockResponse(args[0], 200,const.GET_SCHEMA)
 

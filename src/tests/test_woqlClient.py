@@ -17,15 +17,15 @@ def beforeEach():
 	print("__woqlClient__")
 """
 
-def test_connect(mocker):
+def test_ConnectionError():
 	__woqlClient__= WOQLClient()
-
 	
 	#raises a connection error no requests mock
 	with pytest.raises(requests.exceptions.ConnectionError):
-		__woqlClient__.connect("http://localhost:6363",'mykey')
+		__woqlClient__.connect("https://testServer.com",'mykey')
 
-
+def test_Connection(mocker):
+	__woqlClient__= WOQLClient()
 	with mocker.patch('requests.get', side_effect=mockResponse.mocked_requests):
 		__woqlClient__.connect("http://localhost:6363",'mykey')
 
@@ -34,32 +34,21 @@ def test_connect(mocker):
 		assert (dictTest==__woqlClient__.conCapabilities.connection) ==True
 
 
-def test_createDatabase(mocker):
-	__woqlClient__= WOQLClient()
-
-	details={
-		  "@context": {
-		    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-		    "terminus": "http://terminusdb.com/schema/terminus#"
-		  },
-		  "@type": "terminus:Database",
-		  "rdfs:label": {
-		    "@language": "en",
-		    "@value": "my first test"
-		  },
-		  "rdfs:comment": {
-		    "@language": "en",
-		    "@value": "document test"
-		  },
-		  "terminus:allow_origin": {
-		    "@type": "xsd:string",
-		    "@value": "*"
-		  }
-		}
-
+def test_createDatabaseConnectMode(mocker):
+	__woqlClient__= WOQLClient({'server':"http://localhost:6363"
+							    ,'key':'mykey'})
+	print('__woqlClient__' ,__woqlClient__.conConfig.serverURL)
+	with mocker.patch('requests.get', side_effect=mockResponse.mocked_requests):
+		__woqlClient__.connect();
+		requests.get.assert_called_once_with('http://localhost:6363/', headers={'Authorization': 'Basic Om15a2V5'})		
+	"""	
+	 I use the current server 
+	
 	with mocker.patch('requests.post', side_effect=mockResponse.mocked_requests):
-		__woqlClient__.createDatabase("http://localhost:6363/myFirstTerminusDB",details,'mykey');
-
+		
+		#with pytest.raises(requests.exceptions.ConnectionError):
+		__woqlClient__.createDatabase("myFirstTerminusDB",'my first db')
+"""
 
     
 

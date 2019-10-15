@@ -85,8 +85,11 @@ class ConnectionCapabilities:
 	    
 
 	def serverConnected(self):
-		if(self.connectionConfig.serverURL!=False):
-			return self.connectionConfig.serverURL in self.connection
+		serverURL=self.connectionConfig.serverURL;
+
+		if(serverURL and self.connection.get(serverURL)):
+			print('serverConnectedmmmmmmTTTTTTTT',self.connection.get(serverURL))
+			return ('@context' in  self.connection.get(serverURL))
 		return False
 
 
