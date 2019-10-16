@@ -6,13 +6,12 @@ import json
 import requests
 
 import mockResponse
-from createDatabaseTemplate import CreateDBTemplate
+from documentTemplate import DocumentTemplate
 
 from pytest_mock import mocker
 
-def sendDispatchRequest(url,actionType,key,payload={}):
-	dispatch = DispatchRequest()  
-	return dispatch.sendRequestByAction(url, actionType,key, payload)
+def sendDispatchRequest(url,actionType,key,payload={}): 
+	return DispatchRequest.sendRequestByAction(url, actionType,key, payload)
 
 def test_connectCall(mocker):
 	# Assert requests.get calls
@@ -26,7 +25,7 @@ def test_createDataBase(mocker):
 	with mocker.patch('requests.post', side_effect=mockResponse.mocked_requests):
 		fullUrl="http://localhost:6363/myFirstTerminusDB"
 
-		payload=CreateDBTemplate.getTemplate("http://localhost:6363/","myFirstTerminusDB","my first terminusDB",comment="test terminusDB")
+		payload=DocumentTemplate.createDBTemplate("http://localhost:6363/","myFirstTerminusDB","my first terminusDB",comment="test terminusDB")
 		json_data = sendDispatchRequest(fullUrl, const.CREATE_DATABASE, "mykey" , payload)
 		#requests.post.assert_called_once_with('http://localhost:6363/myFirstTerminusDB', headers={'Authorization': 'Basic Om15a2V5', 'content-type': 'application/json'}, json={'@context': {'rdfs': 'http://www.w3.org/2000/01/rdf-schema#', 'terminus': 'http://terminusdb.com/schema/terminus#', '_': 'http://localhost:6363/myFirstTerminusDB/'}, 'terminus:document': {'@type': 'terminus:Database', 'rdfs:label': {'@language': 'en', '@value': 'my first terminusDB'}, 'rdfs:comment': {'@language': 'en', '@value': 'test terminusDB'}, 'terminus:allow_origin': {'@type': 'xsd:string', '@value': '*'}, '@id': 'http://localhost:6363/myFirstTerminusDB'}, '@type': 'terminus:APIUpdate'})
 
@@ -47,8 +46,8 @@ def test_woqlSelect(mocker):
 
 def test_deleteDatabase(mocker):
 	with mocker.patch('requests.delete', side_effect=mockResponse.mocked_requests):
-		fullUrl="http://localhost:6363/myFirstTerminusDB"
+		fullUrl="http://localhost:6363/myFirstTerminusDB/"
 		json_data = sendDispatchRequest(fullUrl, const.DELETE_DATABASE, 'mykey')
-		requests.delete.assert_called_once_with('http://localhost:6363/myFirstTerminusDB', headers={'Authorization': 'Basic Om15a2V5'})
+		requests.delete.assert_called_once_with('http://localhost:6363/myFirstTerminusDB/', headers={'Authorization': 'Basic Om15a2V5'})
 		#print("call_args_list", requests.delete.call_args_list)
 

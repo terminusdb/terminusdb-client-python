@@ -6,16 +6,19 @@ from  connectionCapabilities import ConnectionCapabilities
 import pytest
 import json
 import const
-from errors import (AccessDeniedError,InvalidURIError)
+from errors import (AccessDeniedError,InvalidURIError,APIError)
 
 def test_connectionCapabilities_noParameter():
 	conConfig=ConnectionConfig()
 	conCapabilities=ConnectionCapabilities(conConfig,'mykey')
 	
 	"""
-	  set a key without server return False
+	  the key is related with a server you have to set both of 
+	  the method raise an APIerror
 	"""
-	conCapabilities.getClientKey()==False
+	with pytest.raises(APIError):
+		conCapabilities.getClientKey()
+
 	assert conCapabilities.serverConnected() == False
 
 	with pytest.raises(InvalidURIError):
@@ -55,7 +58,9 @@ def test_set_getClientKey():
 	serverURL=conConfig.serverURL;
 
 	assert conCapabilities.getClientKey(serverURL) =="mykey"
-	assert conCapabilities.getClientKey("http://testServer") ==False
+	
+	with pytest.raises(APIError):
+		assert conCapabilities.getClientKey("http://testServer")
 
 
 def test_capabilitiesPermit():

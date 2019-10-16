@@ -26,14 +26,20 @@ class ErrorMessage:
 		err['body'] = err['action']+ ' not permitted for'+ err['url']
 		return err
 
+
 	@classmethod
-	def getAPIErrorMessage(self,url, api, err):
-		return 'API Error'+ self.getErrorAsMessage(url, api, err)
+	def getAPIErrorMessage(cls,url, api, err):
+		return 'API Error'+ cls.getErrorAsMessage(url, api, err)
 
 	@classmethod	
-	def getAccessDeniedMessage(self,action, dbid, server):
-		errorObj= self.accessDeniedErrObj(action, dbid, server)
-		return 'Access Denied' + self.getErrorAsMessage(None, None, errorObj)
+	def getAccessDeniedMessage(cls,action, dbid, server):
+		errorObj= cls.accessDeniedErrObj(action, dbid, server)
+		return 'Access Denied' + cls.getErrorAsMessage(None, None, errorObj)
+    
+	@staticmethod	
+	def getInvalidKeyMessage(extraMessage=''):
+		message = "The Api KEY in Undefined "+extraMessage
+		return message
 
 	@staticmethod	
 	def getInvalidURIMessage(url, call):

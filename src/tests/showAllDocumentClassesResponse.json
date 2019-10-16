@@ -1,0 +1,20 @@
+{
+  "bindings": [
+    {
+      "http://terminusdb.com/woql/variable/Abstract":"unknown",
+      "http://terminusdb.com/woql/variable/Comment": {
+	"@language":"en",
+	"@value":"A grouping of humans that has some identifiable membership requirement."
+      },
+      "http://terminusdb.com/woql/variable/Element":"http://terminusdb.com/schema/tcs#Group",
+      "http://terminusdb.com/woql/variable/Label": {"@language":"en", "@value":"Group"}
+    },
+    {
+      "http://terminusdb.com/woql/variable/Abstract":"unknown",
+      "http://terminusdb.com/woql/variable/Comment": {"@language":"en", "@value":"A human bean ;-)"},
+      "http://terminusdb.com/woql/variable/Element":"http://terminusdb.com/schema/tcs#Person",
+      "http://terminusdb.com/woql/variable/Label": {"@language":"en", "@value":"Person"}
+    }
+  ],
+  "graphs": {}
+} 

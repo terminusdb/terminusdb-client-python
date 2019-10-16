@@ -25,6 +25,27 @@ class IDParser:
 	def docID(self):
 		return self._doc
 
+	@staticmethod
+	def schemaURL(dbURL):
+		#if(self.dbURL()==False):return False
+		return dbURL+'/schema'
+
+	@staticmethod
+	def queryURL(dbURL):
+		#if(self.dbURL()==False):return False
+		return dbURL+'/woql'
+
+	@staticmethod
+	def frameURL(dbURL):
+		#if(self.dbURL()==False):return False
+		return dbURL+'/frame'
+
+	@staticmethod
+	def docURL(dbURL,docid=''):
+		#if(self.dbURL()==False):return False
+		return dbURL()+'/document/'+_docid
+	
+
 	def validURL(self,strURL):
 		if(isinstance(strURL,str)==False):
 			return False

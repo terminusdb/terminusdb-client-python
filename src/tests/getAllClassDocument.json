@@ -1,0 +1,107 @@
+{
+  "@context": {
+    "s": "http://localhost:6363/myFirstTerminusDB/schema#",
+    "dg": "http://localhost:6363/myFirstTerminusDB/schema",
+    "doc": "http://localhost:6363/myFirstTerminusDB/document/",
+    "db": "http://localhost:6363/myFirstTerminusDB/",
+    "g": "http://localhost:6363/",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "tcs": "http://terminusdb.com/schema/tcs#",
+    "tbs": "http://terminusdb.com/schema/tbs#",
+    "xdd": "http://terminusdb.com/schema/xdd#",
+    "terminus": "http://terminusdb.com/schema/terminus#",
+    "vio": "http://terminusdb.com/schema/vio#",
+    "docs": "http://terminusdb.com/schema/documentation#",
+    "scm": "http://localhost:6363/myFirstTerminusDB/schema#"
+  },
+  "from": [
+    "http://localhost:6363/myFirstTerminusDB",
+    {
+      "limit": [
+        20,
+        {
+          "start": [
+            0,
+            {
+              "and": [
+                {
+                  "and": [
+                    {
+                      "quad": [
+                        "v:Element",
+                        "rdf:type",
+                        "owl:Class",
+                        "db:schema"
+                      ]
+                    },
+                    {
+                      "opt": [
+                        {
+                          "quad": [
+                            "v:Element",
+                            "rdfs:label",
+                            "v:Label",
+                            "db:schema"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "opt": [
+                        {
+                          "quad": [
+                            "v:Element",
+                            "rdfs:comment",
+                            "v:Comment",
+                            "db:schema"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "opt": [
+                        {
+                          "quad": [
+                            "v:Element",
+                            "tcs:tag",
+                            "v:Abstract",
+                            "db:schema"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "and": [
+                    {
+                      "sub": [
+                        "v:Element",
+                        "tcs:Document"
+                      ]
+                    },
+                    {
+                      "not": [
+                        {
+                          "quad": [
+                            "v:Element",
+                            "tcs:tag",
+                            "tcs:abstract",
+                            "db:schema"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

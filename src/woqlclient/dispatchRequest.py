@@ -13,21 +13,24 @@ class DispatchRequest:
 		pass
 		#header= {'user-agent': 'my-app/0.0.1'}
 #json.dumps
-
-	def getCall(self,url,headers,payload):
+	@staticmethod
+	def __getCall(url,headers,payload):
 		url=Utils.addParamsToUrl(url,payload)
 
 		return requests.get(url,headers=headers)
 
-	def postCall(self,url,headers,payload):
+	@staticmethod
+	def __postCall(url,headers,payload):
 		headers['content-type']= 'application/json'
 		return requests.post(url,json=payload,headers=headers);
-
-	def deleteCall(self,url,headers,payload):
+	
+	@staticmethod
+	def __deleteCall(url,headers,payload):
 		url=Utils.addParamsToUrl(url,payload)
 		return requests.delete(url,headers=headers);
 
-	def _autorizationHeader(self,key):
+	@staticmethod
+	def __autorizationHeader(key):
 		headers={}
 
 		#if (payload and ('terminus:user_key' in  payload)):
@@ -35,28 +38,29 @@ class DispatchRequest:
 		#payload.pop('terminus:user_key')
 		return headers
 
-	def sendRequestByAction(self, url, action, key, payload):
+	@classmethod
+	def sendRequestByAction(cls, url, action, key, payload={}):
 		print("sendRequestByAction")
 		try:
 			requestResponse=None
-			headers=self._autorizationHeader(key);
+			headers=cls.__autorizationHeader(key);
 
 			if (action == const.CONNECT 
 				or action==const.GET_SCHEMA 
 				or action==const.CLASS_FRAME 
 				or action==const.WOQL_SELECT 
 				or action==const.GET_DOCUMENT):
-				requestResponse= self.getCall(url,headers,payload)
+				requestResponse= cls.__getCall(url,headers,payload)
 			
 			elif(action==const.DELETE_DATABASE or
 				action==const.DELETE_DOCUMENT):
-				requestResponse= self.deleteCall(url,headers,payload)
+				requestResponse= cls.__deleteCall(url,headers,payload)
 
 			elif(action==const.CREATE_DATABASE or
 				action==const.UPDATE_SCHEMA or
 				action==const.CREATE_DOCUMENT or
 				action==const.WOQL_UPDATE):
-				requestResponse=self.postCall(url,headers,payload)
+				requestResponse=cls.__postCall(url,headers,payload)
 
 			if(requestResponse.status_code==200):
 				return requestResponse.json() #if not a json not it raises an error

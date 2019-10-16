@@ -3,7 +3,7 @@
 #const UTILS = require('./utils.js');
 from errorMessage import ErrorMessage
 import const
-from errors import (AccessDeniedError,InvalidURIError)
+from errors import (AccessDeniedError,InvalidURIError,APIError)
 from connectionConfig import ConnectionConfig
 
 """
@@ -36,7 +36,7 @@ class ConnectionCapabilities:
 		if(serverURL==None): serverURL=self.connectionConfig.serverURL
 		if((serverURL in self.connection) and ('key' in  self.connection[serverURL])): 
 			return self.connection[serverURL]['key']
-		return False
+		raise APIError(ErrorMessage.getInvalidKeyMessage())
 	
 
 	def __actionToArray(self,actions):
@@ -88,7 +88,6 @@ class ConnectionCapabilities:
 		serverURL=self.connectionConfig.serverURL;
 
 		if(serverURL and self.connection.get(serverURL)):
-			print('serverConnectedmmmmmmTTTTTTTT',self.connection.get(serverURL))
 			return ('@context' in  self.connection.get(serverURL))
 		return False
 
