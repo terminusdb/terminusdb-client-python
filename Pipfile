@@ -10,6 +10,9 @@ pytest = "*"
 pytest-mock = "*"
 requests = "*"
 autopep8 = "*"
+flake8 = "*"
+docutils-python3 = "*"
+pytest-cov = "*"
 
 [requires]
 python_version = "3.6"

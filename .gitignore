@@ -1,5 +1,4 @@
 src/.pytest_cache/
-src/.coverage/
 woqlClientP.sublime-project  
 woqlClientP.sublime-workspace
 
@@ -15,6 +14,10 @@ src/*.py[cod]
 src/__pycache__/
 src/woqlclient/__pycache__/
 src/woqlclient/*.egg-info/
+
+coverage.xml
+report.xml
+.coverage
 
 *.so
 *~

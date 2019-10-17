@@ -25,7 +25,7 @@ def test_connectionCapabilities_noParameter():
 		assert conCapabilities.serverConnected() == False
 
 		with pytest.raises(InvalidURIError):
-			with open('tests/capabilitiesResponse.json') as json_file:
+			with open('src/tests/capabilitiesResponse.json') as json_file:
 				capResponse = json.load(json_file)
 				conCapabilities.addConnection(capResponse);
 
@@ -38,11 +38,11 @@ def test_addConnection():
 
 	assert ({"http://localhost:6363/":{'key':"mykey"}}==conCapabilities.connection)==True
 
-	with open('tests/capabilitiesResponse.json') as json_file:
+	with open('src/tests/capabilitiesResponse.json') as json_file:
 		capResponse = json.load(json_file)
 		conCapabilities.addConnection(capResponse);
 
-	with open ('tests/connectionDictionary.json') as json_file:
+	with open ('src/tests/connectionDictionary.json') as json_file:
 		dictTest = json.load(json_file)
 		assert (dictTest==conCapabilities.connection) ==True
 		
@@ -69,7 +69,7 @@ def test_capabilitiesPermit():
 	conConfig=ConnectionConfig({"server":"http://localhost:6363","db":"myFirstTerminusDB"})
 	conCapabilities=ConnectionCapabilities(conConfig,'mykey')
 
-	with open('tests/capabilitiesResponseNoAllAction.json') as json_file:
+	with open('src/tests/capabilitiesResponseNoAllAction.json') as json_file:
 		capResponse = json.load(json_file)
 		conCapabilities.addConnection(capResponse)
 
@@ -89,7 +89,7 @@ def test_deleteDatabaseForTheConnectionList():
 	conConfig=ConnectionConfig({"server":"http://localhost:6363","db":"myFirstTerminusDB"})
 	conCapabilities=ConnectionCapabilities(conConfig,'mykey')
 
-	with open('tests/capabilitiesResponse.json') as json_file:
+	with open('src/tests/capabilitiesResponse.json') as json_file:
 		capResponse = json.load(json_file)
 		conCapabilities.addConnection(capResponse)
 

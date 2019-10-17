@@ -34,18 +34,18 @@ def mocked_requests(*args,**kwargs):
 			# add json data if provided
 			print('ACTION TYPE', actionType)
 			if actionType==const.CONNECT:
-				with open('tests/capabilitiesResponse.json') as json_file:                 
+				with open('src/tests/capabilitiesResponse.json') as json_file:                 
 					json_data = json.load(json_file)
 					self._json_data=json_data
 					json_file.close()
 
 			elif actionType==const.GET_SCHEMA:
-				with open('tests/getSchemaTurtleResponse.txt') as text_file:
+				with open('src/tests/getSchemaTurtleResponse.txt') as text_file:
 					self._text=text_file.read();
 					text_file.close();
 
 			elif actionType==const.WOQL_SELECT:
-				with open('tests/getAllClassQueryResponse.json') as json_file:
+				with open('src/tests/getAllClassQueryResponse.json') as json_file:
 					json_data = json.load(json_file)
 					self._json_data=json_data
 					json_file.close()

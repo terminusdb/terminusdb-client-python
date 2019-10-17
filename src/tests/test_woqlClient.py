@@ -24,7 +24,7 @@ def test_Connection(mocker):
 	with mocker.patch('requests.get', side_effect=mockResponse.mocked_requests):
 		__woqlClient__.connect("http://localhost:6363",'mykey')
 
-	with open ('tests/connectionDictionary.json') as json_file:
+	with open ('src/tests/connectionDictionary.json') as json_file:
 		dictTest = json.load(json_file)
 		assert (dictTest==__woqlClient__.conCapabilities.connection) ==True
 
