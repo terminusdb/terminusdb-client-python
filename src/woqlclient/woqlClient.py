@@ -12,6 +12,7 @@ from errors import (InvalidURIError)
 from documentTemplate import DocumentTemplate
 
 from idParser import IDParser
+import json
 
 	# WOQL client object
 	#license Apache Version 2
@@ -41,29 +42,24 @@ class WOQLClient:
 		:public
 	"""
 	def connect(self,serverURL=None, key=None): 
-		if (serverURL and self.conConfig.setServer(serverURL)==False):
-			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(serverURL, "Connect"))
-
-		serverURL = self.conConfig.serverURL
-		if(serverURL):
-			if (key):
-				self.conCapabilities.setClientKey(key)
+		if serverURL:
+			self.conConfig.setServer(serverURL)
 			
-			jsonObj=self.dispatch(serverURL, const.CONNECT,key)
-			self.conCapabilities.addConnection(jsonObj)
-			return jsonObj;
-		else:
-			raise InvalidURIError(ErrorMessage.getInvalidURIMessage('Server Url Undefined', "Connect"))
-	
+		if key:
+			self.conCapabilities.setClientKey(key)
+			
+		jsonObj=self.dispatch(self.conConfig.serverURL, const.CONNECT,key)
+		self.conCapabilities.addConnection(jsonObj)
+		return jsonObj;
+		
+
 	"""
 		connect directly without create a new class instance
 	"""
 	@staticmethod
 	def directConnect(serverURL,key):
 		idParser=IDParser()
-		if idParser.parseServerURL(serverURL)==False:
-			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(serverURL, "Connect"))
-
+		idParser.parseServerURL(serverURL)
 		return DispatchRequest.sendRequestByAction(idParser.serverURL, const.CONNECT, key)
 
 
@@ -80,11 +76,8 @@ class WOQLClient:
 		:public 
 	"""
 	def createDatabase(self,dbID,label,key=None,**kwargs):
-		if(self.conConfig.setDB(dbID)==False):
-			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(dbID, "Create Database"))
-		
+		self.conConfig.setDB(dbID)
 		createDBTemplate=DocumentTemplate.createDBTemplate(self.conConfig.serverURL,self.conConfig.dbID,label,**kwargs);
-
 		return self.dispatch(self.conConfig.dbURL, const.CREATE_DATABASE, key, createDBTemplate)
 
 	"""
@@ -98,9 +91,9 @@ class WOQLClient:
 	@staticmethod	
 	def directCreateDatabase(dbURL,label,key,**kwargs):
 		idParser=IDParser()
-		idParser.parseDBID(dbURL)		
+		idParser.parseDBURL(dbURL)		
 		createDBTemplate=DocumentTemplate.createDBTemplate(idParser.serverURL,idParser.dbID,label,**kwargs);
-		DispatchRequest.sendRequestByAction(idParser.serverURL+idParser.dbID, const.CREATE_DATABASE, key,createDBTemplate)
+		DispatchRequest.sendRequestByAction(idParser.dbURL(), const.CREATE_DATABASE, key,createDBTemplate)
 
 	"""
 		Delete a TerminusDB
@@ -110,11 +103,8 @@ class WOQLClient:
 	"""
 
 	def deleteDatabase(self, dbID, key=None):
-		if(self.conConfig.setDB(dbID)==False):
-			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(dbID, "Delete Database"))
-		
+		self.conConfig.setDB(dbID)
 		jsonResponse=self.dispatch(self.conConfig.dbURL()+'/', const.DELETE_DATABASE, key)
-		
 		self.conCapabilities.removeDB()
 		return jsonResponse
 	
@@ -126,8 +116,8 @@ class WOQLClient:
 	@staticmethod
 	def directDeleteDatabase(dbURL,key):
 		idParser=IDParser()
-		idParser.parseDBID(dbURL)
-		DispatchRequest.sendRequestByAction(idParser.serverURL+idParser.dbID+'/', const.DELETE_DATABASE, key)
+		idParser.parseDBURL(dbURL)
+		DispatchRequest.sendRequestByAction(idParser.dbURL()+'/', const.DELETE_DATABASE, key)
 	
 
 	"""
@@ -141,17 +131,17 @@ class WOQLClient:
 	"""
 
 	def getSchema(self, dbID=None, key=None ,options={"terminus:encoding": "terminus:turtle"}):
-		if (dbID and self.conConfig.setDB(dbID)==False):
-			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(dbID, "Get Schema"))
+		if (dbID):
+			self.conConfig.setDB(dbID)
+
 		return self.dispatch(self.conConfig.schemaURL(), const.GET_SCHEMA, key, options)
 
 
 	@staticmethod
 	def directGetSchema(dbURL,key,options={"terminus:encoding": "terminus:turtle"}):
 		idParser=IDParser()
-		idParser.parseDBID(dbURL)
-		schemaURL=IDParser.schemaURL(idParser.serverURL+idParser.dbID)
-		DispatchRequest.sendRequestByAction(schemaURL, const.GET_SCHEMA, key ,options)
+		idParser.parseDBURL(dbURL)
+		DispatchRequest.sendRequestByAction(idParser.schemaURL(), const.GET_SCHEMA, key ,options)
 
 
 	"""
@@ -160,27 +150,25 @@ class WOQLClient:
 		:param {string} dbid TerminusDB Id or omitted
 		:param {string} key is an API key
 		:param {object} opts is an options object
-		returns dict {"terminus:status":"terminus:success"}
+		returns {dict} {"terminus:status":"terminus:success"}
 
 		opts.format is used to specify which format is being used (*json / turtle)
 	"""
 
-	def updateSchema(self, doc , dbID=None, key=None, opts={"terminus:encoding": "terminus:turtle"}):
-		if (schurl and self.conConfig.setDB(schurl)==False):
-			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(schurl, "Update schema"))
-	
-		doc = DocumentTemplate.formatDocument(doc, self.conConfig.schemaURL(), opts);
-		return self.dispatch(self.conConfig.schemaURL(),const.UPDATE_SCHEMA, key, doc)
+	def updateSchema(self, docObj , dbID=None, key=None, opts={"terminus:encoding": "terminus:turtle"}):
+		if (dbID):
+			self.conConfig.setDB(dbID)
+		docObj = DocumentTemplate.formatDocument(docObj, self.conConfig.schemaURL(), opts);
+		return self.dispatch(self.conConfig.schemaURL(),const.UPDATE_SCHEMA, key, docObj)
 
 
 
 	@staticmethod
-	def directUpdateSchema(dbURL, doc, key,opt={"terminus:encoding": "terminus:turtle"}):
+	def directUpdateSchema(dbURL, docObj, key,opt={"terminus:encoding": "terminus:turtle"}):
 		idParser=IDParser()
-		idParser.parseDBID(dbURL)
-		schemaURL=IDParser.schemaURL(idParser.serverURL+idParser.dbID)
-		doc = DocumentTemplate.formatDocument(doc, schemaURL, opts);
-		DispatchRequest.sendRequestByAction(schemaURL, const.UPDATE_SCHEMA, key ,opts)
+		idParser.parseDBURL(dbURL)
+		docObj = DocumentTemplate.formatDocument(docObj, idParser.schemaURL(), opts);
+		DispatchRequest.sendRequestByAction(idParser.schemaURL(), const.UPDATE_SCHEMA, key ,docObj)
 
 
 	"""
@@ -192,9 +180,12 @@ class WOQLClient:
 		:params key is an optional API key
 	""" 
 	def createDocument(self, docObj, documentID, dbID=None, key=None):
-		self.__checkDocumentURI("Create Document",documentID,docObj)
+		if(dbID):
+			self.conConfig.setDB(dbID)
+		self.conConfig.setDocument(documentID)
 		docObj = DocumentTemplate.formatDocument(doc, self.conConfig.schemaURL(),None,self.conConfig.docURL()) 
 		return self.dispatch(self.conConfig.docURL(), const.CREATE_DOCUMENT, key, docObj)
+
 
 	"""
 		Creates a new document in the specified database
@@ -208,23 +199,11 @@ class WOQLClient:
 	@staticmethod	
 	def directCreateDocument(docObj, documentID, dbURL, key):
 		idParser=IDParser()
-		idParser.parseDBID(dbURL)
-		idParser.parseDocumentURL(docId)
-		schemaURL=IDParser.schemaURL(idParser.serverURL+idParser.dbID)
-		docURL=IDParser.docURL(idParser.serverURL+idParser.dbID,idParser.docID)
+		idParser.parseDBURL(dbURL)
+		idParser.parseDocumentID(documentID)
 
-		docObj = DocumentTemplate.formatDocument(doc, schemaURL,None,docURL)
-		return self.dispatch(docURL, const.CREATE_DOCUMENT, key, docObj)
-
-
-
-	def __checkDocumentURI(self, msg, docurl, doc=None):
-		if (docurl and self.conConfig.setDocument(docurl)==False):
-			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(docurl, msg))
-		if (doc and ':id' in doc and 
-			self.conConfig.setDocument(doc[':id'], doc[':context'])==False):
-			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(docurl, msg))
-
+		docObj = DocumentTemplate.formatDocument(doc, idParser.schemaURL(),None,idParser.docURL())
+		return self.dispatch(idParser.docURL(), const.CREATE_DOCUMENT, key, docObj)
 
 
 	"""
@@ -236,23 +215,19 @@ class WOQLClient:
 	"""
 
 	def getDocument(self, documentID, dbID=None, key=None, opts={"terminus:encoding": "terminus:frame"}):
-		if(dbID and self.conConfig.setDB(dbID)==False):
-			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(dbID, "Select"))
+		if(dbID):
+			self.conConfig.setDB(dbID)
 
-		self.__checkDocumentURI("Get Document",documentID);
+		self.conConfig.setDocument(documentID)
 		return self.dispatch(self.conConfig.docURL(), const.GET_DOCUMENT, key, opts)
 
 
 	@staticmethod
 	def directGetDocument(documentID, dbURL, key, opts={"terminus:encoding": "terminus:frame"}):
 		idParser=IDParser()
-		idParser.parseDBID(dbURL)
-		idParser.parseDocumentURL(documentID)
-		dbFullUrl=idParser.serverURL+idParser.dbID;
-
-		docURL=IDParser.docURL(dbFullUrl,idParser.docID)
-		return self.dispatch(docURL, const.GET_DOCUMENT, key, opts)
-
+		idParser.parseDBURL(dbURL)
+		idParser.parseDocumentID(documentID)
+		return self.dispatch(idParser.docURL(), const.GET_DOCUMENT, key, opts)
 
 	"""
 		Updates a document in the specified database with a new version
@@ -260,12 +235,12 @@ class WOQLClient:
 	"""
 	
 	def updateDocument(self, documentID, docObj, dbID=None, key=None):
-		if(dbID and self.conConfig.setDB(dbID)==False):
-			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(dbID, "Select"))
+		if(dbID):
+			self.conConfig.setDB(dbID)
 
-		self.__checkDocumentURI('Upadate document',documentID,docObj);
+		self.conConfig.setDocument(documentID)
 		docObj=DocumentTemplate.formatDocument(docObj, self.conConfig.schemaURL(),None,self.conConfig.docURL())
-		return self.dispatch(this.conConfig.docURL(), 'update_document', docObj,key)
+		return self.dispatch(self.conConfig.docURL(), const.UPDATE_DOCUMENT, key, docObj)
 
 	"""
 		Deletes a document from the specified database
@@ -273,11 +248,10 @@ class WOQLClient:
 	"""
 
 	def deleteDocument(self, documentID,  dbID=None, key=None):
-		if(dbID and self.conConfig.setDB(dbID)==False):
-			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(dbID, "Select"))
+		if(dbID):
+			self.conConfig.setDB(dbID)
 
-		if (self.conConfig.setDocument(documentID)):
-			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(docurl, "Delete Document"))
+		self.conConfig.setDocument(documentID)
 
 		return self.dispatch(self.conConfig.docURL(), const.DELETE_DOCUMENT, key)
 
@@ -287,12 +261,11 @@ class WOQLClient:
 		:param {string} woqlQuery is a "woql query select statement"    
 	"""
 	def select(self, woqlQuery, dbID=None, key=None):
-		if(dbID and self.conConfig.setDB(dbID)==False):
-			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(dbID, "Select"))
-		#if (qurl and self.conConfig.setQueryURL(qurl)==True):
-			
-		query = { "query": woqlQuery }
-		return self.dispatch(self.conConfig.queryURL(), const.WOQL_SELECT, key, query)
+		if(dbID):
+			self.conConfig.setDB(dbID)
+
+		payload = { 'terminus:query': json.dump(woqlQuery) }
+		return self.dispatch(self.conConfig.queryURL(), const.WOQL_SELECT, key, payload)
 
 	"""
 		Executes a WOQL query on the specified database which updates the state and returns the results
@@ -307,7 +280,7 @@ class WOQLClient:
 		if(dbID):
 			self.conConfig.setDB(dbID)
 			#raise InvalidURIError(ErrorMessage.getInvalidURIMessage(docurl, "Update"))
-
+		payload = { 'terminus:query': json.dump(woqlQuery) }
 		return self.dispatch(self.conConfig.queryURL(), const.WOQL_UPDATE, key,  woqlQuery)
 
 

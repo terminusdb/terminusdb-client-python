@@ -1,52 +1,134 @@
 # idParser.py
 
 #  Helper class for parsing and decomposing Terminus URLs /
-#  dealing with prefixed URLs
-# package_dir={'src': 'woqlclient'},
+#  package_dir={'src': 'woqlclient'},
 import re
+from errorMessage import ErrorMessage
+from errors import (InvalidURIError)
 
 class IDParser:
-	"""Implements a socket stream."""
-	def __init__(self,context=None):
-		self._context=context
-		self._server_url=False
-		self._db=False
-		self._doc=False
+
+	def __init__(self):
+		self.__server_url=False
+		self.__db=False
+		self.__doc=False
+
+	def resetDocument(self):
+		self.__doc=False
+
+	def resetDBID(self):
+		self.__db=False
+		self.__doc=False
+
+	def resetServer(self):
+		self.__server_url==False
+		self.__db=False
+		self.__doc=False
 
 	@property
 	def serverURL(self):
-		return self._server_url
+		if(self.__server_url==False):
+			raise InvalidURIError(ErrorMessage.getInvalidURIMessage("Undefined", "Get Server URL"))
+		return self.__server_url
 
 	@property
 	def dbID(self):
-		return self._db
+		if(self.__db==False):
+			raise InvalidURIError(ErrorMessage.getInvalidURIMessage("Undefined", "TerminusDB Id"))
+		return self.__db
 
 	@property
 	def docID(self):
-		return self._doc
+		return self.__doc
+
+	def dbURL(self):
+		return  self.serverURL+self.dbID
+
+	def schemaURL(self):
+		print("SCHEMA URL IN IDPARSER")
+		return self.dbURL()+'/schema'
+
+	def queryURL(self):
+		return self.dbURL()+'/woql'
+
+	def frameURL(self):
+		return self.dbURL()+'/frame'
+
+	def docURL(self):
+		doc='' 
+		if self.docID:
+			doc=self.docID
+		return self.dbURL()+'/document/'+doc
+
+	def parseServerURL(self,strURL):
+		self.resetServer()
+
+		if (self.validURL(strURL)):
+			self.__server_url = strURL
+		else:
+			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(strURL, "Parse ServerURL"))
+		#add / at the  end of the URL
+		if (self.__server_url.rfind('/') != (len(self.__server_url) - 1)):
+			self.__server_url= self.__server_url + '/'
+
+	def parseDBURL(self,dbFullUrl):
+		if self.validURL(dbFullUrl):
+			lastPos=dbFullUrl.rfind('/')
+			if (lastPos== (len(dbFullUrl)- 1)):
+				dbFullUrl = dbFullUrl[0:(len(dbFullUrl) - 1)] # trim trailing slash
+
+			serverUrl = dbFullUrl[0:lastPos]
+			dbid = dbFullUrl[(lastPos + 1):]
+			self.parseServerURL(serverUrl)
+		else:
+			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(dbFullUrl, "Parse TerminusDB Full URL"))
+		self.parseDBID(dbid)
+
+
+    # @param {string} str Terminus server URI or a TerminusID or None
+	def parseDBID(self, strDBID):
+		self.resetDBID()
+		if (self.validIDString(strDBID)):
+			self.__db = strDBID
+		else:
+			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(strDBID, "Parse DBID"))
+
+
+	# @param {string} docName Terminus Document URL or Terminus Document ID
+	def parseDocumentID(self,docID):
+		self.resetDocument()
+		if (self.validIDString(docID)):
+			self.__doc = docID
+		else:
+			raise InvalidURIError(ErrorMessage.getInvalidURIMessage(docID, "Parse Terminus Document ID"))
+
+	"""
+		:param {string} preURL is a valid perfix in the context like doc:document
+	    :param {dict} context 
+		return the namespace URI from the context
+	"""
+	@classmethod
+	def validPrefixedURL(cls,preURL,context):
+		if(isinstance(preURL,str)==False):return False
+		parts = preURL.split(':')
+		if (len(parts)!= 2): return False
+		if (len(parts[0]) < 1 or len(parts[1]) < 1): return False
+		if (context.get(parts[0]) and cls.validIDString(parts[1])): return parts[1]
+		return False
+
 
 	@staticmethod
-	def schemaURL(dbURL):
-		#if(self.dbURL()==False):return False
-		return dbURL+'/schema'
+	def validIDString(strID):
+		if(isinstance(strID,str)==False):
+			return False
+		regex = re.compile(r'[a-zA-Z0-9\\_\\&]+$', re.IGNORECASE)
+
+		if re.match(regex, strID) is not None:
+			return True
+		return False
 
 	@staticmethod
-	def queryURL(dbURL):
-		#if(self.dbURL()==False):return False
-		return dbURL+'/woql'
-
-	@staticmethod
-	def frameURL(dbURL):
-		#if(self.dbURL()==False):return False
-		return dbURL+'/frame'
-
-	@staticmethod
-	def docURL(dbURL,docid=''):
-		#if(self.dbURL()==False):return False
-		return dbURL()+'/document/'+_docid
-	
-
-	def validURL(self,strURL):
+	def validURL(strURL):
 		if(isinstance(strURL,str)==False):
 			return False
 		regex = re.compile(
@@ -62,116 +144,6 @@ class IDParser:
 			return True
 		return False
 
-	def parseServerURL(self,strURL):
-		self._server_url=False;
-
-		if (self.validURL(strURL)):
-			self._server_url = strURL
-		elif (self._context and self.__validPrefixedURL(strURL, self._context)):
-			self._server_url = self.__expandPrefixed(strURL, self._context)
 	
-		if (self._server_url and self._server_url.rfind('/') != (len(self._server_url) - 1)):
-			self._server_url= self._server_url + '/'
-
-		return self._server_url;
-
-
-    # @param {string} str Terminus server URI or a TerminusID or None
-	def parseDBID(self, strDBID):
-		self._db=False
-
-		if (self._context and self.__validPrefixedURL(strDBID, self._context)):
-			strDBID = self.__expandPrefixed(strDBID, self._context)
-
-		if (self.validURL(strDBID)):
-			if (strDBID.rfind('/') == (len(strDBID)- 1)):
-				strDBID = strDBID[0:(len(strDBID) - 1)] # trim trailing slash
-
-			serverUrl = strDBID[0:strDBID.rfind('/')]
-			dbid = strDBID[(strDBID.rfind('/') + 1):];
-
-
-			if (self.parseServerURL(serverUrl)):
-				self._db = dbid
-		
-		elif (self.__validIDString(strDBID)):
-			self._db = strDBID;
-
-		return self._db
-
-	# @param {string} docName Terminus Document URL or Terminus Document ID
-	def parseDocumentURL(self,docName):
-		self._doc=False;
-		if (self._context and self.__validPrefixedURL(docName, self._context)):
-			docName = self.__expandPrefixed(docName, self._context)
-
-		if (self.validURL(docName)):
-			docPos=docName.rfind('/document/')
-			if (docPos != -1):				
-				docURL = docName[0: docPos]
-				docName = docName[docPos+10:]
-				if(self.parseDBID(docURL)==False):return False
-
-		if (self.__validIDString(docName)):
-			self._doc = docName
-
-		return self._doc
-
-
-	def parseSchemaURL(self,schemaURL):
-		if (self._context and self.__validPrefixedURL(schemaURL, self._context)):
-			schemaURL = self.__expandPrefixed(schemaURL, self._context)
-	
-		if (self.validURL(schemaURL)):
-			schemaURL = self.__stripOptionalPath(schemaURL, 'schema')
-		return self.parseDBID(schemaURL)
-
-
-	def parseQueryURL(self,queryURL):
-		if (self._context and self.__validPrefixedURL(queryURL, self._context)):
-			queryURL = self.__expandPrefixed(queryURL, self._context)
-
-		if (self.validURL(queryURL)):
-			queryURL = self.__stripOptionalPath(queryURL, 'woql')
-			queryURL = self.__stripOptionalPath(queryURL, 'query')
-
-		return self.parseDBID(queryURL)
-
-
-	def parseClassFrameURL(self,frameURL):
-		if(self._context and self.__validPrefixedURL(frameURL, self._context)):
-			frameURL = self.__expandPrefixed(frameURL, self._context)
-		
-		if (self.validURL(frameURL)):
-			frameURL = self.__stripOptionalPath(frameURL, 'frame')
-
-		return self.parseDBID(frameURL)
-
-
-	def __stripOptionalPath(self, strOp, bit):
-		#print("__stripOptionalPath")
-		if (strOp.rfind(bit) != -1): 
-			strOp = strOp[0:strOp.rfind(bit)];	
-		return strOp;
-
-	"""
-		valid preURL like doc:document or return false;
-	"""
-	def __validPrefixedURL(self,preURL,context=None):
-		if(isinstance(preURL,str)==False):return False
-		parts = preURL.split(':')
-		if (len(parts)!= 2): return False
-		if (len(parts[0]) < 1 or len(parts[1]) < 1): return False
-		if (context and context[parts[0]] and self.__validIDString(parts[1])): return True
-		return False
-
-	def __validIDString(self,strID): 
-		if (strID.find(' ') != -1 or strID.find('/') != -1): return False
-		return True
-
-	def __expandPrefixed(self, strPre, context):
-		parts = strPre.split(':')
-		return context[parts[0]] + parts[1]
-
 
 

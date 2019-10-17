@@ -10,27 +10,29 @@ from errors import (AccessDeniedError,InvalidURIError,APIError)
 
 def test_connectionCapabilities_noParameter():
 	conConfig=ConnectionConfig()
-	conCapabilities=ConnectionCapabilities(conConfig,'mykey')
 	
 	"""
 	  the key is related with a server you have to set both of 
 	  the method raise an APIerror
 	"""
-	with pytest.raises(APIError):
-		conCapabilities.getClientKey()
-
-	assert conCapabilities.serverConnected() == False
 
 	with pytest.raises(InvalidURIError):
-		with open('tests/capabilitiesResponse.json') as json_file:
-			capResponse = json.load(json_file)
-			conCapabilities.addConnection(capResponse);
+		conCapabilities=ConnectionCapabilities(conConfig,'mykey')
+
+		with pytest.raises(InvalidURIError):
+			conCapabilities.getClientKey()
+
+		assert conCapabilities.serverConnected() == False
+
+		with pytest.raises(InvalidURIError):
+			with open('tests/capabilitiesResponse.json') as json_file:
+				capResponse = json.load(json_file)
+				conCapabilities.addConnection(capResponse);
 
 
 def test_addConnection():
-	"""
-	  No server url in intialization
-	"""
+	#No server url in intialization
+	
 	conConfig=ConnectionConfig({"server":"http://localhost:6363"})
 	conCapabilities=ConnectionCapabilities(conConfig,'mykey')
 
@@ -43,9 +45,9 @@ def test_addConnection():
 	with open ('tests/connectionDictionary.json') as json_file:
 		dictTest = json.load(json_file)
 		assert (dictTest==conCapabilities.connection) ==True
-		"""
-		  you have setServer or the serverConnected is False
-		"""
+		
+		#you have setServer or the serverConnected is False
+		
 	assert conCapabilities.serverConnected() == True
 	assert conCapabilities.getClientKey()=="mykey"
 
@@ -71,9 +73,7 @@ def test_capabilitiesPermit():
 		capResponse = json.load(json_file)
 		conCapabilities.addConnection(capResponse)
 
-	"""
-	 if the action are not permits the method raise an Exception
-	"""
+	#if the action are not permits the method raise an Exception
 	with pytest.raises(AccessDeniedError):
 		conCapabilities.capabilitiesPermit(const.DELETE_DATABASE)
 
@@ -83,6 +83,7 @@ def test_capabilitiesPermit():
 	
 	assert conCapabilities.capabilitiesPermit(const.CREATE_DATABASE)==True
 	assert conCapabilities.capabilitiesPermit(const.CREATE_DOCUMENT)==True	
+
 
 def test_deleteDatabaseForTheConnectionList():
 	conConfig=ConnectionConfig({"server":"http://localhost:6363","db":"myFirstTerminusDB"})

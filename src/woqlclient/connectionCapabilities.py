@@ -19,7 +19,8 @@ class ConnectionCapabilities:
 	def __init__(self,connectionConfig,key=None):
 		self.connection = {};
 		self.connectionConfig = connectionConfig
-		self.setClientKey(key)
+		if(key):
+			self.setClientKey(key)
 
 	"""
 		Utility functions for changing the state of connections with Terminus servers
