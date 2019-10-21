@@ -10,8 +10,8 @@ ci:
 test-readme:
 	@pipenv run python src/setup.py check --restructuredtext --strict && ([ $$? -eq 0 ] && echo "README.rst and HISTORY.rst ok") || echo "Invalid markup in README.rst or HISTORY.rst!"
 
-#flake8:
-	#pipenv run flake8 --ignore=E501,F401,E128,E402,E731,F821 src/woqlclient
+flake8:
+	pipenv run flake8 --ignore=E501,F401,E128,E402,E731,F821 src/woqlclient
 
 coverage:
 	pipenv run py.test src/tests --cov-config .coveragerc --verbose --cov-report term --cov-report xml --cov=src/woqlclient src/tests

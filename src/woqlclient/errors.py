@@ -1,14 +1,15 @@
 
 class Error(Exception):
-	"""Exception that is base class for all other error exceptions."""
-	def __init__(self, msg=None, url=None, errObj=None):
-		super(Error, self).__init__()
-		self.msg = msg
-		self.url=url
-		self.errorObj=errObj
+    """Exception that is base class for all other error exceptions."""
 
-	def __str__(self):
-		return self.msg
+    def __init__(self, msg=None, url=None, errObj=None):
+        super(Error, self).__init__()
+        self.msg = msg
+        self.url = url
+        self.errorObj = errObj
+
+    def __str__(self):
+        return self.msg
 
 
 class InterfaceError(Error):
@@ -22,11 +23,12 @@ class DatabaseError(Error):
 
 
 class AccessDeniedError(DatabaseError):
-	pass
+    pass
+
 
 class APIError(DatabaseError):
-	pass
+    pass
+
 
 class InvalidURIError(Error):
-	pass
-
+    pass
