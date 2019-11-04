@@ -42,7 +42,7 @@ class DispatchRequest:
 
     @classmethod
     def sendRequestByAction(cls, url, action, key, payload={}):
-        print("sendRequestByAction")
+        print("sendRequestByAction_____", action)
         try:
             requestResponse = None
             headers = cls.__autorizationHeader(key)
@@ -58,11 +58,13 @@ class DispatchRequest:
 
             if(requestResponse.status_code == 200):
                 return requestResponse.json()  # if not a json not it raises an error
+            else:
+                requestResponse.raise_for_status()
 
         # to be review
         # the server in the response return always contet-type application/json
         except ValueError as err:
-            "if the response type is not a json"
+            # if the response type is not a json
             print("Value Error", err)
             return requestResponse.text
         """

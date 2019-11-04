@@ -46,8 +46,8 @@ def test_woqlSelect(mocker):
 
 def test_deleteDatabase(mocker):
 	with mocker.patch('requests.delete', side_effect=mockResponse.mocked_requests):
-		fullUrl="http://localhost:6363/myFirstTerminusDB/"
+		fullUrl="http://localhost:6363/myFirstTerminusDB"
 		json_data = sendDispatchRequest(fullUrl, const.DELETE_DATABASE, 'mykey')
-		requests.delete.assert_called_once_with('http://localhost:6363/myFirstTerminusDB/', headers={'Authorization': 'Basic Om15a2V5'})
+		requests.delete.assert_called_once_with('http://localhost:6363/myFirstTerminusDB', headers={'Authorization': 'Basic Om15a2V5'})
 		#print("call_args_list", requests.delete.call_args_list)
 

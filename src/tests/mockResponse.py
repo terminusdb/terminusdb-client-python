@@ -65,4 +65,6 @@ def mocked_requests(*args,**kwargs):
 	elif args[0] == "http://localhost:6363/myFirstTerminusDB" :
 		return MockResponse(args[0], 200,const.DELETE_DATABASE)
 
+
+	print(args[0])
 	return MockResponse(args[0],200,const.CONNECT)

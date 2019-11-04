@@ -107,7 +107,7 @@ class WOQLClient:
     def deleteDatabase(self, dbID, key=None):
         self.conConfig.setDB(dbID)
         jsonResponse = self.dispatch(
-            self.conConfig.dbURL() + '/', const.DELETE_DATABASE, key)
+            self.conConfig.dbURL(), const.DELETE_DATABASE, key)
         self.conCapabilities.removeDB()
         return jsonResponse
 
@@ -120,8 +120,8 @@ class WOQLClient:
     def directDeleteDatabase(dbURL, key):
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
-        DispatchRequest.sendRequestByAction(
-            idParser.dbURL() + '/', const.DELETE_DATABASE, key)
+        return DispatchRequest.sendRequestByAction(
+            idParser.dbURL(), const.DELETE_DATABASE, key)
 
     """
         Retrieves the schema of the specified database
@@ -143,7 +143,7 @@ class WOQLClient:
     def directGetSchema(dbURL, key, options={"terminus:encoding": "terminus:turtle"}):
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
-        DispatchRequest.sendRequestByAction(
+        return DispatchRequest.sendRequestByAction(
             idParser.schemaURL(), const.GET_SCHEMA, key, options)
 
     """
@@ -170,7 +170,7 @@ class WOQLClient:
         idParser.parseDBURL(dbURL)
         docObj = DocumentTemplate.formatDocument(
             docObj, idParser.schemaURL(), opts)
-        DispatchRequest.sendRequestByAction(
+        return DispatchRequest.sendRequestByAction(
             idParser.schemaURL(), const.UPDATE_SCHEMA, key, docObj)
 
     """
@@ -207,7 +207,7 @@ class WOQLClient:
 
         docObj = DocumentTemplate.formatDocument(
             doc, idParser.schemaURL(), None, idParser.docURL())
-        return self.dispatch(idParser.docURL(), const.CREATE_DOCUMENT, key, docObj)
+        return DispatchRequest.sendRequestByAction(idParser.docURL(), const.CREATE_DOCUMENT, key, docObj)
 
     """
         Retrieves a document from the specified database
@@ -229,7 +229,7 @@ class WOQLClient:
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
         idParser.parseDocumentID(documentID)
-        return self.dispatch(idParser.docURL(), const.GET_DOCUMENT, key, opts)
+        return DispatchRequest.sendRequestByAction(idParser.docURL(), const.GET_DOCUMENT, key, opts)
 
     """
         Updates a document in the specified database with a new version
@@ -244,6 +244,15 @@ class WOQLClient:
             docObj, self.conConfig.schemaURL(), None, self.conConfig.docURL())
         return self.dispatch(self.conConfig.docURL(), const.UPDATE_DOCUMENT, key, docObj)
 
+    @staticmethod
+    def directUpdateDocument(documentID, dbURL, key, docObj):
+        idParser = IDParser()
+        idParser.parseDBURL(dbURL)
+        idParser.parseDocumentID(documentID)
+        docObj = DocumentTemplate.formatDocument(
+            docObj, idParser.schemaURL(), None, idParser.docURL())
+        return DispatchRequest.sendRequestByAction(idParser.docURL(), const.GET_DOCUMENT, key, docObj)
+
     """
         Deletes a document from the specified database
     """
@@ -256,6 +265,14 @@ class WOQLClient:
 
         return self.dispatch(self.conConfig.docURL(), const.DELETE_DOCUMENT, key)
 
+    @staticmethod
+    def directDeleteDocument(self, documentID, dbURL, key):
+        idParser = IDParser()
+        idParser.parseDBURL(dbURL)
+        idParser.parseDocumentID(documentID)
+
+        return DispatchRequest.sendRequestByAction(idParser.docURL(), const.DELETE_DOCUMENT, key)
+
     """
         Executes a read-only WOQL query on the specified database and returns the results
         :param {string} woqlQuery is a "woql query select statement"
@@ -267,6 +284,14 @@ class WOQLClient:
 
         payload = {'terminus:query': json.dump(woqlQuery)}
         return self.dispatch(self.conConfig.queryURL(), const.WOQL_SELECT, key, payload)
+
+    @staticmethod
+    def directSelect(woqlQuery, dbURL, key):
+        idParser = IDParser()
+        idParser.parseDBURL(dbURL)
+
+        payload = {'terminus:query': json.dump(woqlQuery)}
+        return DispatchRequest.sendRequestByAction(idParser.queryURL(), const.WOQL_SELECT, key, payload)
 
     """
         Executes a WOQL query on the specified database which updates the state and returns the results
@@ -284,6 +309,14 @@ class WOQLClient:
             # raise InvalidURIError(ErrorMessage.getInvalidURIMessage(docurl, "Update"))
         payload = {'terminus:query': json.dump(woqlQuery)}
         return self.dispatch(self.conConfig.queryURL(), const.WOQL_UPDATE, key, payload)
+
+    @staticmethod
+    def directUpdate(woqlQuery, dbURL, key):
+        idParser = IDParser()
+        idParser.parseDBURL(dbURL)
+
+        payload = {'terminus:query': json.dump(woqlQuery)}
+        return DispatchRequest.sendRequestByAction(idParser.queryURL(), const.WOQL_UPDATE, key, payload)
 
     def dispatch(self, url, action, connectionKey, payload={}):
         if connectionKey is None:

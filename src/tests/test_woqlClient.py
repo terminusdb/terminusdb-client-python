@@ -7,6 +7,10 @@ import json
 
 from woqlClient import WOQLClient
 
+#def test_realCall():
+	#resp=WOQLClient.directDeleteDatabase("http://localhost:6363/test0009","root")
+	#print('test_realCall',resp)
+
 def test_ConnectionError():
 	__woqlClient__= WOQLClient()
 	
@@ -59,13 +63,14 @@ def test_deleteDatabase(mocker):
 
 	with mocker.patch('requests.delete', side_effect=mockResponse.mocked_requests):
 		__woqlClient__.deleteDatabase("myFirstTerminusDB")
-		requests.delete.assert_called_once_with('http://localhost:6363/myFirstTerminusDB/', headers={'Authorization': 'Basic Om15a2V5'})
+		requests.delete.assert_called_once_with('http://localhost:6363/myFirstTerminusDB', headers={'Authorization': 'Basic Om15a2V5'})
 
 def test_directDeleteDatabase(mocker):
 	with mocker.patch('requests.delete', side_effect=mockResponse.mocked_requests):
 		WOQLClient.directDeleteDatabase("http://localhost:6363/myFirstTerminusDB","mykey")
-		requests.delete.assert_called_once_with('http://localhost:6363/myFirstTerminusDB/', headers={'Authorization': 'Basic Om15a2V5'})
+		requests.delete.assert_called_once_with('http://localhost:6363/myFirstTerminusDB', headers={'Authorization': 'Basic Om15a2V5'})
 
+	
 def test_getSchema(mocker):
 	__woqlClient__= WOQLClient({"server":"http://localhost:6363",'key':"mykey",'db':'myFirstTerminusDB'})
 
