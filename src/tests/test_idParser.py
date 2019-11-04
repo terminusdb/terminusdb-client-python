@@ -59,6 +59,6 @@ def test_validIDString():
 	idParser=IDParser()
 	assert idParser.validIDString(idString)== True;
 
-	idString="my First //";
+	idString="my First:";
 	assert idParser.validIDString(idString)== False;
 

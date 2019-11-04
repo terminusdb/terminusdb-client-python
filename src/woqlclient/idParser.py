@@ -130,11 +130,13 @@ class IDParser:
     def validIDString(strID):
         if isinstance(strID, str) is False:
             return False
-        regex = re.compile(r'[a-zA-Z0-9\\_\\&]+$', re.IGNORECASE)
-
-        if re.match(regex, strID) is not None:
+        
+        regex = re.compile(r'[\s\t\r\n\f\/\:]+$', re.IGNORECASE)
+        
+        if re.search(regex, strID) is None:
             return True
         return False
+
 
     @staticmethod
     def validURL(strURL):
