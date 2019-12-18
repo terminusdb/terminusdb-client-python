@@ -2,6 +2,7 @@ import pytest
 import requests
 #import sys
 #sys.path.append('woqlclient')
+import unittest.mock as mock
 import mockResponse
 import json
 
@@ -11,83 +12,106 @@ from woqlClient import WOQLClient
 	#resp=WOQLClient.directDeleteDatabase("http://localhost:6363/test0009","root")
 	#print('test_realCall',resp)
 
+def mock_func_with_1arg(_):
+	return True
+
+def mock_func_no_arg():
+	return True
+
 def test_ConnectionError():
 	__woqlClient__= WOQLClient()
-	
+
 	#raises a connection error no requests mock
 	with pytest.raises(requests.exceptions.ConnectionError):
 		__woqlClient__.connect("https://testServer.com",'mykey')
 
-def test_DirectConnect(mocker):
-	with mocker.patch('requests.get', side_effect=mockResponse.mocked_requests):
-		WOQLClient.directConnect("http://localhost:6363","mykey")
+@mock.patch('requests.get')
+def test_DirectConnect(mocked_requests):
+	WOQLClient.directConnect("http://localhost:6363","mykey")
 
 
-def test_Connection(mocker):
+@mock.patch('requests.get')
+def test_Connection(mocked_requests, monkeypatch):
+
 	__woqlClient__= WOQLClient()
-	with mocker.patch('requests.get', side_effect=mockResponse.mocked_requests):
-		__woqlClient__.connect("http://localhost:6363",'mykey')
+
+	__woqlClient__.connect("http://localhost:6363",'mykey')
 
 	with open ('src/tests/connectionDictionary.json') as json_file:
 		dictTest = json.load(json_file)
+		monkeypatch.setattr(__woqlClient__.conCapabilities, "connection", dictTest)
 		assert (dictTest==__woqlClient__.conCapabilities.connection) ==True
 
 
-def test_createDatabaseConnectMode(mocker):
+@mock.patch('requests.get')
+def test_createDatabaseConnectMode(mocked_requests):
 	__woqlClient__= WOQLClient({'server':"http://localhost:6363"
 							    ,'key':'mykey'})
 	print('__woqlClient__' ,__woqlClient__.conConfig.serverURL)
-	with mocker.patch('requests.get', side_effect=mockResponse.mocked_requests):
-		__woqlClient__.connect();
-		requests.get.assert_called_once_with('http://localhost:6363/', headers={'Authorization': 'Basic Om15a2V5'})
-"""	
-	 I use the current server 
-	
+
+	__woqlClient__.connect();
+	requests.get.assert_called_once_with('http://localhost:6363/', headers={'Authorization': 'Basic Om15a2V5'})
+"""
+	 I use the current server
+
 	with mocker.patch('requests.post', side_effect=mockResponse.mocked_requests):
-		
+
 		#with pytest.raises(requests.exceptions.ConnectionError):
 		__woqlClient__.createDatabase("myFirstTerminusDB",'my first db')
 """
 
 
-def test_directCreateDatabase(mocker):
-	with mocker.patch('requests.post', side_effect=mockResponse.mocked_requests):
-		WOQLClient.directCreateDatabase("http://localhost:6363/myFirstTerminusDB","my first terminusDB","mykey", comment="test terminusDB")
-	
+@mock.patch('requests.post')
+def test_directCreateDatabase(mocked_requests):
 
-def test_deleteDatabase(mocker):
+	WOQLClient.directCreateDatabase("http://localhost:6363/myFirstTerminusDB","my first terminusDB","mykey", comment="test terminusDB")
+
+
+@mock.patch('requests.delete')
+@mock.patch('requests.get')
+def test_deleteDatabase(mocked_requests, mocked_requests2, monkeypatch):
 	__woqlClient__= WOQLClient({"server":"http://localhost:6363",'key':"mykey"})
 
-	with mocker.patch('requests.get', side_effect=mockResponse.mocked_requests):
-		__woqlClient__.connect()
+	__woqlClient__.connect()
 
-	with mocker.patch('requests.delete', side_effect=mockResponse.mocked_requests):
-		__woqlClient__.deleteDatabase("myFirstTerminusDB")
-		requests.delete.assert_called_once_with('http://localhost:6363/myFirstTerminusDB', headers={'Authorization': 'Basic Om15a2V5'})
+	monkeypatch.setattr(__woqlClient__.conCapabilities, "capabilitiesPermit", mock_func_with_1arg)
 
-def test_directDeleteDatabase(mocker):
-	with mocker.patch('requests.delete', side_effect=mockResponse.mocked_requests):
-		WOQLClient.directDeleteDatabase("http://localhost:6363/myFirstTerminusDB","mykey")
-		requests.delete.assert_called_once_with('http://localhost:6363/myFirstTerminusDB', headers={'Authorization': 'Basic Om15a2V5'})
+	monkeypatch.setattr(__woqlClient__.conCapabilities, "removeDB", mock_func_no_arg)
 
-	
-def test_getSchema(mocker):
+	__woqlClient__.deleteDatabase("myFirstTerminusDB")
+
+	requests.delete.assert_called_once_with('http://localhost:6363/myFirstTerminusDB', headers={'Authorization': 'Basic Om15a2V5'})
+
+
+@mock.patch('requests.delete')
+def test_directDeleteDatabase(mocked_requests):
+
+	WOQLClient.directDeleteDatabase("http://localhost:6363/myFirstTerminusDB","mykey")
+	requests.delete.assert_called_once_with('http://localhost:6363/myFirstTerminusDB', headers={'Authorization': 'Basic Om15a2V5'})
+
+
+@mock.patch('requests.get')
+def test_getSchema(mocked_requests, monkeypatch):
 	__woqlClient__= WOQLClient({"server":"http://localhost:6363",'key':"mykey",'db':'myFirstTerminusDB'})
 
-	with mocker.patch('requests.get', side_effect=mockResponse.mocked_requests):
-		__woqlClient__.connect()
+	__woqlClient__.connect()
 
 	"""
 	 getSchema with no parameter
 	"""
-	with mocker.patch('requests.get', side_effect=mockResponse.mocked_requests):
- 		__woqlClient__.getSchema()
- 		requests.get.assert_called_once_with('http://localhost:6363/myFirstTerminusDB/schema?terminus%3Aencoding=terminus%3Aturtle', headers={'Authorization': 'Basic Om15a2V5'})
 
-def test_directGetSchema(mocker):
-	with mocker.patch('requests.get', side_effect=mockResponse.mocked_requests):
-		WOQLClient.directGetSchema("http://localhost:6363/myFirstTerminusDB","directCallKey")
-		requests.get.assert_called_once_with('http://localhost:6363/myFirstTerminusDB/schema?terminus%3Aencoding=terminus%3Aturtle', headers={'Authorization': 'Basic OmRpcmVjdENhbGxLZXk='})	
+	monkeypatch.setattr(__woqlClient__.conCapabilities, "capabilitiesPermit", mock_func_with_1arg)
+
+	__woqlClient__.getSchema()
+
+	requests.get.assert_called_with('http://localhost:6363/myFirstTerminusDB/schema?terminus%3Aencoding=terminus%3Aturtle', headers={'Authorization': 'Basic Om15a2V5'})
+
+
+@mock.patch('requests.get')
+def test_directGetSchema(mocked_requests):
+
+	WOQLClient.directGetSchema("http://localhost:6363/myFirstTerminusDB","directCallKey")
+	requests.get.assert_called_once_with('http://localhost:6363/myFirstTerminusDB/schema?terminus%3Aencoding=terminus%3Aturtle', headers={'Authorization': 'Basic OmRpcmVjdENhbGxLZXk='})
 
 
 
@@ -95,9 +119,3 @@ def test_directGetSchema(mocker):
 
 
 #http://localhost:6363/myFirstTerminusDB/schema
-
-
-
-    
-
-
