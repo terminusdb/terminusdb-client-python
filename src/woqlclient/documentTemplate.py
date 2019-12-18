@@ -36,7 +36,8 @@ class DocumentTemplate:
         return temp
 
         @staticmethod
-        def formatDocument(cls, doc, schemaURL, options=None, urlId=None):
+        def formatDocument(doc, schemaURL, options=None, urlId=None):
+            print('i am enetering here \n')
             document = {}
             if(isinstance(doc, dict)):
                 document['@context'] = doc['@context']
