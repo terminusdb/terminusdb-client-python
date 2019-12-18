@@ -38,7 +38,7 @@ def test_Connection(mocked_requests, monkeypatch):
 
 	__woqlClient__.connect("http://localhost:6363",'mykey')
 
-	with open ('src/tests/connectionDictionary.json') as json_file:
+	with open ('tests/connectionDictionary.json') as json_file:
 		dictTest = json.load(json_file)
 		monkeypatch.setattr(__woqlClient__.conCapabilities, "connection", dictTest)
 		assert (dictTest==__woqlClient__.conCapabilities.connection) ==True

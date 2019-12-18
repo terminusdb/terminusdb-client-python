@@ -5,7 +5,7 @@ test:
 	# This runs all of the tests, on both Python 2 and Python 3.
 	detox
 ci:
-	pipenv run py.test src/tests  --junitxml=report.xml
+	pipenv run py.test tests  --junitxml=report.xml
 
 test-readme:
 	@pipenv run python src/setup.py check --restructuredtext --strict && ([ $$? -eq 0 ] && echo "README.rst and HISTORY.rst ok") || echo "Invalid markup in README.rst or HISTORY.rst!"
