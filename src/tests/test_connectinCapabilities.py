@@ -7,6 +7,7 @@ import pytest
 import json
 from woqlclient import const
 from woqlclient import (AccessDeniedError,InvalidURIError,APIError)
+import os
 
 def test_connectionCapabilities_noParameter():
 	conConfig=ConnectionConfig()
@@ -25,7 +26,7 @@ def test_connectionCapabilities_noParameter():
 		assert conCapabilities.serverConnected() == False
 
 		with pytest.raises(InvalidURIError):
-			with open('./capabilitiesResponse.json') as json_file:
+			with open(os.path.join(os.getcwd(),'capabilitiesResponse.json')) as json_file:
 				capResponse = json.load(json_file)
 				conCapabilities.addConnection(capResponse);
 
@@ -38,11 +39,11 @@ def test_addConnection():
 
 	assert ({"http://localhost:6363/":{'key':"mykey"}}==conCapabilities.connection)==True
 
-	with open('./capabilitiesResponse.json') as json_file:
+	with open(os.path.join(os.getcwd(),'capabilitiesResponse.json')) as json_file:
 		capResponse = json.load(json_file)
 		conCapabilities.addConnection(capResponse);
 
-	with open ('./connectionDictionary.json') as json_file:
+	with open (os.path.join(os.getcwd(),'connectionDictionary.json')) as json_file:
 		dictTest = json.load(json_file)
 		assert (dictTest==conCapabilities.connection) ==True
 
@@ -69,7 +70,7 @@ def test_capabilitiesPermit():
 	conConfig=ConnectionConfig({"server":"http://localhost:6363","db":"myFirstTerminusDB"})
 	conCapabilities=ConnectionCapabilities(conConfig,'mykey')
 
-	with open('./capabilitiesResponseNoAllAction.json') as json_file:
+	with open(os.path.join(os.getcwd(),'capabilitiesResponseNoAllAction.json')) as json_file:
 		capResponse = json.load(json_file)
 		conCapabilities.addConnection(capResponse)
 
@@ -89,7 +90,7 @@ def test_deleteDatabaseForTheConnectionList():
 	conConfig=ConnectionConfig({"server":"http://localhost:6363","db":"myFirstTerminusDB"})
 	conCapabilities=ConnectionCapabilities(conConfig,'mykey')
 
-	with open('./capabilitiesResponse.json') as json_file:
+	with open(os.path.join(os.getcwd(),'capabilitiesResponse.json')) as json_file:
 		capResponse = json.load(json_file)
 		conCapabilities.addConnection(capResponse)
 

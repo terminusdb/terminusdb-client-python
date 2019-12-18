@@ -5,6 +5,7 @@ import requests
 import unittest.mock as mock
 from .mockResponse import *
 import json
+import os
 
 from woqlclient import WOQLClient
 
@@ -37,7 +38,7 @@ def test_Connection(mocked_requests, monkeypatch):
 
 	__woqlClient__.connect("http://localhost:6363",'mykey')
 
-	with open ('./connectionDictionary.json') as json_file:
+	with open (os.path.join(os.getcwd(),'connectionDictionary.json')) as json_file:
 		dictTest = json.load(json_file)
 		monkeypatch.setattr(__woqlClient__.conCapabilities, "connection", dictTest)
 		assert (dictTest==__woqlClient__.conCapabilities.connection) ==True
