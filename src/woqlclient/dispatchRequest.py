@@ -1,9 +1,9 @@
 
-import errorMessage
-import const
+#from .errorMessage import ErrorMessage
+from .const import Const as const
 import requests
 
-from utils import Utils
+from .utils import Utils
 
 from base64 import b64encode
 

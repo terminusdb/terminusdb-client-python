@@ -1,17 +1,18 @@
 # woqlClient.py
-from dispatchRequest import DispatchRequest
+from .dispatchRequest import DispatchRequest
 
-import errorMessage
-from connectionConfig import ConnectionConfig
-from connectionCapabilities import ConnectionCapabilities
+#from .errorMessage import *
+from .connectionConfig import ConnectionConfig
+from .connectionCapabilities import ConnectionCapabilities
 
-import const
-from errorMessage import ErrorMessage
-from errors import (InvalidURIError)
+from .const import Const as const
+from .errorMessage import ErrorMessage
+#from .errors import (InvalidURIError)
+from .errors import *
 
-from documentTemplate import DocumentTemplate
+from .documentTemplate import DocumentTemplate
 
-from idParser import IDParser
+from .idParser import IDParser
 import json
 
 # WOQL client object

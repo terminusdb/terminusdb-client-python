@@ -3,10 +3,10 @@ import requests
 #import sys
 #sys.path.append('woqlclient')
 import unittest.mock as mock
-import mockResponse
+from .mockResponse import *
 import json
 
-from woqlClient import WOQLClient
+from woqlclient import WOQLClient
 
 #def test_realCall():
 	#resp=WOQLClient.directDeleteDatabase("http://localhost:6363/test0009","root")
@@ -37,7 +37,7 @@ def test_Connection(mocked_requests, monkeypatch):
 
 	__woqlClient__.connect("http://localhost:6363",'mykey')
 
-	with open ('src/tests/connectionDictionary.json') as json_file:
+	with open ('connectionDictionary.json') as json_file:
 		dictTest = json.load(json_file)
 		monkeypatch.setattr(__woqlClient__.conCapabilities, "connection", dictTest)
 		assert (dictTest==__woqlClient__.conCapabilities.connection) ==True

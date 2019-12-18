@@ -1,22 +1,22 @@
 import pytest
-from errors import (InvalidURIError)
+from woqlclient import (InvalidURIError)
 #import sys
 #sys.path.append('woqlclient')
 
-from idParser import IDParser
+from woqlclient import IDParser
 
 def test_idParser():
 	idParser=IDParser()
 	with pytest.raises(InvalidURIError):
-		idParser.serverURL  
+		idParser.serverURL
 
 	with pytest.raises(InvalidURIError):
-		idParser.dbID 
+		idParser.dbID
 
-	assert idParser.docID==False 
+	assert idParser.docID==False
 
 def test_parseServerURL():
-	servURL="http://localhost:6363/"	
+	servURL="http://localhost:6363/"
 	idParser=IDParser()
 	idParser.parseServerURL(servURL)
 	assert idParser.serverURL == servURL
@@ -27,7 +27,7 @@ def test_parseDBID():
 	#check db as TerminusDB name
 	idParser.parseDBID(dbName)
 	assert idParser.dbID==dbName
-	#check db name as TerminusDB Url	
+	#check db name as TerminusDB Url
 
 def test_parseDBURL():
 	idParser=IDParser()
@@ -61,4 +61,3 @@ def test_validIDString():
 
 	idString="my First:";
 	assert idParser.validIDString(idString)== False;
-
