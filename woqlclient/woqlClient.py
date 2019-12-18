@@ -77,7 +77,6 @@ class WOQLClient:
     """
 
     def createDatabase(self, dbID, label, key=None, **kwargs):
-        self.conConfig.setDB(dbID)
         createDBTemplate = DocumentTemplate.createDBTemplate(
             self.conConfig.serverURL, self.conConfig.dbID, label, **kwargs)
         return self.dispatch(self.conConfig.dbURL, const.CREATE_DATABASE, key, createDBTemplate)
@@ -162,7 +161,7 @@ class WOQLClient:
         if (dbID):
             self.conConfig.setDB(dbID)
         docObj = DocumentTemplate.formatDocument(
-            docObj, self.conConfig.schemaURL(), opts)
+            docObj, False, opts)
         return self.dispatch(self.conConfig.schemaURL(), const.UPDATE_SCHEMA, key, docObj)
 
     @staticmethod
@@ -170,7 +169,7 @@ class WOQLClient:
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
         docObj = DocumentTemplate.formatDocument(
-            docObj, idParser.schemaURL(), opts)
+            docObj, False, opts)
         return DispatchRequest.sendRequestByAction(
             idParser.schemaURL(), const.UPDATE_SCHEMA, key, docObj)
 
@@ -188,7 +187,7 @@ class WOQLClient:
             self.conConfig.setDB(dbID)
         self.conConfig.setDocument(documentID)
         docObj = DocumentTemplate.formatDocument(
-            doc, self.conConfig.schemaURL(), None, self.conConfig.docURL())
+            doc, None, None, self.conConfig.docURL())
         return self.dispatch(self.conConfig.docURL(), const.CREATE_DOCUMENT, key, docObj)
 
     """
@@ -206,7 +205,7 @@ class WOQLClient:
         idParser.parseDBURL(dbURL)
         idParser.parseDocumentID(documentID)
 
-        docObj = DocumentTemplate.formatDocument(doc, idParser.schemaURL(), None, idParser.docURL())
+        docObj = DocumentTemplate.formatDocument(doc, None, None, idParser.docURL())
         return DispatchRequest.sendRequestByAction(idParser.docURL(), const.CREATE_DOCUMENT, key, docObj)
 
     """
@@ -241,7 +240,7 @@ class WOQLClient:
 
         self.conConfig.setDocument(documentID)
         docObj = DocumentTemplate.formatDocument(
-            docObj, self.conConfig.schemaURL(), None, self.conConfig.docURL())
+            docObj, None, None, self.conConfig.docURL())
         return self.dispatch(self.conConfig.docURL(), const.UPDATE_DOCUMENT, key, docObj)
 
     @staticmethod
@@ -250,7 +249,7 @@ class WOQLClient:
         idParser.parseDBURL(dbURL)
         idParser.parseDocumentID(documentID)
         docObj = DocumentTemplate.formatDocument(
-            docObj, idParser.schemaURL(), None, idParser.docURL())
+            docObj, None, None, idParser.docURL())
         return DispatchRequest.sendRequestByAction(idParser.docURL(), const.GET_DOCUMENT, key, docObj)
 
     """
@@ -290,7 +289,7 @@ class WOQLClient:
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
 
-        payload = {'terminus:query': json.dump(woqlQuery)}
+        payload = {'terminus:query': json.dumps(woqlQuery)}
         return DispatchRequest.sendRequestByAction(idParser.queryURL(), const.WOQL_SELECT, key, payload)
 
     """

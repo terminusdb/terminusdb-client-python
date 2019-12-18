@@ -47,7 +47,7 @@ class DocumentTemplate:
 
                 if (options and options.get('terminus:encoding') and options['terminus:encoding'] == 'terminus:turtle'):
                     document['terminus:turtle'] = doc
-                    document['terminus:schema'] = schemaURL
+                    #document['terminus:schema'] = schemaURL
                     del document['terminus:turtle']['@context']
                 else:
                     document['terminus:document'] = doc
