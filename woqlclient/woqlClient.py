@@ -179,7 +179,7 @@ class WOQLClient:
 
         :params {string} documentID is a valid Terminus document id
         :params {string} dbId is a valid TerminusDB id
-        :params {dict } docObj  is a valid document in json-ld
+        :params {dict} docObj  is a valid document in json-ld
         :params key is an optional API key
     """
 
@@ -206,8 +206,7 @@ class WOQLClient:
         idParser.parseDBURL(dbURL)
         idParser.parseDocumentID(documentID)
 
-        docObj = DocumentTemplate.formatDocument(
-            doc, idParser.schemaURL(), None, idParser.docURL())
+        docObj = DocumentTemplate.formatDocument(doc, idParser.schemaURL(), None, idParser.docURL())
         return DispatchRequest.sendRequestByAction(idParser.docURL(), const.CREATE_DOCUMENT, key, docObj)
 
     """
