@@ -1,10 +1,10 @@
 # connectionCapabilities.py
 
 # const UTILS = require('./utils.js');
-from errorMessage import ErrorMessage
-import const
-from errors import (AccessDeniedError, InvalidURIError, APIError)
-from connectionConfig import ConnectionConfig
+from .errorMessage import ErrorMessage
+from .const import Const as const
+from .errors import (AccessDeniedError, InvalidURIError, APIError)
+from .connectionConfig import ConnectionConfig
 
 """
     Creates an entry in the connection registry for the server

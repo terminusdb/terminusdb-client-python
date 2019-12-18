@@ -1,13 +1,13 @@
 import unittest.mock as mock
-from dispatchRequest import DispatchRequest
-import const
+from woqlclient import DispatchRequest
+from woqlclient import const
 import pytest
 #import sys
 import json
 import requests
 
-import mockResponse
-from documentTemplate import DocumentTemplate
+from .mockResponse import *
+from woqlclient import DocumentTemplate
 
 from pytest_mock import mocker
 

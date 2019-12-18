@@ -1,6 +1,6 @@
-from  connectionConfig import ConnectionConfig
+from  woqlclient import ConnectionConfig
 import pytest
-from errors import (InvalidURIError)
+from woqlclient import (InvalidURIError)
 
 def test_connectionConfig_noParameter():
 	connectionConfig=ConnectionConfig()
@@ -11,11 +11,11 @@ def test_connectionConfig_noParameter():
 	with pytest.raises(InvalidURIError):
 		connectionConfig.serverURL
 		connectionConfig.dbID
-		connectionConfig.schemaURL() 
-		connectionConfig.docURL() 
+		connectionConfig.schemaURL()
+		connectionConfig.docURL()
 		connectionConfig.queryURL()
 		connectionConfig.dbURL()
-	
+
 	assert connectionConfig.connectedMode == True, "start value of connectedMode is True"
 	assert connectionConfig.checkCapabilities == True, "start value of checkCapabilities is True"
 	assert connectionConfig.includeKey == True, "start value of includeKey is True"
@@ -30,7 +30,7 @@ def test_connectionConfig_withParameter():
 					 "checks_capabilities":False}
 
 	connectionConfig=ConnectionConfig(startParameters)
-	
+
 	assert connectionConfig.serverURL== "http://localhost:6363/"
 	assert connectionConfig.dbID== "myFirstTerminusDB"
 	assert connectionConfig.connectedMode == False
