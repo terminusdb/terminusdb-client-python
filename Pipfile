@@ -4,15 +4,15 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-
-[packages]
 pytest = "*"
 pytest-mock = "*"
-requests = "*"
 autopep8 = "*"
 flake8 = "*"
 docutils-python3 = "*"
 pytest-cov = "*"
+
+[packages]
+requests = "*"
 
 [requires]
 python_version = "3.6"
