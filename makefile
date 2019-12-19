@@ -14,7 +14,7 @@ flake8:
 	pipenv run flake8 --ignore=E501,F401,E128,E402,E731,F821 src/woqlclient
 
 coverage:
-	pipenv run py.test src/tests --cov-config .coveragerc --verbose --cov-report term --cov-report xml --cov=src/woqlclient src/tests
+	pipenv run py.test tests --cov-config .coveragerc --verbose --cov-report term --cov-report xml --cov=src/woqlclient tests
 
 #command line for publish the module
 #using twine to upload packages to PyPI https://pypi.org/project/twine/
