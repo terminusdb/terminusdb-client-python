@@ -77,9 +77,12 @@ class WOQLClient:
     """
 
     def createDatabase(self, dbID, label, key=None, **kwargs):
+        self.conConfig.setDB(dbID)
         createDBTemplate = DocumentTemplate.createDBTemplate(
             self.conConfig.serverURL, self.conConfig.dbID, label, **kwargs)
-        return self.dispatch(self.conConfig.dbURL, const.CREATE_DATABASE, key, createDBTemplate)
+        #after create db the server could send back the capabilities of the new db, we can add the new capability at the
+        #capabilities list
+        return self.dispatch(self.conConfig.dbURL(), const.CREATE_DATABASE, key, createDBTemplate)
 
     """
         :param {string} dbURL  TerminusDB full URL like http://localhost:6363/myDB
@@ -281,7 +284,7 @@ class WOQLClient:
         if(dbID):
             self.conConfig.setDB(dbID)
 
-        payload = {'terminus:query': json.dump(woqlQuery)}
+        payload = {'terminus:query': json.dumps(woqlQuery)}
         return self.dispatch(self.conConfig.queryURL(), const.WOQL_SELECT, key, payload)
 
     @staticmethod
@@ -306,7 +309,7 @@ class WOQLClient:
         if(dbID):
             self.conConfig.setDB(dbID)
             # raise InvalidURIError(ErrorMessage.getInvalidURIMessage(docurl, "Update"))
-        payload = {'terminus:query': json.dump(woqlQuery)}
+        payload = {'terminus:query': json.dumps(woqlQuery)}
         return self.dispatch(self.conConfig.queryURL(), const.WOQL_UPDATE, key, payload)
 
     @staticmethod
@@ -314,7 +317,7 @@ class WOQLClient:
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
 
-        payload = {'terminus:query': json.dump(woqlQuery)}
+        payload = {'terminus:query': json.dumps(woqlQuery)}
         return DispatchRequest.sendRequestByAction(idParser.queryURL(), const.WOQL_UPDATE, key, payload)
 
     def dispatch(self, url, action, connectionKey, payload={}):
@@ -322,12 +325,13 @@ class WOQLClient:
             # if the api key is not setted the method raise an APIerror
             connectionKey = self.conCapabilities.getClientKey()
 
-        if (action != const.CONNECT and self.conConfig.connectedMode and self.conCapabilities.serverConnected() is False):
+        #if (action != const.CONNECT and self.conConfig.connectedMode and self.conCapabilities.serverConnected() is False):
 
-            # key = payload.key if isinstance(payload,dict) and key in payload else False
-            self.connect(self.conConfig.serverURL, connectionKey)
-            print("CONNCT BEFORE ACTION", action)
+            #key = payload.key if isinstance(payload,dict) and key in payload else False
+            #self.connect(self.conConfig.serverURL, connectionKey)
+            #print("CONNCT BEFORE ACTION", action)
 
-        # check if we can perform this action or raise an AccessDeniedError error
-        self.conCapabilities.capabilitiesPermit(action)
+        #check if we can perform this action or raise an AccessDeniedError error
+        #review the access control 
+        #self.conCapabilities.capabilitiesPermit(action)
         return DispatchRequest.sendRequestByAction(url, action, connectionKey, payload)
