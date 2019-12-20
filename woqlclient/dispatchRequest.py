@@ -42,7 +42,8 @@ class DispatchRequest:
 
     @classmethod
     def sendRequestByAction(cls, url, action, key, payload={}):
-        print("sendRequestByAction_____", action)
+        print("Sending to URL____________", url)
+        print("sendRequestByAction_____________", action)
         try:
             requestResponse = None
             headers = cls.__autorizationHeader(key)
