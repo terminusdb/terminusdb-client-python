@@ -764,7 +764,7 @@ class WOQLQuery:
                     if type(value) == str:
                         val_spl = value.split(":")
                         if len(val_spl)==2 and val_spl[1] and val_spl[0]!='_':
-                            self.vocab[val_spl[1]] = value
+                            self.vocab[val_spl[0]] = val_spl[1]
 
     def getLimit(self):
         return self.getPagingProperty("limit")
