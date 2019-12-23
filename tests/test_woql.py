@@ -19,9 +19,9 @@ class TestWoqlQueries:
         jsonObj = {"limit": [10,{"start": [0,{}]}]}
         assert woqlObject.json() == jsonObj
 
-    def test_WOQLnot_method(self):
-        woqlObject = WOQLQuery().WOQLnot(WOQLQuery().triple("a", "b", "c"))
-        woqlObjectChain = WOQLQuery().WOQLnot().triple("a", "b", "c")
+    def test_woql_not_method(self):
+        woqlObject = WOQLQuery().woql_not(WOQLQuery().triple("a", "b", "c"))
+        woqlObjectChain = WOQLQuery().woql_not().triple("a", "b", "c")
         jsonObj={ 'not': [ { 'triple': [ "doc:a", "scm:b", { "@language": "en", "@value": "c" } ] } ] }
 
         print(woqlObject.json())
@@ -29,15 +29,15 @@ class TestWoqlQueries:
         assert woqlObject.json() == jsonObj
         assert woqlObjectChain.json() == jsonObj
 
-    def test_WOQLand_method(self):
-        woqlObject=WOQLQuery().WOQLand(WOQLQuery().triple("a", "b", "c"),
+    def test_woql_and_method(self):
+        woqlObject=WOQLQuery().woql_and(WOQLQuery().triple("a", "b", "c"),
                                     WOQLQuery().triple("1", "2", "3"))
         jsonObj={ 'and': [ { 'triple': [ "doc:a", "scm:b", { "@language": "en", "@value": "c" } ] }, { 'triple': [ "doc:1", "scm:2", { "@language": "en", "@value": "3" } ] } ] }
 
         assert woqlObject.json() == jsonObj
 
-    def test_WOQLor_method(self):
-        woqlObject=WOQLQuery().WOQLor(WOQLQuery().triple("a", "b", "c"),
+    def test_woql_or_method(self):
+        woqlObject=WOQLQuery().woql_or(WOQLQuery().triple("a", "b", "c"),
                                     WOQLQuery().triple("1", "2", "3"))
         jsonObj={ 'or': [ { 'triple': [ "doc:a", "scm:b", { "@language": "en", "@value": "c" } ] }, { 'triple': [ "doc:1", "scm:2", { "@language": "en", "@value": "3" } ] } ] }
 
@@ -65,10 +65,10 @@ class TestWoqlQueries:
         assert woqlObject.json() == jsonObj
         assert woqlObjectChain.json() == jsonObj
 
-    def test_WOQLfrom_method(self):
-        WOQLOriginal=WOQLQuery().limit(10)
-        woqlObject=WOQLQuery().WOQLfrom("http://dburl", WOQLOriginal)
-        woqlObjectChain=WOQLQuery().WOQLfrom("http://dburl").limit(10)
+    def test_woql_from_method(self):
+        woql_original=WOQLQuery().limit(10)
+        woqlObject=WOQLQuery().woql_from("http://dburl", woql_original)
+        woqlObjectChain=WOQLQuery().woql_from("http://dburl").limit(10)
 
         jsonObj={ 'from': [ 'http://dburl', { 'limit': [ 10, {} ] } ] }
 
@@ -150,8 +150,8 @@ class TestWoqlQueries:
         assert woqlObject.json() == jsonObj
 
     def test_WQOLas_method(self):
-        woqlObject=WOQLQuery().WOQLas("Source", "Target")
-        woqlObject2=WOQLQuery().WOQLas("Source", "Target").WOQLas("Source2", "Target2")
+        woqlObject=WOQLQuery().woql_as("Source", "Target")
+        woqlObject2=WOQLQuery().woql_as("Source", "Target").woql_as("Source2", "Target2")
         jsonObj=[{ 'as': [ { '@value': 'Source' }, 'v:Target' ] }]
         jsonObj2 =[{ 'as': [ { '@value': 'Source' }, 'v:Target' ] },
                    { 'as': [ { '@value': 'Source2' }, 'v:Target2' ] }]

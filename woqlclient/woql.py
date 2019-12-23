@@ -260,7 +260,7 @@ class WOQLQuery:
             self.cursor = self.cursor["opt"][0]
         return self
 
-    def WOQLfrom(self, dburl, query=None):
+    def woql_from(self, dburl, query=None):
         self._advanceCursor("from", dburl)
         if query:
             self.cursor = query.json()
@@ -294,7 +294,7 @@ class WOQLQuery:
             self.cursor = self.cursor['select'][index]
         return self
 
-    def WOQLand(self, *args):
+    def woql_and(self, *args):
         self.cursor['and'] = []
         for item in args:
             if item.contains_update:
@@ -302,7 +302,7 @@ class WOQLQuery:
             self.cursor['and'].append(item.json())
         return self
 
-    def WOQLor(self, *args):
+    def woql_or(self, *args):
         self.cursor['or'] = []
         for item in args:
             if item.contains_update:
@@ -310,7 +310,7 @@ class WOQLQuery:
             self.cursor['or'].append(item.json())
         return self
 
-    def WOQLnot(self, query=None):
+    def woql_not(self, query=None):
         if query:
             if query.contains_update:
                 self.contains_update = True
@@ -475,7 +475,7 @@ class WOQLQuery:
             graph = self.cleanGraph(graph) if graph else "db:schema"
             c = "scm:" + c if c.find(":") == -1 else c
 
-            return self.WOQLand(WOQLQuery().delete_quad(c, "v:All", "v:Al2", graph),
+            return self.woql_and(WOQLQuery().delete_quad(c, "v:All", "v:Al2", graph),
                             WOQLQuery().opt().delete_quad("v:Al3", "v:Al4", c, graph))
         return self
 
@@ -488,10 +488,10 @@ class WOQLQuery:
             t = self.cleanType(t) if t.find(":") == -1 else t
             tc = self.cursor
             if WOQLQuery().isLiteralType(t):
-                self.WOQLand(WOQLQuery().add_quad(p, "rdf:type", "owl:DatatypeProperty", graph),
+                self.woql_and(WOQLQuery().add_quad(p, "rdf:type", "owl:DatatypeProperty", graph),
                          WOQLQuery().add_quad(p, "rdfs:range", t, graph))
             else:
-                self.WOQLand(WOQLQuery().add_quad(p, "rdf:type", "owl:ObjectProperty", graph),
+                self.woql_and(WOQLQuery().add_quad(p, "rdf:type", "owl:ObjectProperty", graph),
                          WOQLQuery().add_quad(p, "rdfs:range", t, graph))
         return self.lastUpdate("add_quad", self.cleanClass(p))
 
@@ -499,13 +499,13 @@ class WOQLQuery:
         if p:
             graph = self.cleanGraph(graph) if graph else "db:schema"
             p = "scm:" + p if p.find(":") == -1 else p
-            return self.WOQLand(WOQLQuery().delete_quad(p, "v:All", "v:Al2", graph),
+            return self.woql_and(WOQLQuery().delete_quad(p, "v:All", "v:Al2", graph),
                             WOQLQuery().delete_quad("v:Al3", "v:Al4", p, graph))
         return self
 
     # Language elements that cannot be invoked from the top level and therefore are not exposed in the WOQL api
 
-    def WOQLas(self, a=None, b=None):
+    def woql_as(self, a=None, b=None):
         if (not a) or (not b):
             return
 
@@ -611,13 +611,13 @@ class WOQLQuery:
             self.triple("v:Subject", "v:Predicate", "v:Object")
 
     def getAllDocuments(self):
-        return self.WOQLand(
+        return self.woql_and(
                     WOQLQuery().triple("v:Subject", "rdf:type", "v:Type"),
                     WOQLQuery().sub("v:Type", "tcs:Document")
                     )
 
     def documentMetadata(self):
-        return self.WOQLand(
+        return self.woql_and(
                 WOQLQuery().triple("v:ID", "rdf:type", "v:Class"),
                 WOQLQuery().sub("v:Class", "tcs:Document"),
                 WOQLQuery().opt().triple("v:ID", "rdfs:label", "v:Label"),
@@ -627,16 +627,16 @@ class WOQLQuery:
                 )
 
     def concreteDocumentClasses(self):
-        return self.WOQLand(
+        return self.woql_and(
                 WOQLQuery().sub("v:Class", "tcs:Document"),
-                WOQLQuery().WOQLnot().abstract("v:Class"),
+                WOQLQuery().woql_not().abstract("v:Class"),
                 WOQLQuery().opt().quad("v:Class", "rdfs:label", "v:Label", "db:schema"),
                 WOQLQuery().opt().quad("v:Class", "rdfs:comment", "v:Comment", "db:schema")
                 )
 
     def propertyMetadata(self):
-        return self.WOQLand(
-                WOQLQuery().WOQLor(
+        return self.woql_and(
+                WOQLQuery().woql_or(
                     WOQLQuery().quad("v:Property", "rdf:type", "owl:DatatypeProperty", "db:schema"),
                     WOQLQuery().quad("v:Property", "rdf:type", "owl:ObjectProperty", "db:schema")
                 ),
@@ -648,7 +648,7 @@ class WOQLQuery:
                 )
 
     def elementMetadata(self):
-        return self.WOQLand(
+        return self.woql_and(
                 WOQLQuery().quad("v:Element", "rdf:type", "v:Type", "db:schema"),
                 WOQLQuery().opt().quad("v:Element", "tcs:tag", "v:Abstract", "db:schema"),
                 WOQLQuery().opt().quad("v:Element", "rdfs:label", "v:Label", "db:schema"),
@@ -659,7 +659,7 @@ class WOQLQuery:
                 )
 
     def classMetadata(self):
-        return self.WOQLand(
+        return self.woql_and(
                 WOQLQuery().quad("v:Element", "rdf:type", "owl:Class", "db:schema"),
                 WOQLQuery().opt().quad("v:Element", "rdfs:label", "v:Label", "db:schema"),
                 WOQLQuery().opt().quad("v:Element", "rdfs:comment", "v:Comment", "db:schema"),
@@ -667,27 +667,27 @@ class WOQLQuery:
                 )
 
     def getDataOfClass(self, chosen):
-        return self.WOQLand(
+        return self.woql_and(
                 WOQLQuery().triple("v:Subject", "rdf:type", chosen),
                 WOQLQuery().opt().triple("v:Subject", "v:Property", "v:Value")
                 )
 
     def getDataOfProperty(self, chosen):
-        return self.WOQLand(
+        return self.woql_and(
                 WOQLQuery().triple("v:Subject", chosen, "v:Value"),
                 WOQLQuery().opt().triple("v:Subject", "rdfs:label", "v:Label")
                 )
 
     def documentProperties(self, id):
-        return self.WOQLand(
+        return self.woql_and(
                 WOQLQuery().triple(id, "v:Property", "v:Property_Value"),
                 WOQLQuery().opt().quad("v:Property", "rdfs:label", "v:Property_Label", "db:schema"),
                 WOQLQuery().opt().quad("v:Property", "rdf:type", "v:Property_Type", "db:schema")
                 )
 
     def getDocumentConnections(self, id):
-        return self.WOQLand(
-                WOQLQuery().WOQLor(
+        return self.woql_and(
+                WOQLQuery().woql_or(
                     WOQLQuery().triple(id, "v:Outgoing", "v:Entid"),
                     WOQLQuery().triple("v:Entid", "v:Incoming", id)
                 ),
@@ -698,7 +698,7 @@ class WOQLQuery:
                 )
 
     def getInstanceMeta(self, url):
-        return self.WOQLand(
+        return self.woql_and(
                 WOQLQuery().triple(url, "rdf:type", "v:InstanceType"),
                 WOQLQuery().opt().triple(url, "rdfs:label", "v:InstanceLabel"),
                 WOQLQuery().opt().triple(url, "rdfs:comment", "v:InstanceComment"),
@@ -706,7 +706,7 @@ class WOQLQuery:
                 )
 
     def simpleGraphQuery(self):
-        return self.WOQLand(
+        return self.woql_and(
                 WOQLQuery().triple("v:Source", "v:Edge", "v:Target"),
                 WOQLQuery().isa("v:Source", "v:Source_Class"),
                 WOQLQuery().sub("v:Source_Class", "tcs:Document"),
@@ -725,7 +725,7 @@ class WOQLQuery:
                 )
 
     def simpleGraphQuery(self):
-        return self.WOQLand(
+        return self.woql_and(
                 WOQLQuery().triple("v:Source", "v:Edge", "v:Target"),
                 WOQLQuery().isa("v:Source", "v:Source_Class"),
                 WOQLQuery().sub("v:Source_Class", "tcs:Document"),
