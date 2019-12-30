@@ -31,11 +31,11 @@ class WOQLQuery:
         self.contains_update = False
         # operators which preserve global paging
         self.paging_transitive_properties = ['select', 'from', 'start', 'when', 'opt', 'limit']
-        self.vocab = self._loadDefaultVocabulary()
+        self.vocab = self._load_default_vocabulary()
         # object used to accumulate triples from fragments to support usage like node("x").label("y")
         self.tripleBuilder = False
 
-        self.cleanClass = self.cleanType = self.cleanPredicate
+        self.cleanClass = self.cleanType = self.clean_predicate
         self.relationship = self.entity
 
     def isLiteralType(self, t):
@@ -260,26 +260,26 @@ class WOQLQuery:
             self.cursor = self.cursor["opt"][0]
         return self
 
-    def WOQLfrom(self, dburl, query=None):
-        self._advanceCursor("from", dburl)
+    def woql_from(self, dburl, query=None):
+        self._advance_cursor("from", dburl)
         if query:
             self.cursor = query.json()
         return self
 
     def into(self, dburl, query=None):
-        self._advanceCursor("into", dburl)
+        self._advance_cursor("into", dburl)
         if query:
             self.cursor = query.json()
         return self
 
     def limit(self, limit, query=None):
-        self._advanceCursor("limit", limit)
+        self._advance_cursor("limit", limit)
         if query:
             self.cursor = query.json()
         return self
 
     def start(self, start, query=None):
-        self._advanceCursor("start", start)
+        self._advance_cursor("start", start)
         if query:
             self.cursor = query.json()
         return self
@@ -294,7 +294,7 @@ class WOQLQuery:
             self.cursor = self.cursor['select'][index]
         return self
 
-    def WOQLand(self, *args):
+    def woql_and(self, *args):
         self.cursor['and'] = []
         for item in args:
             if item.contains_update:
@@ -302,7 +302,7 @@ class WOQLQuery:
             self.cursor['and'].append(item.json())
         return self
 
-    def WOQLor(self, *args):
+    def woql_or(self, *args):
         self.cursor['or'] = []
         for item in args:
             if item.contains_update:
@@ -310,7 +310,7 @@ class WOQLQuery:
             self.cursor['or'].append(item.json())
         return self
 
-    def WOQLnot(self, query=None):
+    def woql_not(self, query=None):
         if query:
             if query.contains_update:
                 self.contains_update = True
@@ -321,19 +321,19 @@ class WOQLQuery:
         return self
 
     def triple(self, a, b, c):
-        self.cursor["triple"] = [self.cleanSubject(a),self.cleanPredicate(b),self.cleanObject(c)]
-        return self.last("triple", self.cleanSubject(a))
+        self.cursor["triple"] = [self.clean_subject(a),self.clean_predicate(b),self.clean_object(c)]
+        return self.last("triple", self.clean_subject(a))
 
     def quad(self, a, b, c, g):
-        self.cursor["quad"] = [self.cleanSubject(a),
-                                self.cleanPredicate(b),
-                                self.cleanObject(c),
-                                self.cleanGraph(g)]
-        return self.last("quad", self.cleanSubject(a))
+        self.cursor["quad"] = [self.clean_subject(a),
+                                self.clean_predicate(b),
+                                self.clean_object(c),
+                                self.clean_graph(g)]
+        return self.last("quad", self.clean_subject(a))
 
 
     def eq(self, a, b):
-        self.cursor["eq"] = [self.cleanObject(a),self.cleanObject(b)];
+        self.cursor["eq"] = [self.clean_object(a),self.clean_object(b)];
         return self.last()
 
     def sub(self, a, b=None):
@@ -429,83 +429,83 @@ class WOQLQuery:
 
     def delete(self, JSON_or_IRI):
         self.cursor['delete'] = [JSON_or_IRI]
-        return self.lastUpdate()
+        return self.last_update()
 
     def delete_triple(self, Subject, Predicate, Object_or_Literal):
-        self.cursor['delete_triple'] = [self.cleanSubject(Subject),
-                                        self.cleanPredicate(Predicate),
-                                        self.cleanObject(Object_or_Literal)]
-        return self.lastUpdate('delete_triple', self.cleanSubject(Subject))
+        self.cursor['delete_triple'] = [self.clean_subject(Subject),
+                                        self.clean_predicate(Predicate),
+                                        self.clean_object(Object_or_Literal)]
+        return self.last_update('delete_triple', self.clean_subject(Subject))
 
     def add_triple(self, Subject, Predicate, Object_or_Literal):
-        self.cursor['add_triple'] = [self.cleanSubject(Subject),
-                                    self.cleanPredicate(Predicate),
-                                    self.cleanObject(Object_or_Literal)]
-        return self.lastUpdate('add_triple', self.cleanSubject(Subject))
+        self.cursor['add_triple'] = [self.clean_subject(Subject),
+                                    self.clean_predicate(Predicate),
+                                    self.clean_object(Object_or_Literal)]
+        return self.last_update('add_triple', self.clean_subject(Subject))
 
     def delete_quad(self, Subject, Predicate, Object_or_Literal, Graph):
-        self.cursor['delete_quad'] =[self.cleanSubject(Subject),
-                                    self.cleanPredicate(Predicate),
-                                    self.cleanObject(Object_or_Literal),
-                                    self.cleanGraph(Graph)]
-        return self.lastUpdate('delete_quad', self.cleanSubject(Subject))
+        self.cursor['delete_quad'] =[self.clean_subject(Subject),
+                                    self.clean_predicate(Predicate),
+                                    self.clean_object(Object_or_Literal),
+                                    self.clean_graph(Graph)]
+        return self.last_update('delete_quad', self.clean_subject(Subject))
 
     def add_quad(self, Subject, Predicate, Object_or_Literal, Graph):
-        self.cursor['add_quad'] =[self.cleanSubject(Subject),
-                                    self.cleanPredicate(Predicate),
-                                    self.cleanObject(Object_or_Literal),
-                                    self.cleanGraph(Graph)]
-        return self.lastUpdate('add_quad', self.cleanSubject(Subject))
+        self.cursor['add_quad'] =[self.clean_subject(Subject),
+                                    self.clean_predicate(Predicate),
+                                    self.clean_object(Object_or_Literal),
+                                    self.clean_graph(Graph)]
+        return self.last_update('add_quad', self.clean_subject(Subject))
 
     def update(self, woql):
         self.cursor['update'] = [ woql.json() ]
-        return self.lastUpdate()
+        return self.last_update()
 
     # Schema manipulation shorthand
 
-    def addClass(self, c=None, graph=None):
+    def add_class(self, c=None, graph=None):
         if c:
-            graph = self.cleanGraph(graph) if graph else "db:schema"
+            graph = self.clean_graph(graph) if graph else "db:schema"
             c = "scm:" + c if c.find(":") == -1 else c
             self.add_quad(c, "rdf:type", "owl:Class", graph)
         return self
 
-    def deleteClass(self, c=None, graph=None):
+    def delete_class(self, c=None, graph=None):
         if c:
-            graph = self.cleanGraph(graph) if graph else "db:schema"
+            graph = self.clean_graph(graph) if graph else "db:schema"
             c = "scm:" + c if c.find(":") == -1 else c
 
-            return self.WOQLand(WOQLQuery().delete_quad(c, "v:All", "v:Al2", graph),
+            return self.woql_and(WOQLQuery().delete_quad(c, "v:All", "v:Al2", graph),
                             WOQLQuery().opt().delete_quad("v:Al3", "v:Al4", c, graph))
         return self
 
-    def addProperty(self, p=None, t=None, g=None):
+    def add_property(self, p=None, t=None, g=None):
         if not t:
             t = "xsd:string"
         if p:
-            graph = self.cleanGraph(g) if g else "db:schema"
+            graph = self.clean_graph(g) if g else "db:schema"
             p = "scm:" + p if p.find(":") == -1 else p
             t = self.cleanType(t) if t.find(":") == -1 else t
             tc = self.cursor
             if WOQLQuery().isLiteralType(t):
-                self.WOQLand(WOQLQuery().add_quad(p, "rdf:type", "owl:DatatypeProperty", graph),
+                self.woql_and(WOQLQuery().add_quad(p, "rdf:type", "owl:DatatypeProperty", graph),
                          WOQLQuery().add_quad(p, "rdfs:range", t, graph))
             else:
-                self.WOQLand(WOQLQuery().add_quad(p, "rdf:type", "owl:ObjectProperty", graph),
+                self.woql_and(WOQLQuery().add_quad(p, "rdf:type", "owl:ObjectProperty", graph),
                          WOQLQuery().add_quad(p, "rdfs:range", t, graph))
-        return self.lastUpdate("add_quad", self.cleanClass(p))
+        return self.last_update("add_quad", self.cleanClass(p))
 
-    def deleteProperty(self, p=None, graph=None):
+    def delete_property(self, p=None, graph=None):
         if p:
-            graph = self.cleanGraph(graph) if graph else "db:schema"
+            graph = self.clean_graph(graph) if graph else "db:schema"
             p = "scm:" + p if p.find(":") == -1 else p
-            return self.WOQLand(WOQLQuery().delete_quad(p, "v:All", "v:Al2", graph),
+            return self.woql_and(WOQLQuery().delete_quad(p, "v:All", "v:Al2", graph),
                             WOQLQuery().delete_quad("v:Al3", "v:Al4", p, graph))
         return self
 
     # Language elements that cannot be invoked from the top level and therefore are not exposed in the WOQL api
 
-    def WOQLas(self, a=None, b=None):
+    def woql_as(self, a=None, b=None):
         if (not a) or (not b):
             return
 
@@ -533,7 +533,7 @@ class WOQLQuery:
         return self
 
     def graph(self, g):
-        g = self.cleanGraph(g)
+        g = self.clean_graph(g)
         if hasattr(self,'type'):
             t = "quad" if self.type == "triple" else False
             if self.type == "add_triple":
@@ -573,7 +573,7 @@ class WOQLQuery:
 
     def property(self, p,val):
         if self.tripleBuilder:
-            p = self.cleanPredicate(p)
+            p = self.clean_predicate(p)
             self.tripleBuilder.addPO(p, val)
         return self
 
@@ -593,31 +593,31 @@ class WOQLQuery:
         return self
 
     def star(self, GraphIRI=None, Subj=None, Pred=None, Obj=None):
-        Subj = self.cleanSubject(Subj) if Subj else "v:Subject"
-        Pred = self.cleanPredicate(Pred) if Pred else "v:Predicate"
-        Obj = self.cleanObject(Obj) if Obj else "v:Object"
-        GraphIRI = self.cleanGraph(GraphIRI) if GraphIRI else False
+        Subj = self.clean_subject(Subj) if Subj else "v:Subject"
+        Pred = self.clean_predicate(Pred) if Pred else "v:Predicate"
+        Obj = self.clean_object(Obj) if Obj else "v:Object"
+        GraphIRI = self.clean_graph(GraphIRI) if GraphIRI else False
 
         if GraphIRI:
             return self.quad(Subj, Pred, Obj, GraphIRI)
         else:
             return self.triple(Subj, Pred, Obj)
 
-    def getEverything(self, GraphIRI=None):
+    def get_everything(self, GraphIRI=None):
         if GraphIRI:
-            GraphIRI = self.cleanGraph(GraphIRI)
+            GraphIRI = self.clean_graph(GraphIRI)
             return self.quad("v:Subject", "v:Predicate", "v:Object", GraphIRI)
         else:
             self.triple("v:Subject", "v:Predicate", "v:Object")
 
-    def getAllDocuments(self):
-        return self.WOQLand(
+    def get_all_documents(self):
+        return self.woql_and(
                     WOQLQuery().triple("v:Subject", "rdf:type", "v:Type"),
                     WOQLQuery().sub("v:Type", "tcs:Document")
                     )
 
-    def documentMetadata(self):
-        return self.WOQLand(
+    def document_metadata(self):
+        return self.woql_and(
                 WOQLQuery().triple("v:ID", "rdf:type", "v:Class"),
                 WOQLQuery().sub("v:Class", "tcs:Document"),
                 WOQLQuery().opt().triple("v:ID", "rdfs:label", "v:Label"),
@@ -626,17 +626,17 @@ class WOQLQuery:
                 WOQLQuery().opt().quad("v:Class", "rdfs:comment", "v:Type_Comment", "db:schema")
                 )
 
-    def concreteDocumentClasses(self):
-        return self.WOQLand(
+    def concrete_document_classes(self):
+        return self.woql_and(
                 WOQLQuery().sub("v:Class", "tcs:Document"),
-                WOQLQuery().WOQLnot().abstract("v:Class"),
+                WOQLQuery().woql_not().abstract("v:Class"),
                 WOQLQuery().opt().quad("v:Class", "rdfs:label", "v:Label", "db:schema"),
                 WOQLQuery().opt().quad("v:Class", "rdfs:comment", "v:Comment", "db:schema")
                 )
 
-    def propertyMetadata(self):
-        return self.WOQLand(
-                WOQLQuery().WOQLor(
+    def property_metadata(self):
+        return self.woql_and(
+                WOQLQuery().woql_or(
                     WOQLQuery().quad("v:Property", "rdf:type", "owl:DatatypeProperty", "db:schema"),
                     WOQLQuery().quad("v:Property", "rdf:type", "owl:ObjectProperty", "db:schema")
                 ),
@@ -647,8 +647,8 @@ class WOQLQuery:
                 WOQLQuery().opt().quad("v:Property", "rdfs:domain", "v:Domain", "db:schema")
                 )
 
-    def elementMetadata(self):
-        return self.WOQLand(
+    def element_metadata(self):
+        return self.woql_and(
                 WOQLQuery().quad("v:Element", "rdf:type", "v:Type", "db:schema"),
                 WOQLQuery().opt().quad("v:Element", "tcs:tag", "v:Abstract", "db:schema"),
                 WOQLQuery().opt().quad("v:Element", "rdfs:label", "v:Label", "db:schema"),
@@ -658,36 +658,36 @@ class WOQLQuery:
                 WOQLQuery().opt().quad("v:Element", "rdfs:range", "v:Range", "db:schema")
                 )
 
-    def classMetadata(self):
-        return self.WOQLand(
+    def class_metadata(self):
+        return self.woql_and(
                 WOQLQuery().quad("v:Element", "rdf:type", "owl:Class", "db:schema"),
                 WOQLQuery().opt().quad("v:Element", "rdfs:label", "v:Label", "db:schema"),
                 WOQLQuery().opt().quad("v:Element", "rdfs:comment", "v:Comment", "db:schema"),
                 WOQLQuery().opt().quad("v:Element", "tcs:tag", "v:Abstract", "db:schema")
                 )
 
-    def getDataOfClass(self, chosen):
-        return self.WOQLand(
+    def get_data_of_class(self, chosen):
+        return self.woql_and(
                 WOQLQuery().triple("v:Subject", "rdf:type", chosen),
                 WOQLQuery().opt().triple("v:Subject", "v:Property", "v:Value")
                 )
 
-    def getDataOfProperty(self, chosen):
-        return self.WOQLand(
+    def get_data_of_property(self, chosen):
+        return self.woql_and(
                 WOQLQuery().triple("v:Subject", chosen, "v:Value"),
                 WOQLQuery().opt().triple("v:Subject", "rdfs:label", "v:Label")
                 )
 
-    def documentProperties(self, id):
-        return self.WOQLand(
+    def document_properties(self, id):
+        return self.woql_and(
                 WOQLQuery().triple(id, "v:Property", "v:Property_Value"),
                 WOQLQuery().opt().quad("v:Property", "rdfs:label", "v:Property_Label", "db:schema"),
                 WOQLQuery().opt().quad("v:Property", "rdf:type", "v:Property_Type", "db:schema")
                 )
 
-    def getDocumentConnections(self, id):
-        return self.WOQLand(
-                WOQLQuery().WOQLor(
+    def get_document_connections(self, id):
+        return self.woql_and(
+                WOQLQuery().woql_or(
                     WOQLQuery().triple(id, "v:Outgoing", "v:Entid"),
                     WOQLQuery().triple("v:Entid", "v:Incoming", id)
                 ),
@@ -697,16 +697,16 @@ class WOQLQuery:
                 WOQLQuery().opt().quad("v:Enttype", "rdfs:label", "v:Class_Label", "db:schema")
                 )
 
-    def getInstanceMeta(self, url):
-        return self.WOQLand(
+    def get_instance_meta(self, url):
+        return self.woql_and(
                 WOQLQuery().triple(url, "rdf:type", "v:InstanceType"),
                 WOQLQuery().opt().triple(url, "rdfs:label", "v:InstanceLabel"),
                 WOQLQuery().opt().triple(url, "rdfs:comment", "v:InstanceComment"),
                 WOQLQuery().opt().quad("v:InstanceType", "rdfs:label", "v:ClassLabel", "db:schema")
                 )
 
-    def simpleGraphQuery(self):
-        return self.WOQLand(
+    def simple_graph_query(self):
+        return self.woql_and(
                 WOQLQuery().triple("v:Source", "v:Edge", "v:Target"),
                 WOQLQuery().isa("v:Source", "v:Source_Class"),
                 WOQLQuery().sub("v:Source_Class", "tcs:Document"),
@@ -724,33 +724,14 @@ class WOQLQuery:
                 WOQLQuery().opt().quad("v:Edge", "rdfs:comment", "v:Edge_Type_Comment", "db:schema")
                 )
 
-    def simpleGraphQuery(self):
-        return self.WOQLand(
-                WOQLQuery().triple("v:Source", "v:Edge", "v:Target"),
-                WOQLQuery().isa("v:Source", "v:Source_Class"),
-                WOQLQuery().sub("v:Source_Class", "tcs:Document"),
-                WOQLQuery().isa("v:Target", "v:Target_Class"),
-                WOQLQuery().sub("v:Target_Class", "tcs:Document"),
-                WOQLQuery().opt().triple("v:Source", "rdfs:label", "v:Source_Label"),
-                WOQLQuery().opt().triple("v:Source", "rdfs:comment", "v:Source_Comment"),
-                WOQLQuery().opt().quad("v:Source_Class", "rdfs:label", "v:Source_Type", "db:schema"),
-                WOQLQuery().opt().quad("v:Source_Class", "rdfs:comment", "v:Source_Type_Comment", "db:schema"),
-                WOQLQuery().opt().triple("v:Target", "rdfs:label", "v:Target_Label"),
-                WOQLQuery().opt().triple("v:Target", "rdfs:comment", "v:Target_Comment"),
-                WOQLQuery().opt().quad("v:Target_Class", "rdfs:label", "v:Target_Type", "db:schema"),
-                WOQLQuery().opt().quad("v:Target_Class", "rdfs:comment", "v:Target_Type_Comment", "db:schema"),
-                WOQLQuery().opt().quad("v:Edge", "rdfs:label", "v:Edge_Type", "db:schema"),
-                WOQLQuery().opt().quad("v:Edge", "rdfs:comment", "v:Edge_Type_Comment", "db:schema")
-                )
-
-    def getVocabulary(self):
+    def get_vocabulary(self):
         return self.vocab
 
-    def setVocabulary(self, vocab):
+    def set_vocabulary(self, vocab):
         """Provides the query with a 'vocabulary' a list of well known predicates that can be used without prefixes mapping: id: prefix:id ..."""
         self.vocab = vocab
 
-    def loadVocabulary(self, client):
+    def load_vocabulary(self, client):
         """
         * Queries the schema graph and loads all the ids found there as vocabulary that can be used without prefixes
         * ignoring blank node ids
@@ -766,65 +747,65 @@ class WOQLQuery:
                         if len(val_spl)==2 and val_spl[1] and val_spl[0]!='_':
                             self.vocab[val_spl[1]] = value
 
-    def getLimit(self):
-        return self.getPagingProperty("limit")
+    def get_limit(self):
+        return self.get_paging_property("limit")
 
-    def setLimit(self, l):
-        return self.setPagingProperty("limit", l)
+    def set_limit(self, l):
+        return self.set_paging_property("limit", l)
 
-    def isPaged(self, q=None):
+    def is_paged(self, q=None):
         if q is None:
             q = self.query
         for prop in q:
             if prop == "limit":
                 return True
             elif prop in self.paging_transitive_properties:
-                return self.isPaged(q[prop][len(q[prop])-1])
+                return self.is_paged(q[prop][len(q[prop])-1])
         return False
 
-    def getPage(self):
-        if self.isPaged():
-            psize = self.getLimit()
-            if self.hasStart():
-                s = self.getStart()
+    def get_page(self):
+        if self.is_paged():
+            psize = self.get_limit()
+            if self.has_start():
+                s = self.get_start()
                 return ((s // psize) + 1)
             else:
                 return 1
         else:
             return False
 
-    def setPage(self, pagenum):
-        pstart = (self.getLimit() * (pagenum - 1))
-        if self.hasStart():
-            self.setStart(pstart)
+    def set_page(self, pagenum):
+        pstart = (self.get_limit() * (pagenum - 1))
+        if self.has_start():
+            self.set_start(pstart)
         else:
-            self.addStart(pstart)
+            self.add_start(pstart)
         return self
 
-    def nextPage(self):
-        return self.setPage(self.getPage() + 1)
+    def next_page(self):
+        return self.set_page(self.get_page() + 1)
 
-    def firstPage(self):
-        return self.setPage(1)
+    def first_page(self):
+        return self.set_page(1)
 
-    def previousPage(self):
-        npage = self.getPage() - 1
+    def previous_page(self):
+        npage = self.get_page() - 1
         if npage > 0:
-            self.setPage(npage)
+            self.set_page(npage)
         return self
 
-    def setPageSize(self, size):
-        self.setPagingProperty("limit", size)
-        if self.hasStart():
-            self.setStart(0)
+    def set_page_size(self, size):
+        self.set_paging_property("limit", size)
+        if self.has_start():
+            self.set_start(0)
         else:
-            self.addStart(0)
+            self.add_start(0)
         return self
 
-    def hasSelect(self):
-        return bool(self.getPagingProperty("select"))
+    def has_select(self):
+        return bool(self.get_paging_property("select"))
 
-    def getSelectVariables(self, q=None):
+    def get_select_variables(self, q=None):
         if q is None:
             q = self.query
         for prop in q:
@@ -832,29 +813,29 @@ class WOQLQuery:
                 vars = q[prop][:len(q[prop])-1]
                 return vars
             elif prop in self.paging_transitive_properties:
-                val = self.getSelectVariables(q[prop][len(q[prop])-1])
+                val = self.get_select_variables(q[prop][len(q[prop])-1])
                 if val is not None:
                     return val
 
-    def hasStart(self):
-        result = self.getPagingProperty("start")
+    def has_start(self):
+        result = self.get_paging_property("start")
         return result is not None
 
-    def getStart(self):
-        return self.getPagingProperty("start");
+    def get_start(self):
+        return self.get_paging_property("start");
 
-    def setStart(self, start):
-        return self.setPagingProperty("start", start)
+    def set_start(self, start):
+        return self.set_paging_property("start", start)
 
-    def addStart(self, s):
-        if self.hasStart():
-            self.setStart(s)
+    def add_start(self, s):
+        if self.has_start():
+            self.set_start(s)
         else:
             nq = {'start': [s, self.query]}
             self.query = nq
         return self
 
-    def getPagingProperty(self, pageprop, q=None):
+    def get_paging_property(self, pageprop, q=None):
         """Returns the value of one of the 'paging' related properties (limit, start,...)"""
         if q is None:
             q = self.query
@@ -862,11 +843,11 @@ class WOQLQuery:
             if prop == pageprop:
                 return q[prop][0]
             elif prop in self.paging_transitive_properties:
-                val = self.getPagingProperty(pageprop, q[prop][len(q[prop])-1])
+                val = self.get_paging_property(pageprop, q[prop][len(q[prop])-1])
                 if val is not None:
                     return val
 
-    def setPagingProperty(self, pageprop, val, q=None):
+    def set_paging_property(self, pageprop, val, q=None):
         """Sets the value of one of the paging_transitive_properties properties"""
         if q is None:
             q = self.query
@@ -874,11 +855,11 @@ class WOQLQuery:
             if prop == pageprop:
                 q[prop][0] = val
             elif prop in self.paging_transitive_properties:
-                self.setPagingProperty(pageprop, val, q[prop][len(q[prop])-1])
+                self.set_paging_property(pageprop, val, q[prop][len(q[prop])-1])
         return self
 
 
-    def getContext(self, q=None):
+    def get_context(self, q=None):
         """Retrieves the value of the current json-ld context"""
         if q is None:
             q = self.query
@@ -886,7 +867,7 @@ class WOQLQuery:
             if prop == "@context":
                 return q[prop]
             if prop in self.paging_transitive_properties:
-                nc = self.getContext(q[prop][1])
+                nc = self.get_context(q[prop][1])
             if nc:
                 return nc
 
@@ -897,14 +878,14 @@ class WOQLQuery:
     #Internal State Control Functions
     #Not part of public API -
 
-    def _defaultContext(self, DB_IRI):
+    def _default_context(self, DB_IRI):
         result = copy(STANDARD_URLS)
         result['scm'] = DB_IRI + "/schema#"
         result['doc'] = DB_IRI + "/document/"
         result['db'] = DB_IRI + "/"
         return result
 
-    def _loadDefaultVocabulary(self):
+    def _load_default_vocabulary(self):
         vocab = {}
         vocab['type'] = "rdf:type"
         vocab['label'] = "rdfs:label"
@@ -934,34 +915,34 @@ class WOQLQuery:
         vocab['polygon'] = "xdd:coordinatePolygon"
         return vocab
 
-    def _advanceCursor(self, action, value):
+    def _advance_cursor(self, action, value):
         """Advances internal cursor to support chaining of calls: limit(50).start(50). rather than (limit, [50, (start, [50, (lisp-style (encapsulation)))))"""
         self.cursor[action] = [value]
         self.cursor[action].append({})
         self.cursor = self.cursor[action][1]
 
-    def cleanSubject(self, s):
+    def clean_subject(self, s):
         if type(s) != str or s.find(":") != -1:
             return s
         if self.vocab and (s in self.vocab):
             return self.vocab[s]
         return "doc:" + s
 
-    def cleanPredicate(self, p):
+    def clean_predicate(self, p):
         if p.find(":") != -1:
             return p
         if self.vocab and (p in self.vocab):
             return self.vocab[p]
         return "scm:" + p
 
-    def cleanGraph(self, g):
+    def clean_graph(self, g):
         if g.find(":") != -1:
             return g
         if self.vocab and (g in self.vocab):
             return self.vocab[g]
         return "db:" + g
 
-    def cleanObject(self, o):
+    def clean_object(self, o):
         if type(o) != str or o.find(":") != -1:
             return o
         if self.vocab and (o in self.vocab):
@@ -971,10 +952,10 @@ class WOQLQuery:
     def last(self, call=None, subject=None):
         self.chain_ended = True
         if call:
-            self.tripleBuilder = TripleBuilder(call, self.cursor, self.cleanSubject(subject))
+            self.tripleBuilder = TripleBuilder(call, self.cursor, self.clean_subject(subject))
         return self
 
-    def lastUpdate(self, call=None, subj=None):
+    def last_update(self, call=None, subj=None):
         """Called to indicate that this is the last call that is chainable - for example triple pattern matching.."""
         self.contains_update = True
         ret = self.last(call, subj)
@@ -983,7 +964,7 @@ class WOQLQuery:
     def execute(self, client):
         """Executes the query using the passed client to connect to a server"""
         if "@context" not in self.query:
-            self.query['@context'] = self._defaultContext(client.conConfig.dbURL())
+            self.query['@context'] = self._default_context(client.conConfig.dbURL())
         json = self.json()
         if self.contains_update:
             return client.select(json)
@@ -1051,7 +1032,7 @@ class TripleBuilder:
         evstr += ")"
         try:
             unit = eval("WOQLQuery()." + evstr)
-            return self.addEntry(unit)
+            return self.add_entry(unit)
         except:
             print("Unexpected error:", sys.exc_info()[0])
             return self
@@ -1075,7 +1056,7 @@ class TripleBuilder:
 
         return False
 
-    def addEntry(self, unit):
+    def add_entry(self, unit):
         if self.type in self.cursor:
             next = {}
             next[self.type] = self.cursor[self.type]
@@ -1114,7 +1095,7 @@ class TripleBuilder:
 
     def isa(self, a):
         unit = WOQLQuery.isa(self.subject, a)
-        self.addEntry(unit)
+        self.add_entry(unit)
 
     def graph(self, g):
         self.g = g
@@ -1139,7 +1120,7 @@ WOQLQuery.prototype.prettyPrint = function(indent, show_context, q, fluent){
     //ignore context in pretty print
     if(operator == "@context") {
     if( show_context){
-    var c = this.getContext();
+    var c = this.get_context();
     if(c) str += "@context: " + JSON.stringify(c) + "\n";
     }
     continue;
@@ -1279,7 +1260,7 @@ WOQLQuery.prototype.uncleanArgument = function(operator, val, index, allArgs){
     var oval = '"' + cstr + '"';
     }
     else {
-    var oval = this.uncleanObjectArgument(operator, val, index);
+    var oval = this.unclean_objectArgument(operator, val, index);
     }
     return oval;
     }
@@ -1292,14 +1273,14 @@ WOQLQuery.prototype.uncleanArgument = function(operator, val, index, allArgs){
     return val;
 }
 
-WOQLQuery.prototype.uncleanObjectArgument = function(operator, val, index){
+WOQLQuery.prototype.unclean_objectArgument = function(operator, val, index){
     if(val['@value'] && (val['@language'] || (val['@type'] && val['@type'] == "xsd:string"))) return '"' + val['@value'] + '"';
     if(val['@value'] && (val['@type'] && val['@type'] == "xsd:integer")) return val['@value'];
     if(val['list']) {
     var nstr = "[";
     for(var i = 0 ; i<val['list'].length; i++){
     if(typeof val['list'][i] == "object"){
-    nstr += this.uncleanObjectArgument("list", val['list'][i], i);
+    nstr += this.unclean_objectArgument("list", val['list'][i], i);
     }
     else {
     nstr += '"' + val['list'][i] + '"';

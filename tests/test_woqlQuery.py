@@ -16,17 +16,17 @@ def test_database_document_id(mocked_requests):
 
 class TestPreRollQuery:
 
-    def test_getEverything_method(self):
+    def test_get_everything_method(self):
         woqlObject=WOQLQuery().limit(2).start(0)
         jsonObj={ 'limit': [ 2, { 'start': [ 0, {"quad": ["v:Subject", "v:Predicate", "v:Object", "db:Graph" ] } ] } ] }
-        assert woqlObject.getEverything("Graph").json() == jsonObj
+        assert woqlObject.get_everything("Graph").json() == jsonObj
 
-    def test_getAllDocuments_method(self):
+    def test_get_all_documents_method(self):
         woqlObject=WOQLQuery().limit(2).start(0)
         jsonObj={ 'limit': [ 2, { 'start': [ 0, { "and": [ { "triple": [ "v:Subject", "rdf:type", "v:Type"] }, { "sub": ["v:Type", "tcs:Document" ] } ] } ] } ] }
-        assert woqlObject.getAllDocuments().json() == jsonObj
+        assert woqlObject.get_all_documents().json() == jsonObj
 
-    def test_documentMetadata_method(self):
+    def test_document_metadata_method(self):
         woqlObject=WOQLQuery().limit(2).start(0)
         jsonObj={ 'limit': [ 2, { 'start': [ 0, { "and": [
             { "triple": [ "v:ID", "rdf:type", "v:Class"] },
@@ -36,9 +36,9 @@ class TestPreRollQuery:
             { "opt": [ { "quad": [ "v:Class", "rdfs:label", "v:Type", "db:schema"] } ] },
             { "opt": [ { "quad": [ "v:Class", "rdfs:comment", "v:Type_Comment", "db:schema"] } ] }
             ] } ] } ] }
-        assert woqlObject.documentMetadata().json() == jsonObj
+        assert woqlObject.document_metadata().json() == jsonObj
 
-    def test_concreteDocumentClasses_method(self):
+    def test_concrete_document_classes_method(self):
         woqlObject=WOQLQuery().limit(2).start(0)
         jsonObj={ 'limit': [ 2, { 'start': [ 0, { "and": [
             { "sub": [ "v:Class", "tcs:Document"] },
@@ -46,9 +46,9 @@ class TestPreRollQuery:
             { "opt": [ { "quad": ["v:Class", "rdfs:label", "v:Label", "db:schema"] } ] },
             { "opt": [ { "quad": ["v:Class", "rdfs:comment", "v:Comment","db:schema"] } ] }
             ] } ] } ] }
-        assert woqlObject.concreteDocumentClasses().json() == jsonObj
+        assert woqlObject.concrete_document_classes().json() == jsonObj
 
-    def test_propertyMetadata_method(self):
+    def test_property_metadata_method(self):
         woqlObject=WOQLQuery().limit(2).start(0)
         jsonObj={ 'limit': [ 2, { 'start': [ 0, { "and": [
         {  "or": [ { "quad": ["v:Property", "rdf:type", "owl:DatatypeProperty", "db:schema"] },
@@ -60,9 +60,9 @@ class TestPreRollQuery:
         { "opt": [ { "quad": ["v:Property", "rdfs:comment", "v:Comment", "db:schema"] } ] },
         { "opt": [ { "quad": ["v:Property", "rdfs:domain", "v:Domain", "db:schema" ] } ] }
         ] } ] } ] }
-        assert woqlObject.propertyMetadata().json() == jsonObj
+        assert woqlObject.property_metadata().json() == jsonObj
 
-    def test_elementMetadata_method(self):
+    def test_element_metadata_method(self):
         woqlObject=WOQLQuery().limit(2).start(0)
         jsonObj={ 'limit': [ 2, { 'start': [ 0, { "and": [
         { "quad": ["v:Element", "rdf:type", "v:Type", "db:schema"] },
@@ -73,9 +73,9 @@ class TestPreRollQuery:
         { "opt": [ { "quad": ["v:Element", "rdfs:domain", "v:Domain", "db:schema"] } ] },
         {  "opt": [ { "quad": ["v:Element", "rdfs:range", "v:Range", "db:schema"] } ] }
         ] } ] } ] }
-        assert woqlObject.elementMetadata().json() == jsonObj
+        assert woqlObject.element_metadata().json() == jsonObj
 
-    def test_classMetadata_method(self):
+    def test_class_metadata_method(self):
         woqlObject=WOQLQuery().limit(2).start(0)
         jsonObj={ 'limit': [ 2, { 'start': [ 0, { "and": [
         { "quad": [ "v:Element", "rdf:type", "owl:Class", "db:schema"] },
@@ -83,34 +83,34 @@ class TestPreRollQuery:
         { "opt": [ { "quad": ["v:Element", "rdfs:comment", "v:Comment", "db:schema"] } ] },
         { "opt": [ { "quad": ["v:Element", "tcs:tag", "v:Abstract", "db:schema"] } ] }
         ] } ] } ] }
-        assert woqlObject.classMetadata().json() == jsonObj
+        assert woqlObject.class_metadata().json() == jsonObj
 
-    def test_getDataOfClass_method(self):
+    def test_get_data_of_class_method(self):
         woqlObject=WOQLQuery().limit(2).start(0)
         jsonObj={ 'limit': [ 2, { 'start': [ 0, { "and": [
         { "triple": [ "v:Subject", "rdf:type", {"@language": "en", "@value": "ClassID"}] },
         { "opt": [ { "triple": ["v:Subject", "v:Property", "v:Value"] } ] }
         ] } ] } ] }
-        assert woqlObject.getDataOfClass('ClassID').json() == jsonObj
+        assert woqlObject.get_data_of_class('ClassID').json() == jsonObj
 
-    def test_getDataOfProperty_method(self):
+    def test_get_data_of_property_method(self):
         woqlObject=WOQLQuery().limit(2).start(0)
         jsonObj={ 'limit': [ 2, { 'start': [ 0, { "and": [
         { "triple": [ "v:Subject", "scm:PropID", "v:Value"] },
         { "opt": [ { "triple": ["v:Subject", "rdfs:label", "v:Label"] } ] }
         ] } ] } ] }
-        assert woqlObject.getDataOfProperty("PropID").json() == jsonObj
+        assert woqlObject.get_data_of_property("PropID").json() == jsonObj
 
-    def test_documentProperties_method(self):
+    def test_document_properties_method(self):
         woqlObject=WOQLQuery().limit(2).start(0)
         jsonObj={ 'limit': [ 2, { 'start': [ 0, { "and": [
         { "triple": [ "doc:docid", "v:Property", "v:Property_Value"] },
         { "opt": [ { "quad": ["v:Property", "rdfs:label", "v:Property_Label", "db:schema"] } ] },
         { "opt": [ { "quad": ["v:Property", "rdf:type", "v:Property_Type", "db:schema"] } ] }
         ] } ] } ] }
-        assert woqlObject.documentProperties("docid").json() == jsonObj
+        assert woqlObject.document_properties("docid").json() == jsonObj
 
-    def test_getDocumentConnections_method(self):
+    def test_get_document_connections_method(self):
         woqlObject=WOQLQuery().limit(2).start(0)
         jsonObj={ 'limit': [ 2, { 'start': [ 0, { "and": [
         { "or": [
@@ -122,9 +122,9 @@ class TestPreRollQuery:
         { "opt": [ { "triple": ["v:Entid", "rdfs:label", "v:Label"] } ] },
         { "opt": [ { "quad": ["v:Enttype", "rdfs:label", "v:Class_Label", "db:schema"] } ] }
         ] } ] } ] }
-        assert woqlObject.getDocumentConnections("docid").json() == jsonObj
+        assert woqlObject.get_document_connections("docid").json() == jsonObj
 
-    def test_getInstanceMeta_method(self):
+    def test_get_instance_meta_method(self):
         woqlObject=WOQLQuery().limit(2).start(0)
         jsonObj={ 'limit': [ 2, { 'start': [ 0, { "and": [
         { "triple": [ "doc:docid", "rdf:type", "v:InstanceType"] },
@@ -132,9 +132,9 @@ class TestPreRollQuery:
         { "opt": [ { "triple": ["doc:docid", "rdfs:comment", "v:InstanceComment"] } ] },
         { "opt": [ { "quad": ["v:InstanceType", "rdfs:label", "v:ClassLabel", "db:schema"] } ] }
         ] } ] } ] }
-        assert woqlObject.getInstanceMeta("docid").json() == jsonObj
+        assert woqlObject.get_instance_meta("docid").json() == jsonObj
 
-    def test_simpleGraphQuery_method(self):
+    def test_simple_graph_query_method(self):
         woqlObject=WOQLQuery().limit(2).start(0)
         jsonObj={ 'limit': [ 2, { 'start': [ 0, { "and": [
         { "triple": [ "v:Source", "v:Edge", "v:Target"] },
@@ -153,107 +153,107 @@ class TestPreRollQuery:
         { "opt": [ { "quad": ["v:Edge", "rdfs:label", "v:Edge_Type", "db:schema"] } ] },
         { "opt": [ { "quad": ["v:Edge", "rdfs:comment", "v:Edge_Type_Comment", "db:schema"] } ] }
         ] } ] } ] }
-        assert woqlObject.simpleGraphQuery().json() == jsonObj
+        assert woqlObject.simple_graph_query().json() == jsonObj
 
 
 class TestWoqlQueryObject:
 
-    def test_setVocabulary_and_getVocabulary_method(self):
+    def test_set_vocabulary_and_get_vocabulary_method(self):
         woqlObject=WOQLQuery().limit(2).start(0)
-        woqlObject.setVocabulary("vocab")
-        assert woqlObject.getVocabulary() == "vocab"
+        woqlObject.set_vocabulary("vocab")
+        assert woqlObject.get_vocabulary() == "vocab"
 
     @mock.patch('requests.get')
-    def test_loadVocabulary_method(self, mocked_requests):
+    def test_load_vocabulary_method(self, mocked_requests):
         woqlObject=WOQLQuery().limit(2).start(0)
-        woqlObject.loadVocabulary(test_client)
+        woqlObject.load_vocabulary(test_client)
         assert True
 
-    def test_isPaged_method(self):
+    def test_is_paged_method(self):
         woqlObjectTrue=WOQLQuery().limit(2).start(0)
         woqlObjectFalse=WOQLQuery().select("V1", WOQLQuery().triple("a", "b", "c"))
-        assert woqlObjectTrue.isPaged() == True
-        assert woqlObjectFalse.isPaged() == False
+        assert woqlObjectTrue.is_paged() == True
+        assert woqlObjectFalse.is_paged() == False
 
-    def test_getPage_method(self):
+    def test_get_page_method(self):
         woqlObject=WOQLQuery().limit(2).start(0)
         woqlObject2=WOQLQuery().limit(3).start(10)
         woqlObject3=WOQLQuery().limit(2).start(10)
 
-        assert woqlObject.getPage() == 1
-        assert woqlObject2.getPage() == 4
-        assert woqlObject3.getPage() == 6
+        assert woqlObject.get_page() == 1
+        assert woqlObject2.get_page() == 4
+        assert woqlObject3.get_page() == 6
 
-    def test_setPage_method(self):
+    def test_set_page_method(self):
         woqlObject=WOQLQuery().limit(2).start(0)
         jsonObj={ 'limit': [ 2, { 'start': [ 2, {} ] } ] }
-        assert woqlObject.setPage(2).json() == jsonObj
+        assert woqlObject.set_page(2).json() == jsonObj
 
-    def test_nextPage_method(self):
+    def test_next_page_method(self):
         woqlObject=WOQLQuery().limit(2).start(0)
         jsonObj={ 'limit': [ 2, { 'start': [ 2, {} ] } ] }
-        assert woqlObject.nextPage().json() == jsonObj
+        assert woqlObject.next_page().json() == jsonObj
 
-    def test_firstPage_method(self):
+    def test_first_page_method(self):
         woqlObject=WOQLQuery().limit(2).start(0)
         jsonObj={ 'limit': [ 2, { 'start': [ 0, {} ] } ] }
-        assert woqlObject.firstPage().json() == jsonObj
+        assert woqlObject.first_page().json() == jsonObj
 
-    def test_previousPage_method(self):
+    def test_previous_page_method(self):
         woqlObject=WOQLQuery().limit(2).start(4)
         jsonObj={ 'limit': [ 2, { 'start': [ 2, {} ] } ] }
-        assert woqlObject.previousPage().json() == jsonObj
+        assert woqlObject.previous_page().json() == jsonObj
 
-    def test_setPageSize_method(self):
+    def test_set_page_size_method(self):
         woqlObject=WOQLQuery().limit(2).start(0)
         jsonObj={ 'limit': [ 3, { 'start': [ 0, {} ] } ] }
-        assert woqlObject.setPageSize(3).json() == jsonObj
+        assert woqlObject.set_page_size(3).json() == jsonObj
 
-    def test_setPageSize_method_not_first(self):
+    def test_set_page_size_method_not_first(self):
         woqlObject=WOQLQuery().limit(2).start(10)
         jsonObj={ 'limit': [ 3, { 'start': [ 0, {} ] } ] }
-        assert woqlObject.setPageSize(3).json() == jsonObj
+        assert woqlObject.set_page_size(3).json() == jsonObj
 
-    def test_addStart_method(self):
+    def test_add_start_method(self):
         woqlObject=WOQLQuery().limit(2)
         woqlObject2=WOQLQuery().start(5).limit(2)
         jsonObj={ 'start': [ 10, { 'limit': [ 2, {} ] } ] }
-        assert woqlObject.addStart(10).json() == jsonObj
-        assert woqlObject2.addStart(10).json() == jsonObj
+        assert woqlObject.add_start(10).json() == jsonObj
+        assert woqlObject2.add_start(10).json() == jsonObj
 
-    def test_hasStart_method(self):
+    def test_has_start_method(self):
         woqlObjectTrue=WOQLQuery().limit(2).start(10)
         woqlObjectFalse=WOQLQuery().limit(2)
-        assert woqlObjectTrue.hasStart() == True
-        assert woqlObjectFalse.hasStart() == False
+        assert woqlObjectTrue.has_start() == True
+        assert woqlObjectFalse.has_start() == False
 
-    def test_getStart_method(self):
+    def test_get_start_method(self):
         woqlObject=WOQLQuery().limit(2).start(10)
-        assert woqlObject.getStart() == 10
+        assert woqlObject.get_start() == 10
 
-    def test_setLimit_method_not_first(self):
+    def test_set_limit_method_not_first(self):
         woqlObject=WOQLQuery().limit(2).start(10)
         jsonObj={ 'limit': [ 3, { 'start': [ 10, {} ] } ] }
-        assert woqlObject.setLimit(3).json() == jsonObj
+        assert woqlObject.set_limit(3).json() == jsonObj
 
-    def test_getLimit_method(self):
+    def test_get_limit_method(self):
         woqlObject=WOQLQuery().limit(2).start(0)
-        assert woqlObject.getLimit() == 2
+        assert woqlObject.get_limit() == 2
 
-    def test_hasSelect_method(self):
+    def test_has_select_method(self):
         woqlObjectTrue=WOQLQuery().select("V1", WOQLQuery().triple("a", "b", "c"))
         woqlObjectFalse=WOQLQuery().limit(2).start(0)
-        assert woqlObjectTrue.hasSelect() == True
-        assert woqlObjectFalse.hasSelect() == False
+        assert woqlObjectTrue.has_select() == True
+        assert woqlObjectFalse.has_select() == False
 
-    def test_getSelectVariables_method(self):
+    def test_get_select_variables_method(self):
         woqlObject=WOQLQuery().select("V1", WOQLQuery().triple("a", "b", "c"))
-        assert woqlObject.getSelectVariables() == ["V1"]
+        assert woqlObject.get_select_variables() == ["V1"]
 
-    def test_context_and_getContext_method(self):
+    def test_context_and_get_context_method(self):
         contextObj = {"@import": "https://terminusdb/contexts/woql/syntax/context.jsonld",
            "@propagate": True,
            "db" : "http://localhost:6363/testDB004/"}
         woqlObject=WOQLQuery().limit(2).start(0)
         woqlObject.context(contextObj)
-        assert woqlObject.getContext() == contextObj
+        assert woqlObject.get_context() == contextObj

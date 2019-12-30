@@ -19,9 +19,9 @@ class TestWoqlQueries:
         jsonObj = {"limit": [10,{"start": [0,{}]}]}
         assert woqlObject.json() == jsonObj
 
-    def test_WOQLnot_method(self):
-        woqlObject = WOQLQuery().WOQLnot(WOQLQuery().triple("a", "b", "c"))
-        woqlObjectChain = WOQLQuery().WOQLnot().triple("a", "b", "c")
+    def test_woql_not_method(self):
+        woqlObject = WOQLQuery().woql_not(WOQLQuery().triple("a", "b", "c"))
+        woqlObjectChain = WOQLQuery().woql_not().triple("a", "b", "c")
         jsonObj={ 'not': [ { 'triple': [ "doc:a", "scm:b", { "@language": "en", "@value": "c" } ] } ] }
 
         print(woqlObject.json())
@@ -29,15 +29,15 @@ class TestWoqlQueries:
         assert woqlObject.json() == jsonObj
         assert woqlObjectChain.json() == jsonObj
 
-    def test_WOQLand_method(self):
-        woqlObject=WOQLQuery().WOQLand(WOQLQuery().triple("a", "b", "c"),
+    def test_woql_and_method(self):
+        woqlObject=WOQLQuery().woql_and(WOQLQuery().triple("a", "b", "c"),
                                     WOQLQuery().triple("1", "2", "3"))
         jsonObj={ 'and': [ { 'triple': [ "doc:a", "scm:b", { "@language": "en", "@value": "c" } ] }, { 'triple': [ "doc:1", "scm:2", { "@language": "en", "@value": "3" } ] } ] }
 
         assert woqlObject.json() == jsonObj
 
-    def test_WOQLor_method(self):
-        woqlObject=WOQLQuery().WOQLor(WOQLQuery().triple("a", "b", "c"),
+    def test_woql_or_method(self):
+        woqlObject=WOQLQuery().woql_or(WOQLQuery().triple("a", "b", "c"),
                                     WOQLQuery().triple("1", "2", "3"))
         jsonObj={ 'or': [ { 'triple': [ "doc:a", "scm:b", { "@language": "en", "@value": "c" } ] }, { 'triple': [ "doc:1", "scm:2", { "@language": "en", "@value": "3" } ] } ] }
 
@@ -45,8 +45,8 @@ class TestWoqlQueries:
 
     def test_when_method(self):
 
-        woqlObject=WOQLQuery().when(True, WOQLQuery().addClass("id"))
-        woqlObjectChain=WOQLQuery().when(True).addClass("id")
+        woqlObject=WOQLQuery().when(True, WOQLQuery().add_class("id"))
+        woqlObjectChain=WOQLQuery().when(True).add_class("id")
         jsonObj={'when': [
                         {"true":[]},
                         {'add_quad': [ 'scm:id', 'rdf:type', 'owl:Class', 'db:schema' ]}
@@ -65,10 +65,10 @@ class TestWoqlQueries:
         assert woqlObject.json() == jsonObj
         assert woqlObjectChain.json() == jsonObj
 
-    def test_WOQLfrom_method(self):
-        WOQLOriginal=WOQLQuery().limit(10)
-        woqlObject=WOQLQuery().WOQLfrom("http://dburl", WOQLOriginal)
-        woqlObjectChain=WOQLQuery().WOQLfrom("http://dburl").limit(10)
+    def test_woql_from_method(self):
+        woql_original=WOQLQuery().limit(10)
+        woqlObject=WOQLQuery().woql_from("http://dburl", woql_original)
+        woqlObjectChain=WOQLQuery().woql_from("http://dburl").limit(10)
 
         jsonObj={ 'from': [ 'http://dburl', { 'limit': [ 10, {} ] } ] }
 
@@ -149,9 +149,9 @@ class TestWoqlQueries:
         jsonObj={ 'get': [[], {}] }
         assert woqlObject.json() == jsonObj
 
-    def test_WQOLas_method(self):
-        woqlObject=WOQLQuery().WOQLas("Source", "Target")
-        woqlObject2=WOQLQuery().WOQLas("Source", "Target").WOQLas("Source2", "Target2")
+    def test_woql_as_method(self):
+        woqlObject=WOQLQuery().woql_as("Source", "Target")
+        woqlObject2=WOQLQuery().woql_as("Source", "Target").woql_as("Source2", "Target2")
         jsonObj=[{ 'as': [ { '@value': 'Source' }, 'v:Target' ] }]
         jsonObj2 =[{ 'as': [ { '@value': 'Source' }, 'v:Target' ] },
                    { 'as': [ { '@value': 'Source2' }, 'v:Target2' ] }]
@@ -193,13 +193,13 @@ class TestTripleBuilder:
         jsonObj={ 'quad': [ "doc:a", "scm:b", { "@language": "en", "@value": "c" }, "db:d" ] }
         assert woqlObject.json() == jsonObj
 
-    def test_addClass_method(self):
-        woqlObject=WOQLQuery().addClass("id")
+    def test_add_class_method(self):
+        woqlObject=WOQLQuery().add_class("id")
         jsonObj={ 'add_quad': [ 'scm:id', 'rdf:type', 'owl:Class', 'db:schema' ] }
         assert woqlObject.json() == jsonObj
 
-    def test_deleteClass_method(self):
-        woqlObject=WOQLQuery().deleteClass("id")
+    def test_delete_class_method(self):
+        woqlObject=WOQLQuery().delete_class("id")
         jsonObj= { 'and': [
           { 'delete_quad': [ 'scm:id', 'v:All', 'v:Al2', 'db:schema' ] },
           { 'opt': [ { 'delete_quad': [ 'v:Al3', 'v:Al4', 'scm:id', 'db:schema' ] } ] }
@@ -245,14 +245,14 @@ class TestTripleBuilder:
         jsonObj={ 'add_quad': [ "doc:a", "scm:b", { "@language": "en", "@value": "c" }, "db:d" ] }
         assert woqlObject.json() == jsonObj
 
-    def test_addProperty_methof(self):
-        woqlObject=WOQLQuery().addProperty("some_property", "string")
+    def test_add_property_methof(self):
+        woqlObject=WOQLQuery().add_property("some_property", "string")
         jsonObj={ 'and': [ { 'add_quad': [ 'scm:some_property', 'rdf:type', 'owl:DatatypeProperty', 'db:schema' ] }, { 'add_quad': [ 'scm:some_property', 'rdfs:range', 'xsd:string', 'db:schema' ] } ] }
         print(woqlObject.json())
         assert woqlObject.json() == jsonObj
 
-    def test_deleteProperty_method(self):
-        woqlObject=WOQLQuery().deleteProperty("some_property", "string")
+    def test_delete_property_method(self):
+        woqlObject=WOQLQuery().delete_property("some_property", "string")
         jsonObj={ 'and': [ { 'delete_quad': [ 'scm:some_property', 'v:All', 'v:Al2', 'xsd:string' ] }, { 'delete_quad': [ 'v:Al3', 'v:Al4', 'scm:some_property', 'xsd:string' ] } ] }
         assert woqlObject.json() == jsonObj
 
@@ -278,8 +278,8 @@ class TestTripleBuilderChainer:
         jsonObj={ 'add_quad': ['doc:x', 'rdfs:label', { '@value': 'my label', '@language': 'en' }, 'db:schema'] }
         assert woqlObject.json() == jsonObj
 
-    def test_again_addClass_method(self):
-        woqlObject=WOQLQuery().addClass("NewClass").description("A new class object.").entity()
+    def test_again_add_class_method(self):
+        woqlObject=WOQLQuery().add_class("NewClass").description("A new class object.").entity()
         jsonObj={ "and": [{"add_quad": ['scm:NewClass', 'rdf:type', "owl:Class", 'db:schema']},
                       {"add_quad": ['scm:NewClass', 'rdfs:comment', { '@value': "A new class object.", '@language': 'en' }, 'db:schema']},
                       {"add_quad": ['scm:NewClass', 'rdfs:subClassOf', "tcs:Entity", 'db:schema']}
@@ -325,7 +325,7 @@ class TestTripleBuilderChainer:
         assert woqlObject.json() == jsonObj
 
     def test_max_method(self):
-        woqlObject=WOQLQuery().addProperty("P", "string").max(4)
+        woqlObject=WOQLQuery().add_property("P", "string").max(4)
         jsonObj={ "and": [ { "add_quad": ["scm:P",
                                             "rdf:type",
                                             "owl:DatatypeProperty",
@@ -349,7 +349,7 @@ class TestTripleBuilderChainer:
         assert woqlObject.json() == jsonObj
 
     def test_min_method(self):
-        woqlObject=WOQLQuery().addProperty("P", "string").min(2)
+        woqlObject=WOQLQuery().add_property("P", "string").min(2)
         jsonObj={ "and": [ { "add_quad": ["scm:P",
                                             "rdf:type",
                                             "owl:DatatypeProperty",
@@ -373,7 +373,7 @@ class TestTripleBuilderChainer:
         assert woqlObject.json() == jsonObj
 
     def test_cardinality_method(self):
-        woqlObject=WOQLQuery().addProperty("P", "string").cardinality(3)
+        woqlObject=WOQLQuery().add_property("P", "string").cardinality(3)
         jsonObj={ "and": [ { "add_quad": ["scm:P",
                                               "rdf:type",
                                               "owl:DatatypeProperty",
