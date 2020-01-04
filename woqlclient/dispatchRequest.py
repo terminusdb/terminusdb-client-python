@@ -60,10 +60,11 @@ class DispatchRequest:
             if(requestResponse.status_code == 200):
                 return requestResponse.json()  # if not a json not it raises an error
             else:
+                # This needs to raise an exception throwing the content!
                 requestResponse.raise_for_status()
 
-        # to be review
-        # the server in the response return always contet-type application/json
+        # to be reviewed
+        # the server in the response return always content-type application/json
         except ValueError as err:
             # if the response type is not a json
             print("Value Error", err)

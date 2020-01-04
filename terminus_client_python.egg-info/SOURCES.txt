@@ -17,4 +17,5 @@ woqlclient/errorMessage.py
 woqlclient/errors.py
 woqlclient/idParser.py
 woqlclient/utils.py
+woqlclient/woql.py
 woqlclient/woqlClient.py
