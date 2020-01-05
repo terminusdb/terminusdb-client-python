@@ -1300,7 +1300,7 @@ WOQLQuery.prototype.uncleanArgument = function(operator, val, index, allArgs){
     var oval = '"' + cstr + '"';
     }
     else {
-    var oval = this.un_clean_objectArgument(operator, val, index);
+    var oval = this.unclean_objectArgument(operator, val, index);
     }
     return oval;
     }
@@ -1313,14 +1313,14 @@ WOQLQuery.prototype.uncleanArgument = function(operator, val, index, allArgs){
     return val;
 }
 
-WOQLQuery.prototype.un_clean_objectArgument = function(operator, val, index){
+WOQLQuery.prototype.unclean_objectArgument = function(operator, val, index){
     if(val['@value'] && (val['@language'] || (val['@type'] && val['@type'] == "xsd:string"))) return '"' + val['@value'] + '"';
     if(val['@value'] && (val['@type'] && val['@type'] == "xsd:integer")) return val['@value'];
     if(val['list']) {
     var nstr = "[";
     for(var i = 0 ; i<val['list'].length; i++){
     if(typeof val['list'][i] == "object"){
-    nstr += this.un_clean_objectArgument("list", val['list'][i], i);
+    nstr += this.unclean_objectArgument("list", val['list'][i], i);
     }
     else {
     nstr += '"' + val['list'][i] + '"';
