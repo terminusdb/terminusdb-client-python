@@ -6,8 +6,7 @@
 
 import sys
 from copy import copy
-
-#from .woql import WOQL
+from .utils import Utils
 
 STANDARD_URLS = {
     'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
@@ -35,8 +34,9 @@ class WOQLQuery:
         # object used to accumulate triples from fragments to support usage like node("x").label("y")
         self.tripleBuilder = False
 
-        self.cleanClass = self.cleanType = self.clean_predicate
+        self.cleanClass = self.cleanType = self._clean_predicate
         self.relationship = self.entity
+        self.cast = self.typecast
 
     def isLiteralType(self, t):
         if t:
@@ -87,6 +87,15 @@ class WOQLQuery:
         self.cursor['typecast'] = [va, type, vb];
         return self
 
+    def insert(self, node, type, graph=None):
+        if graph is not None:
+            return WOQLQuery().add_quad(node, "rdf:type", WOQLQuery().cleanType(type), graph)
+        else:
+            return WOQLQuery().add_triple(node, "rdf:type", WOQLQuery().cleanType(type))
+
+    def doctype(self, type, graph=None):
+        return WOQLQuery().add_class(type, graph).parent("Document")
+
     def length(self, va, vb):
         self.cursor['length'] = [va, vb];
         return self
@@ -113,13 +122,10 @@ class WOQLQuery:
             args.append({'list': gvarlist})
 
         if type(groupedvar) == list:
-            ng = []
-            for item in groupedvar:
-                ng.append(item if (item[:2] == "v:") else "v:" + item)
+            ng = Utils.addNamespacesToVariables(groupedvar)
             groupedvar = {"list": ng}
         elif type(groupedvar) == str:
-            if groupedvar[:2] != "v:":
-                groupedvar = "v:" + groupedvar
+            groupedvar = Utils.addNamespacesToVariable(groupedvar)
 
         args.append(groupedvar)
 
@@ -133,11 +139,37 @@ class WOQLQuery:
             self.cursor = sq
             args.append(sq)
 
-        if output[:2] != "v:":
-            output = "v:" + output
+        args.append(Utils.addNamespacesToVariable(output))
 
-        args.append(output)
+        return self
 
+    def order_by(self, gvarlist, asc_or_desc=None, query=None):
+        ordering = gvarlist
+        if hasattr(gvarlist, 'json'):
+            ordering = gvarlist.json()
+        if type(ordering) not in [list, dict]:
+            ordering = [ordering]
+        if type(ordering) == list:
+            vars = Utils.addNamespacesToVariables(ordering)
+            if asc_or_desc is None:
+                asc_or_desc = "asc"
+            ordering = {}
+            ordering[asc_or_desc] = vars
+        self._advance_cursor("order_by", ordering)
+        if query is not None:
+            self.cursor = query.json() if hasattr(query, 'json') else query
+        return self
+
+    def asc(self, varlist_or_var):
+        if type(varlist_or_var) != list:
+            varlist_or_var = [varlist_or_var]
+        self.cursor["asc"] = varlist_or_var
+        return self
+
+    def desc(self, varlist_or_var):
+        if type(varlist_or_var) != list:
+            varlist_or_var = [varlist_or_var]
+        self.cursor["desc"] = varlist_or_var
         return self
 
     def idgen(self, prefix, vari, type, mode=None):
@@ -209,7 +241,7 @@ class WOQLQuery:
 
     def join(self, *args):
         self.cursor['join'] = args
-        return this
+        return self
 
     def less(self, v1, v2):
         self.cursor['less'] = [v1, v2]
@@ -220,8 +252,8 @@ class WOQLQuery:
         return self
 
     def list(self, *args):
-        self.cursor['list'] = args
-        return this
+        self.cursor['list'] = list(args)
+        return self
 
     def json(self, json=None):
         """json version of query for passing to api"""
@@ -263,19 +295,19 @@ class WOQLQuery:
     def woql_from(self, dburl, query=None):
         self._advance_cursor("from", dburl)
         if query:
-            self.cursor = query.json()
+            self.cursor = query.json() if hasattr(query,'json') else query
         return self
 
     def into(self, dburl, query=None):
         self._advance_cursor("into", dburl)
         if query:
-            self.cursor = query.json()
+            self.cursor = query.json() if hasattr(query,'json') else query
         return self
 
     def limit(self, limit, query=None):
         self._advance_cursor("limit", limit)
         if query:
-            self.cursor = query.json()
+            self.cursor = query.json() if hasattr(query,'json') else query
         return self
 
     def start(self, start, query=None):
@@ -314,34 +346,35 @@ class WOQLQuery:
         if query:
             if query.contains_update:
                 self.contains_update = True
-            self.cursor['not'] = [query.json()]
+            query = query.json() if hasattr(query,'json') else query
+            self.cursor['not'] = [query]
         else:
             self.cursor['not'] = [{}]
             self.cursor = self.cursor['not'][0]
         return self
 
     def triple(self, a, b, c):
-        self.cursor["triple"] = [self.clean_subject(a),self.clean_predicate(b),self.clean_object(c)]
-        return self.last("triple", self.clean_subject(a))
+        self.cursor["triple"] = [self._clean_subject(a),self._clean_predicate(b),self._clean_object(c)]
+        return self._chainable("triple", self._clean_subject(a))
 
     def quad(self, a, b, c, g):
-        self.cursor["quad"] = [self.clean_subject(a),
-                                self.clean_predicate(b),
-                                self.clean_object(c),
-                                self.clean_graph(g)]
-        return self.last("quad", self.clean_subject(a))
+        self.cursor["quad"] = [self._clean_subject(a),
+                                self._clean_predicate(b),
+                                self._clean_object(c),
+                                self._clean_graph(g)]
+        return self._chainable("quad", self._clean_subject(a))
 
 
     def eq(self, a, b):
-        self.cursor["eq"] = [self.clean_object(a),self.clean_object(b)];
-        return self.last()
+        self.cursor["eq"] = [self._clean_object(a),self._clean_object(b)];
+        return self._last()
 
     def sub(self, a, b=None):
         if (not b) and self.tripleBuilder:
             self.tripleBuilder.sub(self.cleanClass(a))
             return self
         self.cursor["sub"] = [self.cleanClass(a),self.cleanClass(b)]
-        return self.last("sub", a)
+        return self._last("sub", a)
 
     def comment(self, val=None):
         if val and hasattr(val, 'json'):
@@ -375,48 +408,48 @@ class WOQLQuery:
 
         if b:
             self.cursor["isa"] = [self.cleanClass(a),self.cleanClass(b)]
-            return self.last("isa", a)
+            return self._chainable("isa", a)
 
     def trim(self, a, b):
         self.cursor['trim'] = [a, b]
-        return self.last('trim', b)
+        return self._chainable('trim', b)
 
     def eval(self, arith, v):
         if hasattr(arith, 'json'):
             arith = arith.json()
         self.cursor['eval'] = [arith, v]
-        return self.last('eval', v)
+        return self._chainable('eval', v)
 
 
     def plus(self, *args):
         self.cursor['plus'] = []
         for item in args:
             self.cursor['plus'].append(item.json() if hasattr(item,'json') else item)
-        return self.last()
+        return self._last()
 
     def minus(self, *args):
         self.cursor['minus'] = []
         for item in args:
             self.cursor['minus'].append(item.json() if hasattr(item,'json') else item)
-        return self.last()
+        return self._last()
 
     def times(self, *args):
         self.cursor['times'] = []
         for item in args:
             self.cursor['times'].append(item.json() if hasattr(item,'json') else item)
-        return self.last()
+        return self._last()
 
     def divide(self, *args):
         self.cursor['divide'] = []
         for item in args:
             self.cursor['divide'].append(item.json() if hasattr(item,'json') else item)
-        return self.last()
+        return self._last()
 
     def div(self, *args):
         self.cursor['div'] = []
         for item in args:
             self.cursor['div'].append(item.json() if hasattr(item,'json') else item)
-        return self.last()
+        return self._last()
 
     def exp(self, a, b):
         if hasattr(a, 'json'):
@@ -425,54 +458,54 @@ class WOQLQuery:
             b = b.json()
 
         self.cursor['exp'] = [a, b]
-        return self.last()
+        return self._last()
 
     def delete(self, JSON_or_IRI):
         self.cursor['delete'] = [JSON_or_IRI]
-        return self.last_update()
+        return self._last_update()
 
     def delete_triple(self, Subject, Predicate, Object_or_Literal):
-        self.cursor['delete_triple'] = [self.clean_subject(Subject),
-                                        self.clean_predicate(Predicate),
-                                        self.clean_object(Object_or_Literal)]
-        return self.last_update('delete_triple', self.clean_subject(Subject))
+        self.cursor['delete_triple'] = [self._clean_subject(Subject),
+                                        self._clean_predicate(Predicate),
+                                        self._clean_object(Object_or_Literal)]
+        return self._chainable_update('delete_triple', Subject)
 
     def add_triple(self, Subject, Predicate, Object_or_Literal):
-        self.cursor['add_triple'] = [self.clean_subject(Subject),
-                                    self.clean_predicate(Predicate),
-                                    self.clean_object(Object_or_Literal)]
-        return self.last_update('add_triple', self.clean_subject(Subject))
+        self.cursor['add_triple'] = [self._clean_subject(Subject),
+                                    self._clean_predicate(Predicate),
+                                    self._clean_object(Object_or_Literal)]
+        return self._chainable_update('add_triple', Subject)
 
     def delete_quad(self, Subject, Predicate, Object_or_Literal, Graph):
-        self.cursor['delete_quad'] =[self.clean_subject(Subject),
-                                    self.clean_predicate(Predicate),
-                                    self.clean_object(Object_or_Literal),
-                                    self.clean_graph(Graph)]
-        return self.last_update('delete_quad', self.clean_subject(Subject))
+        self.cursor['delete_quad'] =[self._clean_subject(Subject),
+                                    self._clean_predicate(Predicate),
+                                    self._clean_object(Object_or_Literal),
+                                    self._clean_graph(Graph)]
+        return self._chainable_update('delete_quad', Subject)
 
     def add_quad(self, Subject, Predicate, Object_or_Literal, Graph):
-        self.cursor['add_quad'] =[self.clean_subject(Subject),
-                                    self.clean_predicate(Predicate),
-                                    self.clean_object(Object_or_Literal),
-                                    self.clean_graph(Graph)]
-        return self.last_update('add_quad', self.clean_subject(Subject))
+        self.cursor['add_quad'] =[self._clean_subject(Subject),
+                                    self._clean_predicate(Predicate),
+                                    self._clean_object(Object_or_Literal),
+                                    self._clean_graph(Graph)]
+        return self._chainable_update('add_quad', Subject)
 
     def update(self, woql):
         self.cursor['update'] = [ woql.json() ]
-        return self.last_update()
+        return self._last_update()
 
     # Schema manipulation shorthand
 
     def add_class(self, c=None, graph=None):
         if c:
-            graph = self.clean_graph(graph) if graph else "db:schema"
+            graph = self._clean_graph(graph) if graph else "db:schema"
             c = "scm:" + c if c.find(":") == -1 else c
             self.add_quad(c, "rdf:type", "owl:Class", graph)
         return self
 
     def delete_class(self, c=None, graph=None):
         if c:
-            graph = self.clean_graph(graph) if graph else "db:schema"
+            graph = self._clean_graph(graph) if graph else "db:schema"
             c = "scm:" + c if c.find(":") == -1 else c
 
             return self.woql_and(WOQLQuery().delete_quad(c, "v:All", "v:Al2", graph),
@@ -483,21 +516,22 @@ class WOQLQuery:
         if not t:
             t = "xsd:string"
         if p:
-            graph = self.clean_graph(g) if g else "db:schema"
+            graph = self._clean_graph(g) if g else "db:schema"
             p = "scm:" + p if p.find(":") == -1 else p
             t = self.cleanType(t) if t.find(":") == -1 else t
             tc = self.cursor
-            if WOQLQuery().isLiteralType(t):
+            pref = t.split(":")
+            if (pref[0] is not None) and (pref[0] == "xdd" or pref[0] == "xsd"):
                 self.woql_and(WOQLQuery().add_quad(p, "rdf:type", "owl:DatatypeProperty", graph),
                          WOQLQuery().add_quad(p, "rdfs:range", t, graph))
             else:
                 self.woql_and(WOQLQuery().add_quad(p, "rdf:type", "owl:ObjectProperty", graph),
                          WOQLQuery().add_quad(p, "rdfs:range", t, graph))
-        return self.last_update("add_quad", self.cleanClass(p))
+        return self._chainable_update("add_quad", p)
 
     def delete_property(self, p=None, graph=None):
         if p:
-            graph = self.clean_graph(graph) if graph else "db:schema"
+            graph = self._clean_graph(graph) if graph else "db:schema"
             p = "scm:" + p if p.find(":") == -1 else p
             return self.woql_and(WOQLQuery().delete_quad(p, "v:All", "v:Al2", graph),
                             WOQLQuery().delete_quad("v:Al3", "v:Al4", p, graph))
@@ -533,7 +567,7 @@ class WOQLQuery:
         return self
 
     def graph(self, g):
-        g = self.clean_graph(g)
+        g = self._clean_graph(g)
         if hasattr(self,'type'):
             t = "quad" if self.type == "triple" else False
             if self.type == "add_triple":
@@ -573,7 +607,7 @@ class WOQLQuery:
 
     def property(self, p,val):
         if self.tripleBuilder:
-            p = self.clean_predicate(p)
+            p = self._clean_predicate(p)
             self.tripleBuilder.addPO(p, val)
         return self
 
@@ -593,10 +627,10 @@ class WOQLQuery:
         return self
 
     def star(self, GraphIRI=None, Subj=None, Pred=None, Obj=None):
-        Subj = self.clean_subject(Subj) if Subj else "v:Subject"
-        Pred = self.clean_predicate(Pred) if Pred else "v:Predicate"
-        Obj = self.clean_object(Obj) if Obj else "v:Object"
-        GraphIRI = self.clean_graph(GraphIRI) if GraphIRI else False
+        Subj = self._clean_subject(Subj) if Subj else "v:Subject"
+        Pred = self._clean_predicate(Pred) if Pred else "v:Predicate"
+        Obj = self._clean_object(Obj) if Obj else "v:Object"
+        GraphIRI = self._clean_graph(GraphIRI) if GraphIRI else False
 
         if GraphIRI:
             return self.quad(Subj, Pred, Obj, GraphIRI)
@@ -605,7 +639,7 @@ class WOQLQuery:
 
     def get_everything(self, GraphIRI=None):
         if GraphIRI:
-            GraphIRI = self.clean_graph(GraphIRI)
+            GraphIRI = self._clean_graph(GraphIRI)
             return self.quad("v:Subject", "v:Predicate", "v:Object", GraphIRI)
         else:
             self.triple("v:Subject", "v:Predicate", "v:Object")
@@ -921,45 +955,69 @@ class WOQLQuery:
         self.cursor[action].append({})
         self.cursor = self.cursor[action][1]
 
-    def clean_subject(self, s):
+    def _clean_subject(self, s):
         if type(s) != str or s.find(":") != -1:
             return s
         if self.vocab and (s in self.vocab):
             return self.vocab[s]
         return "doc:" + s
 
-    def clean_predicate(self, p):
+    def _clean_predicate(self, p):
         if p.find(":") != -1:
             return p
         if self.vocab and (p in self.vocab):
             return self.vocab[p]
         return "scm:" + p
 
-    def clean_graph(self, g):
+    def _clean_graph(self, g):
         if g.find(":") != -1:
             return g
         if self.vocab and (g in self.vocab):
             return self.vocab[g]
         return "db:" + g
 
-    def clean_object(self, o):
+    def _clean_object(self, o):
         if type(o) != str or o.find(":") != -1:
             return o
         if self.vocab and (o in self.vocab):
             return self.vocab[o]
         return { "@value": o, "@language": "en"}
 
-    def last(self, call=None, subject=None):
+    def _last(self, call=None, subject=None):
+        """Called to indicate that this is the last call in constructing a complete woql query object"""
         self.chain_ended = True
-        if call:
-            self.tripleBuilder = TripleBuilder(call, self.cursor, self.clean_subject(subject))
         return self
 
-    def last_update(self, call=None, subj=None):
+    def _last_update(self):
         """Called to indicate that this is the last call that is chainable - for example triple pattern matching.."""
-        self.contains_update = True
-        ret = self.last(call, subj)
-        return ret
+        self._last()
+        return self
+
+    def _chainable(self, call, subj):
+        """Called to indicate internally that this is a chainable update - by setting the subject and call of the Triple Builder object which is used to build further triples"""
+        self.tripleBuilder = TripleBuilder(call, self.cursor, self._clean_subject(subj))
+        self._last()
+        return self
+
+    def _chainable_update(self, call, subj):
+        """Called to indicate internally that this is a chainable update - by setting the subject and call of the Triple Builder object which is used to build further triples"""
+        self.tripleBuilder = TripleBuilder(call, self.cursor, self._clean_subject(subj))
+        return self._last_update()
+
+    def _is_chainable(self, operator, lastArg=None):
+        """Determines whether a given operator can have a chained query as its last argument"""
+        non_chaining_operators = ["and", "or"]
+        if (lastArg is not None and type(lastArg) == dict and
+            '@value' not in lastArg and
+            '@type' not in lastArg and
+            'value' not in lastArg
+            ):
+            for op in non_chaining_operators:
+                if op in operator:
+                    return False
+            return True
+        else:
+            return False
 
     def execute(self, client):
         """Executes the query using the passed client to connect to a server"""
@@ -1108,71 +1166,53 @@ class TripleBuilder:
 Methods that has not been impremented
 ====================================
 
-/*
-* Transforms from internal json representation to human writable WOQL.js format
-*/
-WOQLQuery.prototype.prettyPrint = function(indent, show_context, q, fluent){
-    if(!this.indent) this.indent = indent;
-    q = (q ? q : this.query);
-    var str = "";
-    const newlining_operators = ["get", "from", "into"];
-    for(var operator in q){
-    //ignore context in pretty print
-    if(operator == "@context") {
-    if( show_context){
-    var c = this.get_context();
-    if(c) str += "@context: " + JSON.stringify(c) + "\n";
-    }
-    continue;
-    }
-    //statement starts differently depending on indent and whether it is fluent style or regular function style
-    str += this.getWOQLPrelude(operator, fluent, indent - this.indent);
-    var val = q[operator];
-    if(this.chainable(operator, val[val.length-1])){
-    //all arguments up until the last are regular function arguments
-    str += this.uncleanArguments(operator,  val.slice(0, val.length-1), indent, show_context);
-    if(newlining_operators.indexOf(operator) !== -1){
-    //some fluent function calls demand a linebreak..
-    str += "\n" + nspaces(indent-this.indent);
-    }
-    //recursive call to query included in tail
-    str += this.prettyPrint(indent, show_context, val[val.length-1], true);
-    }
-    else {
-    //non chainable operators all live inside the function call parameters
-    str += this.uncleanArguments(operator,  val, indent, show_context);
-    }
-    }
-    //remove any trailing dots in the chain (only exist in incompletely specified queries)
-    if(str.substring(str.length-1) == "."){
-    str = str.substring(0, str.length-1);
-    }
-    return str;
-}
+# Pretty print need logic for translate to WOQLpy
 
-/**
- * Gets the starting characters for a WOQL query - varies depending on how the query is invoked and how indented it is
- */
-WOQLQuery.prototype.getWOQLPrelude = function(operator, fluent, inline){
-    if(operator === "true" || operator === "false"){
-    return operator;
-    }
-    if(fluent){
-    return "." + operator;
-    }
-    return (inline ? "\n" + nspaces(inline) : "") + "WOQL." + operator;
-}
+    def pretty_print(self, indent, show_context, q=None, fluent=None):
+        if not hasattr(self, 'indent'):
+            self.indent = indent
+        if q is None:
+            q = self.query
+        string = ""
+        newlining_operators = ["get", "from", "into"]
+        for operator in q:
+            # ignore context in pretty print
+            if (operator == "@context"):
+                if (show_context):
+                    c = self._get_context()
+                    if c:
+                        string += "@context: " + str(c) + "\n"
+                continue
+            # statement starts differently depending on indent and whether it is fluent style or regular function style
+            string += self._get_woql_prelude(operator, fluent, indent - self.indent)
+            val = q[operator]
+            if self._is_chainable(operator, val[val.length-1]):
+                # all arguments up until the last are regular function arguments
+                string += self._unclean_arguments(operator,  val.slice(0, val.length-1), indent, show_context)
+                if newlining_operators not in operator:
+                    # some fluent function calls demand a linebreak..
+                    string += "\n" + (" " * (indent-this.indent))
+                # recursive call to query included in tail
+                string += self.pretty_print(indent, show_context, val[val.length-1], true)
+            else:
+                # non chainable operators all live inside the function call parameters
+                string += this._unclean_arguments(operator, val, indent, show_context)
+        # remove any trailing dots in the chain (only exist in incompletely specified queries)
+        if (string[-1] == "."):
+            string = string[:-1];
+        return string
 
-/**
- * Determines whether a given operator can have a chained query as its last argument
- */
-WOQLQuery.prototype.chainable = function(operator, lastArg){
-    const non_chaining_operators = ["and", "or"];
-    if(lastArg && typeof lastArg == "object" && typeof lastArg['@value'] == "undefined"  && typeof lastArg['@type'] == "undefined"  && typeof lastArg['value'] == "undefined" && non_chaining_operators.indexOf(operator) == -1){
-    return true;
-    }
-    return false;
-}
+    def _get_woql_prelude(self, operator, fluent, inline):
+        Gets the starting characters for a WOQL query - varies depending on how the query is invoked and how indented it is
+        # TODO: should follow WOQLpy syntex not js syntex
+        if operator in ["true" or "false"]:
+            return operator
+        if fluent:
+            return "." + operator
+        if inline:
+            return "\n" + " " * (inline) + "WOQL." + operator
+        else:
+            return "WOQL." + operator
 
 /**
  * Transforms arguments to WOQL functions from the internal (clean) version, to the WOQL.js human-friendly version
@@ -1260,7 +1300,7 @@ WOQLQuery.prototype.uncleanArgument = function(operator, val, index, allArgs){
     var oval = '"' + cstr + '"';
     }
     else {
-    var oval = this.unclean_objectArgument(operator, val, index);
+    var oval = this.un_clean_objectArgument(operator, val, index);
     }
     return oval;
     }
@@ -1273,14 +1313,14 @@ WOQLQuery.prototype.uncleanArgument = function(operator, val, index, allArgs){
     return val;
 }
 
-WOQLQuery.prototype.unclean_objectArgument = function(operator, val, index){
+WOQLQuery.prototype.un_clean_objectArgument = function(operator, val, index){
     if(val['@value'] && (val['@language'] || (val['@type'] && val['@type'] == "xsd:string"))) return '"' + val['@value'] + '"';
     if(val['@value'] && (val['@type'] && val['@type'] == "xsd:integer")) return val['@value'];
     if(val['list']) {
     var nstr = "[";
     for(var i = 0 ; i<val['list'].length; i++){
     if(typeof val['list'][i] == "object"){
-    nstr += this.unclean_objectArgument("list", val['list'][i], i);
+    nstr += this.un_clean_objectArgument("list", val['list'][i], i);
     }
     else {
     nstr += '"' + val['list'][i] + '"';

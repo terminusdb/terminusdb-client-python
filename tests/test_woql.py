@@ -19,6 +19,28 @@ class TestWoqlQueries:
         jsonObj = {"limit": [10,{"start": [0,{}]}]}
         assert woqlObject.json() == jsonObj
 
+    def test_insert_method(self):
+        woqlObject = WOQLQuery().insert("v:Bike_URL", "Bicycle")
+        woqlObjectDB = WOQLQuery().insert("v:Bike_URL", "Bicycle", "myDB")
+        jsonObj = { "add_triple": [ 'v:Bike_URL', 'rdf:type', 'scm:Bicycle' ] }
+        jsonObjDB={ "add_quad": [ 'v:Bike_URL', 'rdf:type', 'scm:Bicycle', 'db:myDB' ] }
+        assert woqlObject.json() == jsonObj
+        assert woqlObjectDB.json() == jsonObjDB
+
+    def test_doctype_method(self):
+        woqlObject = WOQLQuery().doctype("Station")
+        jsonObj = { "and": [
+                    { "add_quad": ["scm:Station",
+                    "rdf:type",
+                    "owl:Class",
+                    "db:schema"] },
+                    { "add_quad": ["scm:Station",
+                    "rdfs:subClassOf",
+                    "tcs:Document",
+                    "db:schema"] }
+                   ] }
+        assert woqlObject.json() == jsonObj
+
     def test_woql_not_method(self):
         woqlObject = WOQLQuery().woql_not(WOQLQuery().triple("a", "b", "c"))
         woqlObjectChain = WOQLQuery().woql_not().triple("a", "b", "c")
@@ -174,10 +196,30 @@ class TestWoqlQueries:
         jsonObj={ "typecast": [ "v:Duration", "xsd:integer", "v:Duration_Cast" ] }
         assert woqlObject.json() == jsonObj
 
+    def test_cast_method(self):
+        woqlObject=WOQLQuery().cast("v:Duration", "xsd:integer", "v:Duration_Cast")
+        jsonObj={ "typecast": [ "v:Duration", "xsd:integer", "v:Duration_Cast" ] }
+        assert woqlObject.json() == jsonObj
 
-    def teat_list_method(self):
+    def test_list_method(self):
         woqlObject=WOQLQuery().list(["V1","V2"])
         jsonObj={ 'list': [ [ 'V1', 'V2' ] ] }
+        assert woqlObject.json() == jsonObj
+
+    def test_group_by_method(self):
+        woqlObject=WOQLQuery().group_by(["v:A", "v:B"],["v:C"],"v:New")
+        jsonObj={ "group_by": [ {"list": ['v:A', "v:B"]}, {"list": ["v:C"]}, {},  "v:New"] }
+        assert woqlObject.json() == jsonObj
+
+    def test_order_by_method(self):
+        woqlObject=WOQLQuery().order_by("B")
+        jsonObj={ "order_by": [ {"asc": ['v:B']}, {} ] }
+        assert woqlObject.json() == jsonObj
+
+    def test_order_by_method_desc(self):
+        desc=WOQLQuery().desc(["v:C", "v:A"])
+        woqlObject=WOQLQuery().order_by(desc)
+        jsonObj={ "order_by": [ {"desc": ['v:C', "v:A"]}, {} ] }
         assert woqlObject.json() == jsonObj
 
 
