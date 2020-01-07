@@ -587,9 +587,9 @@ class WOQLQuery:
             if(self.adding_class):
 			    nwoql = WOQL.add_property(p, val)
                 nwoql.domain(this.adding_class)
-			    nwoql.query.woql_and.push(this.json())
+			    nwoql.query.woql_and.push(self.json())
 			    nwoql.adding_class = self.adding_class
-			    return nwoql;
+			    return nwoql
 		    p = self.clean_predicate(p)
             self.tripleBuilder.addPO(p, val)
         return self
