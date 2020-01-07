@@ -34,7 +34,7 @@ class WOQLQuery:
         # object used to accumulate triples from fragments to support usage like node("x").label("y")
         self.tripleBuilder = False
         self.adding_class = False
-        self.cleanClass = self.cleanType = self.clean_predicate
+        self._clean_class = self._clean_type = self._clean_predicate
         self.relationship = self.entity
         self.cast = self.typecast
 
@@ -65,9 +65,9 @@ class WOQLQuery:
     def insert(Node, Type, Graph=None):
         q = WOQLQuery()
         if Graph:
-            return q.add_quad(Node, "rdf:type", q.cleanType(Type), Graph)
+            return q.add_quad(Node, "rdf:type", q._clean_type(Type), Graph)
         else :
-            return q.add_triple(Node, "rdf:type", q.cleanType(Type))
+            return q.add_triple(Node, "rdf:type", q._clean_type(Type))
 
     def buildAsClauses(self, vars=None, cols=None):
         clauses = []
@@ -96,9 +96,9 @@ class WOQLQuery:
 
     def insert(self, node, type, graph=None):
         if graph is not None:
-            return WOQLQuery().add_quad(node, "rdf:type", WOQLQuery().cleanType(type), graph)
+            return WOQLQuery().add_quad(node, "rdf:type", WOQLQuery()._clean_type(type), graph)
         else:
-            return WOQLQuery().add_triple(node, "rdf:type", WOQLQuery().cleanType(type))
+            return WOQLQuery().add_triple(node, "rdf:type", WOQLQuery()._clean_type(type))
 
     def doctype(self, type, graph=None):
         return WOQLQuery().add_class(type, graph).parent("Document")
@@ -381,9 +381,9 @@ class WOQLQuery:
 
     def sub(self, a, b=None):
         if (not b) and self.tripleBuilder:
-            self.tripleBuilder.sub(self.cleanClass(a))
+            self.tripleBuilder.sub(self._clean_class(a))
             return self
-        self.cursor["sub"] = [self.cleanClass(a),self.cleanClass(b)]
+        self.cursor["sub"] = [self._clean_class(a),self._clean_class(b)]
         return self._last("sub", a)
 
     def comment(self, val=None):
@@ -413,11 +413,11 @@ class WOQLQuery:
 
     def isa(self, a, b=None):
         if (not b) and self.tripleBuilder:
-            self.tripleBuilder.isa(self.cleanClass(a))
+            self.tripleBuilder.isa(self._clean_class(a))
             return self
 
         if b:
-            self.cursor["isa"] = [self.cleanClass(a),self.cleanClass(b)]
+            self.cursor["isa"] = [self._clean_class(a),self._clean_class(b)]
             return self._chainable("isa", a)
 
     def trim(self, a, b):
@@ -529,7 +529,7 @@ class WOQLQuery:
         if p:
             graph = self._clean_graph(g) if g else "db:schema"
             p = "scm:" + p if p.find(":") == -1 else p
-            t = self.cleanType(t) if t.find(":") == -1 else t
+            t = self._clean_type(t) if t.find(":") == -1 else t
             tc = self.cursor
             pref = t.split(":")
             if (pref[0] is not None) and (pref[0] == "xdd" or pref[0] == "xsd"):
@@ -601,7 +601,7 @@ class WOQLQuery:
         return self
 
     def domain(self, d):
-        d = self.cleanClass(d)
+        d = self._clean_class(d)
         if self.tripleBuilder:
             self.tripleBuilder.addPO('rdfs:domain',d)
         return self
@@ -609,7 +609,7 @@ class WOQLQuery:
     def parent(self, *args):
         if self.tripleBuilder:
             for item in args:
-                pn = self.cleanClass(item)
+                pn = self._clean_class(item)
                 self.tripleBuilder.addPO('rdfs:subClassOf', pn)
         return self
 
@@ -624,7 +624,7 @@ class WOQLQuery:
                 #nwoql.query["and"].append(self.json())
                 #nwoql.adding_class = self.adding_class
                 #return nwoql
-            p = self.clean_predicate(p)
+            p = self._clean_predicate(p)
             self.tripleBuilder.addPO(p, val)
         return self
 
