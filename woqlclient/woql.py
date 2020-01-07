@@ -584,13 +584,13 @@ class WOQLQuery:
 
     def property(self, p,val):
         if self.tripleBuilder:
-            if(self.adding_class):
-			    nwoql = WOQL.add_property(p, val)
-                nwoql.domain(this.adding_class)
-			    nwoql.query.woql_and.push(self.json())
-			    nwoql.adding_class = self.adding_class
-			    return nwoql
-		    p = self.clean_predicate(p)
+            #if(self.adding_class):
+                ##nwoql = self.add_property(p, val)
+                #nwoql.domain(self.adding_class)
+                #nwoql.query["and"].append(self.json())
+                #nwoql.adding_class = self.adding_class
+                #return nwoql
+            p = self.clean_predicate(p)
             self.tripleBuilder.addPO(p, val)
         return self
 
@@ -1033,8 +1033,10 @@ class TripleBuilder:
                 ttype = self.type
         else:
             ttype = "triple"
-
-        evstr = ttype + '("' + self.subject + '", "' + p + '", '
+        #“In the basket are %s and %s” % (x,y)
+        
+        evstr = " %s (\"%s\" , \"%s\" , " % (ttype, self.subject, p) 
+        #ttype + "(\"" + self.subject + "\", " + p + "\", "
         if type(o) == str:
             evstr += "'" + o + "'"
         elif isinstance(o, (list, dict, WOQLQuery)):
@@ -1045,7 +1047,8 @@ class TripleBuilder:
         if ttype[-4:] == "quad" or self.g:
             if not g:
                 g = self.g if self.g else "db:schema"
-            evstr += ', "' + g + '"'
+            evstr += ", \"%s\" " % (g)
+            #', "' + g + '"'
         evstr += ")"
         try:
             unit = eval("WOQLQuery()." + evstr)
@@ -1055,7 +1058,7 @@ class TripleBuilder:
             return self
 
     def getO(self, s, p):
-        if self.cursor['and']:
+        if "and" in self.cursor:
             for item in self.cursor['and']:
                 clause = item
                 key = list(clause.keys())[0]
