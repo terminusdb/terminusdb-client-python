@@ -34,7 +34,7 @@ class WOQLQuery:
         self.vocab = self._load_default_vocabulary()
         # object used to accumulate triples from fragments to support usage like node("x").label("y")
         self.tripleBuilder = False
-
+        self.adding_class = False
         self.cleanClass = self.cleanType = self.clean_predicate
         self.relationship = self.entity
 
@@ -466,6 +466,7 @@ class WOQLQuery:
     def add_class(self, c=None, graph=None):
         if c:
             graph = self.clean_graph(graph) if graph else "db:schema"
+            self.adding_class = c
             c = "scm:" + c if c.find(":") == -1 else c
             self.add_quad(c, "rdf:type", "owl:Class", graph)
         return self
@@ -573,7 +574,13 @@ class WOQLQuery:
 
     def property(self, p,val):
         if self.tripleBuilder:
-            p = self.clean_predicate(p)
+            if(self.adding_class):
+			    nwoql = WOQL.add_property(p, val)
+                nwoql.domain(this.adding_class)
+			    nwoql.query.woql_and.push(this.json())
+			    nwoql.adding_class = self.adding_class
+			    return nwoql;
+		    p = self.clean_predicate(p)
             self.tripleBuilder.addPO(p, val)
         return self
 
