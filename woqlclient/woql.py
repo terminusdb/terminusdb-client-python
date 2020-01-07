@@ -45,7 +45,7 @@ class WOQLQuery:
                 return True
         return False
 
-    def get(self, arr1, arr2, target=None):
+    def get(self, arr1, arr2=None, target=None):
         """Takes an array of variables, an optional array of column names"""
         if hasattr(arr1, 'json'):
             map = arr1.json()
@@ -61,6 +61,13 @@ class WOQLQuery:
             self.cursor['get'] = [map, {}];
             self.cursor = self.cursor["get"][1];
         return self
+
+    def insert(Node, Type, Graph=None):
+        q = WOQLQuery()
+        if Graph:
+            return q.add_quad(Node, "rdf:type", q.cleanType(Type), Graph)
+        else :
+            return q.add_triple(Node, "rdf:type", q.cleanType(Type))
 
     def buildAsClauses(self, vars=None, cols=None):
         clauses = []
@@ -186,7 +193,7 @@ class WOQLQuery:
                 continue
             if type(item) == str:
                 if item[:2] == "v:":
-                    arg.append(item)
+                    args.append(item)
                 else:
                     nvalue = {"@value": item, "@type": "xsd:string"}
                     args.append(nvalue)
@@ -229,6 +236,9 @@ class WOQLQuery:
             self.query = json
             return self
         return self.query
+
+    def doctype(self, Type, Graph=None):
+        return self.add_class(Type, Graph).parent("Document");
 
     def when(self, Query, Update=None):
         """
