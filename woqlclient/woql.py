@@ -33,8 +33,8 @@ class WOQLQuery:
         self.vocab = self._load_default_vocabulary()
         # object used to accumulate triples from fragments to support usage like node("x").label("y")
         self.tripleBuilder = False
-
-        self.cleanClass = self.cleanType = self._clean_predicate
+        self.adding_class = False
+        self.cleanClass = self.cleanType = self.clean_predicate
         self.relationship = self.entity
         self.cast = self.typecast
 
@@ -45,7 +45,7 @@ class WOQLQuery:
                 return True
         return False
 
-    def get(self, arr1, arr2, target=None):
+    def get(self, arr1, arr2=None, target=None):
         """Takes an array of variables, an optional array of column names"""
         if hasattr(arr1, 'json'):
             map = arr1.json()
@@ -61,6 +61,13 @@ class WOQLQuery:
             self.cursor['get'] = [map, {}];
             self.cursor = self.cursor["get"][1];
         return self
+
+    def insert(Node, Type, Graph=None):
+        q = WOQLQuery()
+        if Graph:
+            return q.add_quad(Node, "rdf:type", q.cleanType(Type), Graph)
+        else :
+            return q.add_triple(Node, "rdf:type", q.cleanType(Type))
 
     def buildAsClauses(self, vars=None, cols=None):
         clauses = []
@@ -218,7 +225,7 @@ class WOQLQuery:
                 continue
             if type(item) == str:
                 if item[:2] == "v:":
-                    arg.append(item)
+                    args.append(item)
                 else:
                     nvalue = {"@value": item, "@type": "xsd:string"}
                     args.append(nvalue)
@@ -261,6 +268,9 @@ class WOQLQuery:
             self.query = json
             return self
         return self.query
+
+    def doctype(self, Type, Graph=None):
+        return self.add_class(Type, Graph).parent("Document");
 
     def when(self, Query, Update=None):
         """
@@ -498,7 +508,8 @@ class WOQLQuery:
 
     def add_class(self, c=None, graph=None):
         if c:
-            graph = self._clean_graph(graph) if graph else "db:schema"
+            graph = self.clean_graph(graph) if graph else "db:schema"
+            self.adding_class = c
             c = "scm:" + c if c.find(":") == -1 else c
             self.add_quad(c, "rdf:type", "owl:Class", graph)
         return self
@@ -607,7 +618,13 @@ class WOQLQuery:
 
     def property(self, p,val):
         if self.tripleBuilder:
-            p = self._clean_predicate(p)
+            #if(self.adding_class):
+                ##nwoql = self.add_property(p, val)
+                #nwoql.domain(self.adding_class)
+                #nwoql.query["and"].append(self.json())
+                #nwoql.adding_class = self.adding_class
+                #return nwoql
+            p = self.clean_predicate(p)
             self.tripleBuilder.addPO(p, val)
         return self
 
@@ -1074,8 +1091,10 @@ class TripleBuilder:
                 ttype = self.type
         else:
             ttype = "triple"
+        #“In the basket are %s and %s” % (x,y)
 
-        evstr = ttype + '("' + self.subject + '", "' + p + '", '
+        evstr = " %s (\"%s\" , \"%s\" , " % (ttype, self.subject, p)
+        #ttype + "(\"" + self.subject + "\", " + p + "\", "
         if type(o) == str:
             evstr += "'" + o + "'"
         elif isinstance(o, (list, dict, WOQLQuery)):
@@ -1086,7 +1105,8 @@ class TripleBuilder:
         if ttype[-4:] == "quad" or self.g:
             if not g:
                 g = self.g if self.g else "db:schema"
-            evstr += ', "' + g + '"'
+            evstr += ", \"%s\" " % (g)
+            #', "' + g + '"'
         evstr += ")"
         try:
             unit = eval("WOQLQuery()." + evstr)
@@ -1096,7 +1116,7 @@ class TripleBuilder:
             return self
 
     def getO(self, s, p):
-        if self.cursor['and']:
+        if "and" in self.cursor:
             for item in self.cursor['and']:
                 clause = item
                 key = list(clause.keys())[0]
