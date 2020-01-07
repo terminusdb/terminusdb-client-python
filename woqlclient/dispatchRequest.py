@@ -7,6 +7,7 @@ from .utils import Utils
 
 from base64 import b64encode
 
+from .errors import *
 
 class DispatchRequest:
 
@@ -60,8 +61,7 @@ class DispatchRequest:
             if(requestResponse.status_code == 200):
                 return requestResponse.json()  # if not a json not it raises an error
             else:
-                # This needs to raise an exception throwing the content!
-                requestResponse.raise_for_status()
+                raise(APIError(requestResponse.text,url,requestResponse.json(),requestResponse.status_code))
 
         # to be reviewed
         # the server in the response return always content-type application/json
