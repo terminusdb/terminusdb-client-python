@@ -25,10 +25,14 @@ class DatabaseError(Error):
 class AccessDeniedError(DatabaseError):
     pass
 
-
 class APIError(DatabaseError):
-    pass
-
+    """Exceptions to do with return messages from HTTP"""
+    def __init__(self, msg=None, url=None, errObj=None, status_code=None):
+        super(APIError, self).__init__()
+        self.msg = msg
+        self.url = url
+        self.errorObj = errObj
+        self.status_code = status_code
 
 class InvalidURIError(Error):
     pass
