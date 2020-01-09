@@ -35,3 +35,18 @@ class Utils:
             if (params):
                 url = ('%s?%s' % (url, params))
         return url
+
+    # below are utils for WOQLQuery
+
+    @classmethod
+    def addNamespacesToVariable(self, v):
+        if (v[:2] != "v:"):
+            return "v:" + v
+        return v
+
+    @classmethod
+    def addNamespacesToVariables(self, vars):
+        nvars = []
+        for v in vars:
+            nvars.append(self.addNamespacesToVariable(v))
+        return nvars
