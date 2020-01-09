@@ -437,3 +437,43 @@ class TestTripleBuilderChainer:
                                               { "@value": 3, "@type": "xsd:nonNegativeInteger" },
                                               "db:schema"] } ] }
         assert woqlObject.json() == jsonObj
+
+    def test_chained_insert_method(self):
+        woqlObject = WOQLQuery().insert("v:Node_ID", "v:Type").\
+                    label("v:Label").\
+                    description("v:Description").\
+                    property("prop", "v:Prop").\
+                    property("prop", "v:Prop2").\
+                    entity().parent("hello")
+
+        jsonObj={ 'and': [
+             { 'add_triple': ["v:Node_ID", "rdf:type", "v:Type"] },
+             { 'add_triple': ["v:Node_ID", "rdfs:label", "v:Label"] },
+             { 'add_triple': ["v:Node_ID", "rdfs:comment", "v:Description"] },
+             { 'add_triple': ["v:Node_ID", "scm:prop", "v:Prop"] },
+             { 'add_triple': ["v:Node_ID", "scm:prop", "v:Prop2"] },
+             { 'add_triple': ["v:Node_ID", "rdfs:subClassOf", "tcs:Entity"] },
+             { 'add_triple': ["v:Node_ID", "rdfs:subClassOf", "scm:hello"] }
+        ]}
+        assert woqlObject.json() == jsonObj
+
+    def test_chained_doctype_method(self):
+        woqlObject = WOQLQuery().doctype("MyDoc").\
+                        property("prop", "dateTime").\
+                        property("prop2", "integer")
+        jsonObj={ 'and': [
+        { 'add_quad': ["scm:prop2", "rdf:type", "owl:DatatypeProperty", "db:schema"] },
+        { 'add_quad': ["scm:prop2", "rdfs:range", "xsd:integer", "db:schema"] },
+        { 'add_quad': ["scm:prop2", "rdfs:domain", "scm:MyDoc", "db:schema"] },
+        { 'and': [
+            { 'add_quad': ["scm:prop", "rdf:type", "owl:DatatypeProperty", "db:schema"] },
+            { 'add_quad': ["scm:prop", "rdfs:range", "xsd:dateTime", "db:schema"] },
+            { 'add_quad': ["scm:prop", "rdfs:domain", "scm:MyDoc", "db:schema"] },
+
+            { 'and': [
+            { 'add_quad': ["scm:MyDoc", "rdf:type", "owl:Class", "db:schema"] },
+            { 'add_quad': ["scm:MyDoc", "rdfs:subClassOf", "tcs:Document", "db:schema"] }
+        ]}
+        ]},
+        ]}
+        assert woqlObject.json() == jsonObj
