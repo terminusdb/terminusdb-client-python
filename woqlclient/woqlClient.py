@@ -283,7 +283,7 @@ class WOQLClient:
     def select(self, woqlQuery, dbID=None, key=None):
         if(dbID):
             self.conConfig.setDB(dbID)
-
+        
         payload = {'terminus:query': json.dumps(woqlQuery)}
         return self.dispatch(self.conConfig.queryURL(), const.WOQL_SELECT, key, payload)
 
