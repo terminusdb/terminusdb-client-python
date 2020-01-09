@@ -317,8 +317,11 @@ class TestTripleBuilderChainer:
 
     def test_label_method(self):
         woqlObject=WOQLQuery().node("doc:x", "add_quad").label("my label", "en")
+        woqlObject2=WOQLQuery().node("doc:x", "add_quad").label("v:label")
         jsonObj={ 'add_quad': ['doc:x', 'rdfs:label', { '@value': 'my label', '@language': 'en' }, 'db:schema'] }
+        jsonObj2={ 'add_quad': ['doc:x', 'rdfs:label', "v:label", 'db:schema'] }
         assert woqlObject.json() == jsonObj
+        assert woqlObject2.json() == jsonObj2
 
     def test_again_add_class_method(self):
         woqlObject=WOQLQuery().add_class("NewClass").description("A new class object.").entity()
@@ -445,7 +448,6 @@ class TestTripleBuilderChainer:
                     property("prop", "v:Prop").\
                     property("prop", "v:Prop2").\
                     entity().parent("hello")
-
         jsonObj={ 'and': [
              { 'add_triple': ["v:Node_ID", "rdf:type", "v:Type"] },
              { 'add_triple': ["v:Node_ID", "rdfs:label", "v:Label"] },
@@ -461,6 +463,7 @@ class TestTripleBuilderChainer:
         woqlObject = WOQLQuery().doctype("MyDoc").\
                         property("prop", "dateTime").\
                         property("prop2", "integer")
+        print(woqlObject.json())
         jsonObj={ 'and': [
         { 'add_quad': ["scm:prop2", "rdf:type", "owl:DatatypeProperty", "db:schema"] },
         { 'add_quad': ["scm:prop2", "rdfs:range", "xsd:integer", "db:schema"] },

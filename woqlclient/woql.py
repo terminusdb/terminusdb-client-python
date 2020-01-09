@@ -66,7 +66,7 @@ class WOQLQuery:
         q = WOQLQuery()
         if Graph:
             return q.add_quad(Node, "rdf:type", q._clean_type(Type), Graph)
-        else :
+        else:
             return q.add_triple(Node, "rdf:type", q._clean_type(Type))
 
     def buildAsClauses(self, vars=None, cols=None):
@@ -618,12 +618,12 @@ class WOQLQuery:
 
     def property(self, p,val):
         if self.tripleBuilder:
-            #if(self.adding_class):
-                ##nwoql = self.add_property(p, val)
-                #nwoql.domain(self.adding_class)
-                #nwoql.query["and"].append(self.json())
-                #nwoql.adding_class = self.adding_class
-                #return nwoql
+            if(self.adding_class):
+                nwoql = WOQLQuery().add_property(p, val).\
+                domain(self.adding_class)
+                nwoql.query["and"].append(self.json())
+                nwoql.adding_class = self.adding_class
+                return nwoql
             p = self._clean_predicate(p)
             self.tripleBuilder.addPO(p, val)
         return self
@@ -1067,7 +1067,7 @@ class TripleBuilder:
         if not lang:
             lang = "en"
         if l[:2] == "v:":
-            d = {"value": l, "@language": lang }
+            d = l
         else:
             d = {"@value": l, "@language": lang }
         x = self.addPO('rdfs:label', d)
@@ -1077,7 +1077,7 @@ class TripleBuilder:
         if not lang:
             lang = "en"
         if l[:2] == "v:":
-            d = {"value": l, "@language": lang }
+            d = l
         else:
             d = {"@value": l, "@language": lang }
         x = self.addPO('rdfs:comment', d)
