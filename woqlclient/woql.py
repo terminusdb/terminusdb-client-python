@@ -5,6 +5,7 @@
 """
 
 import sys
+import re
 from copy import copy
 from .utils import Utils
 
@@ -208,8 +209,7 @@ class WOQLQuery:
 
     def concat(self, list, v):
         if type(list) == str:
-            nlist = list.split('/(v:[\w_]+)\b/')
-            nxlist = []
+            nlist = re.split('(v:[\w_]+)\\b', list)
             for i in range(1,len(nlist)):
                 if (nlist[i-1][len(nlist[i-1])-1:] == "v") and \
                    (nlist[i][:1] == ":"):
@@ -235,7 +235,7 @@ class WOQLQuery:
         if v.find(":") == -1:
             v = "v:" + v
 
-        self.cursor['concat'] = [{"list": args}, v]
+        self.cursor['concat'] = [{'list': args}, v]
         return self
 
     def lower(self, u, l):
@@ -1165,9 +1165,9 @@ class TripleBuilder:
 
         od = self.getO(os, "rdfs:domain")
         if od:
-            x = self.subject
+            cardcls = self.subject
             self.subject = od
-            self.addPO("rdfs:subClassOf", self.subject)
+            self.addPO("rdfs:subClassOf", cardcls)
         self.subject = os
         return self
 

@@ -201,6 +201,11 @@ class TestWoqlQueries:
         jsonObj={ "typecast": [ "v:Duration", "xsd:integer", "v:Duration_Cast" ] }
         assert woqlObject.json() == jsonObj
 
+    def test_concat_method(self):
+        woqlObject=WOQLQuery().concat("v:Duration yo v:Duration_Cast", "x")
+        jsonObj={ "concat": [ { "list": ["v:Duration", {"@value": " yo ", "@type": "xsd:string"}, "v:Duration_Cast" ]}, "v:x"] }
+        assert woqlObject.json() == jsonObj
+
     def test_list_method(self):
         woqlObject=WOQLQuery().list(["V1","V2"])
         jsonObj={ 'list': [ [ 'V1', 'V2' ] ] }
@@ -461,9 +466,9 @@ class TestTripleBuilderChainer:
 
     def test_chained_doctype_method(self):
         woqlObject = WOQLQuery().doctype("MyDoc").\
-                        property("prop", "dateTime").\
-                        property("prop2", "integer")
-        print(woqlObject.json())
+                    label("abc").description("abcd").\
+                    property("prop", "dateTime").label("aaa").\
+                    property("prop2", "integer").label("abe")
         jsonObj={ 'and': [
         { 'add_quad': ["scm:prop2", "rdf:type", "owl:DatatypeProperty", "db:schema"] },
         { 'add_quad': ["scm:prop2", "rdfs:range", "xsd:integer", "db:schema"] },
@@ -475,8 +480,12 @@ class TestTripleBuilderChainer:
 
             { 'and': [
             { 'add_quad': ["scm:MyDoc", "rdf:type", "owl:Class", "db:schema"] },
-            { 'add_quad': ["scm:MyDoc", "rdfs:subClassOf", "tcs:Document", "db:schema"] }
-        ]}
+            { 'add_quad': ["scm:MyDoc", "rdfs:subClassOf", "tcs:Document", "db:schema"] },
+            { "add_quad": ["scm:MyDoc", "rdfs:label", {"@value": "abc", "@language": "en"}, "db:schema"] },
+            { "add_quad": ["scm:MyDoc", "rdfs:comment", {"@value": "abcd", "@language": "en"}, "db:schema"] }
         ]},
+        { "add_quad": ["scm:prop", "rdfs:label", {"@value": "aaa", "@language": "en"}, "db:schema"] }
+        ]},
+        { "add_quad": ["scm:prop2", "rdfs:label", {"@value": "abe", "@language": "en"}, "db:schema"] }
         ]}
         assert woqlObject.json() == jsonObj
