@@ -14,10 +14,11 @@ test_requirements = [
 setuptools.setup(
     name="terminus-client-python",
     version="0.0.1",
-    author="Francesca Bitto",
-    author_email="francesca@datachemist.com",
-    description="woql client for Terminus DB",
-    long_description_content_type="terminus client for DB",
+    author="TerminusDB group",
+    author_email="terminusdatabase@gmail.com",
+    description="Python client for Terminus DB",
+    long_description="Python terminus client for TerminusDB API and WOQLpy",
+    long_description_content_type="text/markdown",
     package_data={'': ['LICENSE']},
     url="https://github.com/terminusdb/terminus-client-python",
     packages=setuptools.find_packages(exclude=['tests']),
@@ -26,7 +27,7 @@ setuptools.setup(
    
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: APACHE 2",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: OS Independent",
     ],
     setup_requires=['pytest-runner'],

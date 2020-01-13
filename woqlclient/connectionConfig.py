@@ -1,5 +1,5 @@
 # connectionConfig.py
-from idParser import IDParser
+from .idParser import IDParser
 
 
 class ConnectionConfig:

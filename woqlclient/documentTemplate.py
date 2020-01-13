@@ -36,7 +36,8 @@ class DocumentTemplate:
         return temp
 
         @staticmethod
-        def formatDocument(cls, doc, schemaURL, options=None, urlId=None):
+        def formatDocument(doc, schemaURL, options=None, urlId=None):
+            print('i am enetering here \n')
             document = {}
             if(isinstance(doc, dict)):
                 document['@context'] = doc['@context']
@@ -46,7 +47,7 @@ class DocumentTemplate:
 
                 if (options and options.get('terminus:encoding') and options['terminus:encoding'] == 'terminus:turtle'):
                     document['terminus:turtle'] = doc
-                    document['terminus:schema'] = schemaURL
+                    #document['terminus:schema'] = schemaURL
                     del document['terminus:turtle']['@context']
                 else:
                     document['terminus:document'] = doc

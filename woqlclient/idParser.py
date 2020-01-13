@@ -1,7 +1,7 @@
 # idParser.py
 
-from errorMessage import ErrorMessage
-from errors import (InvalidURIError)
+from .errorMessage import ErrorMessage
+from .errors import (InvalidURIError)
 import re
 
 

@@ -1,12 +1,15 @@
 
-import errorMessage
-import const
-import requests
+#from .errorMessage import ErrorMessage
+from .const import Const as const
 
-from utils import Utils
+import requests
+import sys
+
+from .utils import Utils
 
 from base64 import b64encode
 
+from .errors import *
 
 class DispatchRequest:
 
@@ -42,7 +45,9 @@ class DispatchRequest:
 
     @classmethod
     def sendRequestByAction(cls, url, action, key, payload={}):
-        print("sendRequestByAction_____", action)
+        print("Sending to URL____________", url)
+        print("sendRequestByAction_____________", action)
+
         try:
             requestResponse = None
             headers = cls.__autorizationHeader(key)
@@ -56,18 +61,30 @@ class DispatchRequest:
             elif action in [const.CREATE_DATABASE, const.UPDATE_SCHEMA, const.CREATE_DOCUMENT, const.WOQL_UPDATE]:
                 requestResponse = cls.__postCall(url, headers, payload)
 
+           
             if(requestResponse.status_code == 200):
                 return requestResponse.json()  # if not a json not it raises an error
             else:
-                requestResponse.raise_for_status()
+                #Raise an exception if a request is unsuccessful
+                message="Api Error";
 
-        # to be review
-        # the server in the response return always contet-type application/json
+                if type(requestResponse.text) is str:
+                    message=requestResponse.text
+
+                raise(APIError(message,url,requestResponse.json(),requestResponse.status_code))
+
+        # to be reviewed
+        # the server in the response return always content-type application/json
         except ValueError as err:
             # if the response type is not a json
             print("Value Error", err)
             return requestResponse.text
+
         """
+        except Exception as err:
+            print(type(err))
+            print(err.args)
+
         except requests.exceptions.RequestException as err:
             print ("Request Error",err)
         except requests.exceptions.HTTPError as err:

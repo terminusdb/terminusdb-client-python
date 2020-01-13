@@ -1,10 +1,10 @@
 # connectionCapabilities.py
 
 # const UTILS = require('./utils.js');
-from errorMessage import ErrorMessage
-import const
-from errors import (AccessDeniedError, InvalidURIError, APIError)
-from connectionConfig import ConnectionConfig
+from .errorMessage import ErrorMessage
+from .const import Const as const
+from .errors import (AccessDeniedError, InvalidURIError, APIError)
+from .connectionConfig import ConnectionConfig
 
 """
     Creates an entry in the connection registry for the server
@@ -154,7 +154,7 @@ class ConnectionCapabilities:
         self.connectionConfig.deletedbID(dbid)
         url = srvr if srvr else self.connectionConfig.serverURL
         dbidCap = self.__dbCapabilityID(dbid)
-        if(url in self.connection):
+        if(url in self.connection and self.connection[url].get(dbidCap)):
             self.connection[url].pop(dbidCap)
 
     def __dbCapabilityID(self, dbid):

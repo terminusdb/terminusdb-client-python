@@ -1,18 +1,19 @@
 #import sys
 #sys.path.append('woqlclient')
 
-from  connectionConfig import ConnectionConfig
-from  connectionCapabilities import ConnectionCapabilities
+from  woqlclient import ConnectionConfig
+from  woqlclient import ConnectionCapabilities
 import pytest
 import json
-import const
-from errors import (AccessDeniedError,InvalidURIError,APIError)
+from woqlclient import const
+from woqlclient import (AccessDeniedError,InvalidURIError,APIError)
+import os
 
 def test_connectionCapabilities_noParameter():
 	conConfig=ConnectionConfig()
-	
+
 	"""
-	  the key is related with a server you have to set both of 
+	  the key is related with a server you have to set both of
 	  the method raise an APIerror
 	"""
 
@@ -25,29 +26,29 @@ def test_connectionCapabilities_noParameter():
 		assert conCapabilities.serverConnected() == False
 
 		with pytest.raises(InvalidURIError):
-			with open('src/tests/capabilitiesResponse.json') as json_file:
+			with open('tests/capabilitiesResponse.json') as json_file:
 				capResponse = json.load(json_file)
 				conCapabilities.addConnection(capResponse);
 
 
 def test_addConnection():
 	#No server url in intialization
-	
+
 	conConfig=ConnectionConfig({"server":"http://localhost:6363"})
 	conCapabilities=ConnectionCapabilities(conConfig,'mykey')
 
 	assert ({"http://localhost:6363/":{'key':"mykey"}}==conCapabilities.connection)==True
 
-	with open('src/tests/capabilitiesResponse.json') as json_file:
+	with open('tests/capabilitiesResponse.json') as json_file:
 		capResponse = json.load(json_file)
 		conCapabilities.addConnection(capResponse);
 
-	with open ('src/tests/connectionDictionary.json') as json_file:
+	with open ('tests/connectionDictionary.json') as json_file:
 		dictTest = json.load(json_file)
 		assert (dictTest==conCapabilities.connection) ==True
-		
+
 		#you have setServer or the serverConnected is False
-		
+
 	assert conCapabilities.serverConnected() == True
 	assert conCapabilities.getClientKey()=="mykey"
 
@@ -60,7 +61,7 @@ def test_set_getClientKey():
 	serverURL=conConfig.serverURL;
 
 	assert conCapabilities.getClientKey(serverURL) =="mykey"
-	
+
 	with pytest.raises(APIError):
 		assert conCapabilities.getClientKey("http://testServer")
 
@@ -69,7 +70,7 @@ def test_capabilitiesPermit():
 	conConfig=ConnectionConfig({"server":"http://localhost:6363","db":"myFirstTerminusDB"})
 	conCapabilities=ConnectionCapabilities(conConfig,'mykey')
 
-	with open('src/tests/capabilitiesResponseNoAllAction.json') as json_file:
+	with open('tests/capabilitiesResponseNoAllAction.json') as json_file:
 		capResponse = json.load(json_file)
 		conCapabilities.addConnection(capResponse)
 
@@ -78,18 +79,18 @@ def test_capabilitiesPermit():
 		conCapabilities.capabilitiesPermit(const.DELETE_DATABASE)
 
 	with pytest.raises(AccessDeniedError):
-		conCapabilities.capabilitiesPermit(const.DELETE_DOCUMENT)	
+		conCapabilities.capabilitiesPermit(const.DELETE_DOCUMENT)
 
-	
+
 	assert conCapabilities.capabilitiesPermit(const.CREATE_DATABASE)==True
-	assert conCapabilities.capabilitiesPermit(const.CREATE_DOCUMENT)==True	
+	assert conCapabilities.capabilitiesPermit(const.CREATE_DOCUMENT)==True
 
 
 def test_deleteDatabaseForTheConnectionList():
 	conConfig=ConnectionConfig({"server":"http://localhost:6363","db":"myFirstTerminusDB"})
 	conCapabilities=ConnectionCapabilities(conConfig,'mykey')
 
-	with open('src/tests/capabilitiesResponse.json') as json_file:
+	with open('tests/capabilitiesResponse.json') as json_file:
 		capResponse = json.load(json_file)
 		conCapabilities.addConnection(capResponse)
 
@@ -98,4 +99,3 @@ def test_deleteDatabaseForTheConnectionList():
 	conCapabilities.removeDB();
 
 	assert ("doc:myFirstTerminusDB" in conCapabilities.connection["http://localhost:6363/"]) == False
-
