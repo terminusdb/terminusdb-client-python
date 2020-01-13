@@ -113,16 +113,17 @@ class TestPreRollQuery:
     def test_get_document_connections_method(self):
         woqlObject=WOQLQuery().limit(2).start(0)
         jsonObj={ 'limit': [ 2, { 'start': [ 0, { "and": [
+        {"eq": ["v:Docid", "doc:docid"]},
         { "or": [
             { "triple": ["doc:docid", "v:Outgoing", "v:Entid"] },
-            { "triple": ["v:Entid", "v:Incoming", { "@language": "en", "@value": "docid" } ] },
+            { "triple": ["v:Entid", "v:Incoming", "doc:docid" ] },
         ] },
         { "isa": [ "v:Entid", "v:Enttype"] },
         { "sub": [ "v:Enttype", "tcs:Document"] },
         { "opt": [ { "triple": ["v:Entid", "rdfs:label", "v:Label"] } ] },
         { "opt": [ { "quad": ["v:Enttype", "rdfs:label", "v:Class_Label", "db:schema"] } ] }
         ] } ] } ] }
-        assert woqlObject.get_document_connections("docid").json() == jsonObj
+        assert woqlObject.get_document_connections("doc:docid").json() == jsonObj
 
     def test_get_instance_meta_method(self):
         woqlObject=WOQLQuery().limit(2).start(0)

@@ -738,6 +738,7 @@ class WOQLQuery:
 
     def get_document_connections(self, id):
         return self.woql_and(
+                WOQLQuery().eq("v:Docid", id),
                 WOQLQuery().woql_or(
                     WOQLQuery().triple(id, "v:Outgoing", "v:Entid"),
                     WOQLQuery().triple("v:Entid", "v:Incoming", id)
