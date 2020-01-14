@@ -108,11 +108,15 @@ class WOQLQuery:
         self.cursor['length'] = [va, vb];
         return self
 
-    def remote(self, json):
+    def remote(self, json, opts=None):
+        if opts is not None:
+            self.cursor['remote'] = [json, opts]
         self.cursor['remote'] = [json];
         return self
 
-    def file(self, json):
+    def file(self, json, opts=None):
+        if opts is not None:
+            self.cursor['file'] = [json, opts]
         self.cursor['file'] = [json];
         return self
 
@@ -205,6 +209,24 @@ class WOQLQuery:
             self.cursor['unique'].append({"list": vari})
 
         self.cursor['unique'].append(type)
+        return self
+
+    def re(self, p, s, m):
+        if type(p) == str:
+            if p[:2] != 'v:':
+                p = {"@value" : p, "@type": "xsd:string"}
+
+        if type(s) == str:
+            if s[:2] != 'v:':
+                s = {"@value" : s, "@type": "xsd:string"}
+
+        if type(m) == str:
+            m = [m]
+
+        if (type(m) != dict) or ('list' not in m):
+            m = {'list': m}
+
+        self.cursor['re'] = [p, s, m]
         return self
 
     def concat(self, list, v):
@@ -551,22 +573,26 @@ class WOQLQuery:
     # Language elements that cannot be invoked from the top level and therefore are not exposed in the WOQL api
 
     def woql_as(self, a=None, b=None):
-        if (not a) or (not b):
+        if a is None:
             return
 
         if not hasattr(self, 'asArray'):
             self.asArray = True
             self.query = []
 
-        if b.find(":") == -1:
-            b = "v:" + b
-
-        if isinstance(a, (list, dict, WOQLQuery)):
-            val = a
+        if b is not None:
+            if b.find(":") == -1:
+                b = "v:" + b
+            if isinstance(a, (list, dict, WOQLQuery)):
+                val = a
+            else:
+                val = { "@value" : a}
+            self.query.append({'as': [val, b]})
         else:
-            val = { "@value" : a}
+            if a.find(":") == -1:
+                a = "v:" + a
+            self.query.append({'as': [a]})
 
-        self.query.append({'as': [val, b]})
         return self
 
     # WOQL API
@@ -1024,7 +1050,7 @@ class WOQLQuery:
 
     def _is_chainable(self, operator, lastArg=None):
         """Determines whether a given operator can have a chained query as its last argument"""
-        non_chaining_operators = ["and", "or"]
+        non_chaining_operators = ["and", "or", "remote", "file", "re"]
         if (lastArg is not None and type(lastArg) == dict and
             '@value' not in lastArg and
             '@type' not in lastArg and
