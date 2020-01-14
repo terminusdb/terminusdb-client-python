@@ -573,22 +573,26 @@ class WOQLQuery:
     # Language elements that cannot be invoked from the top level and therefore are not exposed in the WOQL api
 
     def woql_as(self, a=None, b=None):
-        if (not a) or (not b):
+        if a is None:
             return
 
         if not hasattr(self, 'asArray'):
             self.asArray = True
             self.query = []
 
-        if b.find(":") == -1:
-            b = "v:" + b
-
-        if isinstance(a, (list, dict, WOQLQuery)):
-            val = a
+        if b is not None:
+            if b.find(":") == -1:
+                b = "v:" + b
+            if isinstance(a, (list, dict, WOQLQuery)):
+                val = a
+            else:
+                val = { "@value" : a}
+            self.query.append({'as': [val, b]})
         else:
-            val = { "@value" : a}
+            if a.find(":") == -1:
+                a = "v:" + a
+            self.query.append({'as': [a]})
 
-        self.query.append({'as': [val, b]})
         return self
 
     # WOQL API
@@ -1046,7 +1050,7 @@ class WOQLQuery:
 
     def _is_chainable(self, operator, lastArg=None):
         """Determines whether a given operator can have a chained query as its last argument"""
-        non_chaining_operators = ["and", "or"]
+        non_chaining_operators = ["and", "or", "remote", "file", "re"]
         if (lastArg is not None and type(lastArg) == dict and
             '@value' not in lastArg and
             '@type' not in lastArg and
