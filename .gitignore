@@ -33,8 +33,6 @@ venv/
 *.swp
 *.egg
 
-#pytest
-
-.pytest_cache/
-
 .DS_Store
+
+Pipfile.lock
