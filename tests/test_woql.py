@@ -201,6 +201,17 @@ class TestWoqlQueries:
         jsonObj={ "typecast": [ "v:Duration", "xsd:integer", "v:Duration_Cast" ] }
         assert woqlObject.json() == jsonObj
 
+    def test_re_method(self):
+        woqlObject=WOQLQuery().re(".*", "v:string", "v:formated")
+        jsonObj={
+                're': [
+                  { '@value': '.*', '@type': 'xsd:string' },
+                  'v:string',
+                  { 'list': ["v:formated"] }
+                ]
+              }
+        assert woqlObject.json() == jsonObj
+
     def test_concat_method(self):
         woqlObject=WOQLQuery().concat("v:Duration yo v:Duration_Cast", "x")
         jsonObj={ "concat": [ { "list": ["v:Duration", {"@value": " yo ", "@type": "xsd:string"}, "v:Duration_Cast" ]}, "v:x"] }
