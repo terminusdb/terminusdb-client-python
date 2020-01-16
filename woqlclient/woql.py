@@ -130,7 +130,7 @@ class WOQLQuery:
             map = arr1.json()
             target = arr2;
         else:
-            map = self.buildAsClauses(arr1, arr2);
+            map = self.build_as_clauses(arr1, arr2);
 
         if target:
             if hasattr(target, 'json'):
@@ -141,7 +141,7 @@ class WOQLQuery:
             self.cursor = self.cursor["get"][1];
         return self
 
-    def buildAsClauses(self, vars=None, cols=None):
+    def build_as_clauses(self, vars=None, cols=None):
         clauses = []
         def check_vars_cols(obj):
             return obj and \
@@ -209,6 +209,17 @@ class WOQLQuery:
         return self
 
     def file(self, json, opts=None):
+        """Provides details of a file source in a JSON format that includes a URL property
+
+        Parameters
+        ----------
+        json : dict, remote data source in a JSON format
+        opts : imput options, optional
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         if opts is not None:
             self.cursor['file'] = [json, opts]
         self.cursor['file'] = [json];
@@ -429,9 +440,6 @@ class WOQLQuery:
             self.query = json
             return self
         return self.query
-
-    def doctype(self, Type, Graph=None):
-        return self.add_class(Type, Graph).parent("Document");
 
     def when(self, Query, Update=None):
         """
@@ -1136,7 +1144,7 @@ class WOQLQuery:
     def entity(self, *args):
         return self.parent("tcs:Entity")
 
-    def property(self, p,val):
+    def property(self, p, val):
         if self.tripleBuilder:
             if(self.adding_class):
                 nwoql = WOQLQuery().add_property(p, val).\
