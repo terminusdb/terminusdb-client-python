@@ -22,7 +22,7 @@ STANDARD_URLS = {
 }
 
 class WOQLQuery:
-"""Creates a new Empty Query object
+    """Creates a new Empty Query object
 
     Attributes
     ----------
@@ -84,7 +84,7 @@ class WOQLQuery:
     get_document_connections
     get_instance_meta
     simple_graph_query
-"""
+    """
 
     def __init__(self,query=None):
         self.query = query if query else {}
@@ -887,7 +887,7 @@ class WOQLQuery:
         """
         self.cursor['delete_triple'] = [self._clean_subject(subject),
                                         self._clean_predicate(predicate),
-                                        self._clean_object(object_or_Lliteral)]
+                                        self._clean_object(object_or_literal)]
         return self._chainable_update('delete_triple', subject)
 
     def add_triple(self, subject, predicate, object_or_literal):
