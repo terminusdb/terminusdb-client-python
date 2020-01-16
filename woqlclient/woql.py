@@ -1,7 +1,5 @@
 """
-  * The WOQL Query object implements the WOQL language via the fluent style
-  * @param query - json version of query
-  * @returns WOQLQuery object
+  The WOQL Query object implements the WOQL language via the fluent style
 """
 
 import sys
@@ -24,6 +22,62 @@ STANDARD_URLS = {
 }
 
 class WOQLQuery:
+"""Creates a new Empty Query object
+
+    Attributes
+    ----------
+    query
+    cursor
+    chain_ended
+    contains_update
+    paging_transitive_properties
+    vocab
+    tripleBuilder
+    adding_class
+
+    Methods
+    -------
+    woql_and
+    woql_or
+    woql_not
+    when
+    triple
+    quad
+    opt
+    woql_from
+    limit
+    start
+    select
+    sub
+    isa
+    eq
+    trim
+    delete
+    delete_triple
+    delete_quad
+    add_triple
+    add_quad
+    eval
+    minus
+    plus
+    times
+    divide
+    exp
+    get
+    woql_as
+    remote
+    idgen
+    unique
+    list
+    add_class
+    delete_class
+    add_property
+    delete_property
+    node
+    json
+    insert
+"""
+
     def __init__(self,query=None):
         self.query = query if query else {}
         self.cursor = self.query
@@ -47,7 +101,23 @@ class WOQLQuery:
         return False
 
     def get(self, arr1, arr2=None, target=None):
-        """Takes an array of variables, an optional array of column names"""
+        """Imports the Target Resource to the variables defined in Map
+
+        Takes an array of variables, an optional array of column names
+
+        Parameters
+        ----------
+        arr1 : WQOLQuery object or list
+            If WQOLQuery, arr2 will replace the target. If list, its column names of the source csv
+        arr2 : list or str
+            List, if arr1 is list and it will take the variable names for the input. Str, if arr1 is WQOLQuery, it will be the target
+        target : str, target of the source data, optional
+            Used only if arr1 and arr2 is list
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         if hasattr(arr1, 'json'):
             map = arr1.json()
             target = arr2;
@@ -62,13 +132,6 @@ class WOQLQuery:
             self.cursor['get'] = [map, {}];
             self.cursor = self.cursor["get"][1];
         return self
-
-    def insert(Node, Type, Graph=None):
-        q = WOQLQuery()
-        if Graph:
-            return q.add_quad(Node, "rdf:type", q._clean_type(Type), Graph)
-        else:
-            return q.add_triple(Node, "rdf:type", q._clean_type(Type))
 
     def buildAsClauses(self, vars=None, cols=None):
         clauses = []
@@ -96,6 +159,18 @@ class WOQLQuery:
         return self
 
     def insert(self, node, type, graph=None):
+        """Insert a node with a specific type in a graph
+
+        Parameters
+        ----------
+        node : str, node to be insert
+        type : str, type of the node
+        graph : str, target graph, optional
+
+        Results
+        -------
+        WOQLQuery object
+        """
         if graph is not None:
             return WOQLQuery().add_quad(node, "rdf:type", WOQLQuery()._clean_type(type), graph)
         else:
@@ -109,6 +184,17 @@ class WOQLQuery:
         return self
 
     def remote(self, json, opts=None):
+        """Provides details of a remote data source in a JSON format that includes a URL property
+
+        Parameters
+        ----------
+        json : dict, remote data source in a JSON format
+        opts : imput options, optional
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         if opts is not None:
             self.cursor['remote'] = [json, opts]
         self.cursor['remote'] = [json];
@@ -185,6 +271,18 @@ class WOQLQuery:
         return self
 
     def idgen(self, prefix, vari, type, mode=None):
+        """Generates an ID for a node as a function of the passed VariableList with a specific prefix (URL base). If the values of the passed variables are the same, the output will be the same
+
+        Parameters
+        ----------
+        prefix : str, prefix for the id
+        vari : str, variable to generate id for
+        type : str, the variable to hold the id
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         self.cursor['idgen'] = [prefix]
         if hasattr(vari, 'json'):
             self.cursor['idgen'].append(vari.json())
@@ -200,6 +298,18 @@ class WOQLQuery:
         return self
 
     def unique(self, prefix, vari, type):
+        """Generates an ID for a node as a function of the passed VariableList with a specific prefix (URL base). If the values of the passed variables are the same, the output will be the same
+
+        Parameters
+        ----------
+        prefix : str, prefix for the id
+        vari : str, variable to generate id for
+        type : str, the variable to hold the id
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         self.cursor['unique'] = [prefix]
         if hasattr(vari, 'json'):
             self.cursor['unique'].append(vari.json())
@@ -281,11 +391,32 @@ class WOQLQuery:
         return self
 
     def list(self, *args):
+        """Create a list of variables for WOQL
+
+        Parameters
+        ----------
+        *args : variables to be put in the list
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         self.cursor['list'] = list(args)
         return self
 
     def json(self, json=None):
-        """json version of query for passing to api"""
+        """Generates a WOQLQuery object from the passed WOQL JSON
+
+        json version of query for passing to api
+
+        Parameters
+        ----------
+        json : dict, JSON-LD object, optional
+
+        Returns
+        -------
+        dict
+        """
         if json:
             self.query = json
             return self
@@ -296,6 +427,19 @@ class WOQLQuery:
 
     def when(self, Query, Update=None):
         """
+        When the sub-query in Condition is met, the Update query is executed
+
+        Parameters
+        ----------
+        Query : WOQLQuery object or bool
+        Update : WOQLQuery object, optional
+
+        Returns
+        -------
+        WOQLQuery object
+
+        Note
+        ----
         Functions which take a query as an argument advance the cursor to make the chaining of queries fall
         into the corrent place in the encompassing json
         """
@@ -316,6 +460,16 @@ class WOQLQuery:
         return self
 
     def opt(self, query=None):
+        """The Query in the Optional argument is specified as optional
+
+        Parameters
+        ----------
+        query : WOQLQuery object
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         if query:
             q = query.json() if callable(query.json) else query
             self.cursor["opt"] = [q]
@@ -325,6 +479,17 @@ class WOQLQuery:
         return self
 
     def woql_from(self, dburl, query=None):
+        """Specifies the database URL that will be the default database for the enclosed query
+
+        Parameters
+        ----------
+        dburl : str, url of the database
+        query : WOQLQuery object, optional
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         self._advance_cursor("from", dburl)
         if query:
             self.cursor = query.json() if hasattr(query,'json') else query
@@ -337,18 +502,51 @@ class WOQLQuery:
         return self
 
     def limit(self, limit, query=None):
+        """Specifies that only the first Number of rows will be returned
+
+        Parameters
+        ----------
+        limit : int, number of maximum results returned
+        query : WOQLQuery object, optional
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         self._advance_cursor("limit", limit)
         if query:
             self.cursor = query.json() if hasattr(query,'json') else query
         return self
 
     def start(self, start, query=None):
+        """Specifies that the start of the query returned
+
+        Parameters
+        ----------
+        start : int, index of the frist result got returned
+        query : WOQLQuery object, optional
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         self._advance_cursor("start", start)
         if query:
             self.cursor = query.json()
         return self
 
     def select(self, *args):
+        """Filters the query so that only the variables included in [V1...Vn] are returned in the bindings
+
+        Parameters
+        ----------
+        *args : only these variables are returned
+
+        Returns
+        -------
+        WOQLQuery object
+        """
+
         self.cursor['select'] = list(args)
         index = len(args)
         if isinstance(self.cursor['select'][index-1], (list, dict, WOQLQuery)):
@@ -359,6 +557,16 @@ class WOQLQuery:
         return self
 
     def woql_and(self, *args):
+        """Creates a logical AND of the arguments
+
+        Parameters
+        ----------
+        *args : WOQLQuery objects
+
+        Returns
+        ----------
+        WOQLQuery object
+        """
         self.cursor['and'] = []
         for item in args:
             if item.contains_update:
@@ -367,6 +575,16 @@ class WOQLQuery:
         return self
 
     def woql_or(self, *args):
+        """Creates a logical OR of the arguments
+
+        Parameters
+        ----------
+        *args : WOQLQuery objects
+
+        Returns
+        ----------
+        WOQLQuery object
+        """
         self.cursor['or'] = []
         for item in args:
             if item.contains_update:
@@ -375,6 +593,16 @@ class WOQLQuery:
         return self
 
     def woql_not(self, query=None):
+        """Creates a logical NOT of the arguments
+
+        Parameters
+        ----------
+        query : WOQLQuery object, optional
+
+        Returns
+        ----------
+        WOQLQuery object
+        """
         if query:
             if query.contains_update:
                 self.contains_update = True
@@ -385,23 +613,70 @@ class WOQLQuery:
             self.cursor = self.cursor['not'][0]
         return self
 
-    def triple(self, a, b, c):
-        self.cursor["triple"] = [self._clean_subject(a),self._clean_predicate(b),self._clean_object(c)]
-        return self._chainable("triple", self._clean_subject(a))
+    def triple(self, sub, pre, obj):
+        """Creates a triple pattern matching rule for the triple [S, P, O] (Subject, Predicate, Object)
 
-    def quad(self, a, b, c, g):
-        self.cursor["quad"] = [self._clean_subject(a),
-                                self._clean_predicate(b),
-                                self._clean_object(c),
-                                self._clean_graph(g)]
-        return self._chainable("quad", self._clean_subject(a))
+        Parameters
+        ----------
+        sub : str, Subject
+        pre : str, Predicate
+        obj : str, Object
+
+        Returns
+        -------
+        WOQLQuery object
+        """
+        self.cursor["triple"] = [self._clean_subject(sub),self._clean_predicate(pre),self._clean_object(obj)]
+        return self._chainable("triple", self._clean_subject(sub))
+
+    def quad(self, sub, pre, obj, gra):
+        """Creates a pattern matching rule for the quad [S, P, O, G] (Subject, Predicate, Object, Graph)
+
+        Parameters
+        ----------
+        sub : str, Subject
+        pre : str, Predicate
+        obj : str, Object
+        gra : str, Graph
+
+        Returns
+        -------
+        WOQLQuery object
+        """
+        self.cursor["quad"] = [self._clean_subject(sub),
+                                self._clean_predicate(pre),
+                                self._clean_object(obj),
+                                self._clean_graph(gra)]
+        return self._chainable("quad", self._clean_subject(sub))
 
 
     def eq(self, a, b):
+        """Matches if a is equal to b
+
+        Parameters
+        ----------
+        a : str, object in the graph
+        b : str, object in the graph
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         self.cursor["eq"] = [self._clean_object(a),self._clean_object(b)];
         return self._last()
 
     def sub(self, a, b=None):
+        """Returns true if ClassA is a sub-class of ClassB, according to the current DB schema
+
+        Parameters
+        ----------
+        a : str, classA
+        b : str, classB, optional
+
+        Returns
+        -------
+        bool
+        """
         if (not b) and self.tripleBuilder:
             self.tripleBuilder.sub(self._clean_class(a))
             return self
@@ -434,6 +709,17 @@ class WOQLQuery:
         return self
 
     def isa(self, a, b=None):
+        """Matches if Instance is a member of Class, according to the current state of the DB
+
+        Parameters
+        ----------
+        a : str, classA
+        b : str, classB, optional
+
+        Returns
+        -------
+        bool
+        """
         if (not b) and self.tripleBuilder:
             self.tripleBuilder.isa(self._clean_class(a))
             return self
@@ -442,11 +728,33 @@ class WOQLQuery:
             self.cursor["isa"] = [self._clean_class(a),self._clean_class(b)]
             return self._chainable("isa", a)
 
-    def trim(self, a, b):
-        self.cursor['trim'] = [a, b]
-        return self._chainable('trim', b)
+    def trim(self, string, variable):
+        """A trimmed version of StringA (with leading and trailing whitespace removed) is copied into VariableA
+
+        Parameters
+        ----------
+        string : str, StringA
+        variable : str, VariableA
+
+        Returns
+        -------
+        WOQLQuery object
+        """
+        self.cursor['trim'] = [string, variable]
+        return self._chainable('trim', variable)
 
     def eval(self, arith, v):
+        """Evaluates the Arithmetic Expression Arith and copies the output to variable V
+
+        Parameters
+        ----------
+        arith : WOQLQuery or dict in JSON-LD representing the query
+        v : str, output variable
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         if hasattr(arith, 'json'):
             arith = arith.json()
         self.cursor['eval'] = [arith, v]
@@ -454,24 +762,63 @@ class WOQLQuery:
 
 
     def plus(self, *args):
+        """Adds numbers N1...Nn together
+
+        Parameters
+        ----------
+        *args : int or float, numbers
+
+        Returns
+        -------
+        WOQLQuery object"""
         self.cursor['plus'] = []
         for item in args:
             self.cursor['plus'].append(item.json() if hasattr(item,'json') else item)
         return self._last()
 
     def minus(self, *args):
+        """Subtracts Numbers N1..Nn
+
+        Parameters
+        ----------
+        *args : int or float, numbers
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         self.cursor['minus'] = []
         for item in args:
             self.cursor['minus'].append(item.json() if hasattr(item,'json') else item)
         return self._last()
 
     def times(self, *args):
+        """Multiplies numbers N1...Nn together
+
+        Parameters
+        ----------
+        *args : int or float, numbers
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         self.cursor['times'] = []
         for item in args:
             self.cursor['times'].append(item.json() if hasattr(item,'json') else item)
         return self._last()
 
     def divide(self, *args):
+        """Divides numbers N1...Nn by each other left, to right precedence
+
+        Parameters
+        ----------
+        *args : int or float, numbers
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         self.cursor['divide'] = []
         for item in args:
             self.cursor['divide'].append(item.json() if hasattr(item,'json') else item)
@@ -484,6 +831,17 @@ class WOQLQuery:
         return self._last()
 
     def exp(self, a, b):
+        """Raises A to the power of B
+
+        Parameters
+        ----------
+        a : int or float
+        b : int or float
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         if hasattr(a, 'json'):
             a = a.json()
         if hasattr(b, 'json'):
@@ -493,34 +851,94 @@ class WOQLQuery:
         return self._last()
 
     def delete(self, JSON_or_IRI):
+        """Deletes a node identified by an IRI or a JSON-LD document
+
+        Parameters
+        ----------
+        JSON_or_IRI : str, IRI or a JSON-LD document
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         self.cursor['delete'] = [JSON_or_IRI]
         return self._last_update()
 
-    def delete_triple(self, Subject, Predicate, Object_or_Literal):
-        self.cursor['delete_triple'] = [self._clean_subject(Subject),
-                                        self._clean_predicate(Predicate),
-                                        self._clean_object(Object_or_Literal)]
-        return self._chainable_update('delete_triple', Subject)
+    def delete_triple(self, subject, predicate, object_or_literal):
+        """Deletes any triples that match the rule [S,P,O]
 
-    def add_triple(self, Subject, Predicate, Object_or_Literal):
-        self.cursor['add_triple'] = [self._clean_subject(Subject),
-                                    self._clean_predicate(Predicate),
-                                    self._clean_object(Object_or_Literal)]
-        return self._chainable_update('add_triple', Subject)
+        Parameters
+        ----------
+        subject : str, Subject
+        predicate : str, Predicate
+        object_or_literal : str, Object or Literal
 
-    def delete_quad(self, Subject, Predicate, Object_or_Literal, Graph):
-        self.cursor['delete_quad'] =[self._clean_subject(Subject),
-                                    self._clean_predicate(Predicate),
-                                    self._clean_object(Object_or_Literal),
-                                    self._clean_graph(Graph)]
-        return self._chainable_update('delete_quad', Subject)
+        Returns
+        -------
+        WOQLQuery object
+        """
+        self.cursor['delete_triple'] = [self._clean_subject(subject),
+                                        self._clean_predicate(predicate),
+                                        self._clean_object(object_or_Lliteral)]
+        return self._chainable_update('delete_triple', subject)
 
-    def add_quad(self, Subject, Predicate, Object_or_Literal, Graph):
-        self.cursor['add_quad'] =[self._clean_subject(Subject),
-                                    self._clean_predicate(Predicate),
-                                    self._clean_object(Object_or_Literal),
-                                    self._clean_graph(Graph)]
-        return self._chainable_update('add_quad', Subject)
+    def add_triple(self, subject, predicate, object_or_literal):
+        """Adds triples according to the the pattern [S,P,O]
+
+        Parameters
+        ----------
+        subject : str, Subject
+        predicate : str, Predicate
+        object_or_literal : str, Object or Literal
+
+        Returns
+        -------
+        WOQLQuery object
+        """
+        self.cursor['add_triple'] = [self._clean_subject(subject),
+                                    self._clean_predicate(predicate),
+                                    self._clean_object(object_or_literal)]
+        return self._chainable_update('add_triple', subject)
+
+    def delete_quad(self, subject, predicate, object_or_literal, graph):
+        """Deletes any quads that match the rule [S, P, O, G] (Subject, Predicate, Object, Graph)
+
+        Parameters
+        ----------
+        subject : str, Subject
+        predicate : str, Predicate
+        object_or_literal : str, Object or Literal
+        graph : str, Graph
+
+        Returns
+        -------
+        WOQLQuery object
+        """
+        self.cursor['delete_quad'] =[self._clean_subject(subject),
+                                    self._clean_predicate(predicate),
+                                    self._clean_object(object_or_literal),
+                                    self._clean_graph(graph)]
+        return self._chainable_update('delete_quad', subject)
+
+    def add_quad(self, subject, predicate, object_or_literal, graph):
+        """Adds quads according to the the pattern [S,P,O]
+
+        Parameters
+        ----------
+        subject : str, Subject
+        predicate : str, Predicate
+        object_or_literal : str, Object or Literal
+        graph : str, Graph
+
+        Returns
+        -------
+        WOQLQuery object
+        """
+        self.cursor['add_quad'] =[self._clean_subject(subject),
+                                    self._clean_predicate(predicate),
+                                    self._clean_object(object_or_literal),
+                                    self._clean_graph(graph)]
+        return self._chainable_update('add_quad', subject)
 
     def update(self, woql):
         self.cursor['update'] = [ woql.json() ]
@@ -529,6 +947,17 @@ class WOQLQuery:
     # Schema manipulation shorthand
 
     def add_class(self, c=None, graph=None):
+        """Generates a new Class with the given ClassID and writes it to the DB schema
+
+        Parameters
+        ----------
+        c : str, class to be added
+        graph : str, target graph, optional
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         if c:
             graph = self.clean_graph(graph) if graph else "db:schema"
             self.adding_class = c
@@ -537,6 +966,17 @@ class WOQLQuery:
         return self
 
     def delete_class(self, c=None, graph=None):
+        """Deletes the Class with the passed ID form the schema (and all references to it)
+
+        Parameters
+        ----------
+        c : str, class to be deleted
+        graph : str, target graph, optional
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         if c:
             graph = self._clean_graph(graph) if graph else "db:schema"
             c = "scm:" + c if c.find(":") == -1 else c
@@ -546,6 +986,18 @@ class WOQLQuery:
         return self
 
     def add_property(self, p=None, t=None, g=None):
+        """Generates a new Property with the given PropertyID and a range of type PropType and writes it to the DB schema
+
+        Parameters
+        ----------
+        p : str, property id to be added
+        t : str, type of the proerty
+        g : str, target graph ,optional
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         if not t:
             t = "xsd:string"
         if p:
@@ -563,6 +1015,17 @@ class WOQLQuery:
         return self._chainable_update("add_quad", p)
 
     def delete_property(self, p=None, graph=None):
+        """Deletes the property with the passed ID from the schema (and all references to it)
+
+        Parameters
+        ----------
+        p : str, property id to be deleted
+        g : str, target graph ,optional
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         if p:
             graph = self._clean_graph(graph) if graph else "db:schema"
             p = "scm:" + p if p.find(":") == -1 else p
@@ -573,6 +1036,17 @@ class WOQLQuery:
     # Language elements that cannot be invoked from the top level and therefore are not exposed in the WOQL api
 
     def woql_as(self, a=None, b=None):
+        """Imports the value identified by Source to a Target variable
+
+        Parameters
+        ----------
+        a : str, Source
+        b : str, Target
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         if a is None:
             return
 
@@ -598,6 +1072,18 @@ class WOQLQuery:
     # WOQL API
 
     def node(self, node, type=None):
+        """
+        Selects nodes with the ID NodeID as the subject of subsequent sub-queries. The second argument PatternType specifies what type of sub-queries are being constructed, options are: triple, quad, update_triple, update_quad, delete_triple, delete_quad
+
+        Parameters
+        ----------
+        node : str, node to be selected
+        type : str, pattern type, optional (default is triple)
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         if not type:
             type = "triple"
         self.tripleBuilder = TripleBuilder(type, self.cursor, node)
