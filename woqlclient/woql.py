@@ -74,6 +74,16 @@ class WOQLQuery:
     has_select, get_select_variables
     context, get_context
     execute
+
+    get_everything
+    get_all_documents
+    document_metadata, property_metadata, element_metadata, class_metadata
+    concrete_document_classes
+    get_data_of_class, get_data_of_property
+    document_properties
+    get_document_connections
+    get_instance_meta
+    simple_graph_query
 """
 
     def __init__(self,query=None):
@@ -1165,6 +1175,16 @@ class WOQLQuery:
             return self.triple(Subj, Pred, Obj)
 
     def get_everything(self, GraphIRI=None):
+        """Retrieves all triples from the graph in question as (v:Subject, v:Predicate, v:Object)
+
+        Parameters
+        ----------
+        GraphIRI : str, target graph
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         if GraphIRI:
             GraphIRI = self._clean_graph(GraphIRI)
             return self.quad("v:Subject", "v:Predicate", "v:Object", GraphIRI)
@@ -1172,12 +1192,31 @@ class WOQLQuery:
             self.triple("v:Subject", "v:Predicate", "v:Object")
 
     def get_all_documents(self):
+        """Retrieves document id (v:Document) and type (v:Type) of all documents
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         return self.woql_and(
                     WOQLQuery().triple("v:Subject", "rdf:type", "v:Type"),
                     WOQLQuery().sub("v:Type", "tcs:Document")
                     )
 
     def document_metadata(self):
+        """
+        Retrieves meta-data about all documents, document id, label, comment (v:ID, v:Label, v:Comment), document class id, label and comment (v:Class, v:Type, v:Type_Comment),
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         return self.woql_and(
                 WOQLQuery().triple("v:ID", "rdf:type", "v:Class"),
                 WOQLQuery().sub("v:Class", "tcs:Document"),
@@ -1188,6 +1227,15 @@ class WOQLQuery:
                 )
 
     def concrete_document_classes(self):
+        """Retrieves all instances and their meta-data (v:Class, v:Label, v:Comment) of concrete document classes
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         return self.woql_and(
                 WOQLQuery().sub("v:Class", "tcs:Document"),
                 WOQLQuery().woql_not().abstract("v:Class"),
@@ -1196,6 +1244,15 @@ class WOQLQuery:
                 )
 
     def property_metadata(self):
+        """Retrieves all meta-data about each property (v:Property, v:Type, v:Range, v:Domain, v:Label, v:Comment)
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         return self.woql_and(
                 WOQLQuery().woql_or(
                     WOQLQuery().quad("v:Property", "rdf:type", "owl:DatatypeProperty", "db:schema"),
@@ -1209,6 +1266,16 @@ class WOQLQuery:
                 )
 
     def element_metadata(self):
+        """
+        Retrieves meta-data about all elements in the schema (v:Element, v:Parent, v:Type, v:Range, v:Domain, v:Label, v:Comment, v:Abstract)
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         return self.woql_and(
                 WOQLQuery().quad("v:Element", "rdf:type", "v:Type", "db:schema"),
                 WOQLQuery().opt().quad("v:Element", "tcs:tag", "v:Abstract", "db:schema"),
@@ -1220,6 +1287,15 @@ class WOQLQuery:
                 )
 
     def class_metadata(self):
+        """Retrieves meta-data about all the classes in the schema (v:Element, v:Label, v:Comment, v:Abstract)
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         return self.woql_and(
                 WOQLQuery().quad("v:Element", "rdf:type", "owl:Class", "db:schema"),
                 WOQLQuery().opt().quad("v:Element", "rdfs:label", "v:Label", "db:schema"),
@@ -1228,18 +1304,49 @@ class WOQLQuery:
                 )
 
     def get_data_of_class(self, chosen):
+        """Retrieves all triples that have a subject of the passed class (v:Document, v:Property, v:Value)
+
+        Parameters
+        ----------
+        chosen : str, chosen class
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         return self.woql_and(
                 WOQLQuery().triple("v:Subject", "rdf:type", chosen),
                 WOQLQuery().opt().triple("v:Subject", "v:Property", "v:Value")
                 )
 
     def get_data_of_property(self, chosen):
+        """Retrieves all triples that use the passed predicate along with the predicate's label (v:Document, v:Value, v:Label)
+
+        Parameters
+        ----------
+        chosen : str, chosen predicate
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         return self.woql_and(
                 WOQLQuery().triple("v:Subject", chosen, "v:Value"),
                 WOQLQuery().opt().triple("v:Subject", "rdfs:label", "v:Label")
                 )
 
     def document_properties(self, id):
+        """
+        Retrieves all properties of a given document, along with their labels, values and type (v:Property, v:Property_Value, v:Property_Label, v:Property_Type)
+
+        Parameters
+        ----------
+        id : str, document id
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         return self.woql_and(
                 WOQLQuery().triple(id, "v:Property", "v:Property_Value"),
                 WOQLQuery().opt().quad("v:Property", "rdfs:label", "v:Property_Label", "db:schema"),
@@ -1247,6 +1354,17 @@ class WOQLQuery:
                 )
 
     def get_document_connections(self, id):
+        """
+        Retrieve all links between the passed document and other documents (v:Entid, v:Outgoing, v:Incoming, v:Enttype, v:Label, v:Class_Label)
+
+        Parameters
+        ----------
+        id : str, document id
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         return self.woql_and(
                 WOQLQuery().eq("v:Docid", id),
                 WOQLQuery().woql_or(
@@ -1259,15 +1377,36 @@ class WOQLQuery:
                 WOQLQuery().opt().quad("v:Enttype", "rdfs:label", "v:Class_Label", "db:schema")
                 )
 
-    def get_instance_meta(self, url):
+    def get_instance_meta(self, id):
+        """
+        Retrieve basic meta-data for a given object (v:InstanceType, v:InstanceLabel, v:InstanceComment, v:ClassLabel)
+
+        Parameters
+        ----------
+        id : str, document id
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         return self.woql_and(
-                WOQLQuery().triple(url, "rdf:type", "v:InstanceType"),
-                WOQLQuery().opt().triple(url, "rdfs:label", "v:InstanceLabel"),
-                WOQLQuery().opt().triple(url, "rdfs:comment", "v:InstanceComment"),
+                WOQLQuery().triple(id, "rdf:type", "v:InstanceType"),
+                WOQLQuery().opt().triple(id, "rdfs:label", "v:InstanceLabel"),
+                WOQLQuery().opt().triple(id, "rdfs:comment", "v:InstanceComment"),
                 WOQLQuery().opt().quad("v:InstanceType", "rdfs:label", "v:ClassLabel", "db:schema")
                 )
 
     def simple_graph_query(self):
+        """
+        Create a graph query with pattern (v:Source, v:Edge, v:Target), with meta-data for each element (v:Source_Class, v:Source_Label , v:Source_Comment, v:Source_Type, v:Source_Type_Comment, v:Target_Class, v:Target_Label , v:Target_Comment, v:Target_Type, v:Target_Class_Comment, v:Target_Label , v:Edge_Type_Comment, v:Edge_Type)
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         return self.woql_and(
                 WOQLQuery().triple("v:Source", "v:Edge", "v:Target"),
                 WOQLQuery().isa("v:Source", "v:Source_Class"),
