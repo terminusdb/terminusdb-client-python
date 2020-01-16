@@ -37,12 +37,9 @@ class WOQLQuery:
 
     Methods
     -------
-    woql_and
-    woql_or
-    woql_not
+    woql_and, woql_or, woql_not
     when
-    triple
-    quad
+    triple, quad
     opt
     woql_from
     limit
@@ -53,29 +50,30 @@ class WOQLQuery:
     eq
     trim
     delete
-    delete_triple
-    delete_quad
-    add_triple
-    add_quad
+    delete_triple, delete_quad, add_triple, add_quad
     eval
-    minus
-    plus
-    times
-    divide
-    exp
+    minus, plus, times, divide, exp
     get
     woql_as
     remote
-    idgen
-    unique
+    idgen, unique
     list
-    add_class
-    delete_class
-    add_property
-    delete_property
+    add_class, delete_class
+    add_property, delete_property
     node
     json
     insert
+
+    set_vocabulary, get_vocabulary
+    is_paged
+    get_page, set_page
+    first_page, next_page, previous_page
+    set_page_size
+    add_start, has_start, get_start
+    set_limit, get_limit
+    has_select, get_select_variables
+    context, get_context
+    execute
 """
 
     def __init__(self,query=None):
@@ -1292,13 +1290,35 @@ class WOQLQuery:
         return self.vocab
 
     def set_vocabulary(self, vocab):
-        """Provides the query with a 'vocabulary' a list of well known predicates that can be used without prefixes mapping: id: prefix:id ..."""
+        """
+        Provides the query with a 'vocabulary' a list of well known predicates that can be used without prefixes mapping: id: prefix:id ...
+
+        Parameters
+        ----------
+        vocab : dict
+            JSON object where the indices are non-prefixed string and the values are the corresponding prefixed strings: {type: "rdf:type"...}
+
+        Results
+        -------
+        WOQLQuery object
+        """
         self.vocab = vocab
 
     def load_vocabulary(self, client):
         """
-        * Queries the schema graph and loads all the ids found there as vocabulary that can be used without prefixes
-        * ignoring blank node ids
+        Loads the entirety of the current schema graph as a vocabulary - allows all valid schema URLs to be used without prefixes.
+
+        Queries the schema graph and loads all the ids found there as vocabulary that can be used without prefixes.
+
+        It ignoring blank node ids.
+
+        Parameters
+        ----------
+        client : WOQLClient object
+
+        Results
+        -------
+        WOQLQuery object
         """
         nw = WOQLQuery().quad("v:S", "v:P", "v:O", "db:schema")
         result = nw.execute(client)
@@ -1312,12 +1332,40 @@ class WOQLQuery:
                             self.vocab[val_spl[0]] = val_spl[1]
 
     def get_limit(self):
+        """Returns the current limit value
+        Parameters
+        ----------
+
+        Returns
+        -------
+        int
+        """
         return self.get_paging_property("limit")
 
     def set_limit(self, l):
+        """Sets the limit to N
+
+        Parameters
+        ----------
+        l : int, limit to set
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         return self.set_paging_property("limit", l)
 
     def is_paged(self, q=None):
+        """True if the query was paged (i.e. had a limit set)
+
+        Parameters
+        ----------
+        q : WOQLQuery object
+
+        Returns
+        -------
+        bool
+        """
         if q is None:
             q = self.query
         for prop in q:
@@ -1328,6 +1376,15 @@ class WOQLQuery:
         return False
 
     def get_page(self):
+        """Returns the current page number as an offset from the current page size (limit)
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        int
+        """
         if self.is_paged():
             psize = self.get_limit()
             if self.has_start():
@@ -1339,6 +1396,16 @@ class WOQLQuery:
             return False
 
     def set_page(self, pagenum):
+        """Sets the page to page number N (where N is an integer)
+
+        Parameters
+        ----------
+        pagenum : int, page number to set
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         pstart = (self.get_limit() * (pagenum - 1))
         if self.has_start():
             self.set_start(pstart)
@@ -1347,18 +1414,54 @@ class WOQLQuery:
         return self
 
     def next_page(self):
+        """Increments the page number
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         return self.set_page(self.get_page() + 1)
 
     def first_page(self):
+        """Sets the page number to the first page
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         return self.set_page(1)
 
     def previous_page(self):
+        """Decrements the page number if it is currently ≥ 1
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         npage = self.get_page() - 1
         if npage > 0:
             self.set_page(npage)
         return self
 
     def set_page_size(self, size):
+        """Sets the page size (limit)
+        Parameters
+        ----------
+        size : int, size of the page
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         self.set_paging_property("limit", size)
         if self.has_start():
             self.set_start(0)
@@ -1367,9 +1470,28 @@ class WOQLQuery:
         return self
 
     def has_select(self):
+        """Returns true if the query contains a select clause
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        bool
+        """
         return bool(self.get_paging_property("select"))
 
     def get_select_variables(self, q=None):
+        """Returns list of the variables specified as part of the select clause
+
+        Parameters
+        ----------
+        q : WOQLQuery object, optional
+
+        Returns
+        -------
+        list
+        """
         if q is None:
             q = self.query
         for prop in q:
@@ -1382,16 +1504,43 @@ class WOQLQuery:
                     return val
 
     def has_start(self):
+        """Check if the query have a start value set
+
+        Parameters
+        ----------
+
+        Results
+        -------
+        bool
+        """
         result = self.get_paging_property("start")
         return result is not None
 
     def get_start(self):
+        """Returns the current start value (result offset)
+        Parameters
+        ----------
+
+        Results
+        -------
+        int
+        """
         return self.get_paging_property("start");
 
     def set_start(self, start):
         return self.set_paging_property("start", start)
 
     def add_start(self, s):
+        """Sets the start value (result offset)
+
+        Parameters
+        ----------
+        s : int, start index
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         if self.has_start():
             self.set_start(s)
         else:
@@ -1424,7 +1573,16 @@ class WOQLQuery:
 
 
     def get_context(self, q=None):
-        """Retrieves the value of the current json-ld context"""
+        """Retrieves the value of the current json-ld context
+
+        Parameters
+        ----------
+        q : WOQLQuery object, optional
+
+        Results
+        -------
+        dict
+        """
         if q is None:
             q = self.query
         for prop in q:
@@ -1436,7 +1594,16 @@ class WOQLQuery:
                 return nc
 
     def context(self, c):
-        """Retrieves the value of the current json-ld context"""
+        """Specifies the query context as a JSON-LD context (prefix → value)
+
+        Parameters
+        ----------
+        c : dict, context
+
+        Returns
+        -------
+        none
+        """
         self.cursor['@context'] = c
 
     #Internal State Control Functions
@@ -1550,7 +1717,12 @@ class WOQLQuery:
             return False
 
     def execute(self, client):
-        """Executes the query using the passed client to connect to a server"""
+        """Executes the query using the passed client to connect to a server
+
+        Parameters
+        ----------
+        client : woqlClient
+        """
         if "@context" not in self.query:
             self.query['@context'] = self._default_context(client.conConfig.dbURL())
         json = self.json()
