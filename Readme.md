@@ -38,6 +38,6 @@ It will be nice, if you open an issue first so that we can know what is going on
 
 ## Licence
 
-The APACHE 2.0 License
+GNU General Public License v3 (GPLv3)
 
 Copyright (c) 2019
