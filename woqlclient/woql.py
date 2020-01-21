@@ -141,6 +141,19 @@ class WOQLQuery:
             self.cursor = self.cursor["get"][1];
         return self
 
+    def woql_with(self, gid, remq, subq=None):
+        if hasattr(remq, 'json'):
+            remq = remq.json()
+        if subq is not None:
+            if hasattr(subq, 'json'):
+                subq = subq.json()
+            self.cursor['with'] = [gid, remq, subq]
+        else:
+            self.cursor['with'] = [gid, remq, {}]
+            self.cursor = self.cursor["with"][2]
+
+        return self
+
     def build_as_clauses(self, vars=None, cols=None):
         clauses = []
         def check_vars_cols(obj):
@@ -393,12 +406,12 @@ class WOQLQuery:
         self.cursor['lower'] = [u, l]
         return self
 
-    def pad(self, u, l):
-        self.cursor['lower'] = [u, l]
+    def pad(self, input, pad, len, output):
+        self.cursor['pad'] = [input, pad, len, output]
         return self
 
-    def join(self, *args):
-        self.cursor['join'] = args
+    def join(self, input, glue, output):
+        self.cursor['join'] = [input, glue, output]
         return self
 
     def less(self, v1, v2):
@@ -583,7 +596,8 @@ class WOQLQuery:
         ----------
         WOQLQuery object
         """
-        self.cursor['and'] = []
+        if not hasattr(self.cursor,'and'):
+            self.cursor['and'] = []
         for item in args:
             if item.contains_update:
                 self.contains_update = True
@@ -601,11 +615,19 @@ class WOQLQuery:
         ----------
         WOQLQuery object
         """
-        self.cursor['or'] = []
+        if not hasattr(self.cursor,'or'):
+            self.cursor['or'] = []
         for item in args:
             if item.contains_update:
                 self.contains_update = True
-            self.cursor['or'].append(item.json())
+            if hasattr(item,'or'):
+                nquery = item.json()
+            else:
+                nquery = item
+            if hasattr(nquery,'or'):
+                self.cursor['and'] = self.cursor['or'] + nquery['or']
+            else:
+                self.cursor['or'].append(item.json())
         return self
 
     def woql_not(self, query=None):
@@ -955,10 +977,6 @@ class WOQLQuery:
                                     self._clean_object(object_or_literal),
                                     self._clean_graph(graph)]
         return self._chainable_update('add_quad', subject)
-
-    def update(self, woql):
-        self.cursor['update'] = [ woql.json() ]
-        return self._last_update()
 
     # Schema manipulation shorthand
 
