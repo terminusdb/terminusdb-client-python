@@ -52,17 +52,37 @@ class WOQLQuery:
     delete
     delete_triple, delete_quad, add_triple, add_quad
     eval
-    minus, plus, times, divide, exp
+    minus, plus, times, divide, exp, div
     get
     woql_as
     remote
     idgen, unique
+    concat, join
+    re
+    lower
+    pad
+    length
     list
     add_class, delete_class
     add_property, delete_property
     node
     json
     insert
+    group_by, order_by
+    asc, desc
+    less, greater
+    into
+    comment
+    abstract
+    graph
+    property
+    label, description
+    domain, parent, entity
+    cardinality, max, min
+    star
+    woql_with
+
+
 
     set_vocabulary, get_vocabulary
     is_paged
@@ -142,6 +162,18 @@ class WOQLQuery:
         return self
 
     def woql_with(self, gid, remq, subq=None):
+        """Reads source into a temporary in-memory graph and runs the query on it.
+
+        Parameters
+        ----------
+        gid : str, graph id
+        remq : WOQLQuery object
+        subq : WOQLQuery object, optional
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         if hasattr(remq, 'json'):
             remq = remq.json()
         if subq is not None:
@@ -201,6 +233,17 @@ class WOQLQuery:
         return WOQLQuery().add_class(type, graph).parent("Document")
 
     def length(self, va, vb):
+        """Calculates the length of the value in va and stores it in vb
+
+        Parameters
+        ----------
+        va : str, value to calculate length
+        vb : str, stores result
+
+        Results
+        -------
+        WOQLQuery object
+        """
         self.cursor['length'] = [va, vb];
         return self
 
@@ -241,6 +284,20 @@ class WOQLQuery:
     # WOQL.group_by = function(gvarlist, groupedvar, groupquery, output){    return new WOQLQuery().group_by(gvarlist, groupedvar, groupquery, output); }
 
     def group_by(self, gvarlist, groupedvar, groupquery, output=None):
+        """
+        Groups the results of groupquery together by the list of variables gvarlist, using the variable groupedvar as a grouping and saves the result into variable output.
+
+        Parameters
+        ----------
+        gvarlist : list or dict or WOQLQuery object, list of variables to group
+        groupedvar : list or str, grouping variable(s)
+        groupquery : WOQLQuery object
+        output : str, output variable, optional
+
+        Results
+        -------
+        WOQLQuery object
+        """
         args = []
         self.cursor['group_by'] = args
         if hasattr(gvarlist, 'json'):
@@ -274,6 +331,13 @@ class WOQLQuery:
         return self
 
     def order_by(self, gvarlist, asc_or_desc=None, query=None):
+        """
+        Orders the results by the list of variables including in gvarlist, asc_or_desc is a WOQL.asc or WOQ.desc list of variables
+
+        gvarlist : list or dict or WOQLQuery object, list of variables to order
+        asc_or_desc : WOQLQuery object, WOQL.asc or WOQ.desc, optional, default is asc
+        query : WOQLQuery object, optional
+        """
         ordering = gvarlist
         if hasattr(gvarlist, 'json'):
             ordering = gvarlist.json()
@@ -291,12 +355,32 @@ class WOQLQuery:
         return self
 
     def asc(self, varlist_or_var):
+        """Orders the list by ascending order
+
+        Parameters
+        ----------
+        varlist_or_var : list or str, list of variables to order
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         if type(varlist_or_var) != list:
             varlist_or_var = [varlist_or_var]
         self.cursor["asc"] = varlist_or_var
         return self
 
     def desc(self, varlist_or_var):
+        """Orders the list by descending value
+
+        Parameters
+        ----------
+        varlist_or_var : list or str, list of variables to order
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         if type(varlist_or_var) != list:
             varlist_or_var = [varlist_or_var]
         self.cursor["desc"] = varlist_or_var
@@ -354,6 +438,21 @@ class WOQLQuery:
         return self
 
     def re(self, p, s, m):
+        """
+        Regular Expression Call, p is a regex pattern
+(.*) using normal regular expression syntax, the only unusual thing is that special characters have to be escaped twice, s is the string to be matched and m is a list of matches:
+e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
+
+        Parameters
+        ----------
+        p : str, regex pattern
+        s : str, string to be matched
+        m : str or list or dict, store list of matches
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         if type(p) == str:
             if p[:2] != 'v:':
                 p = {"@value" : p, "@type": "xsd:string"}
@@ -372,6 +471,17 @@ class WOQLQuery:
         return self
 
     def concat(self, list, v):
+        """Concatenates the list of variables into a string and saves the result in v
+
+        Parameters
+        ----------
+        list : list, list of variables to concatenate
+        v : str, saves the results
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         if type(list) == str:
             nlist = re.split('(v:[\w_]+)\\b', list)
             for i in range(1,len(nlist)):
@@ -403,22 +513,82 @@ class WOQLQuery:
         return self
 
     def lower(self, u, l):
+        """Changes a string to lower-case - input is in u, output in l
+
+        Parameters
+        ----------
+        u : str, input string
+        l : str, stores output
+
+        Results
+        -------
+        WOQLQuery object
+        """
         self.cursor['lower'] = [u, l]
         return self
 
     def pad(self, input, pad, len, output):
+        """
+        Pads out the string input to be exactly len long by appending the pad character pad to form output
+
+        Parameters
+        ----------
+        input : str, input string
+        pad : str, padding character(s)
+        len :  int, length to pad
+        output : str, stores output
+
+        Results
+        -------
+        WOQLQuery object
+        """
         self.cursor['pad'] = [input, pad, len, output]
         return self
 
     def join(self, input, glue, output):
+        """
+        Joins a list variable together (input) into a string variable (output) by glueing the strings together with glue
+
+        Parameters
+        ----------
+        input : list, a list of variables
+        glue :  str, jioining character(s)
+        output : sotres output
+
+        Results
+        -------
+        WOQLQuery object
+        """
         self.cursor['join'] = [input, glue, output]
         return self
 
     def less(self, v1, v2):
+        """Compares the value of v1 against v2 and returns true if v1 is less than v2
+
+        Parameters
+        ----------
+        v1 : str, first variable to compare
+        v2 : str, second variable to compare
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         self.cursor['less'] = [v1, v2]
         return self
 
     def greater(self, v1, v2):
+        """Compares the value of v1 against v2 and returns true if v1 is greater than v2
+
+        Parameters
+        ----------
+        v1 : str, first variable to compare
+        v2 : str, second variable to compare
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         self.cursor['greaters'] = [v1, v2]
         return self
 
@@ -525,6 +695,17 @@ class WOQLQuery:
         return self
 
     def into(self, dburl, query=None):
+        """Sets the current output graph for writing output to.
+
+        Parameters
+        ----------
+        dburl : str, output graph
+        query : WOQLQuery object, optional
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         self._advance_cursor("into", dburl)
         if query:
             self.cursor = query.json() if hasattr(query,'json') else query
@@ -722,6 +903,17 @@ class WOQLQuery:
         return self._last("sub", a)
 
     def comment(self, val=None):
+        """Adds a text comment to a query - can also be used to wrap any part of a query to turn it off
+
+        Parameters
+        ----------
+        val : str, text comment
+
+        Returns
+        -------
+        WOQLQuery object
+        """
+
         if val and hasattr(val, 'json'):
             self.cursor['comment'] = [val.json()]
         elif type(val) == str:
@@ -740,6 +932,17 @@ class WOQLQuery:
         return self
 
     def abstract(self, varname=None):
+        """
+        If no argument is set, this is used to specify that a new class is abstract. If used with an argument, a triple check for class abstraction is added and the result is saved in varname
+
+        Parameters
+        ----------
+        varname : str, result of class abstraction, optional
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         if varname:
             return self.quad(varname, "tcs:tag", "tcs:abstract", "db:schema")
         elif self.tripleBuilder:
@@ -863,6 +1066,16 @@ class WOQLQuery:
         return self._last()
 
     def div(self, *args):
+        """Division - integer division - args are divided left to right
+
+        Parameters
+        ----------
+        args : int or float, numbers for division
+
+        Results
+        -------
+        WOQLQuery
+        """
         self.cursor['div'] = []
         for item in args:
             self.cursor['div'].append(item.json() if hasattr(item,'json') else item)
@@ -1124,6 +1337,16 @@ class WOQLQuery:
         return self
 
     def graph(self, g):
+        """Used to specify that the rest of the query should use the graph g in calls to add_quad, quad, etc
+
+        Parameters
+        ----------
+        g : str, target graph
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         g = self._clean_graph(g)
         if hasattr(self,'type'):
             t = "quad" if self.type == "triple" else False
@@ -1137,32 +1360,95 @@ class WOQLQuery:
         return self
 
     def label(self, l, lang=None):
+        """Depending on context, either adds a label match to a triple/quad or adds a label create to add_quad, add_triple
+
+        Parameters
+        ----------
+        l : str, label to add
+        lang, str, language, optional
+
+        Results
+        -------
+        WOQLQuery object
+        """
         if self.tripleBuilder:
             self.tripleBuilder.label(l, lang)
         return self
 
     def description(self, c, lang=None):
+        """Adds or matches a rdfs:comment field in a query
+
+        Parameters
+        ----------
+        c : str, description to be added
+        lang, str, language, optional
+
+        Results
+        -------
+        WOQLQuery object
+        """
         if self.tripleBuilder:
             self.tripleBuilder.description(c, lang)
         return self
 
     def domain(self, d):
+        """Specifies the domain of a new property
+
+        Parameters
+        ----------
+        d : str, target domain
+
+        Results
+        -------
+        WOQLQuery object
+        """
         d = self._clean_class(d)
         if self.tripleBuilder:
             self.tripleBuilder.addPO('rdfs:domain',d)
         return self
 
     def parent(self, *args):
+        """Specifies that a new class should have parents listed in *args - (short hand for (a, rdfs:subClassOf b)
+
+        Parameters
+        ----------
+        args : list, parent classes
+
+        Results
+        -------
+        WOQLQuery object
+        """
         if self.tripleBuilder:
             for item in args:
                 pn = self._clean_class(item)
                 self.tripleBuilder.addPO('rdfs:subClassOf', pn)
         return self
 
-    def entity(self, *args):
+    def entity(self):
+        """Adds or matches a subclass relationship to tcs:Entity class
+
+        Parameters
+        ----------
+        None
+
+        Results
+        -------
+        WOQLQuery object
+        """
         return self.parent("tcs:Entity")
 
     def property(self, p, val):
+        """Specifies that property p should have value val
+
+        Parameters
+        ----------
+        p : str, property
+        val : str, value
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         if self.tripleBuilder:
             if(self.adding_class):
                 nwoql = WOQLQuery().add_property(p, val).\
@@ -1175,21 +1461,66 @@ class WOQLQuery:
         return self
 
     def max(self, m):
+        """Sets the maximum cardinality for a property to m
+
+        Parameters
+        ----------
+        m : int, maximum cardinality
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         if self.tripleBuilder:
             self.tripleBuilder.card(m, "max")
         return self
 
     def cardinality(self, m):
+        """Sets the cardinality of a property to be precisely m
+
+        Parameters
+        ----------
+        m : int, cardinality
+
+        Returns
+        -------
+        WOQLQuery object
+        """
         if self.tripleBuilder:
             self.tripleBuilder.card(m, "cardinality")
         return self
 
     def min(self, m):
+        """Sets the minimum cardinality for a property to m
+
+        Parameters
+        ----------
+        m : int, minimum cardinality
+
+        Results
+        -------
+        WOQLQuery object
+        """
         if self.tripleBuilder:
             self.tripleBuilder.card(m, "min")
         return self
 
     def star(self, GraphIRI=None, Subj=None, Pred=None, Obj=None):
+        """
+        Selects everything as triples in the graph identified by GraphIRI into variables Subj, Pred, Obj - by default they are "v:Subject", "v:Predicate", "v:Object"
+
+        Parameters
+        ----------
+        GraphIRI : str, graphIRI, optional
+        Subj : str, target subject, optional
+        Pred : str, target predicate, optional
+        Obj : str, target object, optional
+
+        Results
+        -------
+        WOQLQuery object
+        """
+
         Subj = self._clean_subject(Subj) if Subj else "v:Subject"
         Pred = self._clean_predicate(Pred) if Pred else "v:Predicate"
         Obj = self._clean_object(Obj) if Obj else "v:Object"
@@ -1452,6 +1783,16 @@ class WOQLQuery:
                 )
 
     def get_vocabulary(self):
+        """Returns the vocabulary at play - a list of all properties and classes in the schema
+
+        Parameters
+        ----------
+        None
+
+        Results
+        -------
+        dict
+        """
         return self.vocab
 
     def set_vocabulary(self, vocab):
@@ -1505,7 +1846,7 @@ class WOQLQuery:
         -------
         int
         """
-        return self.get_paging_property("limit")
+        return self._get_paging_property("limit")
 
     def set_limit(self, l):
         """Sets the limit to N
@@ -1518,7 +1859,7 @@ class WOQLQuery:
         -------
         WOQLQuery object
         """
-        return self.set_paging_property("limit", l)
+        return self._set_paging_property("limit", l)
 
     def is_paged(self, q=None):
         """True if the query was paged (i.e. had a limit set)
@@ -1573,7 +1914,7 @@ class WOQLQuery:
         """
         pstart = (self.get_limit() * (pagenum - 1))
         if self.has_start():
-            self.set_start(pstart)
+            self._set_start(pstart)
         else:
             self.add_start(pstart)
         return self
@@ -1627,9 +1968,9 @@ class WOQLQuery:
         -------
         WOQLQuery object
         """
-        self.set_paging_property("limit", size)
+        self._set_paging_property("limit", size)
         if self.has_start():
-            self.set_start(0)
+            self._set_start(0)
         else:
             self.add_start(0)
         return self
@@ -1644,7 +1985,7 @@ class WOQLQuery:
         -------
         bool
         """
-        return bool(self.get_paging_property("select"))
+        return bool(self._get_paging_property("select"))
 
     def get_select_variables(self, q=None):
         """Returns list of the variables specified as part of the select clause
@@ -1678,7 +2019,7 @@ class WOQLQuery:
         -------
         bool
         """
-        result = self.get_paging_property("start")
+        result = self._get_paging_property("start")
         return result is not None
 
     def get_start(self):
@@ -1690,10 +2031,12 @@ class WOQLQuery:
         -------
         int
         """
-        return self.get_paging_property("start");
+        return self._get_paging_property("start");
 
-    def set_start(self, start):
-        return self.set_paging_property("start", start)
+    def _set_start(self, start):
+        """Internal function for setting a start value for an already built query
+        """
+        return self._set_paging_property("start", start)
 
     def add_start(self, s):
         """Sets the start value (result offset)
@@ -1707,33 +2050,36 @@ class WOQLQuery:
         WOQLQuery object
         """
         if self.has_start():
-            self.set_start(s)
+            self._set_start(s)
         else:
             nq = {'start': [s, self.query]}
             self.query = nq
         return self
 
-    def get_paging_property(self, pageprop, q=None):
-        """Returns the value of one of the 'paging' related properties (limit, start,...)"""
+    def _get_paging_property(self, pageprop, q=None):
+        """Internal function for interogating formed query
+        Returns the value of one of the 'paging' related properties (limit, start,...)
+        """
         if q is None:
             q = self.query
         for prop in q:
             if prop == pageprop:
                 return q[prop][0]
             elif prop in self.paging_transitive_properties:
-                val = self.get_paging_property(pageprop, q[prop][len(q[prop])-1])
+                val = self._get_paging_property(pageprop, q[prop][len(q[prop])-1])
                 if val is not None:
                     return val
 
-    def set_paging_property(self, pageprop, val, q=None):
-        """Sets the value of one of the paging_transitive_properties properties"""
+    def _set_paging_property(self, pageprop, val, q=None):
+        """Internal function for changing paging properties (start, limit) of already built queries
+        Sets the value of one of the paging_transitive_properties properties"""
         if q is None:
             q = self.query
         for prop in q:
             if prop == pageprop:
                 q[prop][0] = val
             elif prop in self.paging_transitive_properties:
-                self.set_paging_property(pageprop, val, q[prop][len(q[prop])-1])
+                self._set_paging_property(pageprop, val, q[prop][len(q[prop])-1])
         return self
 
 
