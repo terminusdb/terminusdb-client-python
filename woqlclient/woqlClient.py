@@ -22,10 +22,17 @@ import json
 
 class WOQLClient:
 
-    def __init__(self, params={}):
+    """
+        The WOQLClient constructor
+        
+        :param **kwargs Connection arguments used to configure the Client. (db=terminusDBName | server=terminusServerURL | doc=docName | key=apiKey)
+
+    """
+
+    def __init__(self, **kwargs):
         # current conCapabilities context variables
-        key = params.get('key')
-        self.conConfig = ConnectionConfig(params)
+        key = kwargs.get('key')
+        self.conConfig = ConnectionConfig(**kwargs)
         self.conCapabilities = ConnectionCapabilities(self.conConfig, key)
 
     """
