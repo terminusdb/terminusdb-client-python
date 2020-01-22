@@ -23,87 +23,6 @@ STANDARD_URLS = {
 
 class WOQLQuery:
     """Creates a new Empty Query object
-
-    Attributes
-    ----------
-    query
-    cursor
-    chain_ended
-    contains_update
-    paging_transitive_properties
-    vocab
-    tripleBuilder
-    adding_class
-
-    Methods
-    -------
-    woql_and, woql_or, woql_not
-    when
-    triple, quad
-    opt
-    woql_from
-    limit
-    start
-    select
-    sub
-    isa
-    eq
-    trim
-    delete
-    delete_triple, delete_quad, add_triple, add_quad
-    eval
-    minus, plus, times, divide, exp, div
-    get
-    woql_as
-    remote
-    idgen, unique
-    concat, join
-    re
-    lower
-    pad
-    length
-    list
-    add_class, delete_class
-    add_property, delete_property
-    node
-    json
-    insert
-    group_by, order_by
-    asc, desc
-    less, greater
-    into
-    comment
-    abstract
-    graph
-    property
-    label, description
-    domain, parent, entity
-    cardinality, max, min
-    star
-    woql_with
-
-
-
-    set_vocabulary, get_vocabulary
-    is_paged
-    get_page, set_page
-    first_page, next_page, previous_page
-    set_page_size
-    add_start, has_start, get_start
-    set_limit, get_limit
-    has_select, get_select_variables
-    context, get_context
-    execute
-
-    get_everything
-    get_all_documents
-    document_metadata, property_metadata, element_metadata, class_metadata
-    concrete_document_classes
-    get_data_of_class, get_data_of_property
-    document_properties
-    get_document_connections
-    get_instance_meta
-    simple_graph_query
     """
 
     def __init__(self,query=None):
@@ -145,12 +64,13 @@ class WOQLQuery:
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if hasattr(arr1, 'json'):
             map = arr1.json()
             target = arr2;
         else:
-            map = self.build_as_clauses(arr1, arr2);
+            map = self._build_as_clauses(arr1, arr2);
 
         if target:
             if hasattr(target, 'json'):
@@ -166,13 +86,15 @@ class WOQLQuery:
 
         Parameters
         ----------
-        gid : str, graph id
+        gid : str
+            graph id
         remq : WOQLQuery object
         subq : WOQLQuery object, optional
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if hasattr(remq, 'json'):
             remq = remq.json()
@@ -186,7 +108,7 @@ class WOQLQuery:
 
         return self
 
-    def build_as_clauses(self, vars=None, cols=None):
+    def _build_as_clauses(self, vars=None, cols=None):
         clauses = []
         def check_vars_cols(obj):
             return obj and \
@@ -208,6 +130,22 @@ class WOQLQuery:
         return clauses
 
     def typecast(self, va, type, vb):
+        """Changes the type of va to type and saves the return in vb
+
+        Parameters
+        ----------
+        va : str
+            original variable
+        type : str
+            type to be changed
+        vb : str
+            save the return variable
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         self.cursor['typecast'] = [va, type, vb];
         return self
 
@@ -216,13 +154,17 @@ class WOQLQuery:
 
         Parameters
         ----------
-        node : str, node to be insert
-        type : str, type of the node
-        graph : str, target graph, optional
+        node : str
+            node to be insert
+        type : str
+            type of the node
+        graph : str, optional
+            target graph
 
-        Results
+        Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if graph is not None:
             return WOQLQuery().add_quad(node, "rdf:type", WOQLQuery()._clean_type(type), graph)
@@ -230,6 +172,20 @@ class WOQLQuery:
             return WOQLQuery().add_triple(node, "rdf:type", WOQLQuery()._clean_type(type))
 
     def doctype(self, type, graph=None):
+        """Creates a new document class in the schema - equivalent to: add_quad(type, "rdf:type", "owl:Class", graph), add_quad(type, subclassof, tcs:Document, graph)
+
+        Parameters
+        ----------
+        type : str
+            type of the docuemnt
+        graph : str, optional
+            target graph
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         return WOQLQuery().add_class(type, graph).parent("Document")
 
     def length(self, va, vb):
@@ -237,12 +193,15 @@ class WOQLQuery:
 
         Parameters
         ----------
-        va : str, value to calculate length
-        vb : str, stores result
+        va : str
+            value to calculate length
+        vb : str
+            stores result
 
-        Results
+        Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self.cursor['length'] = [va, vb];
         return self
@@ -252,12 +211,14 @@ class WOQLQuery:
 
         Parameters
         ----------
-        json : dict, remote data source in a JSON format
+        json : dict
+            remote data source in a JSON format
         opts : imput options, optional
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if opts is not None:
             self.cursor['remote'] = [json, opts]
@@ -269,12 +230,14 @@ class WOQLQuery:
 
         Parameters
         ----------
-        json : dict, remote data source in a JSON format
+        json : dict
+            remote data source in a JSON format
         opts : imput options, optional
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if opts is not None:
             self.cursor['file'] = [json, opts]
@@ -289,14 +252,18 @@ class WOQLQuery:
 
         Parameters
         ----------
-        gvarlist : list or dict or WOQLQuery object, list of variables to group
-        groupedvar : list or str, grouping variable(s)
+        gvarlist : list or dict or WOQLQuery object
+            list of variables to group
+        groupedvar : list or str
+            grouping variable(s)
         groupquery : WOQLQuery object
-        output : str, output variable, optional
+        output : str, optional
+            output variable
 
-        Results
+        Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         args = []
         self.cursor['group_by'] = args
@@ -334,9 +301,18 @@ class WOQLQuery:
         """
         Orders the results by the list of variables including in gvarlist, asc_or_desc is a WOQL.asc or WOQ.desc list of variables
 
-        gvarlist : list or dict or WOQLQuery object, list of variables to order
-        asc_or_desc : WOQLQuery object, WOQL.asc or WOQ.desc, optional, default is asc
+        Parameters
+        ----------
+        gvarlist : list or dict or WOQLQuery object
+            list of variables to order
+        asc_or_desc : WOQLQuery object
+            WOQL.asc or WOQ.desc, optional, default is asc
         query : WOQLQuery object, optional
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
         """
         ordering = gvarlist
         if hasattr(gvarlist, 'json'):
@@ -359,11 +335,13 @@ class WOQLQuery:
 
         Parameters
         ----------
-        varlist_or_var : list or str, list of variables to order
+        varlist_or_var : list or str
+            list of variables to order
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if type(varlist_or_var) != list:
             varlist_or_var = [varlist_or_var]
@@ -375,11 +353,13 @@ class WOQLQuery:
 
         Parameters
         ----------
-        varlist_or_var : list or str, list of variables to order
+        varlist_or_var : list or str
+            list of variables to order
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if type(varlist_or_var) != list:
             varlist_or_var = [varlist_or_var]
@@ -391,13 +371,17 @@ class WOQLQuery:
 
         Parameters
         ----------
-        prefix : str, prefix for the id
-        vari : str, variable to generate id for
-        type : str, the variable to hold the id
+        prefix : str
+            prefix for the id
+        vari : str
+            variable to generate id for
+        type : str
+            the variable to hold the id
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self.cursor['idgen'] = [prefix]
         if hasattr(vari, 'json'):
@@ -418,13 +402,17 @@ class WOQLQuery:
 
         Parameters
         ----------
-        prefix : str, prefix for the id
-        vari : str, variable to generate id for
-        type : str, the variable to hold the id
+        prefix : str
+            prefix for the id
+        vari : str
+            variable to generate id for
+        type : str
+            the variable to hold the id
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self.cursor['unique'] = [prefix]
         if hasattr(vari, 'json'):
@@ -438,20 +426,24 @@ class WOQLQuery:
         return self
 
     def re(self, p, s, m):
-        """
-        Regular Expression Call, p is a regex pattern
-(.*) using normal regular expression syntax, the only unusual thing is that special characters have to be escaped twice, s is the string to be matched and m is a list of matches:
-e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
+        """Regular Expression Call
+
+        p is a regex pattern (.*) using normal regular expression syntax, the only unusual thing is that special characters have to be escaped twice, s is the string to be matched and m is a list of matches:
+        e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        p : str, regex pattern
-        s : str, string to be matched
-        m : str or list or dict, store list of matches
+        p : str
+            regex pattern
+        s : str
+            string to be matched
+        m : str or list or dict
+            store list of matches
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if type(p) == str:
             if p[:2] != 'v:':
@@ -475,12 +467,15 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        list : list, list of variables to concatenate
-        v : str, saves the results
+        list : list
+            list of variables to concatenate
+        v : str
+            saves the results
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if type(list) == str:
             nlist = re.split('(v:[\w_]+)\\b', list)
@@ -517,12 +512,15 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        u : str, input string
-        l : str, stores output
+        u : str
+            input string
+        l : str
+            stores output
 
-        Results
+        Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self.cursor['lower'] = [u, l]
         return self
@@ -533,14 +531,19 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        input : str, input string
-        pad : str, padding character(s)
-        len :  int, length to pad
-        output : str, stores output
+        input : str
+            input string
+        pad : str
+            padding character(s)
+        len :  int
+            length to pad
+        output : str
+            stores output
 
-        Results
+        Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self.cursor['pad'] = [input, pad, len, output]
         return self
@@ -551,13 +554,17 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        input : list, a list of variables
-        glue :  str, jioining character(s)
-        output : sotres output
+        input : list
+            a list of variables
+        glue :  str
+            jioining character(s)
+        output : str
+            variable that sotres output
 
-        Results
+        Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self.cursor['join'] = [input, glue, output]
         return self
@@ -567,12 +574,15 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        v1 : str, first variable to compare
-        v2 : str, second variable to compare
+        v1 : str
+            first variable to compare
+        v2 : str
+            second variable to compare
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self.cursor['less'] = [v1, v2]
         return self
@@ -582,12 +592,15 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        v1 : str, first variable to compare
-        v2 : str, second variable to compare
+        v1 : str
+            first variable to compare
+        v2 : str
+            second variable to compare
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self.cursor['greaters'] = [v1, v2]
         return self
@@ -597,11 +610,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        *args : variables to be put in the list
+        args
+            variables to be put in the list
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self.cursor['list'] = list(args)
         return self
@@ -613,11 +628,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        json : dict, JSON-LD object, optional
+        json : dict
+            JSON-LD object, optional
 
         Returns
         -------
         dict
+            JSON-LD format of the WOQL query
         """
         if json:
             self.query = json
@@ -625,8 +642,7 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
         return self.query
 
     def when(self, Query, Update=None):
-        """
-        When the sub-query in Condition is met, the Update query is executed
+        """When the sub-query in Condition is met, the Update query is executed
 
         Parameters
         ----------
@@ -636,9 +652,10 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
 
-        Note
-        ----
+        Notes
+        -----
         Functions which take a query as an argument advance the cursor to make the chaining of queries fall
         into the corrent place in the encompassing json
         """
@@ -668,6 +685,7 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if query:
             q = query.json() if callable(query.json) else query
@@ -682,12 +700,14 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        dburl : str, url of the database
+        dburl : str
+            url of the database
         query : WOQLQuery object, optional
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self._advance_cursor("from", dburl)
         if query:
@@ -699,12 +719,14 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        dburl : str, output graph
+        dburl : str
+            output graph
         query : WOQLQuery object, optional
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self._advance_cursor("into", dburl)
         if query:
@@ -716,12 +738,14 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        limit : int, number of maximum results returned
+        limit : int
+            number of maximum results returned
         query : WOQLQuery object, optional
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self._advance_cursor("limit", limit)
         if query:
@@ -733,12 +757,14 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        start : int, index of the frist result got returned
+        start : int
+            index of the frist result got returned
         query : WOQLQuery object, optional
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self._advance_cursor("start", start)
         if query:
@@ -750,11 +776,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        *args : only these variables are returned
+        args
+            only these variables are returned
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
 
         self.cursor['select'] = list(args)
@@ -771,11 +799,12 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        *args : WOQLQuery objects
+        args : WOQLQuery objects
 
         Returns
-        ----------
+        -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if not hasattr(self.cursor,'and'):
             self.cursor['and'] = []
@@ -790,11 +819,12 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        *args : WOQLQuery objects
+        args : WOQLQuery objects
 
         Returns
-        ----------
+        -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if not hasattr(self.cursor,'or'):
             self.cursor['or'] = []
@@ -821,6 +851,7 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
         Returns
         ----------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if query:
             if query.contains_update:
@@ -837,13 +868,17 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        sub : str, Subject
-        pre : str, Predicate
-        obj : str, Object
+        sub : str
+            Subject
+        pre : str
+            Predicate
+        obj : str
+            Object
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self.cursor["triple"] = [self._clean_subject(sub),self._clean_predicate(pre),self._clean_object(obj)]
         return self._chainable("triple", self._clean_subject(sub))
@@ -853,14 +888,19 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        sub : str, Subject
-        pre : str, Predicate
-        obj : str, Object
-        gra : str, Graph
+        sub : str
+            Subject
+        pre : str
+            Predicate
+        obj : str
+            Object
+        gra : str
+            Graph
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self.cursor["quad"] = [self._clean_subject(sub),
                                 self._clean_predicate(pre),
@@ -874,12 +914,15 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        a : str, object in the graph
-        b : str, object in the graph
+        a : str
+            object in the graph
+        b : str
+            object in the graph
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self.cursor["eq"] = [self._clean_object(a),self._clean_object(b)];
         return self._last()
@@ -889,8 +932,10 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        a : str, classA
-        b : str, classB, optional
+        a : str
+            classA
+        b : str, optional
+            classB
 
         Returns
         -------
@@ -907,11 +952,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        val : str, text comment
+        val : str
+            text comment
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
 
         if val and hasattr(val, 'json'):
@@ -937,11 +984,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        varname : str, result of class abstraction, optional
+        varname : str, optional
+            result of class abstraction
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if varname:
             return self.quad(varname, "tcs:tag", "tcs:abstract", "db:schema")
@@ -954,8 +1003,10 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        a : str, classA
-        b : str, classB, optional
+        a : str
+            classA
+        b : str, optional
+            classB
 
         Returns
         -------
@@ -974,12 +1025,15 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        string : str, StringA
-        variable : str, VariableA
+        string : str
+            StringA
+        variable : str
+            VariableA
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self.cursor['trim'] = [string, variable]
         return self._chainable('trim', variable)
@@ -989,12 +1043,15 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        arith : WOQLQuery or dict in JSON-LD representing the query
-        v : str, output variable
+        arith : WOQLQuery or dict
+            query or JSON-LD representing the query
+        v : str
+            output variable
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if hasattr(arith, 'json'):
             arith = arith.json()
@@ -1007,11 +1064,14 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        *args : int or float, numbers
+        args : int or float
+            numbers to add together
 
         Returns
         -------
-        WOQLQuery object"""
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         self.cursor['plus'] = []
         for item in args:
             self.cursor['plus'].append(item.json() if hasattr(item,'json') else item)
@@ -1022,11 +1082,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        *args : int or float, numbers
+        args : int or float
+            numbers to be subtracted
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self.cursor['minus'] = []
         for item in args:
@@ -1038,11 +1100,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        *args : int or float, numbers
+        args : int or float
+            numbers to be multiplied
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self.cursor['times'] = []
         for item in args:
@@ -1054,11 +1118,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        *args : int or float, numbers
+        args : int or float
+            numbers to tbe divided
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self.cursor['divide'] = []
         for item in args:
@@ -1070,11 +1136,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        args : int or float, numbers for division
+        args : int or float
+            numbers for division
 
-        Results
+        Returns
         -------
         WOQLQuery
+            query object that can be chained and/or execute
         """
         self.cursor['div'] = []
         for item in args:
@@ -1092,6 +1160,7 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if hasattr(a, 'json'):
             a = a.json()
@@ -1106,11 +1175,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        JSON_or_IRI : str, IRI or a JSON-LD document
+        JSON_or_IRI : str
+            IRI or a JSON-LD document
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self.cursor['delete'] = [JSON_or_IRI]
         return self._last_update()
@@ -1120,13 +1191,17 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        subject : str, Subject
-        predicate : str, Predicate
-        object_or_literal : str, Object or Literal
+        subject : str
+            Subject
+        predicate : str
+            Predicate
+        object_or_literal : str
+            Object or Literal
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self.cursor['delete_triple'] = [self._clean_subject(subject),
                                         self._clean_predicate(predicate),
@@ -1138,13 +1213,17 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        subject : str, Subject
-        predicate : str, Predicate
-        object_or_literal : str, Object or Literal
+        subject : str
+            Subject
+        predicate : str
+            Predicate
+        object_or_literal : str
+            Object or Literal
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self.cursor['add_triple'] = [self._clean_subject(subject),
                                     self._clean_predicate(predicate),
@@ -1156,14 +1235,19 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        subject : str, Subject
-        predicate : str, Predicate
-        object_or_literal : str, Object or Literal
-        graph : str, Graph
+        subject : str
+            Subject
+        predicate : str
+            Predicate
+        object_or_literal : str
+            Object or Literal
+        graph : str
+            Graph
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self.cursor['delete_quad'] =[self._clean_subject(subject),
                                     self._clean_predicate(predicate),
@@ -1176,14 +1260,19 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        subject : str, Subject
-        predicate : str, Predicate
-        object_or_literal : str, Object or Literal
-        graph : str, Graph
+        subject : str
+            Subject
+        predicate : str
+            Predicate
+        object_or_literal : str
+            Object or Literal
+        graph : str
+            Graph
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self.cursor['add_quad'] =[self._clean_subject(subject),
                                     self._clean_predicate(predicate),
@@ -1198,12 +1287,15 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        c : str, class to be added
-        graph : str, target graph, optional
+        c : str
+            class to be added
+        graph : str, optional
+            target graph
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if c:
             graph = self.clean_graph(graph) if graph else "db:schema"
@@ -1217,12 +1309,15 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        c : str, class to be deleted
-        graph : str, target graph, optional
+        c : str
+            class to be deleted
+        graph : str, optional
+            target graph
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if c:
             graph = self._clean_graph(graph) if graph else "db:schema"
@@ -1237,13 +1332,17 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        p : str, property id to be added
-        t : str, type of the proerty
-        g : str, target graph ,optional
+        p : str
+            property id to be added
+        t : str
+            type of the proerty
+        g : str
+            target graph ,optional
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if not t:
             t = "xsd:string"
@@ -1266,12 +1365,15 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        p : str, property id to be deleted
-        g : str, target graph ,optional
+        p : str
+            property id to be deleted
+        g : str
+            target graph ,optional
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if p:
             graph = self._clean_graph(graph) if graph else "db:schema"
@@ -1287,12 +1389,15 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        a : str, Source
-        b : str, Target
+        a : str
+            Source
+        b : str
+            Target
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if a is None:
             return
@@ -1324,12 +1429,15 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        node : str, node to be selected
-        type : str, pattern type, optional (default is triple)
+        node : str
+            node to be selected
+        type : str
+            pattern type, optional (default is triple)
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if not type:
             type = "triple"
@@ -1341,11 +1449,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        g : str, target graph
+        g : str
+            target graph
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         g = self._clean_graph(g)
         if hasattr(self,'type'):
@@ -1364,12 +1474,15 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        l : str, label to add
-        lang, str, language, optional
+        l : str
+            label to add
+        lang : str, optional
+            language
 
-        Results
+        Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if self.tripleBuilder:
             self.tripleBuilder.label(l, lang)
@@ -1380,12 +1493,15 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        c : str, description to be added
-        lang, str, language, optional
+        c : str
+            description to be added
+        lang : str, optional
+            language
 
-        Results
+        Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if self.tripleBuilder:
             self.tripleBuilder.description(c, lang)
@@ -1396,11 +1512,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        d : str, target domain
+        d : str
+            target domain
 
-        Results
+        Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         d = self._clean_class(d)
         if self.tripleBuilder:
@@ -1412,11 +1530,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        args : list, parent classes
+        args : list
+            parent classes
 
-        Results
+        Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if self.tripleBuilder:
             for item in args:
@@ -1427,13 +1547,10 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
     def entity(self):
         """Adds or matches a subclass relationship to tcs:Entity class
 
-        Parameters
-        ----------
-        None
-
-        Results
+        Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         return self.parent("tcs:Entity")
 
@@ -1442,12 +1559,15 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        p : str, property
-        val : str, value
+        p : str
+            property
+        val : str
+            value
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if self.tripleBuilder:
             if(self.adding_class):
@@ -1465,11 +1585,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        m : int, maximum cardinality
+        m : int
+            maximum cardinality
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if self.tripleBuilder:
             self.tripleBuilder.card(m, "max")
@@ -1480,11 +1602,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        m : int, cardinality
+        m : int
+            cardinality
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if self.tripleBuilder:
             self.tripleBuilder.card(m, "cardinality")
@@ -1495,11 +1619,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        m : int, minimum cardinality
+        m : int
+            minimum cardinality
 
-        Results
+        Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if self.tripleBuilder:
             self.tripleBuilder.card(m, "min")
@@ -1511,14 +1637,19 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        GraphIRI : str, graphIRI, optional
-        Subj : str, target subject, optional
-        Pred : str, target predicate, optional
-        Obj : str, target object, optional
+        GraphIRI : str
+            graphIRI
+        Subj : str, optional
+            target subject
+        Pred : str, optional
+            target predicate
+        Obj : str, optional
+            target object
 
-        Results
+        Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
 
         Subj = self._clean_subject(Subj) if Subj else "v:Subject"
@@ -1536,11 +1667,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        GraphIRI : str, target graph
+        GraphIRI : str
+            target graph
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if GraphIRI:
             GraphIRI = self._clean_graph(GraphIRI)
@@ -1551,12 +1684,10 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
     def get_all_documents(self):
         """Retrieves document id (v:Document) and type (v:Type) of all documents
 
-        Parameters
-        ----------
-
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         return self.woql_and(
                     WOQLQuery().triple("v:Subject", "rdf:type", "v:Type"),
@@ -1567,12 +1698,10 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
         """
         Retrieves meta-data about all documents, document id, label, comment (v:ID, v:Label, v:Comment), document class id, label and comment (v:Class, v:Type, v:Type_Comment),
 
-        Parameters
-        ----------
-
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         return self.woql_and(
                 WOQLQuery().triple("v:ID", "rdf:type", "v:Class"),
@@ -1586,12 +1715,10 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
     def concrete_document_classes(self):
         """Retrieves all instances and their meta-data (v:Class, v:Label, v:Comment) of concrete document classes
 
-        Parameters
-        ----------
-
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         return self.woql_and(
                 WOQLQuery().sub("v:Class", "tcs:Document"),
@@ -1603,12 +1730,11 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
     def property_metadata(self):
         """Retrieves all meta-data about each property (v:Property, v:Type, v:Range, v:Domain, v:Label, v:Comment)
 
-        Parameters
-        ----------
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         return self.woql_and(
                 WOQLQuery().woql_or(
@@ -1626,12 +1752,10 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
         """
         Retrieves meta-data about all elements in the schema (v:Element, v:Parent, v:Type, v:Range, v:Domain, v:Label, v:Comment, v:Abstract)
 
-        Parameters
-        ----------
-
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         return self.woql_and(
                 WOQLQuery().quad("v:Element", "rdf:type", "v:Type", "db:schema"),
@@ -1646,12 +1770,10 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
     def class_metadata(self):
         """Retrieves meta-data about all the classes in the schema (v:Element, v:Label, v:Comment, v:Abstract)
 
-        Parameters
-        ----------
-
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         return self.woql_and(
                 WOQLQuery().quad("v:Element", "rdf:type", "owl:Class", "db:schema"),
@@ -1665,11 +1787,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        chosen : str, chosen class
+        chosen : str
+            chosen class
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         return self.woql_and(
                 WOQLQuery().triple("v:Subject", "rdf:type", chosen),
@@ -1681,11 +1805,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        chosen : str, chosen predicate
+        chosen : str
+            chosen predicate
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         return self.woql_and(
                 WOQLQuery().triple("v:Subject", chosen, "v:Value"),
@@ -1698,11 +1824,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        id : str, document id
+        id : str
+            document id
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         return self.woql_and(
                 WOQLQuery().triple(id, "v:Property", "v:Property_Value"),
@@ -1716,11 +1844,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        id : str, document id
+        id : str
+            document id
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         return self.woql_and(
                 WOQLQuery().eq("v:Docid", id),
@@ -1740,11 +1870,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        id : str, document id
+        id : str
+            document id
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         return self.woql_and(
                 WOQLQuery().triple(id, "rdf:type", "v:InstanceType"),
@@ -1757,12 +1889,10 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
         """
         Create a graph query with pattern (v:Source, v:Edge, v:Target), with meta-data for each element (v:Source_Class, v:Source_Label , v:Source_Comment, v:Source_Type, v:Source_Type_Comment, v:Target_Class, v:Target_Label , v:Target_Comment, v:Target_Type, v:Target_Class_Comment, v:Target_Label , v:Edge_Type_Comment, v:Edge_Type)
 
-        Parameters
-        ----------
-
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         return self.woql_and(
                 WOQLQuery().triple("v:Source", "v:Edge", "v:Target"),
@@ -1785,11 +1915,7 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
     def get_vocabulary(self):
         """Returns the vocabulary at play - a list of all properties and classes in the schema
 
-        Parameters
-        ----------
-        None
-
-        Results
+        Returns
         -------
         dict
         """
@@ -1804,15 +1930,15 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
         vocab : dict
             JSON object where the indices are non-prefixed string and the values are the corresponding prefixed strings: {type: "rdf:type"...}
 
-        Results
+        Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self.vocab = vocab
 
     def load_vocabulary(self, client):
-        """
-        Loads the entirety of the current schema graph as a vocabulary - allows all valid schema URLs to be used without prefixes.
+        """Loads the entirety of the current schema graph as a vocabulary - allows all valid schema URLs to be used without prefixes.
 
         Queries the schema graph and loads all the ids found there as vocabulary that can be used without prefixes.
 
@@ -1822,9 +1948,10 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
         ----------
         client : WOQLClient object
 
-        Results
+        Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         nw = WOQLQuery().quad("v:S", "v:P", "v:O", "db:schema")
         result = nw.execute(client)
@@ -1839,8 +1966,6 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
     def get_limit(self):
         """Returns the current limit value
-        Parameters
-        ----------
 
         Returns
         -------
@@ -1853,11 +1978,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        l : int, limit to set
+        l : int
+            limit to set
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         return self._set_paging_property("limit", l)
 
@@ -1884,9 +2011,6 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
     def get_page(self):
         """Returns the current page number as an offset from the current page size (limit)
 
-        Parameters
-        ----------
-
         Returns
         -------
         int
@@ -1906,11 +2030,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        pagenum : int, page number to set
+        pagenum : int
+            page number to set
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         pstart = (self.get_limit() * (pagenum - 1))
         if self.has_start():
@@ -1922,36 +2048,30 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
     def next_page(self):
         """Increments the page number
 
-        Parameters
-        ----------
-
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         return self.set_page(self.get_page() + 1)
 
     def first_page(self):
         """Sets the page number to the first page
 
-        Parameters
-        ----------
-
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         return self.set_page(1)
 
     def previous_page(self):
         """Decrements the page number if it is currently ≥ 1
 
-        Parameters
-        ----------
-
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         npage = self.get_page() - 1
         if npage > 0:
@@ -1960,13 +2080,16 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
     def set_page_size(self, size):
         """Sets the page size (limit)
+
         Parameters
         ----------
-        size : int, size of the page
+        size : int
+            size of the page
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         self._set_paging_property("limit", size)
         if self.has_start():
@@ -1977,9 +2100,6 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
     def has_select(self):
         """Returns true if the query contains a select clause
-
-        Parameters
-        ----------
 
         Returns
         -------
@@ -2012,10 +2132,7 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
     def has_start(self):
         """Check if the query have a start value set
 
-        Parameters
-        ----------
-
-        Results
+        Returns
         -------
         bool
         """
@@ -2024,10 +2141,8 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
     def get_start(self):
         """Returns the current start value (result offset)
-        Parameters
-        ----------
 
-        Results
+        Returns
         -------
         int
         """
@@ -2043,11 +2158,13 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        s : int, start index
+        s : int
+            start index
 
         Returns
         -------
         WOQLQuery object
+            query object that can be chained and/or execute
         """
         if self.has_start():
             self._set_start(s)
@@ -2090,7 +2207,7 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
         ----------
         q : WOQLQuery object, optional
 
-        Results
+        Returns
         -------
         dict
         """
@@ -2109,11 +2226,8 @@ e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
-        c : dict, context
-
-        Returns
-        -------
-        none
+        c : dict
+            context
         """
         self.cursor['@context'] = c
 
