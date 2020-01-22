@@ -10,7 +10,10 @@ autopep8 = "*"
 flake8 = "*"
 docutils-python3 = "*"
 pytest-cov = "*"
-bumpversion ="*"
+bumpversion = "*"
+sphinx = "*"
+sphinx_rtd_theme = "*"
+sphinxcontrib-napoleon = "*"
 
 [packages]
 requests = "*"
