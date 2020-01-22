@@ -35,7 +35,10 @@ class WOQLClient:
         self.conConfig = ConnectionConfig(**kwargs)
         self.conCapabilities = ConnectionCapabilities(self.conConfig, key)
 
-    """
+
+
+    def connect(self, serverURL=None, key=None):
+        """
         Connect to a Terminus server at the given URI with an API key
         Stores the terminus:ServerCapability document returned
         in the conCapabilities register which stores, the url, key, capabilities,
@@ -45,13 +48,17 @@ class WOQLClient:
         self.conConfig.serverURL will be used if present
         or an error will be raise.
 
-        :param  {string} serverURL Terminus server URI
-        :param  {string} API  key
-        :return dict or raise an InvalidURIError
-        :public
-    """
+        Parameters
+        ----------
+        serverURL : str
+            Terminus server URI
+        key : str
+            API key
 
-    def connect(self, serverURL=None, key=None):
+        Returns
+        -------
+        dict or raise an InvalidURIError
+        """
         if serverURL:
             self.conConfig.setServer(serverURL)
 
@@ -62,28 +69,46 @@ class WOQLClient:
         self.conCapabilities.addConnection(jsonObj)
         return jsonObj
 
-    """
-        connect directly without create a new class instance
-    """
     @staticmethod
     def directConnect(serverURL, key):
+        """
+        connect directly without create a new class instance
+
+        Parameters
+        ----------
+        serverURL : str
+            Terminus server URI
+        key : str
+            API key
+
+        Returns
+        -------
+        dict or raise an InvalidURIError
+        """
         idParser = IDParser()
         idParser.parseServerURL(serverURL)
         return DispatchRequest.sendRequestByAction(idParser.serverURL, const.CONNECT, key)
 
-    """
+    def createDatabase(self, dbID, label, key=None, **kwargs):
+        """
         Create a Terminus Database by posting
         a terminus:Database document to the Terminus Server
 
-        :param {string} dbID TerminusDB id
-        :param {string} label Terminus label
-        :param {string} key you can omit the key if you have set it before
-        :param **kwargs: Optional arguments that ``createDatabase`` takes.
-        :return {dict} {"terminus:status":"terminus:success"}
-        :public
-    """
+        Parameters
+        ----------
+        dbID : str
+            TerminusDB id
+        label : str
+            Terminus label
+        key : str, optional
+            you can omit the key if you have set it before
+        kwargs
+            Optional arguments that ``createDatabase`` takes
 
-    def createDatabase(self, dbID, label, key=None, **kwargs):
+        Returns
+        -------
+        dict
+        """
         self.conConfig.setDB(dbID)
         createDBTemplate = DocumentTemplate.createDBTemplate(
             self.conConfig.serverURL, self.conConfig.dbID, label, **kwargs)
@@ -91,15 +116,25 @@ class WOQLClient:
         #capabilities list
         return self.dispatch(self.conConfig.dbURL(), const.CREATE_DATABASE, key, createDBTemplate)
 
-    """
-        :param {string} dbURL  TerminusDB full URL like http://localhost:6363/myDB
-        :param {label}  the terminus db title
-        :param {string} key is the server API key
-        :param **kwargs: Optional arguments that ``createDatabase`` takes.
-        :return {dict} {"terminus:status":"terminus:success"}
-    """
     @staticmethod
     def directCreateDatabase(dbURL, label, key, **kwargs):
+        """Create Terminus Database with settings
+
+        Parameters
+        ----------
+        dbURL : str
+            TerminusDB full URL like http://localhost:6363/myDB
+        label : str
+            the terminus db title
+        key : str
+            the server API key
+        kwargs
+            Optional arguments that ``createDatabase`` takes
+
+        Returns
+        -------
+        dict
+        """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
         createDBTemplate = DocumentTemplate.createDBTemplate(
@@ -107,43 +142,60 @@ class WOQLClient:
         DispatchRequest.sendRequestByAction(
             idParser.dbURL(), const.CREATE_DATABASE, key, createDBTemplate)
 
-    """
-        Delete a TerminusDB
-        :param {string} dbID is a terminusDB Id
-        :param {key} you need the key if you didn't set before
-        :return {dict} {"terminus:status":"terminus:success"}
-    """
-
     def deleteDatabase(self, dbID, key=None):
+        """Delete a TerminusDB
+
+        Parameters
+        ----------
+        dbID : str
+            terminusDB Id
+        key : str, optional
+            you need the key if you didn't set before
+
+        Returns
+        -------
+        dict
+        """
         self.conConfig.setDB(dbID)
         jsonResponse = self.dispatch(
             self.conConfig.dbURL(), const.DELETE_DATABASE, key)
         self.conCapabilities.removeDB()
         return jsonResponse
 
-    """
-        param {string} dbURL  TerminusDB full URL like http://localhost:6363/myDB
-        param {key} is the server API key
-    """
-
     @staticmethod
     def directDeleteDatabase(dbURL, key):
+        """Delete a TerminusDB with settings
+
+        Parameters
+        ----------
+        dbURL : str
+            TerminusDB full URL like http://localhost:6363/myDB
+        key : str
+            the server API key
+        """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
         return DispatchRequest.sendRequestByAction(
             idParser.dbURL(), const.DELETE_DATABASE, key)
 
-    """
-        Retrieves the schema of the specified database
-
-        param {string} dbId TerminusDB Id or omitted (get last select database)
-        param {key} is the server API key
-        return {string/dict}
+    def getSchema(self, dbID=None, key=None, options={"terminus:encoding": "terminus:turtle"}):
+        """Retrieves the schema of the specified database
 
         opts.format defines which format is requested, default is turtle(*json / turtle)
-    """
 
-    def getSchema(self, dbID=None, key=None, options={"terminus:encoding": "terminus:turtle"}):
+        Parameters
+        ----------
+        dbId : str
+            TerminusDB Id or omitted (get last select database)
+        key : str
+            the server API key
+        options : dict
+            options object
+
+        Returns
+        -------
+        str or dict
+        """
         if (dbID):
             self.conConfig.setDB(dbID)
 
@@ -151,23 +203,48 @@ class WOQLClient:
 
     @staticmethod
     def directGetSchema(dbURL, key, options={"terminus:encoding": "terminus:turtle"}):
+        """Retrieves the schema of the specified database with settings
+
+        opts.format defines which format is requested, default is turtle(*json / turtle)
+
+        Parameters
+        ----------
+        dbId : str
+            TerminusDB Id or omitted (get last select database)
+        key : str
+            the server API key
+        options : dict
+            options object
+
+        Returns
+        -------
+        str or dict
+        """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
         return DispatchRequest.sendRequestByAction(
             idParser.schemaURL(), const.GET_SCHEMA, key, options)
 
-    """
-        Updates the Schema of the specified database
-        :param {object} doc is a valid owl ontology in json-ld or turtle format
-        :param {string} dbid TerminusDB Id or omitted
-        :param {string} key is an API key
-        :param {object} opts is an options object
-        returns {dict} {"terminus:status":"terminus:success"}
+    def updateSchema(self, docObj, dbID=None, key=None, opts={"terminus:encoding": "terminus:turtle"}):
+        """Updates the Schema of the specified database
 
         opts.format is used to specify which format is being used (*json / turtle)
-    """
 
-    def updateSchema(self, docObj, dbID=None, key=None, opts={"terminus:encoding": "terminus:turtle"}):
+        Parameters
+        ----------
+        docObj : dict
+            valid owl ontology in json-ld or turtle format
+        dbid : str
+            TerminusDB Id or omitted
+        key : str
+            API key
+        opts : dict
+            options object
+
+        Returns
+        -------
+        dict
+        """
         if (dbID):
             self.conConfig.setDB(dbID)
         docObj = DocumentTemplate.formatDocument(
@@ -176,6 +253,25 @@ class WOQLClient:
 
     @staticmethod
     def directUpdateSchema(dbURL, docObj, key, opt={"terminus:encoding": "terminus:turtle"}):
+        """Updates the Schema of the specified database with settings
+
+        opts.format is used to specify which format is being used (*json / turtle)
+
+        Parameters
+        ----------
+        dbURL : str
+            a valid TerminusDB full URL
+        docObj : dict
+            valid owl ontology in json-ld or turtle format
+        key : str
+            API key
+        opts : dict
+            options object
+
+        Returns
+        -------
+        dict
+        """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
         docObj = DocumentTemplate.formatDocument(
@@ -183,16 +279,20 @@ class WOQLClient:
         return DispatchRequest.sendRequestByAction(
             idParser.schemaURL(), const.UPDATE_SCHEMA, key, docObj)
 
-    """
-        Creates a new document in the specified database
-
-        :params {string} documentID is a valid Terminus document id
-        :params {string} dbId is a valid TerminusDB id
-        :params {dict} docObj  is a valid document in json-ld
-        :params key is an optional API key
-    """
-
     def createDocument(self, docObj, documentID, dbID=None, key=None):
+        """Creates a new document in the specified database
+
+        Parameters
+        ----------
+        docObj : dict
+            a valid document in json-ld
+        documentID : str
+            a valid Terminus document id
+        dbId : str
+            a valid TerminusDB id
+        key : str, optional
+            API key
+        """
         if(dbID):
             self.conConfig.setDB(dbID)
         self.conConfig.setDocument(documentID)
@@ -200,17 +300,21 @@ class WOQLClient:
             doc, None, None, self.conConfig.docURL())
         return self.dispatch(self.conConfig.docURL(), const.CREATE_DOCUMENT, key, docObj)
 
-    """
-        Creates a new document in the specified database
-
-        :params {string} documentID is a valid Terminus document id
-        :params {string} dbURL is a valid TerminusDB full URL
-        :params {dict } docObj  is a valid document in json-ld
-        :params key is an optional API key
-    """
-
     @staticmethod
     def directCreateDocument(docObj, documentID, dbURL, key):
+        """Creates a new document in the specified database
+
+        Parameters
+        ----------
+        docObj : dict
+            a valid document in json-ld
+        documentID : str
+            a valid Terminus document id
+        dbURL : str
+            a valid TerminusDB full URL
+        key : str, optional
+            API key
+        """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
         idParser.parseDocumentID(documentID)
@@ -218,15 +322,20 @@ class WOQLClient:
         docObj = DocumentTemplate.formatDocument(doc, None, None, idParser.docURL())
         return DispatchRequest.sendRequestByAction(idParser.docURL(), const.CREATE_DOCUMENT, key, docObj)
 
-    """
-        Retrieves a document from the specified database
-        :params {string} documentID is a valid Terminus document id
-        :params {string} dbID is a valid TerminusDB id
-        :params key is an optional API key
-        opts
-    """
-
     def getDocument(self, documentID, dbID=None, key=None, opts={"terminus:encoding": "terminus:frame"}):
+        """Retrieves a document from the specified database
+
+        Parameters
+        ----------
+        documentID : str
+            a valid Terminus document id
+        dbId : str
+            a valid TerminusDB id
+        key : str, optional
+            API key
+        opts : dict
+            options object
+        """
         if(dbID):
             self.conConfig.setDB(dbID)
 
@@ -235,16 +344,39 @@ class WOQLClient:
 
     @staticmethod
     def directGetDocument(documentID, dbURL, key, opts={"terminus:encoding": "terminus:frame"}):
+        """Retrieves a document from the specified database with URL
+
+        Parameters
+        ----------
+        documentID : str
+            a valid Terminus document id
+        dbURL : str
+            a valid TerminusDB full URL
+        key : str, optional
+            API key
+        opts : dict
+            options object
+        """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
         idParser.parseDocumentID(documentID)
         return DispatchRequest.sendRequestByAction(idParser.docURL(), const.GET_DOCUMENT, key, opts)
 
-    """
-        Updates a document in the specified database with a new version
-    """
-
     def updateDocument(self, documentID, docObj, dbID=None, key=None):
+        """
+        Updates a document in the specified database with a new version
+
+        Parameters
+        ----------
+        documentID : str
+            a valid Terminus document id
+        docObj : dict
+            a valid document in json-ld
+        dbId : str
+            a valid TerminusDB id
+        key : str, optional
+            API key
+        """
         if(dbID):
             self.conConfig.setDB(dbID)
 
@@ -255,6 +387,20 @@ class WOQLClient:
 
     @staticmethod
     def directUpdateDocument(documentID, dbURL, key, docObj):
+        """
+        Updates a document in the specified database with URL
+
+        Parameters
+        ----------
+        documentID : str
+            a valid Terminus document id
+        dbURL : str
+            a valid TerminusDB full URL
+        key : str, optional
+            API key
+        docObj : dict
+            a valid document in json-ld
+        """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
         idParser.parseDocumentID(documentID)
@@ -262,11 +408,19 @@ class WOQLClient:
             docObj, None, None, idParser.docURL())
         return DispatchRequest.sendRequestByAction(idParser.docURL(), const.GET_DOCUMENT, key, docObj)
 
-    """
-        Deletes a document from the specified database
-    """
-
     def deleteDocument(self, documentID, dbID=None, key=None):
+        """
+        Deletes a document from the specified database
+
+        Parameters
+        ----------
+        documentID : str
+            a valid Terminus document id
+        dbId : str
+            a valid TerminusDB id
+        key : str, optional
+            API key
+        """
         if(dbID):
             self.conConfig.setDB(dbID)
 
@@ -276,21 +430,40 @@ class WOQLClient:
 
     @staticmethod
     def directDeleteDocument(self, documentID, dbURL, key):
+        """
+        Deletes a document from the specified database with URL
+
+        Parameters
+        ----------
+        documentID : str
+            a valid Terminus document id
+        dbURL : str
+            a valid TerminusDB full URL
+        key : str, optional
+            API key
+        """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
         idParser.parseDocumentID(documentID)
 
         return DispatchRequest.sendRequestByAction(idParser.docURL(), const.DELETE_DOCUMENT, key)
 
-    """
-        Executes a read-only WOQL query on the specified database and returns the results
-        :param {string} woqlQuery is a "woql query select statement"
-    """
-
     def select(self, woqlQuery, dbID=None, key=None):
+        """
+        Executes a read-only WOQL query on the specified database and returns the results
+
+        Parameters
+        ----------
+        woqlQuery : WOQLQuery object
+            woql query select statement
+        dbId : str
+            a valid TerminusDB id
+        key : str, optional
+            API key
+        """
         if(dbID):
             self.conConfig.setDB(dbID)
-        
+
         payload = {'terminus:query': json.dumps(woqlQuery)}
         return self.dispatch(self.conConfig.queryURL(), const.WOQL_SELECT, key, payload)
 
@@ -302,7 +475,8 @@ class WOQLClient:
         payload = {'terminus:query': json.dumps(woqlQuery)}
         return DispatchRequest.sendRequestByAction(idParser.queryURL(), const.WOQL_SELECT, key, payload)
 
-    """
+    def update(self, woqlQuery, dbID=None, key=None):
+        """
         Executes a WOQL query on the specified database which updates the state and returns the results
 
         The first (qurl) argument can be
@@ -310,9 +484,7 @@ class WOQLClient:
         2) omitted - the current database will be used
         the second argument (woql) is a woql select statement encoded as a string
         the third argument (opts) is an options json - opts.key is an optional API key
-    """
-
-    def update(self, woqlQuery, dbID=None, key=None):
+        """
         if(dbID):
             self.conConfig.setDB(dbID)
             # raise InvalidURIError(ErrorMessage.getInvalidURIMessage(docurl, "Update"))
@@ -339,6 +511,6 @@ class WOQLClient:
             #print("CONNCT BEFORE ACTION", action)
 
         #check if we can perform this action or raise an AccessDeniedError error
-        #review the access control 
+        #review the access control
         #self.conCapabilities.capabilitiesPermit(action)
         return DispatchRequest.sendRequestByAction(url, action, connectionKey, payload)
