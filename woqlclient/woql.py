@@ -571,6 +571,26 @@ class WOQLQuery:
         self.cursor['join'] = [input, glue, output]
         return self
 
+    def sum(self, input, output):
+        """
+        Joins a list variable containing numbers together (input) into a single number
+        containing the sum.
+
+        Parameters
+        ----------
+        input : list
+            a variable containing a list of numbers
+        output : str
+            a variable that stores the output
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        self.cursor['sum'] = [input, output]
+        return self
+
     def less(self, v1, v2):
         """Compares the value of v1 against v2 and returns true if v1 is less than v2
 
