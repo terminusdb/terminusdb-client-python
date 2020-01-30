@@ -37,6 +37,8 @@ $ pytest tests
 ## Contribute
 It will be nice, if you open an issue first so that we can know what is going on, then, fork this repo and push in your ideas. Do not forget to add a bit of test(s) of what value you adding.
 
+Please check [Contributing.md](Contributing.md) for more information.
+
 ## Licence
 
 GNU General Public License v3 (GPLv3)
