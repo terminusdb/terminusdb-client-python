@@ -318,7 +318,7 @@ class WOQLQuery:
 
         self._advance_cursor("order_by", ordering)
         if query is not None:
-            self.cursor["order_by"] = query.json() if hasattr(query,'json') else query
+            self.cursor = query.json() if hasattr(query,'json') else query
         return self
 
     def asc(self, var):
