@@ -22,7 +22,7 @@ We are using [`pytest`](https://docs.pytest.org/en/latest/) for testing. All tes
 
 To run the tests:
 
-`pytest /tests`
+`pytest tests/`
 
 ## Writing Documentation
 
