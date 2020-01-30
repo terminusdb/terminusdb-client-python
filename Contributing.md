@@ -12,6 +12,10 @@ Make sure you have Python>=3.6 installed. We use [pipenv](https://pipenv-fork.re
 
 `pipenv install --dev`
 
+To “editable” install the local Terminus Client Python:
+
+`pip3 install -e .`
+
 ## Writing tests and testing
 
 We are using [`pytest`](https://docs.pytest.org/en/latest/) for testing. All tests are stored in `/tests`
