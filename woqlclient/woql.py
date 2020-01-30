@@ -244,8 +244,6 @@ class WOQLQuery:
         self.cursor['file'] = [json];
         return self
 
-    # WOQL.group_by = function(gvarlist, groupedvar, groupquery, output){    return new WOQLQuery().group_by(gvarlist, groupedvar, groupquery, output); }
-
     def group_by(self, gvarlist, groupedvar, groupquery, output=None):
         """
         Groups the results of groupquery together by the list of variables gvarlist, using the variable groupedvar as a grouping and saves the result into variable output.
@@ -297,16 +295,13 @@ class WOQLQuery:
 
         return self
 
-    def order_by(self, gvarlist, asc_or_desc=None, query=None):
+    def order_by(self, gvarlist, query=None):
         """
         Orders the results by the list of variables including in gvarlist, asc_or_desc is a WOQL.asc or WOQ.desc list of variables
 
         Parameters
         ----------
-        gvarlist : list or dict or WOQLQuery object
-            list of variables to order
-        asc_or_desc : WOQLQuery object
-            WOQL.asc or WOQ.desc, optional, default is asc
+        gvarlist : list or dict of WOQLQuery().asc or WOQLQuery().desc objects
         query : WOQLQuery object, optional
 
         Returns
@@ -314,56 +309,48 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        ordering = gvarlist
-        if hasattr(gvarlist, 'json'):
-            ordering = gvarlist.json()
-        if type(ordering) not in [list, dict]:
-            ordering = [ordering]
-        if type(ordering) == list:
-            vars = Utils.addNamespacesToVariables(ordering)
-            if asc_or_desc is None:
-                asc_or_desc = "asc"
-            ordering = {}
-            ordering[asc_or_desc] = vars
+        ordering = []
+        for gvar in gvarlist:
+            if hasattr(gvar, 'json'):
+                ordering.append(gvar.json())
+            else:
+                ordering.append(gvar)
+
         self._advance_cursor("order_by", ordering)
         if query is not None:
-            self.cursor = query.json() if hasattr(query, 'json') else query
+            self.cursor = query.json() if hasattr(query,'json') else query
         return self
 
-    def asc(self, varlist_or_var):
-        """Orders the list by ascending order
+    def asc(self, var):
+        """Orders by ascending order on this argument
 
         Parameters
         ----------
-        varlist_or_var : list or str
-            list of variables to order
+        var : variable to order
 
         Returns
         -------
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        if type(varlist_or_var) != list:
-            varlist_or_var = [varlist_or_var]
-        self.cursor["asc"] = varlist_or_var
+        uri_var = Utils.addNamespacesToVariable(var)
+        self.cursor["asc"] = [uri_var]
         return self
 
-    def desc(self, varlist_or_var):
-        """Orders the list by descending value
+    def desc(self, var):
+        """Orders by descending value
 
         Parameters
         ----------
-        varlist_or_var : list or str
-            list of variables to order
+        var : variable to order
 
         Returns
         -------
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        if type(varlist_or_var) != list:
-            varlist_or_var = [varlist_or_var]
-        self.cursor["desc"] = varlist_or_var
+        uri_var = Utils.addNamespacesToVariable(var)
+        self.cursor["desc"] = [uri_var]
         return self
 
     def idgen(self, prefix, vari, type, mode=None):
