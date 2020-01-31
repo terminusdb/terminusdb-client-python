@@ -3,7 +3,7 @@ import requests
 #import sys
 #sys.path.append('woqlclient')
 import unittest.mock as mock
-from .mockResponse import mocked_requests
+from mockResponse import mocked_requests
 import json
 import os
 
@@ -99,9 +99,9 @@ def test_getSchema(mocked_requests, monkeypatch):
 
 	__woqlClient__.connect()
 
-	
+
 	 #getSchema with no parameter
-	
+
 
 	monkeypatch.setattr(__woqlClient__.conCapabilities, "capabilitiesPermit", mock_func_with_1arg)
 
