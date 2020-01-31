@@ -15,7 +15,7 @@ jobs:
     script: coverage
   - stages: publish
     if: "(tag IS blank) AND (branch = master)"
-    script: publish
+    script: make publish
 deploy:
   provider: pypi
   user: __token__
