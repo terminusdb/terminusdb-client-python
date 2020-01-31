@@ -18,8 +18,11 @@ coverage:
 
 #command line for publish the module
 #using twine to upload packages to PyPI https://pypi.org/project/twine/
-#publish:
-	#pip install 'twine>=1.5.0'
-	#python setup.py sdist bdist_wheel
-	#twine upload dist/*
-	#rm -fr build dist .egg requests.egg-info
+publish:
+	pip install 'twine>=1.5.0'
+	pip install bumpversion
+	bumpversion patch
+	python setup.py sdist bdist_wheel
+	twine upload dist/*
+	rm -fr build dist .egg requests.egg-info
+	git push origin master --tags
