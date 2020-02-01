@@ -1,19 +1,25 @@
 language: python
-# command to install dependencies
-install: "make"
-# command to run tests
+install: make
 script:
-  - make ci
+- make ci
 cache: pip
 jobs:
   include:
-    - stage: test
-      python: '3.5'
-    - stage: test
-      python: '3.6'
-    - stage: test
-      python: '3.7'
-      dist: xenial   
-    - stage: coverage
-      python: '3.6'
-      script: coverage
+  - stage: test
+    python: '3.6'
+  - stage: test
+    python: '3.7'
+    dist: xenial
+  - stage: coverage
+    python: '3.6'
+    script: coverage
+  - stages: publish
+    if: "(tag IS blank) AND (branch = master)"
+    script: make publish
+deploy:
+  provider: pypi
+  user: __token__
+  password:
+    secure: CBprpI5MpbgeReYOKTP8Ke/J+dC+eoDd5WEY5Tj/BpJ9v6mDIYHBhv4b5WudzaEcytEoBdEhSGM/elalJStHtPvIz8i2Di5zAnjQAo3uX3/R9uV50MdbiDIobpM617zmh2eYYwkBmVUZxm5ENzXoMUwAOFl0abEu+z+mYz3cd+zO1dm/T047mbyUn1hxwUflMejRp4oVoamtnRRd8v9E7QWh3scqIrsSYQnxMUvKr3AabkjxFwfN4PNcRNCWsqviU3jNEqwWUOGc7fMNAJBdFsr7ENm4/a432NN+ocRqq0OMpzOL7LBC9ZsEGPTCtLZPVfJ11Yo9zAMAgh+DFRxkp3jgToAjHehFs0j0XIqnux0l3ezQl2GqXosdLfdsTCcKtEW2hoH+2dpkc1p41xe6s208E/pwD1FZfPPmlDvXiSc0rB6MNgMEGq6Vf3cQFay1tfMHxydYT/hlGKg3eUx13+V0H8l8eSFxMTLYa+5btg8hUvbdEU6ET5MUxzY7hCVl3fHMacdsC+oz53ddBv+h+DlCS8wPeiFG7sWRzBWEizk/EJgLwkFIigqHq1RYZsq4GlXFdsrqgeIITcxbXARtnXz3UJONhdMqeBpfxc84maB46HKE2bohQvHbm+n2u2N05vMUMuFyOG6M7DLeLWlbpKGhMDMgPeRhBYT89E9QR88=
+  on:
+    tags: true

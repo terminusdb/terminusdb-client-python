@@ -1,4 +1,5 @@
 import setuptools
+from woqlclient import __version__
 
 # read the contents of your README file
 from os import path
@@ -19,7 +20,7 @@ test_requirements = [
 
 setuptools.setup(
     name="terminus-client-python",
-    version="0.0.4",
+    version=__version__,
     author="TerminusDB group",
     author_email="terminusdatabase@gmail.com",
     description="Python client for Terminus DB",

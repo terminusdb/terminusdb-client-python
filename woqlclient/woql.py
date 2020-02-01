@@ -58,8 +58,8 @@ class WOQLQuery:
             If WQOLQuery, arr2 will replace the target. If list, its column names of the source csv
         arr2 : list or str
             List, if arr1 is list and it will take the variable names for the input. Str, if arr1 is WQOLQuery, it will be the target
-        target : str, target of the source data, optional
-            Used only if arr1 and arr2 is list
+        target : str, optional
+            target of the source data, used only if arr1 and arr2 is list
 
         Returns
         -------
@@ -129,16 +129,16 @@ class WOQLQuery:
                         clauses.append({'as': [v]})
         return clauses
 
-    def typecast(self, va, type, vb):
+    def typecast(self, vara, type, varb):
         """Changes the type of va to type and saves the return in vb
 
         Parameters
         ----------
-        va : str
+        vara : str
             original variable
         type : str
             type to be changed
-        vb : str
+        varb : str
             save the return variable
 
         Returns
@@ -146,7 +146,7 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        self.cursor['typecast'] = [va, type, vb];
+        self.cursor['typecast'] = [vara, type, varb];
         return self
 
     def insert(self, node, type, graph=None):
@@ -231,7 +231,7 @@ class WOQLQuery:
         Parameters
         ----------
         json : dict
-            remote data source in a JSON format
+            file data source in a JSON format
         opts : imput options, optional
 
         Returns
@@ -243,8 +243,6 @@ class WOQLQuery:
             self.cursor['file'] = [json, opts]
         self.cursor['file'] = [json];
         return self
-
-    # WOQL.group_by = function(gvarlist, groupedvar, groupquery, output){    return new WOQLQuery().group_by(gvarlist, groupedvar, groupquery, output); }
 
     def group_by(self, gvarlist, groupedvar, groupquery, output=None):
         """
@@ -297,16 +295,13 @@ class WOQLQuery:
 
         return self
 
-    def order_by(self, gvarlist, asc_or_desc=None, query=None):
+    def order_by(self, gvarlist, query=None):
         """
         Orders the results by the list of variables including in gvarlist, asc_or_desc is a WOQL.asc or WOQ.desc list of variables
 
         Parameters
         ----------
-        gvarlist : list or dict or WOQLQuery object
-            list of variables to order
-        asc_or_desc : WOQLQuery object
-            WOQL.asc or WOQ.desc, optional, default is asc
+        gvarlist : list or dict of WOQLQuery().asc or WOQLQuery().desc objects
         query : WOQLQuery object, optional
 
         Returns
@@ -314,56 +309,48 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        ordering = gvarlist
-        if hasattr(gvarlist, 'json'):
-            ordering = gvarlist.json()
-        if type(ordering) not in [list, dict]:
-            ordering = [ordering]
-        if type(ordering) == list:
-            vars = Utils.addNamespacesToVariables(ordering)
-            if asc_or_desc is None:
-                asc_or_desc = "asc"
-            ordering = {}
-            ordering[asc_or_desc] = vars
+        ordering = []
+        for gvar in gvarlist:
+            if hasattr(gvar, 'json'):
+                ordering.append(gvar.json())
+            else:
+                ordering.append(gvar)
+
         self._advance_cursor("order_by", ordering)
         if query is not None:
-            self.cursor = query.json() if hasattr(query, 'json') else query
+            self.cursor = query.json() if hasattr(query,'json') else query
         return self
 
-    def asc(self, varlist_or_var):
-        """Orders the list by ascending order
+    def asc(self, var):
+        """Orders by ascending order on this argument
 
         Parameters
         ----------
-        varlist_or_var : list or str
-            list of variables to order
+        var : variable to order
 
         Returns
         -------
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        if type(varlist_or_var) != list:
-            varlist_or_var = [varlist_or_var]
-        self.cursor["asc"] = varlist_or_var
+        uri_var = Utils.addNamespacesToVariable(var)
+        self.cursor["asc"] = [uri_var]
         return self
 
-    def desc(self, varlist_or_var):
-        """Orders the list by descending value
+    def desc(self, var):
+        """Orders by descending value
 
         Parameters
         ----------
-        varlist_or_var : list or str
-            list of variables to order
+        var : variable to order
 
         Returns
         -------
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        if type(varlist_or_var) != list:
-            varlist_or_var = [varlist_or_var]
-        self.cursor["desc"] = varlist_or_var
+        uri_var = Utils.addNamespacesToVariable(var)
+        self.cursor["desc"] = [uri_var]
         return self
 
     def idgen(self, prefix, vari, type, mode=None):
@@ -373,10 +360,12 @@ class WOQLQuery:
         ----------
         prefix : str
             prefix for the id
-        vari : str
+        vari : str or list
             variable to generate id for
         type : str
             the variable to hold the id
+        mode : str
+            idgen mode
 
         Returns
         -------
@@ -425,7 +414,7 @@ class WOQLQuery:
         self.cursor['unique'].append(type)
         return self
 
-    def re(self, p, s, m):
+    def re(self, pattern, test, matches):
         """Regular Expression Call
 
         p is a regex pattern (.*) using normal regular expression syntax, the only unusual thing is that special characters have to be escaped twice, s is the string to be matched and m is a list of matches:
@@ -433,11 +422,11 @@ class WOQLQuery:
 
         Parameters
         ----------
-        p : str
+        pattern : str
             regex pattern
-        s : str
+        test : str
             string to be matched
-        m : str or list or dict
+        matches : str or list or dict
             store list of matches
 
         Returns
@@ -445,21 +434,21 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        if type(p) == str:
-            if p[:2] != 'v:':
-                p = {"@value" : p, "@type": "xsd:string"}
+        if type(pattern) == str:
+            if pattern[:2] != 'v:':
+                pattern = {"@value" : pattern, "@type": "xsd:string"}
 
-        if type(s) == str:
-            if s[:2] != 'v:':
-                s = {"@value" : s, "@type": "xsd:string"}
+        if type(test) == str:
+            if test[:2] != 'v:':
+                test = {"@value" : test, "@type": "xsd:string"}
 
-        if type(m) == str:
-            m = [m]
+        if type(matches) == str:
+            matches = [matches]
 
-        if (type(m) != dict) or ('list' not in m):
-            m = {'list': m}
+        if (type(matches) != dict) or ('list' not in matches):
+            matches = {'list': matches}
 
-        self.cursor['re'] = [p, s, m]
+        self.cursor['re'] = [pattern, test, matches]
         return self
 
     def concat(self, list, v):
@@ -567,6 +556,26 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         self.cursor['join'] = [input, glue, output]
+        return self
+
+    def sum(self, input, output):
+        """
+        Joins a list variable containing numbers together (input) into a single number
+        containing the sum.
+
+        Parameters
+        ----------
+        input : list
+            a variable containing a list of numbers
+        output : str
+            a variable that stores the output
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        self.cursor['sum'] = [input, output]
         return self
 
     def less(self, v1, v2):
@@ -1119,7 +1128,7 @@ class WOQLQuery:
         Parameters
         ----------
         args : int or float
-            numbers to tbe divided
+            numbers to be divided
 
         Returns
         -------
@@ -1155,7 +1164,9 @@ class WOQLQuery:
         Parameters
         ----------
         a : int or float
+            base number
         b : int or float
+            power of
 
         Returns
         -------
@@ -1256,7 +1267,7 @@ class WOQLQuery:
         return self._chainable_update('delete_quad', subject)
 
     def add_quad(self, subject, predicate, object_or_literal, graph):
-        """Adds quads according to the the pattern [S,P,O]
+        """Adds quads according to the pattern [S,P,O,G]
 
         Parameters
         ----------
@@ -1282,12 +1293,12 @@ class WOQLQuery:
 
     # Schema manipulation shorthand
 
-    def add_class(self, c=None, graph=None):
+    def add_class(self, classid=None, graph=None):
         """Generates a new Class with the given ClassID and writes it to the DB schema
 
         Parameters
         ----------
-        c : str
+        classid : str
             class to be added
         graph : str, optional
             target graph
@@ -1297,19 +1308,19 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        if c:
+        if classid:
             graph = self.clean_graph(graph) if graph else "db:schema"
-            self.adding_class = c
-            c = "scm:" + c if c.find(":") == -1 else c
-            self.add_quad(c, "rdf:type", "owl:Class", graph)
+            self.adding_class = classid
+            classid = "scm:" + classid if classid.find(":") == -1 else classid
+            self.add_quad(classid, "rdf:type", "owl:Class", graph)
         return self
 
-    def delete_class(self, c=None, graph=None):
+    def delete_class(self, classid=None, graph=None):
         """Deletes the Class with the passed ID form the schema (and all references to it)
 
         Parameters
         ----------
-        c : str
+        classid : str
             class to be deleted
         graph : str, optional
             target graph
@@ -1319,12 +1330,12 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        if c:
+        if classid:
             graph = self._clean_graph(graph) if graph else "db:schema"
-            c = "scm:" + c if c.find(":") == -1 else c
+            classid = "scm:" + classid if classid.find(":") == -1 else classid
 
-            return self.woql_and(WOQLQuery().delete_quad(c, "v:All", "v:Al2", graph),
-                            WOQLQuery().opt().delete_quad("v:Al3", "v:Al4", c, graph))
+            return self.woql_and(WOQLQuery().delete_quad(classid, "v:All", "v:Al2", graph),
+                            WOQLQuery().opt().delete_quad("v:Al3", "v:Al4", classid, graph))
         return self
 
     def add_property(self, p=None, t=None, g=None):
@@ -1336,8 +1347,8 @@ class WOQLQuery:
             property id to be added
         t : str
             type of the proerty
-        g : str
-            target graph ,optional
+        g : str, optional
+            target graph
 
         Returns
         -------
