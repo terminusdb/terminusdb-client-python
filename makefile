@@ -28,6 +28,5 @@ publish:
 	#rm -fr build dist .egg requests.egg-info
 	git config --global user.email "travis@travis-ci.org"
 	git config --global user.name "Travis CI"
-	git remote set-url origin https://${GH_TOKEN}@
-	github.com/terminusdb/terminus-client-python
+	git remote set-url origin https://${GH_TOKEN}@github.com/terminusdb/terminus-client-python
 	git push origin master --tags
