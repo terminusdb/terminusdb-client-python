@@ -17,20 +17,12 @@ flake8:
 coverage:
 	pipenv run py.test tests --cov-config .coveragerc --verbose --cov-report term --cov-report xml --cov=woqlclient tests
 
-#command line for publish the module
-#using twine to upload packages to PyPI https://pypi.org/project/twine/
+#command line for release: bumpversion (patch), tag and push
 publish:
-	pip install 'twine>=1.5.0'
 	pip install -U bumpversion
 	git remote add upstream git@github.com:terminusdb/terminus-client-python.git
 	git checkout master
 	git pull upstream master
 	bumpversion patch
-	#python setup.py sdist bdist_wheel
-	#twine upload dist/*
-	#rm -fr build dist .egg requests.egg-info
-	#git config --global user.email "travis@travis-ci.org"
-	#git config --global user.name "Travis CI"
-	#git remote set-url origin https://${GH_TOKEN}@github.com/terminusdb/terminus-client-python
-	git push publish master
-	git push publish master --tags
+	git push upstream master
+	git push upstream master --tags
