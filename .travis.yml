@@ -13,19 +13,21 @@ jobs:
   - stage: coverage
     python: '3.6'
     script: coverage
-  - stage: build # This stage builds and lints in parallel
-    if: (branch = master)
-    name: Build
-    script: cd docs && make html && cd ../ # build the docs
+  #- stage: build # This stage builds and lints in parallel
+    #if: (branch = master)
+    #name: Build
+    #script: cd docs && make html && cd ../ # build the docs
   - stage: deploy
     #name: Deploy to GitHub Pages
-    if: (NOT type IN (pull_request)) AND (branch = master) # only deploy if merging on master
-    script: cd docs && make html && cd ../
+    #if: (NOT type IN (pull_request)) AND (branch = master) # only deploy if merging on master
+    before_deploy: cd docs && make html && cd ../
     deploy:
       - provider: pages # deploy on github pages
         cleanup: false
         github_token: $GH_TOKEN # defined via the Travis interface
         local_dir: docs/build/html
+        on:
+          branch: master
       - provider: pypi
         user: __token__
         password:
