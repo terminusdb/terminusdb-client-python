@@ -14,7 +14,7 @@ jobs:
     python: '3.6'
     script: coverage
   - stage: build # This stage builds and lints in parallel
-    if: (NOT type IN (pull_request)) AND (branch = master)
+    if: (branch = master)
     name: Build
     script: cd docs && make html && cd ../ # build the docs
   - stage: deploy
