@@ -1,0 +1,703 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>woqlclient &mdash; Terminus Client Python 0.0.4 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="woqlpy" href="woqlpy.html" />
+    <link rel="prev" title="terminus-client-python" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #0055B8" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Terminus Client Python
+          
+
+          
+            
+            <img src="_static/logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">terminus-client-python</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">woqlclient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="woqlpy.html">woqlpy</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Terminus Client Python</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">terminus-client-python</a> &raquo;</li>
+        
+      <li>woqlclient</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/woqlclient.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="woqlclient">
+<h1>woqlclient<a class="headerlink" href="#woqlclient" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="woqlclient.WOQLClient">
+<em class="property">class </em><code class="descclassname">woqlclient.</code><code class="descname">WOQLClient</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The WOQLClient constructor</p>
+<p>:param <a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs Connection arguments used to configure the Client. (db=terminusDBName | server=terminusServerURL | doc=docName | key=apiKey)</p>
+<dl class="method">
+<dt id="woqlclient.WOQLClient.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLClient.connect">
+<code class="descname">connect</code><span class="sig-paren">(</span><em>serverURL=None</em>, <em>key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect to a Terminus server at the given URI with an API key
+Stores the terminus:ServerCapability document returned
+in the conCapabilities register which stores, the url, key, capabilities,
+and database meta-data for the connected server</p>
+<p>If the serverURL argument is omitted,
+self.conConfig.serverURL will be used if present
+or an error will be raise.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>serverURL</strong> (<em>str</em>) – Terminus server URI</li>
+<li><strong>key</strong> (<em>str</em>) – API key</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict or raise an InvalidURIError</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLClient.directConnect">
+<em class="property">static </em><code class="descname">directConnect</code><span class="sig-paren">(</span><em>serverURL</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directConnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>connect directly without create a new class instance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>serverURL</strong> (<em>str</em>) – Terminus server URI</li>
+<li><strong>key</strong> (<em>str</em>) – API key</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict or raise an InvalidURIError</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLClient.createDatabase">
+<code class="descname">createDatabase</code><span class="sig-paren">(</span><em>dbID</em>, <em>label</em>, <em>key=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.createDatabase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Terminus Database by posting
+a terminus:Database document to the Terminus Server</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dbID</strong> (<em>str</em>) – TerminusDB id</li>
+<li><strong>label</strong> (<em>str</em>) – Terminus label</li>
+<li><strong>key</strong> (<em>str</em><em>, </em><em>optional</em>) – you can omit the key if you have set it before</li>
+<li><strong>kwargs</strong> – Optional arguments that <code class="docutils literal notranslate"><span class="pre">createDatabase</span></code> takes</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLClient.directCreateDatabase">
+<em class="property">static </em><code class="descname">directCreateDatabase</code><span class="sig-paren">(</span><em>dbURL</em>, <em>label</em>, <em>key</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directCreateDatabase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create Terminus Database with settings</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dbURL</strong> (<em>str</em>) – TerminusDB full URL like <a class="reference external" href="http://localhost:6363/myDB">http://localhost:6363/myDB</a></li>
+<li><strong>label</strong> (<em>str</em>) – the terminus db title</li>
+<li><strong>key</strong> (<em>str</em>) – the server API key</li>
+<li><strong>kwargs</strong> – Optional arguments that <code class="docutils literal notranslate"><span class="pre">createDatabase</span></code> takes</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLClient.deleteDatabase">
+<code class="descname">deleteDatabase</code><span class="sig-paren">(</span><em>dbID</em>, <em>key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.deleteDatabase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a TerminusDB</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dbID</strong> (<em>str</em>) – terminusDB Id</li>
+<li><strong>key</strong> (<em>str</em><em>, </em><em>optional</em>) – you need the key if you didn’t set before</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLClient.directDeleteDatabase">
+<em class="property">static </em><code class="descname">directDeleteDatabase</code><span class="sig-paren">(</span><em>dbURL</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directDeleteDatabase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a TerminusDB with settings</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dbURL</strong> (<em>str</em>) – TerminusDB full URL like <a class="reference external" href="http://localhost:6363/myDB">http://localhost:6363/myDB</a></li>
+<li><strong>key</strong> (<em>str</em>) – the server API key</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLClient.getSchema">
+<code class="descname">getSchema</code><span class="sig-paren">(</span><em>dbID=None</em>, <em>key=None</em>, <em>options={'terminus:encoding': 'terminus:turtle'}</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.getSchema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the schema of the specified database</p>
+<p>opts.format defines which format is requested, default is turtle(<a href="#id3"><span class="problematic" id="id4">*</span></a>json / turtle)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dbId</strong> (<em>str</em>) – TerminusDB Id or omitted (get last select database)</li>
+<li><strong>key</strong> (<em>str</em>) – the server API key</li>
+<li><strong>options</strong> (<em>dict</em>) – options object</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str or dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLClient.directGetSchema">
+<em class="property">static </em><code class="descname">directGetSchema</code><span class="sig-paren">(</span><em>dbURL</em>, <em>key</em>, <em>options={'terminus:encoding': 'terminus:turtle'}</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directGetSchema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the schema of the specified database with settings</p>
+<p>opts.format defines which format is requested, default is turtle(<a href="#id5"><span class="problematic" id="id6">*</span></a>json / turtle)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dbId</strong> (<em>str</em>) – TerminusDB Id or omitted (get last select database)</li>
+<li><strong>key</strong> (<em>str</em>) – the server API key</li>
+<li><strong>options</strong> (<em>dict</em>) – options object</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str or dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLClient.updateSchema">
+<code class="descname">updateSchema</code><span class="sig-paren">(</span><em>docObj</em>, <em>dbID=None</em>, <em>key=None</em>, <em>opts={'terminus:encoding': 'terminus:turtle'}</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.updateSchema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the Schema of the specified database</p>
+<p>opts.format is used to specify which format is being used (<a href="#id7"><span class="problematic" id="id8">*</span></a>json / turtle)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>docObj</strong> (<em>dict</em>) – valid owl ontology in json-ld or turtle format</li>
+<li><strong>dbid</strong> (<em>str</em>) – TerminusDB Id or omitted</li>
+<li><strong>key</strong> (<em>str</em>) – API key</li>
+<li><strong>opts</strong> (<em>dict</em>) – options object</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLClient.directUpdateSchema">
+<em class="property">static </em><code class="descname">directUpdateSchema</code><span class="sig-paren">(</span><em>dbURL</em>, <em>docObj</em>, <em>key</em>, <em>opt={'terminus:encoding': 'terminus:turtle'}</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directUpdateSchema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the Schema of the specified database with settings</p>
+<p>opts.format is used to specify which format is being used (<a href="#id9"><span class="problematic" id="id10">*</span></a>json / turtle)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dbURL</strong> (<em>str</em>) – a valid TerminusDB full URL</li>
+<li><strong>docObj</strong> (<em>dict</em>) – valid owl ontology in json-ld or turtle format</li>
+<li><strong>key</strong> (<em>str</em>) – API key</li>
+<li><strong>opts</strong> (<em>dict</em>) – options object</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLClient.createDocument">
+<code class="descname">createDocument</code><span class="sig-paren">(</span><em>docObj</em>, <em>documentID</em>, <em>dbID=None</em>, <em>key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.createDocument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new document in the specified database</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>docObj</strong> (<em>dict</em>) – a valid document in json-ld</li>
+<li><strong>documentID</strong> (<em>str</em>) – a valid Terminus document id</li>
+<li><strong>dbId</strong> (<em>str</em>) – a valid TerminusDB id</li>
+<li><strong>key</strong> (<em>str</em><em>, </em><em>optional</em>) – API key</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLClient.directCreateDocument">
+<em class="property">static </em><code class="descname">directCreateDocument</code><span class="sig-paren">(</span><em>docObj</em>, <em>documentID</em>, <em>dbURL</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directCreateDocument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new document in the specified database</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>docObj</strong> (<em>dict</em>) – a valid document in json-ld</li>
+<li><strong>documentID</strong> (<em>str</em>) – a valid Terminus document id</li>
+<li><strong>dbURL</strong> (<em>str</em>) – a valid TerminusDB full URL</li>
+<li><strong>key</strong> (<em>str</em><em>, </em><em>optional</em>) – API key</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLClient.getDocument">
+<code class="descname">getDocument</code><span class="sig-paren">(</span><em>documentID</em>, <em>dbID=None</em>, <em>key=None</em>, <em>opts={'terminus:encoding': 'terminus:frame'}</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.getDocument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves a document from the specified database</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>documentID</strong> (<em>str</em>) – a valid Terminus document id</li>
+<li><strong>dbId</strong> (<em>str</em>) – a valid TerminusDB id</li>
+<li><strong>key</strong> (<em>str</em><em>, </em><em>optional</em>) – API key</li>
+<li><strong>opts</strong> (<em>dict</em>) – options object</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLClient.directGetDocument">
+<em class="property">static </em><code class="descname">directGetDocument</code><span class="sig-paren">(</span><em>documentID</em>, <em>dbURL</em>, <em>key</em>, <em>opts={'terminus:encoding': 'terminus:frame'}</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directGetDocument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves a document from the specified database with URL</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>documentID</strong> (<em>str</em>) – a valid Terminus document id</li>
+<li><strong>dbURL</strong> (<em>str</em>) – a valid TerminusDB full URL</li>
+<li><strong>key</strong> (<em>str</em><em>, </em><em>optional</em>) – API key</li>
+<li><strong>opts</strong> (<em>dict</em>) – options object</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLClient.updateDocument">
+<code class="descname">updateDocument</code><span class="sig-paren">(</span><em>documentID</em>, <em>docObj</em>, <em>dbID=None</em>, <em>key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.updateDocument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates a document in the specified database with a new version</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>documentID</strong> (<em>str</em>) – a valid Terminus document id</li>
+<li><strong>docObj</strong> (<em>dict</em>) – a valid document in json-ld</li>
+<li><strong>dbId</strong> (<em>str</em>) – a valid TerminusDB id</li>
+<li><strong>key</strong> (<em>str</em><em>, </em><em>optional</em>) – API key</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLClient.directUpdateDocument">
+<em class="property">static </em><code class="descname">directUpdateDocument</code><span class="sig-paren">(</span><em>documentID</em>, <em>dbURL</em>, <em>key</em>, <em>docObj</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directUpdateDocument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates a document in the specified database with URL</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>documentID</strong> (<em>str</em>) – a valid Terminus document id</li>
+<li><strong>dbURL</strong> (<em>str</em>) – a valid TerminusDB full URL</li>
+<li><strong>key</strong> (<em>str</em><em>, </em><em>optional</em>) – API key</li>
+<li><strong>docObj</strong> (<em>dict</em>) – a valid document in json-ld</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLClient.deleteDocument">
+<code class="descname">deleteDocument</code><span class="sig-paren">(</span><em>documentID</em>, <em>dbID=None</em>, <em>key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.deleteDocument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a document from the specified database</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>documentID</strong> (<em>str</em>) – a valid Terminus document id</li>
+<li><strong>dbId</strong> (<em>str</em>) – a valid TerminusDB id</li>
+<li><strong>key</strong> (<em>str</em><em>, </em><em>optional</em>) – API key</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLClient.directDeleteDocument">
+<em class="property">static </em><code class="descname">directDeleteDocument</code><span class="sig-paren">(</span><em>self</em>, <em>documentID</em>, <em>dbURL</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directDeleteDocument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a document from the specified database with URL</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>documentID</strong> (<em>str</em>) – a valid Terminus document id</li>
+<li><strong>dbURL</strong> (<em>str</em>) – a valid TerminusDB full URL</li>
+<li><strong>key</strong> (<em>str</em><em>, </em><em>optional</em>) – API key</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLClient.select">
+<code class="descname">select</code><span class="sig-paren">(</span><em>woqlQuery</em>, <em>dbID=None</em>, <em>key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.select" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes a read-only WOQL query on the specified database and returns the results</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>woqlQuery</strong> (<em>WOQLQuery object</em>) – woql query select statement</li>
+<li><strong>dbId</strong> (<em>str</em>) – a valid TerminusDB id</li>
+<li><strong>key</strong> (<em>str</em><em>, </em><em>optional</em>) – API key</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLClient.directSelect">
+<em class="property">static </em><code class="descname">directSelect</code><span class="sig-paren">(</span><em>woqlQuery</em>, <em>dbURL</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directSelect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLClient.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>woqlQuery</em>, <em>dbID=None</em>, <em>key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes a WOQL query on the specified database which updates the state and returns the results</p>
+<p>The first (qurl) argument can be
+1) a valid URL of a terminus database or
+2) omitted - the current database will be used
+the second argument (woql) is a woql select statement encoded as a string
+the third argument (opts) is an options json - opts.key is an optional API key</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLClient.directUpdate">
+<em class="property">static </em><code class="descname">directUpdate</code><span class="sig-paren">(</span><em>woqlQuery</em>, <em>dbURL</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directUpdate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLClient.dispatch">
+<code class="descname">dispatch</code><span class="sig-paren">(</span><em>url</em>, <em>action</em>, <em>connectionKey</em>, <em>payload={}</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.dispatch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="woqlpy.html" class="btn btn-neutral float-right" title="woqlpy" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="modules.html" class="btn btn-neutral float-left" title="terminus-client-python" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Team Terminus
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    <!-- Theme Analytics -->
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-XXXXXXX-1', 'auto');
+    ga('send', 'pageview');
+    </script>
+
+    
+   
+
+</body>
+</html>
