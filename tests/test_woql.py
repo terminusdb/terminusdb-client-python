@@ -228,14 +228,14 @@ class TestWoqlQueries:
         assert woqlObject.json() == jsonObj
 
     def test_order_by_method(self):
-        woqlObject=WOQLQuery().order_by("B")
-        jsonObj={ "order_by": [ {"asc": ['v:B']}, {} ] }
+        woqlObject=WOQLQuery().order_by([WOQLQuery().asc("v:B")])
+        jsonObj={ "order_by": [ [{"asc": ['v:B']}], {} ] }
         assert woqlObject.json() == jsonObj
 
     def test_order_by_method_desc(self):
-        desc=WOQLQuery().desc(["v:C", "v:A"])
+        desc=[WOQLQuery().desc("v:C"), WOQLQuery().desc("v:A")]
         woqlObject=WOQLQuery().order_by(desc)
-        jsonObj={ "order_by": [ {"desc": ['v:C', "v:A"]}, {} ] }
+        jsonObj={ "order_by": [ [ {"desc": ['v:C']}, {"desc" : ["v:A"]} ], {} ] }
         assert woqlObject.json() == jsonObj
 
 

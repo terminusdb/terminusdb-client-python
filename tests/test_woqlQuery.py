@@ -3,9 +3,9 @@ import unittest.mock as mock
 from woqlclient import WOQLQuery
 from woqlclient import WOQLClient
 
-test_client = WOQLClient({'server':"http://localhost:6363",
-                    'key':'mykey',
-                    'db':'mydb'})
+test_client = WOQLClient(server="http://localhost:6363",
+                         key="mykey",
+                         db="mydb")
 
 @mock.patch('requests.get')
 def test_database_document_id(mocked_requests):

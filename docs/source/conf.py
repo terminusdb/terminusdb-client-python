@@ -15,6 +15,7 @@ import sys
 sys.path.insert(0, os.path.abspath('../..'))
 
 import sphinx_rtd_theme
+from woqlclient import __version__
 
 
 # -- Project information -----------------------------------------------------
@@ -23,8 +24,10 @@ project = 'Terminus Client Python'
 copyright = '2020, Team Terminus'
 author = 'Team Terminus'
 
+# The short X.Y version.
+version = __version__
 # The full version, including alpha/beta/rc tags
-release = '0.0.4'
+release = version
 
 master_doc = 'index'
 

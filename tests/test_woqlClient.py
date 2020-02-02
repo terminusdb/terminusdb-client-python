@@ -3,7 +3,7 @@ import requests
 #import sys
 #sys.path.append('woqlclient')
 import unittest.mock as mock
-from .mockResponse import mocked_requests
+from mockResponse import mocked_requests
 import json
 import os
 
@@ -48,8 +48,8 @@ def test_Connection(mocked_requests, monkeypatch):
 
 @mock.patch('requests.get',side_effect=mocked_requests)
 def test_createDatabaseConnectMode(mocked_requests):
-	__woqlClient__= WOQLClient({'server':"http://localhost:6363"
-							    ,'key':'mykey'})
+	__woqlClient__= WOQLClient(server="http://localhost:6363"
+							    ,key='mykey')
 	print('__woqlClient__' ,__woqlClient__.conConfig.serverURL)
 
 	__woqlClient__.connect();
@@ -73,7 +73,7 @@ def test_directCreateDatabase(mocked_requests):
 @mock.patch('requests.delete',side_effect=mocked_requests)
 @mock.patch('requests.get',side_effect=mocked_requests)
 def test_deleteDatabase(mocked_requests, mocked_requests2, monkeypatch):
-	__woqlClient__= WOQLClient({"server":"http://localhost:6363",'key':"mykey"})
+	__woqlClient__= WOQLClient(server="http://localhost:6363",key="mykey")
 
 	__woqlClient__.connect()
 
@@ -95,13 +95,13 @@ def test_directDeleteDatabase(mocked_requests):
 
 @mock.patch('requests.get',side_effect=mocked_requests)
 def test_getSchema(mocked_requests, monkeypatch):
-	__woqlClient__= WOQLClient({"server":"http://localhost:6363",'key':"mykey",'db':'myFirstTerminusDB'})
+	__woqlClient__= WOQLClient(server="http://localhost:6363",key="mykey",db='myFirstTerminusDB')
 
 	__woqlClient__.connect()
 
-	
+
 	 #getSchema with no parameter
-	
+
 
 	monkeypatch.setattr(__woqlClient__.conCapabilities, "capabilitiesPermit", mock_func_with_1arg)
 

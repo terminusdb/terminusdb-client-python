@@ -5,6 +5,7 @@ test:
 	# This runs all of the tests, on both Python 2 and Python 3.
 	detox
 ci:
+	pip3 install -e .
 	pipenv run py.test tests  --junitxml=report.xml
 
 test-readme:
@@ -18,8 +19,14 @@ coverage:
 
 #command line for publish the module
 #using twine to upload packages to PyPI https://pypi.org/project/twine/
-#publish:
+publish:
 	#pip install 'twine>=1.5.0'
+	pip install bumpversion
+	bumpversion patch
 	#python setup.py sdist bdist_wheel
 	#twine upload dist/*
 	#rm -fr build dist .egg requests.egg-info
+	git config --global user.email "travis@travis-ci.org"
+	git config --global user.name "Travis CI"
+	git remote set-url origin https://${GH_TOKEN}@github.com/terminusdb/terminus-client-python
+	git push origin master --tags

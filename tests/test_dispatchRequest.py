@@ -6,7 +6,7 @@ import pytest
 import json
 import requests
 
-from .mockResponse import *
+from mockResponse import *
 from woqlclient import DocumentTemplate
 
 from pytest_mock import mocker

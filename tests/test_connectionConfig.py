@@ -22,14 +22,16 @@ def test_connectionConfig_noParameter():
 
 
 def test_connectionConfig_withParameter():
+	
 	startParameters={"server":"http://localhost:6363/",
 					 "db":"myFirstTerminusDB",
 					 "doc":"chess",
 					 "connected_mode":False,
 					 "include_key":False,
 					 "checks_capabilities":False}
+	
 
-	connectionConfig=ConnectionConfig(startParameters)
+	connectionConfig=ConnectionConfig(**startParameters)
 
 	assert connectionConfig.serverURL== "http://localhost:6363/"
 	assert connectionConfig.dbID== "myFirstTerminusDB"

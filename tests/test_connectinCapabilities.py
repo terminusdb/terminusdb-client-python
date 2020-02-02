@@ -34,7 +34,7 @@ def test_connectionCapabilities_noParameter():
 def test_addConnection():
 	#No server url in intialization
 
-	conConfig=ConnectionConfig({"server":"http://localhost:6363"})
+	conConfig=ConnectionConfig(server="http://localhost:6363")
 	conCapabilities=ConnectionCapabilities(conConfig,'mykey')
 
 	assert ({"http://localhost:6363/":{'key':"mykey"}}==conCapabilities.connection)==True
@@ -54,7 +54,7 @@ def test_addConnection():
 
 
 def test_set_getClientKey():
-	conConfig=ConnectionConfig({"server":"http://localhost:6363"})
+	conConfig=ConnectionConfig(server="http://localhost:6363")
 	conCapabilities=ConnectionCapabilities(conConfig)
 
 	conCapabilities.setClientKey("mykey")
@@ -67,7 +67,7 @@ def test_set_getClientKey():
 
 
 def test_capabilitiesPermit():
-	conConfig=ConnectionConfig({"server":"http://localhost:6363","db":"myFirstTerminusDB"})
+	conConfig=ConnectionConfig(server="http://localhost:6363",db="myFirstTerminusDB")
 	conCapabilities=ConnectionCapabilities(conConfig,'mykey')
 
 	with open('tests/capabilitiesResponseNoAllAction.json') as json_file:
@@ -87,7 +87,7 @@ def test_capabilitiesPermit():
 
 
 def test_deleteDatabaseForTheConnectionList():
-	conConfig=ConnectionConfig({"server":"http://localhost:6363","db":"myFirstTerminusDB"})
+	conConfig=ConnectionConfig(server="http://localhost:6363",db="myFirstTerminusDB")
 	conCapabilities=ConnectionCapabilities(conConfig,'mykey')
 
 	with open('tests/capabilitiesResponse.json') as json_file:

@@ -4,7 +4,7 @@ from .idParser import IDParser
 
 class ConnectionConfig:
 
-    def __init__(self, params={}):
+    def __init__(self, **kwargs):
         self.__idParser = IDParser()
 
         """
@@ -17,17 +17,17 @@ class ConnectionConfig:
         # client side checking of access control (in addition to server-side access control)
         self.__checks_capabilities = True
 
-        if 'server' in params:
-            self.setServer(params['server'])
-        if 'db' in params:
-            self.setDB(params['db'])
-        if 'doc' in params:
-            self.setDocument(params['doc'])
-        if 'connected_mode' in params and params['connected_mode'] is False:
+        if 'server' in kwargs:
+            self.setServer(kwargs.get('server'))
+        if 'db' in kwargs:
+            self.setDB(kwargs.get('db'))
+        if 'doc' in kwargs:
+            self.setDocument(kwargs.get('doc'))
+        if 'connected_mode' in kwargs and kwargs.get('connected_mode') is False:
             self.__connected_mode = False
-        if 'include_key' in params and params['include_key'] is False:
+        if 'include_key' in kwargs and kwargs.get('include_key') is False:
             self.__include_key = False
-        if 'checks_capabilities' in params and params['checks_capabilities'] is False:
+        if 'checks_capabilities' in kwargs and kwargs.get('checks_capabilities') is False:
             self.__checks_capabilities = False
 
     def deletedbID(self, dbName):
