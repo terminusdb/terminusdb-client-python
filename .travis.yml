@@ -24,7 +24,7 @@ jobs:
     deploy:
       - provider: pages # deploy on github pages
         cleanup: false
-        github_token: $GH_TOKEN # defined via the Travis interface
+        github_token: $GITHUB_TOKEN # defined via the Travis interface
         local_dir: docs/build/html
         on:
           branch: master
