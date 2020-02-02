@@ -23,7 +23,7 @@ jobs:
     before_deploy: cd docs && make html && cd ../
     deploy:
       - provider: pages # deploy on github pages
-        cleanup: false
+        skip_cleanup: true
         github_token: $GITHUB_TOKEN # defined via the Travis interface
         local_dir: docs/build/html
         on:
