@@ -20,6 +20,9 @@ Python terminus client for TerminusDB API and WOQLpy
 ## Usage
 For the [full Documentation](https://terminus-client-python.readthedocs.io/)
 
+## Tutorials
+Visit [terminus-tutorials](https://github.com/terminusdb/terminus-tutorials) for tutorial scripts
+
 ## Testing
 * Clone this repository
 `git clone https://github.com/terminusdb/terminus-client-python.git`
