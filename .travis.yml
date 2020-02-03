@@ -20,7 +20,7 @@ jobs:
   - stage: deploy
     #name: Deploy to GitHub Pages
     #if: (NOT type IN (pull_request)) AND (branch = master) # only deploy if merging on master
-    before_deploy: cd docs && make html && cd ../
+    before_deploy: cd docs && touch .nojekyll && make html && cd ../
     deploy:
       - provider: pages # deploy on github pages
         skip_cleanup: true
