@@ -20,7 +20,7 @@ coverage:
 #command line for release: bumpversion (patch), tag and push
 publish:
 	pip install -U bumpversion
-	git remote add upstream git@github.com:terminusdb/terminus-client-python.git
+	#git remote add upstream git@github.com:terminusdb/terminus-client-python.git
 	git checkout master
 	git pull upstream master
 	bumpversion patch
