@@ -24,8 +24,8 @@ jobs:
     deploy:
       - provider: pages # deploy on github pages
         skip_cleanup: true
-        github_token:
-          secure: nQrHvpvJO4nrO49Cv2AiRFdmpldJr3VBKG+ZvkntH5+BTZUu3Jf9YRvNZhOEzA8+DJqdmA1ZvHSTVe8ABtpIfZjdzfMdfQjVC3y4Ky6pSozDTxaXaXPCM206RmBiwqzdWli++UOBm+nwDPKmfGxtQZnDgQ5MjxKfPUq9ItnwAV2mJ7SuLTAKzqxOE3lnDFeznFq09mD6fok4CW7iicSENH1HaJ6n535F6eIzhzwtyIIHuMvsVGK1A69vxUx6EEyX/La//3QCKKKqGCFg2N23Lar9hxaBTPFBTislODA7kRmIHJVdWyGiB2W4vUs0QUpWmIxRwWHG4qVpj1N23q6utT8o98GfnwVR1wCfdpmWmNbRTniaKTS30/OZcbO/W4LupR0cKPD5dClP/FaRWpTToTA8Yd8SFAjpkDzl+9I7m2xB7oGqPgG7O5Mb4UXNXBbmBAY6MIDh7iIcpm0DRJIl6QeMqOrHm0cSUTGOqVGOmsdFBr3aG9lvrktzU8WhStPHIW7RkHu+i4Wdk6Olv5KNLf0+Dhsh6w6Vd99o3DY2oBs2wBJTDXF8HLWKvAH6R+jT8mmFQa21Z5ckuGFcRlTRhmIMyoqd9kYF+jeDRR42w7TmWzumSVb/F4cq9xwbC58ujkSYw6BCpgsHPNODxZdBMXuC7uOqdof2mQACNhO2+og=
+        github_token: $GITHUB_TOKEN
+        keep_history: true
         local_dir: docs/build/html
         on:
           branch: master
