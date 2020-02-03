@@ -21,8 +21,8 @@ from woqlclient import __version__
 # -- Project information -----------------------------------------------------
 
 project = 'Terminus Client Python'
-copyright = '2020, Team Terminus'
-author = 'Team Terminus'
+copyright = '2020, TerminusDB group'
+author = 'TerminusDB group'
 
 # The short X.Y version.
 version = __version__
