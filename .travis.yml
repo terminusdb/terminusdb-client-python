@@ -25,7 +25,7 @@ jobs:
       - provider: pages # deploy on github pages
         skip_cleanup: true
         github_token:
-          secure: TaZ22Dtymptib5jqGyUADzdAjvj+WMd9IgbsOindbfQUJ/KucmoHE8hqTs/f+6J1e/ALwkosILEKy8DSiDqIFE32/TXrIQqK2b9fDhgyZDnMo+s9EUswTM/NDLYAXKpjM87UDtkxQbOf5TWkBeux2jXVlD3RW1ZEgMAVDarpLsu968uyiAQw59ik1Qt2t1uhdbtbdmv6nPrnRh+DtqD0EtrQHTLDxK9ARBJBd3Tg58JE/UE7FiRtVGgVtZnFh+rYVNrdxdk7Z6vcOC+Qv98XFs/oTg8akwgV6J1lyP4QtMDWgNLZpVf32iPZuvVghSDHo5wZw37CTX3Q2S8YK4H4mNKwOJJNREK6Jwsc80SpQ5tyBU5anSlAmUq7H5acVCRClwgN7v/K72WXtzkth4hO1UQVNZcqRFywzYHkAUE0oxfdgA42fNHYb30bYuE/1zXmMzTvqHqFaLFxSriKJ4g0yA/gSRslmQQ+1nJVGZpEOqTx94J1sKg2KB48myPLAPyWeyX576uHrfeX66jNi8I6jEanNgGWucTbIN9vy1iJtw28vbDTb9geB+le2BT5BLoJk4vbcoK8nRCl5DFwSTWbtJCpYSLepDl0BHdGaacP+NgR8DNe4R3Rznw9CCvisrFaEnb84xUM0hDEyN92pCm9x9hfu3riYqw2pAII7nuRfk8=
+          secure: P1jBvvXa+6q4263AgWm/WxMvCNe5/jin8FyBXGMhoJCgfq1WMxmfjTCsS82aQl14bYOnNkkNubZUGGZfmS8S+6koH6MKhPuNKqQNPqxn8W7X09ZEH4JRCRPPN9IyrO+YOJf9QZsMGvo+SbYwH3UOCxGucQRN/Or74I2+U93Vlq17+J6o7MOvYxNEbUSbbbeVus45JFSUpGZR+80dfl4KakkK82U44TKFyAfp8cO27oanXiPxzQwzCX2m34MsI96qjBZ41HymitOeXDIbH8XV5SnrrzWJ9BQCkUvwkM7Id9WmIlz9voXdyrvJ3/A9pUnyAmm/TlKNCRWWHXPvFgjEVleG3A8sDZA0Ux+Drfan59ITKmUrWZ7WGXOxBZ3z2dEL/0C9vTQoxFro9ZYhfwRYj34GT6cdF1jZzaPX/fjR4eVmOdqJCnToVUWDGjGCXPt7LrPtdH769OyV+shQCbhrbnhXxOIhB6LqDye50yDVQDC52BrCTL61J5U9PQtY9LVFgSz+Z4ttHY0woJfysYWDLwY/UkRopwHzPojpOEhPMyKm5Idx2LL6fuMKiYJq91CQh5EEfrqCiTS330JUgmtejezemcU4Txtg/oEi+Tqay6vH75ZKx6q/U3zA/rV06cpYXd9Vc9TKUd9TsunFroD2kt7ipFHqEhE7QRwrdL4KW2E=
         local_dir: docs/build/html
         on:
           branch: master
