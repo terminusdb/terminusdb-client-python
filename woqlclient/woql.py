@@ -1586,7 +1586,10 @@ class WOQLQuery:
                 domain(self.adding_class)
                 nwoql.query["and"].append(self.json())
                 nwoql.adding_class = self.adding_class
-                return nwoql
+                self.query = nwoql.query
+                self.cursor = nwoql.cursor
+                self.tripleBuilder = nwoql.tripleBuilder
+                return self
             p = self._clean_predicate(p)
             self.tripleBuilder.addPO(p, val)
         return self

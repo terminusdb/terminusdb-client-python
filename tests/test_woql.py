@@ -500,3 +500,14 @@ class TestTripleBuilderChainer:
         { "add_quad": ["scm:prop2", "rdfs:label", {"@value": "abe", "@language": "en"}, "db:schema"] }
         ]}
         assert woqlObject.json() == jsonObj
+
+    def test_chained_property_method(self):
+        woqlObject = WOQLQuery().doctype("Journey")
+        woqlObject = woqlObject.property(
+        "start_station", "Station").label("Start Station")
+
+        woqlObject2 = WOQLQuery().doctype("Journey")
+        woqlObject2.property(
+        "start_station", "Station").label("Start Station")
+
+        assert woqlObject.json() == woqlObject2.json()
