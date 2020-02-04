@@ -26,4 +26,4 @@ publish:
 	bumpversion patch
 	git push upstream dev
 	git push upstream dev:master
-	git push upstream master --tags
+	git push upstream --tags
