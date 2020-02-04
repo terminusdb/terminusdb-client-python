@@ -5,7 +5,7 @@ test:
 	# This runs all of the tests, on both Python 2 and Python 3.
 	detox
 ci:
-	pip3 install -e .
+	#pip3 install -e .
 	pipenv run py.test tests  --junitxml=report.xml
 
 test-readme:
@@ -26,4 +26,4 @@ publish:
 	bumpversion patch
 	git push upstream dev
 	git push upstream dev:master
-	git push upstream master --tags
+	git push upstream --tags
