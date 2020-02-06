@@ -221,7 +221,8 @@ class WOQLQuery:
         """
         if opts is not None:
             self.cursor['remote'] = [url, opts]
-        self.cursor['remote'] = [url];
+        else:
+            self.cursor['remote'] = [url]
         return self
 
     def post(self, field, opts=None):
@@ -240,8 +241,8 @@ class WOQLQuery:
         """
         if opts is not None:
             self.cursor['post'] = [field, opts]
-        self.cursor['post'] = [field];
-        print("Cursor: {}".format(self.cursor))
+        else:
+            self.cursor['post'] = [field]
         return self
 
 
@@ -261,7 +262,8 @@ class WOQLQuery:
         """
         if opts is not None:
             self.cursor['file'] = [json, opts]
-        self.cursor['file'] = [json];
+        else:
+            self.cursor['file'] = [json]
         return self
 
     def group_by(self, gvarlist, groupedvar, groupquery, output=None):
