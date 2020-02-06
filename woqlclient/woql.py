@@ -206,13 +206,12 @@ class WOQLQuery:
         self.cursor['length'] = [va, vb];
         return self
 
-    def remote(self, json, opts=None):
+    def remote(self, url, opts=None):
         """Provides details of a remote data source in a JSON format that includes a URL property
 
         Parameters
         ----------
-        json : dict
-            remote data source in a JSON format
+        url : remote data source url
         opts : input options, optional
 
         Returns
@@ -221,19 +220,17 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         if opts is not None:
-            self.cursor['remote'] = [json, opts]
-        self.cursor['remote'] = [json];
+            self.cursor['remote'] = [url, opts]
+        self.cursor['remote'] = [url];
         return self
 
-    def post(self, json, fileName, opts=None):
+    def post(self, field, opts=None):
         """Provides details of a file source in a JSON format that includes a URL property
 
         Parameters
         ----------
-        json : dict
-            file data source in a JSON format
         fileName : str
-            the file's name
+            field
         opts : input options, optional
 
         Returns
@@ -242,8 +239,8 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         if opts is not None:
-            self.cursor['post'] = [json, fileName,opts]
-        self.cursor['post'] = [json, fileName];
+            self.cursor['post'] = [field, opts]
+        self.cursor['post'] = [field];
         return self
 
 
