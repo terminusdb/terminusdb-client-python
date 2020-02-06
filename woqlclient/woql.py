@@ -232,6 +232,8 @@ class WOQLQuery:
         ----------
         json : dict
             file data source in a JSON format
+        fileName : str
+            the file's name
         opts : input options, optional
 
         Returns
