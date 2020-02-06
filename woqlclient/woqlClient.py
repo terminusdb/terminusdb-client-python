@@ -448,7 +448,7 @@ class WOQLClient:
 
         return DispatchRequest.sendRequestByAction(idParser.docURL(), const.DELETE_DOCUMENT, key)
 
-    def select(self, woqlQuery, dbID=None, key=None):
+    def select(self, woqlQuery, dbID=None, key=None,fileList=None):
         """
         Executes a read-only WOQL query on the specified database and returns the results
 
@@ -465,17 +465,22 @@ class WOQLClient:
             self.conConfig.setDB(dbID)
 
         payload = {'terminus:query': json.dumps(woqlQuery)}
+        if type(fileList) == dict:
+            payload.update(fileList);
+
         return self.dispatch(self.conConfig.queryURL(), const.WOQL_SELECT, key, payload)
 
     @staticmethod
-    def directSelect(woqlQuery, dbURL, key):
+    def directSelect(woqlQuery, dbURL, key, fileList=None):
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
 
         payload = {'terminus:query': json.dumps(woqlQuery)}
+        if type(fileList) == dict:
+            payload.update(fileList);
         return DispatchRequest.sendRequestByAction(idParser.queryURL(), const.WOQL_SELECT, key, payload)
 
-    def update(self, woqlQuery, dbID=None, key=None):
+    def update(self, woqlQuery, dbID=None, key=None ,fileList=None):
         """
         Executes a WOQL query on the specified database which updates the state and returns the results
 
@@ -489,14 +494,19 @@ class WOQLClient:
             self.conConfig.setDB(dbID)
             # raise InvalidURIError(ErrorMessage.getInvalidURIMessage(docurl, "Update"))
         payload = {'terminus:query': json.dumps(woqlQuery)}
+        if type(fileList) == dict:
+            payload.update(fileList);
+
         return self.dispatch(self.conConfig.queryURL(), const.WOQL_UPDATE, key, payload)
 
     @staticmethod
-    def directUpdate(woqlQuery, dbURL, key):
+    def directUpdate(woqlQuery, dbURL, key,fileList=None):
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
 
         payload = {'terminus:query': json.dumps(woqlQuery)}
+        if type(fileList) == dict:
+            payload.update(fileList);
         return DispatchRequest.sendRequestByAction(idParser.queryURL(), const.WOQL_UPDATE, key, payload)
 
     def dispatch(self, url, action, connectionKey, payload={}):

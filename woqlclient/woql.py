@@ -225,6 +225,26 @@ class WOQLQuery:
         self.cursor['remote'] = [json];
         return self
 
+    def post(self, json, opts=None):
+        """Provides details of a file source in a JSON format that includes a URL property
+
+        Parameters
+        ----------
+        json : dict
+            file data source in a JSON format
+        opts : imput options, optional
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if opts is not None:
+            self.cursor['post'] = [json, opts]
+        self.cursor['post'] = [json];
+        return self
+
+
     def file(self, json, opts=None):
         """Provides details of a file source in a JSON format that includes a URL property
 
@@ -2342,7 +2362,7 @@ class WOQLQuery:
 
     def _is_chainable(self, operator, lastArg=None):
         """Determines whether a given operator can have a chained query as its last argument"""
-        non_chaining_operators = ["and", "or", "remote", "file", "re"]
+        non_chaining_operators = ["and", "or", "remote", "file", "re","post"]
         if (lastArg is not None and type(lastArg) == dict and
             '@value' not in lastArg and
             '@type' not in lastArg and
@@ -2355,21 +2375,23 @@ class WOQLQuery:
         else:
             return False
 
-    def execute(self, client):
+    def execute(self, client, fileList=None):
         """Executes the query using the passed client to connect to a server
 
         Parameters
         ----------
         client : woqlClient
         """
+        
         if "@context" not in self.query:
             self.query['@context'] = self._default_context(client.conConfig.dbURL())
         json = self.json()
         if self.contains_update:
-            return client.select(json)
-            #return client.update(json)
+            #return client.select(json)
+            return client.update(json,None,None,fileList)
         else:
-            return client.select(json)
+            #return client.select(json)
+            return client.update(json,None,None,fileList)
 
 
 class TripleBuilder:
