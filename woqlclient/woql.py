@@ -123,7 +123,7 @@ class WOQLQuery:
                         c = {"@value": c}
                     clauses.append({'as': [c, v]})
                 else:
-                    if hasattr(a, 'as') or ('as' in a):
+                    if hasattr(v, 'woql_as') or ('as' in v):
                         clauses.append(v)
                     else:
                         clauses.append({'as': [v]})
@@ -471,12 +471,12 @@ class WOQLQuery:
         self.cursor['re'] = [pattern, test, matches]
         return self
 
-    def concat(self, list, v):
+    def concat(self, lst, v):
         """Concatenates the list of variables into a string and saves the result in v
 
         Parameters
         ----------
-        list : list
+        lst : list
             list of variables to concatenate
         v : str
             saves the results
@@ -486,17 +486,17 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        if type(list) == str:
-            nlist = re.split('(v:[\w_]+)\\b', list)
+        if type(lst) == str:
+            nlist = re.split('(v:[\w_]+)\\b', lst)
             for i in range(1,len(nlist)):
                 if (nlist[i-1][len(nlist[i-1])-1:] == "v") and \
                    (nlist[i][:1] == ":"):
                    nlist[i-1] = nlist[i-1][:len(nlist[i-1])-1]
                    nlist[i] = nlist[i][1:]
-        elif 'list' in list:
-            nlist = list['list']
-        elif isinstance(list, (list, dict, WOQLQuery)):
-            nlist = list
+        elif 'list' in lst:
+            nlist = lst['list']
+        elif isinstance(lst, (list, dict, WOQLQuery)):
+            nlist = lst
         args = []
         for item in nlist:
             if (not item):
@@ -508,7 +508,7 @@ class WOQLQuery:
                     nvalue = {"@value": item, "@type": "xsd:string"}
                     args.append(nvalue)
             elif item:
-                args.append(nlist[i])
+                args.append(item)
 
         if v.find(":") == -1:
             v = "v:" + v
