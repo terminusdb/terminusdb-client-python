@@ -241,6 +241,7 @@ class WOQLQuery:
         if opts is not None:
             self.cursor['post'] = [field, opts]
         self.cursor['post'] = [field];
+        print("Cursor: {}".format(self.cursor))
         return self
 
 
