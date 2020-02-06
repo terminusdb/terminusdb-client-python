@@ -124,7 +124,7 @@ class WOQLQuery:
                     clauses.append({'as': [c, v]})
                 else:
                     if hasattr(v, 'woql_as') or ('as' in v):
-                        clauses.append(v)
+                        clauses += v.json()
                     else:
                         clauses.append({'as': [v]})
         return clauses
@@ -667,6 +667,7 @@ class WOQLQuery:
         if json:
             self.query = json
             return self
+
         return self.query
 
     def when(self, Query, Update=None):
