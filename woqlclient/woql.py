@@ -213,7 +213,7 @@ class WOQLQuery:
         ----------
         json : dict
             remote data source in a JSON format
-        opts : imput options, optional
+        opts : input options, optional
 
         Returns
         -------
@@ -225,14 +225,14 @@ class WOQLQuery:
         self.cursor['remote'] = [json];
         return self
 
-    def post(self, json, opts=None):
+    def post(self, json, fileName, opts=None):
         """Provides details of a file source in a JSON format that includes a URL property
 
         Parameters
         ----------
         json : dict
             file data source in a JSON format
-        opts : imput options, optional
+        opts : input options, optional
 
         Returns
         -------
@@ -240,8 +240,8 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         if opts is not None:
-            self.cursor['post'] = [json, opts]
-        self.cursor['post'] = [json];
+            self.cursor['post'] = [json, fileName,opts]
+        self.cursor['post'] = [json, fileName];
         return self
 
 

@@ -186,6 +186,11 @@ class TestWoqlQueries:
         jsonObj={ 'remote': [ { 'url': 'http://url' } ] }
         assert woqlObject.json() == jsonObj
 
+    def test_post_method(self):
+        woqlObject=WOQLQuery().post("my_json_file",{'type': "panda_json"})
+        jsonObj={"post":["my_json_file",  {"type":"panda_json"} ]}
+        assert woqlObject.json() == jsonObj
+
     def test_idgen_method(self):
         woqlObject=WOQLQuery().idgen("doc:Station",["v:Start_ID"],"v:Start_Station_URL")
         jsonObj={ "idgen": [ 'doc:Station', { "list": ["v:Start_ID"] }, 'v:Start_Station_URL' ] }
