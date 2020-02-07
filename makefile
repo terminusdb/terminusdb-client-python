@@ -2,8 +2,7 @@ init:
 	pip3 install pipenv --upgrade
 	pipenv install --dev
 test:
-	# This runs all of the tests, on both Python 2 and Python 3.
-	detox
+	pytest tests/
 ci:
 	pip3 install -e .
 	pipenv run py.test tests  --junitxml=report.xml

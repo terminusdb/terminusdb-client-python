@@ -493,7 +493,6 @@ class WOQLClient:
         if(dbID):
             self.conConfig.setDB(dbID)
             # raise InvalidURIError(ErrorMessage.getInvalidURIMessage(docurl, "Update"))
-        payload = {'terminus:query': json.dumps(woqlQuery)}
         if type(fileList) == dict:
             file_dict = {}
             for name in fileList:
@@ -502,8 +501,10 @@ class WOQLClient:
                 print(name)
                 file_dict[name] = (name,stream,'text/plain')
             file_dict['terminus:query'] = (None,json.dumps(woqlQuery),'application/json')
+            payload = None
         else:
             file_dict = None
+            payload = {'terminus:query': json.dumps(woqlQuery)}
 
         return self.dispatch(self.conConfig.queryURL(), const.WOQL_UPDATE, key, payload, file_dict)
 
@@ -512,7 +513,6 @@ class WOQLClient:
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
 
-        payload = {'terminus:query': json.dumps(woqlQuery)}
         if type(fileList) == dict:
             file_dict = {}
             for name in fileList:
@@ -521,8 +521,10 @@ class WOQLClient:
                 print(name)
                 file_dict[name] = (name,stream,'text/plain')
             file_dict['terminus:query'] = (None,json.dumps(woqlQuery),'application/json')
+            payload = None
         else:
             file_dict = None
+            payload = {'terminus:query': json.dumps(woqlQuery)}
 
         return DispatchRequest.sendRequestByAction(idParser.queryURL(), const.WOQL_UPDATE, key, payload, file_dict)
 
