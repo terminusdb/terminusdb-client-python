@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>woqlclient &mdash; Terminus Client Python 0.0.12 documentation</title>
+  <title>woqlclient &mdash; Terminus Client Python 0.0.8 documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                0.0.12
+                0.0.8
               </div>
             
           
@@ -592,7 +592,7 @@ a terminus:Database document to the Terminus Server</p>
 
 <dl class="method">
 <dt id="woqlclient.WOQLClient.select">
-<code class="descname">select</code><span class="sig-paren">(</span><em>woqlQuery</em>, <em>dbID=None</em>, <em>key=None</em>, <em>fileList=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.select" title="Permalink to this definition">¶</a></dt>
+<code class="descname">select</code><span class="sig-paren">(</span><em>woqlQuery</em>, <em>dbID=None</em>, <em>key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.select" title="Permalink to this definition">¶</a></dt>
 <dd><p>Executes a read-only WOQL query on the specified database and returns the results</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -611,12 +611,12 @@ a terminus:Database document to the Terminus Server</p>
 
 <dl class="method">
 <dt id="woqlclient.WOQLClient.directSelect">
-<em class="property">static </em><code class="descname">directSelect</code><span class="sig-paren">(</span><em>woqlQuery</em>, <em>dbURL</em>, <em>key</em>, <em>fileList=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directSelect" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">directSelect</code><span class="sig-paren">(</span><em>woqlQuery</em>, <em>dbURL</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directSelect" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="woqlclient.WOQLClient.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>woqlQuery</em>, <em>dbID=None</em>, <em>key=None</em>, <em>fileList=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.update" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update</code><span class="sig-paren">(</span><em>woqlQuery</em>, <em>dbID=None</em>, <em>key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Executes a WOQL query on the specified database which updates the state and returns the results</p>
 <p>The first (qurl) argument can be
 1) a valid URL of a terminus database or
@@ -627,12 +627,12 @@ the third argument (opts) is an options json - opts.key is an optional API key</
 
 <dl class="method">
 <dt id="woqlclient.WOQLClient.directUpdate">
-<em class="property">static </em><code class="descname">directUpdate</code><span class="sig-paren">(</span><em>woqlQuery</em>, <em>dbURL</em>, <em>key</em>, <em>fileList=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directUpdate" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">directUpdate</code><span class="sig-paren">(</span><em>woqlQuery</em>, <em>dbURL</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directUpdate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="woqlclient.WOQLClient.dispatch">
-<code class="descname">dispatch</code><span class="sig-paren">(</span><em>url</em>, <em>action</em>, <em>connectionKey</em>, <em>payload={}</em>, <em>file_dict=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.dispatch" title="Permalink to this definition">¶</a></dt>
+<code class="descname">dispatch</code><span class="sig-paren">(</span><em>url</em>, <em>action</em>, <em>connectionKey</em>, <em>payload={}</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.dispatch" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
