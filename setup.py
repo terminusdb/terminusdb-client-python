@@ -19,7 +19,7 @@ test_requirements = [
 
 setuptools.setup(
     name="terminus-client-python",
-    version="0.0.10",
+    version="0.0.11",
     author="TerminusDB group",
     author_email="terminusdatabase@gmail.com",
     description="Python client for Terminus DB",
