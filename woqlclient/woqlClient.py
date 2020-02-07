@@ -495,9 +495,17 @@ class WOQLClient:
             # raise InvalidURIError(ErrorMessage.getInvalidURIMessage(docurl, "Update"))
         payload = {'terminus:query': json.dumps(woqlQuery)}
         if type(fileList) == dict:
-            payload.update(fileList);
+            file_dict = {}
+            for name in fileList:
+                path = fileList[name]
+                stream = open(path, 'rb')
+                print(name)
+                file_dict[name] = (name,stream,'text/plain')
+            file_dict['terminus:query'] = (None,json.dumps(woqlQuery),'application/json')
+        else:
+            file_dict = None
 
-        return self.dispatch(self.conConfig.queryURL(), const.WOQL_UPDATE, key, payload)
+        return self.dispatch(self.conConfig.queryURL(), const.WOQL_UPDATE, key, payload, file_dict)
 
     @staticmethod
     def directUpdate(woqlQuery, dbURL, key,fileList=None):
@@ -506,10 +514,19 @@ class WOQLClient:
 
         payload = {'terminus:query': json.dumps(woqlQuery)}
         if type(fileList) == dict:
-            payload.update(fileList);
-        return DispatchRequest.sendRequestByAction(idParser.queryURL(), const.WOQL_UPDATE, key, payload)
+            file_dict = {}
+            for name in fileList:
+                path = fileList[name]
+                stream = open(path, 'rb')
+                print(name)
+                file_dict[name] = (name,stream,'text/plain')
+            file_dict['terminus:query'] = (None,json.dumps(woqlQuery),'application/json')
+        else:
+            file_dict = None
 
-    def dispatch(self, url, action, connectionKey, payload={}):
+        return DispatchRequest.sendRequestByAction(idParser.queryURL(), const.WOQL_UPDATE, key, payload, file_dict)
+
+    def dispatch(self, url, action, connectionKey, payload={}, file_dict = None):
         if connectionKey is None:
             # if the api key is not setted the method raise an APIerror
             connectionKey = self.conCapabilities.getClientKey()
@@ -523,4 +540,4 @@ class WOQLClient:
         #check if we can perform this action or raise an AccessDeniedError error
         #review the access control
         #self.conCapabilities.capabilitiesPermit(action)
-        return DispatchRequest.sendRequestByAction(url, action, connectionKey, payload)
+        return DispatchRequest.sendRequestByAction(url, action, connectionKey, payload, file_dict)

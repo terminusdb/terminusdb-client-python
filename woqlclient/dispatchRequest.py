@@ -23,9 +23,12 @@ class DispatchRequest:
         return requests.get(url, headers=headers)
 
     @staticmethod
-    def __postCall(url, headers, payload):
-        headers['content-type'] = 'application/json'
-        return requests.post(url, json=payload, headers=headers)
+    def __postCall(url, headers, payload, file_dict=None):
+        if file_dict:
+            return requests.post(url, json=payload, headers=headers, files=file_dict)
+        else:
+            headers['content-type'] = 'application/json'
+            return requests.post(url, json=payload, headers=headers)
 
     @staticmethod
     def __deleteCall(url, headers, payload):
@@ -44,7 +47,7 @@ class DispatchRequest:
         return headers
 
     @classmethod
-    def sendRequestByAction(cls, url, action, key, payload={}):
+    def sendRequestByAction(cls, url, action, key, payload={}, file_dict=None):
         print("Sending to URL____________", url)
         print("sendRequestByAction_____________", action)
 
@@ -59,9 +62,9 @@ class DispatchRequest:
                 requestResponse = cls.__deleteCall(url, headers, payload)
 
             elif action in [const.CREATE_DATABASE, const.UPDATE_SCHEMA, const.CREATE_DOCUMENT, const.WOQL_UPDATE]:
-                requestResponse = cls.__postCall(url, headers, payload)
+                requestResponse = cls.__postCall(url, headers, payload, file_dict)
 
-           
+
             if(requestResponse.status_code == 200):
                 return requestResponse.json()  # if not a json not it raises an error
             else:
