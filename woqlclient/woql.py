@@ -436,6 +436,18 @@ class WOQLQuery:
         self.cursor['unique'].append(type)
         return self
 
+    def _pack_string(self, var):
+        if type(var) == str and var[:2] != "v:":
+            return {"@value" : var, "@type": "xsd:string"}
+        return var
+
+    def _pack_strings(self, vars):
+        result = []
+        for var in vars:
+            if var:
+                result.append(self._pack_string(var))
+        return result
+
     def re(self, pattern, test, matches):
         """Regular Expression Call
 
@@ -456,13 +468,8 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        if type(pattern) == str:
-            if pattern[:2] != 'v:':
-                pattern = {"@value" : pattern, "@type": "xsd:string"}
-
-        if type(test) == str:
-            if test[:2] != 'v:':
-                test = {"@value" : test, "@type": "xsd:string"}
+        pattern = self._pack_string(pattern)
+        test = self._pack_string(test)
 
         if type(matches) == str:
             matches = [matches]
@@ -495,27 +502,55 @@ class WOQLQuery:
                    (nlist[i][:1] == ":"):
                    nlist[i-1] = nlist[i-1][:len(nlist[i-1])-1]
                    nlist[i] = nlist[i][1:]
-        elif 'list' in lst:
-            nlist = lst['list']
-        elif isinstance(lst, (list, dict, WOQLQuery)):
-            nlist = lst
-        args = []
-        for item in nlist:
-            if (not item):
-                continue
-            if type(item) == str:
-                if item[:2] == "v:":
-                    args.append(item)
-                else:
-                    nvalue = {"@value": item, "@type": "xsd:string"}
-                    args.append(nvalue)
-            elif item:
-                args.append(item)
-
+        elif 'list' in list:
+            nlist = list['list']
+        elif isinstance(list, (list, dict, WOQLQuery)):
+            nlist = list
+        args = self._pack_strings(nlist)
         if v.find(":") == -1:
             v = "v:" + v
 
         self.cursor['concat'] = [{'list': args}, v]
+        return self
+
+    def split(self, input, separator, output):
+        """Splits a variable apart (input) into a list of variables (output) by separating the strings together with separator
+
+        Parameters
+        ----------
+        input : str
+            input string or WOQL variable "v:"
+        separator : str
+            character string to separate string into list
+        output : str
+            WOQL variable that stores output list
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        separator = self._pack_string(separator)
+        input = self._pack_string(input)
+        self.cursor['split'] = [input, separator, output]
+        return self
+
+    def member(self, ele, list_obj):
+        """Iterates through a list and returns a value for each member
+
+        Parameters
+        ----------
+        ele : str
+            a WOQL variable representing an element of the list
+        list_obj : str
+            a WOQL list variable
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        self.cursor['member'] = [ele, list_obj]
         return self
 
     def lower(self, u, l):
@@ -556,6 +591,7 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
+        pad = self._pack_string(pad)
         self.cursor['pad'] = [input, pad, len, output]
         return self
 
@@ -577,6 +613,7 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
+        glue = self._pack_string(glue)
         self.cursor['join'] = [input, glue, output]
         return self
 
@@ -2385,7 +2422,7 @@ class WOQLQuery:
         ----------
         client : woqlClient
         """
-        
+
         if "@context" not in self.query:
             self.query['@context'] = self._default_context(client.conConfig.dbURL())
         json = self.json()

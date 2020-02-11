@@ -217,6 +217,31 @@ class TestWoqlQueries:
               }
         assert woqlObject.json() == jsonObj
 
+    def test_join_method(self):
+        woqlObject=WOQLQuery().join(["v:A_obj", "v:B_obj"], ", ", "v:output")
+        jsonObj={'join': [
+                  [ 'v:A_obj', 'v:B_obj' ],
+                  { '@value': ', ', '@type': 'xsd:string' },
+                  'v:output'
+                  ]
+                }
+        assert woqlObject.json() == jsonObj
+
+    def test_split_method(self):
+        woqlObject=WOQLQuery().split("A, B, C", ", ", "v:list_obj")
+        jsonObj={'split': [
+                    { '@value': 'A, B, C', '@type': 'xsd:string' },
+                    {"@type": "xsd:string", "@value": ", "},
+                    "v:list_obj"
+                    ]
+                }
+        assert woqlObject.json() == jsonObj
+
+    def test_member_method(self):
+        woqlObject=WOQLQuery().member("v:member", "v:list_obj")
+        jsonObj={ 'member': [ 'v:member', 'v:list_obj' ] }
+        assert woqlObject.json() == jsonObj
+
     def test_concat_method(self):
         woqlObject=WOQLQuery().concat("v:Duration yo v:Duration_Cast", "x")
         jsonObj={ "concat": [ { "list": ["v:Duration", {"@value": " yo ", "@type": "xsd:string"}, "v:Duration_Cast" ]}, "v:x"] }
