@@ -1455,7 +1455,7 @@ class WOQLQuery:
 
     # Language elements that cannot be invoked from the top level and therefore are not exposed in the WOQL api
 
-    def woql_as(self, a=None, b=None):
+    def woql_as(self, a=None, b=None, c=None):
         """Imports the value identified by Source to a Target variable
 
         Parameters
@@ -1464,6 +1464,8 @@ class WOQLQuery:
             Source
         b : str
             Target
+        c : type
+            Type to cast input to
 
         Returns
         -------
@@ -1484,7 +1486,12 @@ class WOQLQuery:
                 val = a
             else:
                 val = { "@value" : a}
-            self.query.append({'as': [val, b]})
+
+            if c is not None:
+                self.query.append({'as': [val, b, c]})
+            else:
+                self.query.append({'as': [val, b]})
+
         else:
             if a.find(":") == -1:
                 a = "v:" + a
