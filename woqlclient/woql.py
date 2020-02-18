@@ -670,7 +670,7 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        self.cursor['greaters'] = [v1, v2]
+        self.cursor['greater'] = [v1, v2]
         return self
 
     def list(self, *args):
