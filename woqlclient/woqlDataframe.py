@@ -19,7 +19,7 @@ def extract_header(query):
     bindings = query['bindings'][0]
     for k, v in bindings.items():
         name = get_var_name(k)
-        if isinstance(v,dict):
+        if type(v) == dict and ('@type' in v):            
             ty = v['@type']
         else:
             ty = 'http://www.w3.org/2001/XMLSchema#string'
@@ -47,6 +47,8 @@ def type_map(ty_rdf):
         return np.int
     elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#dateTime':
         return np.datetime64
+    elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#decimal':
+        return np.double
     else:
         raise Exception("Unknown rdf type! "+ty_rdf)
 
@@ -56,7 +58,9 @@ def type_value_map(ty_rdf,value):
     elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#integer':
         return int(value)
     elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#dateTime':
-        return numpy.datetime64(value)
+        return np.datetime64(value)
+    elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#decimal':
+        return float(value)
     else:
         raise Exception("Unknown rdf type! "+ty_rdf)
 
