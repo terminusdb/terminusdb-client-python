@@ -17,12 +17,22 @@ coverage:
 	pipenv run py.test tests --cov-config .coveragerc --verbose --cov-report term --cov-report xml --cov=woqlclient tests
 
 #command line for release: bumpversion (patch), tag and push
-publish:
+publish_patch:
+	pip install -U bumpversion
+	#git remote add upstream git@github.com:terminusdb/terminus-client-python.git
+	git checkout master
+	git pull upstream master
+	bumpversion patch
+	git push upstream master
+	git push upstream --tags
+
+publish_release:
 	pip install -U bumpversion
 	#git remote add upstream git@github.com:terminusdb/terminus-client-python.git
 	git checkout dev
 	git pull upstream dev
-	bumpversion patch
+	git pull upstream master
+	bumpversion minor
 	git push upstream dev
 	git push upstream dev:master
 	git push upstream --tags
