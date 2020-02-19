@@ -4,22 +4,26 @@ import numpy as np
 import pandas as pd
 import re
 
-def get_var_name(uri):
+class EmptyException(Exception):
+    pass
+
+def _get_var_name(uri):
     (_,var_name) = re.split('^http://terminusdb.com/woql/variable/', uri, maxsplit=1)
     return var_name
 
-def is_empty(query):
+def _is_empty(query):
     return len(query['bindings']) == 0
 
 def extract_header(query):
+    """Extracts the header of the returned result table"""
     header = []
-    if is_empty(query):
-        raise Exception('Query is empty')
+    if _is_empty(query):
+        raise EmptyException('Query is empty')
 
     bindings = query['bindings'][0]
     for k, v in bindings.items():
-        name = get_var_name(k)
-        if type(v) == dict and ('@type' in v):            
+        name = _get_var_name(k)
+        if type(v) == dict and ('@type' in v):
             ty = v['@type']
         else:
             ty = 'http://www.w3.org/2001/XMLSchema#string'
@@ -27,6 +31,7 @@ def extract_header(query):
     return header
 
 def extract_column(query,name,ty):
+    """Extracts the column of the returned result table"""
     bindings = query['bindings']
     column = []
     for binding in bindings:
@@ -53,6 +58,7 @@ def type_map(ty_rdf):
         raise Exception("Unknown rdf type! "+ty_rdf)
 
 def type_value_map(ty_rdf,value):
+    "Converts valuen of different types between RDF and dataframe"
     if ty_rdf == 'http://www.w3.org/2001/XMLSchema#string':
         return value
     elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#integer':
@@ -64,7 +70,7 @@ def type_value_map(ty_rdf,value):
     else:
         raise Exception("Unknown rdf type! "+ty_rdf)
 
-def query_to_dt(query):
+def query_to_df(query):
     """Convert a query to a data frame.
        This only works for homogeneous query results!"""
     header = extract_header(query)
