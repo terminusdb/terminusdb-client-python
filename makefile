@@ -21,9 +21,9 @@ coverage:
 publish:
 	pip install -U bumpversion
 	#git remote add upstream git@github.com:terminusdb/terminus-client-python.git
-	git checkout dev
-	git pull upstream dev
+	#git checkout dev
+	git pull upstream master
 	bumpversion patch
-	git push upstream dev
-	git push upstream dev:master
+	git push upstream master
+	#git push upstream dev:master
 	git push upstream --tags
