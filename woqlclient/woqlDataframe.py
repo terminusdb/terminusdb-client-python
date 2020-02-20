@@ -1,5 +1,4 @@
-import woqlclient.woqlClient as woql
-from woqlclient import WOQLQuery
+# woqlDataframe.py
 import numpy as np
 import pandas as pd
 import re
@@ -7,85 +6,90 @@ import re
 class EmptyException(Exception):
     pass
 
-def _get_var_name(uri):
-    (_,var_name) = re.split('^http://terminusdb.com/woql/variable/', uri, maxsplit=1)
-    return var_name
+class WOQLDataFrame:
 
-def _is_empty(query):
-    return len(query['bindings']) == 0
+    def __init__(self):
+        pass
 
-def extract_header(query):
-    """Extracts the header of the returned result table"""
-    header = []
-    if _is_empty(query):
-        raise EmptyException('Query is empty')
+    def _get_var_name(uri):
+        (_,var_name) = re.split('^http://terminusdb.com/woql/variable/', uri, maxsplit=1)
+        return var_name
 
-    bindings = query['bindings'][0]
-    for k, v in bindings.items():
-        name = _get_var_name(k)
-        if type(v) == dict and ('@type' in v):
-            ty = v['@type']
+    def _is_empty(query):
+        return len(query['bindings']) == 0
+
+    def extract_header(query):
+        """Extracts the header of the returned result table"""
+        header = []
+        if _is_empty(query):
+            raise EmptyException('Query is empty')
+
+        bindings = query['bindings'][0]
+        for k, v in bindings.items():
+            name = _get_var_name(k)
+            if type(v) == dict and ('@type' in v):
+                ty = v['@type']
+            else:
+                ty = 'http://www.w3.org/2001/XMLSchema#string'
+            header.append((name,ty))
+        return header
+
+    def extract_column(query,name,ty):
+        """Extracts the column of the returned result table"""
+        bindings = query['bindings']
+        column = []
+        for binding in bindings:
+            for k,v in binding.items():
+                if k == ('http://terminusdb.com/woql/variable/' + name):
+                    if isinstance(v,dict):
+                        value = type_value_map(ty,v['@value'])
+                    else:
+                        value = type_value_map(ty,v)
+                    column.append(value)
+        return column
+
+    def type_map(ty_rdf):
+        "Converts types between RDF and dataframe"
+        if ty_rdf == 'http://www.w3.org/2001/XMLSchema#string':
+            return np.unicode_
+        elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#integer':
+            return np.int
+        elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#dateTime':
+            return np.datetime64
+        elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#decimal':
+            return np.double
         else:
-            ty = 'http://www.w3.org/2001/XMLSchema#string'
-        header.append((name,ty))
-    return header
+            raise Exception("Unknown rdf type! "+ty_rdf)
 
-def extract_column(query,name,ty):
-    """Extracts the column of the returned result table"""
-    bindings = query['bindings']
-    column = []
-    for binding in bindings:
-        for k,v in binding.items():
-            if k == ('http://terminusdb.com/woql/variable/' + name):
-                if isinstance(v,dict):
-                    value = type_value_map(ty,v['@value'])
-                else:
-                    value = type_value_map(ty,v)
-                column.append(value)
-    return column
+    def type_value_map(ty_rdf,value):
+        "Converts valuen of different types between RDF and dataframe"
+        if ty_rdf == 'http://www.w3.org/2001/XMLSchema#string':
+            return value
+        elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#integer':
+            return int(value)
+        elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#dateTime':
+            return np.datetime64(value)
+        elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#decimal':
+            return float(value)
+        else:
+            raise Exception("Unknown rdf type! "+ty_rdf)
 
-def type_map(ty_rdf):
-    "Converts types between RDF and dataframe"
-    if ty_rdf == 'http://www.w3.org/2001/XMLSchema#string':
-        return np.unicode_
-    elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#integer':
-        return np.int
-    elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#dateTime':
-        return np.datetime64
-    elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#decimal':
-        return np.double
-    else:
-        raise Exception("Unknown rdf type! "+ty_rdf)
+    def query_to_df(query):
+        """Convert a query to a data frame.
+           This only works for homogeneous query results!"""
+        header = extract_header(query)
+        dtypes = {}
+        column_names = []
+        for name,rdftype in header:
+            column_names.append(name)
+            dtype = type_map(rdftype)
+            dtypes[name] = dtype
 
-def type_value_map(ty_rdf,value):
-    "Converts valuen of different types between RDF and dataframe"
-    if ty_rdf == 'http://www.w3.org/2001/XMLSchema#string':
-        return value
-    elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#integer':
-        return int(value)
-    elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#dateTime':
-        return np.datetime64(value)
-    elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#decimal':
-        return float(value)
-    else:
-        raise Exception("Unknown rdf type! "+ty_rdf)
+        dataframe = pd.DataFrame(columns=column_names)
+        dataframe.astype(dtypes)
 
-def query_to_df(query):
-    """Convert a query to a data frame.
-       This only works for homogeneous query results!"""
-    header = extract_header(query)
-    dtypes = {}
-    column_names = []
-    for name,rdftype in header:
-        column_names.append(name)
-        dtype = type_map(rdftype)
-        dtypes[name] = dtype
+        for name,rdftype in header:
+            column = extract_column(query,name,rdftype)
+            dataframe[name] = column
 
-    dataframe = pd.DataFrame(columns=column_names)
-    dataframe.astype(dtypes)
-
-    for name,rdftype in header:
-        column = extract_column(query,name,rdftype)
-        dataframe[name] = column
-
-    return dataframe
+        return dataframe
