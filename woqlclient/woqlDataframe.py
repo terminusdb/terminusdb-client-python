@@ -1,5 +1,4 @@
-import woqlclient.woqlClient as woql
-from woqlclient import WOQLQuery
+# woqlDataframe.py
 import numpy as np
 import pandas as pd
 import re
@@ -46,14 +45,13 @@ def extract_column(query,name,ty):
 
 def type_map(ty_rdf):
     "Converts types between RDF and dataframe"
-    if ty_rdf == 'http://www.w3.org/2001/XMLSchema#string':
-        return np.unicode_
-    elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#integer':
-        return np.int
-    elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#dateTime':
-        return np.datetime64
-    elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#decimal':
-        return np.double
+    convert_mapping = {'http://www.w3.org/2001/XMLSchema#string': np.unicode_,
+    'http://www.w3.org/2001/XMLSchema#integer': np.int,
+    'http://www.w3.org/2001/XMLSchema#dateTime': np.datetime64,
+    'http://www.w3.org/2001/XMLSchema#decimal': np.double,
+    }
+    if ty_rdf in convert_mapping:
+        return convert_mapping[ty_rdf]
     else:
         raise Exception("Unknown rdf type! "+ty_rdf)
 
