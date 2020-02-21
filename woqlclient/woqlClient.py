@@ -24,7 +24,7 @@ class WOQLClient:
 
     """
         The WOQLClient constructor
-        
+
         :param **kwargs Connection arguments used to configure the Client. (db=terminusDBName | server=terminusServerURL | doc=docName | key=apiKey)
 
     """
@@ -58,6 +58,11 @@ class WOQLClient:
         Returns
         -------
         dict or raise an InvalidURIError
+
+        Examples
+        -------
+        >>> woql.WOQLClient().connect(serverUrl, key)
+        dict
         """
         if serverURL:
             self.conConfig.setServer(serverURL)
@@ -72,7 +77,7 @@ class WOQLClient:
     @staticmethod
     def directConnect(serverURL, key):
         """
-        connect directly without create a new class instance
+        connect directly without creating a new class instance
 
         Parameters
         ----------
@@ -97,7 +102,7 @@ class WOQLClient:
         Parameters
         ----------
         dbID : str
-            TerminusDB id
+            ID of the specific database to delete
         label : str
             Terminus label
         key : str, optional
@@ -143,12 +148,12 @@ class WOQLClient:
             idParser.dbURL(), const.CREATE_DATABASE, key, createDBTemplate)
 
     def deleteDatabase(self, dbID, key=None):
-        """Delete a TerminusDB
+        """Delete a TerminusDB database
 
         Parameters
         ----------
         dbID : str
-            terminusDB Id
+            ID of the database to delete
         key : str, optional
             you need the key if you didn't set before
 
@@ -472,6 +477,19 @@ class WOQLClient:
 
     @staticmethod
     def directSelect(woqlQuery, dbURL, key, fileList=None):
+        """
+        Static function that executes a read-only WOQL query on the specified database
+        and returns the results
+
+        Parameters
+        ----------
+        woqlQuery : WOQLQuery object
+            woql query select statement
+        dbId : str
+            a valid full TerminusDB database URL
+        key : str, optional
+            API key
+        """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
 
