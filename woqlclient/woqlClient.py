@@ -465,6 +465,8 @@ class WOQLClient:
             a valid TerminusDB id
         key : str, optional
             API key
+        fileList : list, optional
+            List of files that are needed for the query
         """
         if(dbID):
             self.conConfig.setDB(dbID)
@@ -489,6 +491,8 @@ class WOQLClient:
             a valid full TerminusDB database URL
         key : str, optional
             API key
+        fileList : list, optional
+            List of files that are needed for the query
         """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
@@ -502,11 +506,16 @@ class WOQLClient:
         """
         Executes a WOQL query on the specified database which updates the state and returns the results
 
-        The first (qurl) argument can be
-        1) a valid URL of a terminus database or
-        2) omitted - the current database will be used
-        the second argument (woql) is a woql select statement encoded as a string
-        the third argument (opts) is an options json - opts.key is an optional API key
+        Parameters
+        ----------
+        woqlQuery : WOQLQuery object
+            woql query select statement
+        dbId : str
+            a valid full TerminusDB database URL
+        key : str, optional
+            API key
+        fileList : list, optional
+            List of files that are needed for the query
         """
         if(dbID):
             self.conConfig.setDB(dbID)
