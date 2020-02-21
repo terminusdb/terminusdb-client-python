@@ -164,6 +164,10 @@ class WOQLClient:
         Returns
         -------
         dict
+
+        Examples
+        -------
+        >>> WOQLClient(server="http://localhost:6363").deleteDatabase("someDBToDelete", "password")
         """
         self.conConfig.setDB(dbID)
         jsonResponse = self.dispatch(
