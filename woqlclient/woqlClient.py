@@ -511,7 +511,7 @@ class WOQLClient:
         woqlQuery : WOQLQuery object
             woql query select statement
         dbId : str
-            a valid full TerminusDB database URL
+            a valid TerminusDB database ID
         key : str, optional
             API key
         fileList : list, optional
@@ -537,6 +537,21 @@ class WOQLClient:
 
     @staticmethod
     def directUpdate(woqlQuery, dbURL, key,fileList=None):
+        """
+        Static function that executes a WOQL query on the specified database which
+        updates the state and returns the results
+
+        Parameters
+        ----------
+        woqlQuery : WOQLQuery object
+            woql query select statement
+        dbURL : str
+            a valid full TerminusDB database URL
+        key : str, optional
+            API key
+        fileList : list, optional
+            List of files that are needed for the query
+        """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
 
