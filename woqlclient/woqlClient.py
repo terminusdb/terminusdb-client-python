@@ -618,6 +618,25 @@ class WOQLClient:
         return DispatchRequest.sendRequestByAction(idParser.queryURL(), const.WOQL_UPDATE, key, payload, file_dict)
 
     def dispatch(self, url, action, connectionKey, payload={}, file_dict = None):
+        """
+        Directly dispatch to a Terminus database.
+
+        Parameters
+        ----------
+        url : str
+            The server URL to point the action at
+        connectionKey : str
+            API key to the document
+        payload : dict
+            Payload to send to the server
+        file_dict : list, optional
+            List of files that are needed for the query
+
+
+        Returns
+        -------
+        dict or raise an InvalidURIError
+        """
         if connectionKey is None:
             # if the api key is not setted the method raise an APIerror
             connectionKey = self.conCapabilities.getClientKey()
