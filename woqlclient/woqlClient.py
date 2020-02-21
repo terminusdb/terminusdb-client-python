@@ -297,6 +297,9 @@ class WOQLClient:
             a valid TerminusDB id
         key : str, optional
             API key
+        Returns
+        -------
+        dict
         """
         if(dbID):
             self.conConfig.setDB(dbID)
@@ -319,6 +322,10 @@ class WOQLClient:
             a valid TerminusDB full URL
         key : str, optional
             API key
+
+        Returns
+        -------
+        dict or raise an InvalidURIError
         """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
@@ -340,6 +347,10 @@ class WOQLClient:
             API key
         opts : dict
             options object
+
+        Returns
+        -------
+        dict
         """
         if(dbID):
             self.conConfig.setDB(dbID)
@@ -361,6 +372,10 @@ class WOQLClient:
             API key
         opts : dict
             options object
+
+        Returns
+        -------
+        dict or raise an InvalidURIError
         """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
@@ -381,6 +396,10 @@ class WOQLClient:
             a valid TerminusDB id
         key : str, optional
             API key
+
+        Returns
+        -------
+        dict
         """
         if(dbID):
             self.conConfig.setDB(dbID)
@@ -405,6 +424,10 @@ class WOQLClient:
             API key
         docObj : dict
             a valid document in json-ld
+
+        Returns
+        -------
+        dict or raise an InvalidURIError
         """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
@@ -425,6 +448,10 @@ class WOQLClient:
             a valid TerminusDB id
         key : str, optional
             API key
+
+        Returns
+        -------
+        dict
         """
         if(dbID):
             self.conConfig.setDB(dbID)
@@ -446,6 +473,10 @@ class WOQLClient:
             a valid TerminusDB full URL
         key : str, optional
             API key
+
+        Returns
+        -------
+        dict or raise an InvalidURIError
         """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
@@ -467,6 +498,10 @@ class WOQLClient:
             API key
         fileList : list, optional
             List of files that are needed for the query
+
+        Returns
+        -------
+        dict
         """
         if(dbID):
             self.conConfig.setDB(dbID)
@@ -493,6 +528,10 @@ class WOQLClient:
             API key
         fileList : list, optional
             List of files that are needed for the query
+
+        Returns
+        -------
+        dict or raise an InvalidURIError
         """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
@@ -516,6 +555,10 @@ class WOQLClient:
             API key
         fileList : list, optional
             List of files that are needed for the query
+
+        Returns
+        -------
+        dict
         """
         if(dbID):
             self.conConfig.setDB(dbID)
@@ -551,6 +594,10 @@ class WOQLClient:
             API key
         fileList : list, optional
             List of files that are needed for the query
+
+        Returns
+        -------
+        dict or raise an InvalidURIError
         """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
