@@ -755,6 +755,14 @@ class WOQLQuery:
         -------
         WOQLQuery object
             query object that can be chained and/or execute
+
+        Examples
+        -------
+        >>> WOQLQuery().woql_and(WOQLQuery().
+        ... triple('v:MandatorySubject','v:MandatoryObject', 'v:MandatoryValue'),
+        ... WOQLQuery.opt(WOQLQuery().triple('v:OptionalS', 'v:OptionalObject',
+        ... 'v:OptionalValue'))
+        ... )
         """
         if query:
             q = query.json() if callable(query.json) else query
