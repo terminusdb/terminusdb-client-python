@@ -711,11 +711,15 @@ class WOQLQuery:
         return self.query
 
     def when(self, Query, Update=None):
-        """When the sub-query in Condition is met, the Update query is executed
+        """When the query in Condition is met, the Update query is executed.
+        The Condition can only contain read-clauses, but update query may contain either reads,
+        conditions or writes. The entire 'when' clause acts as one transaction, allowing the
+        the query to compose inserts required to satisfy all constraints related to inserted
+        update or deleted data.
 
         Parameters
         ----------
-        Query : WOQLQuery object or bool
+        Condition : WOQLQuery object or bool
         Update : WOQLQuery object, optional
 
         Returns
@@ -726,7 +730,14 @@ class WOQLQuery:
         Notes
         -----
         Functions which take a query as an argument advance the cursor to make the chaining of queries fall
-        into the corrent place in the encompassing json
+        into the current place in the encompassing JSON
+
+        Examples
+        -------
+        >>> WOQLQuery().when(WOQLQuery().triple('v:X', 'v:P', 'v:Y'), WOQLQuery().delete_triple('v:X ', 'v:P', 'v:Y')).json()
+        {'when': [{'triple': ['v:X', 'v:P', 'v:Y']}, {'delete_triple': ['v:X ', 'v:P', 'v:Y']}]}
+
+        This query deletes everything in the database. Use this example with caution!
         """
         if type(Query) == bool:
             if Query:
@@ -745,7 +756,7 @@ class WOQLQuery:
         return self
 
     def opt(self, query=None):
-        """The Query in the Optional argument is specified as optional
+        """The Query will succeed, even if the query in the optional argument fails.
 
         Parameters
         ----------
@@ -755,6 +766,16 @@ class WOQLQuery:
         -------
         WOQLQuery object
             query object that can be chained and/or execute
+
+        Examples
+        --------
+        >>> WOQLQuery().limit(10).and(
+        ...  WOQLQuery().triple("v:X","v:P","v:Z"),
+        ...  WOQLQuery().not().eq("v:P","rdfs:label"),
+        ...  WOQLQuery().opt().triple("v:X","label","v:Y"))
+        <woqlclient.woql.WOQLQuery object at 0x7fe7ff2e2410>
+
+        This query obtains 10 tripes from an object that has a label.
         """
         if query:
             q = query.json() if callable(query.json) else query
@@ -777,6 +798,14 @@ class WOQLQuery:
         -------
         WOQLQuery object
             query object that can be chained and/or execute
+
+
+        Examples
+        --------
+        >>> WOQLQuery().woql_from('http://server:6363/my_database').triple("v:X","v:P","v:Z")
+        <woqlclient.woql.WOQLQuery object at 0x7fe7ff2e2890>
+
+        Searches for every triple in 'my_database'
         """
         self._advance_cursor("from", dburl)
         if query:
@@ -933,7 +962,8 @@ class WOQLQuery:
         return self
 
     def triple(self, sub, pre, obj):
-        """Creates a triple pattern matching rule for the triple [S, P, O] (Subject, Predicate, Object)
+        """Creates a triple pattern matching rule for the triple [sub, pred, obj] 
+        i.e. (Subject, Predicate, Object)
 
         Parameters
         ----------
@@ -948,6 +978,19 @@ class WOQLQuery:
         -------
         WOQLQuery object
             query object that can be chained and/or execute
+
+        Examples
+        --------
+        >>> WOQLQuery().triple("v:X","label","v:Z")
+
+        Returns all objects and their labels from the database.
+
+        >>> WOQLQuery().woql_and(
+        ...      WOQLQuery().sub("v:Type", "tcs:Document"),
+        ...      WOQLQuery().triple("v:X","type","v:Type"),
+        ...      WOQLQuery().triple("v:X","label","v:Label"))
+
+        This query finds labels for all documents.
         """
         self.cursor["triple"] = [self._clean_subject(sub),self._clean_predicate(pre),self._clean_object(obj)]
         return self._chainable("triple", self._clean_subject(sub))
