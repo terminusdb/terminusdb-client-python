@@ -102,7 +102,7 @@ class WOQLClient:
         Parameters
         ----------
         dbID : str
-            ID of the specific database to delete
+            ID of the specific database to create
         label : str
             Terminus label
         key : str, optional
@@ -113,6 +113,10 @@ class WOQLClient:
         Returns
         -------
         dict
+
+        Examples
+        --------
+        WOQLClient(server="http://localhost:6363").createDatabase("someDB", "Database Label", "password")
         """
         self.conConfig.setDB(dbID)
         createDBTemplate = DocumentTemplate.createDBTemplate(
