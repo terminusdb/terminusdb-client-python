@@ -40,13 +40,6 @@ class WOQLQuery:
         self.relationship = self.entity
         self.cast = self.typecast
 
-    def isLiteralType(self, t):
-        if t:
-            pref = t.split(":")
-            if (pref[0] == "xdd" or pref[0] == "xsd"):
-                return True
-        return False
-
     def get(self, arr1, arr2=None, target=None):
         """Imports the Target Resource to the variables defined in Map
 
