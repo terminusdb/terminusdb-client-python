@@ -123,8 +123,8 @@ class WOQLQuery:
                         c = {"@value": c}
                     clauses.append({'as': [c, v]})
                 else:
-                    if hasattr(a, 'as') or ('as' in a):
-                        clauses.append(v)
+                    if hasattr(v, 'woql_as') or ('as' in v):
+                        clauses += v.json()
                     else:
                         clauses.append({'as': [v]})
         return clauses
