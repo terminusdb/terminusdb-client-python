@@ -12,8 +12,14 @@ Install using pip
 
 Install form PyPI:
 
-``pip install terminus-client-python``
+``python -m pip install terminus-client-python``
+
+this only include the core Python Client and WOQLQuery.
+
+If you want to use woqlDataframe:
+
+``python -m pip install terminus-client-python[dataframe]``
 
 Install from source:
 
-``pip3 install git+https://github.com/terminusdb/terminus-client-python.git``
+``python -m pip install git+https://github.com/terminusdb/terminus-client-python.git``
