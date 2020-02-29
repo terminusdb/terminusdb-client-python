@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -174,11 +174,6 @@
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>query=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
-
-<dl class="method">
-<dt id="woqlclient.WOQLQuery.isLiteralType">
-<code class="descname">isLiteralType</code><span class="sig-paren">(</span><em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.isLiteralType" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="method">
 <dt id="woqlclient.WOQLQuery.get">
@@ -331,15 +326,39 @@
 
 <dl class="method">
 <dt id="woqlclient.WOQLQuery.remote">
-<code class="descname">remote</code><span class="sig-paren">(</span><em>json</em>, <em>opts=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.remote" title="Permalink to this definition">¶</a></dt>
+<code class="descname">remote</code><span class="sig-paren">(</span><em>url</em>, <em>opts=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.remote" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provides details of a remote data source in a JSON format that includes a URL property</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>json</strong> (<em>dict</em>) – remote data source in a JSON format</li>
-<li><strong>opts</strong> (<em>imput options</em><em>, </em><em>optional</em>) – </li>
+<li><strong>url</strong> (<em>remote data source url</em>) – </li>
+<li><strong>opts</strong> (<em>input options</em><em>, </em><em>optional</em>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query object that can be chained and/or execute</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">WOQLQuery object</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLQuery.post">
+<code class="descname">post</code><span class="sig-paren">(</span><em>field</em>, <em>opts=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.post" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides details of a file source in a JSON format that includes a URL property</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fileName</strong> (<em>str</em>) – field</li>
+<li><strong>opts</strong> (<em>input options</em><em>, </em><em>optional</em>) – </li>
 </ul>
 </td>
 </tr>
@@ -543,15 +562,64 @@ e.g. WOQL.re(“(.).*”, “hello”, [“v:All”, “v:Sub”])</p>
 
 <dl class="method">
 <dt id="woqlclient.WOQLQuery.concat">
-<code class="descname">concat</code><span class="sig-paren">(</span><em>list</em>, <em>v</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.concat" title="Permalink to this definition">¶</a></dt>
+<code class="descname">concat</code><span class="sig-paren">(</span><em>lst</em>, <em>v</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.concat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Concatenates the list of variables into a string and saves the result in v</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>list</strong> (<em>list</em>) – list of variables to concatenate</li>
+<li><strong>lst</strong> (<em>list</em>) – list of variables to concatenate</li>
 <li><strong>v</strong> (<em>str</em>) – saves the results</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query object that can be chained and/or execute</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">WOQLQuery object</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLQuery.split">
+<code class="descname">split</code><span class="sig-paren">(</span><em>input</em>, <em>separator</em>, <em>output</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits a variable apart (input) into a list of variables (output) by separating the strings together with separator</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>input</strong> (<em>str</em>) – input string or WOQL variable “v:”</li>
+<li><strong>separator</strong> (<em>str</em>) – character string to separate string into list</li>
+<li><strong>output</strong> (<em>str</em>) – WOQL variable that stores output list</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query object that can be chained and/or execute</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">WOQLQuery object</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="woqlclient.WOQLQuery.member">
+<code class="descname">member</code><span class="sig-paren">(</span><em>ele</em>, <em>list_obj</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.member" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterates through a list and returns a value for each member</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ele</strong> (<em>str</em>) – a WOQL variable representing an element of the list</li>
+<li><strong>list_obj</strong> (<em>str</em>) – a WOQL list variable</li>
 </ul>
 </td>
 </tr>
@@ -793,6 +861,14 @@ into the corrent place in the encompassing json</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">WOQLQuery</span><span class="p">()</span><span class="o">.</span><span class="n">woql_and</span><span class="p">(</span><span class="n">WOQLQuery</span><span class="p">()</span><span class="o">.</span>
+<span class="gp">... </span><span class="n">triple</span><span class="p">(</span><span class="s1">&#39;v:MandatorySubject&#39;</span><span class="p">,</span><span class="s1">&#39;v:MandatoryObject&#39;</span><span class="p">,</span> <span class="s1">&#39;v:MandatoryValue&#39;</span><span class="p">),</span>
+<span class="gp">... </span><span class="n">WOQLQuery</span><span class="o">.</span><span class="n">opt</span><span class="p">(</span><span class="n">WOQLQuery</span><span class="p">()</span><span class="o">.</span><span class="n">triple</span><span class="p">(</span><span class="s1">&#39;v:OptionalS&#39;</span><span class="p">,</span> <span class="s1">&#39;v:OptionalObject&#39;</span><span class="p">,</span>
+<span class="gp">... </span><span class="s1">&#39;v:OptionalValue&#39;</span><span class="p">))</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">
@@ -1503,7 +1579,7 @@ into the corrent place in the encompassing json</p>
 
 <dl class="method">
 <dt id="woqlclient.WOQLQuery.woql_as">
-<code class="descname">woql_as</code><span class="sig-paren">(</span><em>a=None</em>, <em>b=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.woql_as" title="Permalink to this definition">¶</a></dt>
+<code class="descname">woql_as</code><span class="sig-paren">(</span><em>a=None</em>, <em>b=None</em>, <em>c=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.woql_as" title="Permalink to this definition">¶</a></dt>
 <dd><p>Imports the value identified by Source to a Target variable</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1512,6 +1588,7 @@ into the corrent place in the encompassing json</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>a</strong> (<em>str</em>) – Source</li>
 <li><strong>b</strong> (<em>str</em>) – Target</li>
+<li><strong>c</strong> (<em>type</em>) – Type to cast input to</li>
 </ul>
 </td>
 </tr>
@@ -2315,7 +2392,7 @@ into the corrent place in the encompassing json</p>
 
 <dl class="method">
 <dt id="woqlclient.WOQLQuery.execute">
-<code class="descname">execute</code><span class="sig-paren">(</span><em>client</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.execute" title="Permalink to this definition">¶</a></dt>
+<code class="descname">execute</code><span class="sig-paren">(</span><em>client</em>, <em>fileList=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Executes the query using the passed client to connect to a server</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
