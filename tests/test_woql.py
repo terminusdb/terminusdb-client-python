@@ -186,6 +186,11 @@ class TestWoqlQueries:
         jsonObj={ 'remote': [ { 'url': 'http://url' } ] }
         assert woqlObject.json() == jsonObj
 
+    def test_post_method(self):
+        woqlObject=WOQLQuery().post("my_json_file",{'type': "panda_json"})
+        jsonObj={"post":["my_json_file",  {"type":"panda_json"} ]}
+        assert woqlObject.json() == jsonObj
+
     def test_idgen_method(self):
         woqlObject=WOQLQuery().idgen("doc:Station",["v:Start_ID"],"v:Start_Station_URL")
         jsonObj={ "idgen": [ 'doc:Station', { "list": ["v:Start_ID"] }, 'v:Start_Station_URL' ] }
@@ -210,6 +215,31 @@ class TestWoqlQueries:
                   { 'list': ["v:formated"] }
                 ]
               }
+        assert woqlObject.json() == jsonObj
+
+    def test_join_method(self):
+        woqlObject=WOQLQuery().join(["v:A_obj", "v:B_obj"], ", ", "v:output")
+        jsonObj={'join': [
+                  [ 'v:A_obj', 'v:B_obj' ],
+                  { '@value': ', ', '@type': 'xsd:string' },
+                  'v:output'
+                  ]
+                }
+        assert woqlObject.json() == jsonObj
+
+    def test_split_method(self):
+        woqlObject=WOQLQuery().split("A, B, C", ", ", "v:list_obj")
+        jsonObj={'split': [
+                    { '@value': 'A, B, C', '@type': 'xsd:string' },
+                    {"@type": "xsd:string", "@value": ", "},
+                    "v:list_obj"
+                    ]
+                }
+        assert woqlObject.json() == jsonObj
+
+    def test_member_method(self):
+        woqlObject=WOQLQuery().member("v:member", "v:list_obj")
+        jsonObj={ 'member': [ 'v:member', 'v:list_obj' ] }
         assert woqlObject.json() == jsonObj
 
     def test_concat_method(self):

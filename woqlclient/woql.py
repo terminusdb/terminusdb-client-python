@@ -40,13 +40,6 @@ class WOQLQuery:
         self.relationship = self.entity
         self.cast = self.typecast
 
-    def isLiteralType(self, t):
-        if t:
-            pref = t.split(":")
-            if (pref[0] == "xdd" or pref[0] == "xsd"):
-                return True
-        return False
-
     def get(self, arr1, arr2=None, target=None):
         """Imports the Target Resource to the variables defined in Map
 
@@ -206,14 +199,13 @@ class WOQLQuery:
         self.cursor['length'] = [va, vb];
         return self
 
-    def remote(self, json, opts=None):
+    def remote(self, url, opts=None):
         """Provides details of a remote data source in a JSON format that includes a URL property
 
         Parameters
         ----------
-        json : dict
-            remote data source in a JSON format
-        opts : imput options, optional
+        url : remote data source url
+        opts : input options, optional
 
         Returns
         -------
@@ -221,9 +213,31 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         if opts is not None:
-            self.cursor['remote'] = [json, opts]
-        self.cursor['remote'] = [json];
+            self.cursor['remote'] = [url, opts]
+        else:
+            self.cursor['remote'] = [url]
         return self
+
+    def post(self, field, opts=None):
+        """Provides details of a file source in a JSON format that includes a URL property
+
+        Parameters
+        ----------
+        fileName : str
+            field
+        opts : input options, optional
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if opts is not None:
+            self.cursor['post'] = [field, opts]
+        else:
+            self.cursor['post'] = [field]
+        return self
+
 
     def file(self, json, opts=None):
         """Provides details of a file source in a JSON format that includes a URL property
@@ -241,7 +255,8 @@ class WOQLQuery:
         """
         if opts is not None:
             self.cursor['file'] = [json, opts]
-        self.cursor['file'] = [json];
+        else:
+            self.cursor['file'] = [json]
         return self
 
     def group_by(self, gvarlist, groupedvar, groupquery, output=None):
@@ -414,6 +429,18 @@ class WOQLQuery:
         self.cursor['unique'].append(type)
         return self
 
+    def _pack_string(self, var):
+        if type(var) == str and var[:2] != "v:":
+            return {"@value" : var, "@type": "xsd:string"}
+        return var
+
+    def _pack_strings(self, vars):
+        result = []
+        for var in vars:
+            if var:
+                result.append(self._pack_string(var))
+        return result
+
     def re(self, pattern, test, matches):
         """Regular Expression Call
 
@@ -434,13 +461,8 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        if type(pattern) == str:
-            if pattern[:2] != 'v:':
-                pattern = {"@value" : pattern, "@type": "xsd:string"}
-
-        if type(test) == str:
-            if test[:2] != 'v:':
-                test = {"@value" : test, "@type": "xsd:string"}
+        pattern = self._pack_string(pattern)
+        test = self._pack_string(test)
 
         if type(matches) == str:
             matches = [matches]
@@ -451,12 +473,12 @@ class WOQLQuery:
         self.cursor['re'] = [pattern, test, matches]
         return self
 
-    def concat(self, list, v):
+    def concat(self, lst, v):
         """Concatenates the list of variables into a string and saves the result in v
 
         Parameters
         ----------
-        list : list
+        lst : list
             list of variables to concatenate
         v : str
             saves the results
@@ -466,8 +488,8 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        if type(list) == str:
-            nlist = re.split('(v:[\w_]+)\\b', list)
+        if type(lst) == str:
+            nlist = re.split('(v:[\w_]+)\\b', lst)
             for i in range(1,len(nlist)):
                 if (nlist[i-1][len(nlist[i-1])-1:] == "v") and \
                    (nlist[i][:1] == ":"):
@@ -477,23 +499,51 @@ class WOQLQuery:
             nlist = list['list']
         elif isinstance(list, (list, dict, WOQLQuery)):
             nlist = list
-        args = []
-        for item in nlist:
-            if (not item):
-                continue
-            if type(item) == str:
-                if item[:2] == "v:":
-                    args.append(item)
-                else:
-                    nvalue = {"@value": item, "@type": "xsd:string"}
-                    args.append(nvalue)
-            elif item:
-                args.append(nlist[i])
-
+        args = self._pack_strings(nlist)
         if v.find(":") == -1:
             v = "v:" + v
 
         self.cursor['concat'] = [{'list': args}, v]
+        return self
+
+    def split(self, input, separator, output):
+        """Splits a variable apart (input) into a list of variables (output) by separating the strings together with separator
+
+        Parameters
+        ----------
+        input : str
+            input string or WOQL variable "v:"
+        separator : str
+            character string to separate string into list
+        output : str
+            WOQL variable that stores output list
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        separator = self._pack_string(separator)
+        input = self._pack_string(input)
+        self.cursor['split'] = [input, separator, output]
+        return self
+
+    def member(self, ele, list_obj):
+        """Iterates through a list and returns a value for each member
+
+        Parameters
+        ----------
+        ele : str
+            a WOQL variable representing an element of the list
+        list_obj : str
+            a WOQL list variable
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        self.cursor['member'] = [ele, list_obj]
         return self
 
     def lower(self, u, l):
@@ -534,6 +584,7 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
+        pad = self._pack_string(pad)
         self.cursor['pad'] = [input, pad, len, output]
         return self
 
@@ -555,6 +606,7 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
+        glue = self._pack_string(glue)
         self.cursor['join'] = [input, glue, output]
         return self
 
@@ -648,6 +700,7 @@ class WOQLQuery:
         if json:
             self.query = json
             return self
+
         return self.query
 
     def when(self, Query, Update=None):
@@ -695,6 +748,14 @@ class WOQLQuery:
         -------
         WOQLQuery object
             query object that can be chained and/or execute
+
+        Examples
+        -------
+        >>> WOQLQuery().woql_and(WOQLQuery().
+        ... triple('v:MandatorySubject','v:MandatoryObject', 'v:MandatoryValue'),
+        ... WOQLQuery.opt(WOQLQuery().triple('v:OptionalS', 'v:OptionalObject',
+        ... 'v:OptionalValue'))
+        ... )
         """
         if query:
             q = query.json() if callable(query.json) else query
@@ -1395,7 +1456,7 @@ class WOQLQuery:
 
     # Language elements that cannot be invoked from the top level and therefore are not exposed in the WOQL api
 
-    def woql_as(self, a=None, b=None):
+    def woql_as(self, a=None, b=None, c=None):
         """Imports the value identified by Source to a Target variable
 
         Parameters
@@ -1404,6 +1465,8 @@ class WOQLQuery:
             Source
         b : str
             Target
+        c : type
+            Type to cast input to
 
         Returns
         -------
@@ -1424,7 +1487,12 @@ class WOQLQuery:
                 val = a
             else:
                 val = { "@value" : a}
-            self.query.append({'as': [val, b]})
+
+            if c is not None:
+                self.query.append({'as': [val, b, c]})
+            else:
+                self.query.append({'as': [val, b]})
+
         else:
             if a.find(":") == -1:
                 a = "v:" + a
@@ -2342,7 +2410,7 @@ class WOQLQuery:
 
     def _is_chainable(self, operator, lastArg=None):
         """Determines whether a given operator can have a chained query as its last argument"""
-        non_chaining_operators = ["and", "or", "remote", "file", "re"]
+        non_chaining_operators = ["and", "or", "remote", "file", "re","post"]
         if (lastArg is not None and type(lastArg) == dict and
             '@value' not in lastArg and
             '@type' not in lastArg and
@@ -2355,21 +2423,23 @@ class WOQLQuery:
         else:
             return False
 
-    def execute(self, client):
+    def execute(self, client, fileList=None):
         """Executes the query using the passed client to connect to a server
 
         Parameters
         ----------
         client : woqlClient
         """
+
         if "@context" not in self.query:
             self.query['@context'] = self._default_context(client.conConfig.dbURL())
         json = self.json()
         if self.contains_update:
-            return client.select(json)
-            #return client.update(json)
+            #return client.select(json)
+            return client.update(json,None,None,fileList)
         else:
-            return client.select(json)
+            #return client.select(json)
+            return client.update(json,None,None,fileList)
 
 
 class TripleBuilder:

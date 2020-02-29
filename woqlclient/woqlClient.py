@@ -24,7 +24,7 @@ class WOQLClient:
 
     """
         The WOQLClient constructor
-        
+
         :param **kwargs Connection arguments used to configure the Client. (db=terminusDBName | server=terminusServerURL | doc=docName | key=apiKey)
 
     """
@@ -58,6 +58,11 @@ class WOQLClient:
         Returns
         -------
         dict or raise an InvalidURIError
+
+        Examples
+        -------
+        >>> woql.WOQLClient().connect(serverUrl, key)
+        dict
         """
         if serverURL:
             self.conConfig.setServer(serverURL)
@@ -72,7 +77,7 @@ class WOQLClient:
     @staticmethod
     def directConnect(serverURL, key):
         """
-        connect directly without create a new class instance
+        connect directly without creating a new class instance
 
         Parameters
         ----------
@@ -97,7 +102,7 @@ class WOQLClient:
         Parameters
         ----------
         dbID : str
-            TerminusDB id
+            ID of the specific database to create
         label : str
             Terminus label
         key : str, optional
@@ -108,6 +113,10 @@ class WOQLClient:
         Returns
         -------
         dict
+
+        Examples
+        --------
+        WOQLClient(server="http://localhost:6363").createDatabase("someDB", "Database Label", "password")
         """
         self.conConfig.setDB(dbID)
         createDBTemplate = DocumentTemplate.createDBTemplate(
@@ -143,18 +152,22 @@ class WOQLClient:
             idParser.dbURL(), const.CREATE_DATABASE, key, createDBTemplate)
 
     def deleteDatabase(self, dbID, key=None):
-        """Delete a TerminusDB
+        """Delete a TerminusDB database
 
         Parameters
         ----------
         dbID : str
-            terminusDB Id
+            ID of the database to delete
         key : str, optional
             you need the key if you didn't set before
 
         Returns
         -------
         dict
+
+        Examples
+        -------
+        >>> WOQLClient(server="http://localhost:6363").deleteDatabase("someDBToDelete", "password")
         """
         self.conConfig.setDB(dbID)
         jsonResponse = self.dispatch(
@@ -292,6 +305,9 @@ class WOQLClient:
             a valid TerminusDB id
         key : str, optional
             API key
+        Returns
+        -------
+        dict
         """
         if(dbID):
             self.conConfig.setDB(dbID)
@@ -314,6 +330,10 @@ class WOQLClient:
             a valid TerminusDB full URL
         key : str, optional
             API key
+
+        Returns
+        -------
+        dict or raise an InvalidURIError
         """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
@@ -335,6 +355,10 @@ class WOQLClient:
             API key
         opts : dict
             options object
+
+        Returns
+        -------
+        dict
         """
         if(dbID):
             self.conConfig.setDB(dbID)
@@ -356,6 +380,10 @@ class WOQLClient:
             API key
         opts : dict
             options object
+
+        Returns
+        -------
+        dict or raise an InvalidURIError
         """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
@@ -376,6 +404,10 @@ class WOQLClient:
             a valid TerminusDB id
         key : str, optional
             API key
+
+        Returns
+        -------
+        dict
         """
         if(dbID):
             self.conConfig.setDB(dbID)
@@ -400,6 +432,10 @@ class WOQLClient:
             API key
         docObj : dict
             a valid document in json-ld
+
+        Returns
+        -------
+        dict or raise an InvalidURIError
         """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
@@ -420,6 +456,10 @@ class WOQLClient:
             a valid TerminusDB id
         key : str, optional
             API key
+
+        Returns
+        -------
+        dict
         """
         if(dbID):
             self.conConfig.setDB(dbID)
@@ -441,6 +481,10 @@ class WOQLClient:
             a valid TerminusDB full URL
         key : str, optional
             API key
+
+        Returns
+        -------
+        dict or raise an InvalidURIError
         """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
@@ -448,7 +492,7 @@ class WOQLClient:
 
         return DispatchRequest.sendRequestByAction(idParser.docURL(), const.DELETE_DOCUMENT, key)
 
-    def select(self, woqlQuery, dbID=None, key=None):
+    def select(self, woqlQuery, dbID=None, key=None,fileList=None):
         """
         Executes a read-only WOQL query on the specified database and returns the results
 
@@ -460,46 +504,147 @@ class WOQLClient:
             a valid TerminusDB id
         key : str, optional
             API key
+        fileList : list, optional
+            List of files that are needed for the query
+
+        Returns
+        -------
+        dict
         """
         if(dbID):
             self.conConfig.setDB(dbID)
 
         payload = {'terminus:query': json.dumps(woqlQuery)}
+        if type(fileList) == dict:
+            payload.update(fileList);
+
         return self.dispatch(self.conConfig.queryURL(), const.WOQL_SELECT, key, payload)
 
     @staticmethod
-    def directSelect(woqlQuery, dbURL, key):
+    def directSelect(woqlQuery, dbURL, key, fileList=None):
+        """
+        Static function that executes a read-only WOQL query on the specified database
+        and returns the results
+
+        Parameters
+        ----------
+        woqlQuery : WOQLQuery object
+            woql query select statement
+        dbId : str
+            a valid full TerminusDB database URL
+        key : str, optional
+            API key
+        fileList : list, optional
+            List of files that are needed for the query
+
+        Returns
+        -------
+        dict or raise an InvalidURIError
+        """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
 
         payload = {'terminus:query': json.dumps(woqlQuery)}
+        if type(fileList) == dict:
+            payload.update(fileList);
         return DispatchRequest.sendRequestByAction(idParser.queryURL(), const.WOQL_SELECT, key, payload)
 
-    def update(self, woqlQuery, dbID=None, key=None):
+    def update(self, woqlQuery, dbID=None, key=None ,fileList=None):
         """
         Executes a WOQL query on the specified database which updates the state and returns the results
 
-        The first (qurl) argument can be
-        1) a valid URL of a terminus database or
-        2) omitted - the current database will be used
-        the second argument (woql) is a woql select statement encoded as a string
-        the third argument (opts) is an options json - opts.key is an optional API key
+        Parameters
+        ----------
+        woqlQuery : WOQLQuery object
+            woql query select statement
+        dbId : str
+            a valid TerminusDB database ID
+        key : str, optional
+            API key
+        fileList : list, optional
+            List of files that are needed for the query
+
+        Returns
+        -------
+        dict
         """
         if(dbID):
             self.conConfig.setDB(dbID)
             # raise InvalidURIError(ErrorMessage.getInvalidURIMessage(docurl, "Update"))
-        payload = {'terminus:query': json.dumps(woqlQuery)}
-        return self.dispatch(self.conConfig.queryURL(), const.WOQL_UPDATE, key, payload)
+        if type(fileList) == dict:
+            file_dict = {}
+            for name in fileList:
+                path = fileList[name]
+                stream = open(path, 'rb')
+                print(name)
+                file_dict[name] = (name,stream,'text/plain')
+            file_dict['terminus:query'] = (None,json.dumps(woqlQuery),'application/json')
+            payload = None
+        else:
+            file_dict = None
+            payload = {'terminus:query': json.dumps(woqlQuery)}
+
+        return self.dispatch(self.conConfig.queryURL(), const.WOQL_UPDATE, key, payload, file_dict)
 
     @staticmethod
-    def directUpdate(woqlQuery, dbURL, key):
+    def directUpdate(woqlQuery, dbURL, key,fileList=None):
+        """
+        Static function that executes a WOQL query on the specified database which
+        updates the state and returns the results
+
+        Parameters
+        ----------
+        woqlQuery : WOQLQuery object
+            woql query select statement
+        dbURL : str
+            a valid full TerminusDB database URL
+        key : str, optional
+            API key
+        fileList : list, optional
+            List of files that are needed for the query
+
+        Returns
+        -------
+        dict or raise an InvalidURIError
+        """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
 
-        payload = {'terminus:query': json.dumps(woqlQuery)}
-        return DispatchRequest.sendRequestByAction(idParser.queryURL(), const.WOQL_UPDATE, key, payload)
+        if type(fileList) == dict:
+            file_dict = {}
+            for name in fileList:
+                path = fileList[name]
+                stream = open(path, 'rb')
+                print(name)
+                file_dict[name] = (name,stream,'text/plain')
+            file_dict['terminus:query'] = (None,json.dumps(woqlQuery),'application/json')
+            payload = None
+        else:
+            file_dict = None
+            payload = {'terminus:query': json.dumps(woqlQuery)}
 
-    def dispatch(self, url, action, connectionKey, payload={}):
+        return DispatchRequest.sendRequestByAction(idParser.queryURL(), const.WOQL_UPDATE, key, payload, file_dict)
+
+    def dispatch(self, url, action, connectionKey, payload={}, file_dict = None):
+        """
+        Directly dispatch to a Terminus database.
+
+        Parameters
+        ----------
+        url : str
+            The server URL to point the action at
+        connectionKey : str
+            API key to the document
+        payload : dict
+            Payload to send to the server
+        file_dict : list, optional
+            List of files that are needed for the query
+
+
+        Returns
+        -------
+        dict or raise an InvalidURIError
+        """
         if connectionKey is None:
             # if the api key is not setted the method raise an APIerror
             connectionKey = self.conCapabilities.getClientKey()
@@ -513,4 +658,4 @@ class WOQLClient:
         #check if we can perform this action or raise an AccessDeniedError error
         #review the access control
         #self.conCapabilities.capabilitiesPermit(action)
-        return DispatchRequest.sendRequestByAction(url, action, connectionKey, payload)
+        return DispatchRequest.sendRequestByAction(url, action, connectionKey, payload, file_dict)
