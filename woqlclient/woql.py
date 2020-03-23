@@ -495,10 +495,10 @@ class WOQLQuery:
                    (nlist[i][:1] == ":"):
                    nlist[i-1] = nlist[i-1][:len(nlist[i-1])-1]
                    nlist[i] = nlist[i][1:]
-        elif 'list' in list:
-            nlist = list['list']
-        elif isinstance(list, (list, dict, WOQLQuery)):
-            nlist = list
+        elif 'list' in lst:
+            nlist = lst['list']
+        elif isinstance(lst, (list, dict, WOQLQuery)):
+            nlist = lst
         args = self._pack_strings(nlist)
         if v.find(":") == -1:
             v = "v:" + v
