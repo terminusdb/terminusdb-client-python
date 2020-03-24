@@ -71,7 +71,7 @@ html_theme_options = {
     'prev_next_buttons_location': 'bottom',
     'style_external_links': False,
     #'vcs_pageview_mode': 'blob',
-    'style_nav_header_background': '#0055B8',
+    'style_nav_header_background': '#002856',
     # Toc options
     'collapse_navigation': True,
     'sticky_navigation': True,
@@ -85,6 +85,10 @@ html_theme_options = {
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-html_logo = '_static/logo.png'
+html_css_files = [
+    'css/custom.css',
+]
+
+html_logo = '_static/horizontal_lockup_white.png'
 
 html_favicon = '_static/favicon.png'
