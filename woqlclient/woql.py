@@ -143,12 +143,12 @@ class WOQLQuery:
         return self
 
     def insert(self, node, type, graph=None):
-        """Inserts a new document of a specified type in a graph
+        """Inserts a new node of a specified type in a graph
 
         Parameters
         ----------
         node : str
-            document ID to be inserted
+            ID of the node to be inserted
         type : str
             The rdf type of the node. This should be defined in your schema.
         graph : str, optional
