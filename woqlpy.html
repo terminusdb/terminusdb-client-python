@@ -165,20 +165,20 @@
             
   <div class="section" id="woqlpy">
 <h1>woqlpy<a class="headerlink" href="#woqlpy" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="woqlclient.WOQLQuery">
-<em class="property">class </em><code class="descclassname">woqlclient.</code><code class="descname">WOQLQuery</code><span class="sig-paren">(</span><em>query=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">woqlclient.</code><code class="descname">WOQLQuery</code><span class="sig-paren">(</span><em><span class="n">query</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Creates a new Empty Query object</p>
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>query=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em><span class="n">query</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.get">
-<code class="descname">get</code><span class="sig-paren">(</span><em>arr1</em>, <em>arr2=None</em>, <em>target=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.get" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get</code><span class="sig-paren">(</span><em><span class="n">arr1</span></em>, <em><span class="n">arr2</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">target</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Imports the Target Resource to the variables defined in Map</p>
 <p>Takes an array of variables, an optional array of column names</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -202,9 +202,9 @@
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.woql_with">
-<code class="descname">woql_with</code><span class="sig-paren">(</span><em>gid</em>, <em>remq</em>, <em>subq=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.woql_with" title="Permalink to this definition">¶</a></dt>
+<code class="descname">woql_with</code><span class="sig-paren">(</span><em><span class="n">gid</span></em>, <em><span class="n">remq</span></em>, <em><span class="n">subq</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.woql_with" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads source into a temporary in-memory graph and runs the query on it.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -227,9 +227,9 @@
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.typecast">
-<code class="descname">typecast</code><span class="sig-paren">(</span><em>vara</em>, <em>type</em>, <em>varb</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.typecast" title="Permalink to this definition">¶</a></dt>
+<code class="descname">typecast</code><span class="sig-paren">(</span><em><span class="n">vara</span></em>, <em><span class="n">type</span></em>, <em><span class="n">varb</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.typecast" title="Permalink to this definition">¶</a></dt>
 <dd><p>Changes the type of va to type and saves the return in vb</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -252,22 +252,22 @@
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.insert">
-<code class="descname">insert</code><span class="sig-paren">(</span><em>node</em>, <em>type</em>, <em>graph=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.insert" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert a node with a specific type in a graph</p>
+<code class="descname">insert</code><span class="sig-paren">(</span><em><span class="n">node</span></em>, <em><span class="n">type</span></em>, <em><span class="n">graph</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inserts a new node of a specified type in a graph</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>node</strong> (<em>str</em>) – node to be insert</li>
-<li><strong>type</strong> (<em>str</em>) – type of the node</li>
+<li><strong>node</strong> (<em>str</em>) – ID of the node to be inserted</li>
+<li><strong>type</strong> (<em>str</em>) – The rdf type of the node. This should be defined in your schema.</li>
 <li><strong>graph</strong> (<em>str</em><em>, </em><em>optional</em>) – target graph</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query object that can be chained and/or execute</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a query object that can be chained and/or execute</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">WOQLQuery object</p>
@@ -275,11 +275,26 @@
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>If graph parameter is None then this is a shorthand for calling <a class="reference internal" href="#woqlclient.WOQLQuery.add_triple" title="woqlclient.WOQLQuery.add_triple"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_triple()</span></code></a> with
+rdf:type as predicate: <code class="docutils literal notranslate"><span class="pre">.add_triple(subject,</span> <span class="pre">'rdf:type',</span> <span class="pre">type).</span></code>
+Otherwise <a class="reference internal" href="#woqlclient.WOQLQuery.add_quad" title="woqlclient.WOQLQuery.add_quad"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_quad()</span></code></a> will be called.</p>
+<p>It will yield a json object like follows: <code class="docutils literal notranslate"><span class="pre">{'add_triple':</span> <span class="pre">['doc:subject',</span> <span class="pre">'rdf:type',</span> <span class="pre">'scm:type']}</span></code></p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">update</span> <span class="o">=</span> <span class="n">WOQLQuery</span><span class="p">()</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s2">&quot;Dog&quot;</span><span class="p">,</span> <span class="s2">&quot;scm:Animal&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s1">&#39;Dog&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qry</span> <span class="o">=</span> <span class="n">WOQLQuery</span><span class="p">()</span><span class="o">.</span><span class="n">when</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">update</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">qry</span><span class="o">.</span><span class="n">json</span><span class="p">(),</span> <span class="s1">&#39;MyDatabaseId&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#woqlclient.WOQLQuery.add_triple" title="woqlclient.WOQLQuery.add_triple"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_triple()</span></code></a>, <a class="reference internal" href="#woqlclient.WOQLQuery.add_quad" title="woqlclient.WOQLQuery.add_quad"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_quad()</span></code></a></p>
+</div>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.doctype">
-<code class="descname">doctype</code><span class="sig-paren">(</span><em>type</em>, <em>graph=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.doctype" title="Permalink to this definition">¶</a></dt>
+<code class="descname">doctype</code><span class="sig-paren">(</span><em><span class="n">type</span></em>, <em><span class="n">graph</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.doctype" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new document class in the schema - equivalent to: add_quad(type, “rdf:type”, “owl:Class”, graph), add_quad(type, subclassof, tcs:Document, graph)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -301,9 +316,9 @@
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.length">
-<code class="descname">length</code><span class="sig-paren">(</span><em>va</em>, <em>vb</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.length" title="Permalink to this definition">¶</a></dt>
+<code class="descname">length</code><span class="sig-paren">(</span><em><span class="n">va</span></em>, <em><span class="n">vb</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.length" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the length of the value in va and stores it in vb</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -325,17 +340,17 @@
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.remote">
-<code class="descname">remote</code><span class="sig-paren">(</span><em>url</em>, <em>opts=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.remote" title="Permalink to this definition">¶</a></dt>
+<code class="descname">remote</code><span class="sig-paren">(</span><em><span class="n">url</span></em>, <em><span class="n">opts</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.remote" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provides details of a remote data source in a JSON format that includes a URL property</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>url</strong> (<em>remote data source url</em>) – </li>
-<li><strong>opts</strong> (<em>input options</em><em>, </em><em>optional</em>) – </li>
+<li><strong>url</strong> (<em>str</em>) – remote data source</li>
+<li><strong>opts</strong> (<em>input options</em>) – optional</li>
 </ul>
 </td>
 </tr>
@@ -347,11 +362,25 @@
 </tr>
 </tbody>
 </table>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">csv</span> <span class="o">=</span> <span class="n">WOQLQuery</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">WOQLQuery</span><span class="p">()</span><span class="o">.</span><span class="n">woql_as</span><span class="p">(</span><span class="s2">&quot;Start station&quot;</span><span class="p">,</span> <span class="s2">&quot;v:Start_Station&quot;</span><span class="p">)</span><span class="o">.</span>
+<span class="gp">... </span>    <span class="n">woql_as</span><span class="p">(</span><span class="s2">&quot;End station&quot;</span><span class="p">,</span> <span class="s2">&quot;v:End_Station&quot;</span><span class="p">)</span><span class="o">.</span>
+<span class="gp">... </span>    <span class="n">woql_as</span><span class="p">(</span><span class="s2">&quot;Start date&quot;</span><span class="p">,</span> <span class="s2">&quot;v:Start_Time&quot;</span><span class="p">)</span><span class="o">.</span>
+<span class="gp">... </span>    <span class="n">woql_as</span><span class="p">(</span><span class="s2">&quot;End date&quot;</span><span class="p">,</span> <span class="s2">&quot;v:End_Time&quot;</span><span class="p">)</span><span class="o">.</span>
+<span class="gp">... </span>    <span class="n">woql_as</span><span class="p">(</span><span class="s2">&quot;Duration&quot;</span><span class="p">,</span> <span class="s2">&quot;v:Duration&quot;</span><span class="p">)</span><span class="o">.</span>
+<span class="gp">... </span>    <span class="n">woql_as</span><span class="p">(</span><span class="s2">&quot;Start station number&quot;</span><span class="p">,</span> <span class="s2">&quot;v:Start_ID&quot;</span><span class="p">)</span><span class="o">.</span>
+<span class="gp">... </span>    <span class="n">woql_as</span><span class="p">(</span><span class="s2">&quot;End station number&quot;</span><span class="p">,</span> <span class="s2">&quot;v:End_ID&quot;</span><span class="p">)</span><span class="o">.</span>
+<span class="gp">... </span>    <span class="n">woql_as</span><span class="p">(</span><span class="s2">&quot;Bike number&quot;</span><span class="p">,</span> <span class="s2">&quot;v:Bike&quot;</span><span class="p">)</span><span class="o">.</span>
+<span class="gp">... </span>    <span class="n">woql_as</span><span class="p">(</span><span class="s2">&quot;Member type&quot;</span><span class="p">,</span> <span class="s2">&quot;v:Member_Type&quot;</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="s2">&quot;https://terminusdb.com/t/data/bike_tutorial.csv&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.post">
-<code class="descname">post</code><span class="sig-paren">(</span><em>field</em>, <em>opts=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.post" title="Permalink to this definition">¶</a></dt>
+<code class="descname">post</code><span class="sig-paren">(</span><em><span class="n">field</span></em>, <em><span class="n">opts</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.post" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provides details of a file source in a JSON format that includes a URL property</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -359,7 +388,7 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>fileName</strong> (<em>str</em>) – field</li>
-<li><strong>opts</strong> (<em>input options</em><em>, </em><em>optional</em>) – </li>
+<li><strong>opts</strong> (<em>input options</em>) – optional</li>
 </ul>
 </td>
 </tr>
@@ -373,9 +402,9 @@
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.file">
-<code class="descname">file</code><span class="sig-paren">(</span><em>json</em>, <em>opts=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.file" title="Permalink to this definition">¶</a></dt>
+<code class="descname">file</code><span class="sig-paren">(</span><em><span class="n">json</span></em>, <em><span class="n">opts</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provides details of a file source in a JSON format that includes a URL property</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -383,7 +412,7 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>json</strong> (<em>dict</em>) – file data source in a JSON format</li>
-<li><strong>opts</strong> (<em>imput options</em><em>, </em><em>optional</em>) – </li>
+<li><strong>opts</strong> (<em>input options</em>) – optional</li>
 </ul>
 </td>
 </tr>
@@ -397,9 +426,9 @@
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.group_by">
-<code class="descname">group_by</code><span class="sig-paren">(</span><em>gvarlist</em>, <em>groupedvar</em>, <em>groupquery</em>, <em>output=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.group_by" title="Permalink to this definition">¶</a></dt>
+<code class="descname">group_by</code><span class="sig-paren">(</span><em><span class="n">gvarlist</span></em>, <em><span class="n">groupedvar</span></em>, <em><span class="n">groupquery</span></em>, <em><span class="n">output</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.group_by" title="Permalink to this definition">¶</a></dt>
 <dd><p>Groups the results of groupquery together by the list of variables gvarlist, using the variable groupedvar as a grouping and saves the result into variable output.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -423,9 +452,9 @@
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.order_by">
-<code class="descname">order_by</code><span class="sig-paren">(</span><em>gvarlist</em>, <em>query=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.order_by" title="Permalink to this definition">¶</a></dt>
+<code class="descname">order_by</code><span class="sig-paren">(</span><em><span class="n">gvarlist</span></em>, <em><span class="n">query</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.order_by" title="Permalink to this definition">¶</a></dt>
 <dd><p>Orders the results by the list of variables including in gvarlist, asc_or_desc is a WOQL.asc or WOQ.desc list of variables</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -447,9 +476,9 @@
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.asc">
-<code class="descname">asc</code><span class="sig-paren">(</span><em>var</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.asc" title="Permalink to this definition">¶</a></dt>
+<code class="descname">asc</code><span class="sig-paren">(</span><em><span class="n">var</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.asc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Orders by ascending order on this argument</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -465,9 +494,9 @@
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.desc">
-<code class="descname">desc</code><span class="sig-paren">(</span><em>var</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.desc" title="Permalink to this definition">¶</a></dt>
+<code class="descname">desc</code><span class="sig-paren">(</span><em><span class="n">var</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.desc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Orders by descending value</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -483,9 +512,9 @@
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.idgen">
-<code class="descname">idgen</code><span class="sig-paren">(</span><em>prefix</em>, <em>vari</em>, <em>type</em>, <em>mode=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.idgen" title="Permalink to this definition">¶</a></dt>
+<code class="descname">idgen</code><span class="sig-paren">(</span><em><span class="n">prefix</span></em>, <em><span class="n">vari</span></em>, <em><span class="n">type</span></em>, <em><span class="n">mode</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.idgen" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates an ID for a node as a function of the passed VariableList with a specific prefix (URL base). If the values of the passed variables are the same, the output will be the same</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -509,9 +538,9 @@
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.unique">
-<code class="descname">unique</code><span class="sig-paren">(</span><em>prefix</em>, <em>vari</em>, <em>type</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.unique" title="Permalink to this definition">¶</a></dt>
+<code class="descname">unique</code><span class="sig-paren">(</span><em><span class="n">prefix</span></em>, <em><span class="n">vari</span></em>, <em><span class="n">type</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.unique" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates an ID for a node as a function of the passed VariableList with a specific prefix (URL base). If the values of the passed variables are the same, the output will be the same</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -534,9 +563,9 @@
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.re">
-<code class="descname">re</code><span class="sig-paren">(</span><em>pattern</em>, <em>test</em>, <em>matches</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.re" title="Permalink to this definition">¶</a></dt>
+<code class="descname">re</code><span class="sig-paren">(</span><em><span class="n">pattern</span></em>, <em><span class="n">test</span></em>, <em><span class="n">matches</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.re" title="Permalink to this definition">¶</a></dt>
 <dd><p>Regular Expression Call</p>
 <p>p is a regex pattern (.*) using normal regular expression syntax, the only unusual thing is that special characters have to be escaped twice, s is the string to be matched and m is a list of matches:
 e.g. WOQL.re(“(.).*”, “hello”, [“v:All”, “v:Sub”])</p>
@@ -561,9 +590,9 @@ e.g. WOQL.re(“(.).*”, “hello”, [“v:All”, “v:Sub”])</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.concat">
-<code class="descname">concat</code><span class="sig-paren">(</span><em>lst</em>, <em>v</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.concat" title="Permalink to this definition">¶</a></dt>
+<code class="descname">concat</code><span class="sig-paren">(</span><em><span class="n">lst</span></em>, <em><span class="n">v</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.concat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Concatenates the list of variables into a string and saves the result in v</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -585,9 +614,9 @@ e.g. WOQL.re(“(.).*”, “hello”, [“v:All”, “v:Sub”])</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.split">
-<code class="descname">split</code><span class="sig-paren">(</span><em>input</em>, <em>separator</em>, <em>output</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.split" title="Permalink to this definition">¶</a></dt>
+<code class="descname">split</code><span class="sig-paren">(</span><em><span class="n">input</span></em>, <em><span class="n">separator</span></em>, <em><span class="n">output</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.split" title="Permalink to this definition">¶</a></dt>
 <dd><p>Splits a variable apart (input) into a list of variables (output) by separating the strings together with separator</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -610,9 +639,9 @@ e.g. WOQL.re(“(.).*”, “hello”, [“v:All”, “v:Sub”])</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.member">
-<code class="descname">member</code><span class="sig-paren">(</span><em>ele</em>, <em>list_obj</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.member" title="Permalink to this definition">¶</a></dt>
+<code class="descname">member</code><span class="sig-paren">(</span><em><span class="n">ele</span></em>, <em><span class="n">list_obj</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.member" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterates through a list and returns a value for each member</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -634,9 +663,9 @@ e.g. WOQL.re(“(.).*”, “hello”, [“v:All”, “v:Sub”])</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.lower">
-<code class="descname">lower</code><span class="sig-paren">(</span><em>u</em>, <em>l</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.lower" title="Permalink to this definition">¶</a></dt>
+<code class="descname">lower</code><span class="sig-paren">(</span><em><span class="n">u</span></em>, <em><span class="n">l</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.lower" title="Permalink to this definition">¶</a></dt>
 <dd><p>Changes a string to lower-case - input is in u, output in l</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -658,9 +687,9 @@ e.g. WOQL.re(“(.).*”, “hello”, [“v:All”, “v:Sub”])</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.pad">
-<code class="descname">pad</code><span class="sig-paren">(</span><em>input</em>, <em>pad</em>, <em>len</em>, <em>output</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.pad" title="Permalink to this definition">¶</a></dt>
+<code class="descname">pad</code><span class="sig-paren">(</span><em><span class="n">input</span></em>, <em><span class="n">pad</span></em>, <em><span class="n">len</span></em>, <em><span class="n">output</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.pad" title="Permalink to this definition">¶</a></dt>
 <dd><p>Pads out the string input to be exactly len long by appending the pad character pad to form output</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -684,9 +713,9 @@ e.g. WOQL.re(“(.).*”, “hello”, [“v:All”, “v:Sub”])</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.join">
-<code class="descname">join</code><span class="sig-paren">(</span><em>input</em>, <em>glue</em>, <em>output</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.join" title="Permalink to this definition">¶</a></dt>
+<code class="descname">join</code><span class="sig-paren">(</span><em><span class="n">input</span></em>, <em><span class="n">glue</span></em>, <em><span class="n">output</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.join" title="Permalink to this definition">¶</a></dt>
 <dd><p>Joins a list variable together (input) into a string variable (output) by glueing the strings together with glue</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -709,9 +738,9 @@ e.g. WOQL.re(“(.).*”, “hello”, [“v:All”, “v:Sub”])</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.sum">
-<code class="descname">sum</code><span class="sig-paren">(</span><em>input</em>, <em>output</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.sum" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sum</code><span class="sig-paren">(</span><em><span class="n">input</span></em>, <em><span class="n">output</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.sum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Joins a list variable containing numbers together (input) into a single number
 containing the sum.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -734,9 +763,9 @@ containing the sum.</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.less">
-<code class="descname">less</code><span class="sig-paren">(</span><em>v1</em>, <em>v2</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.less" title="Permalink to this definition">¶</a></dt>
+<code class="descname">less</code><span class="sig-paren">(</span><em><span class="n">v1</span></em>, <em><span class="n">v2</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.less" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compares the value of v1 against v2 and returns true if v1 is less than v2</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -758,9 +787,9 @@ containing the sum.</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.greater">
-<code class="descname">greater</code><span class="sig-paren">(</span><em>v1</em>, <em>v2</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.greater" title="Permalink to this definition">¶</a></dt>
+<code class="descname">greater</code><span class="sig-paren">(</span><em><span class="n">v1</span></em>, <em><span class="n">v2</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.greater" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compares the value of v1 against v2 and returns true if v1 is greater than v2</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -782,9 +811,9 @@ containing the sum.</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.list">
-<code class="descname">list</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.list" title="Permalink to this definition">¶</a></dt>
+<code class="descname">list</code><span class="sig-paren">(</span><em><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a list of variables for WOQL</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -800,9 +829,9 @@ containing the sum.</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.json">
-<code class="descname">json</code><span class="sig-paren">(</span><em>json=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.json" title="Permalink to this definition">¶</a></dt>
+<code class="descname">json</code><span class="sig-paren">(</span><em><span class="n">json</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates a WOQLQuery object from the passed WOQL JSON</p>
 <p>json version of query for passing to api</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -819,9 +848,9 @@ containing the sum.</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.when">
-<code class="descname">when</code><span class="sig-paren">(</span><em>Query</em>, <em>Update=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.when" title="Permalink to this definition">¶</a></dt>
+<code class="descname">when</code><span class="sig-paren">(</span><em><span class="n">Query</span></em>, <em><span class="n">Update</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.when" title="Permalink to this definition">¶</a></dt>
 <dd><p>When the sub-query in Condition is met, the Update query is executed</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -846,9 +875,9 @@ containing the sum.</p>
 into the corrent place in the encompassing json</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.opt">
-<code class="descname">opt</code><span class="sig-paren">(</span><em>query=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.opt" title="Permalink to this definition">¶</a></dt>
+<code class="descname">opt</code><span class="sig-paren">(</span><em><span class="n">query</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.opt" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Query in the Optional argument is specified as optional</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -872,9 +901,9 @@ into the corrent place in the encompassing json</p>
 </div>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.woql_from">
-<code class="descname">woql_from</code><span class="sig-paren">(</span><em>dburl</em>, <em>query=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.woql_from" title="Permalink to this definition">¶</a></dt>
+<code class="descname">woql_from</code><span class="sig-paren">(</span><em><span class="n">dburl</span></em>, <em><span class="n">query</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.woql_from" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specifies the database URL that will be the default database for the enclosed query</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -896,9 +925,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.into">
-<code class="descname">into</code><span class="sig-paren">(</span><em>dburl</em>, <em>query=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.into" title="Permalink to this definition">¶</a></dt>
+<code class="descname">into</code><span class="sig-paren">(</span><em><span class="n">dburl</span></em>, <em><span class="n">query</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.into" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the current output graph for writing output to.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -920,9 +949,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.limit">
-<code class="descname">limit</code><span class="sig-paren">(</span><em>limit</em>, <em>query=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.limit" title="Permalink to this definition">¶</a></dt>
+<code class="descname">limit</code><span class="sig-paren">(</span><em><span class="n">limit</span></em>, <em><span class="n">query</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.limit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specifies that only the first Number of rows will be returned</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -944,9 +973,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.start">
-<code class="descname">start</code><span class="sig-paren">(</span><em>start</em>, <em>query=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.start" title="Permalink to this definition">¶</a></dt>
+<code class="descname">start</code><span class="sig-paren">(</span><em><span class="n">start</span></em>, <em><span class="n">query</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.start" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specifies that the start of the query returned</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -968,9 +997,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.select">
-<code class="descname">select</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.select" title="Permalink to this definition">¶</a></dt>
+<code class="descname">select</code><span class="sig-paren">(</span><em><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.select" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filters the query so that only the variables included in [V1…Vn] are returned in the bindings</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -986,9 +1015,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.woql_and">
-<code class="descname">woql_and</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.woql_and" title="Permalink to this definition">¶</a></dt>
+<code class="descname">woql_and</code><span class="sig-paren">(</span><em><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.woql_and" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a logical AND of the arguments</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1004,9 +1033,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.woql_or">
-<code class="descname">woql_or</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.woql_or" title="Permalink to this definition">¶</a></dt>
+<code class="descname">woql_or</code><span class="sig-paren">(</span><em><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.woql_or" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a logical OR of the arguments</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1022,9 +1051,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.woql_not">
-<code class="descname">woql_not</code><span class="sig-paren">(</span><em>query=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.woql_not" title="Permalink to this definition">¶</a></dt>
+<code class="descname">woql_not</code><span class="sig-paren">(</span><em><span class="n">query</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.woql_not" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a logical NOT of the arguments</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1040,9 +1069,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.triple">
-<code class="descname">triple</code><span class="sig-paren">(</span><em>sub</em>, <em>pre</em>, <em>obj</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.triple" title="Permalink to this definition">¶</a></dt>
+<code class="descname">triple</code><span class="sig-paren">(</span><em><span class="n">sub</span></em>, <em><span class="n">pre</span></em>, <em><span class="n">obj</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.triple" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a triple pattern matching rule for the triple [S, P, O] (Subject, Predicate, Object)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1065,9 +1094,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.quad">
-<code class="descname">quad</code><span class="sig-paren">(</span><em>sub</em>, <em>pre</em>, <em>obj</em>, <em>gra</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.quad" title="Permalink to this definition">¶</a></dt>
+<code class="descname">quad</code><span class="sig-paren">(</span><em><span class="n">sub</span></em>, <em><span class="n">pre</span></em>, <em><span class="n">obj</span></em>, <em><span class="n">gra</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.quad" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a pattern matching rule for the quad [S, P, O, G] (Subject, Predicate, Object, Graph)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1091,9 +1120,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.eq">
-<code class="descname">eq</code><span class="sig-paren">(</span><em>a</em>, <em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.eq" title="Permalink to this definition">¶</a></dt>
+<code class="descname">eq</code><span class="sig-paren">(</span><em><span class="n">a</span></em>, <em><span class="n">b</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.eq" title="Permalink to this definition">¶</a></dt>
 <dd><p>Matches if a is equal to b</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1115,9 +1144,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.sub">
-<code class="descname">sub</code><span class="sig-paren">(</span><em>a</em>, <em>b=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.sub" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sub</code><span class="sig-paren">(</span><em><span class="n">a</span></em>, <em><span class="n">b</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.sub" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns true if ClassA is a sub-class of ClassB, according to the current DB schema</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1139,9 +1168,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.comment">
-<code class="descname">comment</code><span class="sig-paren">(</span><em>val=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.comment" title="Permalink to this definition">¶</a></dt>
+<code class="descname">comment</code><span class="sig-paren">(</span><em><span class="n">val</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.comment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a text comment to a query - can also be used to wrap any part of a query to turn it off</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1157,9 +1186,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.abstract">
-<code class="descname">abstract</code><span class="sig-paren">(</span><em>varname=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.abstract" title="Permalink to this definition">¶</a></dt>
+<code class="descname">abstract</code><span class="sig-paren">(</span><em><span class="n">varname</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.abstract" title="Permalink to this definition">¶</a></dt>
 <dd><p>If no argument is set, this is used to specify that a new class is abstract. If used with an argument, a triple check for class abstraction is added and the result is saved in varname</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1175,9 +1204,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.isa">
-<code class="descname">isa</code><span class="sig-paren">(</span><em>a</em>, <em>b=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.isa" title="Permalink to this definition">¶</a></dt>
+<code class="descname">isa</code><span class="sig-paren">(</span><em><span class="n">a</span></em>, <em><span class="n">b</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.isa" title="Permalink to this definition">¶</a></dt>
 <dd><p>Matches if Instance is a member of Class, according to the current state of the DB</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1199,9 +1228,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.trim">
-<code class="descname">trim</code><span class="sig-paren">(</span><em>string</em>, <em>variable</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.trim" title="Permalink to this definition">¶</a></dt>
+<code class="descname">trim</code><span class="sig-paren">(</span><em><span class="n">string</span></em>, <em><span class="n">variable</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.trim" title="Permalink to this definition">¶</a></dt>
 <dd><p>A trimmed version of StringA (with leading and trailing whitespace removed) is copied into VariableA</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1223,9 +1252,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.eval">
-<code class="descname">eval</code><span class="sig-paren">(</span><em>arith</em>, <em>v</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.eval" title="Permalink to this definition">¶</a></dt>
+<code class="descname">eval</code><span class="sig-paren">(</span><em><span class="n">arith</span></em>, <em><span class="n">v</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.eval" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluates the Arithmetic Expression Arith and copies the output to variable V</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1247,9 +1276,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.plus">
-<code class="descname">plus</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.plus" title="Permalink to this definition">¶</a></dt>
+<code class="descname">plus</code><span class="sig-paren">(</span><em><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.plus" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds numbers N1…Nn together</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1265,9 +1294,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.minus">
-<code class="descname">minus</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.minus" title="Permalink to this definition">¶</a></dt>
+<code class="descname">minus</code><span class="sig-paren">(</span><em><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.minus" title="Permalink to this definition">¶</a></dt>
 <dd><p>Subtracts Numbers N1..Nn</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1283,9 +1312,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.times">
-<code class="descname">times</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.times" title="Permalink to this definition">¶</a></dt>
+<code class="descname">times</code><span class="sig-paren">(</span><em><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.times" title="Permalink to this definition">¶</a></dt>
 <dd><p>Multiplies numbers N1…Nn together</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1301,9 +1330,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.divide">
-<code class="descname">divide</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.divide" title="Permalink to this definition">¶</a></dt>
+<code class="descname">divide</code><span class="sig-paren">(</span><em><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.divide" title="Permalink to this definition">¶</a></dt>
 <dd><p>Divides numbers N1…Nn by each other left, to right precedence</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1319,9 +1348,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.div">
-<code class="descname">div</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.div" title="Permalink to this definition">¶</a></dt>
+<code class="descname">div</code><span class="sig-paren">(</span><em><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.div" title="Permalink to this definition">¶</a></dt>
 <dd><p>Division - integer division - args are divided left to right</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1337,9 +1366,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.exp">
-<code class="descname">exp</code><span class="sig-paren">(</span><em>a</em>, <em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.exp" title="Permalink to this definition">¶</a></dt>
+<code class="descname">exp</code><span class="sig-paren">(</span><em><span class="n">a</span></em>, <em><span class="n">b</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.exp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises A to the power of B</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1361,9 +1390,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.delete">
-<code class="descname">delete</code><span class="sig-paren">(</span><em>JSON_or_IRI</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.delete" title="Permalink to this definition">¶</a></dt>
+<code class="descname">delete</code><span class="sig-paren">(</span><em><span class="n">JSON_or_IRI</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes a node identified by an IRI or a JSON-LD document</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1379,35 +1408,10 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
-<dt id="woqlclient.WOQLQuery.delete_triple">
-<code class="descname">delete_triple</code><span class="sig-paren">(</span><em>subject</em>, <em>predicate</em>, <em>object_or_literal</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.delete_triple" title="Permalink to this definition">¶</a></dt>
-<dd><p>Deletes any triples that match the rule [S,P,O]</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>subject</strong> (<em>str</em>) – Subject</li>
-<li><strong>predicate</strong> (<em>str</em>) – Predicate</li>
-<li><strong>object_or_literal</strong> (<em>str</em>) – Object or Literal</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query object that can be chained and/or execute</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">WOQLQuery object</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.add_triple">
-<code class="descname">add_triple</code><span class="sig-paren">(</span><em>subject</em>, <em>predicate</em>, <em>object_or_literal</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.add_triple" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds triples according to the the pattern [S,P,O]</p>
+<code class="descname">add_triple</code><span class="sig-paren">(</span><em><span class="n">subject</span></em>, <em><span class="n">predicate</span></em>, <em><span class="n">object_or_literal</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.add_triple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds triples according to the the pattern [subject, predicate, object]</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1427,12 +1431,27 @@ into the corrent place in the encompassing json</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Examples</p>
+<p>This example adds a triple for a comment predicate and a certain value to the document identified by doc:X:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">update</span> <span class="o">=</span> <span class="n">WOQLQuery</span><span class="p">()</span><span class="o">.</span><span class="n">add_triple</span><span class="p">(</span><span class="s2">&quot;doc:X&quot;</span><span class="p">,</span> <span class="s2">&quot;comment&quot;</span><span class="p">,</span> <span class="s2">&quot;my comment&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qry</span> <span class="o">=</span> <span class="n">WOQLQuery</span><span class="p">()</span><span class="o">.</span><span class="n">when</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">update</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">qry</span><span class="o">.</span><span class="n">json</span><span class="p">(),</span> <span class="s1">&#39;MyDatabaseId&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">Notes</p>
+<p>To update an existing triple, it is not just a case of calling <cite>add_triple</cite> again.
+One needs to delete the previous triple first.
+Otherwise two triples with the same predicate but different object values will be present.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#woqlclient.WOQLQuery.delete_triple" title="woqlclient.WOQLQuery.delete_triple"><code class="xref py py-meth docutils literal notranslate"><span class="pre">delete_triple()</span></code></a>, <a class="reference internal" href="#woqlclient.WOQLQuery.add_quad" title="woqlclient.WOQLQuery.add_quad"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_quad()</span></code></a></p>
+</div>
 </dd></dl>
 
-<dl class="method">
-<dt id="woqlclient.WOQLQuery.delete_quad">
-<code class="descname">delete_quad</code><span class="sig-paren">(</span><em>subject</em>, <em>predicate</em>, <em>object_or_literal</em>, <em>graph</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.delete_quad" title="Permalink to this definition">¶</a></dt>
-<dd><p>Deletes any quads that match the rule [S, P, O, G] (Subject, Predicate, Object, Graph)</p>
+<dl class="py method">
+<dt id="woqlclient.WOQLQuery.delete_triple">
+<code class="descname">delete_triple</code><span class="sig-paren">(</span><em><span class="n">subject</span></em>, <em><span class="n">predicate</span></em>, <em><span class="n">object_or_literal</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.delete_triple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes any triples that match the rule [subject, predicate, object]</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1441,7 +1460,6 @@ into the corrent place in the encompassing json</p>
 <li><strong>subject</strong> (<em>str</em>) – Subject</li>
 <li><strong>predicate</strong> (<em>str</em>) – Predicate</li>
 <li><strong>object_or_literal</strong> (<em>str</em>) – Object or Literal</li>
-<li><strong>graph</strong> (<em>str</em>) – Graph</li>
 </ul>
 </td>
 </tr>
@@ -1453,12 +1471,30 @@ into the corrent place in the encompassing json</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Examples</p>
+<p>This example deletes the comment triple of a particular value from the document
+identified by doc:X:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">update</span> <span class="o">=</span> <span class="n">WOQLQuery</span><span class="p">()</span><span class="o">.</span><span class="n">delete_triple</span><span class="p">(</span><span class="s2">&quot;doc:X&quot;</span><span class="p">,</span> <span class="s2">&quot;comment&quot;</span><span class="p">,</span> <span class="s2">&quot;my comment&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qry</span> <span class="o">=</span> <span class="n">WOQLQuery</span><span class="p">()</span><span class="o">.</span><span class="n">when</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">update</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">qry</span><span class="o">.</span><span class="n">json</span><span class="p">(),</span> <span class="s1">&#39;MyDatabaseId&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that only triples matching the particular object value will be deleted.
+To delete all triples matching this predicate, (regardless of value) we use a
+when clause, and introduce a variable <code class="docutils literal notranslate"><span class="pre">v:any</span></code> which will bind to any value
+for this subject and predicate combination:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">when</span> <span class="o">=</span> <span class="n">WOQLQuery</span><span class="p">()</span><span class="o">.</span><span class="n">triple</span><span class="p">(</span><span class="s1">&#39;doc:X&#39;</span><span class="p">,</span> <span class="s1">&#39;comment&#39;</span><span class="p">,</span> <span class="s1">&#39;v:any&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">update</span> <span class="o">=</span> <span class="n">WOQLQuery</span><span class="p">()</span><span class="o">.</span><span class="n">delete_triple</span><span class="p">(</span><span class="s1">&#39;doc:X&#39;</span><span class="p">,</span> <span class="s1">&#39;comment&#39;</span><span class="p">,</span> <span class="s1">&#39;v:any&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qry</span> <span class="o">=</span> <span class="n">WOQLQuery</span><span class="p">()</span><span class="o">.</span><span class="n">when</span><span class="p">(</span><span class="n">when</span><span class="p">,</span> <span class="n">update</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">qry</span><span class="o">.</span><span class="n">json</span><span class="p">(),</span> <span class="s1">&#39;MyDatabaseId&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.add_quad">
-<code class="descname">add_quad</code><span class="sig-paren">(</span><em>subject</em>, <em>predicate</em>, <em>object_or_literal</em>, <em>graph</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.add_quad" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds quads according to the pattern [S,P,O,G]</p>
+<code class="descname">add_quad</code><span class="sig-paren">(</span><em><span class="n">subject</span></em>, <em><span class="n">predicate</span></em>, <em><span class="n">object_or_literal</span></em>, <em><span class="n">graph</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.add_quad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds quads according to the pattern [subject, predicate, object, graph]</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1481,9 +1517,35 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
+<dt id="woqlclient.WOQLQuery.delete_quad">
+<code class="descname">delete_quad</code><span class="sig-paren">(</span><em><span class="n">subject</span></em>, <em><span class="n">predicate</span></em>, <em><span class="n">object_or_literal</span></em>, <em><span class="n">graph</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.delete_quad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes any quads that match the rule [subject, predicate, object, graph]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>subject</strong> (<em>str</em>) – Subject</li>
+<li><strong>predicate</strong> (<em>str</em>) – Predicate</li>
+<li><strong>object_or_literal</strong> (<em>str</em>) – Object or Literal</li>
+<li><strong>graph</strong> (<em>str</em>) – Graph</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">query object that can be chained and/or execute</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">WOQLQuery object</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.add_class">
-<code class="descname">add_class</code><span class="sig-paren">(</span><em>classid=None</em>, <em>graph=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.add_class" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_class</code><span class="sig-paren">(</span><em><span class="n">classid</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">graph</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.add_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates a new Class with the given ClassID and writes it to the DB schema</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1505,9 +1567,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.delete_class">
-<code class="descname">delete_class</code><span class="sig-paren">(</span><em>classid=None</em>, <em>graph=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.delete_class" title="Permalink to this definition">¶</a></dt>
+<code class="descname">delete_class</code><span class="sig-paren">(</span><em><span class="n">classid</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">graph</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.delete_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes the Class with the passed ID form the schema (and all references to it)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1529,9 +1591,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.add_property">
-<code class="descname">add_property</code><span class="sig-paren">(</span><em>p=None</em>, <em>t=None</em>, <em>g=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.add_property" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_property</code><span class="sig-paren">(</span><em><span class="n">p</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">t</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">g</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.add_property" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates a new Property with the given PropertyID and a range of type PropType and writes it to the DB schema</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1554,9 +1616,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.delete_property">
-<code class="descname">delete_property</code><span class="sig-paren">(</span><em>p=None</em>, <em>graph=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.delete_property" title="Permalink to this definition">¶</a></dt>
+<code class="descname">delete_property</code><span class="sig-paren">(</span><em><span class="n">p</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">graph</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.delete_property" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes the property with the passed ID from the schema (and all references to it)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1578,9 +1640,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.woql_as">
-<code class="descname">woql_as</code><span class="sig-paren">(</span><em>a=None</em>, <em>b=None</em>, <em>c=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.woql_as" title="Permalink to this definition">¶</a></dt>
+<code class="descname">woql_as</code><span class="sig-paren">(</span><em><span class="n">a</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">b</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">c</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.woql_as" title="Permalink to this definition">¶</a></dt>
 <dd><p>Imports the value identified by Source to a Target variable</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1603,9 +1665,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.node">
-<code class="descname">node</code><span class="sig-paren">(</span><em>node</em>, <em>type=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.node" title="Permalink to this definition">¶</a></dt>
+<code class="descname">node</code><span class="sig-paren">(</span><em><span class="n">node</span></em>, <em><span class="n">type</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.node" title="Permalink to this definition">¶</a></dt>
 <dd><p>Selects nodes with the ID NodeID as the subject of subsequent sub-queries. The second argument PatternType specifies what type of sub-queries are being constructed, options are: triple, quad, update_triple, update_quad, delete_triple, delete_quad</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1627,9 +1689,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.graph">
-<code class="descname">graph</code><span class="sig-paren">(</span><em>g</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.graph" title="Permalink to this definition">¶</a></dt>
+<code class="descname">graph</code><span class="sig-paren">(</span><em><span class="n">g</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.graph" title="Permalink to this definition">¶</a></dt>
 <dd><p>Used to specify that the rest of the query should use the graph g in calls to add_quad, quad, etc</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1645,10 +1707,11 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.label">
-<code class="descname">label</code><span class="sig-paren">(</span><em>l</em>, <em>lang=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.label" title="Permalink to this definition">¶</a></dt>
+<code class="descname">label</code><span class="sig-paren">(</span><em><span class="n">l</span></em>, <em><span class="n">lang</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.label" title="Permalink to this definition">¶</a></dt>
 <dd><p>Depending on context, either adds a label match to a triple/quad or adds a label create to add_quad, add_triple</p>
+<p>The triple/quad that will get created will be for the rdfs:label predicate.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1669,9 +1732,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.description">
-<code class="descname">description</code><span class="sig-paren">(</span><em>c</em>, <em>lang=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.description" title="Permalink to this definition">¶</a></dt>
+<code class="descname">description</code><span class="sig-paren">(</span><em><span class="n">c</span></em>, <em><span class="n">lang</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.description" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds or matches a rdfs:comment field in a query</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1693,9 +1756,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.domain">
-<code class="descname">domain</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.domain" title="Permalink to this definition">¶</a></dt>
+<code class="descname">domain</code><span class="sig-paren">(</span><em><span class="n">d</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.domain" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specifies the domain of a new property</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1711,9 +1774,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.parent">
-<code class="descname">parent</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.parent" title="Permalink to this definition">¶</a></dt>
+<code class="descname">parent</code><span class="sig-paren">(</span><em><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.parent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specifies that a new class should have parents listed in <a href="#id1"><span class="problematic" id="id2">*</span></a>args - (short hand for (a, rdfs:subClassOf b)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1729,7 +1792,7 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.entity">
 <code class="descname">entity</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.entity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds or matches a subclass relationship to tcs:Entity class</p>
@@ -1745,9 +1808,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.property">
-<code class="descname">property</code><span class="sig-paren">(</span><em>p</em>, <em>val</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.property" title="Permalink to this definition">¶</a></dt>
+<code class="descname">property</code><span class="sig-paren">(</span><em><span class="n">p</span></em>, <em><span class="n">val</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.property" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specifies that property p should have value val</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1769,9 +1832,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.max">
-<code class="descname">max</code><span class="sig-paren">(</span><em>m</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.max" title="Permalink to this definition">¶</a></dt>
+<code class="descname">max</code><span class="sig-paren">(</span><em><span class="n">m</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.max" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the maximum cardinality for a property to m</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1787,9 +1850,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.cardinality">
-<code class="descname">cardinality</code><span class="sig-paren">(</span><em>m</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.cardinality" title="Permalink to this definition">¶</a></dt>
+<code class="descname">cardinality</code><span class="sig-paren">(</span><em><span class="n">m</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.cardinality" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the cardinality of a property to be precisely m</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1805,9 +1868,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.min">
-<code class="descname">min</code><span class="sig-paren">(</span><em>m</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.min" title="Permalink to this definition">¶</a></dt>
+<code class="descname">min</code><span class="sig-paren">(</span><em><span class="n">m</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.min" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the minimum cardinality for a property to m</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1823,9 +1886,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.star">
-<code class="descname">star</code><span class="sig-paren">(</span><em>GraphIRI=None</em>, <em>Subj=None</em>, <em>Pred=None</em>, <em>Obj=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.star" title="Permalink to this definition">¶</a></dt>
+<code class="descname">star</code><span class="sig-paren">(</span><em><span class="n">GraphIRI</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">Subj</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">Pred</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">Obj</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.star" title="Permalink to this definition">¶</a></dt>
 <dd><p>Selects everything as triples in the graph identified by GraphIRI into variables Subj, Pred, Obj - by default they are “v:Subject”, “v:Predicate”, “v:Object”</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1849,9 +1912,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.get_everything">
-<code class="descname">get_everything</code><span class="sig-paren">(</span><em>GraphIRI=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.get_everything" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_everything</code><span class="sig-paren">(</span><em><span class="n">GraphIRI</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.get_everything" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves all triples from the graph in question as (v:Subject, v:Predicate, v:Object)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1867,7 +1930,7 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.get_all_documents">
 <code class="descname">get_all_documents</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.get_all_documents" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves document id (v:Document) and type (v:Type) of all documents</p>
@@ -1883,7 +1946,7 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.document_metadata">
 <code class="descname">document_metadata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.document_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves meta-data about all documents, document id, label, comment (v:ID, v:Label, v:Comment), document class id, label and comment (v:Class, v:Type, v:Type_Comment),</p>
@@ -1899,7 +1962,7 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.concrete_document_classes">
 <code class="descname">concrete_document_classes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.concrete_document_classes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves all instances and their meta-data (v:Class, v:Label, v:Comment) of concrete document classes</p>
@@ -1915,7 +1978,7 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.property_metadata">
 <code class="descname">property_metadata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.property_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves all meta-data about each property (v:Property, v:Type, v:Range, v:Domain, v:Label, v:Comment)</p>
@@ -1931,7 +1994,7 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.element_metadata">
 <code class="descname">element_metadata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.element_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves meta-data about all elements in the schema (v:Element, v:Parent, v:Type, v:Range, v:Domain, v:Label, v:Comment, v:Abstract)</p>
@@ -1947,7 +2010,7 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.class_metadata">
 <code class="descname">class_metadata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.class_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves meta-data about all the classes in the schema (v:Element, v:Label, v:Comment, v:Abstract)</p>
@@ -1963,9 +2026,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.get_data_of_class">
-<code class="descname">get_data_of_class</code><span class="sig-paren">(</span><em>chosen</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.get_data_of_class" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_data_of_class</code><span class="sig-paren">(</span><em><span class="n">chosen</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.get_data_of_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves all triples that have a subject of the passed class (v:Document, v:Property, v:Value)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1981,9 +2044,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.get_data_of_property">
-<code class="descname">get_data_of_property</code><span class="sig-paren">(</span><em>chosen</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.get_data_of_property" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_data_of_property</code><span class="sig-paren">(</span><em><span class="n">chosen</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.get_data_of_property" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves all triples that use the passed predicate along with the predicate’s label (v:Document, v:Value, v:Label)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1999,9 +2062,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.document_properties">
-<code class="descname">document_properties</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.document_properties" title="Permalink to this definition">¶</a></dt>
+<code class="descname">document_properties</code><span class="sig-paren">(</span><em><span class="n">id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.document_properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves all properties of a given document, along with their labels, values and type (v:Property, v:Property_Value, v:Property_Label, v:Property_Type)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2017,9 +2080,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.get_document_connections">
-<code class="descname">get_document_connections</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.get_document_connections" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_document_connections</code><span class="sig-paren">(</span><em><span class="n">id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.get_document_connections" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve all links between the passed document and other documents (v:Entid, v:Outgoing, v:Incoming, v:Enttype, v:Label, v:Class_Label)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2035,9 +2098,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.get_instance_meta">
-<code class="descname">get_instance_meta</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.get_instance_meta" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_instance_meta</code><span class="sig-paren">(</span><em><span class="n">id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.get_instance_meta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve basic meta-data for a given object (v:InstanceType, v:InstanceLabel, v:InstanceComment, v:ClassLabel)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2053,7 +2116,7 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.simple_graph_query">
 <code class="descname">simple_graph_query</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.simple_graph_query" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a graph query with pattern (v:Source, v:Edge, v:Target), with meta-data for each element (v:Source_Class, v:Source_Label , v:Source_Comment, v:Source_Type, v:Source_Type_Comment, v:Target_Class, v:Target_Label , v:Target_Comment, v:Target_Type, v:Target_Class_Comment, v:Target_Label , v:Edge_Type_Comment, v:Edge_Type)</p>
@@ -2069,7 +2132,7 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.get_vocabulary">
 <code class="descname">get_vocabulary</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.get_vocabulary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the vocabulary at play - a list of all properties and classes in the schema</p>
@@ -2085,9 +2148,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.set_vocabulary">
-<code class="descname">set_vocabulary</code><span class="sig-paren">(</span><em>vocab</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.set_vocabulary" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_vocabulary</code><span class="sig-paren">(</span><em><span class="n">vocab</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.set_vocabulary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provides the query with a ‘vocabulary’ a list of well known predicates that can be used without prefixes mapping: id: prefix:id …</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2103,9 +2166,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.load_vocabulary">
-<code class="descname">load_vocabulary</code><span class="sig-paren">(</span><em>client</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.load_vocabulary" title="Permalink to this definition">¶</a></dt>
+<code class="descname">load_vocabulary</code><span class="sig-paren">(</span><em><span class="n">client</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.load_vocabulary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads the entirety of the current schema graph as a vocabulary - allows all valid schema URLs to be used without prefixes.</p>
 <p>Queries the schema graph and loads all the ids found there as vocabulary that can be used without prefixes.</p>
 <p>It ignoring blank node ids.</p>
@@ -2123,7 +2186,7 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.get_limit">
 <code class="descname">get_limit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.get_limit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the current limit value</p>
@@ -2139,9 +2202,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.set_limit">
-<code class="descname">set_limit</code><span class="sig-paren">(</span><em>l</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.set_limit" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_limit</code><span class="sig-paren">(</span><em><span class="n">l</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.set_limit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the limit to N</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2157,9 +2220,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.is_paged">
-<code class="descname">is_paged</code><span class="sig-paren">(</span><em>q=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.is_paged" title="Permalink to this definition">¶</a></dt>
+<code class="descname">is_paged</code><span class="sig-paren">(</span><em><span class="n">q</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.is_paged" title="Permalink to this definition">¶</a></dt>
 <dd><p>True if the query was paged (i.e. had a limit set)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2175,7 +2238,7 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.get_page">
 <code class="descname">get_page</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.get_page" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the current page number as an offset from the current page size (limit)</p>
@@ -2191,9 +2254,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.set_page">
-<code class="descname">set_page</code><span class="sig-paren">(</span><em>pagenum</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.set_page" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_page</code><span class="sig-paren">(</span><em><span class="n">pagenum</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.set_page" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the page to page number N (where N is an integer)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2209,7 +2272,7 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.next_page">
 <code class="descname">next_page</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.next_page" title="Permalink to this definition">¶</a></dt>
 <dd><p>Increments the page number</p>
@@ -2225,7 +2288,7 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.first_page">
 <code class="descname">first_page</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.first_page" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the page number to the first page</p>
@@ -2241,7 +2304,7 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.previous_page">
 <code class="descname">previous_page</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.previous_page" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decrements the page number if it is currently ≥ 1</p>
@@ -2257,9 +2320,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.set_page_size">
-<code class="descname">set_page_size</code><span class="sig-paren">(</span><em>size</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.set_page_size" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_page_size</code><span class="sig-paren">(</span><em><span class="n">size</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.set_page_size" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the page size (limit)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2275,7 +2338,7 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.has_select">
 <code class="descname">has_select</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.has_select" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns true if the query contains a select clause</p>
@@ -2291,9 +2354,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.get_select_variables">
-<code class="descname">get_select_variables</code><span class="sig-paren">(</span><em>q=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.get_select_variables" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_select_variables</code><span class="sig-paren">(</span><em><span class="n">q</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.get_select_variables" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns list of the variables specified as part of the select clause</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2309,7 +2372,7 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.has_start">
 <code class="descname">has_start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.has_start" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if the query have a start value set</p>
@@ -2325,7 +2388,7 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.get_start">
 <code class="descname">get_start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.get_start" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the current start value (result offset)</p>
@@ -2341,9 +2404,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.add_start">
-<code class="descname">add_start</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.add_start" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_start</code><span class="sig-paren">(</span><em><span class="n">s</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.add_start" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the start value (result offset)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2359,9 +2422,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.get_context">
-<code class="descname">get_context</code><span class="sig-paren">(</span><em>q=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.get_context" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_context</code><span class="sig-paren">(</span><em><span class="n">q</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.get_context" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves the value of the current json-ld context</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2377,9 +2440,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.context">
-<code class="descname">context</code><span class="sig-paren">(</span><em>c</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.context" title="Permalink to this definition">¶</a></dt>
+<code class="descname">context</code><span class="sig-paren">(</span><em><span class="n">c</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.context" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specifies the query context as a JSON-LD context (prefix → value)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2391,9 +2454,9 @@ into the corrent place in the encompassing json</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLQuery.execute">
-<code class="descname">execute</code><span class="sig-paren">(</span><em>client</em>, <em>fileList=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.execute" title="Permalink to this definition">¶</a></dt>
+<code class="descname">execute</code><span class="sig-paren">(</span><em><span class="n">client</span></em>, <em><span class="n">fileList</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLQuery.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Executes the query using the passed client to connect to a server</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

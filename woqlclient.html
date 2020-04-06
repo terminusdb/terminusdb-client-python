@@ -166,21 +166,21 @@
             
   <div class="section" id="woqlclient">
 <h1>woqlclient<a class="headerlink" href="#woqlclient" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="woqlclient.WOQLClient">
-<em class="property">class </em><code class="descclassname">woqlclient.</code><code class="descname">WOQLClient</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">woqlclient.</code><code class="descname">WOQLClient</code><span class="sig-paren">(</span><em><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>The WOQLClient constructor</p>
 <p>:param <a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs Connection arguments used to configure the Client. (db=terminusDBName | server=terminusServerURL | doc=docName | key=apiKey)</p>
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.connect">
-<code class="descname">connect</code><span class="sig-paren">(</span><em>serverURL=None</em>, <em>key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.connect" title="Permalink to this definition">¶</a></dt>
+<code class="descname">connect</code><span class="sig-paren">(</span><em><span class="n">serverURL</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">key</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.connect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Connect to a Terminus server at the given URI with an API key
 Stores the terminus:ServerCapability document returned
 in the conCapabilities register which stores, the url, key, capabilities,
@@ -213,9 +213,9 @@ or an error will be raise.</p>
 </div>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.directConnect">
-<em class="property">static </em><code class="descname">directConnect</code><span class="sig-paren">(</span><em>serverURL</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directConnect" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">directConnect</code><span class="sig-paren">(</span><em><span class="n">serverURL</span></em>, <em><span class="n">key</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directConnect" title="Permalink to this definition">¶</a></dt>
 <dd><p>connect directly without creating a new class instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -237,9 +237,9 @@ or an error will be raise.</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.createDatabase">
-<code class="descname">createDatabase</code><span class="sig-paren">(</span><em>dbID</em>, <em>label</em>, <em>key=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.createDatabase" title="Permalink to this definition">¶</a></dt>
+<code class="descname">createDatabase</code><span class="sig-paren">(</span><em><span class="n">dbID</span></em>, <em><span class="n">label</span></em>, <em><span class="n">key</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.createDatabase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Terminus Database by posting
 a terminus:Database document to the Terminus Server</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -266,9 +266,9 @@ a terminus:Database document to the Terminus Server</p>
 <p>WOQLClient(server=”<a class="reference external" href="http://localhost:6363">http://localhost:6363</a>”).createDatabase(“someDB”, “Database Label”, “password”)</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.directCreateDatabase">
-<em class="property">static </em><code class="descname">directCreateDatabase</code><span class="sig-paren">(</span><em>dbURL</em>, <em>label</em>, <em>key</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directCreateDatabase" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">directCreateDatabase</code><span class="sig-paren">(</span><em><span class="n">dbURL</span></em>, <em><span class="n">label</span></em>, <em><span class="n">key</span></em>, <em><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directCreateDatabase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create Terminus Database with settings</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -292,9 +292,9 @@ a terminus:Database document to the Terminus Server</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.deleteDatabase">
-<code class="descname">deleteDatabase</code><span class="sig-paren">(</span><em>dbID</em>, <em>key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.deleteDatabase" title="Permalink to this definition">¶</a></dt>
+<code class="descname">deleteDatabase</code><span class="sig-paren">(</span><em><span class="n">dbID</span></em>, <em><span class="n">key</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.deleteDatabase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete a TerminusDB database</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -320,9 +320,9 @@ a terminus:Database document to the Terminus Server</p>
 </div>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.directDeleteDatabase">
-<em class="property">static </em><code class="descname">directDeleteDatabase</code><span class="sig-paren">(</span><em>dbURL</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directDeleteDatabase" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">directDeleteDatabase</code><span class="sig-paren">(</span><em><span class="n">dbURL</span></em>, <em><span class="n">key</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directDeleteDatabase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete a TerminusDB with settings</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -338,9 +338,9 @@ a terminus:Database document to the Terminus Server</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.getSchema">
-<code class="descname">getSchema</code><span class="sig-paren">(</span><em>dbID=None</em>, <em>key=None</em>, <em>options={'terminus:encoding': 'terminus:turtle'}</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.getSchema" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getSchema</code><span class="sig-paren">(</span><em><span class="n">dbID</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">key</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">options</span><span class="o">=</span><span class="default_value">{'terminus:encoding': 'terminus:turtle'}</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.getSchema" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves the schema of the specified database</p>
 <p>opts.format defines which format is requested, default is turtle(<a href="#id3"><span class="problematic" id="id4">*</span></a>json / turtle)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -364,9 +364,9 @@ a terminus:Database document to the Terminus Server</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.directGetSchema">
-<em class="property">static </em><code class="descname">directGetSchema</code><span class="sig-paren">(</span><em>dbURL</em>, <em>key</em>, <em>options={'terminus:encoding': 'terminus:turtle'}</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directGetSchema" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">directGetSchema</code><span class="sig-paren">(</span><em><span class="n">dbURL</span></em>, <em><span class="n">key</span></em>, <em><span class="n">options</span><span class="o">=</span><span class="default_value">{'terminus:encoding': 'terminus:turtle'}</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directGetSchema" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves the schema of the specified database with settings</p>
 <p>opts.format defines which format is requested, default is turtle(<a href="#id5"><span class="problematic" id="id6">*</span></a>json / turtle)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -390,9 +390,9 @@ a terminus:Database document to the Terminus Server</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.updateSchema">
-<code class="descname">updateSchema</code><span class="sig-paren">(</span><em>docObj</em>, <em>dbID=None</em>, <em>key=None</em>, <em>opts={'terminus:encoding': 'terminus:turtle'}</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.updateSchema" title="Permalink to this definition">¶</a></dt>
+<code class="descname">updateSchema</code><span class="sig-paren">(</span><em><span class="n">docObj</span></em>, <em><span class="n">dbID</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">key</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">opts</span><span class="o">=</span><span class="default_value">{'terminus:encoding': 'terminus:turtle'}</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.updateSchema" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates the Schema of the specified database</p>
 <p>opts.format is used to specify which format is being used (<a href="#id7"><span class="problematic" id="id8">*</span></a>json / turtle)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -417,9 +417,9 @@ a terminus:Database document to the Terminus Server</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.directUpdateSchema">
-<em class="property">static </em><code class="descname">directUpdateSchema</code><span class="sig-paren">(</span><em>dbURL</em>, <em>docObj</em>, <em>key</em>, <em>opt={'terminus:encoding': 'terminus:turtle'}</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directUpdateSchema" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">directUpdateSchema</code><span class="sig-paren">(</span><em><span class="n">dbURL</span></em>, <em><span class="n">docObj</span></em>, <em><span class="n">key</span></em>, <em><span class="n">opt</span><span class="o">=</span><span class="default_value">{'terminus:encoding': 'terminus:turtle'}</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directUpdateSchema" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates the Schema of the specified database with settings</p>
 <p>opts.format is used to specify which format is being used (<a href="#id9"><span class="problematic" id="id10">*</span></a>json / turtle)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -444,9 +444,9 @@ a terminus:Database document to the Terminus Server</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.createDocument">
-<code class="descname">createDocument</code><span class="sig-paren">(</span><em>docObj</em>, <em>documentID</em>, <em>dbID=None</em>, <em>key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.createDocument" title="Permalink to this definition">¶</a></dt>
+<code class="descname">createDocument</code><span class="sig-paren">(</span><em><span class="n">docObj</span></em>, <em><span class="n">documentID</span></em>, <em><span class="n">dbID</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">key</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.createDocument" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new document in the specified database</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -470,9 +470,9 @@ a terminus:Database document to the Terminus Server</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.directCreateDocument">
-<em class="property">static </em><code class="descname">directCreateDocument</code><span class="sig-paren">(</span><em>docObj</em>, <em>documentID</em>, <em>dbURL</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directCreateDocument" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">directCreateDocument</code><span class="sig-paren">(</span><em><span class="n">docObj</span></em>, <em><span class="n">documentID</span></em>, <em><span class="n">dbURL</span></em>, <em><span class="n">key</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directCreateDocument" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new document in the specified database</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -496,9 +496,9 @@ a terminus:Database document to the Terminus Server</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.getDocument">
-<code class="descname">getDocument</code><span class="sig-paren">(</span><em>documentID</em>, <em>dbID=None</em>, <em>key=None</em>, <em>opts={'terminus:encoding': 'terminus:frame'}</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.getDocument" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getDocument</code><span class="sig-paren">(</span><em><span class="n">documentID</span></em>, <em><span class="n">dbID</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">key</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">opts</span><span class="o">=</span><span class="default_value">{'terminus:encoding': 'terminus:frame'}</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.getDocument" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves a document from the specified database</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -522,9 +522,9 @@ a terminus:Database document to the Terminus Server</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.directGetDocument">
-<em class="property">static </em><code class="descname">directGetDocument</code><span class="sig-paren">(</span><em>documentID</em>, <em>dbURL</em>, <em>key</em>, <em>opts={'terminus:encoding': 'terminus:frame'}</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directGetDocument" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">directGetDocument</code><span class="sig-paren">(</span><em><span class="n">documentID</span></em>, <em><span class="n">dbURL</span></em>, <em><span class="n">key</span></em>, <em><span class="n">opts</span><span class="o">=</span><span class="default_value">{'terminus:encoding': 'terminus:frame'}</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directGetDocument" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves a document from the specified database with URL</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -548,9 +548,9 @@ a terminus:Database document to the Terminus Server</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.updateDocument">
-<code class="descname">updateDocument</code><span class="sig-paren">(</span><em>documentID</em>, <em>docObj</em>, <em>dbID=None</em>, <em>key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.updateDocument" title="Permalink to this definition">¶</a></dt>
+<code class="descname">updateDocument</code><span class="sig-paren">(</span><em><span class="n">documentID</span></em>, <em><span class="n">docObj</span></em>, <em><span class="n">dbID</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">key</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.updateDocument" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates a document in the specified database with a new version</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -574,9 +574,9 @@ a terminus:Database document to the Terminus Server</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.directUpdateDocument">
-<em class="property">static </em><code class="descname">directUpdateDocument</code><span class="sig-paren">(</span><em>documentID</em>, <em>dbURL</em>, <em>key</em>, <em>docObj</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directUpdateDocument" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">directUpdateDocument</code><span class="sig-paren">(</span><em><span class="n">documentID</span></em>, <em><span class="n">dbURL</span></em>, <em><span class="n">key</span></em>, <em><span class="n">docObj</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directUpdateDocument" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates a document in the specified database with URL</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -600,9 +600,9 @@ a terminus:Database document to the Terminus Server</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.deleteDocument">
-<code class="descname">deleteDocument</code><span class="sig-paren">(</span><em>documentID</em>, <em>dbID=None</em>, <em>key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.deleteDocument" title="Permalink to this definition">¶</a></dt>
+<code class="descname">deleteDocument</code><span class="sig-paren">(</span><em><span class="n">documentID</span></em>, <em><span class="n">dbID</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">key</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.deleteDocument" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes a document from the specified database</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -625,9 +625,9 @@ a terminus:Database document to the Terminus Server</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.directDeleteDocument">
-<em class="property">static </em><code class="descname">directDeleteDocument</code><span class="sig-paren">(</span><em>self</em>, <em>documentID</em>, <em>dbURL</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directDeleteDocument" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">directDeleteDocument</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">documentID</span></em>, <em><span class="n">dbURL</span></em>, <em><span class="n">key</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directDeleteDocument" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes a document from the specified database with URL</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -650,9 +650,9 @@ a terminus:Database document to the Terminus Server</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.select">
-<code class="descname">select</code><span class="sig-paren">(</span><em>woqlQuery</em>, <em>dbID=None</em>, <em>key=None</em>, <em>fileList=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.select" title="Permalink to this definition">¶</a></dt>
+<code class="descname">select</code><span class="sig-paren">(</span><em><span class="n">woqlQuery</span></em>, <em><span class="n">dbID</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">key</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">fileList</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.select" title="Permalink to this definition">¶</a></dt>
 <dd><p>Executes a read-only WOQL query on the specified database and returns the results</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -676,9 +676,9 @@ a terminus:Database document to the Terminus Server</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.directSelect">
-<em class="property">static </em><code class="descname">directSelect</code><span class="sig-paren">(</span><em>woqlQuery</em>, <em>dbURL</em>, <em>key</em>, <em>fileList=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directSelect" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">directSelect</code><span class="sig-paren">(</span><em><span class="n">woqlQuery</span></em>, <em><span class="n">dbURL</span></em>, <em><span class="n">key</span></em>, <em><span class="n">fileList</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directSelect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Static function that executes a read-only WOQL query on the specified database
 and returns the results</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -703,9 +703,9 @@ and returns the results</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>woqlQuery</em>, <em>dbID=None</em>, <em>key=None</em>, <em>fileList=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.update" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update</code><span class="sig-paren">(</span><em><span class="n">woqlQuery</span></em>, <em><span class="n">dbID</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">key</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">fileList</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Executes a WOQL query on the specified database which updates the state and returns the results</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -729,9 +729,9 @@ and returns the results</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.directUpdate">
-<em class="property">static </em><code class="descname">directUpdate</code><span class="sig-paren">(</span><em>woqlQuery</em>, <em>dbURL</em>, <em>key</em>, <em>fileList=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directUpdate" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">directUpdate</code><span class="sig-paren">(</span><em><span class="n">woqlQuery</span></em>, <em><span class="n">dbURL</span></em>, <em><span class="n">key</span></em>, <em><span class="n">fileList</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.directUpdate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Static function that executes a WOQL query on the specified database which
 updates the state and returns the results</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -756,9 +756,9 @@ updates the state and returns the results</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="woqlclient.WOQLClient.dispatch">
-<code class="descname">dispatch</code><span class="sig-paren">(</span><em>url</em>, <em>action</em>, <em>connectionKey</em>, <em>payload={}</em>, <em>file_dict=None</em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.dispatch" title="Permalink to this definition">¶</a></dt>
+<code class="descname">dispatch</code><span class="sig-paren">(</span><em><span class="n">url</span></em>, <em><span class="n">action</span></em>, <em><span class="n">connectionKey</span></em>, <em><span class="n">payload</span><span class="o">=</span><span class="default_value">{}</span></em>, <em><span class="n">file_dict</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.WOQLClient.dispatch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Directly dispatch to a Terminus database.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
