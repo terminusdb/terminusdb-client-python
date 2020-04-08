@@ -248,6 +248,12 @@ class WOQLQuery:
         ...     woql_as("Member type", "v:Member_Type")
         ... ).remote("https://terminusdb.com/t/data/bike_tutorial.csv")
 
+
+        See Also
+        --------
+        file
+            If your csv file is local then use :meth:`.file` instead of `.remote`.
+
         """
         if opts is not None:
             self.cursor['remote'] = [url, opts]
@@ -291,6 +297,18 @@ class WOQLQuery:
         -------
         WOQLQuery object
             query object that can be chained and/or execute
+
+        Example
+        -------
+        To load a local csv file:
+
+        >>> WOQLQuery().file("/app/local_files/my.csv")
+
+        See Also
+        --------
+        remote
+            If your csv file is a uri then use :meth:`.remote` instead of `.file`.
+
         """
         if opts is not None:
             self.cursor['file'] = [json, opts]
@@ -2511,6 +2529,10 @@ class WOQLQuery:
         Parameters
         ----------
         client : woqlClient
+            A woqlClient
+        fileList: dict, optional.
+            A dictionary with key=name, value=filePath. Defaults to None.
+            Deprecated. This parameter is not currently used and is likely to be removed in future versions.
         """
 
         if "@context" not in self.query:
