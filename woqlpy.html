@@ -376,6 +376,12 @@ Otherwise <a class="reference internal" href="#woqlclient.WOQLQuery.add_quad" ti
 <span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="s2">&quot;https://terminusdb.com/t/data/bike_tutorial.csv&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><a class="reference internal" href="#woqlclient.WOQLQuery.file" title="woqlclient.WOQLQuery.file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">file()</span></code></a></dt><dd>If your csv file is local then use <a class="reference internal" href="#woqlclient.WOQLQuery.file" title="woqlclient.WOQLQuery.file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">file()</span></code></a> instead of <cite>.remote</cite>.</dd>
+</dl>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -424,6 +430,17 @@ Otherwise <a class="reference internal" href="#woqlclient.WOQLQuery.add_quad" ti
 </tr>
 </tbody>
 </table>
+<p class="rubric">Example</p>
+<p>To load a local csv file:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">WOQLQuery</span><span class="p">()</span><span class="o">.</span><span class="n">file</span><span class="p">(</span><span class="s2">&quot;/app/local_files/my.csv&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><a class="reference internal" href="#woqlclient.WOQLQuery.remote" title="woqlclient.WOQLQuery.remote"><code class="xref py py-meth docutils literal notranslate"><span class="pre">remote()</span></code></a></dt><dd>If your csv file is a uri then use <a class="reference internal" href="#woqlclient.WOQLQuery.remote" title="woqlclient.WOQLQuery.remote"><code class="xref py py-meth docutils literal notranslate"><span class="pre">remote()</span></code></a> instead of <cite>.file</cite>.</dd>
+</dl>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -2462,7 +2479,12 @@ for this subject and predicate combination:</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>client</strong> (<em>woqlClient</em>) – </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>client</strong> (<em>woqlClient</em>) – A woqlClient</li>
+<li><strong>fileList</strong> (<em>dict</em><em>, </em><em>optional.</em>) – A dictionary with key=name, value=filePath. Defaults to None.
+Deprecated. This parameter is not currently used and is likely to be removed in future versions.</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
