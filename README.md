@@ -20,6 +20,10 @@ If you want to use woqlDataframe:
 
 `python -m pip install terminus-client-python[dataframe]`
 
+*if you are installing form `zsh` you have to quote the argument like this:*
+
+`python -m pip install 'terminus-client-python[dataframe]'`
+
 - Install from source:
 
 `python -m pip install git+https://github.com/terminusdb/terminus-client-python.git`
