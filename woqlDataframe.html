@@ -168,27 +168,26 @@
 <span id="woqldataframe"></span><h1>woqlDataframe<a class="headerlink" href="#module-woqlclient.woqlDataframe" title="Permalink to this headline">¶</a></h1>
 <dl class="py exception">
 <dt id="woqlclient.woqlDataframe.EmptyException">
-<em class="property">exception </em><code class="descclassname">woqlclient.woqlDataframe.</code><code class="descname">EmptyException</code><a class="headerlink" href="#woqlclient.woqlDataframe.EmptyException" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="sig-prename descclassname">woqlclient.woqlDataframe.</code><code class="sig-name descname">EmptyException</code><a class="headerlink" href="#woqlclient.woqlDataframe.EmptyException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="woqlclient.woqlDataframe.extract_header">
-<code class="descclassname">woqlclient.woqlDataframe.</code><code class="descname">extract_header</code><span class="sig-paren">(</span><em><span class="n">query</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.woqlDataframe.extract_header" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">woqlclient.woqlDataframe.</code><code class="sig-name descname">extract_header</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.woqlDataframe.extract_header" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extracts the header of the returned result table</p>
 <p>Extrace the result of the query binding, including the header name and their WOQL rdf data type.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>query</strong> (<em>dict</em>) – JSON of the result of the query</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">List of tuples, each tuple will have the name of the column as the 1st element an the WOQL rdf data type of that column as the 2nd element.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>query</strong> (<em>dict</em>) – JSON of the result of the query</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of tuples, each tuple will have the name of the column as the 1st element an the WOQL rdf data type of that column as the 2nd element.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;bindings&#39;</span><span class="p">:</span> <span class="p">[{</span>
 <span class="gp">... </span>          <span class="s1">&#39;http://terminusdb.com/woql/variable/Product&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;@type&#39;</span><span class="p">:</span> <span class="s1">&#39;http://www.w3.org/2001/XMLSchema#string&#39;</span><span class="p">,</span>
@@ -199,39 +198,38 @@
 </pre></div>
 </div>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><a class="reference internal" href="#woqlclient.woqlDataframe.query_to_df" title="woqlclient.woqlDataframe.query_to_df"><code class="xref py py-func docutils literal notranslate"><span class="pre">query_to_df()</span></code></a></dt><dd>put the result of the query into a pandas DataFrame</dd>
-<dt><a class="reference internal" href="#woqlclient.woqlDataframe.type_map" title="woqlclient.woqlDataframe.type_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_map()</span></code></a></dt><dd>convert WQOL rdf data types into numpy data types</dd>
-<dt><a class="reference internal" href="#woqlclient.woqlDataframe.extract_column" title="woqlclient.woqlDataframe.extract_column"><code class="xref py py-func docutils literal notranslate"><span class="pre">extract_column()</span></code></a></dt><dd>extract the column of the returned result table</dd>
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#woqlclient.woqlDataframe.query_to_df" title="woqlclient.woqlDataframe.query_to_df"><code class="xref py py-func docutils literal notranslate"><span class="pre">query_to_df()</span></code></a></dt><dd><p>put the result of the query into a pandas DataFrame</p>
+</dd>
+<dt><a class="reference internal" href="#woqlclient.woqlDataframe.type_map" title="woqlclient.woqlDataframe.type_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_map()</span></code></a></dt><dd><p>convert WQOL rdf data types into numpy data types</p>
+</dd>
+<dt><a class="reference internal" href="#woqlclient.woqlDataframe.extract_column" title="woqlclient.woqlDataframe.extract_column"><code class="xref py py-func docutils literal notranslate"><span class="pre">extract_column()</span></code></a></dt><dd><p>extract the column of the returned result table</p>
+</dd>
 </dl>
 </div>
 </dd></dl>
 
 <dl class="py function">
 <dt id="woqlclient.woqlDataframe.extract_column">
-<code class="descclassname">woqlclient.woqlDataframe.</code><code class="descname">extract_column</code><span class="sig-paren">(</span><em><span class="n">query</span></em>, <em><span class="n">name</span></em>, <em><span class="n">ty</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.woqlDataframe.extract_column" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">woqlclient.woqlDataframe.</code><code class="sig-name descname">extract_column</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">ty</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.woqlDataframe.extract_column" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extracts the column of the returned result table</p>
 <p>Extrace one specific column from the result of the query binding.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>query</strong> (<em>dict</em>) – JSON of the result of the query</li>
-<li><strong>name</strong> (<em>str</em>) – Name of the column, can be extract from <cite>extract_header()</cite></li>
-<li><strong>ty</strong> (<em>str</em>) – WOQL rdf type of the column</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> (<em>dict</em>) – JSON of the result of the query</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Name of the column, can be extract from <cite>extract_header()</cite></p></li>
+<li><p><strong>ty</strong> (<em>str</em>) – WOQL rdf type of the column</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List consist of elements in that column</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List consist of elements in that column</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;bindings&#39;</span><span class="p">:</span> <span class="p">[{</span>
 <span class="gp">... </span>          <span class="s1">&#39;http://terminusdb.com/woql/variable/Product&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;@type&#39;</span><span class="p">:</span> <span class="s1">&#39;http://www.w3.org/2001/XMLSchema#string&#39;</span><span class="p">,</span>
@@ -242,100 +240,101 @@
 </pre></div>
 </div>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><a class="reference internal" href="#woqlclient.woqlDataframe.query_to_df" title="woqlclient.woqlDataframe.query_to_df"><code class="xref py py-func docutils literal notranslate"><span class="pre">query_to_df()</span></code></a></dt><dd>put the result of the query into a pandas DataFrame</dd>
-<dt><a class="reference internal" href="#woqlclient.woqlDataframe.type_map" title="woqlclient.woqlDataframe.type_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_map()</span></code></a></dt><dd>convert WQOL rdf data types into numpy data types</dd>
-<dt><a class="reference internal" href="#woqlclient.woqlDataframe.extract_header" title="woqlclient.woqlDataframe.extract_header"><code class="xref py py-func docutils literal notranslate"><span class="pre">extract_header()</span></code></a></dt><dd>extract header of the returned result table</dd>
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#woqlclient.woqlDataframe.query_to_df" title="woqlclient.woqlDataframe.query_to_df"><code class="xref py py-func docutils literal notranslate"><span class="pre">query_to_df()</span></code></a></dt><dd><p>put the result of the query into a pandas DataFrame</p>
+</dd>
+<dt><a class="reference internal" href="#woqlclient.woqlDataframe.type_map" title="woqlclient.woqlDataframe.type_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_map()</span></code></a></dt><dd><p>convert WQOL rdf data types into numpy data types</p>
+</dd>
+<dt><a class="reference internal" href="#woqlclient.woqlDataframe.extract_header" title="woqlclient.woqlDataframe.extract_header"><code class="xref py py-func docutils literal notranslate"><span class="pre">extract_header()</span></code></a></dt><dd><p>extract header of the returned result table</p>
+</dd>
 </dl>
 </div>
 </dd></dl>
 
 <dl class="py function">
 <dt id="woqlclient.woqlDataframe.type_map">
-<code class="descclassname">woqlclient.woqlDataframe.</code><code class="descname">type_map</code><span class="sig-paren">(</span><em><span class="n">ty_rdf</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.woqlDataframe.type_map" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">woqlclient.woqlDataframe.</code><code class="sig-name descname">type_map</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ty_rdf</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.woqlDataframe.type_map" title="Permalink to this definition">¶</a></dt>
 <dd><p>Mapping types from WOQL rdf to numpy data types</p>
 <p>Maps the WOQL rdf type in the result query binding to numpy data types so it can be used in constructed pandas DataFrame.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ty_rdf</strong> (<em>str</em>) – WOQL rdf type, an exception will be raise if it’s not a valid type</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The numpy data type object that matches with the WOQL rdf data type</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">one of the numpy built-in scalar types objects</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ty_rdf</strong> (<em>str</em>) – WOQL rdf type, an exception will be raise if it’s not a valid type</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The numpy data type object that matches with the WOQL rdf data type</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>one of the numpy built-in scalar types objects</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">woql</span><span class="o">.</span><span class="n">type_map</span><span class="p">(</span><span class="s1">&#39;http://www.w3.org/2001/XMLSchema#string&#39;</span><span class="p">)</span>
 <span class="go">&lt;class &#39;numpy.str_&#39;&gt;</span>
 </pre></div>
 </div>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><a class="reference internal" href="#woqlclient.woqlDataframe.query_to_df" title="woqlclient.woqlDataframe.query_to_df"><code class="xref py py-func docutils literal notranslate"><span class="pre">query_to_df()</span></code></a></dt><dd>put the result of the query into a pandas DataFrame</dd>
-<dt><a class="reference internal" href="#woqlclient.woqlDataframe.type_value_map" title="woqlclient.woqlDataframe.type_value_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_value_map()</span></code></a></dt><dd>converts values of different WOQL rdf types to numpy data types values</dd>
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#woqlclient.woqlDataframe.query_to_df" title="woqlclient.woqlDataframe.query_to_df"><code class="xref py py-func docutils literal notranslate"><span class="pre">query_to_df()</span></code></a></dt><dd><p>put the result of the query into a pandas DataFrame</p>
+</dd>
+<dt><a class="reference internal" href="#woqlclient.woqlDataframe.type_value_map" title="woqlclient.woqlDataframe.type_value_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_value_map()</span></code></a></dt><dd><p>converts values of different WOQL rdf types to numpy data types values</p>
+</dd>
 </dl>
 </div>
 </dd></dl>
 
 <dl class="py function">
 <dt id="woqlclient.woqlDataframe.type_value_map">
-<code class="descclassname">woqlclient.woqlDataframe.</code><code class="descname">type_value_map</code><span class="sig-paren">(</span><em><span class="n">ty_rdf</span></em>, <em><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.woqlDataframe.type_value_map" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">woqlclient.woqlDataframe.</code><code class="sig-name descname">type_value_map</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ty_rdf</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.woqlDataframe.type_value_map" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts values of different WOQL rdf types to numpy data types values</p>
 <p>Converts the values in the result query binding to numpy data types according to their WOQL rdf type, so it can be used in constructed pandas DataFrame.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>ty_rdf</strong> (<em>str</em>) – WOQL rdf type, an exception will be raise if it’s not a valid type</li>
-<li><strong>value</strong> (<em>str</em>) – value to be converted</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ty_rdf</strong> (<em>str</em>) – WOQL rdf type, an exception will be raise if it’s not a valid type</p></li>
+<li><p><strong>value</strong> (<em>str</em>) – value to be converted</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The converted value in numpy data type</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">one of the numpy built-in scalar types</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The converted value in numpy data type</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>one of the numpy built-in scalar types</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">woql</span><span class="o">.</span><span class="n">type_value_map</span><span class="p">(</span><span class="s1">&#39;http://www.w3.org/2001/XMLSchema#decimal&#39;</span><span class="p">,</span> <span class="s1">&#39;10.80&#39;</span><span class="p">)</span>
 <span class="go">10.8</span>
 </pre></div>
 </div>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><a class="reference internal" href="#woqlclient.woqlDataframe.query_to_df" title="woqlclient.woqlDataframe.query_to_df"><code class="xref py py-func docutils literal notranslate"><span class="pre">query_to_df()</span></code></a></dt><dd>put the result of the query into a pandas DataFrame</dd>
-<dt><a class="reference internal" href="#woqlclient.woqlDataframe.type_map" title="woqlclient.woqlDataframe.type_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_map()</span></code></a></dt><dd>mapping types from WOQL rdf to numpy data types</dd>
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#woqlclient.woqlDataframe.query_to_df" title="woqlclient.woqlDataframe.query_to_df"><code class="xref py py-func docutils literal notranslate"><span class="pre">query_to_df()</span></code></a></dt><dd><p>put the result of the query into a pandas DataFrame</p>
+</dd>
+<dt><a class="reference internal" href="#woqlclient.woqlDataframe.type_map" title="woqlclient.woqlDataframe.type_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_map()</span></code></a></dt><dd><p>mapping types from WOQL rdf to numpy data types</p>
+</dd>
 </dl>
 </div>
 </dd></dl>
 
 <dl class="py function">
 <dt id="woqlclient.woqlDataframe.query_to_df">
-<code class="descclassname">woqlclient.woqlDataframe.</code><code class="descname">query_to_df</code><span class="sig-paren">(</span><em><span class="n">query</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.woqlDataframe.query_to_df" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">woqlclient.woqlDataframe.</code><code class="sig-name descname">query_to_df</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em><span class="sig-paren">)</span><a class="headerlink" href="#woqlclient.woqlDataframe.query_to_df" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a query to a data frame.</p>
 <p>Converts result query binding to a pandas DataFrame. This only works for homogeneous query results</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>query</strong> (<em>dict</em>) – JSON of the result of the query</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The pandas DataFrame that is converted from the result.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pandas.DataFrame</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>query</strong> (<em>dict</em>) – JSON of the result of the query</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The pandas DataFrame that is converted from the result.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;bindings&#39;</span><span class="p">:</span> <span class="p">[{</span>
 <span class="gp">... </span>          <span class="s1">&#39;http://terminusdb.com/woql/variable/Product&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;@type&#39;</span><span class="p">:</span> <span class="s1">&#39;http://www.w3.org/2001/XMLSchema#string&#39;</span><span class="p">,</span>
@@ -347,10 +346,12 @@
 </pre></div>
 </div>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><code class="xref py py-func docutils literal notranslate"><span class="pre">WOQLQuery()</span></code></dt><dd>create a WOQLQuery</dd>
-<dt><code class="xref py py-func docutils literal notranslate"><span class="pre">WOQLClient()</span></code></dt><dd>create a WOQLClient</dd>
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><code class="xref py py-func docutils literal notranslate"><span class="pre">WOQLQuery()</span></code></dt><dd><p>create a WOQLQuery</p>
+</dd>
+<dt><code class="xref py py-func docutils literal notranslate"><span class="pre">WOQLClient()</span></code></dt><dd><p>create a WOQLClient</p>
+</dd>
 </dl>
 </div>
 </dd></dl>
