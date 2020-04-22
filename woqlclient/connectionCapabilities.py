@@ -18,31 +18,10 @@ from .connectionConfig import ConnectionConfig
 
 class ConnectionCapabilities:
 
-    def __init__(self, connectionConfig, key=None):
+    def __init__(self):
         self.connection = {}
-        self.connectionConfig = connectionConfig
-        if(key):
-            self.setClientKey(key)
 
-    """
-        Utility functions for changing the state of connections with Terminus servers
-    """
-
-    def setClientKey(self, key):
-        curl = self.connectionConfig.serverURL
-        if(curl and (isinstance(key, str) and key.strip())):
-            if (curl not in self.connection):
-                self.connection[curl] = {}
-            self.connection[curl]['key'] = key.strip()
-
-    def getClientKey(self, serverURL=None):
-        if serverURL is None:
-            serverURL = self.connectionConfig.serverURL
-        if((serverURL in self.connection) and ('key' in self.connection[serverURL])):
-            return self.connection[serverURL]['key']
-        raise APIError(ErrorMessage.getInvalidKeyMessage())
-
-    def __actionToArray(self, actions):
+    def _action_to_array(self, actions):
         if isinstance(actions, list) is False:
             return []
         actionList = []
@@ -51,111 +30,122 @@ class ConnectionCapabilities:
 
         return actionList
 
-    """
-        @params {string} curl a valid terminusDB server URL
-        @params {object} capabilities it is the connect call response
-    """
+    def set_capabilities(self, capabilities):
+        self.connection = {}
 
-    def addConnection(self, capabilities):
-        if self.connectionConfig.serverURL is not False:
-            curl = self.connectionConfig.serverURL
+        if(isinstance(capabilities, dict)):
+            for key, value in capabilities.items():
+                if(key == 'terminus:authority'):
+                    if(isinstance(value, dict)):
+                        value = [value]
+                    for item in value:
+                        scope = item['terminus:authority_scope']
+                        actions = item['terminus:action']
 
-            if (curl not in self.connection):
-                self.connection[curl] = {}
+                        if(isinstance(scope, dict)):
+                            scope = [scope]
 
-            if(isinstance(capabilities, dict)):
-                for key, value in capabilities.items():
-                    if(key == 'terminus:authority'):
-                        if(isinstance(value, dict)):
-                            value = [value]
-                        for item in value:
-                            scope = item['terminus:authority_scope']
-                            actions = item['terminus:action']
+                        actionList = self._action_to_array(actions)
 
-                            if(isinstance(scope, dict)):
-                                scope = [scope]
+                        for scopeItem in scope:
+                            dbName = scopeItem['@id']
+                            if (dbName not in self.connection[curl]):
+                                self.connection[curl][dbName] = scopeItem
 
-                            actionList = self.__actionToArray(actions)
+                            self.connection[curl][dbName]['terminus:authority'] = actionList
+                else:
+                    self.connection[curl][key] = value
 
-                            for scopeItem in scope:
-                                dbName = scopeItem['@id']
-                                if (dbName not in self.connection[curl]):
-                                    self.connection[curl][dbName] = scopeItem
+    def _form_resource_name(self, dbid, account):
+        if(dbid == "terminus"):
+            return "terminus"
+	    return f"{account}|{dbid}"
 
-                                self.connection[curl][dbName]['terminus:authority'] = actionList
-                    else:
-                        self.connection[curl][key] = value
-        else:
-            raise InvalidURIError(ErrorMessage.getInvalidURIMessage(
-                'Undefined', "Add Connection"))
-        # print(self.connection)
+    def find_resource_document_id(self, dbid account):
+        testrn = self._formResourceName(dbid, account)
+        for (pred in self.connection.keys()):
+            rec = self.connection[pred]
+            if('terminus:resource_name' in rec):
+                 resource_name = rec['terminus:resource_name']
+                 if ('@value' in resource_name and rec['terminus:resource_name']['@value'] == testrn):
+                     return pred
+        return None
 
-    def serverConnected(self):
-        serverURL = self.connectionConfig.serverURL
-
-        if(serverURL and self.connection.get(serverURL)):
-            return ('@context' in self.connection.get(serverURL))
-        return False
-
-    def capabilitiesPermit(self, action, dbid=None, server=None):
-        if self.connectionConfig.connectedMode is False or self.connectionConfig.checkCapabilities is False or action == const.CONNECT:
-            return True
-
-        server = server if server else self.connectionConfig.serverURL
-        dbid = dbid if dbid else self.connectionConfig.dbID
-
-        rec = None
+    def capabilities_permit(self, action, dbid=None, account=None):
         if (action == const.CREATE_DATABASE):
-            rec = self.__getServerRecord(server)
+            rec = self._get_server_record()
+        elif dbid is not None:
+            rec = self._get_server_record(dbid, account)
         else:
-            rec = self.__getDBRecord(dbid, server)
-
+            raise ValueError('no dbid provided in capabilities check ', server, dbid)
         if (rec):
             auths = rec.get('terminus:authority')
             terminusActionName = 'terminus:' + action
             if (auths and terminusActionName in auths):
                 return True
-
         raise AccessDeniedError(
-            ErrorMessage.getAccessDeniedMessage(action, dbid, server))
+            ErrorMessage.getAccessDeniedMessage(action, dbid, account))
 
-    def __getServerRecord(self, serverURL):
-        if (serverURL in self.connection):
-            connectionObj = self.connection[serverURL]
-
-            if isinstance(connectionObj, dict) is False:
-                return None
-
-            for oid in connectionObj.values():
-                if (isinstance(oid, dict) and oid.get("@type") == 'terminus:Server'):
-                    return oid
+    def _get_server_record(self):
+        """retrieves the meta-data record returned by connect for the connected server
+           Returns
+           =======
+           {terminus:Server} JSON server record as returned by WOQLClient.connect
+        """
+        for obj in self.connection.values():
+            if (isinstance(obj, dict) and oid.get("@type") == 'terminus:Server'):
+                return obj
         return None
 
-    def __getDBRecord(self, dbid, url):
-        if isinstance(self.connection.get(url), dict) is False:
-            return None
+    def _get_db_record(self, dbid, account):
+        """retrieves the meta-data record returned by connect for a particular database
+           Returns
+           =======
+           {terminus:Database} terminus:Database JSON document as returned by WOQLClient.connect
+        """
+        docid = this.find_resource_document_id(dbid, account)
+         if docid is not None:
+             return self.connection[docid]
 
-        if dbid in self.connection[url]:
-            return self.connection[url][dbid]
+    def _extract_metadata(self, dbrec):
+        meta = {'db': "",
+            'account': "",
+            'title': "",
+            'description': ""}
+        if ('terminus:resource_name' in dbrec) and ('@value' in dbrec['terminus:resource_name']):
+            rn = dbrec['terminus:resource_name']['@value']
+            if(rn == "terminus"):
+                meta['db'] = rn
+            elif type(rn) is str and rn:
+                bits = rn.split("|")
+                if(bits.length == 1):
+                    meta['db'] = rn
+                else:
+                    meta['account'] = bits[0]
+                    meta['db'] = bits[1]
+        if 'rdfs:label' in dbrec:
+            if type(dbrec['rdfs:label']) == list:
+                label = dbrec['rdfs:label'][0]
+            else:
+                label = dbrec['rdfs:comment']
+            if label is not None and label and '@value' in label:
+                meta['description'] = label['@value']
 
-        dbidCap = self.__dbCapabilityID(dbid)
+    def _get_db_metadata(self, dbid, account):
+        dbrec = self._get_db_record(dbid, account)
+        if dbrec is not None:
+            return self._extract_metadata(dbrec)
 
-        if dbidCap in self.connection[url]:
-            return self.connection[url][dbidCap]
-
-        return None
-
-    """
-      removes a database record from the connection registry (after deletion, for example)
-    """
-
-    def removeDB(self, dbid=None, srvr=None):
-        dbid = dbid if dbid else self.connectionConfig.dbID
-        self.connectionConfig.deletedbID(dbid)
-        url = srvr if srvr else self.connectionConfig.serverURL
-        dbidCap = self.__dbCapabilityID(dbid)
-        if(url in self.connection and self.connection[url].get(dbidCap)):
-            self.connection[url].pop(dbidCap)
-
-    def __dbCapabilityID(self, dbid):
+    def _db_capability_id(self, dbid):
         return 'doc:' + dbid
+
+    def remove_db(self, dbid=None, srvr=None):
+        """
+          removes a database record from the connection registry (after deletion, for example)
+          @param {String} [dbid] optional DB ID - if omitted current connection config db will be used
+          @param {String} [srvr] optional server URL - if omitted current connection config server will be used
+          @returns {[terminus:Database]} array of terminus:Database JSON documents as returned by WOQLClient.
+        """
+        docid = this.find_resource_document_id(dbid, account)
+        if docid is not None:
+            del self.connection['docid']
