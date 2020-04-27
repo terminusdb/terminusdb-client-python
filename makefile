@@ -1,6 +1,7 @@
 init:
 	pip3 install pipenv --upgrade
 	pipenv install --dev
+	pip install -e .
 test:
 	pytest tests/
 ci:
