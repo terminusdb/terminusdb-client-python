@@ -139,7 +139,8 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        self.cursor['typecast'] = [vara, type, varb];
+        clean_vara = self._pack_string(vara)
+        self.cursor['typecast'] = [clean_vara, type, varb];
         return self
 
     def insert(self, node, type, graph=None):
@@ -450,7 +451,8 @@ class WOQLQuery:
         elif hasattr(vari, 'list') or ('list' in vari):
             self.cursor['idgen'].append(vari)
         else:
-            self.cursor['idgen'].append({"list": vari})
+            clean_vari = self._pack_strings(vari)
+            self.cursor['idgen'].append({'list': clean_vari})
 
         if mode:
             self.cursor['idgen'].append(mode)
