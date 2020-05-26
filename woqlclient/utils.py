@@ -2,7 +2,6 @@ import urllib.parse
 
 
 class Utils:
-
     def __init__(self):
         pass
 
@@ -26,21 +25,21 @@ class Utils:
                 else:
                     payloadArr.append(self.encodeURIComponent({key: value}))
 
-        return '&'.join(payloadArr)
+        return "&".join(payloadArr)
 
     @classmethod
     def addParamsToUrl(self, url, payload):
-        if (payload):
+        if payload:
             params = self.URIEncodePayload(payload)
-            if (params):
-                url = ('%s?%s' % (url, params))
+            if params:
+                url = "{}?{}".format(url, params)
         return url
 
     # below are utils for WOQLQuery
 
     @classmethod
     def addNamespacesToVariable(self, v):
-        if (v[:2] != "v:"):
+        if v[:2] != "v:":
             return "v:" + v
         return v
 

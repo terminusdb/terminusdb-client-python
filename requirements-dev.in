@@ -1,0 +1,18 @@
+requests
+numpy >= 1.13.0
+pandas >= 0.23.0
+pytest>=3
+pytest-cov
+pytest-mock
+pytest-xdist
+pytest-runner
+
+flake8
+flake8-assertive
+flake8-bandit
+flake8-bugbear
+flake8-builtins
+flake8-comprehensions
+flake8-print
+pep8-naming
+shed
