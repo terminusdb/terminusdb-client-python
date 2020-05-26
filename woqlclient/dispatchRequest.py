@@ -1,18 +1,14 @@
-
-#from .errorMessage import ErrorMessage
-from .const import Const as const
-
-import requests
-import sys
-
-from .utils import Utils
-
+# from .errorMessage import ErrorMessage
 from base64 import b64encode
 
-from .errors import *
+import requests
+
+from .const import Const as const
+from .errors import APIError
+from .utils import Utils
+
 
 class DispatchRequest:
-
     def __init__(self):
         pass
 
@@ -27,7 +23,7 @@ class DispatchRequest:
         if file_dict:
             return requests.post(url, json=payload, headers=headers, files=file_dict)
         else:
-            headers['content-type'] = 'application/json'
+            headers["content-type"] = "application/json"
             return requests.post(url, json=payload, headers=headers)
 
     @staticmethod
@@ -62,26 +58,43 @@ class DispatchRequest:
             requestResponse = None
             headers = cls.__autorizationHeader(key,jwt)
 
-            if action in [const.CONNECT, const.GET_SCHEMA, const.CLASS_FRAME, const.WOQL_SELECT, const.GET_DOCUMENT]:
+            if action in [
+                const.CONNECT,
+                const.GET_SCHEMA,
+                const.CLASS_FRAME,
+                const.WOQL_SELECT,
+                const.GET_DOCUMENT,
+            ]:
                 requestResponse = cls.__getCall(url, headers, payload)
 
             elif action in [const.DELETE_DATABASE, const.DELETE_DOCUMENT]:
                 requestResponse = cls.__deleteCall(url, headers, payload)
 
-            elif action in [const.CREATE_DATABASE, const.UPDATE_SCHEMA, const.CREATE_DOCUMENT, const.WOQL_UPDATE]:
+            elif action in [
+                const.CREATE_DATABASE,
+                const.UPDATE_SCHEMA,
+                const.CREATE_DOCUMENT,
+                const.WOQL_UPDATE,
+            ]:
                 requestResponse = cls.__postCall(url, headers, payload, file_dict)
 
-
-            if(requestResponse.status_code == 200):
+            if requestResponse.status_code == 200:
                 return requestResponse.json()  # if not a json not it raises an error
             else:
-                #Raise an exception if a request is unsuccessful
-                message="Api Error";
+                # Raise an exception if a request is unsuccessful
+                message = "Api Error"
 
                 if type(requestResponse.text) is str:
-                    message=requestResponse.text
+                    message = requestResponse.text
 
-                raise(APIError(message,url,requestResponse.json(),requestResponse.status_code))
+                raise (
+                    APIError(
+                        message,
+                        url,
+                        requestResponse.json(),
+                        requestResponse.status_code,
+                    )
+                )
 
         # to be reviewed
         # the server in the response return always content-type application/json

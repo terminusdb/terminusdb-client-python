@@ -1,0 +1,8 @@
+requests
+numpy >= 1.13.0
+pandas >= 0.23.0
+pytest>=3
+pytest-cov
+pytest-mock
+pytest-xdist
+pytest-runner

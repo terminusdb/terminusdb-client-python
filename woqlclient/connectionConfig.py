@@ -1,10 +1,10 @@
 # connectionConfig.py
-from .idParser import IDParser
 from copy import copy
+
+from .idParser import IDParser
 
 
 class ConnectionConfig:
-
     def __init__(self, server_url,**kwargs):
 
         """
@@ -165,7 +165,7 @@ class ConnectionConfig:
             repoid = self.repo
         return self.db_base("fetch") + f"/{repoid}"
 
-    def rebase_url(self, source_repo= None, source_branch=None):
+    def rebase_url(self, source_repo=None, source_branch=None):
         purl = self.branch_base("rebase")
         if source_repo is not None:
             purl = purl + f"/{source_repo}"
@@ -259,6 +259,19 @@ class ConnectionConfig:
             self.__branchid = bid
         else:
             raise ValueError(f"Invalid Branch ID: {input_str}")
+
+    def set_key(self, input_str=None, uid=None):
+        if input_str is None:
+            self.basic_auth = False
+            return False
+        uid = udi if uid is not None else "admin"
+        parser = IDParser()
+        key = parser.parse_key(input_str)
+        if key:
+            self.rebase_url = f"{uid}:{key}"
+            return self.basic_auth
+        self.set_error(f"Invalid API Key: {input_str}")
+
 
             
     #None value is a possible value, in this case we set redid to false 

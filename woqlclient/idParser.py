@@ -1,33 +1,28 @@
 # idParser.py
 
-from .errorMessage import ErrorMessage
-from .errors import (InvalidURIError)
-import re
-
 
 class IDParser:
-
     def __init__(self):
         pass
 
     def _valid_url(self, input):
         if input is not None:
-            if (input[:7] == 'http://') or (input[:8] == 'https://'):
+            if (input[:7] == "http://") or (input[:8] == "https://"):
                 return True
         return False
 
-    def _valid_id_string(self, input, _):
+    def _valid_id_string(self, input, _=None):
         if type(input) != str:
             return False
-        if (':' in input) or (' ' in input) or ('/' in input):
+        if (":" in input) or (" " in input) or ("/" in input):
             return False
         return True
 
     def parse_server_url(self, url):
         if not self._valid_url(url):
             return False
-        if url[-1] != '/':
-            url += '/'
+        if url[-1] != "/":
+            url += "/"
         return url
 
     def parse_dbid(self, dbid):

@@ -5,7 +5,9 @@ test:
 	pytest tests/
 ci:
 	pip3 install ./ --upgrade
-	python -m pytest tests  --junitxml=report.xml
+	pip3 install tox
+	tox  --recreate
+	#python -m pytest tests  --junitxml=report.xml
 
 test-readme:
 	@pipenv run python src/setup.py check --restructuredtext --strict && ([ $$? -eq 0 ] && echo "README.rst and HISTORY.rst ok") || echo "Invalid markup in README.rst or HISTORY.rst!"

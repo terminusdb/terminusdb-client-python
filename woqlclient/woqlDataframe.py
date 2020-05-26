@@ -1,17 +1,22 @@
 # woqlDataframe.py
+import re
+
 import numpy as np
 import pandas as pd
-import re
+
 
 class EmptyException(Exception):
     pass
 
+
 def _get_var_name(uri):
-    (_,var_name) = re.split('^http://terminusdb.com/woql/variable/', uri, maxsplit=1)
+    (_, var_name) = re.split("^http://terminusdb.com/woql/variable/", uri, maxsplit=1)
     return var_name
 
+
 def _is_empty(query):
-    return len(query['bindings']) == 0
+    return len(query["bindings"]) == 0
+
 
 def extract_header(query):
     """Extracts the header of the returned result table
@@ -45,17 +50,18 @@ def extract_header(query):
     """
     header = []
     if _is_empty(query):
-        raise EmptyException('Query is empty')
+        raise EmptyException("Query is empty")
 
-    bindings = query['bindings'][0]
+    bindings = query["bindings"][0]
     for k, v in bindings.items():
         name = _get_var_name(k)
-        if type(v) == dict and ('@type' in v):
-            ty = v['@type']
+        if type(v) == dict and ("@type" in v):
+            ty = v["@type"]
         else:
-            ty = 'http://www.w3.org/2001/XMLSchema#string'
-        header.append((name,ty))
+            ty = "http://www.w3.org/2001/XMLSchema#string"
+        header.append((name, ty))
     return header
+
 
 def extract_column(query, name, ty):
     """Extracts the column of the returned result table
@@ -91,17 +97,18 @@ def extract_column(query, name, ty):
     type_map : convert WQOL rdf data types into numpy data types
     extract_header : extract header of the returned result table
     """
-    bindings = query['bindings']
+    bindings = query["bindings"]
     column = []
     for binding in bindings:
-        for k,v in binding.items():
-            if k == ('http://terminusdb.com/woql/variable/' + name):
-                if isinstance(v,dict):
-                    value = type_value_map(ty,v['@value'])
+        for k, v in binding.items():
+            if k == ("http://terminusdb.com/woql/variable/" + name):
+                if isinstance(v, dict):
+                    value = type_value_map(ty, v["@value"])
                 else:
-                    value = type_value_map(ty,v)
+                    value = type_value_map(ty, v)
                 column.append(value)
     return column
+
 
 def type_map(ty_rdf):
     """Mapping types from WOQL rdf to numpy data types
@@ -128,15 +135,17 @@ def type_map(ty_rdf):
     query_to_df : put the result of the query into a pandas DataFrame
     type_value_map : converts values of different WOQL rdf types to numpy data types values
     """
-    convert_mapping = {'http://www.w3.org/2001/XMLSchema#string': np.unicode_,
-    'http://www.w3.org/2001/XMLSchema#integer': np.int,
-    'http://www.w3.org/2001/XMLSchema#dateTime': np.datetime64,
-    'http://www.w3.org/2001/XMLSchema#decimal': np.double,
+    convert_mapping = {
+        "http://www.w3.org/2001/XMLSchema#string": np.unicode_,
+        "http://www.w3.org/2001/XMLSchema#integer": np.int,
+        "http://www.w3.org/2001/XMLSchema#dateTime": np.datetime64,
+        "http://www.w3.org/2001/XMLSchema#decimal": np.double,
     }
     if ty_rdf in convert_mapping:
         return convert_mapping[ty_rdf]
     else:
-        raise Exception("Unknown rdf type! "+ty_rdf)
+        raise Exception("Unknown rdf type! " + ty_rdf)
+
 
 def type_value_map(ty_rdf, value):
     """Converts values of different WOQL rdf types to numpy data types values
@@ -165,16 +174,17 @@ def type_value_map(ty_rdf, value):
     query_to_df : put the result of the query into a pandas DataFrame
     type_map : mapping types from WOQL rdf to numpy data types
     """
-    if ty_rdf == 'http://www.w3.org/2001/XMLSchema#string':
+    if ty_rdf == "http://www.w3.org/2001/XMLSchema#string":
         return value
-    elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#integer':
+    elif ty_rdf == "http://www.w3.org/2001/XMLSchema#integer":
         return int(value)
-    elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#dateTime':
+    elif ty_rdf == "http://www.w3.org/2001/XMLSchema#dateTime":
         return np.datetime64(value)
-    elif ty_rdf == 'http://www.w3.org/2001/XMLSchema#decimal':
+    elif ty_rdf == "http://www.w3.org/2001/XMLSchema#decimal":
         return float(value)
     else:
-        raise Exception("Unknown rdf type! "+ty_rdf)
+        raise Exception("Unknown rdf type! " + ty_rdf)
+
 
 def query_to_df(query):
     """Convert a query to a data frame.
@@ -209,7 +219,7 @@ def query_to_df(query):
     header = extract_header(query)
     dtypes = {}
     column_names = []
-    for name,rdftype in header:
+    for name, rdftype in header:
         column_names.append(name)
         dtype = type_map(rdftype)
         dtypes[name] = dtype
@@ -217,8 +227,8 @@ def query_to_df(query):
     dataframe = pd.DataFrame(columns=column_names)
     dataframe.astype(dtypes)
 
-    for name,rdftype in header:
-        column = extract_column(query,name,rdftype)
+    for name, rdftype in header:
+        column = extract_column(query, name, rdftype)
         dataframe[name] = column
 
     return dataframe
