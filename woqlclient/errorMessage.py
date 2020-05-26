@@ -43,7 +43,7 @@ class ErrorMessage:
 
     @staticmethod
     def getInvalidKeyMessage(extraMessage=''):
-        message = "The Api KEY in Undefined " + extraMessage
+        message = "The Api KEY is Undefined " + extraMessage
         return message
 
     @staticmethod
