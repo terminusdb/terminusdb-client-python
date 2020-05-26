@@ -1,50 +1,25 @@
 from  woqlclient import ConnectionConfig
 import pytest
-from woqlclient import (InvalidURIError)
 
-def test_connectionConfig_noParameter():
-	connectionConfig=ConnectionConfig()
+class TestConnectionConfig:
+    start_server_url = "http://localhost:6363/";
+    start_dbid = "testDB";
+    account="admin"
+    connection_config = ConnectionConfig(server=start_server_url,
+                        db=start_dbid,
+                        account=account)
+    db_url="http://localhost:6363/db/admin/testDB"
 
-	"""
-	 you need to set the terminusServer and the terminusDB id
-	"""
-	with pytest.raises(InvalidURIError):
-		connectionConfig.serverURL
-		connectionConfig.dbID
-		connectionConfig.schemaURL()
-		connectionConfig.docURL()
-		connectionConfig.queryURL()
-		connectionConfig.dbURL()
+    def test_get_sever_url(self):
+        assert self.connection_config.server_url == self.start_server_url
+        assert self.connection_config.db_url == self.db_url
 
-	assert connectionConfig.connectedMode == True, "start value of connectedMode is True"
-	assert connectionConfig.checkCapabilities == True, "start value of checkCapabilities is True"
-	assert connectionConfig.includeKey == True, "start value of includeKey is True"
+    def test_change_server(self):
+        connection_config.set_branch("myBranch")
+        assert self.connection_config.db_url() == self.db_url
+        assert self.connection_config.query_url == "http://localhost:6363/woql/admin/testDB/local/branch/myBranch"
 
-
-def test_connectionConfig_withParameter():
-	
-	startParameters={"server":"http://localhost:6363/",
-					 "db":"myFirstTerminusDB",
-					 "doc":"chess",
-					 "connected_mode":False,
-					 "include_key":False,
-					 "checks_capabilities":False}
-	
-
-	connectionConfig=ConnectionConfig(**startParameters)
-
-	assert connectionConfig.serverURL== "http://localhost:6363/"
-	assert connectionConfig.dbID== "myFirstTerminusDB"
-	assert connectionConfig.connectedMode == False
-	assert connectionConfig.checkCapabilities == False
-	assert connectionConfig.includeKey == False
-	assert connectionConfig.dbURL() == "http://localhost:6363/myFirstTerminusDB", "dbURL"
-	assert connectionConfig.schemaURL() == "http://localhost:6363/myFirstTerminusDB/schema", "schemaURL"
-	assert connectionConfig.docURL() == "http://localhost:6363/myFirstTerminusDB/document/chess", "docURL"
-	assert connectionConfig.queryURL() == "http://localhost:6363/myFirstTerminusDB/woql", "queryURL"
-
-
-def test_setServer():
-	connectionConfig=ConnectionConfig()
-	connectionConfig.setServer("http://localhost:6363")
-	assert connectionConfig.serverURL== "http://localhost:6363/"
+    def test_change_server(self):
+        new_ref = "gfhfjkflfgorpyuiioo"
+        self.connection_config.set_ref(new_ref)
+        assert self.connection_config.query_url == "http://localhost:6363/woql/admin/testDB/local/commit/"+new_ref
