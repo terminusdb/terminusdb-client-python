@@ -54,7 +54,7 @@ class DispatchRequest:
     @classmethod
     def send_request_by_action(
         cls, url, action, key, payload={}, file_dict=None, jwt=None
-    ): #payload default as empty dict is against PEP
+    ):  # payload default as empty dict is against PEP
         print("Sending to URL____________", url)
         print("Send Request By Action_____________", action)
 
