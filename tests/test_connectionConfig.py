@@ -14,12 +14,16 @@ class TestConnectionConfig:
         assert self.connection_config.server_url == self.start_server_url
         assert self.connection_config.db_url == self.db_url
 
-    def test_change_server(self):
-        connection_config.set_branch("myBranch")
-        assert self.connection_config.db_url() == self.db_url
+    
+    def test_change_branch(self):
+        self.connection_config.branch = "myBranch"
+        assert self.connection_config.db_url == self.db_url
         assert self.connection_config.query_url == "http://localhost:6363/woql/admin/testDB/local/branch/myBranch"
-
+    
     def test_change_server(self):
         new_ref = "gfhfjkflfgorpyuiioo"
-        self.connection_config.set_ref(new_ref)
+        self.connection_config.ref=new_ref
+        print(self.connection_config.query_url)
+
         assert self.connection_config.query_url == "http://localhost:6363/woql/admin/testDB/local/commit/"+new_ref
+    

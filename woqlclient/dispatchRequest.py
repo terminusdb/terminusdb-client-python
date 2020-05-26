@@ -35,7 +35,7 @@ class DispatchRequest:
         url = Utils.addParamsToUrl(url, payload)
         return requests.delete(url, headers=headers)
 
-    @staticmethod
+
     @staticmethod
     def __autorizationHeader(key=None,jwt=None):
         headers = {}
@@ -47,7 +47,7 @@ class DispatchRequest:
             if jwt:
                 headers['HUB_AUTHORIZATION'] = 'Bearer %s' % jwt
         # payload.pop('terminus:user_key')
-        else if jwt:
+        elif jwt:
             headers['Authorization'] = 'Bearer %s' % jwt
 
         return headers
@@ -60,7 +60,7 @@ class DispatchRequest:
 
         try:
             requestResponse = None
-            headers = cls.__autorizationHeader(key)
+            headers = cls.__autorizationHeader(key,jwt)
 
             if action in [const.CONNECT, const.GET_SCHEMA, const.CLASS_FRAME, const.WOQL_SELECT, const.GET_DOCUMENT]:
                 requestResponse = cls.__getCall(url, headers, payload)

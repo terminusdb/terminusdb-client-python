@@ -29,11 +29,10 @@ class WOQLClient:
 
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, server_url, **kwargs):
         # current conCapabilities context variables
-        key = kwargs.get('key')
-        self.conConfig = ConnectionConfig(**kwargs)
-        self.conCapabilities = ConnectionCapabilities(self.conConfig, key)
+        self.conConfig = ConnectionConfig(server_url,**kwargs)
+        self.conCapabilities = ConnectionCapabilities()
 
 
 
