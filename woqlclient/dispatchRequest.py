@@ -36,18 +36,25 @@ class DispatchRequest:
         return requests.delete(url, headers=headers)
 
     @staticmethod
-    def __autorizationHeader(key):
+    @staticmethod
+    def __autorizationHeader(key=None,jwt=None):
         headers = {}
 
         # if (payload and ('terminus:user_key' in  payload)):
         # Utils.encodeURIComponent(payload['terminus:user_key'])}
-        headers = {'Authorization': 'Basic %s' % b64encode(
-            (':' + key).encode('utf-8')).decode('utf-8')}
+        if key:
+            headers['Authorization'] = 'Basic %s' % b64encode((':' + key).encode('utf-8')).decode('utf-8')
+            if jwt:
+                headers['HUB_AUTHORIZATION'] = 'Bearer %s' % jwt
         # payload.pop('terminus:user_key')
-        return headers
+        else if jwt:
+            headers['Authorization'] = 'Bearer %s' % jwt
 
+        return headers
+    #url, action, payload, basic_auth, jwt=null
+   
     @classmethod
-    def sendRequestByAction(cls, url, action, key, payload={}, file_dict=None):
+    def sendRequestByAction(cls, url, action, key, payload={}, file_dict=None, jwt=None):
         print("Sending to URL____________", url)
         print("sendRequestByAction_____________", action)
 
