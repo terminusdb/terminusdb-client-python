@@ -12,7 +12,7 @@ from woqlclient import ConnectionCapabilities
 # from connectResponseForCapabilities import connect_response
 
 url = "http://localhost:6363/"
-jsonContext = {
+json_context = {
     "doc": "terminus:///terminus/document/",
     "layer": "http://terminusdb.com/schema/layer#",
     "owl": "http://www.w3.org/2002/07/owl#",
@@ -90,7 +90,6 @@ connection_capabilities.set_capabilities(snapCapabilitiesObj)
 
 class TestCapabilitiesActions:
     def test_connection_capability_object(self):
-        print(connection_capabilities.connection)
         assert connection_capabilities.connection == ConnectionDump
 
     def test_form_resource_name(self):
@@ -108,15 +107,11 @@ class TestCapabilitiesActions:
         assert x == serverRecordsFromCap
 
     def test_get_json_context(self):
-        print(connection_capabilities.get_json_context())
-        assert connection_capabilities.get_json_context() == jsonContext
+        assert connection_capabilities.get_json_context() == json_context
 
     def test_capabilities_permit(self):
-        assert (
-            connection_capabilities.capabilities_permit(
-                "create_database", "aaaaaa", "admin"
-            )
-            == True
+        assert connection_capabilities.capabilities_permit(
+            "create_database", "aaaaaa", "admin"
         )
         with pytest.raises(Exception):
             assert connection_capabilities.capabilities_permit(

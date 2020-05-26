@@ -1,6 +1,6 @@
 # connectionCapabilities.py
 
-from .const import Const as const
+from .api_endpoint_const import APIEndpointConst
 
 # const UTILS = require('./utils.js');
 from .errorMessage import ErrorMessage
@@ -24,11 +24,11 @@ class ConnectionCapabilities:
     def _action_to_array(self, actions):
         if isinstance(actions, list) is False:
             return []
-        actionList = []
+        action_list = []
         for item in actions:
-            actionList.append(item["@id"])
+            action_list.append(item["@id"])
 
-        return actionList
+        return action_list
 
     def set_capabilities(self, capabilities=None):
         self.connection = {}
@@ -87,7 +87,7 @@ class ConnectionCapabilities:
         return {}
 
     def capabilities_permit(self, action, dbid=None, account=None):
-        if action == const.CREATE_DATABASE:
+        if action == APIEndpointConst.CREATE_DATABASE:
             rec = self._get_server_record()
         elif dbid is not None:
             rec = self._get_db_record(dbid, account)
@@ -95,8 +95,8 @@ class ConnectionCapabilities:
             raise ValueError("no dbid provided in capabilities check ", action, dbid)
         if rec:
             auths = rec.get("terminus:authority")
-            terminusActionName = "terminus:" + action
-            if auths and terminusActionName in auths:
+            terminus_action_name = "terminus:" + action
+            if auths and terminus_action_name in auths:
                 return True
             else:
                 raise ValueError("No record found for connection: ", action, dbid)

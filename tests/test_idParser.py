@@ -4,30 +4,30 @@ from woqlclient import IDParser
 # sys.path.append('woqlclient')
 
 
-def test_parseServerURL():
-    servURL = "http://localhost:6363/"
-    idParser = IDParser()
-    assert idParser.parse_server_url(servURL) == servURL
+def test_parse_server_url():
+    server_url = "http://localhost:6363/"
+    id_parser = IDParser()
+    assert id_parser.parse_server_url(server_url) == server_url
 
 
-def test_parseDBID():
-    dbName = "myFirstTerminusDB"
-    idParser = IDParser()
-    assert idParser.parse_dbid(dbName) == dbName
+def test_parse_dbid():
+    db_name = "myFirstTerminusDB"
+    id_parser = IDParser()
+    assert id_parser.parse_dbid(db_name) == db_name
 
 
-def test_validURL():
-    fullURL = "http://localhost:6363/myFirstTerminusDB"
-    idParser = IDParser()
-    assert idParser._valid_url(fullURL) == True
+def test_valid_url():
+    full_url = "http://localhost:6363/myFirstTerminusDB"
+    id_parser = IDParser()
+    assert id_parser._valid_url(full_url)
 
-    fullURL = "localhost&899900/myFirstTerminusDB"
-    assert idParser._valid_url(fullURL) == False
+    full_url = "localhost&899900/myFirstTerminusDB"
+    assert not id_parser._valid_url(full_url)
 
 
-def test_validIDString():
-    idString = "myFirstTerminusDB"
-    idParser = IDParser()
-    assert idParser._valid_id_string(idString) == True
-    idString = "my First:"
-    assert idParser._valid_id_string(idString) == False
+def test_valid_id_string():
+    id_string = "myFirstTerminusDB"
+    id_parser = IDParser()
+    assert id_parser._valid_id_string(id_string)
+    id_string = "my First:"
+    assert not id_parser._valid_id_string(id_string)
