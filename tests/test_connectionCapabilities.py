@@ -111,8 +111,8 @@ class TestCapabilitiesActions:
 
     def test_capabilities_permit(self):
         assert connection_capabilities.capabilities_permit(
-                "create_database", "aaaaaa", "admin"
-            )
+            "create_database", "aaaaaa", "admin"
+        )
         with pytest.raises(Exception):
             assert connection_capabilities.capabilities_permit(
                 "delete_database", "nonexistant", "admin"

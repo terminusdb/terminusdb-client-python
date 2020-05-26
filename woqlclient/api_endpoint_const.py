@@ -1,4 +1,4 @@
-class Const:
+class APIEndpointConst:
     CONNECT = "connect"
     GET_SCHEMA = "get_schema"
     UPDATE_SCHEMA = "update_schema"

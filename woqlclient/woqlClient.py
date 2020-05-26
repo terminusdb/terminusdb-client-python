@@ -702,7 +702,9 @@ class WOQLClient:
             id_parser.queryURL(), APIEndpointConst.WOQL_UPDATE, key, payload, file_dict
         )
 
-    def dispatch(self, url, action, payload={}, file_dict=None): #don't use dict as default
+    def dispatch(
+        self, url, action, payload={}, file_dict=None
+    ):  # don't use dict as default
         """
         Directly dispatch to a Terminus database.
 
