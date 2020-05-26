@@ -185,8 +185,8 @@ class ConnectionConfig:
     def db_url(self):
         return self.db_base("db")
 
-    def graph_url(self, type, gid):
-        return self.branch_base("graph") + f"/{type}/{gid}"
+    def graph_url(self, graph_type, gid):
+        return self.branch_base("graph") + f"/{graph_type}/{gid}"
 
     """
       Utility functions for setting and parsing urls and determining

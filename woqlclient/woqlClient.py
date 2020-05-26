@@ -31,12 +31,27 @@ class WOQLClient:
 
     def __init__(self, server_url, **kwargs):
         # current conCapabilities context variables
+        """
+        Parameters
+        ----------
+        server_url str 
+        key        str option key 
+        user
+        jwt
+        jwt_user
+        account
+        db: set cursor to this db
+        repo: set cursor to this repo
+        branch: set branch to this id
+
+        """
         self.conConfig = ConnectionConfig(server_url,**kwargs)
         self.conCapabilities = ConnectionCapabilities()
 
 
 
-    def connect(self, serverURL=None, key=None):
+
+    def connect(self, **kwargs):
         """
         Connect to a Terminus server at the given URI with an API key
         Stores the terminus:ServerCapability document returned
@@ -49,10 +64,15 @@ class WOQLClient:
 
         Parameters
         ----------
-        serverURL : str
-            Terminus server URI
-        key : str
-            API key
+        key        str option key 
+        user
+        jwt
+        jwt_user
+        account
+        db: set cursor to this db
+        repo: set cursor to this repo
+        branch: set branch to this id
+
 
         Returns
         -------
@@ -63,44 +83,79 @@ class WOQLClient:
         >>> woql.WOQLClient().connect(serverUrl, key)
         dict
         """
-        if serverURL:
-            self.conConfig.setServer(serverURL)
-
-        if key:
-            self.conCapabilities.setClientKey(key)
-
-        jsonObj = self.dispatch(self.conConfig.serverURL, const.CONNECT, key)
+        if len(kwarg) > 0:
+            self.connectionConfig.update(**kwargs)
+        
+        jsonObj = self.dispatch(self.conConfig.serverURL, const.CONNECT)
         self.conCapabilities.addConnection(jsonObj)
         return jsonObj
 
-    @staticmethod
-    def directConnect(serverURL, key):
-        """
-        connect directly without creating a new class instance
 
-        Parameters
+    def key (self,key=None, user=None): 
+        if key :
+            self.connectionConfig.set_key(key, user)
+        return self.connectionConfig.key
+    
+    def jwt (self,jwt=None, accountUser=None):
+        if jwt :   
+            self.connectionConfig.set_jwt(jwt, accountUser)
+        return self.connectionConfig.jwt
+
+
+    def db (self,dbid=None):
+        if dbid :
+            self.connectionConfig.db = dbid
+        return self.connectionConfig.db
+
+    def account (self,accountid=None) :
+        if accountid :
+            self.connectionConfig.account=accountid
+        self.connectionConfig.account
+
+    def repo (self,repoid=None) :
+        if repoid :
+            self.connectionConfig.repo= repoid
+    
+        return self.connectionConfig.repo
+
+    def ref (self,refid=None):
+        if refid :
+            self.connectionConfig.ref=refid
+        return self.connectionConfig.ref
+
+
+    def checkout (self, branchid):
+        if branchid :
+          self.connectionConfig.branch=branchid  
+        return self.connectionConfig.branch
+
+    def uid (self,ignore_jwt):
+        return self.connectionConfig.user(ignore_jwt)
+
+    """
+    Parameters
         ----------
-        serverURL : str
-            Terminus server URI
-        key : str
-            API key
+        key        str option key 
+        user
+        jwt
+        jwt_user
+        account
+        db: set cursor to this db
+        repo: set cursor to this repo
+        branch: set branch to this id
+    """
 
-        Returns
-        -------
-        dict or raise an InvalidURIError
-        """
-        idParser = IDParser()
-        idParser.parseServerURL(serverURL)
-        return DispatchRequest.sendRequestByAction(idParser.serverURL, const.CONNECT, key)
+    def set (self,**kwargs):
+        self.connectionConfig.update(**kwargs)
 
-    def createDatabase(self, dbID, label, key=None, **kwargs):
+    def create_database = function(self, dbid, label, **kwargs):
         """
         Create a Terminus Database by posting
         a terminus:Database document to the Terminus Server
 
         Parameters
         ----------
-        dbID : str
+        dbid : str
             ID of the specific database to create
         label : str
             Terminus label
@@ -117,40 +172,24 @@ class WOQLClient:
         --------
         WOQLClient(server="http://localhost:6363").createDatabase("someDB", "Database Label", "password")
         """
-        self.conConfig.setDB(dbID)
-        createDBTemplate = DocumentTemplate.createDBTemplate(
-            self.conConfig.serverURL, self.conConfig.dbID, label, **kwargs)
-        #after create db the server could send back the capabilities of the new db, we can add the new capability at the
-        #capabilities list
-        return self.dispatch(self.conConfig.dbURL(), const.CREATE_DATABASE, key, createDBTemplate)
 
-    @staticmethod
-    def directCreateDatabase(dbURL, label, key, **kwargs):
-        """Create Terminus Database with settings
+        self.db(dbid)
+        if kwargs.get('accountid'): 
+            self.account(accountid)
 
-        Parameters
-        ----------
-        dbURL : str
-            TerminusDB full URL like http://localhost:6363/myDB
-        label : str
-            the terminus db title
-        key : str
-            the server API key
-        kwargs
-            Optional arguments that ``createDatabase`` takes
+        comment = kwargs.get("comment",label);
+        username=self.account();
 
-        Returns
-        -------
-        dict
-        """
-        idParser = IDParser()
-        idParser.parseDBURL(dbURL)
-        createDBTemplate = DocumentTemplate.createDBTemplate(
-            idParser.serverURL, idParser.dbID, label, **kwargs)
-        DispatchRequest.sendRequestByAction(
-            idParser.dbURL(), const.CREATE_DATABASE, key, createDBTemplate)
+        doc={"label":label,
+               "comment":comment,
+               "prefixes":{"scm":f"terminus://{username}/{dbid}/schema#",
+                           "doc":f"terminus://{username}/{dbid}/data/"}}
 
-    def deleteDatabase(self, dbID, key=None):
+        
+        return this.dispatch(self.connectionConfig.db_url(), const.CREATE_DATABASE,  doc)
+    
+    
+    def delete_database(self, dbid , accountid=None):
         """Delete a TerminusDB database
 
         Parameters
@@ -168,29 +207,32 @@ class WOQLClient:
         -------
         >>> WOQLClient(server="http://localhost:6363").deleteDatabase("someDBToDelete", "password")
         """
-        self.conConfig.setDB(dbID)
+        self.db(dbid)
         jsonResponse = self.dispatch(
-            self.conConfig.dbURL(), const.DELETE_DATABASE, key)
-        self.conCapabilities.removeDB()
+            self.conConfig.db_url(), const.DELETE_DATABASE)
+        self.conCapabilities.removeDB(self.db(), self.account())
         return jsonResponse
 
-    @staticmethod
-    def directDeleteDatabase(dbURL, key):
-        """Delete a TerminusDB with settings
+    def create_graph (self, graph_type, graph_id, commit_msg):
+        if graph_type in ["inference", "schema", "instance"] :
+            commit = self.generate_commit(commit_msg)
+            return self.dispatch(CONST.CREATE_GRAPH, self.connectionConfig.graph_url(graph_type, graph_id), commit_msg)
+    
+        raise ValueError('Create graph parameter error - you must specify a valid type (inference, instance, schema), graph id and commit message')
+    
+    def generate_commit(self,msg, author):
+        mes_author
+        if author : 
+            mes_author=author
+        else 
+            mes_author=self.uid()
 
-        Parameters
-        ----------
-        dbURL : str
-            TerminusDB full URL like http://localhost:6363/myDB
-        key : str
-            the server API key
-        """
-        idParser = IDParser()
-        idParser.parseDBURL(dbURL)
-        return DispatchRequest.sendRequestByAction(
-            idParser.dbURL(), const.DELETE_DATABASE, key)
+        ci = {"commit_info": {author: mes_author, message: msg}}
+        return ci
 
-    def getSchema(self, dbID=None, key=None, options={"terminus:encoding": "terminus:turtle"}):
+
+    
+    def get_schema(self, dbID=None, key=None, options={"terminus:encoding": "terminus:turtle"}):
         """Retrieves the schema of the specified database
 
         opts.format defines which format is requested, default is turtle(*json / turtle)
@@ -213,31 +255,8 @@ class WOQLClient:
 
         return self.dispatch(self.conConfig.schemaURL(), const.GET_SCHEMA, key, options)
 
-    @staticmethod
-    def directGetSchema(dbURL, key, options={"terminus:encoding": "terminus:turtle"}):
-        """Retrieves the schema of the specified database with settings
-
-        opts.format defines which format is requested, default is turtle(*json / turtle)
-
-        Parameters
-        ----------
-        dbId : str
-            TerminusDB Id or omitted (get last select database)
-        key : str
-            the server API key
-        options : dict
-            options object
-
-        Returns
-        -------
-        str or dict
-        """
-        idParser = IDParser()
-        idParser.parseDBURL(dbURL)
-        return DispatchRequest.sendRequestByAction(
-            idParser.schemaURL(), const.GET_SCHEMA, key, options)
-
-    def updateSchema(self, docObj, dbID=None, key=None, opts={"terminus:encoding": "terminus:turtle"}):
+   
+    def update_schema(self, docObj, dbID=None, key=None, opts={"terminus:encoding": "terminus:turtle"}):
         """Updates the Schema of the specified database
 
         opts.format is used to specify which format is being used (*json / turtle)
@@ -624,7 +643,8 @@ class WOQLClient:
 
         return DispatchRequest.sendRequestByAction(idParser.queryURL(), const.WOQL_UPDATE, key, payload, file_dict)
 
-    def dispatch(self, url, action, connectionKey, payload={}, file_dict = None):
+    
+    def dispatch(self, url, action, payload={}, file_dict = None):
         """
         Directly dispatch to a Terminus database.
 
@@ -644,17 +664,10 @@ class WOQLClient:
         -------
         dict or raise an InvalidURIError
         """
-        if connectionKey is None:
-            # if the api key is not setted the method raise an APIerror
-            connectionKey = self.conCapabilities.getClientKey()
-
-        #if (action != const.CONNECT and self.conConfig.connectedMode and self.conCapabilities.serverConnected() is False):
-
-            #key = payload.key if isinstance(payload,dict) and key in payload else False
-            #self.connect(self.conConfig.serverURL, connectionKey)
-            #print("CONNCT BEFORE ACTION", action)
+       
+       
 
         #check if we can perform this action or raise an AccessDeniedError error
         #review the access control
         #self.conCapabilities.capabilitiesPermit(action)
-        return DispatchRequest.sendRequestByAction(url, action, connectionKey, payload, file_dict)
+        return DispatchRequest.sendRequestByAction(url, action, self.key(), payload, file_dict, self.jwt())
