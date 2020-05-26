@@ -30,46 +30,57 @@ class ConnectionCapabilities:
 
         return actionList
 
-    def set_capabilities(self, capabilities):
+    def set_capabilities(self, capabilities=None):
         self.connection = {}
+        if capabilities is not None:
+            self.capabilitiesKeys = capabilities.keys()
+        else:
+            self.capabilitiesKeys = []
 
-        if(isinstance(capabilities, dict)):
-            for key, value in capabilities.items():
-                if(key == 'terminus:authority'):
-                    if(isinstance(value, dict)):
-                        value = [value]
-                    for item in value:
-                        scope = item['terminus:authority_scope']
-                        actions = item['terminus:action']
-
-                        if(isinstance(scope, dict)):
-                            scope = [scope]
-
-                        actionList = self._action_to_array(actions)
-
-                        for scopeItem in scope:
-                            dbName = scopeItem['@id']
-                            if (dbName not in self.connection[curl]):
-                                self.connection[curl][dbName] = scopeItem
-
-                            self.connection[curl][dbName]['terminus:authority'] = actionList
+        for pred in self.capabilitiesKeys:
+            if (pred == 'terminus:authority') and (pred in capabilities):
+                if type(capabilities[pred]) == list:
+                    auths = capabilities[pred]
                 else:
-                    self.connection[curl][key] = value
+                    auths = [capabilities[pred]]
+                for item in auths:
+                    access = item['terminus:access']
+                    scope = access['terminus:authority_scope']
+                    actions = access['terminus:action']
+                    if type(scope) != list:
+                        scope = [scope]
+                    if type(actions) == list:
+                        action_arr = [obj['@id'] for obj in actions]
+                    else:
+                        action_arr = []
+                    for nrec in scope:
+                        if (nrec['@id'] not in self.connection):
+                            self.connection[nrec['@id']] = nrec
+                        self.connection[nrec['@id']]['terminus:authority'] = action_arr
+            else:
+                self.connection[pred] = capabilities[pred]
 
     def _form_resource_name(self, dbid, account):
         if(dbid == "terminus"):
             return "terminus"
-	    return f"{account}|{dbid}"
+        return f"{account}|{dbid}"
 
-    def find_resource_document_id(self, dbid account):
-        testrn = self._formResourceName(dbid, account)
-        for (pred in self.connection.keys()):
+    def find_resource_document_id(self, dbid, account):
+        testrn = self._form_resource_name(dbid, account)
+        for pred in self.connection.keys():
             rec = self.connection[pred]
             if('terminus:resource_name' in rec):
                  resource_name = rec['terminus:resource_name']
                  if ('@value' in resource_name and rec['terminus:resource_name']['@value'] == testrn):
                      return pred
         return None
+
+    def get_json_context(self):
+        if "@context" in self.connection:
+            ctxt = self.connection["@context"]
+            ctxt['scm'] = "http://my.old.man/is/a/walrus#"
+            return ctxt
+        return {}
 
     def capabilities_permit(self, action, dbid=None, account=None):
         if (action == const.CREATE_DATABASE):
@@ -93,7 +104,7 @@ class ConnectionCapabilities:
            {terminus:Server} JSON server record as returned by WOQLClient.connect
         """
         for obj in self.connection.values():
-            if (isinstance(obj, dict) and oid.get("@type") == 'terminus:Server'):
+            if (isinstance(obj, dict) and obj.get("@type") == 'terminus:Server'):
                 return obj
         return None
 
@@ -104,8 +115,8 @@ class ConnectionCapabilities:
            {terminus:Database} terminus:Database JSON document as returned by WOQLClient.connect
         """
         docid = this.find_resource_document_id(dbid, account)
-         if docid is not None:
-             return self.connection[docid]
+        if docid is not None:
+            return self.connection[docid]
 
     def _extract_metadata(self, dbrec):
         meta = {'db': "",
