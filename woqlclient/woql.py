@@ -143,21 +143,41 @@ class WOQLQuery:
         return self
 
     def insert(self, node, type, graph=None):
-        """Insert a node with a specific type in a graph
+        """Inserts a new node of a specified type in a graph
 
         Parameters
         ----------
         node : str
-            node to be insert
+            ID of the node to be inserted
         type : str
-            type of the node
+            The rdf type of the node. This should be defined in your schema.
         graph : str, optional
             target graph
 
         Returns
         -------
         WOQLQuery object
-            query object that can be chained and/or execute
+            a query object that can be chained and/or execute
+
+        Notes
+        --------
+        If graph parameter is None then this is a shorthand for calling :meth:`add_triple` with
+        rdf:type as predicate: ``.add_triple(subject, 'rdf:type', type).``
+        Otherwise :meth:`add_quad` will be called.
+
+        It will yield a json object like follows: ``{'add_triple': ['doc:subject', 'rdf:type', 'scm:type']}``
+
+        Examples
+        --------
+        >>> update = WOQLQuery().insert("Dog", "scm:Animal").label('Dog')
+        >>> qry = WOQLQuery().when(True, update)
+        >>> client.update(qry.json(), 'MyDatabaseId')
+
+        See Also
+        --------
+        add_triple
+        add_quad
+
         """
         if graph is not None:
             return WOQLQuery().add_quad(node, "rdf:type", WOQLQuery()._clean_type(type), graph)
@@ -204,13 +224,36 @@ class WOQLQuery:
 
         Parameters
         ----------
-        url : remote data source url
-        opts : input options, optional
+        url : str
+            remote data source
+        opts : input options
+            optional
 
         Returns
         -------
         WOQLQuery object
             query object that can be chained and/or execute
+
+        Examples
+        --------
+        >>> csv = WOQLQuery().get(
+        ...     WOQLQuery().woql_as("Start station", "v:Start_Station").
+        ...     woql_as("End station", "v:End_Station").
+        ...     woql_as("Start date", "v:Start_Time").
+        ...     woql_as("End date", "v:End_Time").
+        ...     woql_as("Duration", "v:Duration").
+        ...     woql_as("Start station number", "v:Start_ID").
+        ...     woql_as("End station number", "v:End_ID").
+        ...     woql_as("Bike number", "v:Bike").
+        ...     woql_as("Member type", "v:Member_Type")
+        ... ).remote("https://terminusdb.com/t/data/bike_tutorial.csv")
+
+
+        See Also
+        --------
+        file
+            If your csv file is local then use :meth:`.file` instead of `.remote`.
+
         """
         if opts is not None:
             self.cursor['remote'] = [url, opts]
@@ -225,7 +268,8 @@ class WOQLQuery:
         ----------
         fileName : str
             field
-        opts : input options, optional
+        opts : input options
+            optional
 
         Returns
         -------
@@ -246,12 +290,25 @@ class WOQLQuery:
         ----------
         json : dict
             file data source in a JSON format
-        opts : imput options, optional
+        opts : input options
+            optional
 
         Returns
         -------
         WOQLQuery object
             query object that can be chained and/or execute
+
+        Example
+        -------
+        To load a local csv file:
+
+        >>> WOQLQuery().file("/app/local_files/my.csv")
+
+        See Also
+        --------
+        remote
+            If your csv file is a uri then use :meth:`.remote` instead of `.file`.
+
         """
         if opts is not None:
             self.cursor['file'] = [json, opts]
@@ -1258,30 +1315,8 @@ class WOQLQuery:
         self.cursor['delete'] = [JSON_or_IRI]
         return self._last_update()
 
-    def delete_triple(self, subject, predicate, object_or_literal):
-        """Deletes any triples that match the rule [S,P,O]
-
-        Parameters
-        ----------
-        subject : str
-            Subject
-        predicate : str
-            Predicate
-        object_or_literal : str
-            Object or Literal
-
-        Returns
-        -------
-        WOQLQuery object
-            query object that can be chained and/or execute
-        """
-        self.cursor['delete_triple'] = [self._clean_subject(subject),
-                                        self._clean_predicate(predicate),
-                                        self._clean_object(object_or_literal)]
-        return self._chainable_update('delete_triple', subject)
-
     def add_triple(self, subject, predicate, object_or_literal):
-        """Adds triples according to the the pattern [S,P,O]
+        """Adds triples according to the the pattern [subject, predicate, object]
 
         Parameters
         ----------
@@ -1296,14 +1331,34 @@ class WOQLQuery:
         -------
         WOQLQuery object
             query object that can be chained and/or execute
+
+        Examples
+        --------
+        This example adds a triple for a comment predicate and a certain value to the document identified by doc:X:
+
+        >>> update = WOQLQuery().add_triple("doc:X", "comment", "my comment")
+        >>> qry = WOQLQuery().when(True, update)
+        >>> client.update(qry.json(), 'MyDatabaseId')
+
+        Notes
+        --------
+        To update an existing triple, it is not just a case of calling `add_triple` again.
+        One needs to delete the previous triple first.
+        Otherwise two triples with the same predicate but different object values will be present.
+
+        See Also
+        --------
+        delete_triple
+        add_quad
+
         """
         self.cursor['add_triple'] = [self._clean_subject(subject),
                                     self._clean_predicate(predicate),
                                     self._clean_object(object_or_literal)]
         return self._chainable_update('add_triple', subject)
 
-    def delete_quad(self, subject, predicate, object_or_literal, graph):
-        """Deletes any quads that match the rule [S, P, O, G] (Subject, Predicate, Object, Graph)
+    def delete_triple(self, subject, predicate, object_or_literal):
+        """Deletes any triples that match the rule [subject, predicate, object]
 
         Parameters
         ----------
@@ -1313,22 +1368,39 @@ class WOQLQuery:
             Predicate
         object_or_literal : str
             Object or Literal
-        graph : str
-            Graph
 
         Returns
         -------
         WOQLQuery object
             query object that can be chained and/or execute
+
+        Examples
+        --------
+        This example deletes the comment triple of a particular value from the document
+        identified by doc:X:
+
+        >>> update = WOQLQuery().delete_triple("doc:X", "comment", "my comment")
+        >>> qry = WOQLQuery().when(True, update)
+        >>> client.update(qry.json(), 'MyDatabaseId')
+
+        Note that only triples matching the particular object value will be deleted.
+        To delete all triples matching this predicate, (regardless of value) we use a
+        when clause, and introduce a variable ``v:any`` which will bind to any value
+        for this subject and predicate combination:
+
+        >>> when = WOQLQuery().triple('doc:X', 'comment', 'v:any')
+        >>> update = WOQLQuery().delete_triple('doc:X', 'comment', 'v:any')
+        >>> qry = WOQLQuery().when(when, update)
+        >>> client.update(qry.json(), 'MyDatabaseId')
+
         """
-        self.cursor['delete_quad'] =[self._clean_subject(subject),
-                                    self._clean_predicate(predicate),
-                                    self._clean_object(object_or_literal),
-                                    self._clean_graph(graph)]
-        return self._chainable_update('delete_quad', subject)
+        self.cursor['delete_triple'] = [self._clean_subject(subject),
+                                        self._clean_predicate(predicate),
+                                        self._clean_object(object_or_literal)]
+        return self._chainable_update('delete_triple', subject)
 
     def add_quad(self, subject, predicate, object_or_literal, graph):
-        """Adds quads according to the pattern [S,P,O,G]
+        """Adds quads according to the pattern [subject, predicate, object, graph]
 
         Parameters
         ----------
@@ -1351,6 +1423,32 @@ class WOQLQuery:
                                     self._clean_object(object_or_literal),
                                     self._clean_graph(graph)]
         return self._chainable_update('add_quad', subject)
+
+    def delete_quad(self, subject, predicate, object_or_literal, graph):
+        """Deletes any quads that match the rule [subject, predicate, object, graph]
+
+        Parameters
+        ----------
+        subject : str
+            Subject
+        predicate : str
+            Predicate
+        object_or_literal : str
+            Object or Literal
+        graph : str
+            Graph
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+
+        """
+        self.cursor['delete_quad'] =[self._clean_subject(subject),
+                                    self._clean_predicate(predicate),
+                                    self._clean_object(object_or_literal),
+                                    self._clean_graph(graph)]
+        return self._chainable_update('delete_quad', subject)
 
     # Schema manipulation shorthand
 
@@ -1550,6 +1648,8 @@ class WOQLQuery:
 
     def label(self, l, lang=None):
         """Depending on context, either adds a label match to a triple/quad or adds a label create to add_quad, add_triple
+
+        The triple/quad that will get created will be for the rdfs:label predicate.
 
         Parameters
         ----------
@@ -2429,6 +2529,10 @@ class WOQLQuery:
         Parameters
         ----------
         client : woqlClient
+            A woqlClient
+        fileList: dict, optional.
+            A dictionary with key=name, value=filePath. Defaults to None.
+            Deprecated. This parameter is not currently used and is likely to be removed in future versions.
         """
 
         if "@context" not in self.query:
@@ -2577,7 +2681,7 @@ class TripleBuilder:
 
 """
 
-Methods that has not been impremented
+Methods that has not been implemented
 ====================================
 
 # Pretty print need logic for translate to WOQLpy
