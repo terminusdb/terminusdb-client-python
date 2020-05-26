@@ -44,8 +44,8 @@ class ConnectionConfig:
             self.set_db(kwargs['db'])
         if 'jwt' in kwargs:
             self.set_jwt(kwargs['jwt'], kwargs['jwt_user'])
-        if 'key' in kwargs:
-            self.set_key(kwargs['key'], kwargs['user'])
+        #if 'key' in kwargs and 'user' in kwargs:
+        #    self.set_key(kwargs['key'], kwargs['user'])
         if 'branch' in kwargs:
             self.set_branch(kwargs['branch'])
         if 'ref' in kwargs:
@@ -85,38 +85,40 @@ class ConnectionConfig:
     def jwt(self):
         return self.jwt_token
 
+    @property
     def user(self, ignore_jwt):
         if (not ignore_jwt and self.jwt_user):
             return self.jwt_user
         if self.basic_auth:
             return self.basic_auth.split(":")[0]
 
+    @property
     def db_url_fragment(self):
-        if self.db() = "terminus":
-            return self.db()
-        return self.account() + "/" + self.db()
+        if self.db == "terminus":
+            return self.db
+        return self.account + "/" + self.db
 
     def db_base(self, action):
-        return f"{self.server_url()}{action}/{self.db_url_fragment()}"
+        return f"{self.server_url}{action}/{self.db_url_fragment}"
 
     def repo_base(self, action):
         base = self.db_base(action)
         if self.repo:
-            base = base + f"/{self.repo()}"
+            base = base + f"/{self.repo}"
         else:
             base = base + "/" + self.default_repo_id
         return base
 
     def branch_base(self, action):
         base = self.repo_base(action)
-        if self.repo() == "_meta":
+        if self.repo == "_meta":
             return base
-        if self.branch() == "_commits":
-            return base + f"/{self.branch()}"
-        elif self.ref():
-            return base + f"/commit/{self.ref()}"
-        elif self.branch():
-            return base + f"/branch/{self.branch()}"
+        if self.branch == "_commits":
+            return base + f"/{self.branch}"
+        elif self.ref:
+            return base + f"/commit/{self.ref}"
+        elif self.branch:
+            return base + f"/branch/{self.branch}"
         else:
             base = base + "/branch/" + self.default_branch_id
         return base
@@ -130,25 +132,27 @@ class ConnectionConfig:
             schema = schema + f"/{sgid}"
         return schema
 
+    @property
     def query_url(self):
         if self.db == "terminus":
             return self.db_base("woql")
         return self.branch_base("woql")
 
+    @property
     def class_frame_url(self):
         if self.db == "terminus":
             return self.db_base("frame")
         return self.branch_base("frame")
 
     def clone_url(self, new_repo_id=None):
-        crl = f"{self.serverURL()}clone/{self.account()}"
+        crl = f"{self.serverURL}clone/{self.account}"
         if new_repo_id is not None:
             crl = crl + f"/${new_repo_id}"
         return crl
 
     def fetch_url(self, repoid=None):
         if repoid is None:
-            repoid = self.repo()
+            repoid = self.repo
         return self.db_base("fetch") + f"/{repoid}"
 
     def rebase_url(self, source_repo= None, source_branch=None):
@@ -167,6 +171,7 @@ class ConnectionConfig:
                 purl = purl + f"/{target_branch}"
         return purl
 
+    @property
     def db_url(self):
         return self.db_base("db")
 
@@ -198,7 +203,7 @@ class ConnectionConfig:
             return False
         return True
 
-    def set_server(self, imput_str):
+    def set_server(self, input_str):
         parser = IDParser()
         surl = parser.parse_server_url(input_str)
         if surl:
@@ -217,7 +222,7 @@ class ConnectionConfig:
             return True
         return False
 
-    def set_account(self, import_str=None):
+    def set_account(self, input_str=None):
         if input_str is None:
             self.accountid = False
             return False
@@ -248,7 +253,7 @@ class ConnectionConfig:
         if repoid:
             self.repoid = repoid
             return self.repoid
-        self.set_error(f"Invalid Repo ID: {inputStr}")
+        self.set_error(f"Invalid Repo ID: {input_str}")
 
     def set_branch(self, input_str=None):
         if input_str is None:
@@ -259,7 +264,19 @@ class ConnectionConfig:
         if bid:
             self.branchid = bid
             return self.branchid
-        self.set_error(f"Invalid Branch ID: {inputStr}")
+        self.set_error(f"Invalid Branch ID: {input_str}")
+
+    def set_key(self, input_str=None, uid=None):
+        if input_str is None:
+            self.basic_auth = False
+            return False
+        uid = udi if uid is not None else "admin"
+        parser = IDParser()
+        key = parser.parse_key(input_str)
+        if key:
+            self.rebase_url = f'{uid}:{key}'
+            return self.basic_auth
+        self.set_error(f"Invalid API Key: {input_str}")
 
     def set_ref(self, input_str=None):
         if input_str is not None:
@@ -268,12 +285,12 @@ class ConnectionConfig:
             if bid:
                 self.refid = bid
                 return self.refid
-                self.set_error(f"Invalid Branch ID: {inputStr}")
+                self.set_error(f"Invalid Branch ID: {input_str}")
         self.refid = False
         return self.refid
 
-    def set_key(self, imput_str=None, uid=None):
-        if imput_str is None:
+    def set_key(self, input_str=None, uid=None):
+        if input_str is None:
             self.basic_auth = False
             return False
         if uid is None:
@@ -283,7 +300,7 @@ class ConnectionConfig:
         if key:
             self.basic_auth = f"{uid}:{key}"
             return self.basic_auth
-        self.set_error(f"Invalid API Key: {inputStr}")
+        self.set_error(f"Invalid API Key: {input_str}")
 
     def set_jwt(self, input_str=None, user_id=None):
         if input_str is None:
@@ -299,4 +316,4 @@ class ConnectionConfig:
                 self.jwt_user = user_id
                 self.jwt_token = jwt
                 return self.jwt_token
-        self.set_error(f"Invalid JWT: {inputStr}")
+        self.set_error(f"Invalid JWT: {input_str}")

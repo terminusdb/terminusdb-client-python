@@ -2,7 +2,7 @@ import pytest
 import unittest.mock as mock
 from woqlclient import WOQLQuery
 from woqlclient import WOQLClient
-
+"""
 test_client = WOQLClient(server="http://localhost:6363",
                          key="mykey",
                          db="mydb")
@@ -258,3 +258,4 @@ class TestWoqlQueryObject:
         woqlObject=WOQLQuery().limit(2).start(0)
         woqlObject.context(contextObj)
         assert woqlObject.get_context() == contextObj
+"""
