@@ -1,19 +1,17 @@
 # woqlClient.py
-from .dispatchRequest import DispatchRequest
+import json
 
-#from .errorMessage import *
-from .connectionConfig import ConnectionConfig
 from .connectionCapabilities import ConnectionCapabilities
 
+# from .errorMessage import *
+from .connectionConfig import ConnectionConfig
 from .const import Const as const
-from .errorMessage import ErrorMessage
-#from .errors import (InvalidURIError)
-from .errors import *
-
+from .dispatchRequest import DispatchRequest
 from .documentTemplate import DocumentTemplate
 
+# from .errors import (InvalidURIError)
+from .errors import doc, opts
 from .idParser import IDParser
-import json
 
 # WOQL client object
 # license Apache Version 2
@@ -31,11 +29,9 @@ class WOQLClient:
 
     def __init__(self, **kwargs):
         # current conCapabilities context variables
-        key = kwargs.get('key')
+        key = kwargs.get("key")
         self.conConfig = ConnectionConfig(**kwargs)
         self.conCapabilities = ConnectionCapabilities(self.conConfig, key)
-
-
 
     def connect(self, serverURL=None, key=None):
         """
@@ -87,7 +83,9 @@ class WOQLClient:
         """
         idParser = IDParser()
         idParser.parseServerURL(serverURL)
-        return DispatchRequest.sendRequestByAction(idParser.serverURL, const.CONNECT, key)
+        return DispatchRequest.sendRequestByAction(
+            idParser.serverURL, const.CONNECT, key
+        )
 
     def createDatabase(self, dbID, label, key=None, **kwargs):
         """
@@ -111,10 +109,13 @@ class WOQLClient:
         """
         self.conConfig.setDB(dbID)
         createDBTemplate = DocumentTemplate.createDBTemplate(
-            self.conConfig.serverURL, self.conConfig.dbID, label, **kwargs)
-        #after create db the server could send back the capabilities of the new db, we can add the new capability at the
-        #capabilities list
-        return self.dispatch(self.conConfig.dbURL(), const.CREATE_DATABASE, key, createDBTemplate)
+            self.conConfig.serverURL, self.conConfig.dbID, label, **kwargs
+        )
+        # after create db the server could send back the capabilities of the new db, we can add the new capability at the
+        # capabilities list
+        return self.dispatch(
+            self.conConfig.dbURL(), const.CREATE_DATABASE, key, createDBTemplate
+        )
 
     @staticmethod
     def directCreateDatabase(dbURL, label, key, **kwargs):
@@ -138,9 +139,11 @@ class WOQLClient:
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
         createDBTemplate = DocumentTemplate.createDBTemplate(
-            idParser.serverURL, idParser.dbID, label, **kwargs)
+            idParser.serverURL, idParser.dbID, label, **kwargs
+        )
         DispatchRequest.sendRequestByAction(
-            idParser.dbURL(), const.CREATE_DATABASE, key, createDBTemplate)
+            idParser.dbURL(), const.CREATE_DATABASE, key, createDBTemplate
+        )
 
     def deleteDatabase(self, dbID, key=None):
         """Delete a TerminusDB
@@ -157,8 +160,7 @@ class WOQLClient:
         dict
         """
         self.conConfig.setDB(dbID)
-        jsonResponse = self.dispatch(
-            self.conConfig.dbURL(), const.DELETE_DATABASE, key)
+        jsonResponse = self.dispatch(self.conConfig.dbURL(), const.DELETE_DATABASE, key)
         self.conCapabilities.removeDB()
         return jsonResponse
 
@@ -176,9 +178,12 @@ class WOQLClient:
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
         return DispatchRequest.sendRequestByAction(
-            idParser.dbURL(), const.DELETE_DATABASE, key)
+            idParser.dbURL(), const.DELETE_DATABASE, key
+        )
 
-    def getSchema(self, dbID=None, key=None, options={"terminus:encoding": "terminus:turtle"}):
+    def getSchema(
+        self, dbID=None, key=None, options={"terminus:encoding": "terminus:turtle"}
+    ):
         """Retrieves the schema of the specified database
 
         opts.format defines which format is requested, default is turtle(*json / turtle)
@@ -196,7 +201,7 @@ class WOQLClient:
         -------
         str or dict
         """
-        if (dbID):
+        if dbID:
             self.conConfig.setDB(dbID)
 
         return self.dispatch(self.conConfig.schemaURL(), const.GET_SCHEMA, key, options)
@@ -223,9 +228,12 @@ class WOQLClient:
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
         return DispatchRequest.sendRequestByAction(
-            idParser.schemaURL(), const.GET_SCHEMA, key, options)
+            idParser.schemaURL(), const.GET_SCHEMA, key, options
+        )
 
-    def updateSchema(self, docObj, dbID=None, key=None, opts={"terminus:encoding": "terminus:turtle"}):
+    def updateSchema(
+        self, docObj, dbID=None, key=None, opts={"terminus:encoding": "terminus:turtle"}
+    ):
         """Updates the Schema of the specified database
 
         opts.format is used to specify which format is being used (*json / turtle)
@@ -245,14 +253,17 @@ class WOQLClient:
         -------
         dict
         """
-        if (dbID):
+        if dbID:
             self.conConfig.setDB(dbID)
-        docObj = DocumentTemplate.formatDocument(
-            docObj, False, opts)
-        return self.dispatch(self.conConfig.schemaURL(), const.UPDATE_SCHEMA, key, docObj)
+        docObj = DocumentTemplate.formatDocument(docObj, False, opts)
+        return self.dispatch(
+            self.conConfig.schemaURL(), const.UPDATE_SCHEMA, key, docObj
+        )
 
     @staticmethod
-    def directUpdateSchema(dbURL, docObj, key, opt={"terminus:encoding": "terminus:turtle"}):
+    def directUpdateSchema(
+        dbURL, docObj, key, opt={"terminus:encoding": "terminus:turtle"}
+    ):
         """Updates the Schema of the specified database with settings
 
         opts.format is used to specify which format is being used (*json / turtle)
@@ -274,10 +285,10 @@ class WOQLClient:
         """
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
-        docObj = DocumentTemplate.formatDocument(
-            docObj, False, opts)
+        docObj = DocumentTemplate.formatDocument(docObj, False, opts)
         return DispatchRequest.sendRequestByAction(
-            idParser.schemaURL(), const.UPDATE_SCHEMA, key, docObj)
+            idParser.schemaURL(), const.UPDATE_SCHEMA, key, docObj
+        )
 
     def createDocument(self, docObj, documentID, dbID=None, key=None):
         """Creates a new document in the specified database
@@ -293,12 +304,15 @@ class WOQLClient:
         key : str, optional
             API key
         """
-        if(dbID):
+        if dbID:
             self.conConfig.setDB(dbID)
         self.conConfig.setDocument(documentID)
         docObj = DocumentTemplate.formatDocument(
-            doc, None, None, self.conConfig.docURL())
-        return self.dispatch(self.conConfig.docURL(), const.CREATE_DOCUMENT, key, docObj)
+            doc, None, None, self.conConfig.docURL()
+        )
+        return self.dispatch(
+            self.conConfig.docURL(), const.CREATE_DOCUMENT, key, docObj
+        )
 
     @staticmethod
     def directCreateDocument(docObj, documentID, dbURL, key):
@@ -320,9 +334,17 @@ class WOQLClient:
         idParser.parseDocumentID(documentID)
 
         docObj = DocumentTemplate.formatDocument(doc, None, None, idParser.docURL())
-        return DispatchRequest.sendRequestByAction(idParser.docURL(), const.CREATE_DOCUMENT, key, docObj)
+        return DispatchRequest.sendRequestByAction(
+            idParser.docURL(), const.CREATE_DOCUMENT, key, docObj
+        )
 
-    def getDocument(self, documentID, dbID=None, key=None, opts={"terminus:encoding": "terminus:frame"}):
+    def getDocument(
+        self,
+        documentID,
+        dbID=None,
+        key=None,
+        opts={"terminus:encoding": "terminus:frame"},
+    ):
         """Retrieves a document from the specified database
 
         Parameters
@@ -336,14 +358,16 @@ class WOQLClient:
         opts : dict
             options object
         """
-        if(dbID):
+        if dbID:
             self.conConfig.setDB(dbID)
 
         self.conConfig.setDocument(documentID)
         return self.dispatch(self.conConfig.docURL(), const.GET_DOCUMENT, key, opts)
 
     @staticmethod
-    def directGetDocument(documentID, dbURL, key, opts={"terminus:encoding": "terminus:frame"}):
+    def directGetDocument(
+        documentID, dbURL, key, opts={"terminus:encoding": "terminus:frame"}
+    ):
         """Retrieves a document from the specified database with URL
 
         Parameters
@@ -360,7 +384,9 @@ class WOQLClient:
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
         idParser.parseDocumentID(documentID)
-        return DispatchRequest.sendRequestByAction(idParser.docURL(), const.GET_DOCUMENT, key, opts)
+        return DispatchRequest.sendRequestByAction(
+            idParser.docURL(), const.GET_DOCUMENT, key, opts
+        )
 
     def updateDocument(self, documentID, docObj, dbID=None, key=None):
         """
@@ -377,13 +403,16 @@ class WOQLClient:
         key : str, optional
             API key
         """
-        if(dbID):
+        if dbID:
             self.conConfig.setDB(dbID)
 
         self.conConfig.setDocument(documentID)
         docObj = DocumentTemplate.formatDocument(
-            docObj, None, None, self.conConfig.docURL())
-        return self.dispatch(self.conConfig.docURL(), const.UPDATE_DOCUMENT, key, docObj)
+            docObj, None, None, self.conConfig.docURL()
+        )
+        return self.dispatch(
+            self.conConfig.docURL(), const.UPDATE_DOCUMENT, key, docObj
+        )
 
     @staticmethod
     def directUpdateDocument(documentID, dbURL, key, docObj):
@@ -404,9 +433,10 @@ class WOQLClient:
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
         idParser.parseDocumentID(documentID)
-        docObj = DocumentTemplate.formatDocument(
-            docObj, None, None, idParser.docURL())
-        return DispatchRequest.sendRequestByAction(idParser.docURL(), const.GET_DOCUMENT, key, docObj)
+        docObj = DocumentTemplate.formatDocument(docObj, None, None, idParser.docURL())
+        return DispatchRequest.sendRequestByAction(
+            idParser.docURL(), const.GET_DOCUMENT, key, docObj
+        )
 
     def deleteDocument(self, documentID, dbID=None, key=None):
         """
@@ -421,7 +451,7 @@ class WOQLClient:
         key : str, optional
             API key
         """
-        if(dbID):
+        if dbID:
             self.conConfig.setDB(dbID)
 
         self.conConfig.setDocument(documentID)
@@ -446,9 +476,11 @@ class WOQLClient:
         idParser.parseDBURL(dbURL)
         idParser.parseDocumentID(documentID)
 
-        return DispatchRequest.sendRequestByAction(idParser.docURL(), const.DELETE_DOCUMENT, key)
+        return DispatchRequest.sendRequestByAction(
+            idParser.docURL(), const.DELETE_DOCUMENT, key
+        )
 
-    def select(self, woqlQuery, dbID=None, key=None,fileList=None):
+    def select(self, woqlQuery, dbID=None, key=None, fileList=None):
         """
         Executes a read-only WOQL query on the specified database and returns the results
 
@@ -461,12 +493,12 @@ class WOQLClient:
         key : str, optional
             API key
         """
-        if(dbID):
+        if dbID:
             self.conConfig.setDB(dbID)
 
-        payload = {'terminus:query': json.dumps(woqlQuery)}
+        payload = {"terminus:query": json.dumps(woqlQuery)}
         if type(fileList) == dict:
-            payload.update(fileList);
+            payload.update(fileList)
 
         return self.dispatch(self.conConfig.queryURL(), const.WOQL_SELECT, key, payload)
 
@@ -475,12 +507,14 @@ class WOQLClient:
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
 
-        payload = {'terminus:query': json.dumps(woqlQuery)}
+        payload = {"terminus:query": json.dumps(woqlQuery)}
         if type(fileList) == dict:
-            payload.update(fileList);
-        return DispatchRequest.sendRequestByAction(idParser.queryURL(), const.WOQL_SELECT, key, payload)
+            payload.update(fileList)
+        return DispatchRequest.sendRequestByAction(
+            idParser.queryURL(), const.WOQL_SELECT, key, payload
+        )
 
-    def update(self, woqlQuery, dbID=None, key=None ,fileList=None):
+    def update(self, woqlQuery, dbID=None, key=None, fileList=None):
         """
         Executes a WOQL query on the specified database which updates the state and returns the results
 
@@ -490,26 +524,32 @@ class WOQLClient:
         the second argument (woql) is a woql select statement encoded as a string
         the third argument (opts) is an options json - opts.key is an optional API key
         """
-        if(dbID):
+        if dbID:
             self.conConfig.setDB(dbID)
             # raise InvalidURIError(ErrorMessage.getInvalidURIMessage(docurl, "Update"))
         if type(fileList) == dict:
             file_dict = {}
             for name in fileList:
                 path = fileList[name]
-                stream = open(path, 'rb')
+                stream = open(path, "rb")
                 print(name)
-                file_dict[name] = (name,stream,'text/plain')
-            file_dict['terminus:query'] = (None,json.dumps(woqlQuery),'application/json')
+                file_dict[name] = (name, stream, "text/plain")
+            file_dict["terminus:query"] = (
+                None,
+                json.dumps(woqlQuery),
+                "application/json",
+            )
             payload = None
         else:
             file_dict = None
-            payload = {'terminus:query': json.dumps(woqlQuery)}
+            payload = {"terminus:query": json.dumps(woqlQuery)}
 
-        return self.dispatch(self.conConfig.queryURL(), const.WOQL_UPDATE, key, payload, file_dict)
+        return self.dispatch(
+            self.conConfig.queryURL(), const.WOQL_UPDATE, key, payload, file_dict
+        )
 
     @staticmethod
-    def directUpdate(woqlQuery, dbURL, key,fileList=None):
+    def directUpdate(woqlQuery, dbURL, key, fileList=None):
         idParser = IDParser()
         idParser.parseDBURL(dbURL)
 
@@ -517,29 +557,37 @@ class WOQLClient:
             file_dict = {}
             for name in fileList:
                 path = fileList[name]
-                stream = open(path, 'rb')
+                stream = open(path, "rb")
                 print(name)
-                file_dict[name] = (name,stream,'text/plain')
-            file_dict['terminus:query'] = (None,json.dumps(woqlQuery),'application/json')
+                file_dict[name] = (name, stream, "text/plain")
+            file_dict["terminus:query"] = (
+                None,
+                json.dumps(woqlQuery),
+                "application/json",
+            )
             payload = None
         else:
             file_dict = None
-            payload = {'terminus:query': json.dumps(woqlQuery)}
+            payload = {"terminus:query": json.dumps(woqlQuery)}
 
-        return DispatchRequest.sendRequestByAction(idParser.queryURL(), const.WOQL_UPDATE, key, payload, file_dict)
+        return DispatchRequest.sendRequestByAction(
+            idParser.queryURL(), const.WOQL_UPDATE, key, payload, file_dict
+        )
 
-    def dispatch(self, url, action, connectionKey, payload={}, file_dict = None):
+    def dispatch(self, url, action, connectionKey, payload={}, file_dict=None):
         if connectionKey is None:
             # if the api key is not setted the method raise an APIerror
             connectionKey = self.conCapabilities.getClientKey()
 
-        #if (action != const.CONNECT and self.conConfig.connectedMode and self.conCapabilities.serverConnected() is False):
+        # if (action != const.CONNECT and self.conConfig.connectedMode and self.conCapabilities.serverConnected() is False):
 
-            #key = payload.key if isinstance(payload,dict) and key in payload else False
-            #self.connect(self.conConfig.serverURL, connectionKey)
-            #print("CONNCT BEFORE ACTION", action)
+        # key = payload.key if isinstance(payload,dict) and key in payload else False
+        # self.connect(self.conConfig.serverURL, connectionKey)
+        # print("CONNCT BEFORE ACTION", action)
 
-        #check if we can perform this action or raise an AccessDeniedError error
-        #review the access control
-        #self.conCapabilities.capabilitiesPermit(action)
-        return DispatchRequest.sendRequestByAction(url, action, connectionKey, payload, file_dict)
+        # check if we can perform this action or raise an AccessDeniedError error
+        # review the access control
+        # self.conCapabilities.capabilitiesPermit(action)
+        return DispatchRequest.sendRequestByAction(
+            url, action, connectionKey, payload, file_dict
+        )

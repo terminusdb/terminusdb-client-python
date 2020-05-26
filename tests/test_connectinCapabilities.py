@@ -1,101 +1,111 @@
-#import sys
-#sys.path.append('woqlclient')
+# import sys
+# sys.path.append('woqlclient')
 
-from  woqlclient import ConnectionConfig
-from  woqlclient import ConnectionCapabilities
-import pytest
 import json
-from woqlclient import const
-from woqlclient import (AccessDeniedError,InvalidURIError,APIError)
-import os
+
+import pytest
+from woqlclient import (
+    AccessDeniedError,
+    APIError,
+    ConnectionCapabilities,
+    ConnectionConfig,
+    InvalidURIError,
+    const,
+)
+
 
 def test_connectionCapabilities_noParameter():
-	conConfig=ConnectionConfig()
+    conConfig = ConnectionConfig()
 
-	"""
+    """
 	  the key is related with a server you have to set both of
 	  the method raise an APIerror
 	"""
 
-	with pytest.raises(InvalidURIError):
-		conCapabilities=ConnectionCapabilities(conConfig,'mykey')
+    with pytest.raises(InvalidURIError):
+        conCapabilities = ConnectionCapabilities(conConfig, "mykey")
 
-		with pytest.raises(InvalidURIError):
-			conCapabilities.getClientKey()
+        with pytest.raises(InvalidURIError):
+            conCapabilities.getClientKey()
 
-		assert conCapabilities.serverConnected() == False
+        assert conCapabilities.serverConnected() == False
 
-		with pytest.raises(InvalidURIError):
-			with open('tests/capabilitiesResponse.json') as json_file:
-				capResponse = json.load(json_file)
-				conCapabilities.addConnection(capResponse);
+        with pytest.raises(InvalidURIError):
+            with open("tests/capabilitiesResponse.json") as json_file:
+                capResponse = json.load(json_file)
+                conCapabilities.addConnection(capResponse)
 
 
 def test_addConnection():
-	#No server url in intialization
+    # No server url in intialization
 
-	conConfig=ConnectionConfig(server="http://localhost:6363")
-	conCapabilities=ConnectionCapabilities(conConfig,'mykey')
+    conConfig = ConnectionConfig(server="http://localhost:6363")
+    conCapabilities = ConnectionCapabilities(conConfig, "mykey")
 
-	assert ({"http://localhost:6363/":{'key':"mykey"}}==conCapabilities.connection)==True
+    assert (
+        {"http://localhost:6363/": {"key": "mykey"}} == conCapabilities.connection
+    ) == True
 
-	with open('tests/capabilitiesResponse.json') as json_file:
-		capResponse = json.load(json_file)
-		conCapabilities.addConnection(capResponse);
+    with open("tests/capabilitiesResponse.json") as json_file:
+        capResponse = json.load(json_file)
+        conCapabilities.addConnection(capResponse)
 
-	with open ('tests/connectionDictionary.json') as json_file:
-		dictTest = json.load(json_file)
-		assert (dictTest==conCapabilities.connection) ==True
+    with open("tests/connectionDictionary.json") as json_file:
+        dictTest = json.load(json_file)
+        assert (dictTest == conCapabilities.connection) == True
 
-		#you have setServer or the serverConnected is False
+        # you have setServer or the serverConnected is False
 
-	assert conCapabilities.serverConnected() == True
-	assert conCapabilities.getClientKey()=="mykey"
+    assert conCapabilities.serverConnected() == True
+    assert conCapabilities.getClientKey() == "mykey"
 
 
 def test_set_getClientKey():
-	conConfig=ConnectionConfig(server="http://localhost:6363")
-	conCapabilities=ConnectionCapabilities(conConfig)
+    conConfig = ConnectionConfig(server="http://localhost:6363")
+    conCapabilities = ConnectionCapabilities(conConfig)
 
-	conCapabilities.setClientKey("mykey")
-	serverURL=conConfig.serverURL;
+    conCapabilities.setClientKey("mykey")
+    serverURL = conConfig.serverURL
 
-	assert conCapabilities.getClientKey(serverURL) =="mykey"
+    assert conCapabilities.getClientKey(serverURL) == "mykey"
 
-	with pytest.raises(APIError):
-		assert conCapabilities.getClientKey("http://testServer")
+    with pytest.raises(APIError):
+        assert conCapabilities.getClientKey("http://testServer")
 
 
 def test_capabilitiesPermit():
-	conConfig=ConnectionConfig(server="http://localhost:6363",db="myFirstTerminusDB")
-	conCapabilities=ConnectionCapabilities(conConfig,'mykey')
+    conConfig = ConnectionConfig(server="http://localhost:6363", db="myFirstTerminusDB")
+    conCapabilities = ConnectionCapabilities(conConfig, "mykey")
 
-	with open('tests/capabilitiesResponseNoAllAction.json') as json_file:
-		capResponse = json.load(json_file)
-		conCapabilities.addConnection(capResponse)
+    with open("tests/capabilitiesResponseNoAllAction.json") as json_file:
+        capResponse = json.load(json_file)
+        conCapabilities.addConnection(capResponse)
 
-	#if the action are not permits the method raise an Exception
-	with pytest.raises(AccessDeniedError):
-		conCapabilities.capabilitiesPermit(const.DELETE_DATABASE)
+    # if the action are not permits the method raise an Exception
+    with pytest.raises(AccessDeniedError):
+        conCapabilities.capabilitiesPermit(const.DELETE_DATABASE)
 
-	with pytest.raises(AccessDeniedError):
-		conCapabilities.capabilitiesPermit(const.DELETE_DOCUMENT)
+    with pytest.raises(AccessDeniedError):
+        conCapabilities.capabilitiesPermit(const.DELETE_DOCUMENT)
 
-
-	assert conCapabilities.capabilitiesPermit(const.CREATE_DATABASE)==True
-	assert conCapabilities.capabilitiesPermit(const.CREATE_DOCUMENT)==True
+    assert conCapabilities.capabilitiesPermit(const.CREATE_DATABASE) == True
+    assert conCapabilities.capabilitiesPermit(const.CREATE_DOCUMENT) == True
 
 
 def test_deleteDatabaseForTheConnectionList():
-	conConfig=ConnectionConfig(server="http://localhost:6363",db="myFirstTerminusDB")
-	conCapabilities=ConnectionCapabilities(conConfig,'mykey')
+    conConfig = ConnectionConfig(server="http://localhost:6363", db="myFirstTerminusDB")
+    conCapabilities = ConnectionCapabilities(conConfig, "mykey")
 
-	with open('tests/capabilitiesResponse.json') as json_file:
-		capResponse = json.load(json_file)
-		conCapabilities.addConnection(capResponse)
+    with open("tests/capabilitiesResponse.json") as json_file:
+        capResponse = json.load(json_file)
+        conCapabilities.addConnection(capResponse)
 
-	assert ("doc:myFirstTerminusDB" in conCapabilities.connection["http://localhost:6363/"]) == True
+    assert (
+        "doc:myFirstTerminusDB" in conCapabilities.connection["http://localhost:6363/"]
+    ) == True
 
-	conCapabilities.removeDB();
+    conCapabilities.removeDB()
 
-	assert ("doc:myFirstTerminusDB" in conCapabilities.connection["http://localhost:6363/"]) == False
+    assert (
+        "doc:myFirstTerminusDB" in conCapabilities.connection["http://localhost:6363/"]
+    ) == False

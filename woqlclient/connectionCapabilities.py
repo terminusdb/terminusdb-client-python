@@ -1,10 +1,11 @@
 # connectionCapabilities.py
 
+from .const import Const as const
+
 # const UTILS = require('./utils.js');
 from .errorMessage import ErrorMessage
-from .const import Const as const
-from .errors import (AccessDeniedError, InvalidURIError, APIError)
-from .connectionConfig import ConnectionConfig
+from .errors import AccessDeniedError, APIError, InvalidURIError
+
 
 """
     Creates an entry in the connection registry for the server
@@ -17,11 +18,10 @@ from .connectionConfig import ConnectionConfig
 
 
 class ConnectionCapabilities:
-
     def __init__(self, connectionConfig, key=None):
         self.connection = {}
         self.connectionConfig = connectionConfig
-        if(key):
+        if key:
             self.setClientKey(key)
 
     """
@@ -30,16 +30,16 @@ class ConnectionCapabilities:
 
     def setClientKey(self, key):
         curl = self.connectionConfig.serverURL
-        if(curl and (isinstance(key, str) and key.strip())):
-            if (curl not in self.connection):
+        if curl and (isinstance(key, str) and key.strip()):
+            if curl not in self.connection:
                 self.connection[curl] = {}
-            self.connection[curl]['key'] = key.strip()
+            self.connection[curl]["key"] = key.strip()
 
     def getClientKey(self, serverURL=None):
         if serverURL is None:
             serverURL = self.connectionConfig.serverURL
-        if((serverURL in self.connection) and ('key' in self.connection[serverURL])):
-            return self.connection[serverURL]['key']
+        if (serverURL in self.connection) and ("key" in self.connection[serverURL]):
+            return self.connection[serverURL]["key"]
         raise APIError(ErrorMessage.getInvalidKeyMessage())
 
     def __actionToArray(self, actions):
@@ -47,7 +47,7 @@ class ConnectionCapabilities:
             return []
         actionList = []
         for item in actions:
-            actionList.append(item['@id'])
+            actionList.append(item["@id"])
 
         return actionList
 
@@ -60,74 +60,82 @@ class ConnectionCapabilities:
         if self.connectionConfig.serverURL is not False:
             curl = self.connectionConfig.serverURL
 
-            if (curl not in self.connection):
+            if curl not in self.connection:
                 self.connection[curl] = {}
 
-            if(isinstance(capabilities, dict)):
+            if isinstance(capabilities, dict):
                 for key, value in capabilities.items():
-                    if(key == 'terminus:authority'):
-                        if(isinstance(value, dict)):
+                    if key == "terminus:authority":
+                        if isinstance(value, dict):
                             value = [value]
                         for item in value:
-                            scope = item['terminus:authority_scope']
-                            actions = item['terminus:action']
+                            scope = item["terminus:authority_scope"]
+                            actions = item["terminus:action"]
 
-                            if(isinstance(scope, dict)):
+                            if isinstance(scope, dict):
                                 scope = [scope]
 
                             actionList = self.__actionToArray(actions)
 
                             for scopeItem in scope:
-                                dbName = scopeItem['@id']
-                                if (dbName not in self.connection[curl]):
+                                dbName = scopeItem["@id"]
+                                if dbName not in self.connection[curl]:
                                     self.connection[curl][dbName] = scopeItem
 
-                                self.connection[curl][dbName]['terminus:authority'] = actionList
+                                self.connection[curl][dbName][
+                                    "terminus:authority"
+                                ] = actionList
                     else:
                         self.connection[curl][key] = value
         else:
-            raise InvalidURIError(ErrorMessage.getInvalidURIMessage(
-                'Undefined', "Add Connection"))
+            raise InvalidURIError(
+                ErrorMessage.getInvalidURIMessage("Undefined", "Add Connection")
+            )
         # print(self.connection)
 
     def serverConnected(self):
         serverURL = self.connectionConfig.serverURL
 
-        if(serverURL and self.connection.get(serverURL)):
-            return ('@context' in self.connection.get(serverURL))
+        if serverURL and self.connection.get(serverURL):
+            return "@context" in self.connection.get(serverURL)
         return False
 
     def capabilitiesPermit(self, action, dbid=None, server=None):
-        if self.connectionConfig.connectedMode is False or self.connectionConfig.checkCapabilities is False or action == const.CONNECT:
+        if (
+            self.connectionConfig.connectedMode is False
+            or self.connectionConfig.checkCapabilities is False
+            or action == const.CONNECT
+        ):
             return True
 
         server = server if server else self.connectionConfig.serverURL
         dbid = dbid if dbid else self.connectionConfig.dbID
 
         rec = None
-        if (action == const.CREATE_DATABASE):
+        if action == const.CREATE_DATABASE:
             rec = self.__getServerRecord(server)
         else:
             rec = self.__getDBRecord(dbid, server)
 
-        if (rec):
-            auths = rec.get('terminus:authority')
-            terminusActionName = 'terminus:' + action
-            if (auths and terminusActionName in auths):
+        if rec:
+            auths = rec.get("terminus:authority")
+            terminusActionName = "terminus:" + action
+            if auths and terminusActionName in auths:
                 return True
 
         raise AccessDeniedError(
-            ErrorMessage.getAccessDeniedMessage(action, dbid, server))
+            ErrorMessage.getAccessDeniedMessage(action, dbid, server)
+        )
 
     def __getServerRecord(self, serverURL):
-        if (serverURL in self.connection):
+        if serverURL in self.connection:
             connectionObj = self.connection[serverURL]
 
             if isinstance(connectionObj, dict) is False:
                 return None
 
             for oid in connectionObj.values():
-                if (isinstance(oid, dict) and oid.get("@type") == 'terminus:Server'):
+                if isinstance(oid, dict) and oid.get("@type") == "terminus:Server":
                     return oid
         return None
 
@@ -154,8 +162,8 @@ class ConnectionCapabilities:
         self.connectionConfig.deletedbID(dbid)
         url = srvr if srvr else self.connectionConfig.serverURL
         dbidCap = self.__dbCapabilityID(dbid)
-        if(url in self.connection and self.connection[url].get(dbidCap)):
+        if url in self.connection and self.connection[url].get(dbidCap):
             self.connection[url].pop(dbidCap)
 
     def __dbCapabilityID(self, dbid):
-        return 'doc:' + dbid
+        return "doc:" + dbid
