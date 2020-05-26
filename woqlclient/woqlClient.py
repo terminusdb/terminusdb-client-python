@@ -1,11 +1,11 @@
 # woqlClient.py
 import json
 
+from .api_endpoint_const import APIEndpointConst
 from .connectionCapabilities import ConnectionCapabilities
 
 # from .errorMessage import *
 from .connectionConfig import ConnectionConfig
-from .api_endpoint_const import APIEndpointConst
 from .dispatchRequest import DispatchRequest
 from .documentTemplate import DocumentTemplate
 
@@ -137,7 +137,7 @@ class WOQLClient:
         branch: set branch to this id
     """
 
-    def set(self, **kwargs): #bad naming
+    def set(self, **kwargs):  # bad naming
         self.connectionConfig.update(**kwargs)
 
     def create_database(self, dbid, label, **kwargs):
@@ -166,7 +166,7 @@ class WOQLClient:
         """
         self.db(dbid)
         if kwargs.get("accountid"):
-            self.account(accountid) #where does accountid comes from
+            self.account(accountid)  # where does accountid comes from
 
         comment = kwargs.get("comment", label)
         username = self.account()
@@ -180,7 +180,9 @@ class WOQLClient:
             },
         }
 
-        return self.dispatch(self.connectionConfig.db_url(), APIEndpointConst.CREATE_DATABASE, doc)
+        return self.dispatch(
+            self.connectionConfig.db_url(), APIEndpointConst.CREATE_DATABASE, doc
+        )
 
     def delete_database(self, dbid, accountid=None):
         """Delete a TerminusDB database
@@ -202,7 +204,9 @@ class WOQLClient:
         """
 
         self.db(dbid)
-        json_response = self.dispatch(self.conConfig.db_url(), APIEndpointConst.DELETE_DATABASE)
+        json_response = self.dispatch(
+            self.conConfig.db_url(), APIEndpointConst.DELETE_DATABASE
+        )
         self.conCapabilities.remove_db(self.db(), self.account())
         return json_response
 
@@ -230,9 +234,11 @@ class WOQLClient:
 
     def get_schema(
         self, dbid=None, key=None, options={"terminus:encoding": "terminus:turtle"}
-    ): #don't use dict as default
+    ):  # don't use dict as default
         self.conConfig.setDB(dbid)
-        json_response = self.dispatch(self.conConfig.db_url(), APIEndpointConst.DELETE_DATABASE, key)
+        json_response = self.dispatch(
+            self.conConfig.db_url(), APIEndpointConst.DELETE_DATABASE, key
+        )
         self.conCapabilities.removeDB()
         return json_response
 
@@ -254,7 +260,11 @@ class WOQLClient:
         )
 
     def update_schema(
-        self, doc_obj, dbid=None, key=None, opts={"terminus:encoding": "terminus:turtle"}
+        self,
+        doc_obj,
+        dbid=None,
+        key=None,
+        opts={"terminus:encoding": "terminus:turtle"},
     ):
         """Updates the Schema of the specified database
 
@@ -312,14 +322,14 @@ class WOQLClient:
             id_parser.schemaURL(), APIEndpointConst.UPDATE_SCHEMA, key, doc_obj
         )
 
-    def create_document(self, doc_obj, documentID, dbid=None, key=None):
+    def create_document(self, doc_obj, document_id, dbid=None, key=None):
         """Creates a new document in the specified database
 
         Parameters
         ----------
         doc_obj : dict
             a valid document in json-ld
-        documentID : str
+        document_id : str
             a valid Terminus document id
         dbId : str
             a valid TerminusDB id
@@ -331,7 +341,7 @@ class WOQLClient:
         """
         if dbid:
             self.conConfig.setDB(dbid)
-        self.conConfig.setDocument(documentID)
+        self.conConfig.setDocument(document_id)
         doc_obj = DocumentTemplate.formatDocument(
             doc, None, None, self.conConfig.docURL()
         )
@@ -340,14 +350,14 @@ class WOQLClient:
         )
 
     @staticmethod
-    def direct_create_document(doc_obj, documentID, db_url, key):
+    def direct_create_document(doc_obj, document_id, db_url, key):
         """Creates a new document in the specified database
 
         Parameters
         ----------
         doc_obj : dict
             a valid document in json-ld
-        documentID : str
+        document_id : str
             a valid Terminus document id
         db_url : str
             a valid TerminusDB full URL
@@ -360,25 +370,27 @@ class WOQLClient:
         """
         id_parser = IDParser()
         id_parser.parseDBURL(db_url)
-        id_parser.parseDocumentID(documentID)
+        id_parser.parseDocumentID(document_id)
 
-        doc_obj = DocumentTemplate.formatDocument(doc_obj, None, None, id_parser.docURL())
+        doc_obj = DocumentTemplate.formatDocument(
+            doc_obj, None, None, id_parser.docURL()
+        )
         return DispatchRequest.sendRequestByAction(
             id_parser.docURL(), APIEndpointConst.CREATE_DOCUMENT, key, doc_obj
         )
 
     def get_document(
         self,
-        documentID,
+        document_id,
         dbid=None,
         key=None,
         opts={"terminus:encoding": "terminus:frame"},
-    ):
+    ): # don't use dict as default
         """Retrieves a document from the specified database
 
         Parameters
         ----------
-        documentID : str
+        document_id : str
             a valid Terminus document id
         dbId : str
             a valid TerminusDB id
@@ -394,18 +406,20 @@ class WOQLClient:
         if dbid:
             self.conConfig.setDB(dbid)
 
-        self.conConfig.setDocument(documentID)
-        return self.dispatch(self.conConfig.docURL(), APIEndpointConst.GET_DOCUMENT, key, opts)
+        self.conConfig.setDocument(document_id)
+        return self.dispatch(
+            self.conConfig.docURL(), APIEndpointConst.GET_DOCUMENT, key, opts
+        )
 
     @staticmethod
-    def directGetDocument(
-        documentID, db_url, key, opts={"terminus:encoding": "terminus:frame"}
+    def direct_get_document(
+        document_id, db_url, key, opts={"terminus:encoding": "terminus:frame"}
     ):
         """Retrieves a document from the specified database with URL
 
         Parameters
         ----------
-        documentID : str
+        document_id : str
             a valid Terminus document id
         db_url : str
             a valid TerminusDB full URL
@@ -420,18 +434,18 @@ class WOQLClient:
         """
         id_parser = IDParser()
         id_parser.parseDBURL(db_url)
-        id_parser.parseDocumentID(documentID)
+        id_parser.parseDocumentID(document_id)
         return DispatchRequest.sendRequestByAction(
             id_parser.docURL(), APIEndpointConst.GET_DOCUMENT, key, opts
         )
 
-    def updateDocument(self, documentID, doc_obj, dbid=None, key=None):
+    def update_document(self, document_id, doc_obj, dbid=None, key=None):
         """
         Updates a document in the specified database with a new version
 
         Parameters
         ----------
-        documentID : str
+        document_id : str
             a valid Terminus document id
         doc_obj : dict
             a valid document in json-ld
@@ -447,7 +461,7 @@ class WOQLClient:
         if dbid:
             self.conConfig.setDB(dbid)
 
-        self.conConfig.setDocument(documentID)
+        self.conConfig.setDocument(document_id)
         doc_obj = DocumentTemplate.formatDocument(
             doc_obj, None, None, self.conConfig.docURL()
         )
@@ -456,13 +470,13 @@ class WOQLClient:
         )
 
     @staticmethod
-    def direct_update_document(documentID, db_url, key, doc_obj):
+    def direct_update_document(document_id, db_url, key, doc_obj):
         """
         Updates a document in the specified database with URL
 
         Parameters
         ----------
-        documentID : str
+        document_id : str
             a valid Terminus document id
         db_url : str
             a valid TerminusDB full URL
@@ -477,19 +491,21 @@ class WOQLClient:
         """
         id_parser = IDParser()
         id_parser.parseDBURL(db_url)
-        id_parser.parseDocumentID(documentID)
-        doc_obj = DocumentTemplate.formatDocument(doc_obj, None, None, id_parser.docURL())
+        id_parser.parseDocumentID(document_id)
+        doc_obj = DocumentTemplate.formatDocument(
+            doc_obj, None, None, id_parser.docURL()
+        )
         return DispatchRequest.sendRequestByAction(
             id_parser.docURL(), APIEndpointConst.GET_DOCUMENT, key, doc_obj
         )
 
-    def deleteDocument(self, documentID, dbid=None, key=None):
+    def delete_document(self, document_id, dbid=None, key=None):
         """
         Deletes a document from the specified database
 
         Parameters
         ----------
-        documentID : str
+        document_id : str
             a valid Terminus document id
         dbId : str
             a valid TerminusDB id
@@ -503,18 +519,20 @@ class WOQLClient:
         if dbid:
             self.conConfig.setDB(dbid)
 
-        self.conConfig.setDocument(documentID)
+        self.conConfig.setDocument(document_id)
 
-        return self.dispatch(self.conConfig.docURL(), APIEndpointConst.DELETE_DOCUMENT, key)
+        return self.dispatch(
+            self.conConfig.docURL(), APIEndpointConst.DELETE_DOCUMENT, key
+        )
 
     @staticmethod
-    def directDeleteDocument(self, documentID, db_url, key):
+    def direct_delete_document(self, document_id, db_url, key):
         """
         Deletes a document from the specified database with URL
 
         Parameters
         ----------
-        documentID : str
+        document_id : str
             a valid Terminus document id
         db_url : str
             a valid TerminusDB full URL
@@ -527,13 +545,13 @@ class WOQLClient:
         """
         id_parser = IDParser()
         id_parser.parseDBURL(db_url)
-        id_parser.parseDocumentID(documentID)
+        id_parser.parseDocumentID(document_id)
 
         return DispatchRequest.sendRequestByAction(
             id_parser.docURL(), APIEndpointConst.DELETE_DOCUMENT, key
         )
 
-    def select(self, woql_query, dbid=None, key=None, fileList=None):
+    def select(self, woql_query, dbid=None, key=None, file_list=None):
         """
         Executes a read-only WOQL query on the specified database and returns the results
 
@@ -545,7 +563,7 @@ class WOQLClient:
             a valid TerminusDB id
         key : str, optional
             API key
-        fileList : list, optional
+        file_list : list, optional
             List of files that are needed for the query
 
         Returns
@@ -556,13 +574,15 @@ class WOQLClient:
             self.conConfig.setDB(dbid)
 
         payload = {"terminus:query": json.dumps(woql_query)}
-        if type(fileList) == dict:
-            payload.update(fileList)
+        if type(file_list) == dict:
+            payload.update(file_list)
 
-        return self.dispatch(self.conConfig.queryURL(), APIEndpointConst.WOQL_SELECT, key, payload)
+        return self.dispatch(
+            self.conConfig.queryURL(), APIEndpointConst.WOQL_SELECT, key, payload
+        )
 
     @staticmethod
-    def directSelect(woql_query, db_url, key, fileList=None):
+    def direct_select(woql_query, db_url, key, file_list=None):
         """
         Static function that executes a read-only WOQL query on the specified database
         and returns the results
@@ -575,7 +595,7 @@ class WOQLClient:
             a valid full TerminusDB database URL
         key : str, optional
             API key
-        fileList : list, optional
+        file_list : list, optional
             List of files that are needed for the query
 
         Returns
@@ -586,13 +606,13 @@ class WOQLClient:
         id_parser.parseDBURL(db_url)
 
         payload = {"terminus:query": json.dumps(woql_query)}
-        if type(fileList) == dict:
-            payload.update(fileList)
+        if type(file_list) == dict:
+            payload.update(file_list)
         return DispatchRequest.sendRequestByAction(
             id_parser.queryURL(), APIEndpointConst.WOQL_SELECT, key, payload
         )
 
-    def update(self, woql_query, dbid=None, key=None, fileList=None):
+    def update(self, woql_query, dbid=None, key=None, file_list=None):
         """
         Executes a WOQL query on the specified database which updates the state and returns the results
 
@@ -604,7 +624,7 @@ class WOQLClient:
             a valid TerminusDB database ID
         key : str, optional
             API key
-        fileList : list, optional
+        file_list : list, optional
             List of files that are needed for the query
 
         Returns
@@ -614,10 +634,10 @@ class WOQLClient:
         if dbid:
             self.conConfig.setDB(dbid)
             # raise InvalidURIError(ErrorMessage.getInvalidURIMessage(docurl, "Update"))
-        if type(fileList) == dict:
+        if type(file_list) == dict:
             file_dict = {}
-            for name in fileList:
-                path = fileList[name]
+            for name in file_list:
+                path = file_list[name]
                 stream = open(path, "rb")
                 print(name)
                 file_dict[name] = (name, stream, "text/plain")
@@ -632,11 +652,15 @@ class WOQLClient:
             payload = {"terminus:query": json.dumps(woql_query)}
 
         return self.dispatch(
-            self.conConfig.queryURL(), APIEndpointConst.WOQL_UPDATE, key, payload, file_dict
+            self.conConfig.queryURL(),
+            APIEndpointConst.WOQL_UPDATE,
+            key,
+            payload,
+            file_dict,
         )
 
     @staticmethod
-    def direct_update(woql_query, db_url, key, fileList=None):
+    def direct_update(woql_query, db_url, key, file_list=None):
         """
         Static function that executes a WOQL query on the specified database which
         updates the state and returns the results
@@ -649,7 +673,7 @@ class WOQLClient:
             a valid full TerminusDB database URL
         key : str, optional
             API key
-        fileList : list, optional
+        file_list : list, optional
             List of files that are needed for the query
 
         Returns
@@ -659,10 +683,10 @@ class WOQLClient:
         id_parser = IDParser()
         id_parser.parseDBURL(db_url)
 
-        if type(fileList) == dict:
+        if type(file_list) == dict:
             file_dict = {}
-            for name in fileList:
-                path = fileList[name]
+            for name in file_list:
+                path = file_list[name]
                 stream = open(path, "rb")
                 print(name)
                 file_dict[name] = (name, stream, "text/plain")
