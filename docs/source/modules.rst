@@ -6,3 +6,4 @@ terminus-client-python
 
    woqlclient
    woqlpy
+   woqlDataframe
