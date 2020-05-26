@@ -134,7 +134,7 @@ class ConnectionCapabilities:
                 meta['db'] = rn
             elif type(rn) is str and rn:
                 bits = rn.split("|")
-                if(bits.length == 1):
+                if(len(bits) == 1):
                     meta['db'] = rn
                 else:
                     meta['account'] = bits[0]
@@ -172,7 +172,7 @@ class ConnectionCapabilities:
         """
         docid = self.find_resource_document_id(dbid, account)
         if docid is not None:
-            del self.connection['docid']
+            del self.connection[docid]
 
     def get_server_db_records(self):
         """
@@ -180,7 +180,7 @@ class ConnectionCapabilities:
         """
         dbrecs = {}
         for oid in self.connection:
-            if (self.connection[oid]['@type'] is 'terminus:Database'):
+            if (isinstance(self.connection[oid], dict) and self.connection[oid].get("@type") == 'terminus:Database'):
                 dbrecs[oid] = self.connection[oid]
         return dbrecs
 
