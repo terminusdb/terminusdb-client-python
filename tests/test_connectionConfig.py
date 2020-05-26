@@ -1,14 +1,14 @@
-from  woqlclient import ConnectionConfig
-import pytest
+from woqlclient import ConnectionConfig
+
 
 class TestConnectionConfig:
-    start_server_url = "http://localhost:6363/";
-    start_dbid = "testDB";
-    account="admin"
-    connection_config = ConnectionConfig(server=start_server_url,
-                        db=start_dbid,
-                        account=account)
-    db_url="http://localhost:6363/db/admin/testDB"
+    start_server_url = "http://localhost:6363/"
+    start_dbid = "testDB"
+    account = "admin"
+    connection_config = ConnectionConfig(
+        server=start_server_url, db=start_dbid, account=account
+    )
+    db_url = "http://localhost:6363/db/admin/testDB"
 
     def test_get_sever_url(self):
         assert self.connection_config.server_url == self.start_server_url
@@ -17,9 +17,15 @@ class TestConnectionConfig:
     def test_change_server(self):
         connection_config.set_branch("myBranch")
         assert self.connection_config.db_url() == self.db_url
-        assert self.connection_config.query_url == "http://localhost:6363/woql/admin/testDB/local/branch/myBranch"
+        assert (
+            self.connection_config.query_url
+            == "http://localhost:6363/woql/admin/testDB/local/branch/myBranch"
+        )
 
     def test_change_server(self):
         new_ref = "gfhfjkflfgorpyuiioo"
         self.connection_config.set_ref(new_ref)
-        assert self.connection_config.query_url == "http://localhost:6363/woql/admin/testDB/local/commit/"+new_ref
+        assert (
+            self.connection_config.query_url
+            == "http://localhost:6363/woql/admin/testDB/local/commit/" + new_ref
+        )

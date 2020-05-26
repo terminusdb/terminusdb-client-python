@@ -2,36 +2,45 @@
   The WOQL Query object implements the WOQL language via the fluent style
 """
 
-import sys
 import re
+import sys
 from copy import copy
+
 from .utils import Utils
 
 STANDARD_URLS = {
-    'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-    'rdfs': 'http://www.w3.org/2000/01/rdf-schema#',
-    'xsd': 'http://www.w3.org/2001/XMLSchema#',
-    'owl': 'http://www.w3.org/2002/07/owl#',
-    'tcs': 'http://terminusdb.com/schema/tcs#',
-    'tbs': 'http://terminusdb.com/schema/tbs#',
-    'xdd': 'http://terminusdb.com/schema/xdd#',
-    'v': 'http://terminusdb.com/woql/variable/',
-    'terminus': 'http://terminusdb.com/schema/terminus#',
-    'vio': 'http://terminusdb.com/schema/vio#',
-    'docs': 'http://terminusdb.com/schema/documentation#'
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "tcs": "http://terminusdb.com/schema/tcs#",
+    "tbs": "http://terminusdb.com/schema/tbs#",
+    "xdd": "http://terminusdb.com/schema/xdd#",
+    "v": "http://terminusdb.com/woql/variable/",
+    "terminus": "http://terminusdb.com/schema/terminus#",
+    "vio": "http://terminusdb.com/schema/vio#",
+    "docs": "http://terminusdb.com/schema/documentation#",
 }
+
 
 class WOQLQuery:
     """Creates a new Empty Query object
     """
 
-    def __init__(self,query=None):
+    def __init__(self, query=None):
         self.query = query if query else {}
         self.cursor = self.query
         self.chain_ended = False
         self.contains_update = False
         # operators which preserve global paging
-        self.paging_transitive_properties = ['select', 'from', 'start', 'when', 'opt', 'limit']
+        self.paging_transitive_properties = [
+            "select",
+            "from",
+            "start",
+            "when",
+            "opt",
+            "limit",
+        ]
         self.vocab = self._load_default_vocabulary()
         # object used to accumulate triples from fragments to support usage like node("x").label("y")
         self.tripleBuilder = False
@@ -59,19 +68,19 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        if hasattr(arr1, 'json'):
+        if hasattr(arr1, "json"):
             map = arr1.json()
-            target = arr2;
+            target = arr2
         else:
-            map = self._build_as_clauses(arr1, arr2);
+            map = self._build_as_clauses(arr1, arr2)
 
         if target:
-            if hasattr(target, 'json'):
+            if hasattr(target, "json"):
                 target = target.json()
-            self.cursor['get'] = [map, target];
+            self.cursor["get"] = [map, target]
         else:
-            self.cursor['get'] = [map, {}];
-            self.cursor = self.cursor["get"][1];
+            self.cursor["get"] = [map, {}]
+            self.cursor = self.cursor["get"][1]
         return self
 
     def woql_with(self, gid, remq, subq=None):
@@ -89,24 +98,24 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        if hasattr(remq, 'json'):
+        if hasattr(remq, "json"):
             remq = remq.json()
         if subq is not None:
-            if hasattr(subq, 'json'):
+            if hasattr(subq, "json"):
                 subq = subq.json()
-            self.cursor['with'] = [gid, remq, subq]
+            self.cursor["with"] = [gid, remq, subq]
         else:
-            self.cursor['with'] = [gid, remq, {}]
+            self.cursor["with"] = [gid, remq, {}]
             self.cursor = self.cursor["with"][2]
 
         return self
 
     def _build_as_clauses(self, vars=None, cols=None):
         clauses = []
+
         def check_vars_cols(obj):
-            return obj and \
-                   isinstance(obj, (list, dict, WOQLQuery)) and \
-                   len(obj)
+            return obj and isinstance(obj, (list, dict, WOQLQuery)) and len(obj)
+
         if check_vars_cols(vars):
             for i in range(len(vars)):
                 v = vars[i]
@@ -114,12 +123,12 @@ class WOQLQuery:
                     c = cols[i]
                     if type(c) == str:
                         c = {"@value": c}
-                    clauses.append({'as': [c, v]})
+                    clauses.append({"as": [c, v]})
                 else:
-                    if hasattr(v, 'woql_as') or ('as' in v):
+                    if hasattr(v, "woql_as") or ("as" in v):
                         clauses += v.json()
                     else:
-                        clauses.append({'as': [v]})
+                        clauses.append({"as": [v]})
         return clauses
 
     def typecast(self, vara, type, varb):
@@ -139,7 +148,7 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        self.cursor['typecast'] = [vara, type, varb];
+        self.cursor["typecast"] = [vara, type, varb]
         return self
 
     def insert(self, node, type, graph=None):
@@ -180,9 +189,13 @@ class WOQLQuery:
 
         """
         if graph is not None:
-            return WOQLQuery().add_quad(node, "rdf:type", WOQLQuery()._clean_type(type), graph)
+            return WOQLQuery().add_quad(
+                node, "rdf:type", WOQLQuery()._clean_type(type), graph
+            )
         else:
-            return WOQLQuery().add_triple(node, "rdf:type", WOQLQuery()._clean_type(type))
+            return WOQLQuery().add_triple(
+                node, "rdf:type", WOQLQuery()._clean_type(type)
+            )
 
     def doctype(self, type, graph=None):
         """Creates a new document class in the schema - equivalent to: add_quad(type, "rdf:type", "owl:Class", graph), add_quad(type, subclassof, tcs:Document, graph)
@@ -216,7 +229,7 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        self.cursor['length'] = [va, vb];
+        self.cursor["length"] = [va, vb]
         return self
 
     def remote(self, url, opts=None):
@@ -256,9 +269,9 @@ class WOQLQuery:
 
         """
         if opts is not None:
-            self.cursor['remote'] = [url, opts]
+            self.cursor["remote"] = [url, opts]
         else:
-            self.cursor['remote'] = [url]
+            self.cursor["remote"] = [url]
         return self
 
     def post(self, field, opts=None):
@@ -277,11 +290,10 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         if opts is not None:
-            self.cursor['post'] = [field, opts]
+            self.cursor["post"] = [field, opts]
         else:
-            self.cursor['post'] = [field]
+            self.cursor["post"] = [field]
         return self
-
 
     def file(self, json, opts=None):
         """Provides details of a file source in a JSON format that includes a URL property
@@ -311,9 +323,9 @@ class WOQLQuery:
 
         """
         if opts is not None:
-            self.cursor['file'] = [json, opts]
+            self.cursor["file"] = [json, opts]
         else:
-            self.cursor['file'] = [json]
+            self.cursor["file"] = [json]
         return self
 
     def group_by(self, gvarlist, groupedvar, groupquery, output=None):
@@ -336,14 +348,14 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         args = []
-        self.cursor['group_by'] = args
-        if hasattr(gvarlist, 'json'):
+        self.cursor["group_by"] = args
+        if hasattr(gvarlist, "json"):
             args.append(gvarlist.json())
 
-        if 'list' in gvarlist:
+        if "list" in gvarlist:
             args.append(gvarlist)
         else:
-            args.append({'list': gvarlist})
+            args.append({"list": gvarlist})
 
         if type(groupedvar) == list:
             ng = Utils.addNamespacesToVariables(groupedvar)
@@ -354,7 +366,7 @@ class WOQLQuery:
         args.append(groupedvar)
 
         if output:
-            if hasattr(groupquery, 'json'):
+            if hasattr(groupquery, "json"):
                 groupquery = groupquery.json()
             args.append(groupquery)
         else:
@@ -383,14 +395,14 @@ class WOQLQuery:
         """
         ordering = []
         for gvar in gvarlist:
-            if hasattr(gvar, 'json'):
+            if hasattr(gvar, "json"):
                 ordering.append(gvar.json())
             else:
                 ordering.append(gvar)
 
         self._advance_cursor("order_by", ordering)
         if query is not None:
-            self.cursor = query.json() if hasattr(query,'json') else query
+            self.cursor = query.json() if hasattr(query, "json") else query
         return self
 
     def asc(self, var):
@@ -444,18 +456,18 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        self.cursor['idgen'] = [prefix]
-        if hasattr(vari, 'json'):
-            self.cursor['idgen'].append(vari.json())
-        elif hasattr(vari, 'list') or ('list' in vari):
-            self.cursor['idgen'].append(vari)
+        self.cursor["idgen"] = [prefix]
+        if hasattr(vari, "json"):
+            self.cursor["idgen"].append(vari.json())
+        elif hasattr(vari, "list") or ("list" in vari):
+            self.cursor["idgen"].append(vari)
         else:
-            self.cursor['idgen'].append({"list": vari})
+            self.cursor["idgen"].append({"list": vari})
 
         if mode:
-            self.cursor['idgen'].append(mode)
+            self.cursor["idgen"].append(mode)
 
-        self.cursor['idgen'].append(type)
+        self.cursor["idgen"].append(type)
         return self
 
     def unique(self, prefix, vari, type):
@@ -475,20 +487,20 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        self.cursor['unique'] = [prefix]
-        if hasattr(vari, 'json'):
-            self.cursor['unique'].append(vari.json())
-        elif hasattr(vari, 'list') or ('list' in vari):
-            self.cursor['unique'].append(vari)
+        self.cursor["unique"] = [prefix]
+        if hasattr(vari, "json"):
+            self.cursor["unique"].append(vari.json())
+        elif hasattr(vari, "list") or ("list" in vari):
+            self.cursor["unique"].append(vari)
         else:
-            self.cursor['unique'].append({"list": vari})
+            self.cursor["unique"].append({"list": vari})
 
-        self.cursor['unique'].append(type)
+        self.cursor["unique"].append(type)
         return self
 
     def _pack_string(self, var):
         if type(var) == str and var[:2] != "v:":
-            return {"@value" : var, "@type": "xsd:string"}
+            return {"@value": var, "@type": "xsd:string"}
         return var
 
     def _pack_strings(self, vars):
@@ -524,10 +536,10 @@ class WOQLQuery:
         if type(matches) == str:
             matches = [matches]
 
-        if (type(matches) != dict) or ('list' not in matches):
-            matches = {'list': matches}
+        if (type(matches) != dict) or ("list" not in matches):
+            matches = {"list": matches}
 
-        self.cursor['re'] = [pattern, test, matches]
+        self.cursor["re"] = [pattern, test, matches]
         return self
 
     def concat(self, lst, v):
@@ -546,21 +558,22 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         if type(lst) == str:
-            nlist = re.split('(v:[\w_]+)\\b', lst)
-            for i in range(1,len(nlist)):
-                if (nlist[i-1][len(nlist[i-1])-1:] == "v") and \
-                   (nlist[i][:1] == ":"):
-                   nlist[i-1] = nlist[i-1][:len(nlist[i-1])-1]
-                   nlist[i] = nlist[i][1:]
-        elif 'list' in lst:
-            nlist = lst['list']
+            nlist = re.split("(v:[\\w_]+)\\b", lst)
+            for i in range(1, len(nlist)):
+                if (nlist[i - 1][len(nlist[i - 1]) - 1 :] == "v") and (
+                    nlist[i][:1] == ":"
+                ):
+                    nlist[i - 1] = nlist[i - 1][: len(nlist[i - 1]) - 1]
+                    nlist[i] = nlist[i][1:]
+        elif "list" in lst:
+            nlist = lst["list"]
         elif isinstance(lst, (list, dict, WOQLQuery)):
             nlist = lst
         args = self._pack_strings(nlist)
         if v.find(":") == -1:
             v = "v:" + v
 
-        self.cursor['concat'] = [{'list': args}, v]
+        self.cursor["concat"] = [{"list": args}, v]
         return self
 
     def split(self, input, separator, output):
@@ -582,7 +595,7 @@ class WOQLQuery:
         """
         separator = self._pack_string(separator)
         input = self._pack_string(input)
-        self.cursor['split'] = [input, separator, output]
+        self.cursor["split"] = [input, separator, output]
         return self
 
     def member(self, ele, list_obj):
@@ -600,7 +613,7 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        self.cursor['member'] = [ele, list_obj]
+        self.cursor["member"] = [ele, list_obj]
         return self
 
     def lower(self, u, l):
@@ -618,7 +631,7 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        self.cursor['lower'] = [u, l]
+        self.cursor["lower"] = [u, l]
         return self
 
     def pad(self, input, pad, len, output):
@@ -642,7 +655,7 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         pad = self._pack_string(pad)
-        self.cursor['pad'] = [input, pad, len, output]
+        self.cursor["pad"] = [input, pad, len, output]
         return self
 
     def join(self, input, glue, output):
@@ -664,7 +677,7 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         glue = self._pack_string(glue)
-        self.cursor['join'] = [input, glue, output]
+        self.cursor["join"] = [input, glue, output]
         return self
 
     def sum(self, input, output):
@@ -684,7 +697,7 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        self.cursor['sum'] = [input, output]
+        self.cursor["sum"] = [input, output]
         return self
 
     def less(self, v1, v2):
@@ -702,7 +715,7 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        self.cursor['less'] = [v1, v2]
+        self.cursor["less"] = [v1, v2]
         return self
 
     def greater(self, v1, v2):
@@ -720,7 +733,7 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        self.cursor['greater'] = [v1, v2]
+        self.cursor["greater"] = [v1, v2]
         return self
 
     def list(self, *args):
@@ -736,7 +749,7 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        self.cursor['list'] = list(args)
+        self.cursor["list"] = list(args)
         return self
 
     def json(self, json=None):
@@ -784,11 +797,11 @@ class WOQLQuery:
             else:
                 self.cursor["when"] = [{"false": []}, {}]
         else:
-            q =  Query.json() if hasattr(Query,'json') else Query
-            self.cursor['when'] = [q, {}]
+            q = Query.json() if hasattr(Query, "json") else Query
+            self.cursor["when"] = [q, {}]
 
         if Update:
-            upd = Update.json() if hasattr(Update,'json') else Update
+            upd = Update.json() if hasattr(Update, "json") else Update
             self.cursor["when"][1] = upd
 
         self.cursor = self.cursor["when"][1]
@@ -818,7 +831,7 @@ class WOQLQuery:
             q = query.json() if callable(query.json) else query
             self.cursor["opt"] = [q]
         else:
-            self.cursor['opt'] = [{}]
+            self.cursor["opt"] = [{}]
             self.cursor = self.cursor["opt"][0]
         return self
 
@@ -838,7 +851,7 @@ class WOQLQuery:
         """
         self._advance_cursor("from", dburl)
         if query:
-            self.cursor = query.json() if hasattr(query,'json') else query
+            self.cursor = query.json() if hasattr(query, "json") else query
         return self
 
     def into(self, dburl, query=None):
@@ -857,7 +870,7 @@ class WOQLQuery:
         """
         self._advance_cursor("into", dburl)
         if query:
-            self.cursor = query.json() if hasattr(query,'json') else query
+            self.cursor = query.json() if hasattr(query, "json") else query
         return self
 
     def limit(self, limit, query=None):
@@ -876,7 +889,7 @@ class WOQLQuery:
         """
         self._advance_cursor("limit", limit)
         if query:
-            self.cursor = query.json() if hasattr(query,'json') else query
+            self.cursor = query.json() if hasattr(query, "json") else query
         return self
 
     def start(self, start, query=None):
@@ -912,13 +925,13 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
 
-        self.cursor['select'] = list(args)
+        self.cursor["select"] = list(args)
         index = len(args)
-        if isinstance(self.cursor['select'][index-1], (list, dict, WOQLQuery)):
-            self.cursor['select'][index-1] = self.cursor['select'][index-1].json()
+        if isinstance(self.cursor["select"][index - 1], (list, dict, WOQLQuery)):
+            self.cursor["select"][index - 1] = self.cursor["select"][index - 1].json()
         else:
-            self.cursor['select'].append({})
-            self.cursor = self.cursor['select'][index]
+            self.cursor["select"].append({})
+            self.cursor = self.cursor["select"][index]
         return self
 
     def woql_and(self, *args):
@@ -933,12 +946,12 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        if not hasattr(self.cursor,'and'):
-            self.cursor['and'] = []
+        if not hasattr(self.cursor, "and"):
+            self.cursor["and"] = []
         for item in args:
             if item.contains_update:
                 self.contains_update = True
-            self.cursor['and'].append(item.json())
+            self.cursor["and"].append(item.json())
         return self
 
     def woql_or(self, *args):
@@ -953,19 +966,19 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        if not hasattr(self.cursor,'or'):
-            self.cursor['or'] = []
+        if not hasattr(self.cursor, "or"):
+            self.cursor["or"] = []
         for item in args:
             if item.contains_update:
                 self.contains_update = True
-            if hasattr(item,'or'):
+            if hasattr(item, "or"):
                 nquery = item.json()
             else:
                 nquery = item
-            if hasattr(nquery,'or'):
-                self.cursor['and'] = self.cursor['or'] + nquery['or']
+            if hasattr(nquery, "or"):
+                self.cursor["and"] = self.cursor["or"] + nquery["or"]
             else:
-                self.cursor['or'].append(item.json())
+                self.cursor["or"].append(item.json())
         return self
 
     def woql_not(self, query=None):
@@ -983,11 +996,11 @@ class WOQLQuery:
         if query:
             if query.contains_update:
                 self.contains_update = True
-            query = query.json() if hasattr(query,'json') else query
-            self.cursor['not'] = [query]
+            query = query.json() if hasattr(query, "json") else query
+            self.cursor["not"] = [query]
         else:
-            self.cursor['not'] = [{}]
-            self.cursor = self.cursor['not'][0]
+            self.cursor["not"] = [{}]
+            self.cursor = self.cursor["not"][0]
         return self
 
     def triple(self, sub, pre, obj):
@@ -1007,7 +1020,11 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        self.cursor["triple"] = [self._clean_subject(sub),self._clean_predicate(pre),self._clean_object(obj)]
+        self.cursor["triple"] = [
+            self._clean_subject(sub),
+            self._clean_predicate(pre),
+            self._clean_object(obj),
+        ]
         return self._chainable("triple", self._clean_subject(sub))
 
     def quad(self, sub, pre, obj, gra):
@@ -1029,12 +1046,13 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        self.cursor["quad"] = [self._clean_subject(sub),
-                                self._clean_predicate(pre),
-                                self._clean_object(obj),
-                                self._clean_graph(gra)]
+        self.cursor["quad"] = [
+            self._clean_subject(sub),
+            self._clean_predicate(pre),
+            self._clean_object(obj),
+            self._clean_graph(gra),
+        ]
         return self._chainable("quad", self._clean_subject(sub))
-
 
     def eq(self, a, b):
         """Matches if a is equal to b
@@ -1051,7 +1069,7 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        self.cursor["eq"] = [self._clean_object(a),self._clean_object(b)];
+        self.cursor["eq"] = [self._clean_object(a), self._clean_object(b)]
         return self._last()
 
     def sub(self, a, b=None):
@@ -1071,7 +1089,7 @@ class WOQLQuery:
         if (not b) and self.tripleBuilder:
             self.tripleBuilder.sub(self._clean_class(a))
             return self
-        self.cursor["sub"] = [self._clean_class(a),self._clean_class(b)]
+        self.cursor["sub"] = [self._clean_class(a), self._clean_class(b)]
         return self._last("sub", a)
 
     def comment(self, val=None):
@@ -1088,21 +1106,21 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
 
-        if val and hasattr(val, 'json'):
-            self.cursor['comment'] = [val.json()]
+        if val and hasattr(val, "json"):
+            self.cursor["comment"] = [val.json()]
         elif type(val) == str:
-            self.cursor['comment'] = [{"@value": val, "@language": "en"}]
+            self.cursor["comment"] = [{"@value": val, "@language": "en"}]
         elif isinstance(val, (list, dict, WOQLQuery)):
             if len(val):
-                self.cursor['comment'] = val
+                self.cursor["comment"] = val
             else:
-                self.cursor['comment'] = [val]
+                self.cursor["comment"] = [val]
         else:
-            self.cursor['comment'] = []
+            self.cursor["comment"] = []
 
-        last_index = len(self.cursor['comment'])
-        self.cursor['comment'].append({})
-        self.cursor = self.cursor['comment'][last_index]
+        last_index = len(self.cursor["comment"])
+        self.cursor["comment"].append({})
+        self.cursor = self.cursor["comment"][last_index]
         return self
 
     def abstract(self, varname=None):
@@ -1144,7 +1162,7 @@ class WOQLQuery:
             return self
 
         if b:
-            self.cursor["isa"] = [self._clean_class(a),self._clean_class(b)]
+            self.cursor["isa"] = [self._clean_class(a), self._clean_class(b)]
             return self._chainable("isa", a)
 
     def trim(self, string, variable):
@@ -1162,8 +1180,8 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        self.cursor['trim'] = [string, variable]
-        return self._chainable('trim', variable)
+        self.cursor["trim"] = [string, variable]
+        return self._chainable("trim", variable)
 
     def eval(self, arith, v):
         """Evaluates the Arithmetic Expression Arith and copies the output to variable V
@@ -1180,11 +1198,10 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        if hasattr(arith, 'json'):
+        if hasattr(arith, "json"):
             arith = arith.json()
-        self.cursor['eval'] = [arith, v]
-        return self._chainable('eval', v)
-
+        self.cursor["eval"] = [arith, v]
+        return self._chainable("eval", v)
 
     def plus(self, *args):
         """Adds numbers N1...Nn together
@@ -1199,9 +1216,9 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        self.cursor['plus'] = []
+        self.cursor["plus"] = []
         for item in args:
-            self.cursor['plus'].append(item.json() if hasattr(item,'json') else item)
+            self.cursor["plus"].append(item.json() if hasattr(item, "json") else item)
         return self._last()
 
     def minus(self, *args):
@@ -1217,9 +1234,9 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        self.cursor['minus'] = []
+        self.cursor["minus"] = []
         for item in args:
-            self.cursor['minus'].append(item.json() if hasattr(item,'json') else item)
+            self.cursor["minus"].append(item.json() if hasattr(item, "json") else item)
         return self._last()
 
     def times(self, *args):
@@ -1235,9 +1252,9 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        self.cursor['times'] = []
+        self.cursor["times"] = []
         for item in args:
-            self.cursor['times'].append(item.json() if hasattr(item,'json') else item)
+            self.cursor["times"].append(item.json() if hasattr(item, "json") else item)
         return self._last()
 
     def divide(self, *args):
@@ -1253,9 +1270,9 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        self.cursor['divide'] = []
+        self.cursor["divide"] = []
         for item in args:
-            self.cursor['divide'].append(item.json() if hasattr(item,'json') else item)
+            self.cursor["divide"].append(item.json() if hasattr(item, "json") else item)
         return self._last()
 
     def div(self, *args):
@@ -1271,9 +1288,9 @@ class WOQLQuery:
         WOQLQuery
             query object that can be chained and/or execute
         """
-        self.cursor['div'] = []
+        self.cursor["div"] = []
         for item in args:
-            self.cursor['div'].append(item.json() if hasattr(item,'json') else item)
+            self.cursor["div"].append(item.json() if hasattr(item, "json") else item)
         return self._last()
 
     def exp(self, a, b):
@@ -1291,12 +1308,12 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        if hasattr(a, 'json'):
+        if hasattr(a, "json"):
             a = a.json()
-        if hasattr(b, 'json'):
+        if hasattr(b, "json"):
             b = b.json()
 
-        self.cursor['exp'] = [a, b]
+        self.cursor["exp"] = [a, b]
         return self._last()
 
     def delete(self, JSON_or_IRI):
@@ -1312,7 +1329,7 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        self.cursor['delete'] = [JSON_or_IRI]
+        self.cursor["delete"] = [JSON_or_IRI]
         return self._last_update()
 
     def add_triple(self, subject, predicate, object_or_literal):
@@ -1352,10 +1369,12 @@ class WOQLQuery:
         add_quad
 
         """
-        self.cursor['add_triple'] = [self._clean_subject(subject),
-                                    self._clean_predicate(predicate),
-                                    self._clean_object(object_or_literal)]
-        return self._chainable_update('add_triple', subject)
+        self.cursor["add_triple"] = [
+            self._clean_subject(subject),
+            self._clean_predicate(predicate),
+            self._clean_object(object_or_literal),
+        ]
+        return self._chainable_update("add_triple", subject)
 
     def delete_triple(self, subject, predicate, object_or_literal):
         """Deletes any triples that match the rule [subject, predicate, object]
@@ -1394,10 +1413,12 @@ class WOQLQuery:
         >>> client.update(qry.json(), 'MyDatabaseId')
 
         """
-        self.cursor['delete_triple'] = [self._clean_subject(subject),
-                                        self._clean_predicate(predicate),
-                                        self._clean_object(object_or_literal)]
-        return self._chainable_update('delete_triple', subject)
+        self.cursor["delete_triple"] = [
+            self._clean_subject(subject),
+            self._clean_predicate(predicate),
+            self._clean_object(object_or_literal),
+        ]
+        return self._chainable_update("delete_triple", subject)
 
     def add_quad(self, subject, predicate, object_or_literal, graph):
         """Adds quads according to the pattern [subject, predicate, object, graph]
@@ -1418,11 +1439,13 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        self.cursor['add_quad'] =[self._clean_subject(subject),
-                                    self._clean_predicate(predicate),
-                                    self._clean_object(object_or_literal),
-                                    self._clean_graph(graph)]
-        return self._chainable_update('add_quad', subject)
+        self.cursor["add_quad"] = [
+            self._clean_subject(subject),
+            self._clean_predicate(predicate),
+            self._clean_object(object_or_literal),
+            self._clean_graph(graph),
+        ]
+        return self._chainable_update("add_quad", subject)
 
     def delete_quad(self, subject, predicate, object_or_literal, graph):
         """Deletes any quads that match the rule [subject, predicate, object, graph]
@@ -1444,11 +1467,13 @@ class WOQLQuery:
             query object that can be chained and/or execute
 
         """
-        self.cursor['delete_quad'] =[self._clean_subject(subject),
-                                    self._clean_predicate(predicate),
-                                    self._clean_object(object_or_literal),
-                                    self._clean_graph(graph)]
-        return self._chainable_update('delete_quad', subject)
+        self.cursor["delete_quad"] = [
+            self._clean_subject(subject),
+            self._clean_predicate(predicate),
+            self._clean_object(object_or_literal),
+            self._clean_graph(graph),
+        ]
+        return self._chainable_update("delete_quad", subject)
 
     # Schema manipulation shorthand
 
@@ -1493,8 +1518,10 @@ class WOQLQuery:
             graph = self._clean_graph(graph) if graph else "db:schema"
             classid = "scm:" + classid if classid.find(":") == -1 else classid
 
-            return self.woql_and(WOQLQuery().delete_quad(classid, "v:All", "v:Al2", graph),
-                            WOQLQuery().opt().delete_quad("v:Al3", "v:Al4", classid, graph))
+            return self.woql_and(
+                WOQLQuery().delete_quad(classid, "v:All", "v:Al2", graph),
+                WOQLQuery().opt().delete_quad("v:Al3", "v:Al4", classid, graph),
+            )
         return self
 
     def add_property(self, p=None, t=None, g=None):
@@ -1520,14 +1547,18 @@ class WOQLQuery:
             graph = self._clean_graph(g) if g else "db:schema"
             p = "scm:" + p if p.find(":") == -1 else p
             t = self._clean_type(t) if t.find(":") == -1 else t
-            tc = self.cursor
+            self.cursor
             pref = t.split(":")
             if (pref[0] is not None) and (pref[0] == "xdd" or pref[0] == "xsd"):
-                self.woql_and(WOQLQuery().add_quad(p, "rdf:type", "owl:DatatypeProperty", graph),
-                         WOQLQuery().add_quad(p, "rdfs:range", t, graph))
+                self.woql_and(
+                    WOQLQuery().add_quad(p, "rdf:type", "owl:DatatypeProperty", graph),
+                    WOQLQuery().add_quad(p, "rdfs:range", t, graph),
+                )
             else:
-                self.woql_and(WOQLQuery().add_quad(p, "rdf:type", "owl:ObjectProperty", graph),
-                         WOQLQuery().add_quad(p, "rdfs:range", t, graph))
+                self.woql_and(
+                    WOQLQuery().add_quad(p, "rdf:type", "owl:ObjectProperty", graph),
+                    WOQLQuery().add_quad(p, "rdfs:range", t, graph),
+                )
         return self._chainable_update("add_quad", p)
 
     def delete_property(self, p=None, graph=None):
@@ -1548,8 +1579,10 @@ class WOQLQuery:
         if p:
             graph = self._clean_graph(graph) if graph else "db:schema"
             p = "scm:" + p if p.find(":") == -1 else p
-            return self.woql_and(WOQLQuery().delete_quad(p, "v:All", "v:Al2", graph),
-                            WOQLQuery().delete_quad("v:Al3", "v:Al4", p, graph))
+            return self.woql_and(
+                WOQLQuery().delete_quad(p, "v:All", "v:Al2", graph),
+                WOQLQuery().delete_quad("v:Al3", "v:Al4", p, graph),
+            )
         return self
 
     # Language elements that cannot be invoked from the top level and therefore are not exposed in the WOQL api
@@ -1574,7 +1607,7 @@ class WOQLQuery:
         if a is None:
             return
 
-        if not hasattr(self, 'asArray'):
+        if not hasattr(self, "asArray"):
             self.asArray = True
             self.query = []
 
@@ -1584,17 +1617,17 @@ class WOQLQuery:
             if isinstance(a, (list, dict, WOQLQuery)):
                 val = a
             else:
-                val = { "@value" : a}
+                val = {"@value": a}
 
             if c is not None:
-                self.query.append({'as': [val, b, c]})
+                self.query.append({"as": [val, b, c]})
             else:
-                self.query.append({'as': [val, b]})
+                self.query.append({"as": [val, b]})
 
         else:
             if a.find(":") == -1:
                 a = "v:" + a
-            self.query.append({'as': [a]})
+            self.query.append({"as": [a]})
 
         return self
 
@@ -1635,7 +1668,7 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         g = self._clean_graph(g)
-        if hasattr(self,'type'):
+        if hasattr(self, "type"):
             t = "quad" if self.type == "triple" else False
             if self.type == "add_triple":
                 t = "add_quad"
@@ -1701,7 +1734,7 @@ class WOQLQuery:
         """
         d = self._clean_class(d)
         if self.tripleBuilder:
-            self.tripleBuilder.addPO('rdfs:domain',d)
+            self.tripleBuilder.addPO("rdfs:domain", d)
         return self
 
     def parent(self, *args):
@@ -1720,7 +1753,7 @@ class WOQLQuery:
         if self.tripleBuilder:
             for item in args:
                 pn = self._clean_class(item)
-                self.tripleBuilder.addPO('rdfs:subClassOf', pn)
+                self.tripleBuilder.addPO("rdfs:subClassOf", pn)
         return self
 
     def entity(self):
@@ -1749,9 +1782,8 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         if self.tripleBuilder:
-            if(self.adding_class):
-                nwoql = WOQLQuery().add_property(p, val).\
-                domain(self.adding_class)
+            if self.adding_class:
+                nwoql = WOQLQuery().add_property(p, val).domain(self.adding_class)
                 nwoql.query["and"].append(self.json())
                 nwoql.adding_class = self.adding_class
                 self.query = nwoql.query
@@ -1872,9 +1904,9 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         return self.woql_and(
-                    WOQLQuery().triple("v:Subject", "rdf:type", "v:Type"),
-                    WOQLQuery().sub("v:Type", "tcs:Document")
-                    )
+            WOQLQuery().triple("v:Subject", "rdf:type", "v:Type"),
+            WOQLQuery().sub("v:Type", "tcs:Document"),
+        )
 
     def document_metadata(self):
         """
@@ -1886,13 +1918,15 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         return self.woql_and(
-                WOQLQuery().triple("v:ID", "rdf:type", "v:Class"),
-                WOQLQuery().sub("v:Class", "tcs:Document"),
-                WOQLQuery().opt().triple("v:ID", "rdfs:label", "v:Label"),
-                WOQLQuery().opt().triple("v:ID", "rdfs:comment", "v:Comment"),
-                WOQLQuery().opt().quad("v:Class", "rdfs:label", "v:Type", "db:schema"),
-                WOQLQuery().opt().quad("v:Class", "rdfs:comment", "v:Type_Comment", "db:schema")
-                )
+            WOQLQuery().triple("v:ID", "rdf:type", "v:Class"),
+            WOQLQuery().sub("v:Class", "tcs:Document"),
+            WOQLQuery().opt().triple("v:ID", "rdfs:label", "v:Label"),
+            WOQLQuery().opt().triple("v:ID", "rdfs:comment", "v:Comment"),
+            WOQLQuery().opt().quad("v:Class", "rdfs:label", "v:Type", "db:schema"),
+            WOQLQuery()
+            .opt()
+            .quad("v:Class", "rdfs:comment", "v:Type_Comment", "db:schema"),
+        )
 
     def concrete_document_classes(self):
         """Retrieves all instances and their meta-data (v:Class, v:Label, v:Comment) of concrete document classes
@@ -1903,11 +1937,11 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         return self.woql_and(
-                WOQLQuery().sub("v:Class", "tcs:Document"),
-                WOQLQuery().woql_not().abstract("v:Class"),
-                WOQLQuery().opt().quad("v:Class", "rdfs:label", "v:Label", "db:schema"),
-                WOQLQuery().opt().quad("v:Class", "rdfs:comment", "v:Comment", "db:schema")
-                )
+            WOQLQuery().sub("v:Class", "tcs:Document"),
+            WOQLQuery().woql_not().abstract("v:Class"),
+            WOQLQuery().opt().quad("v:Class", "rdfs:label", "v:Label", "db:schema"),
+            WOQLQuery().opt().quad("v:Class", "rdfs:comment", "v:Comment", "db:schema"),
+        )
 
     def property_metadata(self):
         """Retrieves all meta-data about each property (v:Property, v:Type, v:Range, v:Domain, v:Label, v:Comment)
@@ -1919,16 +1953,24 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         return self.woql_and(
-                WOQLQuery().woql_or(
-                    WOQLQuery().quad("v:Property", "rdf:type", "owl:DatatypeProperty", "db:schema"),
-                    WOQLQuery().quad("v:Property", "rdf:type", "owl:ObjectProperty", "db:schema")
+            WOQLQuery().woql_or(
+                WOQLQuery().quad(
+                    "v:Property", "rdf:type", "owl:DatatypeProperty", "db:schema"
                 ),
-                WOQLQuery().opt().quad("v:Property", "rdfs:range", "v:Range", "db:schema"),
-                WOQLQuery().opt().quad("v:Property", "rdf:type", "v:Type", "db:schema"),
-                WOQLQuery().opt().quad("v:Property", "rdfs:label", "v:Label", "db:schema"),
-                WOQLQuery().opt().quad("v:Property", "rdfs:comment", "v:Comment", "db:schema"),
-                WOQLQuery().opt().quad("v:Property", "rdfs:domain", "v:Domain", "db:schema")
-                )
+                WOQLQuery().quad(
+                    "v:Property", "rdf:type", "owl:ObjectProperty", "db:schema"
+                ),
+            ),
+            WOQLQuery().opt().quad("v:Property", "rdfs:range", "v:Range", "db:schema"),
+            WOQLQuery().opt().quad("v:Property", "rdf:type", "v:Type", "db:schema"),
+            WOQLQuery().opt().quad("v:Property", "rdfs:label", "v:Label", "db:schema"),
+            WOQLQuery()
+            .opt()
+            .quad("v:Property", "rdfs:comment", "v:Comment", "db:schema"),
+            WOQLQuery()
+            .opt()
+            .quad("v:Property", "rdfs:domain", "v:Domain", "db:schema"),
+        )
 
     def element_metadata(self):
         """
@@ -1940,14 +1982,18 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         return self.woql_and(
-                WOQLQuery().quad("v:Element", "rdf:type", "v:Type", "db:schema"),
-                WOQLQuery().opt().quad("v:Element", "tcs:tag", "v:Abstract", "db:schema"),
-                WOQLQuery().opt().quad("v:Element", "rdfs:label", "v:Label", "db:schema"),
-                WOQLQuery().opt().quad("v:Element", "rdfs:comment", "v:Comment", "db:schema"),
-                WOQLQuery().opt().quad("v:Element", "rdfs:subClassOf", "v:Parent", "db:schema"),
-                WOQLQuery().opt().quad("v:Element", "rdfs:domain", "v:Domain", "db:schema"),
-                WOQLQuery().opt().quad("v:Element", "rdfs:range", "v:Range", "db:schema")
-                )
+            WOQLQuery().quad("v:Element", "rdf:type", "v:Type", "db:schema"),
+            WOQLQuery().opt().quad("v:Element", "tcs:tag", "v:Abstract", "db:schema"),
+            WOQLQuery().opt().quad("v:Element", "rdfs:label", "v:Label", "db:schema"),
+            WOQLQuery()
+            .opt()
+            .quad("v:Element", "rdfs:comment", "v:Comment", "db:schema"),
+            WOQLQuery()
+            .opt()
+            .quad("v:Element", "rdfs:subClassOf", "v:Parent", "db:schema"),
+            WOQLQuery().opt().quad("v:Element", "rdfs:domain", "v:Domain", "db:schema"),
+            WOQLQuery().opt().quad("v:Element", "rdfs:range", "v:Range", "db:schema"),
+        )
 
     def class_metadata(self):
         """Retrieves meta-data about all the classes in the schema (v:Element, v:Label, v:Comment, v:Abstract)
@@ -1958,11 +2004,13 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         return self.woql_and(
-                WOQLQuery().quad("v:Element", "rdf:type", "owl:Class", "db:schema"),
-                WOQLQuery().opt().quad("v:Element", "rdfs:label", "v:Label", "db:schema"),
-                WOQLQuery().opt().quad("v:Element", "rdfs:comment", "v:Comment", "db:schema"),
-                WOQLQuery().opt().quad("v:Element", "tcs:tag", "v:Abstract", "db:schema")
-                )
+            WOQLQuery().quad("v:Element", "rdf:type", "owl:Class", "db:schema"),
+            WOQLQuery().opt().quad("v:Element", "rdfs:label", "v:Label", "db:schema"),
+            WOQLQuery()
+            .opt()
+            .quad("v:Element", "rdfs:comment", "v:Comment", "db:schema"),
+            WOQLQuery().opt().quad("v:Element", "tcs:tag", "v:Abstract", "db:schema"),
+        )
 
     def get_data_of_class(self, chosen):
         """Retrieves all triples that have a subject of the passed class (v:Document, v:Property, v:Value)
@@ -1978,9 +2026,9 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         return self.woql_and(
-                WOQLQuery().triple("v:Subject", "rdf:type", chosen),
-                WOQLQuery().opt().triple("v:Subject", "v:Property", "v:Value")
-                )
+            WOQLQuery().triple("v:Subject", "rdf:type", chosen),
+            WOQLQuery().opt().triple("v:Subject", "v:Property", "v:Value"),
+        )
 
     def get_data_of_property(self, chosen):
         """Retrieves all triples that use the passed predicate along with the predicate's label (v:Document, v:Value, v:Label)
@@ -1996,9 +2044,9 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         return self.woql_and(
-                WOQLQuery().triple("v:Subject", chosen, "v:Value"),
-                WOQLQuery().opt().triple("v:Subject", "rdfs:label", "v:Label")
-                )
+            WOQLQuery().triple("v:Subject", chosen, "v:Value"),
+            WOQLQuery().opt().triple("v:Subject", "rdfs:label", "v:Label"),
+        )
 
     def document_properties(self, id):
         """
@@ -2015,10 +2063,14 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         return self.woql_and(
-                WOQLQuery().triple(id, "v:Property", "v:Property_Value"),
-                WOQLQuery().opt().quad("v:Property", "rdfs:label", "v:Property_Label", "db:schema"),
-                WOQLQuery().opt().quad("v:Property", "rdf:type", "v:Property_Type", "db:schema")
-                )
+            WOQLQuery().triple(id, "v:Property", "v:Property_Value"),
+            WOQLQuery()
+            .opt()
+            .quad("v:Property", "rdfs:label", "v:Property_Label", "db:schema"),
+            WOQLQuery()
+            .opt()
+            .quad("v:Property", "rdf:type", "v:Property_Type", "db:schema"),
+        )
 
     def get_document_connections(self, id):
         """
@@ -2035,16 +2087,18 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         return self.woql_and(
-                WOQLQuery().eq("v:Docid", id),
-                WOQLQuery().woql_or(
-                    WOQLQuery().triple(id, "v:Outgoing", "v:Entid"),
-                    WOQLQuery().triple("v:Entid", "v:Incoming", id)
-                ),
-                WOQLQuery().isa("v:Entid", "v:Enttype"),
-                WOQLQuery().sub("v:Enttype", "tcs:Document"),
-                WOQLQuery().opt().triple("v:Entid", "rdfs:label", "v:Label"),
-                WOQLQuery().opt().quad("v:Enttype", "rdfs:label", "v:Class_Label", "db:schema")
-                )
+            WOQLQuery().eq("v:Docid", id),
+            WOQLQuery().woql_or(
+                WOQLQuery().triple(id, "v:Outgoing", "v:Entid"),
+                WOQLQuery().triple("v:Entid", "v:Incoming", id),
+            ),
+            WOQLQuery().isa("v:Entid", "v:Enttype"),
+            WOQLQuery().sub("v:Enttype", "tcs:Document"),
+            WOQLQuery().opt().triple("v:Entid", "rdfs:label", "v:Label"),
+            WOQLQuery()
+            .opt()
+            .quad("v:Enttype", "rdfs:label", "v:Class_Label", "db:schema"),
+        )
 
     def get_instance_meta(self, id):
         """
@@ -2061,11 +2115,13 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         return self.woql_and(
-                WOQLQuery().triple(id, "rdf:type", "v:InstanceType"),
-                WOQLQuery().opt().triple(id, "rdfs:label", "v:InstanceLabel"),
-                WOQLQuery().opt().triple(id, "rdfs:comment", "v:InstanceComment"),
-                WOQLQuery().opt().quad("v:InstanceType", "rdfs:label", "v:ClassLabel", "db:schema")
-                )
+            WOQLQuery().triple(id, "rdf:type", "v:InstanceType"),
+            WOQLQuery().opt().triple(id, "rdfs:label", "v:InstanceLabel"),
+            WOQLQuery().opt().triple(id, "rdfs:comment", "v:InstanceComment"),
+            WOQLQuery()
+            .opt()
+            .quad("v:InstanceType", "rdfs:label", "v:ClassLabel", "db:schema"),
+        )
 
     def simple_graph_query(self):
         """
@@ -2077,22 +2133,36 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         return self.woql_and(
-                WOQLQuery().triple("v:Source", "v:Edge", "v:Target"),
-                WOQLQuery().isa("v:Source", "v:Source_Class"),
-                WOQLQuery().sub("v:Source_Class", "tcs:Document"),
-                WOQLQuery().isa("v:Target", "v:Target_Class"),
-                WOQLQuery().sub("v:Target_Class", "tcs:Document"),
-                WOQLQuery().opt().triple("v:Source", "rdfs:label", "v:Source_Label"),
-                WOQLQuery().opt().triple("v:Source", "rdfs:comment", "v:Source_Comment"),
-                WOQLQuery().opt().quad("v:Source_Class", "rdfs:label", "v:Source_Type", "db:schema"),
-                WOQLQuery().opt().quad("v:Source_Class", "rdfs:comment", "v:Source_Type_Comment", "db:schema"),
-                WOQLQuery().opt().triple("v:Target", "rdfs:label", "v:Target_Label"),
-                WOQLQuery().opt().triple("v:Target", "rdfs:comment", "v:Target_Comment"),
-                WOQLQuery().opt().quad("v:Target_Class", "rdfs:label", "v:Target_Type", "db:schema"),
-                WOQLQuery().opt().quad("v:Target_Class", "rdfs:comment", "v:Target_Type_Comment", "db:schema"),
-                WOQLQuery().opt().quad("v:Edge", "rdfs:label", "v:Edge_Type", "db:schema"),
-                WOQLQuery().opt().quad("v:Edge", "rdfs:comment", "v:Edge_Type_Comment", "db:schema")
-                )
+            WOQLQuery().triple("v:Source", "v:Edge", "v:Target"),
+            WOQLQuery().isa("v:Source", "v:Source_Class"),
+            WOQLQuery().sub("v:Source_Class", "tcs:Document"),
+            WOQLQuery().isa("v:Target", "v:Target_Class"),
+            WOQLQuery().sub("v:Target_Class", "tcs:Document"),
+            WOQLQuery().opt().triple("v:Source", "rdfs:label", "v:Source_Label"),
+            WOQLQuery().opt().triple("v:Source", "rdfs:comment", "v:Source_Comment"),
+            WOQLQuery()
+            .opt()
+            .quad("v:Source_Class", "rdfs:label", "v:Source_Type", "db:schema"),
+            WOQLQuery()
+            .opt()
+            .quad(
+                "v:Source_Class", "rdfs:comment", "v:Source_Type_Comment", "db:schema"
+            ),
+            WOQLQuery().opt().triple("v:Target", "rdfs:label", "v:Target_Label"),
+            WOQLQuery().opt().triple("v:Target", "rdfs:comment", "v:Target_Comment"),
+            WOQLQuery()
+            .opt()
+            .quad("v:Target_Class", "rdfs:label", "v:Target_Type", "db:schema"),
+            WOQLQuery()
+            .opt()
+            .quad(
+                "v:Target_Class", "rdfs:comment", "v:Target_Type_Comment", "db:schema"
+            ),
+            WOQLQuery().opt().quad("v:Edge", "rdfs:label", "v:Edge_Type", "db:schema"),
+            WOQLQuery()
+            .opt()
+            .quad("v:Edge", "rdfs:comment", "v:Edge_Type_Comment", "db:schema"),
+        )
 
     def get_vocabulary(self):
         """Returns the vocabulary at play - a list of all properties and classes in the schema
@@ -2137,13 +2207,13 @@ class WOQLQuery:
         """
         nw = WOQLQuery().quad("v:S", "v:P", "v:O", "db:schema")
         result = nw.execute(client)
-        if (result and 'bindings' in result) and (len(result['bindings']) > 0):
-            for item in result['bindings']:
+        if (result and "bindings" in result) and (len(result["bindings"]) > 0):
+            for item in result["bindings"]:
                 for key in item:
                     value = item[key]
                     if type(value) == str:
                         val_spl = value.split(":")
-                        if len(val_spl)==2 and val_spl[1] and val_spl[0]!='_':
+                        if len(val_spl) == 2 and val_spl[1] and val_spl[0] != "_":
                             self.vocab[val_spl[0]] = val_spl[1]
 
     def get_limit(self):
@@ -2187,7 +2257,7 @@ class WOQLQuery:
             if prop == "limit":
                 return True
             elif prop in self.paging_transitive_properties:
-                return self.is_paged(q[prop][len(q[prop])-1])
+                return self.is_paged(q[prop][len(q[prop]) - 1])
         return False
 
     def get_page(self):
@@ -2201,7 +2271,7 @@ class WOQLQuery:
             psize = self.get_limit()
             if self.has_start():
                 s = self.get_start()
-                return ((s // psize) + 1)
+                return (s // psize) + 1
             else:
                 return 1
         else:
@@ -2220,7 +2290,7 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        pstart = (self.get_limit() * (pagenum - 1))
+        pstart = self.get_limit() * (pagenum - 1)
         if self.has_start():
             self._set_start(pstart)
         else:
@@ -2304,10 +2374,10 @@ class WOQLQuery:
             q = self.query
         for prop in q:
             if prop == "select":
-                vars = q[prop][:len(q[prop])-1]
+                vars = q[prop][: len(q[prop]) - 1]
                 return vars
             elif prop in self.paging_transitive_properties:
-                val = self.get_select_variables(q[prop][len(q[prop])-1])
+                val = self.get_select_variables(q[prop][len(q[prop]) - 1])
                 if val is not None:
                     return val
 
@@ -2328,7 +2398,7 @@ class WOQLQuery:
         -------
         int
         """
-        return self._get_paging_property("start");
+        return self._get_paging_property("start")
 
     def _set_start(self, start):
         """Internal function for setting a start value for an already built query
@@ -2351,7 +2421,7 @@ class WOQLQuery:
         if self.has_start():
             self._set_start(s)
         else:
-            nq = {'start': [s, self.query]}
+            nq = {"start": [s, self.query]}
             self.query = nq
         return self
 
@@ -2365,7 +2435,7 @@ class WOQLQuery:
             if prop == pageprop:
                 return q[prop][0]
             elif prop in self.paging_transitive_properties:
-                val = self._get_paging_property(pageprop, q[prop][len(q[prop])-1])
+                val = self._get_paging_property(pageprop, q[prop][len(q[prop]) - 1])
                 if val is not None:
                     return val
 
@@ -2378,9 +2448,8 @@ class WOQLQuery:
             if prop == pageprop:
                 q[prop][0] = val
             elif prop in self.paging_transitive_properties:
-                self._set_paging_property(pageprop, val, q[prop][len(q[prop])-1])
+                self._set_paging_property(pageprop, val, q[prop][len(q[prop]) - 1])
         return self
-
 
     def get_context(self, q=None):
         """Retrieves the value of the current json-ld context
@@ -2411,46 +2480,46 @@ class WOQLQuery:
         c : dict
             context
         """
-        self.cursor['@context'] = c
+        self.cursor["@context"] = c
 
-    #Internal State Control Functions
-    #Not part of public API -
+    # Internal State Control Functions
+    # Not part of public API -
 
     def _default_context(self, DB_IRI):
         result = copy(STANDARD_URLS)
-        result['scm'] = DB_IRI + "/schema#"
-        result['doc'] = DB_IRI + "/document/"
-        result['db'] = DB_IRI + "/"
+        result["scm"] = DB_IRI + "/schema#"
+        result["doc"] = DB_IRI + "/document/"
+        result["db"] = DB_IRI + "/"
         return result
 
     def _load_default_vocabulary(self):
         vocab = {}
-        vocab['type'] = "rdf:type"
-        vocab['label'] = "rdfs:label"
-        vocab['Class'] = "owl:Class"
-        vocab['DatatypeProperty'] = "owl:DatatypeProperty"
-        vocab['ObjectProperty'] = "owl:ObjectProperty"
-        vocab['Entity'] = "tcs:Entity"
-        vocab['Document'] = "tcs:Document"
-        vocab['Relationship'] = "tcs:Relationship"
-        vocab['temporality'] = "tcs:temporality"
-        vocab['geotemporality'] = "tcs:geotemporality"
-        vocab['geography'] = "tcs:geography"
-        vocab['abstract'] = "tcs:abstract"
-        vocab['comment'] = "rdfs:comment"
-        vocab['range'] = "rdfs:range"
-        vocab['domain'] = "rdfs:domain"
-        vocab['subClassOf'] = "rdfs:subClassOf"
-        vocab['string'] = "xsd:string"
-        vocab['integer'] = "xsd:integer"
-        vocab['decimal'] = "xsd:decimal"
-        vocab['email'] = "xdd:email"
-        vocab['json'] = "xdd:json"
-        vocab['dateTime'] = "xsd:dateTime"
-        vocab['date'] = "xsd:date"
-        vocab['coordinate'] = "xdd:coordinate"
-        vocab['line'] = "xdd:coordinatePolyline"
-        vocab['polygon'] = "xdd:coordinatePolygon"
+        vocab["type"] = "rdf:type"
+        vocab["label"] = "rdfs:label"
+        vocab["Class"] = "owl:Class"
+        vocab["DatatypeProperty"] = "owl:DatatypeProperty"
+        vocab["ObjectProperty"] = "owl:ObjectProperty"
+        vocab["Entity"] = "tcs:Entity"
+        vocab["Document"] = "tcs:Document"
+        vocab["Relationship"] = "tcs:Relationship"
+        vocab["temporality"] = "tcs:temporality"
+        vocab["geotemporality"] = "tcs:geotemporality"
+        vocab["geography"] = "tcs:geography"
+        vocab["abstract"] = "tcs:abstract"
+        vocab["comment"] = "rdfs:comment"
+        vocab["range"] = "rdfs:range"
+        vocab["domain"] = "rdfs:domain"
+        vocab["subClassOf"] = "rdfs:subClassOf"
+        vocab["string"] = "xsd:string"
+        vocab["integer"] = "xsd:integer"
+        vocab["decimal"] = "xsd:decimal"
+        vocab["email"] = "xdd:email"
+        vocab["json"] = "xdd:json"
+        vocab["dateTime"] = "xsd:dateTime"
+        vocab["date"] = "xsd:date"
+        vocab["coordinate"] = "xdd:coordinate"
+        vocab["line"] = "xdd:coordinatePolyline"
+        vocab["polygon"] = "xdd:coordinatePolygon"
         return vocab
 
     def _advance_cursor(self, action, value):
@@ -2485,7 +2554,7 @@ class WOQLQuery:
             return o
         if self.vocab and (o in self.vocab):
             return self.vocab[o]
-        return { "@value": o, "@language": "en"}
+        return {"@value": o, "@language": "en"}
 
     def _last(self, call=None, subject=None):
         """Called to indicate that this is the last call in constructing a complete woql query object"""
@@ -2510,12 +2579,14 @@ class WOQLQuery:
 
     def _is_chainable(self, operator, lastArg=None):
         """Determines whether a given operator can have a chained query as its last argument"""
-        non_chaining_operators = ["and", "or", "remote", "file", "re","post"]
-        if (lastArg is not None and type(lastArg) == dict and
-            '@value' not in lastArg and
-            '@type' not in lastArg and
-            'value' not in lastArg
-            ):
+        non_chaining_operators = ["and", "or", "remote", "file", "re", "post"]
+        if (
+            lastArg is not None
+            and type(lastArg) == dict
+            and "@value" not in lastArg
+            and "@type" not in lastArg
+            and "value" not in lastArg
+        ):
             for op in non_chaining_operators:
                 if op in operator:
                     return False
@@ -2536,14 +2607,14 @@ class WOQLQuery:
         """
 
         if "@context" not in self.query:
-            self.query['@context'] = self._default_context(client.conConfig.dbURL())
+            self.query["@context"] = self._default_context(client.conConfig.dbURL())
         json = self.json()
         if self.contains_update:
-            #return client.select(json)
-            return client.update(json,None,None,fileList)
+            # return client.select(json)
+            return client.update(json, None, None, fileList)
         else:
-            #return client.select(json)
-            return client.update(json,None,None,fileList)
+            # return client.select(json)
+            return client.update(json, None, None, fileList)
 
 
 class TripleBuilder:
@@ -2567,8 +2638,8 @@ class TripleBuilder:
         if l[:2] == "v:":
             d = l
         else:
-            d = {"@value": l, "@language": lang }
-        x = self.addPO('rdfs:label', d)
+            d = {"@value": l, "@language": lang}
+        x = self.addPO("rdfs:label", d)
         return x
 
     def description(self, l, lang=None):
@@ -2577,8 +2648,8 @@ class TripleBuilder:
         if l[:2] == "v:":
             d = l
         else:
-            d = {"@value": l, "@language": lang }
-        x = self.addPO('rdfs:comment', d)
+            d = {"@value": l, "@language": lang}
+        x = self.addPO("rdfs:comment", d)
         return x
 
     def addPO(self, p, o, g=None):
@@ -2589,10 +2660,10 @@ class TripleBuilder:
                 ttype = self.type
         else:
             ttype = "triple"
-        #“In the basket are %s and %s” % (x,y)
+        # “In the basket are %s and %s” % (x,y)
 
-        evstr = " %s (\"%s\" , \"%s\" , " % (ttype, self.subject, p)
-        #ttype + "(\"" + self.subject + "\", " + p + "\", "
+        evstr = ' {} ("{}" , "{}" , '.format(ttype, self.subject, p)
+        # ttype + "(\"" + self.subject + "\", " + p + "\", "
         if type(o) == str:
             evstr += "'" + o + "'"
         elif isinstance(o, (list, dict, WOQLQuery)):
@@ -2603,7 +2674,7 @@ class TripleBuilder:
         if ttype[-4:] == "quad" or self.g:
             if not g:
                 g = self.g if self.g else "db:schema"
-            evstr += ", \"%s\" " % (g)
+            evstr += ', "%s" ' % (g)
             #', "' + g + '"'
         evstr += ")"
         try:
@@ -2615,19 +2686,15 @@ class TripleBuilder:
 
     def getO(self, s, p):
         if "and" in self.cursor:
-            for item in self.cursor['and']:
+            for item in self.cursor["and"]:
                 clause = item
                 key = list(clause.keys())[0]
-                if clause[key][0] == s and \
-                   clause[key][1] == p and \
-                   clause[key][2] :
+                if clause[key][0] == s and clause[key][1] == p and clause[key][2]:
                     return clause[key][2]
         elif self.cursor.keys():
             clause = self.cursor
             key = list(clause.keys())[0]
-            if clause[key][0] == s and \
-               clause[key][1] == p and \
-               clause[key][2] :
+            if clause[key][0] == s and clause[key][1] == p and clause[key][2]:
                 return clause[key][2]
 
         return False
@@ -2636,11 +2703,11 @@ class TripleBuilder:
         if self.type in self.cursor:
             next = {}
             next[self.type] = self.cursor[self.type]
-            self.cursor['and'] = [next]
+            self.cursor["and"] = [next]
             del self.cursor[self.type]
 
-        if 'and' in self.cursor:
-            self.cursor['and'].append(unit.json())
+        if "and" in self.cursor:
+            self.cursor["and"].append(unit.json())
         else:
             j = unit.json()
             if self.type in j:
@@ -2652,14 +2719,20 @@ class TripleBuilder:
     def card(self, n, which):
         os = self.subject
         self.subject += "_" + which
-        self.addPO('rdf:type', "owl:Restriction")
+        self.addPO("rdf:type", "owl:Restriction")
         self.addPO("owl:onProperty", os)
         if which == "max":
-            self.addPO("owl:maxCardinality", {"@value": n, "@type": "xsd:nonNegativeInteger"})
+            self.addPO(
+                "owl:maxCardinality", {"@value": n, "@type": "xsd:nonNegativeInteger"}
+            )
         elif which == "min":
-            self.addPO("owl:minCardinality", {"@value": n, "@type": "xsd:nonNegativeInteger"})
+            self.addPO(
+                "owl:minCardinality", {"@value": n, "@type": "xsd:nonNegativeInteger"}
+            )
         else:
-            self.addPO("owl:cardinality", {"@value": n, "@type": "xsd:nonNegativeInteger"})
+            self.addPO(
+                "owl:cardinality", {"@value": n, "@type": "xsd:nonNegativeInteger"}
+            )
 
         od = self.getO(os, "rdfs:domain")
         if od:
@@ -2677,7 +2750,8 @@ class TripleBuilder:
         self.g = g
 
     def abstract(self):
-        return self.addPO('tcs:tag', "tcs:abstract")
+        return self.addPO("tcs:tag", "tcs:abstract")
+
 
 """
 

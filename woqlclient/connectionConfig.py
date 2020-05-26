@@ -1,10 +1,10 @@
 # connectionConfig.py
-from .idParser import IDParser
 from copy import copy
+
+from .idParser import IDParser
 
 
 class ConnectionConfig:
-
     def __init__(self, **kwargs):
 
         """
@@ -13,19 +13,19 @@ class ConnectionConfig:
         """
 
         self.server = False
-        self.jwt_token = False #jwt token for authenticating to remote servers for push / fetch / clone
-        self.jwt_user = False #user id associated with the jwt token
-        self.basic_auth = False # basic auth string for authenticating to local server
-        #these operate as cursors - where within the connected server context, we currently are
+        self.jwt_token = False  # jwt token for authenticating to remote servers for push / fetch / clone
+        self.jwt_user = False  # user id associated with the jwt token
+        self.basic_auth = False  # basic auth string for authenticating to local server
+        # these operate as cursors - where within the connected server context, we currently are
         self.accountid = False
         self.dbid = False
 
         self.default_branch_id = "master"
         self.default_repo_id = "local"
-        #default repository and branch ids
+        # default repository and branch ids
         self.branchid = self.default_branch_id
         self.repoid = self.default_repo_id
-        #set if pointing at a commit within a branch
+        # set if pointing at a commit within a branch
         self.refid = False
 
         self.connection_error = False
@@ -36,22 +36,22 @@ class ConnectionConfig:
         return copy(self)
 
     def update(self, **kwargs):
-        if 'server' in kwargs:
-            self.set_server(kwargs['server'])
-        if 'account' in kwargs:
-            self.set_account(kwargs['account'])
-        if 'db' in kwargs:
-            self.set_db(kwargs['db'])
-        if 'jwt' in kwargs:
-            self.set_jwt(kwargs['jwt'], kwargs['jwt_user'])
-        #if 'key' in kwargs and 'user' in kwargs:
+        if "server" in kwargs:
+            self.set_server(kwargs["server"])
+        if "account" in kwargs:
+            self.set_account(kwargs["account"])
+        if "db" in kwargs:
+            self.set_db(kwargs["db"])
+        if "jwt" in kwargs:
+            self.set_jwt(kwargs["jwt"], kwargs["jwt_user"])
+        # if 'key' in kwargs and 'user' in kwargs:
         #    self.set_key(kwargs['key'], kwargs['user'])
-        if 'branch' in kwargs:
-            self.set_branch(kwargs['branch'])
-        if 'ref' in kwargs:
-            self.set_ref(kwargs['ref'])
-        if 'repo' in kwargs:
-            self.set_repo(kwargs['repo'])
+        if "branch" in kwargs:
+            self.set_branch(kwargs["branch"])
+        if "ref" in kwargs:
+            self.set_ref(kwargs["ref"])
+        if "repo" in kwargs:
+            self.set_repo(kwargs["repo"])
 
     @property
     def server_url(self):
@@ -87,7 +87,7 @@ class ConnectionConfig:
 
     @property
     def user(self, ignore_jwt):
-        if (not ignore_jwt and self.jwt_user):
+        if not ignore_jwt and self.jwt_user:
             return self.jwt_user
         if self.basic_auth:
             return self.basic_auth.split(":")[0]
@@ -155,7 +155,7 @@ class ConnectionConfig:
             repoid = self.repo
         return self.db_base("fetch") + f"/{repoid}"
 
-    def rebase_url(self, source_repo= None, source_branch=None):
+    def rebase_url(self, source_repo=None, source_branch=None):
         purl = self.branch_base("rebase")
         if source_repo is not None:
             purl = purl + f"/{source_repo}"
@@ -274,7 +274,7 @@ class ConnectionConfig:
         parser = IDParser()
         key = parser.parse_key(input_str)
         if key:
-            self.rebase_url = f'{uid}:{key}'
+            self.rebase_url = f"{uid}:{key}"
             return self.basic_auth
         self.set_error(f"Invalid API Key: {input_str}")
 

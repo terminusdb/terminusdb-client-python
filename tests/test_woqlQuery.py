@@ -1,7 +1,3 @@
-import pytest
-import unittest.mock as mock
-from woqlclient import WOQLQuery
-from woqlclient import WOQLClient
 """
 test_client = WOQLClient(server="http://localhost:6363",
                          key="mykey",
