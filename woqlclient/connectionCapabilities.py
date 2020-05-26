@@ -78,7 +78,8 @@ class ConnectionCapabilities:
     def get_json_context(self):
         if "@context" in self.connection:
             ctxt = self.connection["@context"]
-            ctxt['scm'] = "http://my.old.man/is/a/walrus#"
+            if ('scm' not in ctxt):
+                ctxt['scm'] = "terminus://universal#"
             return ctxt
         return {}
 
@@ -86,14 +87,16 @@ class ConnectionCapabilities:
         if (action == const.CREATE_DATABASE):
             rec = self._get_server_record()
         elif dbid is not None:
-            rec = self._get_server_record(dbid, account)
+            rec = self._get_db_record(dbid, account)
         else:
-            raise ValueError('no dbid provided in capabilities check ', server, dbid)
+            raise ValueError('no dbid provided in capabilities check ', action, dbid)
         if (rec):
             auths = rec.get('terminus:authority')
             terminusActionName = 'terminus:' + action
             if (auths and terminusActionName in auths):
                 return True
+            else:
+                raise ValueError('No record found for connection: ', action, dbid)
         raise AccessDeniedError(
             ErrorMessage.getAccessDeniedMessage(action, dbid, account))
 
@@ -114,9 +117,11 @@ class ConnectionCapabilities:
            =======
            {terminus:Database} terminus:Database JSON document as returned by WOQLClient.connect
         """
-        docid = this.find_resource_document_id(dbid, account)
+        docid = self.find_resource_document_id(dbid, account)
         if docid is not None:
             return self.connection[docid]
+        return None
+
 
     def _extract_metadata(self, dbrec):
         meta = {'db': "",
@@ -138,25 +143,55 @@ class ConnectionCapabilities:
             if type(dbrec['rdfs:label']) == list:
                 label = dbrec['rdfs:label'][0]
             else:
-                label = dbrec['rdfs:comment']
+                label = dbrec['rdfs:label']
             if label is not None and label and '@value' in label:
-                meta['description'] = label['@value']
+                meta['title'] = label['@value']
+            else:
+                meta['title'] = meta['db']
+        if 'rdfs:comment' in dbrec:
+            if type(dbrec['rdfs:comment']) == list:
+                cmt = dbrec['rdfs:comment'][0]
+            else:
+                cmt = dbrec['rdfs:comment']
+            if cmt is not None and cmt and '@value' in cmt:
+                meta['description'] = cmt['@value']
+        return meta
+
 
     def _get_db_metadata(self, dbid, account):
         dbrec = self._get_db_record(dbid, account)
         if dbrec is not None:
             return self._extract_metadata(dbrec)
 
-    def _db_capability_id(self, dbid):
-        return 'doc:' + dbid
-
-    def remove_db(self, dbid=None, srvr=None):
+    def remove_db(self, dbid=None, account=None):
         """
           removes a database record from the connection registry (after deletion, for example)
           @param {String} [dbid] optional DB ID - if omitted current connection config db will be used
           @param {String} [srvr] optional server URL - if omitted current connection config server will be used
           @returns {[terminus:Database]} array of terminus:Database JSON documents as returned by WOQLClient.
         """
-        docid = this.find_resource_document_id(dbid, account)
+        docid = self.find_resource_document_id(dbid, account)
         if docid is not None:
             del self.connection['docid']
+
+    def get_server_db_records(self):
+        """
+          returns all records about databases on the currently connected server
+        """
+        dbrecs = {}
+        for oid in self.connection:
+            if (self.connection[oid]['@type'] is 'terminus:Database'):
+                dbrecs[oid] = self.connection[oid]
+        return dbrecs
+
+    def get_server_db_metadata(self):
+        """
+          returns a meta data list {db: title: description:}  about all databases on the currently connected server
+        """
+        dbrecs = self.get_server_db_records()
+        metas = []
+        for oid in dbrecs:
+            met = self._extract_metadata(dbrecs[oid])
+            if met is not None:
+                metas.append(met)
+        return metas
