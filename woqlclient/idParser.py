@@ -16,7 +16,7 @@ class IDParser:
                 return True
         return False
 
-    def _valid_id_string(self, input, _):
+    def _valid_id_string(self, input, _ = None):
         if type(input) != str:
             return False
         if (':' in input) or (' ' in input) or ('/' in input):
