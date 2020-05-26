@@ -385,7 +385,7 @@ class WOQLClient:
         dbid=None,
         key=None,
         opts={"terminus:encoding": "terminus:frame"},
-    ): # don't use dict as default
+    ):  # don't use dict as default
         """Retrieves a document from the specified database
 
         Parameters
@@ -639,7 +639,6 @@ class WOQLClient:
             for name in file_list:
                 path = file_list[name]
                 stream = open(path, "rb")
-                print(name)
                 file_dict[name] = (name, stream, "text/plain")
             file_dict["terminus:query"] = (
                 None,
@@ -688,7 +687,6 @@ class WOQLClient:
             for name in file_list:
                 path = file_list[name]
                 stream = open(path, "rb")
-                print(name)
                 file_dict[name] = (name, stream, "text/plain")
             file_dict["terminus:query"] = (
                 None,
@@ -704,7 +702,7 @@ class WOQLClient:
             id_parser.queryURL(), APIEndpointConst.WOQL_UPDATE, key, payload, file_dict
         )
 
-    def dispatch(self, url, action, payload={}, file_dict=None):
+    def dispatch(self, url, action, payload={}, file_dict=None): #don't use dict as default
         """
         Directly dispatch to a Terminus database.
 
