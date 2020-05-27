@@ -1,6 +1,7 @@
 import json
 
 from woqlclient import APIEndpointConst
+from connectCapabilitiesResponse import ConnectResponse
 
 
 def mocked_requests(*args, **kwargs):
@@ -33,11 +34,8 @@ def mocked_requests(*args, **kwargs):
             # add json data if provided
             print("ACTION TYPE", action_type) #why print?
             if action_type == APIEndpointConst.CONNECT:
-                with open("tests/capabilitiesResponse.json") as json_file:
-                    json_data = json.load(json_file)
-                    self._json_data = json_data
-                    json_file.close()
-
+                self._json_data = ConnectResponse
+                
             elif action_type == APIEndpointConst.GET_SCHEMA:
                 with open("tests/getSchemaTurtleResponse.txt") as text_file:
                     self._text = text_file.read()

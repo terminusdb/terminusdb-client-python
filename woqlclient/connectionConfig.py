@@ -55,8 +55,9 @@ class ConnectionConfig:
 
         if "jwt" in kwargs:
             self.set_jwt(kwargs["jwt"], kwargs["jwt_user"])
-        # if 'key' in kwargs and 'user' in kwargs:
-        #    self.set_key(kwargs['key'], kwargs['user'])
+        
+        if 'key' in kwargs and 'user' in kwargs:
+            self.set_key(kwargs['key'], kwargs['user'])
         if "branch" in kwargs:
             self.branch = kwargs["branch"]
         if "ref" in kwargs:
@@ -155,6 +156,15 @@ class ConnectionConfig:
             return self.db_base("frame")
         return self.branch_base("frame")
 
+    def triples_url (self,graph_type, graph_id="main"):
+        if self.db == "terminus": 
+            base_url = self.db_base("triples") 
+        else :
+            base_url = self.branch_base("triples")
+
+        return f"{base_url}/{graph_type}/{graph_id}"
+    
+
     def clone_url(self, new_repo_id=None):
         crl = f"{self.serverURL}clone/{self.account}"
         if new_repo_id is not None:
@@ -221,8 +231,8 @@ class ConnectionConfig:
         aid = parser.parse_dbid(input_str)
         if aid:
             self.__accountid = aid
-            return self.__accountid
-        self.set_error(f"Invalid Account ID: {input_str}")
+        else:   
+            raise ValueError(f"Invalid Account ID: {input_str}")
 
     @db.setter
     def db(self, input_str):
@@ -260,18 +270,17 @@ class ConnectionConfig:
         else:
             raise ValueError(f"Invalid Branch ID: {input_str}")
 
-    def set_key(self, input_str=None, uid=None):
-        if input_str is None:
+    def set_key(self, api_key=None, user_id="admin"):
+        if api_key is None:
             self.__basic_auth = False
-            return False
-        uid = uid if uid is not None else "admin"
-        parser = IDParser()
-        key = parser.parse_key(input_str)
-        if key:
-            self.__rebase_url = f"{uid}:{key}"
-            return self.__basic_auth
-        else:
-            raise ValueError(f"Invalid API Key: {input_str}")
+            return None
+        else:       
+            parser = IDParser()
+            key = parser.parse_key(api_key)
+            if key:
+                self.__basic_auth = f"{user_id}:{api_key}"
+            else:
+                raise ValueError(f"Invalid API Key: {api_key}")
 
     # None value is a possible value, in this case we set redid to false
     @ref.setter

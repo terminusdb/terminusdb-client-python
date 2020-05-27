@@ -79,50 +79,53 @@ class WOQLClient:
         dict
         """
         if len(kwargs) > 0:
-            self.connectionConfig.update(**kwargs)
+            self.conConfig.update(**kwargs)
 
         json_obj = self.dispatch(self.conConfig.server_url, APIEndpointConst.CONNECT)
         self.conCapabilities.set_capabilities(json_obj)
         return json_obj
 
+    def copy(self):
+        return copy(self)
+
     def key(self, key=None, user=None):
         if key:
-            self.connectionConfig.set_key(key, user)
-        return self.connectionConfig.key
+            self.conConfig.set_key(key, user)
+        return self.conConfig.key
 
     def jwt(self, jwt=None, account_user=None):
         if jwt:
-            self.connectionConfig.set_jwt(jwt, account_user)
-        return self.connectionConfig.jwt
+            self.conConfig.set_jwt(jwt, account_user)
+        return self.conConfig.jwt
 
     def db(self, dbid=None):
         if dbid:
-            self.connectionConfig.db = dbid
-        return self.connectionConfig.db
+            self.conConfig.db = dbid
+        return self.conConfig.db
 
     def account(self, accountid=None):
         if accountid:
-            self.connectionConfig.account = accountid
-        self.connectionConfig.account
+            self.conConfig.account = accountid
+        self.conConfig.account
 
     def repo(self, repoid=None):
         if repoid:
-            self.connectionConfig.repo = repoid
+            self.conConfig.repo = repoid
 
-        return self.connectionConfig.repo
+        return self.conConfig.repo
 
     def ref(self, refid=None):
         if refid:
-            self.connectionConfig.ref = refid
-        return self.connectionConfig.ref
+            self.conConfig.ref = refid
+        return self.conConfig.ref
 
     def checkout(self, branchid):
         if branchid:
-            self.connectionConfig.branch = branchid
-        return self.connectionConfig.branch
+            self.conConfig.branch = branchid
+        return self.conConfig.branch
 
     def uid(self, ignore_jwt):
-        return self.connectionConfig.user(ignore_jwt)
+        return self.conConfig.user(ignore_jwt)
 
     """
     Parameters
@@ -138,7 +141,7 @@ class WOQLClient:
     """
 
     def set(self, **kwargs):  # bad naming
-        self.connectionConfig.update(**kwargs)
+        self.conConfig.update(**kwargs)
 
     def create_database(self, dbid, label, **kwargs):
         """
@@ -169,6 +172,7 @@ class WOQLClient:
             self.account(accountid)  # where does accountid comes from
 
         comment = kwargs.get("comment", label)
+        print("__ACCOUNT___",self.account());
         username = self.account()
 
         doc = {
@@ -181,7 +185,7 @@ class WOQLClient:
         }
 
         return self.dispatch(
-            self.connectionConfig.db_url(), APIEndpointConst.CREATE_DATABASE, doc
+            self.conConfig.db_url, APIEndpointConst.CREATE_DATABASE, doc
         )
 
     def delete_database(self, dbid, accountid=None):
@@ -205,23 +209,91 @@ class WOQLClient:
 
         self.db(dbid)
         json_response = self.dispatch(
-            self.conConfig.db_url(), APIEndpointConst.DELETE_DATABASE
+            self.conConfig.db_url, APIEndpointConst.DELETE_DATABASE
         )
         self.conCapabilities.remove_db(self.db(), self.account())
         return json_response
 
     def create_graph(self, graph_type, graph_id, commit_msg):
         if graph_type in ["inference", "schema", "instance"]:
-            self.generate_commit(commit_msg)
+            commit=self.generate_commit(commit_msg)
             return self.dispatch(
                 APIEndpointConst.CREATE_GRAPH,
-                self.connectionConfig.graph_url(graph_type, graph_id),
-                commit_msg,
+                self.conConfig.graph_url(graph_type, graph_id),
+                commit,
             )
 
         raise ValueError(
-            "Create graph parameter error - you must specify a valid type (inference, instance, schema), graph id and commit message"
+            "Create graph parameter error - you must specify a valid graph_type (inference, instance, schema), graph_id and commit message"
         )
+
+    def delete_graph (self, graph_type, graph_id, commit_msg):
+        if graph_type in ["inference", "schema", "instance"]:
+            commit=self.generate_commit(commit_msg)
+            return self.dispatch(APIEndpointConst.DELETE_GRAPH, self.conConfig.graph_url(graph_type, graph_id), commit)
+
+        raise ValueError("Delete graph parameter error - you must specify a valid graph_type (inference, instance, schema), graph_id and commit message")
+     
+    def get_triples(self,graph_type, graph_id):
+        return self.dispatch(APIEndpointConst.GET_TRIPLES, self.conConfig.triples_url(graph_type, graph_id))
+    
+    def update_triples(self,graph_type, graph_id, turtle, commit_msg):
+        commit = self.generate_commit(commit_msg)
+        commit.turtle = turtle
+        return self.dispatch(APIEndpointConst.UPDATE_TRIPLES, self.conConfig.triples_url(graph_type, graph_id), commit)
+
+    def get_class_frame (self,class_name):
+        opts = {"class": class_name}
+        return self.dispatch(APIEndpointConst.CLASS_FRAME, self.conConfig.class_frame_url(class_name), opts)
+
+    def query (self,woql_query, commit_msg="Automatically Added Commit",file_list=None):
+        #woql.containsUpdate() 
+        query_obj =  self.generate_commit(commit_msg)   
+
+        if type(e) == dict:
+            file_dict = query_obj
+            for name in file_list:
+                path = file_list[name]
+                stream = open(path, "rb")
+                file_dict[name] = (name, stream, "text/plain")
+            file_dict["query"] = (
+                None,
+                json.dumps(woql_query),
+                "application/json",
+            )
+            payload = None
+        else:
+            file_dict = None
+            query_obj['query'] = json.dumps(woql_query);
+            payload = query_obj
+
+        return self.dispatch(
+            self.conConfig.query_url(),
+            APIEndpointConst.WOQL_QUERY,
+            payload,
+            file_dict,
+        )
+
+    def branch(self,new_branch_id):
+        if self.ref():
+            source={ "origin": f"{self.account()}/{self.db()}/{self.repo()}/commit/{self.ref()}"}
+        else:
+            source={ "origin": f"{self.account()}/{self.db()}/{self.repo()}/branch/{self.checkout()}"}
+       
+        return self.dispatch(APIEndpointConst.BRANCH, self.conConfig.branch_url(new_branch_id), source)
+
+    def fetch(self,repo_id):
+        return self.dispatch(APIEndpointConst.FETCH, self.conConfig.fetch_url(repo_id))
+
+    def push (self,target_repo, target_branch) :
+        return self.dispatch(APIEndpointConst.PUSH, self.conConfig.push_url(target_repo, target_branch))
+
+
+    def rebase (self,remote_repo_id, remote_branch_id):
+        return self.dispatch(APIEndpointConst.REBASE, self.conConfig.rebase_url(remote_repo_id, remote_branch_id))
+
+    def clonedb (self,clone_source, newid):
+        return self.dispatch(APIEndpointConst.CLONE, self.conConfig.clone_url(newid), clone_source)
 
     def generate_commit(self, msg, author):
         if author:
@@ -232,476 +304,7 @@ class WOQLClient:
         ci = {"commit_info": {"author": mes_author, "message": msg}}
         return ci
 
-    def get_schema(
-        self, dbid=None, key=None, options={"terminus:encoding": "terminus:turtle"}
-    ):  # don't use dict as default
-        self.conConfig.setDB(dbid)
-        json_response = self.dispatch(
-            self.conConfig.db_url(), APIEndpointConst.DELETE_DATABASE, key
-        )
-        self.conCapabilities.removeDB()
-        return json_response
-
-    @staticmethod
-    def direct_delete_database(db_url, key):
-        """Delete a TerminusDB with settings
-
-        Parameters
-        ----------
-        db_url : str
-            TerminusDB full URL like http://localhost:6363/myDB
-        key : str
-            the server API key
-        """
-        id_parser = IDParser()
-        id_parser.parseDBURL(db_url)
-        return DispatchRequest.sendRequestByAction(
-            id_parser.db_url(), APIEndpointConst.DELETE_DATABASE, key
-        )
-
-    def update_schema(
-        self,
-        doc_obj,
-        dbid=None,
-        key=None,
-        opts={"terminus:encoding": "terminus:turtle"},
-    ):
-        """Updates the Schema of the specified database
-
-        opts.format is used to specify which format is being used (*json / turtle)
-
-        Parameters
-        ----------
-        doc_obj : dict
-            valid owl ontology in json-ld or turtle format
-        dbid : str
-            TerminusDB Id or omitted
-        key : str
-            API key
-        opts : dict
-            options object
-
-        Returns
-        -------
-        dict
-        """
-        if dbid:
-            self.conConfig.setDB(dbid)
-        doc_obj = DocumentTemplate.formatDocument(doc_obj, False, opts)
-        return self.dispatch(
-            self.conConfig.schemaURL(), APIEndpointConst.UPDATE_SCHEMA, key, doc_obj
-        )
-
-    @staticmethod
-    def direct_update_schema(
-        db_url, doc_obj, key, opts={"terminus:encoding": "terminus:turtle"}
-    ):
-        """Updates the Schema of the specified database with settings
-
-        opts.format is used to specify which format is being used (*json / turtle)
-
-        Parameters
-        ----------
-        db_url : str
-            a valid TerminusDB full URL
-        doc_obj : dict
-            valid owl ontology in json-ld or turtle format
-        key : str
-            API key
-        opts : dict
-            options object
-
-        Returns
-        -------
-        dict
-        """
-        id_parser = IDParser()
-        id_parser.parseDBURL(db_url)
-        doc_obj = DocumentTemplate.formatDocument(doc_obj, False, opts)
-        return DispatchRequest.sendRequestByAction(
-            id_parser.schemaURL(), APIEndpointConst.UPDATE_SCHEMA, key, doc_obj
-        )
-
-    def create_document(self, doc_obj, document_id, dbid=None, key=None):
-        """Creates a new document in the specified database
-
-        Parameters
-        ----------
-        doc_obj : dict
-            a valid document in json-ld
-        document_id : str
-            a valid Terminus document id
-        dbId : str
-            a valid TerminusDB id
-        key : str, optional
-            API key
-        Returns
-        -------
-        dict
-        """
-        if dbid:
-            self.conConfig.setDB(dbid)
-        self.conConfig.setDocument(document_id)
-        doc_obj = DocumentTemplate.formatDocument(
-            doc, None, None, self.conConfig.docURL()
-        )
-        return self.dispatch(
-            self.conConfig.docURL(), APIEndpointConst.CREATE_DOCUMENT, key, doc_obj
-        )
-
-    @staticmethod
-    def direct_create_document(doc_obj, document_id, db_url, key):
-        """Creates a new document in the specified database
-
-        Parameters
-        ----------
-        doc_obj : dict
-            a valid document in json-ld
-        document_id : str
-            a valid Terminus document id
-        db_url : str
-            a valid TerminusDB full URL
-        key : str, optional
-            API key
-
-        Returns
-        -------
-        dict or raise an InvalidURIError
-        """
-        id_parser = IDParser()
-        id_parser.parseDBURL(db_url)
-        id_parser.parseDocumentID(document_id)
-
-        doc_obj = DocumentTemplate.formatDocument(
-            doc_obj, None, None, id_parser.docURL()
-        )
-        return DispatchRequest.sendRequestByAction(
-            id_parser.docURL(), APIEndpointConst.CREATE_DOCUMENT, key, doc_obj
-        )
-
-    def get_document(
-        self,
-        document_id,
-        dbid=None,
-        key=None,
-        opts={"terminus:encoding": "terminus:frame"},
-    ):  # don't use dict as default
-        """Retrieves a document from the specified database
-
-        Parameters
-        ----------
-        document_id : str
-            a valid Terminus document id
-        dbId : str
-            a valid TerminusDB id
-        key : str, optional
-            API key
-        opts : dict
-            options object
-
-        Returns
-        -------
-        dict
-        """
-        if dbid:
-            self.conConfig.setDB(dbid)
-
-        self.conConfig.setDocument(document_id)
-        return self.dispatch(
-            self.conConfig.docURL(), APIEndpointConst.GET_DOCUMENT, key, opts
-        )
-
-    @staticmethod
-    def direct_get_document(
-        document_id, db_url, key, opts={"terminus:encoding": "terminus:frame"}
-    ):
-        """Retrieves a document from the specified database with URL
-
-        Parameters
-        ----------
-        document_id : str
-            a valid Terminus document id
-        db_url : str
-            a valid TerminusDB full URL
-        key : str, optional
-            API key
-        opts : dict
-            options object
-
-        Returns
-        -------
-        dict or raise an InvalidURIError
-        """
-        id_parser = IDParser()
-        id_parser.parseDBURL(db_url)
-        id_parser.parseDocumentID(document_id)
-        return DispatchRequest.sendRequestByAction(
-            id_parser.docURL(), APIEndpointConst.GET_DOCUMENT, key, opts
-        )
-
-    def update_document(self, document_id, doc_obj, dbid=None, key=None):
-        """
-        Updates a document in the specified database with a new version
-
-        Parameters
-        ----------
-        document_id : str
-            a valid Terminus document id
-        doc_obj : dict
-            a valid document in json-ld
-        dbId : str
-            a valid TerminusDB id
-        key : str, optional
-            API key
-
-        Returns
-        -------
-        dict
-        """
-        if dbid:
-            self.conConfig.setDB(dbid)
-
-        self.conConfig.setDocument(document_id)
-        doc_obj = DocumentTemplate.formatDocument(
-            doc_obj, None, None, self.conConfig.docURL()
-        )
-        return self.dispatch(
-            self.conConfig.docURL(), APIEndpointConst.UPDATE_DOCUMENT, key, doc_obj
-        )
-
-    @staticmethod
-    def direct_update_document(document_id, db_url, key, doc_obj):
-        """
-        Updates a document in the specified database with URL
-
-        Parameters
-        ----------
-        document_id : str
-            a valid Terminus document id
-        db_url : str
-            a valid TerminusDB full URL
-        key : str, optional
-            API key
-        doc_obj : dict
-            a valid document in json-ld
-
-        Returns
-        -------
-        dict or raise an InvalidURIError
-        """
-        id_parser = IDParser()
-        id_parser.parseDBURL(db_url)
-        id_parser.parseDocumentID(document_id)
-        doc_obj = DocumentTemplate.formatDocument(
-            doc_obj, None, None, id_parser.docURL()
-        )
-        return DispatchRequest.sendRequestByAction(
-            id_parser.docURL(), APIEndpointConst.GET_DOCUMENT, key, doc_obj
-        )
-
-    def delete_document(self, document_id, dbid=None, key=None):
-        """
-        Deletes a document from the specified database
-
-        Parameters
-        ----------
-        document_id : str
-            a valid Terminus document id
-        dbId : str
-            a valid TerminusDB id
-        key : str, optional
-            API key
-
-        Returns
-        -------
-        dict
-        """
-        if dbid:
-            self.conConfig.setDB(dbid)
-
-        self.conConfig.setDocument(document_id)
-
-        return self.dispatch(
-            self.conConfig.docURL(), APIEndpointConst.DELETE_DOCUMENT, key
-        )
-
-    @staticmethod
-    def direct_delete_document(self, document_id, db_url, key):
-        """
-        Deletes a document from the specified database with URL
-
-        Parameters
-        ----------
-        document_id : str
-            a valid Terminus document id
-        db_url : str
-            a valid TerminusDB full URL
-        key : str, optional
-            API key
-
-        Returns
-        -------
-        dict or raise an InvalidURIError
-        """
-        id_parser = IDParser()
-        id_parser.parseDBURL(db_url)
-        id_parser.parseDocumentID(document_id)
-
-        return DispatchRequest.sendRequestByAction(
-            id_parser.docURL(), APIEndpointConst.DELETE_DOCUMENT, key
-        )
-
-    def select(self, woql_query, dbid=None, key=None, file_list=None):
-        """
-        Executes a read-only WOQL query on the specified database and returns the results
-
-        Parameters
-        ----------
-        woql_query : WOQLQuery object
-            woql query select statement
-        dbId : str
-            a valid TerminusDB id
-        key : str, optional
-            API key
-        file_list : list, optional
-            List of files that are needed for the query
-
-        Returns
-        -------
-        dict
-        """
-        if dbid:
-            self.conConfig.setDB(dbid)
-
-        payload = {"terminus:query": json.dumps(woql_query)}
-        if type(file_list) == dict:
-            payload.update(file_list)
-
-        return self.dispatch(
-            self.conConfig.queryURL(), APIEndpointConst.WOQL_SELECT, key, payload
-        )
-
-    @staticmethod
-    def direct_select(woql_query, db_url, key, file_list=None):
-        """
-        Static function that executes a read-only WOQL query on the specified database
-        and returns the results
-
-        Parameters
-        ----------
-        woql_query : WOQLQuery object
-            woql query select statement
-        dbId : str
-            a valid full TerminusDB database URL
-        key : str, optional
-            API key
-        file_list : list, optional
-            List of files that are needed for the query
-
-        Returns
-        -------
-        dict or raise an InvalidURIError
-        """
-        id_parser = IDParser()
-        id_parser.parseDBURL(db_url)
-
-        payload = {"terminus:query": json.dumps(woql_query)}
-        if type(file_list) == dict:
-            payload.update(file_list)
-        return DispatchRequest.sendRequestByAction(
-            id_parser.queryURL(), APIEndpointConst.WOQL_SELECT, key, payload
-        )
-
-    def update(self, woql_query, dbid=None, key=None, file_list=None):
-        """
-        Executes a WOQL query on the specified database which updates the state and returns the results
-
-        Parameters
-        ----------
-        woql_query : WOQLQuery object
-            woql query select statement
-        dbId : str
-            a valid TerminusDB database ID
-        key : str, optional
-            API key
-        file_list : list, optional
-            List of files that are needed for the query
-
-        Returns
-        -------
-        dict
-        """
-        if dbid:
-            self.conConfig.setDB(dbid)
-            # raise InvalidURIError(ErrorMessage.getInvalidURIMessage(docurl, "Update"))
-        if type(file_list) == dict:
-            file_dict = {}
-            for name in file_list:
-                path = file_list[name]
-                stream = open(path, "rb")
-                file_dict[name] = (name, stream, "text/plain")
-            file_dict["terminus:query"] = (
-                None,
-                json.dumps(woql_query),
-                "application/json",
-            )
-            payload = None
-        else:
-            file_dict = None
-            payload = {"terminus:query": json.dumps(woql_query)}
-
-        return self.dispatch(
-            self.conConfig.queryURL(),
-            APIEndpointConst.WOQL_UPDATE,
-            key,
-            payload,
-            file_dict,
-        )
-
-    @staticmethod
-    def direct_update(woql_query, db_url, key, file_list=None):
-        """
-        Static function that executes a WOQL query on the specified database which
-        updates the state and returns the results
-
-        Parameters
-        ----------
-        woql_query : WOQLQuery object
-            woql query select statement
-        db_url : str
-            a valid full TerminusDB database URL
-        key : str, optional
-            API key
-        file_list : list, optional
-            List of files that are needed for the query
-
-        Returns
-        -------
-        dict or raise an InvalidURIError
-        """
-        id_parser = IDParser()
-        id_parser.parseDBURL(db_url)
-
-        if type(file_list) == dict:
-            file_dict = {}
-            for name in file_list:
-                path = file_list[name]
-                stream = open(path, "rb")
-                file_dict[name] = (name, stream, "text/plain")
-            file_dict["terminus:query"] = (
-                None,
-                json.dumps(woql_query),
-                "application/json",
-            )
-            payload = None
-        else:
-            file_dict = None
-            payload = {"terminus:query": json.dumps(woql_query)}
-
-        return DispatchRequest.sendRequestByAction(
-            id_parser.queryURL(), APIEndpointConst.WOQL_UPDATE, key, payload, file_dict
-        )
-
+    
     def dispatch(
         self, url, action, payload={}, file_dict=None
     ):  # don't use dict as default
@@ -728,6 +331,7 @@ class WOQLClient:
         # check if we can perform this action or raise an AccessDeniedError error
         # review the access control
         # self.conCapabilities.capabilitiesPermit(action)
-        return DispatchRequest.sendRequestByAction(
-            url, action, self.key(), payload, file_dict, self.jwt()
+        #url, action, payload={}, basic_auth, jwt=None, file_dict=None)
+        return DispatchRequest.send_request_by_action(
+            url, action, payload, self.key(), self.jwt(), file_dict
         )
