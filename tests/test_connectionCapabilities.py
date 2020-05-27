@@ -3,13 +3,12 @@
 
 import pytest
 from AllServerRecords import AllServerRecords
-from ConnectionDump import ConnectionDump
-from connectionObj import snapCapabilitiesObj
+from connectionObjDump import ConnectionDump
+from connectCapabilitiesResponse import ConnectResponse
 from DBRecord import dbRecordObj
 from serverRecordsFromCap import serverRecordsFromCap
 from woqlclient import ConnectionCapabilities
 
-# from connectResponseForCapabilities import connect_response
 
 url = "http://localhost:6363/"
 json_context = {
@@ -85,7 +84,7 @@ dbrecs = [
 ]
 
 connection_capabilities = ConnectionCapabilities()
-connection_capabilities.set_capabilities(snapCapabilitiesObj)
+connection_capabilities.set_capabilities(ConnectResponse)
 
 
 class TestCapabilitiesActions:

@@ -8,6 +8,8 @@ import requests
 from mockResponse import mocked_requests
 from woqlclient import WOQLClient
 
+from connectionObjDump import ConnectionDump
+
 # def test_realCall():
 # resp=WOQLClient.directDeleteDatabase("http://localhost:6363/test0009","root")
 # print('test_realCall',resp)
@@ -23,7 +25,7 @@ def mock_func_no_arg():
 
 def test_connection_error():
     # this test is weird
-    WOQLClient()
+    WOQLClient("http://localhost:6363")
     print("___MOCKED______", mocked_requests("http://...").status_code)
 
     # raises a connection error no requests mock
@@ -32,52 +34,38 @@ def test_connection_error():
 
 
 @mock.patch("requests.get", side_effect=mocked_requests)
-def test_direct_connect(mocked_requests):
-    WOQLClient.directConnect("http://localhost:6363", "mykey")
-
-
-@mock.patch("requests.get", side_effect=mocked_requests)
 def test_connection(mocked_requests, monkeypatch):
 
-    __woql_client__ = WOQLClient()
+    __woql_client__ = WOQLClient("http://localhost:6363")
 
-    __woql_client__.connect("http://localhost:6363", "mykey")
-
-    with open("tests/connectionDictionary.json") as json_file:
-        dict_test = json.load(json_file)
-        monkeypatch.setattr(__woql_client__.conCapabilities, "connection", dict_test)
-        assert dict_test == __woql_client__.conCapabilities.connection
-
-
-@mock.patch("requests.get", side_effect=mocked_requests)
-def test_create_database_connect_mode(mocked_requests):
-    __woql_client__ = WOQLClient(server="http://localhost:6363", key="mykey")
-
-    __woql_client__.connect()
+    #before connect it connection is empty
+    assert  __woql_client__.conCapabilities.connection == {}
+    __woql_client__.connect(key="mykey", account="admin" , user="admin")
     requests.get.assert_called_once_with(
-        "http://localhost:6363/", headers={"Authorization": "Basic Om15a2V5"}
+       "http://localhost:6363/", headers={"Authorization": "Basic OmFkbWluOm15a2V5"}
     )
+    assert  __woql_client__.conCapabilities.connection == ConnectionDump 
 
 
-"""
-    #I use the current server
+@mock.patch("requests.post", side_effect=mocked_requests)
+def test_create_database(mocked_requests):
+    __woql_client__ = WOQLClient("http://localhost:6363", user="admin", key="mykey", account="admin")
+
+    __woql_client__.key() == "admin:mykey"
+    
+    __woql_client__.create_database("myFirstTerminusDB",'my first db')
+
+    #requests.post.assert_called_once_with(
+     #  "http://localhost:6363/db/admin/myFirstTerminusDB", headers={"Authorization": "Basic OmFkbWluOm15a2V5"},
+      # body={"label":"my first db","comment":"my first db","prefixes":{"scm":"terminus://admin/myFirstTerminusDB/schema#","doc":"terminus://admin/myFirstTerminusDB/data/"}}
+    #)
 
     #with mocker.patch('requests.post', side_effect=mockResponse.mocked_requests):
 
     #with pytest.raises(requests.exceptions.ConnectionError):
-    #__woql_client__.createDatabase("myFirstTerminusDB",'my first db')
+    #
 """
 
-
-@mock.patch("requests.post", side_effect=mocked_requests)
-def test_direct_create_database(mocked_requests):
-
-    WOQLClient.directCreateDatabase(
-        "http://localhost:6363/myFirstTerminusDB",
-        "my first terminusDB",
-        "mykey",
-        comment="test terminusDB",
-    )
 
 
 @mock.patch("requests.delete", side_effect=mocked_requests)
@@ -144,5 +132,5 @@ def test_direct_get_schema(mocked_requests):
         headers={"Authorization": "Basic OmRpcmVjdENhbGxLZXk="},
     )
 
-
+"""
 # http://localhost:6363/myFirstTerminusDB/schema
