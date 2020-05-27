@@ -1,4 +1,4 @@
-snapCapabilitiesObj = {
+ConnectResponse = {
     "@context": {
         "doc": "terminus:///terminus/document/",
         "layer": "http://terminusdb.com/schema/layer#",

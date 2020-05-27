@@ -32,14 +32,14 @@ class DispatchRequest:
         return requests.delete(url, headers=headers)
 
     @staticmethod
-    def __autorization_header(key=None, jwt=None):
+    def __autorization_header(basic_auth=None, jwt=None):
         headers = {}
 
         # if (payload and ('terminus:user_key' in  payload)):
         # Utils.encodeURIComponent(payload['terminus:user_key'])}
-        if key:
+        if basic_auth:
             headers["Authorization"] = "Basic %s" % b64encode(
-                (":" + key).encode("utf-8")
+                (":" + basic_auth).encode("utf-8")
             ).decode("utf-8")
             if jwt:
                 headers["HUB_AUTHORIZATION"] = "Bearer %s" % jwt
@@ -53,35 +53,38 @@ class DispatchRequest:
 
     @classmethod
     def send_request_by_action(
-        cls, url, action, key, payload={}, file_dict=None, jwt=None
-    ):  # payload default as empty dict is against PEP
+        cls, url, action, payload={}, basic_auth=None, jwt=None, file_dict=None):
+        # payload default as empty dict is against PEP
         print("Sending to URL____________", url)
         print("Send Request By Action_____________", action)
 
         try:
             request_response = None
-            headers = cls.__autorization_header(key, jwt)
+            headers = cls.__autorization_header(basic_auth, jwt)
 
             if action in [
+                APIEndpointConst.GET_TRIPLES,
                 APIEndpointConst.CONNECT,
-                APIEndpointConst.GET_SCHEMA,
-                APIEndpointConst.CLASS_FRAME,
-                APIEndpointConst.WOQL_SELECT,
-                APIEndpointConst.GET_DOCUMENT,
+                APIEndpointConst.CLASS_FRAME
             ]:
                 request_response = cls.__get_call(url, headers, payload)
 
             elif action in [
                 APIEndpointConst.DELETE_DATABASE,
-                APIEndpointConst.DELETE_DOCUMENT,
+                APIEndpointConst.DELETE_GRAPH,
             ]:
                 request_response = cls.__delete_call(url, headers, payload)
 
             elif action in [
+                APIEndpointConst.WOQL_QUERY,
                 APIEndpointConst.CREATE_DATABASE,
-                APIEndpointConst.UPDATE_SCHEMA,
-                APIEndpointConst.CREATE_DOCUMENT,
-                APIEndpointConst.WOQL_UPDATE,
+                APIEndpointConst.UPDATE_TRIPLES,
+                APIEndpointConst.CREATE_GRAPH,
+                APIEndpointConst.FETCH,
+                APIEndpointConst.PUSH,
+                APIEndpointConst.REBASE,
+                APIEndpointConst.BRANCH,
+                APIEndpointConst.CLONE
             ]:
                 request_response = cls.__post_call(url, headers, payload, file_dict)
 
