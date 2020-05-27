@@ -1,14 +1,11 @@
-import json
-
 # import sys
 # sys.path.append('woqlclient')
 import unittest.mock as mock
 
 import requests
+from connectionObjDump import ConnectionDump
 from mockResponse import mocked_requests
 from woqlclient import WOQLClient
-
-from connectionObjDump import ConnectionDump
 
 # def test_realCall():
 # resp=WOQLClient.directDeleteDatabase("http://localhost:6363/test0009","root")
@@ -38,32 +35,36 @@ def test_connection(mocked_requests, monkeypatch):
 
     __woql_client__ = WOQLClient("http://localhost:6363")
 
-    #before connect it connection is empty
-    assert  __woql_client__.conCapabilities.connection == {}
-    __woql_client__.connect(key="mykey", account="admin" , user="admin")
+    # before connect it connection is empty
+    assert __woql_client__.conCapabilities.connection == {}
+    __woql_client__.connect(key="mykey", account="admin", user="admin")
     requests.get.assert_called_once_with(
-       "http://localhost:6363/", headers={"Authorization": "Basic OmFkbWluOm15a2V5"}
+        "http://localhost:6363/", headers={"Authorization": "Basic OmFkbWluOm15a2V5"}
     )
-    assert  __woql_client__.conCapabilities.connection == ConnectionDump 
+    assert __woql_client__.conCapabilities.connection == ConnectionDump
 
 
 @mock.patch("requests.post", side_effect=mocked_requests)
 def test_create_database(mocked_requests):
-    __woql_client__ = WOQLClient("http://localhost:6363", user="admin", key="mykey", account="admin")
+    __woql_client__ = WOQLClient(
+        "http://localhost:6363", user="admin", key="mykey", account="admin"
+    )
 
     __woql_client__.key() == "admin:mykey"
-    
-    __woql_client__.create_database("myFirstTerminusDB",'my first db')
 
-    #requests.post.assert_called_once_with(
-     #  "http://localhost:6363/db/admin/myFirstTerminusDB", headers={"Authorization": "Basic OmFkbWluOm15a2V5"},
-      # body={"label":"my first db","comment":"my first db","prefixes":{"scm":"terminus://admin/myFirstTerminusDB/schema#","doc":"terminus://admin/myFirstTerminusDB/data/"}}
-    #)
+    __woql_client__.create_database("myFirstTerminusDB", "my first db")
 
-    #with mocker.patch('requests.post', side_effect=mockResponse.mocked_requests):
+    # requests.post.assert_called_once_with(
+    #  "http://localhost:6363/db/admin/myFirstTerminusDB", headers={"Authorization": "Basic OmFkbWluOm15a2V5"},
+    # body={"label":"my first db","comment":"my first db","prefixes":{"scm":"terminus://admin/myFirstTerminusDB/schema#","doc":"terminus://admin/myFirstTerminusDB/data/"}}
+    # )
 
-    #with pytest.raises(requests.exceptions.ConnectionError):
+    # with mocker.patch('requests.post', side_effect=mockResponse.mocked_requests):
+
+    # with pytest.raises(requests.exceptions.ConnectionError):
     #
+
+
 """
 
 

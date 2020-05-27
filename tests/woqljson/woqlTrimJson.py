@@ -1,17 +1,11 @@
-woqlTrim={
+woqlTrim = {
     "@type": "woql:Trim",
     "woql:untrimmed": {
         "@type": "woql:Datatype",
-        "woql:datatype": {
-            "@type": "xsd:string",
-            "@value": "a"
-        }
+        "woql:datatype": {"@type": "xsd:string", "@value": "a"},
     },
     "woql:trimmed": {
         "@type": "woql:Datatype",
-        "woql:datatype": {
-            "@type": "xsd:string",
-            "@value": "b"
-        }
-    }
+        "woql:datatype": {"@type": "xsd:string", "@value": "b"},
+    },
 }

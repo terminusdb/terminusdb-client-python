@@ -53,7 +53,8 @@ class DispatchRequest:
 
     @classmethod
     def send_request_by_action(
-        cls, url, action, payload={}, basic_auth=None, jwt=None, file_dict=None):
+        cls, url, action, payload={}, basic_auth=None, jwt=None, file_dict=None
+    ):
         # payload default as empty dict is against PEP
         print("Sending to URL____________", url)
         print("Send Request By Action_____________", action)
@@ -65,7 +66,7 @@ class DispatchRequest:
             if action in [
                 APIEndpointConst.GET_TRIPLES,
                 APIEndpointConst.CONNECT,
-                APIEndpointConst.CLASS_FRAME
+                APIEndpointConst.CLASS_FRAME,
             ]:
                 request_response = cls.__get_call(url, headers, payload)
 
@@ -84,7 +85,7 @@ class DispatchRequest:
                 APIEndpointConst.PUSH,
                 APIEndpointConst.REBASE,
                 APIEndpointConst.BRANCH,
-                APIEndpointConst.CLONE
+                APIEndpointConst.CLONE,
             ]:
                 request_response = cls.__post_call(url, headers, payload, file_dict)
 

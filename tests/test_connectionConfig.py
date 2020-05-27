@@ -6,8 +6,12 @@ class TestConnectionConfig:
     start_dbid = "testDB"
     local_user = "admin"
     # to be review !!!!!
-    connection_config = ConnectionConfig( 
-        start_server_url, db=start_dbid, user=local_user, key="mykey", account=local_user
+    connection_config = ConnectionConfig(
+        start_server_url,
+        db=start_dbid,
+        user=local_user,
+        key="mykey",
+        account=local_user,
     )
 
     db_url = "http://localhost:6363/db/admin/testDB"
@@ -31,8 +35,6 @@ class TestConnectionConfig:
             self.connection_config.query_url
             == "http://localhost:6363/woql/admin/testDB/local/commit/" + new_ref
         )
-        
-    def test_check_basic_auth(self):
-        assert (
-            self.connection_config.key == "admin:mykey")
 
+    def test_check_basic_auth(self):
+        assert self.connection_config.key == "admin:mykey"

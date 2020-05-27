@@ -1,9 +1,13 @@
+import sys
 import unittest.mock as mock
 
-# import sys
 import requests
 from mockResponse import mocked_requests
-from woqlclient import APIEndpointConst, DispatchRequest, DocumentTemplate
+from woqlclient.api_endpoint_const import APIEndpointConst
+from woqlclient.dispatchRequest import DispatchRequest
+from woqlclient.documentTemplate import DocumentTemplate
+
+sys.path.append("woqlclient")
 
 
 def send_dispatch_request(

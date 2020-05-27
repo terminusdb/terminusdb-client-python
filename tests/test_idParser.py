@@ -1,7 +1,8 @@
-from woqlclient import IDParser
+import sys
 
-# import sys
-# sys.path.append('woqlclient')
+from woqlclient.id_parser import IDParser
+
+sys.path.append("woqlclient")
 
 
 def test_parse_server_url():

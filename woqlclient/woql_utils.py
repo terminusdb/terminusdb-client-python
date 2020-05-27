@@ -1,16 +1,17 @@
 import urllib.parse
 
 STANDARD_URLS = {
-	rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-	rdfs: 'http://www.w3.org/2000/01/rdf-schema#',
-	xsd: 'http://www.w3.org/2001/XMLSchema#',
-	owl: 'http://www.w3.org/2002/07/owl#',
-	tcs: 'http://terminusdb.com/schema/tcs#',
-	xdd: 'http://terminusdb.com/schema/xdd#',
-	v: 'http://terminusdb.com/woql/variable/',
-	terminus: 'http://terminusdb.com/schema/terminus#',
-	vio: 'http://terminusdb.com/schema/vio#'
+    rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    rdfs: "http://www.w3.org/2000/01/rdf-schema#",
+    xsd: "http://www.w3.org/2001/XMLSchema#",
+    owl: "http://www.w3.org/2002/07/owl#",
+    tcs: "http://terminusdb.com/schema/tcs#",
+    xdd: "http://terminusdb.com/schema/xdd#",
+    v: "http://terminusdb.com/woql/variable/",
+    terminus: "http://terminusdb.com/schema/terminus#",
+    vio: "http://terminusdb.com/schema/vio#",
 }
+
 
 def encode_uri_component(value):
     return urllib.parse.urlencode(value, doseq=True)
@@ -40,6 +41,7 @@ def add_params_to_url(self, url, payload):
         if params:
             url = "{}?{}".format(url, params)
     return url
+
 
 # below are utils for WOQLQuery
 
