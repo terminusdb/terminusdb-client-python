@@ -1,4 +1,4 @@
-WoqlStar = {
+WoqlLimitStart = {
     "@type": "woql:Limit",
     "woql:limit": {
         "@type": "woql:Datatype",

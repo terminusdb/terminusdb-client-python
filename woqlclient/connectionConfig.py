@@ -15,8 +15,10 @@ class ConnectionConfig:
         self.__server = False
         self.__jwt_token = False  # jwt token for authenticating to remote servers for push / fetch / clone
         self.__jwt_user = False  # user id associated with the jwt token
-        self.__basic_auth = False # basic auth string for authenticating to local server
-    
+        self.__basic_auth = (
+            False  # basic auth string for authenticating to local server
+        )
+
         # these operate as cursors - where within the connected server context, we currently are
         self.__accountid = False
         self.__dbid = False
@@ -54,9 +56,10 @@ class ConnectionConfig:
 
         if "jwt" in kwargs:
             self.set_jwt(kwargs["jwt"], kwargs["jwt_user"])
-        
-        if 'key' in kwargs and 'user' in kwargs:
-            self.set_basic_auth(kwargs['key'], kwargs['user'])
+
+        if "key" in kwargs and "user" in kwargs:
+            self.set_basic_auth(kwargs["key"], kwargs["user"])
+
         if "branch" in kwargs:
             self.branch = kwargs["branch"]
         if "ref" in kwargs:
@@ -96,14 +99,12 @@ class ConnectionConfig:
     def jwt(self):
         return self.__jwt_token
 
-
     def user(self, ignore_jwt=True):
         if not ignore_jwt and self.__jwt_user:
             return self.__jwt_user
         if self.__basic_auth:
             return self.__basic_auth.split(":")[0]
 
-    
     def db_url_fragment(self):
         if self.db == "terminus":
             return self.db
@@ -112,10 +113,9 @@ class ConnectionConfig:
     def db_base(self, action):
         return f"{self.server}{action}/{self.db_url_fragment()}"
 
-    def branch_url(self,branch_id):
+    def branch_url(self, branch_id):
         base_url = self.repo_base("branch")
         return f"{base_url}/branch/{branch_id}"
-    
 
     def repo_base(self, action):
         base = self.db_base(action)
@@ -158,14 +158,13 @@ class ConnectionConfig:
             return self.db_base("frame")
         return self.branch_base("frame")
 
-    def triples_url (self,graph_type, graph_id="main"):
-        if self.db == "terminus": 
-            base_url = self.db_base("triples") 
-        else :
+    def triples_url(self, graph_type, graph_id="main"):
+        if self.db == "terminus":
+            base_url = self.db_base("triples")
+        else:
             base_url = self.branch_base("triples")
 
         return f"{base_url}/{graph_type}/{graph_id}"
-    
 
     def clone_url(self, new_repo_id=None):
         crl = f"{self.serverURL}clone/{self.account}"
@@ -193,7 +192,6 @@ class ConnectionConfig:
             if target_branch is not None:
                 purl = purl + f"/{target_branch}"
         return purl
-
 
     def db_url(self):
         return self.db_base("db")
@@ -233,7 +231,7 @@ class ConnectionConfig:
         aid = parser.parse_dbid(input_str)
         if aid:
             self.__accountid = aid
-        else:   
+        else:
             raise ValueError(f"Invalid Account ID: {input_str}")
 
     @db.setter
@@ -276,7 +274,7 @@ class ConnectionConfig:
         if api_key is None:
             self.__basic_auth = False
             return None
-        else:       
+        else:
             parser = IDParser()
             key = parser.parse_key(api_key)
             if key:

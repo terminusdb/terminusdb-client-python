@@ -193,11 +193,17 @@ class WOQLSchema(g):
         nq = self.WOQLQuery().when(filter).woql_and(cls, prop)
         return nq._updated()
 
-    def generateChoiceList(
-        self, cls, clslabel, clsdesc, choices, graph=self.graph, parent
+    def _generateChoiceList(
+        self,
+        cls=None,
+        clslabel=None,
+        clsdesc=None,
+        choices=[],
+        graph=self.graph,
+        parent=None,
     ):
         clist = []
-        if ":" not in cls:
+        if cls.indexOf(":") == -1:
             listid = "_:" + cls
         else:
             listed = "_:" + cls.split(":")[1]
@@ -665,7 +671,15 @@ class WOQLSchema(g):
             ),
         )
 
-    def _boxDatatype(self, datatype, label, descr, parent, graph=self.graph, prefix):
+    def _boxDatatype(
+        self,
+        datatype=None,
+        label=None,
+        descr=None,
+        parent=None,
+        graph=self.graph,
+        prefix=None,
+    ):
         # utility function for boxing a datatype in woql
         # format is (predicate) prefix:datatype (domain) prefix:Datatype (range) xsd:datatype
         prefix = prefix or "scm:"

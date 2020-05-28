@@ -7,11 +7,9 @@ from .connectionCapabilities import ConnectionCapabilities
 # from .errorMessage import *
 from .connectionConfig import ConnectionConfig
 from .dispatchRequest import DispatchRequest
-from .documentTemplate import DocumentTemplate
 
 # from .errors import (InvalidURIError)
 # from .errors import doc, opts
-from .id_parser import IDParser
 
 # WOQL client object
 # license Apache Version 2
@@ -81,7 +79,7 @@ class WOQLClient:
         if len(kwargs) > 0:
             self.conConfig.update(**kwargs)
 
-        json_obj = self.dispatch(APIEndpointConst.CONNECT,self.conConfig.server)
+        json_obj = self.dispatch(APIEndpointConst.CONNECT, self.conConfig.server)
         self.conCapabilities.set_capabilities(json_obj)
         return json_obj
 
@@ -169,7 +167,7 @@ class WOQLClient:
         """
         self.db(dbid)
         if kwargs.get("accountid"):
-            self.account(kwargs['accountid'])  # where does accountid comes from
+            self.account(kwargs["accountid"])  # where does accountid comes from
 
         comment = kwargs.get("comment", label)
         username = self.account()
@@ -210,14 +208,15 @@ class WOQLClient:
         if accountid:
             self.account(accountid)
 
-        json_response = self.dispatch(APIEndpointConst.DELETE_DATABASE,self.conConfig.db_url()
+        json_response = self.dispatch(
+            APIEndpointConst.DELETE_DATABASE, self.conConfig.db_url()
         )
         self.conCapabilities.remove_db(self.db(), self.account())
         return json_response
 
     def create_graph(self, graph_type, graph_id, commit_msg):
         if graph_type in ["inference", "schema", "instance"]:
-            commit=self.generate_commit(commit_msg)
+            commit = self.generate_commit(commit_msg)
             return self.dispatch(
                 APIEndpointConst.CREATE_GRAPH,
                 self.conConfig.graph_url(graph_type, graph_id),
@@ -228,29 +227,48 @@ class WOQLClient:
             "Create graph parameter error - you must specify a valid graph_type (inference, instance, schema), graph_id and commit message"
         )
 
-    def delete_graph (self, graph_type, graph_id, commit_msg):
+    def delete_graph(self, graph_type, graph_id, commit_msg):
         if graph_type in ["inference", "schema", "instance"]:
-            commit=self.generate_commit(commit_msg)
-            return self.dispatch(APIEndpointConst.DELETE_GRAPH, self.conConfig.graph_url(graph_type, graph_id), commit)
+            commit = self.generate_commit(commit_msg)
+            return self.dispatch(
+                APIEndpointConst.DELETE_GRAPH,
+                self.conConfig.graph_url(graph_type, graph_id),
+                commit,
+            )
 
-        raise ValueError("Delete graph parameter error - you must specify a valid graph_type (inference, instance, schema), graph_id and commit message")
-     
-    def get_triples(self,graph_type, graph_id):
-        return self.dispatch(APIEndpointConst.GET_TRIPLES, self.conConfig.triples_url(graph_type, graph_id))
-    
-    def update_triples(self,graph_type, graph_id, turtle, commit_msg):
+        raise ValueError(
+            "Delete graph parameter error - you must specify a valid graph_type (inference, instance, schema), graph_id and commit message"
+        )
+
+    def get_triples(self, graph_type, graph_id):
+        return self.dispatch(
+            APIEndpointConst.GET_TRIPLES,
+            self.conConfig.triples_url(graph_type, graph_id),
+        )
+
+    def update_triples(self, graph_type, graph_id, turtle, commit_msg):
         commit = self.generate_commit(commit_msg)
         commit.turtle = turtle
-        return self.dispatch(APIEndpointConst.UPDATE_TRIPLES, self.conConfig.triples_url(graph_type, graph_id), commit)
+        return self.dispatch(
+            APIEndpointConst.UPDATE_TRIPLES,
+            self.conConfig.triples_url(graph_type, graph_id),
+            commit,
+        )
 
-    def get_class_frame (self,class_name):
+    def get_class_frame(self, class_name):
         opts = {"class": class_name}
-        return self.dispatch(APIEndpointConst.CLASS_FRAME, self.conConfig.class_frame_url(class_name), opts)
+        return self.dispatch(
+            APIEndpointConst.CLASS_FRAME,
+            self.conConfig.class_frame_url(class_name),
+            opts,
+        )
 
-    def query (self,woql_query, commit_msg="Automatically Added Commit",file_list=None):
-        #woql.containsUpdate() 
-        query_obj =  self.generate_commit(commit_msg)   
-        
+    def query(
+        self, woql_query, commit_msg="Automatically Added Commit", file_list=None
+    ):
+        # woql.containsUpdate()
+        query_obj = self.generate_commit(commit_msg)
+
         if type(file_list) == dict:
             file_dict = query_obj
             for name in file_list:
@@ -265,36 +283,45 @@ class WOQLClient:
             payload = None
         else:
             file_dict = None
-            query_obj['query'] = json.dumps(woql_query);
+            query_obj["query"] = json.dumps(woql_query)
             payload = query_obj
-        
 
-        return self.dispatch(APIEndpointConst.WOQL_QUERY,
-            self.conConfig.query_url(),
-            payload,
-            file_dict,
+        return self.dispatch(
+            APIEndpointConst.WOQL_QUERY, self.conConfig.query_url(), payload, file_dict
         )
 
-    def branch(self,new_branch_id):
+    def branch(self, new_branch_id):
         if self.ref():
-            source={ "origin": f"{self.account()}/{self.db()}/{self.repo()}/commit/{self.ref()}"}
+            source = {
+                "origin": f"{self.account()}/{self.db()}/{self.repo()}/commit/{self.ref()}"
+            }
         else:
-            source={ "origin": f"{self.account()}/{self.db()}/{self.repo()}/branch/{self.checkout()}"}
-       
-        return self.dispatch(APIEndpointConst.BRANCH, self.conConfig.branch_url(new_branch_id), source)
+            source = {
+                "origin": f"{self.account()}/{self.db()}/{self.repo()}/branch/{self.checkout()}"
+            }
 
-    def fetch(self,repo_id):
+        return self.dispatch(
+            APIEndpointConst.BRANCH, self.conConfig.branch_url(new_branch_id), source
+        )
+
+    def fetch(self, repo_id):
         return self.dispatch(APIEndpointConst.FETCH, self.conConfig.fetch_url(repo_id))
 
-    def push (self,target_repo, target_branch) :
-        return self.dispatch(APIEndpointConst.PUSH, self.conConfig.push_url(target_repo, target_branch))
+    def push(self, target_repo, target_branch):
+        return self.dispatch(
+            APIEndpointConst.PUSH, self.conConfig.push_url(target_repo, target_branch)
+        )
 
+    def rebase(self, remote_repo_id, remote_branch_id):
+        return self.dispatch(
+            APIEndpointConst.REBASE,
+            self.conConfig.rebase_url(remote_repo_id, remote_branch_id),
+        )
 
-    def rebase (self,remote_repo_id, remote_branch_id):
-        return self.dispatch(APIEndpointConst.REBASE, self.conConfig.rebase_url(remote_repo_id, remote_branch_id))
-
-    def clonedb (self,clone_source, newid):
-        return self.dispatch(APIEndpointConst.CLONE, self.conConfig.clone_url(newid), clone_source)
+    def clonedb(self, clone_source, newid):
+        return self.dispatch(
+            APIEndpointConst.CLONE, self.conConfig.clone_url(newid), clone_source
+        )
 
     def generate_commit(self, msg, author=None):
         if author:
@@ -305,7 +332,6 @@ class WOQLClient:
         ci = {"commit_info": {"author": mes_author, "message": msg}}
         return ci
 
-    
     def dispatch(
         self, action, url, payload={}, file_dict=None
     ):  # don't use dict as default
@@ -332,7 +358,7 @@ class WOQLClient:
         # check if we can perform this action or raise an AccessDeniedError error
         # review the access control
         # self.conCapabilities.capabilitiesPermit(action)
-        #url, action, payload={}, basic_auth, jwt=None, file_dict=None)
+        # url, action, payload={}, basic_auth, jwt=None, file_dict=None)
         return DispatchRequest.send_request_by_action(
             url, action, payload, self.basic_auth(), self.jwt(), file_dict
         )
