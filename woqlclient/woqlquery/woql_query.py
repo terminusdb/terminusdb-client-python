@@ -22,3 +22,10 @@ class WOQLQuery(WOQLCore):
                     spl = item.split(":")
                     if len(spl) == 2 and spl[1] and spl[0] != "_":
                         self._vocab[spl[0]] = spl[1]
+
+    def _wrap_cursor_with_and(self):
+        new_json = WOQLQuery().json(self._cursor)
+        for item in self._curser:
+            del self._cursor[item]
+        self.woql_and(new_json, {})
+        self._cursor = self._cursor["woql:query_list"][1]["woql:query"]
