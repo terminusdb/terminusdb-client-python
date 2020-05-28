@@ -13,7 +13,7 @@ class WOQLCore:
         self._query = query if query else {}
         self._errors = []
         self._cursor = self._query
-        selt._chain_ended = False
+        self._chain_ended = False
         self._contains_update = False
         # operators which preserve global paging
         self._paging_transitive_properties = [
@@ -88,7 +88,7 @@ class WOQLCore:
             val_type = "xsd:" + val_type
         return {"@type": val_type, "@value": val}
 
-    def _varj(self, verb):
+    def _varj(self, varb):
         if varb[:2] == "v:":
             varb = varb[2:]
         if type(varb) == str:
@@ -101,7 +101,7 @@ class WOQLCore:
     def _jobj(self, qobj):
         """Transforms a javascript representation of a query into a json object if needs be"""
         if hasattr(qobj, "json"):
-            return qonj.json()
+            return qobj.json()
         if qobj is True:
             return {"@type": "woql:True"}
         return qobj
@@ -142,14 +142,14 @@ class WOQLCore:
             }
         if opts.format_header:
             self._cursor["woql:format"]["woql:format_header"] = {
-                "@value": true,
+                "@value": True,
                 "@type": "xsd:boolean",
             }
         return self
 
     def _arop(self, arg):
         """Wraps arithmetic operators in the appropriate json-ld"""
-        if type(arg) not in [bool, str, int, float, NoneType]:
+        if type(arg) not in [bool, str, int, float]:
             if hasattr(arg, "json"):
                 return arg.json()
             else:
@@ -195,10 +195,10 @@ class WOQLCore:
             "woql:query": qobj,
         }
 
-    def _clean_object(self, obj):
+    def _clean_subject(self, obj):
         """Transforms whatever is passed in as the subject into the appropriate json-ld for variable or id"""
         subj = False
-        if type(obj) not in [bool, str, int, float, NoneType]:
+        if type(obj) not in [bool, str, int, float]:
             return obj
         elif type(obj) == str:
             if ":" in obj:
@@ -214,7 +214,7 @@ class WOQLCore:
     def _clean_predicate(self, predicate):
         """Transforms whatever is passed in as the predicate (id or variable) into the appropriate json-ld form """
         pred = False
-        if type(predicate) not in [bool, str, int, float, NoneType]:
+        if type(predicate) not in [bool, str, int, float]:
             return predicate
         if type(predicate) != str:
             self._parameter_error("Predicate must be a URI string")
@@ -225,7 +225,7 @@ class WOQLCore:
             pred = self._vocab[predicate]
         else:
             pred = "scm:" + predicate
-        return self._expand_variable(predicate)
+        return self._expand_variable(pred)
 
     def _clean_path_predicate(self, predicate):
         pred = False
@@ -237,25 +237,25 @@ class WOQLCore:
             pred = "scm:" + predicate
         return pred
 
-    def _clean_object(self, object, target):
+    def _clean_object(self, user_obj, target):
         """Transforms whatever is passed in as the object of a triple into the appropriate json-ld form (variable, literal or id)"""
         obj = {"@type": "woql:Datatype"}
-        if type(object) == str:
-            if ":" in object:
-                return self._clean_class(object)
-            elif self._vocab and (object in self._vocab):
-                return self._clean_class(self._vocab[object])
+        if type(user_obj) == str:
+            if ":" in user_obj:
+                return self._clean_class(user_obj)
+            elif self._vocab and (user_obj in self._vocab):
+                return self._clean_class(self._vocab[user_obj])
             else:
-                obj["woql:datatype"] = self._jlt(object, target)
-        elif type(object) == float:
+                obj["woql:datatype"] = self._jlt(user_obj, target)
+        elif type(user_obj) == float:
             if not target:
                 target = "xsd:decimal"
-            obj["woql:datatype"] = self._jlt(object, target)
-        elif type(object) not in [bool, str, int, float, NoneType]:
-            if "@value" in object:
-                obj["woql:datatype"] = object
+            obj["woql:datatype"] = self._jlt(user_obj, target)
+        elif type(user_obj) not in [bool, str, int, float]:
+            if "@value" in user_obj:
+                obj["woql:datatype"] = user_obj
             else:
-                return object
+                return user_obj
         return obj
 
     def _clean_graph(self, graph):
@@ -289,7 +289,7 @@ class WOQLCore:
             return self._expand_variable(user_class)
 
     def _clean_type(self, user_type, string_only):
-        return _clean_class(user_type, string_only)
+        return self._clean_class(user_type, string_only)
 
     def _default_context(self, db_iri):
         default = copy.copy(utils.STANDARD_URLS)
@@ -305,7 +305,7 @@ class WOQLCore:
         for prop in query:
             if prop in self._paging_transitive_properties:
                 native_query = query[prop][1]
-                native_context = selt._get_context(native_query)
+                native_context = self._get_context(native_query)
                 if native_context:
                     return native_context
 
