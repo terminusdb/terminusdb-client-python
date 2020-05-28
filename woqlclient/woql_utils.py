@@ -1,15 +1,15 @@
 import urllib.parse
 
 STANDARD_URLS = {
-    rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-    rdfs: "http://www.w3.org/2000/01/rdf-schema#",
-    xsd: "http://www.w3.org/2001/XMLSchema#",
-    owl: "http://www.w3.org/2002/07/owl#",
-    tcs: "http://terminusdb.com/schema/tcs#",
-    xdd: "http://terminusdb.com/schema/xdd#",
-    v: "http://terminusdb.com/woql/variable/",
-    terminus: "http://terminusdb.com/schema/terminus#",
-    vio: "http://terminusdb.com/schema/vio#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "tcs": "http://terminusdb.com/schema/tcs#",
+    "xdd": "http://terminusdb.com/schema/xdd#",
+    "v": "http://terminusdb.com/woql/variable/",
+    "terminus": "http://terminusdb.com/schema/terminus#",
+    "vio": "http://terminusdb.com/schema/vio#",
 }
 
 
@@ -20,7 +20,7 @@ def encode_uri_component(value):
 def uri_encode_payload(self, payload):
     if isinstance(payload, str):
         return self.encodeURIComponent(payload)
-    payloadArr = []
+    payload_arr = []
     if isinstance(payload, dict):
         for key, value in payload.items():
             """
@@ -28,11 +28,11 @@ def uri_encode_payload(self, payload):
             """
             if isinstance(value, dict):
                 # for keyElement,valueElement in value.items():
-                payloadArr.append(self.encodeURIComponent(value))
+                payload_arr.append(self.encodeURIComponent(value))
             else:
-                payloadArr.append(self.encodeURIComponent({key: value}))
+                payload_arr.append(self.encodeURIComponent({key: value}))
 
-    return "&".join(payloadArr)
+    return "&".join(payload_arr)
 
 
 def add_params_to_url(self, url, payload):
@@ -52,8 +52,8 @@ def add_namespaces_to_variable(self, var):
     return var
 
 
-def add_namespaces_to_variables(self, vars):
+def add_namespaces_to_variables(self, variables):
     nvars = []
-    for v_item in vars:
+    for v_item in variables:
         nvars.append(self.addNamespacesToVariable(v_item))
     return nvars
