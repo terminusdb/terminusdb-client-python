@@ -219,7 +219,8 @@ class WOQLSchema(g):
                 bits.append(self.loadXSDBoxes(parent, graph, prefix));
         elif libs.indexOf("box") != -1:
             bits.append(self.loadXSDBoxes(parent, graph, prefix));
-        if bits.len() > 1 return self.WOQLQuery().woql_and(*bits);
+        if bits.len() > 1:
+            return self.WOQLQuery().woql_and(*bits);
         return bits[0];
 
     def loadXDD(self, graph=self.graph):
