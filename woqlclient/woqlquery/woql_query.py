@@ -1,5 +1,6 @@
 from .woql_core import WOQLCore
 
+
 class WOQLQuery(WOQLCore):
     def __init__(self, query=None):
         """defines the internal functions of the woql query object - the language API is defined in WOQLQuery
@@ -14,12 +15,10 @@ class WOQLQuery(WOQLCore):
         ignoring blank node ids"""
         new_woql = WOQLQuery().quad("v:S", "v:P", "v:O", "schema/*")
         result = new_woql.execute(client)
-        bindings = result.get("bindings",[])
+        bindings = result.get("bindings", [])
         for each_result in bindings:
             for item in each_result:
                 if type(item) == str:
-                    spl = item.split(':')
-                    if len(spl) == 2 and spl[1] and spl[0]!= '_':
+                    spl = item.split(":")
+                    if len(spl) == 2 and spl[1] and spl[0] != "_":
                         self._vocab[spl[0]] = spl[1]
-
-    
