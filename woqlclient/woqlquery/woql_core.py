@@ -1,5 +1,7 @@
 import copy
-import ..woql_utils as utils
+
+import woql_utils as utils
+
 
 class WOQLCore:
     def __init__(self, query=None):
@@ -14,8 +16,22 @@ class WOQLCore:
         selt._chain_ended = False
         self._contains_update = False
         # operators which preserve global paging
-        self._paging_transitive_properties = ['select', 'from', 'start', 'when', 'opt', 'limit']
-        self._update_operators = ["woql:AddTriple", "woql:DeleteTriple", "woql:AddQuad", "woql:DeleteQuad", "woql:DeleteObject", "woql:UpdateObject"]
+        self._paging_transitive_properties = [
+            "select",
+            "from",
+            "start",
+            "when",
+            "opt",
+            "limit",
+        ]
+        self._update_operators = [
+            "woql:AddTriple",
+            "woql:DeleteTriple",
+            "woql:AddQuad",
+            "woql:DeleteQuad",
+            "woql:DeleteObject",
+            "woql:UpdateObject",
+        ]
 
         self._vocab = self._load_default_vocabulary()
 
@@ -24,7 +40,7 @@ class WOQLCore:
 
     def _parameter_error(self, message):
         """Basic Error handling"""
-        self._errors.append({"type": self._cursor['@type'], "message": message})
+        self._errors.append({"type": self._cursor["@type"], "message": message})
         return self
 
     def _has_errors(self):
@@ -33,9 +49,9 @@ class WOQLCore:
     def _add_sub_query(self, sub_query=None):
         """Internal library function which adds a subquery and sets the cursor"""
         if sub_query:
-            self._cursor['woql:query'] = self._jobj(sub_query)
+            self._cursor["woql:query"] = self._jobj(sub_query)
         else:
-            self._cursor['woql:query'] = {}
+            self._cursor["woql:query"] = {}
             self.curson = {}
         return self
 
@@ -45,12 +61,14 @@ class WOQLCore:
             json = self.query
         if json["@type"] in self._update_operators:
             return True
-        if json.get('woql:consequent') and self._contains_update_check(json['woql:consequent']):
+        if json.get("woql:consequent") and self._contains_update_check(
+            json["woql:consequent"]
+        ):
             return True
-        if json.get('woql:query'):
-            return self._contains_update_check(json['woql:query'])
-        if json.get(woql:query_list'):
-            for item in json['woql:query_list']:
+        if json.get("woql:query"):
+            return self._contains_update_check(json["woql:query"])
+        if json.get("woql:query_list"):
+            for item in json["woql:query_list"]:
                 if self._contains_update_check(item):
                     return True
         return False
@@ -66,21 +84,24 @@ class WOQLCore:
         """Wraps the passed value in a json-ld literal carriage"""
         if not val_type:
             val_type = "xsd:string"
-        elif ':' not in val_type:
+        elif ":" not in val_type:
             val_type = "xsd:" + val_type
-        return {"@type": val_type, "@value": val }
+        return {"@type": val_type, "@value": val}
 
     def _varj(self, verb):
         if varb[:2] == "v:":
             varb = varb[2:]
         if type(varb) == str:
-            return {"@type": "woql:Variable", "woql:variable_name": {"@value": varb, "@type": "xsd:string" }}
+            return {
+                "@type": "woql:Variable",
+                "woql:variable_name": {"@value": varb, "@type": "xsd:string"},
+            }
         return varb
 
     def _jobj(self, qobj):
         """Transforms a javascript representation of a query into a json object if needs be"""
-        if hasattr(qobj, 'json'):
-            return qonj.json():
+        if hasattr(qobj, "json"):
+            return qonj.json()
         if qobj is True:
             return {"@type": "woql:True"}
         return qobj
@@ -90,46 +111,46 @@ class WOQLCore:
         asvar = {}
         if type(colname_or_index) == int:
             asvar["@type"] = "woql:IndexedAsVar"
-            asvar['woql:index'] = self._jlt(colname_or_index, "xsd:nonNegativeInteger")
+            asvar["woql:index"] = self._jlt(colname_or_index, "xsd:nonNegativeInteger")
         elif type(colname_or_index) == str:
             asvar["@type"] = "woql:NamedAsVar"
-            asvar['woql:identifier'] = self._jlt(colname_or_index)
+            asvar["woql:identifier"] = self._jlt(colname_or_index)
         if vname[:2] == "v:":
             vname = vname[2:]
         asvar["woql:variable_name"] = {"@type": "xsd:string", "@value": vname}
-        if(obj_type):
-             asvar["woql:var_type"] = self._jlt(obj_type, "xsd:anyURI")
+        if obj_type:
+            asvar["woql:var_type"] = self._jlt(obj_type, "xsd:anyURI")
         return asvar
 
     def _add_asv(self, cursor, asv):
         """Adds a variable to a json-ld as variable list"""
         if asv["@type"] == "woql:IndexedAsVar":
-            if not cursor['woql:indexed_as_var']:
-                cursor['woql:indexed_as_var'] = []
-                cursor['woql:indexed_as_var'].append(asv)
+            if not cursor["woql:indexed_as_var"]:
+                cursor["woql:indexed_as_var"] = []
+                cursor["woql:indexed_as_var"].append(asv)
         else:
-            if not cursor['woql:named_as_var']:
-                cursor['woql:named_as_var'] = []
-                cursor['woql:named_as_var'].append(asv)
+            if not cursor["woql:named_as_var"]:
+                cursor["woql:named_as_var"] = []
+                cursor["woql:named_as_var"].append(asv)
 
     def _wfroms(self, opts):
         """JSON LD Format Descriptor"""
         if opts and opts.format:
-            self._cursor['woql:format'] = {
-            "@type": "woql:Format",
-            "woql:format_type": {"@value": opts.format, "@type": "xsd:string"},
+            self._cursor["woql:format"] = {
+                "@type": "woql:Format",
+                "woql:format_type": {"@value": opts.format, "@type": "xsd:string"},
             }
         if opts.format_header:
-            self._cursor['woql:format']["woql:format_header"] = {
-            "@value": true,
-            "@type": "xsd:boolean"
+            self._cursor["woql:format"]["woql:format_header"] = {
+                "@value": true,
+                "@type": "xsd:boolean",
             }
         return self
 
     def _arop(self, arg):
         """Wraps arithmetic operators in the appropriate json-ld"""
         if type(arg) not in [bool, str, int, float, NoneType]:
-            if hasattr(arg, 'json'):
+            if hasattr(arg, "json"):
                 return arg.json()
             else:
                 return arg
@@ -139,10 +160,7 @@ class WOQLCore:
 
     def _vlist(self, target_list):
         """Wraps value lists in the appropriate json-ld"""
-        vobj = {
-    		"@type": "woql:Array",
-    		"woql:array_element": []
-    	}
+        vobj = {"@type": "woql:Array", "woql:array_element": []}
         if type(target_list) == str:
             target_list = [target_list]
         for idx, item in enumerate(target_list):
@@ -158,7 +176,7 @@ class WOQLCore:
         if type(wvar) == str:
             self._expand_variable(wvar, True)
         if type(wvar) == list:
-            ret = { "@type": "woql:Array", "woql:array_element": []}
+            ret = {"@type": "woql:Array", "woql:array_element": []}
             for idx, item in enumerate(wvar):
                 co_item = self._clean_object(item)
                 if type(co_item) == str:
@@ -172,9 +190,9 @@ class WOQLCore:
         """Query List Element Constructor"""
         qobj = self._jobj(query)
         return {
-        "@type": "woql:QueryListElement",
-        "woql:index" : self._jlt(idx, "nonNegativeInteger"),
-        "woql:query": qobj
+            "@type": "woql:QueryListElement",
+            "woql:index": self._jlt(idx, "nonNegativeInteger"),
+            "woql:query": qobj,
         }
 
     def _clean_object(self, obj):
@@ -183,10 +201,9 @@ class WOQLCore:
         if type(obj) not in [bool, str, int, float, NoneType]:
             return obj
         elif type(obj) == str:
-            if ':' in obj:
+            if ":" in obj:
                 subj = obj
-            elif:
-                self._vocab and (obj in self._vocab):
+            elif self._vocab and (obj in self._vocab):
                 subj = self._vocab[obj]
             else:
                 subj = "doc:" + obj
@@ -202,7 +219,7 @@ class WOQLCore:
         if type(predicate) != str:
             self._parameter_error("Predicate must be a URI string")
             return str(predicate)
-        if ':' in predicate:
+        if ":" in predicate:
             pred = predicate
         elif self._vocab and (predicate in self._vocab):
             pred = self._vocab[predicate]
@@ -212,7 +229,7 @@ class WOQLCore:
 
     def _clean_path_predicate(self, predicate):
         pred = False
-        if ':' in predicate:
+        if ":" in predicate:
             pred = predicate
         elif self._vocab and (predicate in self._vocab):
             pred = self._vocab[predicate]
@@ -224,19 +241,19 @@ class WOQLCore:
         """Transforms whatever is passed in as the object of a triple into the appropriate json-ld form (variable, literal or id)"""
         obj = {"@type": "woql:Datatype"}
         if type(object) == str:
-            if ':' in object:
+            if ":" in object:
                 return self._clean_class(object)
             elif self._vocab and (object in self._vocab):
                 return self._clean_class(self._vocab[object])
             else:
-                obj['woql:datatype'] = self._jlt(object, target)
+                obj["woql:datatype"] = self._jlt(object, target)
         elif type(object) == float:
             if not target:
                 target = "xsd:decimal"
-            obj['woql:datatype'] = self._jlt(object, target)
+            obj["woql:datatype"] = self._jlt(object, target)
         elif type(object) not in [bool, str, int, float, NoneType]:
             if "@value" in object:
-                obj['woql:datatype'] = object
+                obj["woql:datatype"] = object
             else:
                 return object
         return obj
@@ -252,26 +269,20 @@ class WOQLCore:
             if varname[:2] == "v:":
                 varname = varname[2:]
             return {
-            "@type": "woql:Variable",
-            "woql:variable_name": {
-            "@value": varname,
-            "@type": "xsd:string"
-            }
+                "@type": "woql:Variable",
+                "woql:variable_name": {"@value": varname, "@type": "xsd:string"},
             }
         else:
-            return {
-            "@type": "woql:Node",
-            "woql:node": varname
-            }
+            return {"@type": "woql:Node", "woql:node": varname}
 
     def _clean_class(self, user_class, string_only):
         if type(user_class) != str:
             return ""
-        if ':' in user_class:
+        if ":" in user_class:
             if self._vocab and (user_class in self._vocab):
                 user_class = self._vocab[user_class]
             else:
-                user_class = "scm:"+user_class
+                user_class = "scm:" + user_class
         if string_only:
             return user_class
         else:
@@ -282,9 +293,9 @@ class WOQLCore:
 
     def _default_context(self, db_iri):
         default = copy.copy(utils.STANDARD_URLS)
-        default['scm'] = db_iri + "/schema#"
-        default['doc'] = db_iri + "/document/"
-        default['db'] = db_iri + "/"
+        default["scm"] = db_iri + "/schema#"
+        default["doc"] = db_iri + "/document/"
+        default["db"] = db_iri + "/"
         return default
 
     def _get_context(self, query=None):
@@ -300,7 +311,7 @@ class WOQLCore:
 
     def _context(self, current_context):
         """Retrieves the value of the current json-ld context"""
-        self._cursor['@context'] = current_context
+        self._cursor["@context"] = current_context
 
     def _load_default_vocabulary(self):
         """vocabulary elements that can be used without prefixes in woql.py queries"""
@@ -325,7 +336,7 @@ class WOQLCore:
             "date": "xsd:date",
             "coordinate": "xdd:coordinate",
             "line": "xdd:coordinatePolyline",
-            "polygon": "xdd:coordinatePolygon"
+            "polygon": "xdd:coordinatePolygon",
         }
 
     @property
