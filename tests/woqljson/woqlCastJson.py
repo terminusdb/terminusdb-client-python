@@ -1,4 +1,4 @@
-woqlCastJson = {
+WoqlCastJson = {
     "@type": "woql:Typecast",
     "woql:typecast_value": {
         "@type": "woql:Variable",

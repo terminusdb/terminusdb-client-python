@@ -5,7 +5,6 @@ import requests
 from mockResponse import mocked_requests
 from woqlclient.api_endpoint_const import APIEndpointConst
 from woqlclient.dispatchRequest import DispatchRequest
-from woqlclient.documentTemplate import DocumentTemplate
 
 sys.path.append("woqlclient")
 
@@ -13,20 +12,23 @@ sys.path.append("woqlclient")
 def send_dispatch_request(
     url, action_type, key, payload={}
 ):  # don't use empty dict as default
-    return DispatchRequest.sendRequestByAction(url, action_type, key, payload)
+    return DispatchRequest.send_request_by_action(url, action_type, key, payload)
 
 
 @mock.patch("requests.get", side_effect=mocked_requests)
 def test_connect_call(mocked_requests):
     # Assert requests.get calls
     # assert (1 == 2) == True
-    send_dispatch_request("http://localhost:6363/", APIEndpointConst.CONNECT, "mykey")
+    send_dispatch_request(
+        "http://localhost:6363/", APIEndpointConst.CONNECT, "admin:mykey"
+    )
 
     requests.get.assert_called_once_with(
-        "http://localhost:6363/", headers={"Authorization": "Basic Om15a2V5"}
+        "http://localhost:6363/", headers={"Authorization": "Basic OmFkbWluOm15a2V5"}
     )
 
 
+"""
 @mock.patch("requests.post", side_effect=mocked_requests)
 def test_create_database(mocked_requests):
     full_url = "http://localhost:6363/myFirstTerminusDB"
@@ -78,3 +80,4 @@ def test_delete_database(mocked_requests):
         headers={"Authorization": "Basic Om15a2V5"},
     )
     # print("call_args_list", requests.delete.call_args_list)
+"""

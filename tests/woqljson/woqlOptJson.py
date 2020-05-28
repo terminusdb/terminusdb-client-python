@@ -1,4 +1,4 @@
-woqlOpt = {
+WoqlOpt = {
     "@type": "woql:Optional",
     "woql:query": {
         "@type": "woql:Triple",

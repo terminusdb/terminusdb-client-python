@@ -1,4 +1,4 @@
-woqlDoctype = {
+WoqlDoctype = {
     "@type": "woql:And",
     "woql:query_list": [
         {

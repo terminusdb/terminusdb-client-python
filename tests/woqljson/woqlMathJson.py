@@ -1,4 +1,4 @@
-woqlMath = {
+WoqlMath = {
     "minusJson": {
         "@type": "woql:Minus",
         "woql:first": {

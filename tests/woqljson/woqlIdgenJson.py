@@ -1,4 +1,4 @@
-woqlIdgen = {
+WoqlIdgen = {
     "@type": "woql:IDGenerator",
     "woql:base": {"@type": "woql:Node", "woql:node": "doc:Station"},
     "woql:key_list": {

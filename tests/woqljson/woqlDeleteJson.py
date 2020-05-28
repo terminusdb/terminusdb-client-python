@@ -1,4 +1,4 @@
-woqlDeleteJson = {
+WoqlDeleteJson = {
     "@type": "woql:And",
     "woql:query_list": [
         {

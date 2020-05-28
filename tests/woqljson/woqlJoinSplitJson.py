@@ -1,4 +1,4 @@
-woqlJoin = {
+WoqlJoin = {
     "joinJson": {
         "@type": "woql:Join",
         "woql:join_list": {

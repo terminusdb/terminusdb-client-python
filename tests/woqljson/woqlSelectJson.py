@@ -1,4 +1,4 @@
-woqlSelect = {
+WoqlSelect = {
     "jsonObj": {
         "@type": "woql:Select",
         "woql:variable_list": [

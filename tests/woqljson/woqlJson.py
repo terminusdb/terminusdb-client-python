@@ -1,4 +1,4 @@
-woqlJson = {
+WoqlJson = {
     "quadJson": {
         "@type": "woql:Quad",
         "woql:subject": {"@type": "woql:Node", "woql:node": "doc:a"},
@@ -108,7 +108,7 @@ woqlJson = {
             {
                 "@type": "woql:VariableOrdering",
                 "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 1},
-                "woql:ascending": {"@type": "xsd:boolean", "@value": True},
+                "woql:ascending": {"@type": "xsd:boolean", "@value": "true"},
                 "woql:variable": {
                     "@type": "woql:Variable",
                     "woql:variable_name": {"@value": "B", "@type": "xsd:string"},
@@ -117,7 +117,7 @@ woqlJson = {
             {
                 "@type": "woql:VariableOrdering",
                 "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 2},
-                "woql:ascending": {"@type": "xsd:boolean", "@value": True},
+                "woql:ascending": {"@type": "xsd:boolean", "@value": "true"},
                 "woql:variable": {
                     "@type": "woql:Variable",
                     "woql:variable_name": {"@value": "C", "@type": "xsd:string"},

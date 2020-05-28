@@ -1,4 +1,4 @@
-woqlConcatJson = {
+WoqlConcatJson = {
     "@type": "woql:Concatenate",
     "woql:concat_list": {
         "@type": "woql:Array",

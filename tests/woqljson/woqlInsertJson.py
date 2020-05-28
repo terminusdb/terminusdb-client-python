@@ -1,4 +1,4 @@
-woqlInsert = {
+WoqlInsert = {
     "onlyNode": {
         "@type": "woql:AddTriple",
         "woql:subject": {

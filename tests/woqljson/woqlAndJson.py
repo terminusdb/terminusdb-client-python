@@ -1,4 +1,4 @@
-woqlAndJson = {
+WoqlAndJson = {
     "@type": "woql:And",
     "woql:query_list": [
         {

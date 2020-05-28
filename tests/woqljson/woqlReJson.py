@@ -1,4 +1,4 @@
-woqlRe = {
+WoqlRe = {
     "@type": "woql:Regexp",
     "woql:pattern": {
         "@type": "woql:Datatype",

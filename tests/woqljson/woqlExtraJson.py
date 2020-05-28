@@ -1,4 +1,4 @@
-woqlExtra = {
+WoqlExtra = {
     "chainAndJson": {
         "@type": "woql:And",
         "woql:query_list": [

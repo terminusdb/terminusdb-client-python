@@ -1,4 +1,4 @@
-woqlWhen = {
+WoqlWhen = {
     "@type": "woql:When",
     "woql:query": {"@type": "woql:True"},
     "woql:consequent": {
