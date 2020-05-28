@@ -3,12 +3,11 @@
 
 import pytest
 from AllServerRecords import AllServerRecords
-from connectionObjDump import ConnectionDump
 from connectCapabilitiesResponse import ConnectResponse
+from connectionObjDump import ConnectionDump
 from DBRecord import dbRecordObj
 from serverRecordsFromCap import serverRecordsFromCap
 from woqlclient import ConnectionCapabilities
-
 
 url = "http://localhost:6363/"
 json_context = {

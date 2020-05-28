@@ -110,7 +110,7 @@ class DispatchRequest:
         # the server in the response return always content-type application/json
         except ValueError as err:
             # if the response type is not a json
-            print("Value Error", err)
+            #print("Value Error", err)
             return request_response.text
 
         """

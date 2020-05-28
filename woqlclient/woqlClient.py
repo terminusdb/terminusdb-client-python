@@ -81,17 +81,17 @@ class WOQLClient:
         if len(kwargs) > 0:
             self.conConfig.update(**kwargs)
 
-        json_obj = self.dispatch(self.conConfig.server_url, APIEndpointConst.CONNECT)
+        json_obj = self.dispatch(APIEndpointConst.CONNECT,self.conConfig.server)
         self.conCapabilities.set_capabilities(json_obj)
         return json_obj
 
     def copy(self):
         return copy(self)
 
-    def key(self, key=None, user=None):
+    def basic_auth(self, key=None, user=None):
         if key:
-            self.conConfig.set_key(key, user)
-        return self.conConfig.key
+            self.conConfig.set_basic_auth(key, user)
+        return self.conConfig.basic_auth
 
     def jwt(self, jwt=None, account_user=None):
         if jwt:
@@ -106,7 +106,7 @@ class WOQLClient:
     def account(self, accountid=None):
         if accountid:
             self.conConfig.account = accountid
-        self.conConfig.account
+        return self.conConfig.account
 
     def repo(self, repoid=None):
         if repoid:
@@ -119,12 +119,12 @@ class WOQLClient:
             self.conConfig.ref = refid
         return self.conConfig.ref
 
-    def checkout(self, branchid):
+    def checkout(self, branchid=None):
         if branchid:
             self.conConfig.branch = branchid
         return self.conConfig.branch
 
-    def uid(self, ignore_jwt):
+    def uid(self, ignore_jwt=True):
         return self.conConfig.user(ignore_jwt)
 
     """
@@ -169,10 +169,9 @@ class WOQLClient:
         """
         self.db(dbid)
         if kwargs.get("accountid"):
-            self.account(accountid)  # where does accountid comes from
+            self.account(kwargs['accountid'])  # where does accountid comes from
 
         comment = kwargs.get("comment", label)
-        print("__ACCOUNT___",self.account());
         username = self.account()
 
         doc = {
@@ -185,7 +184,7 @@ class WOQLClient:
         }
 
         return self.dispatch(
-            self.conConfig.db_url, APIEndpointConst.CREATE_DATABASE, doc
+            APIEndpointConst.CREATE_DATABASE, self.conConfig.db_url(), doc
         )
 
     def delete_database(self, dbid, accountid=None):
@@ -208,8 +207,10 @@ class WOQLClient:
         """
 
         self.db(dbid)
-        json_response = self.dispatch(
-            self.conConfig.db_url, APIEndpointConst.DELETE_DATABASE
+        if accountid:
+            self.account(accountid)
+
+        json_response = self.dispatch(APIEndpointConst.DELETE_DATABASE,self.conConfig.db_url()
         )
         self.conCapabilities.remove_db(self.db(), self.account())
         return json_response
@@ -249,8 +250,8 @@ class WOQLClient:
     def query (self,woql_query, commit_msg="Automatically Added Commit",file_list=None):
         #woql.containsUpdate() 
         query_obj =  self.generate_commit(commit_msg)   
-
-        if type(e) == dict:
+        
+        if type(file_list) == dict:
             file_dict = query_obj
             for name in file_list:
                 path = file_list[name]
@@ -266,10 +267,10 @@ class WOQLClient:
             file_dict = None
             query_obj['query'] = json.dumps(woql_query);
             payload = query_obj
+        
 
-        return self.dispatch(
+        return self.dispatch(APIEndpointConst.WOQL_QUERY,
             self.conConfig.query_url(),
-            APIEndpointConst.WOQL_QUERY,
             payload,
             file_dict,
         )
@@ -295,7 +296,7 @@ class WOQLClient:
     def clonedb (self,clone_source, newid):
         return self.dispatch(APIEndpointConst.CLONE, self.conConfig.clone_url(newid), clone_source)
 
-    def generate_commit(self, msg, author):
+    def generate_commit(self, msg, author=None):
         if author:
             mes_author = author
         else:
@@ -306,7 +307,7 @@ class WOQLClient:
 
     
     def dispatch(
-        self, url, action, payload={}, file_dict=None
+        self, action, url, payload={}, file_dict=None
     ):  # don't use dict as default
         """
         Directly dispatch to a Terminus database.
@@ -333,5 +334,5 @@ class WOQLClient:
         # self.conCapabilities.capabilitiesPermit(action)
         #url, action, payload={}, basic_auth, jwt=None, file_dict=None)
         return DispatchRequest.send_request_by_action(
-            url, action, payload, self.key(), self.jwt(), file_dict
+            url, action, payload, self.basic_auth(), self.jwt(), file_dict
         )

@@ -1,5 +1,5 @@
-woqlMath={
-        minusJson:{
+WoqlMath={
+        "minusJson":{
                 "@type": "woql:Minus",
                 "woql:first": {
                     "@type": "woql:ArithmeticValue",
@@ -16,7 +16,7 @@ woqlMath={
                     }
                 }
             },
-        evalJson:{"@type": "woql:Eval",
+        "evalJson":{"@type": "woql:Eval",
                         "woql:expression": "1+2",
                         "woql:result": {
                             "@type": "woql:Datatype",
@@ -26,7 +26,7 @@ woqlMath={
                             }
                         }
                 },
-        plusJson:{
+        "plusJson":{
             "@type": "woql:Plus",
             "woql:first": {
                 "@type": "woql:ArithmeticValue",
@@ -43,7 +43,7 @@ woqlMath={
                 }
             }
         },
-        timesJson:{
+        "timesJson":{
                 "@type": "woql:Times",
                 "woql:first": {
                     "@type": "woql:ArithmeticValue",
@@ -60,7 +60,7 @@ woqlMath={
                     }
                 }
             },
-        divideJson:{
+        "divideJson":{
             "@type": "woql:Divide",
             "woql:first": {
                 "@type": "woql:ArithmeticValue",
@@ -77,7 +77,7 @@ woqlMath={
                 }
             }
         },
-        expJson:{
+        "expJson":{
             "@type": "woql:Exp",
             "woql:first": {
                 "@type": "woql:ArithmeticValue",

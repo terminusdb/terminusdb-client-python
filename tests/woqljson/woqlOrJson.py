@@ -1,4 +1,4 @@
-woqlOr={
+WoqlOr={
     "@type": "woql:Or",
     "woql:query_list": [
         {

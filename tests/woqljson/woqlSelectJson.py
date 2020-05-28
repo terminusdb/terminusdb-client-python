@@ -1,4 +1,4 @@
-woqlSelect={jsonObj:{
+WoqlSelect={"jsonObj":{
                     "@type": "woql:Select",
                     "woql:variable_list": [
                         {
@@ -32,7 +32,7 @@ woqlSelect={jsonObj:{
                         }
                     }
                 },
-            jsonObjMulti:{
+            "jsonObjMulti":{
                     "@type": "woql:Select",
                     "woql:variable_list": [
                         {

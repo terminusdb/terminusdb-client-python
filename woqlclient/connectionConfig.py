@@ -15,9 +15,8 @@ class ConnectionConfig:
         self.__server = False
         self.__jwt_token = False  # jwt token for authenticating to remote servers for push / fetch / clone
         self.__jwt_user = False  # user id associated with the jwt token
-        self.__basic_auth = (
-            False  # basic auth string for authenticating to local server
-        )
+        self.__basic_auth = False # basic auth string for authenticating to local server
+    
         # these operate as cursors - where within the connected server context, we currently are
         self.__accountid = False
         self.__dbid = False
@@ -57,7 +56,7 @@ class ConnectionConfig:
             self.set_jwt(kwargs["jwt"], kwargs["jwt_user"])
         
         if 'key' in kwargs and 'user' in kwargs:
-            self.set_key(kwargs['key'], kwargs['user'])
+            self.set_basic_auth(kwargs['key'], kwargs['user'])
         if "branch" in kwargs:
             self.branch = kwargs["branch"]
         if "ref" in kwargs:
@@ -66,7 +65,7 @@ class ConnectionConfig:
             self.repo = kwargs["repo"]
 
     @property
-    def server_url(self):
+    def server(self):
         return self.__server
 
     @property
@@ -90,28 +89,33 @@ class ConnectionConfig:
         return self.__repoid
 
     @property
-    def key(self):
+    def basic_auth(self):
         return self.__basic_auth
 
     @property
     def jwt(self):
         return self.__jwt_token
 
-    @property
-    def user(self, ignore_jwt):
+
+    def user(self, ignore_jwt=True):
         if not ignore_jwt and self.__jwt_user:
             return self.__jwt_user
         if self.__basic_auth:
             return self.__basic_auth.split(":")[0]
 
-    @property
+    
     def db_url_fragment(self):
         if self.db == "terminus":
             return self.db
-        return self.account + "/" + self.db
+        return f"{self.account}/{self.db}"
 
     def db_base(self, action):
-        return f"{self.server_url}{action}/{self.db_url_fragment}"
+        return f"{self.server}{action}/{self.db_url_fragment()}"
+
+    def branch_url(self,branch_id):
+        base_url = self.repo_base("branch")
+        return f"{base_url}/branch/{branch_id}"
+    
 
     def repo_base(self, action):
         base = self.db_base(action)
@@ -144,13 +148,11 @@ class ConnectionConfig:
             schema = schema + f"/{sgid}"
         return schema
 
-    @property
     def query_url(self):
         if self.db == "terminus":
             return self.db_base("woql")
         return self.branch_base("woql")
 
-    @property
     def class_frame_url(self):
         if self.db == "terminus":
             return self.db_base("frame")
@@ -192,7 +194,7 @@ class ConnectionConfig:
                 purl = purl + f"/{target_branch}"
         return purl
 
-    @property
+
     def db_url(self):
         return self.db_base("db")
 
@@ -214,7 +216,7 @@ class ConnectionConfig:
     def set_server_connection(self, surl, key=None, jwt=None):
         if self.set_server(surl):
             if key is not None:
-                if not self.set_key(key):
+                if not self.set_basic_auth(key):
                     return False
             if jwt is not None:
                 if not self.set_jwt(jwt):
@@ -270,7 +272,7 @@ class ConnectionConfig:
         else:
             raise ValueError(f"Invalid Branch ID: {input_str}")
 
-    def set_key(self, api_key=None, user_id="admin"):
+    def set_basic_auth(self, api_key=None, user_id="admin"):
         if api_key is None:
             self.__basic_auth = False
             return None

@@ -1,4 +1,4 @@
-woqlTrim={
+WoqlTrim={
     "@type": "woql:Trim",
     "woql:untrimmed": {
         "@type": "woql:Datatype",
