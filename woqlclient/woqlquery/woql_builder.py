@@ -21,13 +21,13 @@ def _lib(self):
 
 def _abstract(self, graph, subj):
     if self.tripleBuilder is None:
-        self.createTripleBuilder(subj)
+        self._createTripleBuilder(subj)
     self.tripleBuilder.addPO("terminus:tag", "terminus:abstract", graph)
     return self
 
 def _node(self, node, type):
     if self.tripleBuilder is None:
-        self.createTripleBuilder(node, type)
+        self._createTripleBuilder(node, type)
     self.tripleBuilder.subject = node
     return self
 
@@ -45,7 +45,7 @@ Add a property at the current class/document
 
 def _property(self, proId, type):
     if self.tripleBuilder is None:
-        self.createTripleBuilder()
+        self._createTripleBuilder()
     if self.adding_class is not None:
         part = self.findLastSubject(self.cursor)
         g = false
@@ -84,26 +84,26 @@ def _insert_data (self, data, refGraph):
 
 def _graph(self, g):
     if self.tripleBuilder is None:
-        self.createTripleBuilder()
+        self._createTripleBuilder()
     self.tripleBuilder.graph(g)
     return self
 
 def _domain(self, d):
     if self.tripleBuilder is None:
-        self.createTripleBuilder()
+        self._createTripleBuilder()
     d = self._cleanClass(d);
     self.tripleBuilder._addPO('rdfs:domain',d)
     return self
 
 def _label(self, l, lang):
     if self.tripleBuilder is None:
-        self.createTripleBuilder()
+        self._createTripleBuilder()
     self.tripleBuilder._label(l, lang)
     return self
 
 def _description(self, c, lang):
     if self.tripleBuilder is None:
-        self.createTripleBuilder()
+        self._createTripleBuilder()
     self.tripleBuilder._description(c, lang)
     return self
 
@@ -112,9 +112,9 @@ def _description(self, c, lang):
 
 def _parent(self, *parentList):
     if self.tripleBuilder is None:
-        self.createTripleBuilder()
+        self._createTripleBuilder()
     for i in parentList:
-    	pn = self.cleanClass(parentList[i])
+    	pn = self._cleanClass(parentList[i])
     	self.tripleBuilder._addPO('rdfs:subClassOf', pn)
     return self
 
