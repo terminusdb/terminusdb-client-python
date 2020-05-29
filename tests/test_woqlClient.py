@@ -5,11 +5,11 @@ import unittest.mock as mock
 
 import pytest
 import requests
-from connectionObjDump import ConnectionDump
 from mockResponse import mocked_requests
 from woqlclient import WOQLClient
 from woqljson.woqlStarJson import WoqlStar
 
+# from connectionObjDump import ConnectionDump
 # def test_realCall():
 # resp=WOQLClient.directDeleteDatabase("http://localhost:6363/test0009","root")
 # print('test_realCall',resp)
@@ -48,8 +48,10 @@ def test_connection(mocked_requests, monkeypatch):
     requests.get.assert_called_once_with(
         "http://localhost:6363/", headers={"Authorization": "Basic OmFkbWluOm15a2V5"}
     )
-
-    #assert __woql_client__.conCapabilities.connection == ConnectionDump
+    with open("tests/connectionObjDump.json") as json_file:
+        json.load(json_file)
+        json_file.close()
+        # assert __woql_client__.conCapabilities.connection == connectionDump
 
 
 @mock.patch("requests.post", side_effect=mocked_requests)
