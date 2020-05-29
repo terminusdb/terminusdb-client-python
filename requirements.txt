@@ -5,9 +5,11 @@
 #    tox -e deps
 #
 apipkg==1.5               # via execnet
+atomicwrites==1.4.0       # via pytest
 attrs==19.3.0             # via pytest
 certifi==2020.4.5.1       # via requests
 chardet==3.0.4            # via requests
+colorama==0.4.3           # via pytest
 coverage==5.1             # via pytest-cov
 execnet==1.7.1            # via pytest-xdist
 idna==2.9                 # via requests
