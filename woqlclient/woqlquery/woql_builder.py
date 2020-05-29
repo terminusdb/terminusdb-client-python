@@ -141,22 +141,22 @@ def _create_triple_builder(self, node, type):
             g = gobj["@value"]
         else:
             g = False
-    s = lastsubj['woql:subject']
-    t = type or lastsubj["@type"]
-    if self.cursor["@type"] is not None:
-        subq = self.WOQLQuery().json(self.cursor)
-    if self.cursor["@type"] == "woql:And":
-        newq = subq
-    else:
-        newq = self.WOQLQuery().woql_and(subq)
-        nuj = newq.json()
-    for k in self.cursor):
-        delete(self.cursor[k])
-    for i in nuj:
-        self.cursor[i] = nuj[i]
-    else:
-        self.woql_and()
-        self.tripleBuilder = self.TripleBuilder(t, this, s, g)
+		s = lastsubj["woql:subject"]
+		t = type or lastsubj["@type"]
+	if self.cursor["@type"] is not None:
+		subq = self.WOQLQuery().json(self.cursor)
+		if self.cursor["@type"] == "woql:And":
+			newq = subq
+		else:
+			newq = self.WOQLQuery().woql_and(subq)
+		nuj = newq.json()
+		for k in self.cursor:
+			delete(self.cursor[k])
+		for i in nuj:
+			self.cursor[i] = nuj[i]
+	else:
+		self.woql_and()
+	self.tripleBuilder = self.TripleBuilder(t, this, s, g)
 
 
 """
