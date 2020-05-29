@@ -4,6 +4,7 @@
 import pytest
 from AllServerRecords import AllServerRecords
 from connectCapabilitiesResponse import ConnectResponse
+from connectionObjDump import ConnectionDump
 from DBRecord import dbRecordObj
 from serverRecordsFromCap import serverRecordsFromCap
 from woqlclient import ConnectionCapabilities
@@ -87,8 +88,7 @@ connection_capabilities.set_capabilities(ConnectResponse)
 
 class TestCapabilitiesActions:
     def test_connection_capability_object(self):
-        print("hello")
-        # assert connection_capabilities.connection == ConnectionDump
+        assert connection_capabilities.connection == ConnectionDump
 
     def test_form_resource_name(self):
         assert (

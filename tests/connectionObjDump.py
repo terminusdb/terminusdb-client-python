@@ -25,8 +25,8 @@ ConnectionDump = {
         "@value": "$pbkdf2-sha512$t=32768$b7+2Xn5XkuluDASL34WSlg$eORRJ0QzUGa5ET5BRFOd06NmX7hIvU6cWp86zLdMB0Sgu6YMhR2XT3ayL1cDaBs+5EhOPqAKp2BitYvqIsVldA",
     },
     "terminus:agent_name": {"@type": "xsd:string", "@value": "admin"},
-    "doc:Database_admin|5534534": {
-        "@id": "doc:Database_admin|5534534",
+    "doc:Database%5fadmin%7C5534534": {
+        "@id": "doc:Database%5fadmin%7C5534534",
         "@type": "terminus:Database",
         "rdfs:comment": {"@language": "en", "@value": "345345"},
         "rdfs:label": [
@@ -61,8 +61,8 @@ ConnectionDump = {
             "terminus:schema_write_access",
         ],
     },
-    "doc:Database_admin|aaaaaa": {
-        "@id": "doc:Database_admin|aaaaaa",
+    "doc:Database%5fadmin%7Caaaaaa": {
+        "@id": "doc:Database%5fadmin%7Caaaaaa",
         "@type": "terminus:Database",
         "rdfs:comment": {"@language": "en", "@value": "dasdasdds"},
         "rdfs:label": [
@@ -97,8 +97,8 @@ ConnectionDump = {
             "terminus:schema_write_access",
         ],
     },
-    "doc:Database_admin|adsasasddsa": {
-        "@id": "doc:Database_admin|adsasasddsa",
+    "doc:Database%5fadmin%7Cadsasasddsa": {
+        "@id": "doc:Database%5fadmin%7Cadsasasddsa",
         "@type": "terminus:Database",
         "rdfs:comment": {"@language": "en", "@value": "asdsadsda"},
         "rdfs:label": [
@@ -136,8 +136,8 @@ ConnectionDump = {
             "terminus:schema_write_access",
         ],
     },
-    "doc:Database_admin|blah": {
-        "@id": "doc:Database_admin|blah",
+    "doc:Database%5fadmin%7Cblah": {
+        "@id": "doc:Database%5fadmin%7Cblah",
         "@type": "terminus:Database",
         "rdfs:comment": {"@language": "en", "@value": "adfadf"},
         "rdfs:label": [
@@ -172,8 +172,8 @@ ConnectionDump = {
             "terminus:schema_write_access",
         ],
     },
-    "doc:Database_admin|daassd": {
-        "@id": "doc:Database_admin|daassd",
+    "doc:Database%5fadmin%7Cdaassd": {
+        "@id": "doc:Database%5fadmin%7Cdaassd",
         "@type": "terminus:Database",
         "rdfs:comment": {"@language": "en", "@value": "asdasdsd"},
         "rdfs:label": [
@@ -208,8 +208,8 @@ ConnectionDump = {
             "terminus:schema_write_access",
         ],
     },
-    "doc:Database_admin|dassadds": {
-        "@id": "doc:Database_admin|dassadds",
+    "doc:Database%5fadmin%7Cdassadds": {
+        "@id": "doc:Database%5fadmin%7Cdassadds",
         "@type": "terminus:Database",
         "rdfs:comment": {"@language": "en", "@value": "asdsdsad"},
         "rdfs:label": [
@@ -244,8 +244,8 @@ ConnectionDump = {
             "terminus:schema_write_access",
         ],
     },
-    "doc:Database_admin|ddd": {
-        "@id": "doc:Database_admin|ddd",
+    "doc:Database%5fadmin%7Cddd": {
+        "@id": "doc:Database%5fadmin%7Cddd",
         "@type": "terminus:Database",
         "rdfs:comment": {"@language": "en", "@value": "ddds"},
         "rdfs:label": [
@@ -280,8 +280,8 @@ ConnectionDump = {
             "terminus:schema_write_access",
         ],
     },
-    "doc:Database_admin|ffff": {
-        "@id": "doc:Database_admin|ffff",
+    "doc:Database%5fadmin%7Cffff": {
+        "@id": "doc:Database%5fadmin%7Cffff",
         "@type": "terminus:Database",
         "rdfs:comment": {"@language": "en", "@value": "fffff"},
         "rdfs:label": [
@@ -316,8 +316,8 @@ ConnectionDump = {
             "terminus:schema_write_access",
         ],
     },
-    "doc:Database_admin|fffffff": {
-        "@id": "doc:Database_admin|fffffff",
+    "doc:Database%5fadmin%7Cfffffff": {
+        "@id": "doc:Database%5fadmin%7Cfffffff",
         "@type": "terminus:Database",
         "rdfs:comment": {"@language": "en", "@value": "fff"},
         "rdfs:label": [
@@ -352,8 +352,8 @@ ConnectionDump = {
             "terminus:schema_write_access",
         ],
     },
-    "doc:Database_admin|ggggggggg": {
-        "@id": "doc:Database_admin|ggggggggg",
+    "doc:Database%5fadmin%7Cggggggggg": {
+        "@id": "doc:Database%5fadmin%7Cggggggggg",
         "@type": "terminus:Database",
         "rdfs:comment": {"@language": "en", "@value": "gg"},
         "rdfs:label": [
@@ -388,8 +388,8 @@ ConnectionDump = {
             "terminus:schema_write_access",
         ],
     },
-    "doc:Database_admin|twretwert": {
-        "@id": "doc:Database_admin|twretwert",
+    "doc:Database%5fadmin%7Ctwretwert": {
+        "@id": "doc:Database%5fadmin%7Ctwretwert",
         "@type": "terminus:Database",
         "rdfs:comment": {"@language": "en", "@value": "adfadf"},
         "rdfs:label": [
@@ -466,17 +466,17 @@ ConnectionDump = {
         "rdfs:label": {"@language": "en", "@value": "The DB server"},
         "terminus:allow_origin": {"@type": "xsd:string", "@value": "*"},
         "terminus:resource_includes": [
-            {"@id": "doc:Database_admin|5534534", "@type": "terminus:Database"},
-            {"@id": "doc:Database_admin|aaaaaa", "@type": "terminus:Database"},
-            {"@id": "doc:Database_admin|adsasasddsa", "@type": "terminus:Database"},
-            {"@id": "doc:Database_admin|blah", "@type": "terminus:Database"},
-            {"@id": "doc:Database_admin|daassd", "@type": "terminus:Database"},
-            {"@id": "doc:Database_admin|dassadds", "@type": "terminus:Database"},
-            {"@id": "doc:Database_admin|ddd", "@type": "terminus:Database"},
-            {"@id": "doc:Database_admin|ffff", "@type": "terminus:Database"},
-            {"@id": "doc:Database_admin|fffffff", "@type": "terminus:Database"},
-            {"@id": "doc:Database_admin|ggggggggg", "@type": "terminus:Database"},
-            {"@id": "doc:Database_admin|twretwert", "@type": "terminus:Database"},
+            {"@id": "doc:Database%5fadmin%7C5534534", "@type": "terminus:Database"},
+            {"@id": "doc:Database%5fadmin%7Caaaaaa", "@type": "terminus:Database"},
+            {"@id": "doc:Database%5fadmin%7Cadsasasddsa", "@type": "terminus:Database"},
+            {"@id": "doc:Database%5fadmin%7Cblah", "@type": "terminus:Database"},
+            {"@id": "doc:Database%5fadmin%7Cdaassd", "@type": "terminus:Database"},
+            {"@id": "doc:Database%5fadmin%7Cdassadds", "@type": "terminus:Database"},
+            {"@id": "doc:Database%5fadmin%7Cddd", "@type": "terminus:Database"},
+            {"@id": "doc:Database%5fadmin%7Cffff", "@type": "terminus:Database"},
+            {"@id": "doc:Database%5fadmin%7Cfffffff", "@type": "terminus:Database"},
+            {"@id": "doc:Database%5fadmin%7Cggggggggg", "@type": "terminus:Database"},
+            {"@id": "doc:Database%5fadmin%7Ctwretwert", "@type": "terminus:Database"},
             {"@id": "doc:terminus", "@type": "terminus:Database"},
         ],
         "terminus:resource_name": {
