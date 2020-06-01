@@ -31,10 +31,6 @@ def test_connection_error():
     WOQLClient("http://localhost:6363")
     print("___MOCKED______", mocked_requests("http://...").status_code)
 
-    # raises a connection error no requests mock
-    # with pytest.raises(requests.exceptions.ConnectionError):
-    # __woql_client__.connect("https://testServer.com",'mykey')
-
 
 @mock.patch("requests.get", side_effect=mocked_requests)
 def test_connection(mocked_requests, monkeypatch):
@@ -43,12 +39,12 @@ def test_connection(mocked_requests, monkeypatch):
 
     # before connect it connection is empty
     assert __woql_client__.conCapabilities.connection == {}
-    __woql_client__.connect(key="mykey", account="admin", user="admin")
+
+    response = __woql_client__.connect(key="mykey", account="admin", user="admin")
+
     requests.get.assert_called_once_with(
         "http://localhost:6363/", headers={"Authorization": "Basic OmFkbWluOm15a2V5"}
     )
-
-    # assert __woql_client__.conCapabilities.connection == ConnectionDump
 
 
 @mock.patch("requests.post", side_effect=mocked_requests)
@@ -109,11 +105,6 @@ def test_create_database_and_change_account(mocked_requests, mocked_requests2):
     __woql_client__.basic_auth() == "admin:mykey"
 
     __woql_client__.create_database("myFirstTerminusDB", "my first db")
-
-    # requests.post.assert_called_once_with(
-    #  "http://localhost:6363/db/admin/myFirstTerminusDB", headers={"Authorization": "Basic OmFkbWluOm15a2V5"},
-    # body={"label":"my first db","comment":"my first db","prefixes":{"scm":"terminus://admin/myFirstTerminusDB/schema#","doc":"terminus://admin/myFirstTerminusDB/data/"}}
-    # )
 
 
 @mock.patch("requests.delete", side_effect=mocked_requests)
