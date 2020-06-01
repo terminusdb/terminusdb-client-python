@@ -177,7 +177,6 @@ class WOQLCore:
         self._vocab = self._load_default_vocabulary()
 
         self._triple_builder = False
-        return self
 
     def _parameter_error(self, message):
         """Basic Error handling"""
