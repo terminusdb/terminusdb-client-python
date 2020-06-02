@@ -706,7 +706,7 @@ class WOQLQuery(WOQLCore):
         self._cursor["woql:sum"] = self._clean_object(output)
         return self
 
-    def start(self, start, query):
+    def start(self, start, query=None):
         if start and start == "woql:args":
             return ["woql:start", "woql:query"]
         if self._cursor.get("@type"):
@@ -715,7 +715,7 @@ class WOQLQuery(WOQLCore):
         self._cursor["woql:start"] = self._clean_object(start, "xsd:nonNegativeInteger")
         return self._add_sub_query(query)
 
-    def limit(self, limit, query):
+    def limit(self, limit, query=None):
         if limit and limit == "woql:args":
             return ["woql:limit", "woql:query"]
         if self._cursor.get("@type"):

@@ -108,7 +108,7 @@ def _tokens_to_json(seq, query):
         }
 
 
-def _copy_json(orig, rollup):
+def _copy_json(orig, rollup=None):
     if type(orig) == list:
         return orig
     if rollup:
@@ -118,10 +118,10 @@ def _copy_json(orig, rollup):
             if len(orig["woql:query_list"]) == 1:
                 return _copy_json(orig["woql:query_list"][0]["woql:query"], rollup)
         if "woql:query" in orig and orig["@type"] != "woql:Comment":
-            if not orig["woql:query"]["@type"]:
+            if not orig["woql:query"].get("@type"):
                 return {}
         if "woql:consequent" in orig:
-            if not orig["woql:consequent"]["@type"]:
+            if not orig["woql:consequent"].get("@type"):
                 return {}
     nuj = {}
     for key, part in orig.items():

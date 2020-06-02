@@ -1,21 +1,37 @@
-import pytest
 from ..woqlquery.woql_query import WOQLQuery
 # expected results
-from .woqljson.woqlAndJson import *
-from .woqljson.woqlCastJson import *
-from .woqljson.woqlInsertJson import *
+from .woqljson.woqlAndJson import WoqlAndJson
+from .woqljson.woqlCastJson import WoqlCastJson
+from .woqljson.woqlConcatJson import WoqlConcatJson
+from .woqljson.woqlDeleteJson import WoqlDeleteJson
+from .woqljson.woqlDoctypeJson import WoqlDoctype
+from .woqljson.woqlExtraJson import WoqlExtra
+from .woqljson.woqlIdgenJson import WoqlIdgen
+from .woqljson.woqlInsertJson import WoqlInsert
+from .woqljson.woqlJoinSplitJson import WoqlJoin
+from .woqljson.woqlJson import WoqlJson
+from .woqljson.woqlLimitStar import WoqlLimitStart
+from .woqljson.woqlMathJson import WoqlMath
+from .woqljson.woqlOptJson import WoqlOpt
+from .woqljson.woqlOrJson import WoqlOr
+from .woqljson.woqlReJson import WoqlRe
+from .woqljson.woqlSelectJson import WoqlSelect
+from .woqljson.woqlStarJson import WoqlStar
+from .woqljson.woqlTrimJson import WoqlTrim
+from .woqljson.woqlWhenJson import WoqlWhen
+
 
 class TestWoqlQueries:
     def test_start_properties_values(self):
         woqlObject = WOQLQuery()
-        assert woqlObject.chain_ended == False
-        assert woqlObject.contains_update == False
-        assert woqlObject.vocab["type"] == "rdf:type"
+        assert woqlObject._chain_ended == False
+        assert woqlObject._contains_update == False
+        assert woqlObject._vocab["type"] == "rdf:type"
 
     def test_limit_method(self):
         woqlObject = WOQLQuery().limit(10)
-        assert woqlObject.json()["limit"][0] == 10
-        assert woqlObject.json() == {"limit": [10, {}]}
+        limitJson={}
+        assert woqlObject.json() == limitJson
 
     def test_start_method(self):
         woqlObject = WOQLQuery().limit(10).start(0)
