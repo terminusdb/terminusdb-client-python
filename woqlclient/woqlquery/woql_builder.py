@@ -12,13 +12,13 @@ class TripleBuilder:
         """
         if triple_type and triple_type.indexOf(":") == -1:
             triple_type = "woql:" + type
-        self.type = triple_type
-        self.cursor = query.cursor
+        self._type = triple_type
+        self._cursor = query._cursor
         if s is not None:
-            self.subject = s
+            self._subject = s
         else:
-            self.subject = False
-        self.query = query
+            self._subject = False
+        self._query = query
         self.g = g
 
     def label(self, lab, lang="en"):
@@ -42,22 +42,22 @@ class TripleBuilder:
     def _add_po(self, p, o, g):
         g = g or self.g
         newq = False
-        if self.type == "woql:Triple":
-            newq = self.WOQLQuery().triple(self.subject, p, o)
-        elif self.type == "woql:AddTriple":
-            newq = self.WOQLQuery().add_triple(self.subject, p, o)
-        elif self.type == "woql:DeleteTriple":
-            newq = self.WOQLQuery().delete_triple(self.subject, p, o)
-        elif self.type == "woql:Quad":
-            newq = self.WOQLQuery().quad(self.subject, p, o, g)
-        elif self.type == "woql:AddQuad":
-            newq = self.WOQLQuery().add_quad(self.subject, p, o, g)
-        elif self.type == "woql:DeleteQuad":
-            newq = self.WOQLQuery().delete_quad(self.subject, p, o, g)
+        if self._type == "woql:Triple":
+            newq = self.WOQLQuery().triple(self._subject, p, o)
+        elif self._type == "woql:AddTriple":
+            newq = self.WOQLQuery().add_triple(self._subject, p, o)
+        elif self._type == "woql:DeleteTriple":
+            newq = self.WOQLQuery().delete_triple(self._subject, p, o)
+        elif self._type == "woql:Quad":
+            newq = self.WOQLQuery().quad(self._subject, p, o, g)
+        elif self._type == "woql:AddQuad":
+            newq = self.WOQLQuery().add_quad(self._subject, p, o, g)
+        elif self._type == "woql:DeleteQuad":
+            newq = self.WOQLQuery().delete_quad(self._subject, p, o, g)
         elif g is not None:
-            newq = self.WOQLQuery().quad(self.subject, p, o, g)
+            newq = self.WOQLQuery().quad(self._subject, p, o, g)
         else:
-            newq = self.WOQLQuery().triple(self.subject, p, o)
+            newq = self.WOQLQuery().triple(self._subject, p, o)
         self._query.woql_and(newq)
 
     def _get_o(self, s, p):
@@ -72,8 +72,8 @@ class TripleBuilder:
         return False
 
     def card(self, n, which):
-        os = self.subject
-        self.subject += "_" + which
+        os = self._subject
+        self._subject += "_" + which
         self._add_po("rdf:type", "owl:Restriction")
         self._add_po("owl:onProperty", os)
         if which == "max":
@@ -90,8 +90,8 @@ class TripleBuilder:
             )
         od = self._get_o(os, "rdfs:domain")
         if od is not None:
-            cardcls = self.subject
-            self.subject = od
+            cardcls = self._subject
+            self._subject = od
             self._add_po("rdfs:subClassOf", cardcls)
-        self.subject = os
+        self._subject = os
         return self
