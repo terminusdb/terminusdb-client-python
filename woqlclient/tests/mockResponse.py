@@ -1,5 +1,5 @@
 from connectCapabilitiesResponse import ConnectResponse
-from woqlclient import APIEndpointConst
+from api_endpoint_const import APIEndpointConst
 
 
 def mocked_requests(*args, **kwargs):

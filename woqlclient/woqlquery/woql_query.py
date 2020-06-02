@@ -1,13 +1,9 @@
 import re
 
-<<<<<<< HEAD
-from .woql_core import WOQLCore
-=======
 from woql_builder import TripleBuilder
 from woql_core import WOQLCore
 from woql_library import WOQLLibrary
 from woql_schema import WOQLSchema
->>>>>>> 903a65fed6f7447eb446f52f599045bd8c3cccdc
 
 
 class WOQLQuery(WOQLCore):
