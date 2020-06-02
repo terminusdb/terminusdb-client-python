@@ -1,6 +1,13 @@
 import re
 
+<<<<<<< HEAD
 from .woql_core import WOQLCore
+=======
+from woql_builder import TripleBuilder
+from woql_core import WOQLCore
+from woql_library import WOQLLibrary
+from woql_schema import WOQLSchema
+>>>>>>> 903a65fed6f7447eb446f52f599045bd8c3cccdc
 
 
 class WOQLQuery(WOQLCore):
@@ -11,7 +18,6 @@ class WOQLQuery(WOQLCore):
         ----------
         query json-ld query for initialisation"""
         super().__init__(query)
-
         # alias
         self.subsumption = self.sub
         self.equals = self.eq
@@ -866,3 +872,167 @@ class WOQLQuery(WOQLCore):
         self._cursor["woql:resource"] = self._clean_graph(graph)
         self._cursor["woql:triple_count"] = self._varj(triple_count)
         return self
+
+    def star(self, graph=None, subj=None, pred=None, obj=None):
+        if subj is None:
+            subj = "v:Subject"
+        if pred is None:
+            pred = "v:Predicate"
+        if obj is None:
+            obj = "v:Object"
+        if graph is None:
+            graph = False
+        if graph is not None:
+            return self.quad(subj, pred, obj, graph)
+        else:
+            return self.triple(subj, pred, obj)
+
+    def lib(self):
+        return WOQLLibrary()
+
+    def abstract(self, graph, subj):
+        """
+        Internal Triple-builder functions which allow chaining of partial queries
+        """
+        if self._triple_builder is None:
+            self._create_triple_builder(subj)
+        self._triple_builder._add_po("terminus:tag", "terminus:abstract", graph)
+        return self
+
+    def node(self, node, node_type):
+        if self._triple_builder is None:
+            self._create_triple_builder(node, node_type)
+        self._triple_builder.subject = node
+        return self
+
+    def property(self, pro_id, property_type):
+        """
+        Add a property at the current class/document
+
+            @param {string} proId - property ID
+            @param {string} type  - property type (range)
+            @returns WOQLQuery object
+
+            A range could be another class/document or an "xsd":"http://www.w3.org/2001/XMLSchema#" type
+            like string|integer|datatime|nonNegativeInteger|positiveInteger etc ..
+            (you don't need the prefix xsd for specific a type)
+        """
+        if self._triple_builder is None:
+            self._create_triple_builder()
+        if self.adding_class is not None:
+            part = self._find_last_subject(self.cursor)
+            g = False
+            if part is not None:
+                gpart = part["woql:graph_filter"] or part["woql:graph"]
+            if gpart is not None:
+                g = gpart["@value"]
+            nq = WOQLSchema().add_property(pro_id, type, g).domain(self.adding_class)
+            combine = self.WOQLQuery().json(self.query)
+            nwoql = self.WOQLQuery().woql_and(combine, nq)
+            nwoql.adding_class = self.adding_class
+            return nwoql.updated()
+        else:
+            pro_id = self._clean_predicate(pro_id)
+            self._triple_builder._add_po(pro_id, property_type)
+        return self
+
+    def insert(self, insert_id, insert_type, ref_graph):
+        insert_type = self._clean_type(insert_type, True)
+        if ref_graph is not None:
+            return self._add_quad(insert_id, "type", insert_type, ref_graph)
+        return self._add_triple(insert_id, "type", insert_type)
+
+    def insert_data(self, data, ref_graph):
+        if data.type and data.id:
+            data_type = self._clean_type(data.type, True)
+            self.insert(data.id, data_type, ref_graph)
+            if data.label is not None:
+                self.label(data.label)
+            if data.description is not None:
+                self.description(data.description)
+            for k in data:
+                if ["id", "label", "type", "description"].indexOf(k) == -1:
+                    self.property(k, data[k])
+        return self
+
+    def graph(self, g):
+        if self._triple_builder is None:
+            self._create_triple_builder()
+        self._triple_builder.graph(g)
+        return self
+
+    def domain(self, d):
+        if self._triple_builder is None:
+            self._create_triple_builder()
+        d = self._cleanClass(d)
+        self._triple_builder._add_po("rdfs:domain", d)
+        return self
+
+    def label(self, lan, lang):
+        if self._triple_builder is None:
+            self._create_triple_builder()
+        self._triple_builder.label(lan, lang)
+        return self
+
+    def description(self, c, lang):
+        if self._triple_builder is None:
+            self._create_triple_builder()
+        self._triple_builder.description(c, lang)
+        return self
+
+    def parent(self, *parent_list):
+        """Specifies that a new class should have parents class
+        param {array} parentList the list of parent class []
+        """
+        if self._triple_builder is None:
+            self._create_triple_builder()
+        for i in parent_list:
+            pn = self._clean_class(parent_list[i])
+            self._triple_builder._add_po("rdfs:subClassOf", pn)
+        return self
+
+    def max(self, m):
+        if self._triple_builder is not None:
+            self._triple_builder.card(m, "max")
+        return self
+
+    def cardinality(self, m):
+        if self._triple_builder is not None:
+            self._triple_builder.card(m, "cardinality")
+        return self
+
+    def min(self, m):
+        if self._triple_builder is not None:
+            self._triple_builder.card(m, "min")
+        return self
+
+    def _create_triple_builder(self, node, create_type):
+        s = node
+        t = create_type
+        lastsubj = self.findLastSubject(self.cursor)
+        g = False
+        if lastsubj is not None:
+            gobj = lastsubj["woql:graph_filter"] or lastsubj["woql:graph"]
+            if gobj is not None:
+                g = gobj["@value"]
+            else:
+                g = False
+            s = lastsubj["woql:subject"]
+            if create_type is not None:
+                t = create_type
+            else:
+                t = lastsubj["@type"]
+        if self.cursor["@type"] is not None:
+            subq = self.WOQLQuery().json(self.cursor)
+            if self.cursor["@type"] == "woql:And":
+                newq = subq
+            else:
+                newq = self.WOQLQuery().woql_and(subq)
+                nuj = newq.json()
+            for k in self.cursor:
+                del self.cursor[k]
+            for i in nuj:
+                self.cursor[i] = nuj[i]
+        else:
+            self.woql_and()
+        self._triple_builder = TripleBuilder(t, self, s, g)

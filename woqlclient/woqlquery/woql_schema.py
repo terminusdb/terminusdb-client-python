@@ -1,6 +1,7 @@
 from .woql_query import WOQLQuery
 from .woql_utils import *
 
+
 """
     The WOQL Schema Class provides pre-built WOQL queries for schema manipulation
     a) adding and deleting classes and properties
@@ -9,7 +10,7 @@ from .woql_utils import *
 """
 
 
-class WOQLSchema():
+class WOQLSchema:
     def __init__(self):
         self.graph = "schema/main"
 
@@ -75,12 +76,11 @@ class WOQLSchema():
         ap = WOQLQuery
         if c is not None:
             c = ap.cleanClass(c, True)
-            # TODO: cleaning
-            # ap.woql_and(
-            #     WOQLQuery.delete_quad(c, "v:Outgoing", "v:Value", graph),
-            #     WOQLQuery.opt().delete_quad("v:Other", "v:Incoming", c, graph)
-            # )
-            # ap.updated()
+            ap.woql_and(
+                WOQLQuery.delete_quad(c, "v:Outgoing", "v:Value", graph),
+                WOQLQuery.opt().delete_quad("v:Other", "v:Incoming", c, graph),
+            )
+            ap.updated()
         return ap
 
     def _add_property(self, p, t, graph=None):
@@ -93,16 +93,12 @@ class WOQLSchema():
             # TODO: cleaning
             if utils.type_helper.isDatatype(t) is not None:
                 ap.woql_and(
-                    WOQLQuery.add_quad(
-                        p, "rdf:type", "owl:DatatypeProperty", graph
-                    ),
+                    WOQLQuery.add_quad(p, "rdf:type", "owl:DatatypeProperty", graph),
                     WOQLQuery.add_quad(p, "rdfs:range", t, graph),
                 )
             else:
                 ap.woql_and(
-                    WOQLQuery.add_quad(
-                        p, "rdf:type", "owl:ObjectProperty", graph
-                    ),
+                    WOQLQuery.add_quad(p, "rdf:type", "owl:ObjectProperty", graph),
                     WOQLQuery.add_quad(p, "rdfs:range", t, graph),
                 )
             ap._updated()
@@ -145,9 +141,7 @@ class WOQLSchema():
             WOQLQuery.woql_not().node("v:Cid").abstract(graph),
             WOQLQuery.woql_and(*idgens),
             WOQLQuery.quad("v:Cid", "label", "v:Label", graph),
-            WOQLQuery.concat(
-                "Box Class generated for class v:Cid", "v:CDesc", graph
-            ),
+            WOQLQuery.concat("Box Class generated for class v:Cid", "v:CDesc", graph),
             WOQLQuery.concat(
                 "Box Property generated to link box v:ClassID to class v:Cid",
                 "v:PDesc",
@@ -177,7 +171,15 @@ class WOQLSchema():
         nq = WOQLQuery.when(woql_filter).woql_and(cls, prop)
         return nq._updated()
 
-    def _generate_choice_list(self, cls=None, clslabel=None, clsdesc=None, choices=None, graph=None, parent=None):
+    def _generate_choice_list(
+        self,
+        cls=None,
+        clslabel=None,
+        clsdesc=None,
+        choices=None,
+        graph=None,
+        parent=None,
+    ):
         if graph is None:
             graph = self.graph
         clist = []
@@ -286,7 +288,9 @@ class WOQLSchema():
             ),
             # string refinement datatypes
             self._add_datatype("xdd:email", "Email", "A valid email address", graph),
-            self._add_datatype("xdd:html", "HTML", "A string with embedded HTML", graph),
+            self._add_datatype(
+                "xdd:html", "HTML", "A string with embedded HTML", graph
+            ),
             self._add_datatype("xdd:json", "JSON", "A JSON encoded string", graph),
             self._add_datatype("xdd:url", "URL", "A valid http(s) URL", graph),
         )
