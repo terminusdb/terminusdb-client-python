@@ -1,7 +1,7 @@
 import pytest
-from woqlquery.woql_query import WOQLQuery
+from ..woqlquery.woql_query import WOQLQuery
 # expected results
-from woqljson.woqlAndJson import woqlIdgenJson
+from .woqljson.woqlAndJson import woqlIdgenJson
 from woqlCastJson import WoqlCastJson
 from WoqlInsertJson import WoqlInsert
 
