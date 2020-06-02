@@ -105,19 +105,18 @@ class WOQLQuery(WOQLCore):
             self._cursor["woql:query_list"] = []
         for item in queries:
             index = len(self._cursor["woql:query_list"])
-            onevar = self._gle(item, index)
-            if (
-                onevar["woql:query"]["@type"] == "woql:And"
-                and onevar["woql:query"]["woql:query_list"]
-            ):
-                for each in onevar["woql:query"]["woql:query_list"]:
-                    qjson = each["woql:query"]
-                if qjson:
-                    index = len(self._cursor["woql:query_list"])
-                    subvar = self._qle(qjson, index)
-                    self._cursor["woql:query_list"].append(subvar)
-            else:
-                self._cursor["woql:query_list"].append(onevar)
+            onevar = self._qle(item, index)
+            if "woql:query" in onevar:
+                if "@type" in onevar["woql:query"] and "woql:query_list" in onevar["woql:query"]:
+                    if onevar["woql:query"]["@type"] == "woql:And":
+                        for each in onevar["woql:query"]["woql:query_list"]:
+                            qjson = each["woql:query"]
+                        if qjson:
+                            index = len(self._cursor["woql:query_list"])
+                            subvar = self._qle(qjson, index)
+                            self._cursor["woql:query_list"].append(subvar)
+                    else:
+                        self._cursor["woql:query_list"].append(onevar)
         return self
 
     def woql_or(self, *args):
@@ -889,15 +888,15 @@ class WOQLQuery(WOQLCore):
         """
         Internal Triple-builder functions which allow chaining of partial queries
         """
-        if self._triple_builder is None:
+        if not self._triple_builder:
             self._create_triple_builder(subj)
         self._triple_builder._add_po("terminus:tag", "terminus:abstract", graph)
         return self
 
     def node(self, node, node_type):
-        if self._triple_builder is None:
+        if not self._triple_builder:
             self._create_triple_builder(node, node_type)
-        self._triple_builder.subject = node
+        self._triple_builder._subject = node
         return self
 
     def property(self, pro_id, property_type):
@@ -1001,33 +1000,37 @@ class WOQLQuery(WOQLCore):
             self._triple_builder.card(m, "min")
         return self
 
-    def _create_triple_builder(self, node, create_type):
+    def _create_triple_builder(self, node, _type):
         s = node
-        t = create_type
-        lastsubj = self.findLastSubject(self.cursor)
+        t = _type
+        lastsubj = self._find_last_subject(self._cursor)
         g = False
-        if lastsubj is not None:
-            gobj = lastsubj["woql:graph_filter"] or lastsubj["woql:graph"]
+        if lastsubj:
+            subj = lastsubj["woql:graph_filter"]
+            if subj:
+                gobj = subj
+            else:
+                gobj = lastsubj["woql:graph"]
             if gobj is not None:
                 g = gobj["@value"]
             else:
                 g = False
             s = lastsubj["woql:subject"]
-            if create_type is not None:
-                t = create_type
+            if _type is not None:
+                t = _type
             else:
                 t = lastsubj["@type"]
-        if self.cursor["@type"] is not None:
-            subq = self.WOQLQuery().json(self.cursor)
-            if self.cursor["@type"] == "woql:And":
+        if "@type" in self._cursor:
+            subq = self.WOQLQuery().json(self._cursor)
+            if self._cursor["@type"] == "woql:And":
                 newq = subq
             else:
                 newq = self.WOQLQuery().woql_and(subq)
                 nuj = newq.json()
-            for k in self.cursor:
-                del self.cursor[k]
+            for k in self._cursor:
+                del self._cursor[k]
             for i in nuj:
-                self.cursor[i] = nuj[i]
+                self._cursor[i] = nuj[i]
         else:
             self.woql_and()
         self._triple_builder = TripleBuilder(t, self, s, g)

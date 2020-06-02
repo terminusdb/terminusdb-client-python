@@ -151,7 +151,10 @@ class WOQLCore:
         Parameters
         ----------
         query json-ld query for initialisation"""
-        self._query = query if query else {}
+        if query:
+            self._query = query
+        else:
+            self._query = {}
         self._errors = []
         self._cursor = self._query
         self._chain_ended = False
