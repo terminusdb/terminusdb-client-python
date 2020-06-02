@@ -1,4 +1,4 @@
-from woql_query import WOQLQuery
+from .woql_query import WOQLQuery
 
 
 class WOQLLibrary():

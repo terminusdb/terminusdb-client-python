@@ -1,5 +1,5 @@
-from woql_query import WOQLQuery
-from woql_utils import utils
+from .woql_query import WOQLQuery
+from .woql_utils import *
 
 """
     The WOQL Schema Class provides pre-built WOQL queries for schema manipulation

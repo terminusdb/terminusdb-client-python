@@ -1,6 +1,6 @@
 import re
 
-from woql_core import WOQLCore
+from .woql_core import WOQLCore
 
 
 class WOQLQuery(WOQLCore):

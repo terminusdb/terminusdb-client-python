@@ -1,5 +1,5 @@
-from woql_schema import WOQLSchema
-from woql_library import WOQLLibrary
+from .woql_schema import WOQLSchema
+from .woql_library import WOQLLibrary
 
 
 def _star(self, graph=None, subj=None, pred=None, obj=None):
