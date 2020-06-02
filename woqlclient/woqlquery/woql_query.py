@@ -2,7 +2,6 @@ import re
 
 from .woql_builder import TripleBuilder
 from .woql_core import WOQLCore
-from .woql_schema import WOQLSchema
 
 
 class WOQLQuery(WOQLCore):
@@ -18,7 +17,7 @@ class WOQLQuery(WOQLCore):
         self.equals = self.eq
         self.substring = self.substr
         self.update = self.update_object
-        self.delete - self.delete_object
+        self.delete = self.delete_object
         self.read = self.read_object
         self.optional = self.opt
         self.idgenerator = self.idgen

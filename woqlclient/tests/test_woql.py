@@ -1,9 +1,9 @@
 import pytest
 from ..woqlquery.woql_query import WOQLQuery
 # expected results
-from .woqljson.woqlAndJson import woqlIdgenJson
-from woqlCastJson import WoqlCastJson
-from WoqlInsertJson import WoqlInsert
+from .woqljson.woqlAndJson import *
+from .woqljson.woqlCastJson import *
+from .woqljson.woqlInsertJson import *
 
 class TestWoqlQueries:
     def test_start_properties_values(self):
