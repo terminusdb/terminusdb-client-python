@@ -1,6 +1,6 @@
 import copy
 
-from .woql_utils import *
+import woqlclient.woql_utils as utils
 
 # helper functions
 

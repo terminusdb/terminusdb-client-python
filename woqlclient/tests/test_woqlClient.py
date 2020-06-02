@@ -5,9 +5,9 @@ import unittest.mock as mock
 
 import pytest
 import requests
-from mockResponse import mocked_requests
+from .mockResponse import mocked_requests
 from woqlclient import WOQLClient
-from woqljson.woqlStarJson import WoqlStar
+from .woqljson.woqlStarJson import WoqlStar
 
 # def test_realCall():
 # resp=WOQLClient.directDeleteDatabase("http://localhost:6363/test0009","root")
