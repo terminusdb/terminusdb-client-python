@@ -2,7 +2,6 @@ import re
 
 from .woql_builder import TripleBuilder
 from .woql_core import WOQLCore
-from .woql_schema import WOQLSchema
 
 
 class WOQLQuery(WOQLCore):
