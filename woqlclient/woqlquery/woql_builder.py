@@ -58,7 +58,7 @@ def _property(self, pro_id, property_type):
         part = self.findLastSubject(self.cursor)
         g = False
         if part is not None:
-            gpart = part["woql:graph_filter"] or part["woql:graph"]
+            gpart = part['woql:graph_filter'] or part['woql:graph']
         if gpart is not None:
             g = gpart["@value"]
         nq = WOQLSchema()._add_property(pro_id, type, g).domain(self.adding_class)
@@ -121,7 +121,6 @@ def _description(self, c, lang):
     self.tripleBuilder._description(c, lang)
     return self
 
-
 # Specifies that a new class should have parents class
 # @param {array} parentList the list of parent class []
 
@@ -145,7 +144,6 @@ def _cardinality(self, m):
     if self.tripleBuilder is not None:
         self.tripleBuilder.card(m, "cardinality")
     return self
-
 
 
 def _min(self, m):
@@ -270,13 +268,9 @@ def _card(self, n, which):
     self._addPO('rdf:type', "owl:Restriction")
     self._addPO("owl:onProperty", os)
     if which == "max":
-        self._addPO(
-            "owl:maxCardinality", {"@value": n, "@type": "xsd:nonNegativeInteger"}
-        )
+        self._addPO("owl:maxCardinality", {"@value": n, "@type": "xsd:nonNegativeInteger"})
     elif which == "min":
-        self._addPO(
-            "owl:minCardinality", {"@value": n, "@type": "xsd:nonNegativeInteger"}
-        )
+        self._addPO("owl:minCardinality", {"@value": n, "@type": "xsd:nonNegativeInteger"})
     else:
         self._addPO("owl:cardinality", {"@value": n, "@type": "xsd:nonNegativeInteger"})
     od = self._getO(os, "rdfs:domain")
