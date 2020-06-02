@@ -6,13 +6,13 @@ class TripleBuilder:
         type is add_quad / remove_quad / add_triple / remove_triple
      """
 
-    def __init__(self, triple_type, query, s, g):
+    def __init__(self, _type=None, query=None, s=None, g=None):
         """
         what accumulation type are we
         """
-        if triple_type and triple_type.indexOf(":") == -1:
-            triple_type = "woql:" + type
-        self._type = triple_type
+        if _type is not None and _type.find(":") == -1:
+            _type = "woql:" + _type
+        self._type = _type
         self._cursor = query._cursor
         if s is not None:
             self._subject = s
@@ -39,25 +39,26 @@ class TripleBuilder:
             d = {"@value": c, "@type": "xsd:string", "@language": lang}
         return self._addPO("rdfs:comment", d)
 
-    def _add_po(self, p, o, g):
-        g = g or self.g
+    def _add_po(self, p, o, g=None):
+        if g is None:
+            g = self.g
         newq = False
         if self._type == "woql:Triple":
-            newq = self.WOQLQuery().triple(self._subject, p, o)
+            newq = WOQLQuery().triple(self._subject, p, o)
         elif self._type == "woql:AddTriple":
-            newq = self.WOQLQuery().add_triple(self._subject, p, o)
+            newq = WOQLQuery().add_triple(self._subject, p, o)
         elif self._type == "woql:DeleteTriple":
-            newq = self.WOQLQuery().delete_triple(self._subject, p, o)
+            newq = WOQLQuery().delete_triple(self._subject, p, o)
         elif self._type == "woql:Quad":
-            newq = self.WOQLQuery().quad(self._subject, p, o, g)
+            newq = WOQLQuery().quad(self._subject, p, o, g)
         elif self._type == "woql:AddQuad":
-            newq = self.WOQLQuery().add_quad(self._subject, p, o, g)
+            newq = WOQLQuery().add_quad(self._subject, p, o, g)
         elif self._type == "woql:DeleteQuad":
-            newq = self.WOQLQuery().delete_quad(self._subject, p, o, g)
+            newq = WOQLQuery().delete_quad(self._subject, p, o, g)
         elif g is not None:
-            newq = self.WOQLQuery().quad(self._subject, p, o, g)
+            newq = WOQLQuery().quad(self._subject, p, o, g)
         else:
-            newq = self.WOQLQuery().triple(self._subject, p, o)
+            newq = WOQLQuery().triple(self._subject, p, o)
         self._query.woql_and(newq)
 
     def _get_o(self, s, p):
