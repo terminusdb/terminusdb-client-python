@@ -1445,6 +1445,7 @@ class WOQLQuery:
             self._clean_object(object_or_literal),
             self._clean_graph(graph),
         ]
+        print('in add_quad')
         return self._chainable_update("add_quad", subject)
 
     def delete_quad(self, subject, predicate, object_or_literal, graph):
@@ -2559,11 +2560,14 @@ class WOQLQuery:
     def _last(self, call=None, subject=None):
         """Called to indicate that this is the last call in constructing a complete woql query object"""
         self.chain_ended = True
+        print('_last')
         return self
 
     def _last_update(self):
         """Called to indicate that this is the last call that is chainable - for example triple pattern matching.."""
+        print('in _last_update')
         self._last()
+        print('self',self)
         return self
 
     def _chainable(self, call, subj):
@@ -2575,6 +2579,7 @@ class WOQLQuery:
     def _chainable_update(self, call, subj):
         """Called to indicate internally that this is a chainable update - by setting the subject and call of the Triple Builder object which is used to build further triples"""
         self.tripleBuilder = TripleBuilder(call, self.cursor, self._clean_subject(subj))
+        print('in _chainable_update')
         return self._last_update()
 
     def _is_chainable(self, operator, lastArg=None):
