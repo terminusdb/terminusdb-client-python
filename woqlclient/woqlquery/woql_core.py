@@ -416,6 +416,7 @@ class WOQLCore:
             return {"@type": "woql:Node", "woql:node": varname}
 
     def _clean_class(self, user_class, string_only):
+        print(' i am in cean class')
         if type(user_class) != str:
             return ""
         if ":" in user_class:

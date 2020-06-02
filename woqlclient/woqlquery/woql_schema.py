@@ -1,6 +1,5 @@
-import woql_utils as utils
-from .woqlQuery import woqlQuery
-
+from woql_query import WOQLQuery
+from woql_utils import utils
 
 """
     The WOQL Schema Class provides pre-built WOQL queries for schema manipulation
@@ -10,15 +9,15 @@ from .woqlQuery import woqlQuery
 """
 
 
-class WOQLSchema(g):
+class WOQLSchema():
     def __init__(self):
-        self.graph = g or "schema/main"
+        self.graph = "schema/main"
 
     def _add_class(self, c, graph=None):
         graph = self.graph
-        ap = self.woqlQuery()
+        ap = WOQLQuery()
         if c is not None:
-            c = ap._cleanClass(c, True)
+            c = ap._clean_class(c, True)
             ap.adding_class = c
             ap._add_quad(c, "rdf:type", "owl:Class", graph)
         return ap
@@ -27,7 +26,7 @@ class WOQLSchema(g):
         """
             Adds a bunch of class data in one go
         """
-        ap = self.woqlQuery()
+        ap = WOQLQuery
         if data.id is not None:
             c = ap._cleanClass(data.id, True)
             ap = self.WOQLSchema().add_class(c, ref_graph)
@@ -53,7 +52,7 @@ class WOQLSchema(g):
         return self._insert_class_data(data, ref_graph)
 
     def _insert_property_data(self, data, ref_graph):
-        ap = self.woqlQuery()
+        ap = WOQLQuery
         if data.id is not None:
             c = ap._cleanClass(data.id, True)
             ap._add_class(c, ref_graph)
@@ -70,58 +69,41 @@ class WOQLSchema(g):
                     ap.insert_property_data(k, data[k], ref_graph)
         return ap
 
-    def delete_class(self, c, graph=self.graph):
-        ap = self.woqlQuery()
+    def delete_class(self, c, graph=None):
+        if graph is None:
+            graph = self.graph
+        ap = WOQLQuery
         if c is not None:
             c = ap.cleanClass(c, True)
             # TODO: cleaning
             # ap.woql_and(
-            #     self.woqlQuery().delete_quad(c, "v:Outgoing", "v:Value", graph),
-            #     self.woqlQuery().opt().delete_quad("v:Other", "v:Incoming", c, graph)
+            #     WOQLQuery.delete_quad(c, "v:Outgoing", "v:Value", graph),
+            #     WOQLQuery.opt().delete_quad("v:Other", "v:Incoming", c, graph)
             # )
             # ap.updated()
-        return ap
-
-    def _insert_property_data(self, data, graph):
-        ap = self.woqlQuery()
-        if data.id is not None:
-            p = ap._cleanPathPredicate(data.id)
-            t = ap._cleanType(data.range, True) if t is not None else "xsd:string"
-            ap._add_property(p, t, graph)
-            if data.label is not None:
-                ap.label(data.label)
-            if data.description is not None:
-                ap.description(data.description)
-            if data.domain is not None:
-                ap.domain(data.domain)
-            if data.max is not None:
-                ap.max(data.max)
-            if data.min is not None:
-                ap.min(data.min)
-                ap.cardinality(data.cardinality)
         return ap
 
     def _add_property(self, p, t, graph=None):
         if graph is None:
             graph = self.graph
-        ap = self.woqlQuery()
+        ap = WOQLQuery
         t = ap._cleanType(t, True) if t is not None else "xsd:string"
         if p is not None:
             p = ap._cleanPathPredicate(p)
             # TODO: cleaning
             if utils.type_helper.isDatatype(t) is not None:
                 ap.woql_and(
-                    self.woqlQuery().add_quad(
+                    WOQLQuery.add_quad(
                         p, "rdf:type", "owl:DatatypeProperty", graph
                     ),
-                    self.woqlQuery().add_quad(p, "rdfs:range", t, graph),
+                    WOQLQuery.add_quad(p, "rdfs:range", t, graph),
                 )
             else:
                 ap.woql_and(
-                    self.woqlQuery().add_quad(
+                    WOQLQuery.add_quad(
                         p, "rdf:type", "owl:ObjectProperty", graph
                     ),
-                    self.woqlQuery().add_quad(p, "rdfs:range", t, graph),
+                    WOQLQuery.add_quad(p, "rdfs:range", t, graph),
                 )
             ap._updated()
         return ap
@@ -129,13 +111,13 @@ class WOQLSchema(g):
     def _delete_property(self, p, graph=None):
         if graph is None:
             graph = self.graph
-        ap = self.woqlQuery()
+        ap = WOQLQuery
         if p is not None:
             p = ap.cleanPathPredicate(p)
             # TODO: cleaning
             ap.woql_and(
-                self.woqlQuery().delete_quad(p, "v:All", "v:Al2", graph),
-                self.woqlQuery().delete_quad("v:Al3", "v:Al4", p, graph),
+                WOQLQuery.delete_quad(p, "v:All", "v:Al2", graph),
+                WOQLQuery.delete_quad("v:Al3", "v:Al4", p, graph),
             )
             ap.updated()
         return ap
@@ -146,27 +128,27 @@ class WOQLSchema(g):
         prefix = prefix or "scm:"
         subs = []
         for i in classes:
-            subs.append(self.woqlQuery().sub(classes[i], "v:Cid"))
+            subs.append(WOQLQuery.sub(classes[i], "v:Cid"))
         nsubs = []
         for i in excepts:
-            nsubs.append(self.woqlQuery().woql_not().sub(excepts[i], "v:Cid"))
+            nsubs.append(WOQLQuery.woql_not().sub(excepts[i], "v:Cid"))
         idgens = [
-            self.woqlQuery().re("#(.)(.*)", "v:Cid", ["v:AllB", "v:FirstB", "v:RestB"]),
-            self.woqlQuery().lower("v:FirstB", "v:Lower"),
-            self.woqlQuery().concat(["v:Lower", "v:RestB"], "v:Propname"),
-            self.woqlQuery().concat(["Scoped", "v:FirstB", "v:RestB"], "v:Cname"),
-            self.woqlQuery().idgen(prefix, ["v:Cname"], "v:ClassID"),
-            self.woqlQuery().idgen(prefix, ["v:Propname"], "v:PropID"),
+            WOQLQuery.re("#(.)(.*)", "v:Cid", ["v:AllB", "v:FirstB", "v:RestB"]),
+            WOQLQuery.lower("v:FirstB", "v:Lower"),
+            WOQLQuery.concat(["v:Lower", "v:RestB"], "v:Propname"),
+            WOQLQuery.concat(["Scoped", "v:FirstB", "v:RestB"], "v:Cname"),
+            WOQLQuery.idgen(prefix, ["v:Cname"], "v:ClassID"),
+            WOQLQuery.idgen(prefix, ["v:Propname"], "v:PropID"),
         ]
-        woql_filter = self.woqlQuery().woql_and(
-            self.woqlQuery().quad("v:Cid", "rdf:type", "owl:Class", graph),
-            self.woqlQuery().woql_not().node("v:Cid").abstract(graph),
-            self.woqlQuery().woql_and(*idgens),
-            self.woqlQuery().quad("v:Cid", "label", "v:Label", graph),
-            self.woqlQuery().concat(
+        woql_filter = WOQLQuery.woql_and(
+            WOQLQuery.quad("v:Cid", "rdf:type", "owl:Class", graph),
+            WOQLQuery.woql_not().node("v:Cid").abstract(graph),
+            WOQLQuery.woql_and(*idgens),
+            WOQLQuery.quad("v:Cid", "label", "v:Label", graph),
+            WOQLQuery.concat(
                 "Box Class generated for class v:Cid", "v:CDesc", graph
             ),
-            self.woqlQuery().concat(
+            WOQLQuery.concat(
                 "Box Property generated to link box v:ClassID to class v:Cid",
                 "v:PDesc",
                 graph,
@@ -176,9 +158,9 @@ class WOQLSchema(g):
             if len(subs) == 1:
                 woql_filter.woql_and(subs[0])
             else:
-                woql_filter.woql_and(self.woqlQuery().woql_or(*subs))
+                woql_filter.woql_and(WOQLQuery().woql_or(*subs))
         if nsubs.len():
-            woql_filter.woql_and(woqlQuery().woql_and(*nsubs))
+            woql_filter.woql_and(WOQLQuery().woql_and(*nsubs))
         cls = (
             self.WOQLSchema(graph)
             .add_class("v:ClassID")
@@ -192,18 +174,10 @@ class WOQLSchema(g):
             .description("v:PDesc")
             .domain("v:ClassID")
         )
-        nq = self.woqlQuery().when(woql_filter).woql_and(cls, prop)
+        nq = WOQLQuery.when(woql_filter).woql_and(cls, prop)
         return nq._updated()
 
-    def _generate_choice_list(
-        self,
-        cls=None,
-        clslabel=None,
-        clsdesc=None,
-        choices=[],
-        graph=None,
-        parent=None,
-    ):
+    def _generate_choice_list(self, cls=None, clslabel=None, clsdesc=None, choices=None, graph=None, parent=None):
         if graph is None:
             graph = self.graph
         clist = []
@@ -229,7 +203,7 @@ class WOQLSchema(g):
                 chid = choices[i]
                 clab = utils.labelFromURL(chid)
                 desc = False
-            cq = self.woqlQuery().insert(chid, cls, graph).label(clab)
+            cq = WOQLQuery.insert(chid, cls, graph).label(clab)
             if desc is not None:
                 cq.description(desc)
             confs.append(cq)
@@ -237,13 +211,13 @@ class WOQLSchema(g):
                 nextid = listid + "_" + i
             else:
                 nextid = "rdf:nil"
-            clist.append(self.woqlQuery().add_quad(lastid, "rdf:first", chid, graph))
-            clist.append(self.woqlQuery().add_quad(lastid, "rdf:rest", nextid, graph))
+            clist.append(WOQLQuery.add_quad(lastid, "rdf:first", chid, graph))
+            clist.append(WOQLQuery.add_quad(lastid, "rdf:rest", nextid, graph))
             lastid = nextid
-        oneof = self.woqlQuery().woql_and(
-            self.woqlQuery().add_quad(cls, "owl:oneOf", listid, graph), *clist
+        oneof = WOQLQuery.woql_and(
+            WOQLQuery.add_quad(cls, "owl:oneOf", listid, graph), *clist
         )
-        return self.woqlQuery().woql_and(*confs, oneof)
+        return WOQLQuery.woql_and(*confs, oneof)
 
     def _libs(self, libs, parent, graph, prefix):
         bits = []
@@ -255,13 +229,13 @@ class WOQLSchema(g):
         elif libs.indexOf("box") != -1:
             bits.append(self.load_xsd_boxes(parent, graph, prefix))
         if len(bits) > 1:
-            return self.woqlQuery().woql_and(*bits)
+            return WOQLQuery.woql_and(*bits)
         return bits[0]
 
     def _load_xdd(self, graph=None):
         if graph is None:
             graph = self.graph
-        return self.woqlQuery().woql_and(
+        return WOQLQuery.woql_and(
             # geograhpic datatypes
             self._add_datatype(
                 "xdd:coordinate",
@@ -321,7 +295,7 @@ class WOQLSchema(g):
         if graph is None:
             graph = self.graph
         # utility function for creating a datatype in woql
-        dt = self, woqlQuery().insert(d_id, "rdfs:Datatype", graph).label(label)
+        dt = WOQLQuery().insert(d_id, "rdfs:Datatype", graph).label(label)
         if descr is not None:
             dt.description(descr)
         return dt
@@ -329,7 +303,7 @@ class WOQLSchema(g):
     def load_xsd_boxes(self, parent, graph, prefix):
         # Loads box classes for all of the useful xsd classes the format is to generate the box classes for xsd:anyGivenType
         # as class(prefix:AnyGivenType) -> property(prefix:anyGivenType) -> datatype(xsd:anyGivenType)
-        return self.woqlQuery().woql_and(
+        return WOQLQuery.woql_and(
             self._box_datatype(
                 "xsd:anySimpleType",
                 "Any Simple Type",
@@ -616,7 +590,7 @@ class WOQLSchema(g):
     def load_xdd_boxes(self, parent, graph, prefix):
         # Generates a query to create box classes for all of the xdd datatypes. the format is to generate the box classes for xdd:anyGivenType
         # as class(prefix:AnyGivenType) -> property(prefix:anyGivenType) -> datatype(xdd:anyGivenType)
-        return self.woqlQuery().woql_and(
+        return WOQLQuery.woql_and(
             self._box_datatype(
                 "xdd:coordinate",
                 "Coordinate",
@@ -711,4 +685,4 @@ class WOQLSchema(g):
         )
         if descr is not None:
             box_prop.description(descr)
-        return self.woqlQuery().woql_and(box_class, box_prop)
+        return WOQLQuery.woql_and(box_class, box_prop)
