@@ -1,5 +1,9 @@
-from woqlclient import WOQLQuery
-
+import pytest
+from woqlquery.woql_query import WOQLQuery
+# expected results
+from woqljson.woqlAndJson import woqlIdgenJson
+from woqlCastJson import WoqlCastJson
+from WoqlInsertJson import WoqlInsert
 
 class TestWoqlQueries:
     def test_start_properties_values(self):
@@ -20,11 +24,7 @@ class TestWoqlQueries:
 
     def test_insert_method(self):
         woqlObject = WOQLQuery().insert("v:Bike_URL", "Bicycle")
-        woqlObjectDB = WOQLQuery().insert("v:Bike_URL", "Bicycle", "myDB")
-        jsonObj = {"add_triple": ["v:Bike_URL", "rdf:type", "scm:Bicycle"]}
-        jsonObjDB = {"add_quad": ["v:Bike_URL", "rdf:type", "scm:Bicycle", "db:myDB"]}
-        assert woqlObject.json() == jsonObj
-        assert woqlObjectDB.json() == jsonObjDB
+        assert woqlObject.json() == WoqlInsert["onlyNode"]
 
     def test_doctype_method(self):
         woqlObject = WOQLQuery().doctype("Station")

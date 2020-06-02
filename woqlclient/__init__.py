@@ -5,7 +5,8 @@
 """
 import warnings
 
-from .woql import *
+#from .woql_query import *
+#from .woql import *
 from .woqlClient import *
 
 try:
