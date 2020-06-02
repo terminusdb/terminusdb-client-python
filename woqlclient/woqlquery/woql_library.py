@@ -1,7 +1,7 @@
 from woql_query import WOQLQuery
 
 
-class WOQLLibrary():
+class WOQLLibrary:
     def __init__(self):
         self.default_schema = "schema/main"
 
@@ -26,9 +26,9 @@ class WOQLLibrary():
         g = g or self.default_schema
         return WOQLQuery.woql_and(
             WOQLQuery.sub("terminus:Document", "v:Class"),
-            WOQLQuery
-            .woql_not()
-            .quad("v:Class", "terminus:tag", "terminus:abstract", g),
+            WOQLQuery.woql_not().quad(
+                "v:Class", "terminus:tag", "terminus:abstract", g
+            ),
             WOQLQuery.limit(1).opt().quad("v:Class", "label", "v:Label", g),
             WOQLQuery.limit(1).opt().quad("v:Class", "comment", "v:Comment", g),
         )
@@ -50,67 +50,49 @@ class WOQLLibrary():
 
     def _element_metadata(self, g):
         g = g or self.default_schema
-        return (
-            WOQLQuery
-            .select(
-                "v:Element", "v:Label", "v:Comment", "v:Parents", "v:Domain", "v:Range"
-            )
-            .woql_and(
-                WOQLQuery.quad("v:Element", "type", "v:Type", g),
-                WOQLQuery
-                .opt()
-                .quad("v:Element", "terminus:tag", "v:Abstract", g),
-                WOQLQuery.opt().quad("v:Element", "label", "v:Label", g),
-                WOQLQuery.opt().quad("v:Element", "comment", "v:Comment", g),
-                WOQLQuery
-                .opt()
-                .group_by("v:Element", "v:Parent", "v:Parents")
-                .woql_and(
-                    WOQLQuery.quad("v:Element", "subClassOf", "v:Parent", g)
-                ),
-                WOQLQuery.opt().quad("v:Element", "domain", "v:Domain", g),
-                WOQLQuery.opt().quad("v:Element", "range", "v:Range", g),
-            )
+        return WOQLQuery.select(
+            "v:Element", "v:Label", "v:Comment", "v:Parents", "v:Domain", "v:Range"
+        ).woql_and(
+            WOQLQuery.quad("v:Element", "type", "v:Type", g),
+            WOQLQuery.opt().quad("v:Element", "terminus:tag", "v:Abstract", g),
+            WOQLQuery.opt().quad("v:Element", "label", "v:Label", g),
+            WOQLQuery.opt().quad("v:Element", "comment", "v:Comment", g),
+            WOQLQuery.opt()
+            .group_by("v:Element", "v:Parent", "v:Parents")
+            .woql_and(WOQLQuery.quad("v:Element", "subClassOf", "v:Parent", g)),
+            WOQLQuery.opt().quad("v:Element", "domain", "v:Domain", g),
+            WOQLQuery.opt().quad("v:Element", "range", "v:Range", g),
         )
 
     def _class_list(self, g):
         g = g or self.default_schema
-        return (
-            WOQLQuery
-            .select(
-                "v:Class",
-                "v:Name",
-                "v:Parents",
-                "v:Children",
-                "v:Description",
-                "v:Abstract",
-            )
+        return WOQLQuery.select(
+            "v:Class",
+            "v:Name",
+            "v:Parents",
+            "v:Children",
+            "v:Description",
+            "v:Abstract",
+        ).woql_and(
+            WOQLQuery.quad("v:Class", "type", "owl:Class", g),
+            WOQLQuery.limit(1).opt().quad("v:Class", "label", "v:Name", g),
+            WOQLQuery.limit(1).opt().quad("v:Class", "comment", "v:Description", g),
+            WOQLQuery.opt().quad("v:Class", "terminus:tag", "v:Abstract", g),
+            WOQLQuery.opt()
+            .group_by("v:Class", "v:Parent", "v:Parents")
             .woql_and(
-                WOQLQuery.quad("v:Class", "type", "owl:Class", g),
-                WOQLQuery.limit(1).opt().quad("v:Class", "label", "v:Name", g),
-                WOQLQuery
-                .limit(1)
-                .opt()
-                .quad("v:Class", "comment", "v:Description", g),
-                WOQLQuery.opt().quad("v:Class", "terminus:tag", "v:Abstract", g),
-                WOQLQuery
-                .opt()
-                .group_by("v:Class", "v:Parent", "v:Parents")
-                .woql_and(
-                    WOQLQuery.quad("v:Class", "subClassOf", "v:Parent", g),
-                    WOQLQuery.woql_or(
-                        WOQLQuery.eq("v:Parent", "terminus:Document"),
-                        WOQLQuery.quad("v:Parent", "type", "owl:Class", g),
-                    ),
+                WOQLQuery.quad("v:Class", "subClassOf", "v:Parent", g),
+                WOQLQuery.woql_or(
+                    WOQLQuery.eq("v:Parent", "terminus:Document"),
+                    WOQLQuery.quad("v:Parent", "type", "owl:Class", g),
                 ),
-                WOQLQuery
-                .opt()
-                .group_by("v:Class", "v:Child", "v:Children")
-                .woql_and(
-                    WOQLQuery.quad("v:Child", "subClassOf", "v:Class", g),
-                    WOQLQuery.quad("v:Child", "type", "owl:Class", g),
-                ),
-            )
+            ),
+            WOQLQuery.opt()
+            .group_by("v:Class", "v:Child", "v:Children")
+            .woql_and(
+                WOQLQuery.quad("v:Child", "subClassOf", "v:Class", g),
+                WOQLQuery.quad("v:Child", "type", "owl:Class", g),
+            ),
         )
 
     def _get_data_of_class(self, chosen):
@@ -179,15 +161,15 @@ class WOQLLibrary():
             WOQLQuery.opt().triple("v:Source", "comment", "v:Source_Comment"),
             WOQLQuery.opt().triple("v:Source", "label", "v:Source_Label"),
             WOQLQuery.opt().quad("v:Source_Class", "label", "v:Source_Type", g),
-            WOQLQuery
-            .opt()
-            .quad("v:Source_Class", "comment", "v:Source_Type_Comment", g),
+            WOQLQuery.opt().quad(
+                "v:Source_Class", "comment", "v:Source_Type_Comment", g
+            ),
             WOQLQuery.opt().triple("v:Target", "label", "v:Target_Label"),
             WOQLQuery.opt().triple("v:Target", "comment", "v:Target_Comment"),
             WOQLQuery.opt().quad("v:Target_Class", "label", "v:Target_Type", g),
-            WOQLQuery
-            .opt()
-            .quad("v:Target_Class", "comment", "v:Target_Type_Comment", g),
+            WOQLQuery.opt().quad(
+                "v:Target_Class", "comment", "v:Target_Type_Comment", g
+            ),
             WOQLQuery.opt().quad("v:Edge", "label", "v:Edge_Type", g),
             WOQLQuery.opt().quad("v:Edge", "comment", "v:Edge_Type_Comment", g),
         )
@@ -202,9 +184,7 @@ class WOQLLibrary():
         pattern = pattern.concat(
             [
                 WOQLQuery.triple("v:UID", "terminus:authority", "v:CapID"),
-                WOQLQuery.triple(
-                    "v:CapID", "terminus:authority_scope", "v:DBID"
-                ),
+                WOQLQuery.triple("v:CapID", "terminus:authority_scope", "v:DBID"),
                 WOQLQuery.triple("v:CapID", "terminus:action", "v:Action"),
             ]
         )
@@ -222,9 +202,7 @@ class WOQLLibrary():
         gens = [
             WOQLQuery.unique(prefix + "Capability", capids, vcap),
             WOQLQuery.idgen(prefix, [target], vdb),
-            WOQLQuery
-            .woql_not()
-            .triple(vcap, "type", "terminus:DatabaseCapability"),
+            WOQLQuery.woql_not().triple(vcap, "type", "terminus:DatabaseCapability"),
         ]
         writecap = [
             WOQLQuery.add_triple(vcap, "type", "terminus:DatabaseCapability"),
@@ -235,6 +213,4 @@ class WOQLLibrary():
                 WOQLQuery.add_triple(vcap, "terminus:action", capabilities[j])
             )
 
-        return (
-            WOQLQuery.when(WOQLQuery.woql_and(*gens)).woql_and(*writecap)
-        )
+        return WOQLQuery.when(WOQLQuery.woql_and(*gens)).woql_and(*writecap)
