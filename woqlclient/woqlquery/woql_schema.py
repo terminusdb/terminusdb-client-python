@@ -1,4 +1,5 @@
 import woql_utils as utils
+
 from .woqlQuery import woqlQuery
 
 
@@ -312,7 +313,9 @@ class WOQLSchema(g):
             ),
             # string refinement datatypes
             self._add_datatype("xdd:email", "Email", "A valid email address", graph),
-            self._add_datatype("xdd:html", "HTML", "A string with embedded HTML", graph),
+            self._add_datatype(
+                "xdd:html", "HTML", "A string with embedded HTML", graph
+            ),
             self._add_datatype("xdd:json", "JSON", "A JSON encoded string", graph),
             self._add_datatype("xdd:url", "URL", "A valid http(s) URL", graph),
         )

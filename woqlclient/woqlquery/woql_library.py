@@ -1,5 +1,3 @@
-from .woqlQuery import woqlQuery
-
 class WOQLLibrary(g=None):
     def __init__(self):
         self.default_schema = g or "schema/main"
