@@ -5,7 +5,7 @@ from .woql_core import WOQLCore
 
 
 class WOQLQuery(WOQLCore):
-    def __init__(self, query=None):
+    def __init__(self, query=None, graph="schema/main"):
         """defines the internal functions of the woql query object - the language API is defined in WOQLQuery
 
         Parameters
@@ -23,6 +23,8 @@ class WOQLQuery(WOQLCore):
         self.idgenerator = self.idgen
         self.concatenate = self.concat
         self.typecast = self.cast
+        #attribute for schema
+        self._graph = graph
 
     def load_vocabulary(self, client):
         """Queries the schema graph and loads all the ids found there as vocabulary that can be used without prefixes
@@ -39,8 +41,7 @@ class WOQLQuery(WOQLCore):
 
     def _wrap_cursor_with_and(self):
         new_json = WOQLQuery().json(self._cursor)
-        for item in self._curser:
-            del self._cursor[item]
+        self._cursor={}
         self.woql_and(new_json, {})
         self._cursor = self._cursor["woql:query_list"][1]["woql:query"]
 
@@ -95,8 +96,7 @@ class WOQLQuery(WOQLCore):
         queries = list(args)
         if self._cursor.get("@type") and self._cursor["@type"] != "woql:And":
             new_json = WOQLQuery().json(self._cursor)
-            for key in self._cursor:
-                del self._cursor[key]
+            self._cursor={}
             queries = [new_json] + queries
         if queries and queries[0] == "woql:args":
             return ["woql:query_list"]
@@ -106,17 +106,15 @@ class WOQLQuery(WOQLCore):
         for item in queries:
             index = len(self._cursor["woql:query_list"])
             onevar = self._qle(item, index)
-            if "woql:query" in onevar:
-                if "@type" in onevar["woql:query"] and "woql:query_list" in onevar["woql:query"]:
-                    if onevar["woql:query"]["@type"] == "woql:And":
-                        for each in onevar["woql:query"]["woql:query_list"]:
-                            qjson = each["woql:query"]
-                        if qjson:
-                            index = len(self._cursor["woql:query_list"])
-                            subvar = self._qle(qjson, index)
-                            self._cursor["woql:query_list"].append(subvar)
-                    else:
-                        self._cursor["woql:query_list"].append(onevar)
+            if "woql:query" in onevar and "@type" in onevar["woql:query"] and "woql:query_list" in onevar["woql:query"] and onevar["woql:query"]["@type"] == "woql:And":
+                for each in onevar["woql:query"]["woql:query_list"]:
+                    qjson = each["woql:query"]
+                if qjson:
+                    index = len(self._cursor["woql:query_list"])
+                    subvar = self._qle(qjson, index)
+                    self._cursor["woql:query_list"].append(subvar)
+            else:
+                self._cursor["woql:query_list"].append(onevar)
         return self
 
     def woql_or(self, *args):
@@ -136,7 +134,7 @@ class WOQLQuery(WOQLCore):
             self._cursor["woql:query_list"].append(onevar)
         return self
 
-    def woql_from(self, graph_filter, query):
+    def woql_from(self, graph_filter, query=None):
         if graph_filter and graph_filter == "woql:args":
             return ["woql:graph_filter", "woql:query"]
         if self._cursor.get("@type"):
@@ -207,6 +205,7 @@ class WOQLQuery(WOQLCore):
         self._cursor["@type"] = "woql:Equals"
         self._cursor["woql:left"] = self._clean_class(left)
         self._cursor["woql:right"] = self._clean_class(right)
+        return self
 
     def substr(self, string, length, substring, before=0, after=0):
         if string and string == "woql:args":
@@ -336,7 +335,7 @@ class WOQLQuery(WOQLCore):
         self._cursor["woql:file"] = fpath
         return self._wfrom(opts)
 
-    def remote(self, uri, opts):
+    def remote(self, uri, opts=None):
         if uri and uri == "woql:args":
             return ["woql:remote_uri", "woql:format"]
         if self._cursor.get("@type"):
@@ -445,7 +444,7 @@ class WOQLQuery(WOQLCore):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:Plus"
         self._cursor["woql:first"] = self._arop(new_args.pop(0))
-        if len(new_args > 1):
+        if len(new_args) > 1:
             self._cursor = self._jobj(WOQLQuery().plus(*args))
         else:
             self._cursor["woql:second"] = self._arop(args[0])
@@ -512,7 +511,7 @@ class WOQLQuery(WOQLCore):
             return ["woql:first", "woql:second"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
-            self._cursor["@type"] = "woql:Exp"
+        self._cursor["@type"] = "woql:Exp"
         self._cursor["woql:first"] = self._arop(first)
         self._cursor["woql:second"] = self._arop(second)
         return self
@@ -570,7 +569,7 @@ class WOQLQuery(WOQLCore):
         self._cursor["woql:right"] = self._clean_object(right)
         return self
 
-    def opt(self, query):
+    def opt(self, query=None):
         if query and query == "woql:args":
             return ["woql:query"]
         if self._cursor.get("@type"):
@@ -671,7 +670,7 @@ class WOQLQuery(WOQLCore):
                 if item and item == "v:":
                     slist2 = re.split(r"[^\w_]", slist[idx + 1])
                     x_var = slist2.pop(0)
-                    nlist.push("v:" + x_var)
+                    nlist.append("v:" + x_var)
                     rest = "".join(slist2)
                     if rest:
                         nlist.append(rest)
@@ -749,7 +748,7 @@ class WOQLQuery(WOQLCore):
             self._cursor["woql:length"] = self._varj(var_len)
         return self
 
-    def woql_not(self, query):
+    def woql_not(self, query=None):
         if query and query == "woql:args":
             return ["woql:query"]
         if self._cursor.get("@type"):
@@ -802,7 +801,7 @@ class WOQLQuery(WOQLCore):
                 self._cursor["woql:variable_ordering"].append(ordered_varlist[idx])
         return self._add_sub_query(embedquery)
 
-    def group_by(self, gvarlist, groupedvar, output, groupquery):
+    def group_by(self, gvarlist, groupedvar, output, groupquery=None):
         if gvarlist and gvarlist == "woql:args":
             return [
                 "woql:variable_list",
@@ -920,7 +919,7 @@ class WOQLQuery(WOQLCore):
                 gpart = part["woql:graph_filter"] or part["woql:graph"]
             if gpart is not None:
                 g = gpart["@value"]
-            nq = WOQLSchema().add_property(pro_id, type, g).domain(self.adding_class)
+            nq = WOQLQuery().add_property(pro_id, type, g).domain(self.adding_class)
             combine = self.WOQLQuery().json(self.query)
             nwoql = self.WOQLQuery().woql_and(combine, nq)
             nwoql.adding_class = self.adding_class
@@ -930,11 +929,11 @@ class WOQLQuery(WOQLCore):
             self._triple_builder._add_po(pro_id, property_type)
         return self
 
-    def insert(self, insert_id, insert_type, ref_graph):
+    def insert(self, insert_id, insert_type, ref_graph=None):
         insert_type = self._clean_type(insert_type, True)
         if ref_graph is not None:
-            return self._add_quad(insert_id, "type", insert_type, ref_graph)
-        return self._add_triple(insert_id, "type", insert_type)
+            return self.add_quad(insert_id, "type", insert_type, ref_graph)
+        return self.add_triple(insert_id, "type", insert_type)
 
     def insert_data(self, data, ref_graph):
         if data.type and data.id:
@@ -1035,18 +1034,6 @@ class WOQLQuery(WOQLCore):
             self.woql_and()
         self._triple_builder = TripleBuilder(t, self, s, g)
 
-
-class WOQLSchema:
-
-    """The WOQL Schema Class provides pre-built WOQL queries for schema manipulation
-        a) adding and deleting classes and properties
-        b) loading datatype libraries
-        c) boxing classes
-    """
-
-    def __init__(self):
-        self.graph = "schema/main"
-
     def add_class(self, c, graph=None):
         graph = self.graph
         ap = WOQLQuery()
@@ -1063,7 +1050,7 @@ class WOQLSchema:
         ap = WOQLQuery
         if data.id is not None:
             c = ap._clean_class(data.id, True)
-            ap = self.WOQLSchema().add_class(c, ref_graph)
+            ap = self.WOQLQuery().add_class(c, ref_graph)
             if data.label is not None:
                 ap.label(data.label)
             if data.description is not None:
@@ -1189,13 +1176,13 @@ class WOQLSchema:
         if len(nsubs):
             woql_filter.woql_and(WOQLQuery().woql_and(*nsubs))
         cls = (
-            self.WOQLSchema(graph)
+            WOQLQuery(graph=graph)
             .add_class("v:ClassID")
             .label("v:Label")
             .description("v:CDesc")
         )
         prop = (
-            self.WOQLSchema(graph)
+            WOQLQuery(graph=graph)
             .add_property("v:PropID", "v:Cid")
             .label("v:Label")
             .description("v:PDesc")
@@ -1221,7 +1208,7 @@ class WOQLSchema:
         else:
             listid = "_:" + cls.split(":")[1]
         lastid = listid
-        wq = self.WOQLSchema().add_class(cls, graph).label(clslabel)
+        wq = WOQLQuery().add_class(cls, graph).label(clslabel)
         if clsdesc is not None:
             wq.description(clsdesc)
         if parent is not None:
@@ -1723,3 +1710,6 @@ class WOQLSchema:
         if descr is not None:
             box_prop.description(descr)
         return WOQLQuery.woql_and(box_class, box_prop)
+
+    def doctype(self, user_type, graph):
+        return WOQLQuery().add_class(user_type,graph).parent("Document")
