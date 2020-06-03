@@ -112,7 +112,7 @@ def _copy_json(orig, rollup=None):
     if type(orig) == list:
         return orig
     if rollup:
-        if orig["@type"] in ["woql:And", "woql:Or"]:
+        if orig.get("@type") in ["woql:And", "woql:Or"]:
             if not orig.get("woql:query_list") or not len(orig["woql:query_list"]):
                 return {}
             if len(orig["woql:query_list"]) == 1:
@@ -223,7 +223,7 @@ class WOQLCore:
 
     # A bunch of internal functions for formatting values for JSON-LD translation
 
-    def _jlt(self, val, val_type):
+    def _jlt(self, val, val_type=None):
         """Wraps the passed value in a json-ld literal carriage"""
         if not val_type:
             val_type = "xsd:string"
@@ -249,7 +249,7 @@ class WOQLCore:
             return {"@type": "woql:True"}
         return qobj
 
-    def _asv(self, colname_or_index, vname, obj_type):
+    def _asv(self, colname_or_index, vname, obj_type=None):
         """Wraps the elements of an AS variable in the appropriate json-ld"""
         asvar = {}
         if type(colname_or_index) == int:
@@ -276,18 +276,18 @@ class WOQLCore:
                 cursor["woql:named_as_var"] = []
                 cursor["woql:named_as_var"].append(asv)
 
-    def _wfroms(self, opts):
+    def _wfrom(self, opts):
         """JSON LD Format Descriptor"""
         if opts and opts.format:
             self._cursor["woql:format"] = {
                 "@type": "woql:Format",
                 "woql:format_type": {"@value": opts.format, "@type": "xsd:string"},
             }
-        if opts.format_header:
-            self._cursor["woql:format"]["woql:format_header"] = {
-                "@value": True,
-                "@type": "xsd:boolean",
-            }
+            if opts.format_header:
+                self._cursor["woql:format"]["woql:format_header"] = {
+                    "@value": True,
+                    "@type": "xsd:boolean",
+                }
         return self
 
     def _arop(self, arg):
@@ -314,6 +314,7 @@ class WOQLCore:
         return vobj
 
     def _wlist(self, wvar):
+        #TODO: orig is Nonetype
         """takes input that can be either a string (variable name)
         or an array - each element of the array is a member of the list"""
         if type(wvar) == str:
@@ -327,7 +328,7 @@ class WOQLCore:
                     co_item["@type"] = "woql:ArrayElement"
                     co_item["woql:index"] = self._jlt(idx, "xsd:nonNegativeInteger`")
                     ret["woql:array_element"].append(co_item)
-        return ret
+            return ret
 
     def _qle(self, query, idx):
         """Query List Element Constructor"""
@@ -380,7 +381,7 @@ class WOQLCore:
             pred = "scm:" + predicate
         return pred
 
-    def _clean_object(self, user_obj, target):
+    def _clean_object(self, user_obj, target=None):
         """Transforms whatever is passed in as the object of a triple into the appropriate json-ld form (variable, literal or id)"""
         obj = {"@type": "woql:Datatype"}
         if type(user_obj) == str:
@@ -405,7 +406,7 @@ class WOQLCore:
         """Transforms a graph filter or graph id into the proper json-ld form"""
         return {"@type": "xsd:string", "@value": graph}
 
-    def _expand_variable(self, varname, always):
+    def _expand_variable(self, varname, always=None):
         """Transforms strings that start with v: into variable json-ld structures
         @param varname - will be transformed if it starts with v:"""
         if varname[:2] == "v:" or always:
@@ -418,8 +419,7 @@ class WOQLCore:
         else:
             return {"@type": "woql:Node", "woql:node": varname}
 
-    def _clean_class(self, user_class, string_only):
-        print(" i am in cean class")
+    def _clean_class(self, user_class, string_only=None):
         if type(user_class) != str:
             return ""
         if ":" in user_class:
