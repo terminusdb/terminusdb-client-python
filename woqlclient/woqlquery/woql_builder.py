@@ -18,7 +18,8 @@ class TripleBuilder:
             self._subject = s
         else:
             self._subject = False
-        self._query = query
+        self._quer
+        y = query
         self.g = g
 
     def label(self, lab, lang="en"):
@@ -44,21 +45,21 @@ class TripleBuilder:
             g = self.g
         newq = False
         if self._type == "woql:Triple":
-            newq = self.WOQLQuery().triple(self._subject, p, o)
+            newq = WOQLQuery().triple(self._subject, p, o)
         elif self._type == "woql:AddTriple":
-            newq = self.WOQLQuery().add_triple(self._subject, p, o)
+            newq = WOQLQuery().add_triple(self._subject, p, o)
         elif self._type == "woql:DeleteTriple":
-            newq = self.WOQLQuery().delete_triple(self._subject, p, o)
+            newq = WOQLQuery().delete_triple(self._subject, p, o)
         elif self._type == "woql:Quad":
-            newq = self.WOQLQuery().quad(self._subject, p, o, g)
+            newq = WOQLQuery().quad(self._subject, p, o, g)
         elif self._type == "woql:AddQuad":
-            newq = self.WOQLQuery().add_quad(self._subject, p, o, g)
+            newq = WOQLQuery().add_quad(self._subject, p, o, g)
         elif self._type == "woql:DeleteQuad":
-            newq = self.WOQLQuery().delete_quad(self._subject, p, o, g)
+            newq = WOQLQuery().delete_quad(self._subject, p, o, g)
         elif g:
-            newq = self.WOQLQuery().quad(self._subject, p, o, g)
+            newq = WOQLQuery().quad(self._subject, p, o, g)
         else:
-            newq = self.WOQLQuery().triple(self._subject, p, o)
+            newq = WOQLQuery().triple(self._subject, p, o)
         self._query.woql_and(newq)
 
     def _get_o(self, s, p):
