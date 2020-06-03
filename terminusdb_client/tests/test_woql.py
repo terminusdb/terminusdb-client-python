@@ -64,8 +64,8 @@ class TestWoqlQueries:
     def test_insert_method(self):
         #TODO: please check logic
         woqlObject = WOQLQuery().insert("v:Bike_URL", "Bicycle")
-        #pp.pprint(woqlObject.json())
-        #pp.pprint(WoqlInsert["onlyNode"])
+        pp.pprint(woqlObject.json())
+        pp.pprint(WoqlInsert["onlyNode"])
         assert woqlObject.json() == WoqlInsert["onlyNode"]
 
     def test_doctype_method(self):

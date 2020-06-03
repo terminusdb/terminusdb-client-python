@@ -422,7 +422,7 @@ class WOQLCore:
     def _clean_class(self, user_class, string_only=None):
         if type(user_class) != str:
             return ""
-        if ":" in user_class:
+        if ":" not in user_class:
             if self._vocab and (user_class in self._vocab):
                 user_class = self._vocab[user_class]
             else:
