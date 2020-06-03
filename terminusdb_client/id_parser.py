@@ -6,9 +6,10 @@ class IDParser:
         pass
 
     def _valid_url(self, input):
-        if input is not None:
-            if (input[:7] == "http://") or (input[:8] == "https://"):
-                return True
+        if input is None:
+            return False
+        if input[:7] == "http://" or input[:8] == "https://":
+            return True
         return False
 
     def _valid_id_string(self, input, _=None):
