@@ -1,6 +1,6 @@
 import copy
 
-import woqlclient.woql_utils as utils
+import terminusdb_client.woql_utils as utils
 
 # helper functions
 

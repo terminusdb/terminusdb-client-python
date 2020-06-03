@@ -1,4 +1,4 @@
-from ..woqlquery.woql_query import WOQLQuery
+from terminusdb_client.woqlquery.woql_query import WOQLQuery
 # expected results
 from .woqljson.woqlAndJson import WoqlAndJson
 from .woqljson.woqlCastJson import WoqlCastJson
