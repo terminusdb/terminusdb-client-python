@@ -223,7 +223,7 @@ class WOQLCore:
 
     # A bunch of internal functions for formatting values for JSON-LD translation
 
-    def _jlt(self, val, val_type):
+    def _jlt(self, val, val_type=None):
         """Wraps the passed value in a json-ld literal carriage"""
         if not val_type:
             val_type = "xsd:string"
@@ -380,7 +380,7 @@ class WOQLCore:
             pred = "scm:" + predicate
         return pred
 
-    def _clean_object(self, user_obj, target):
+    def _clean_object(self, user_obj, target=None):
         """Transforms whatever is passed in as the object of a triple into the appropriate json-ld form (variable, literal or id)"""
         obj = {"@type": "woql:Datatype"}
         if type(user_obj) == str:
@@ -405,7 +405,7 @@ class WOQLCore:
         """Transforms a graph filter or graph id into the proper json-ld form"""
         return {"@type": "xsd:string", "@value": graph}
 
-    def _expand_variable(self, varname, always):
+    def _expand_variable(self, varname, always=False):
         """Transforms strings that start with v: into variable json-ld structures
         @param varname - will be transformed if it starts with v:"""
         if varname[:2] == "v:" or always:
@@ -418,7 +418,7 @@ class WOQLCore:
         else:
             return {"@type": "woql:Node", "woql:node": varname}
 
-    def _clean_class(self, user_class, string_only):
+    def _clean_class(self, user_class, string_only=False):
         print(" i am in cean class")
         if type(user_class) != str:
             return ""
