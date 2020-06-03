@@ -1021,11 +1021,11 @@ class WOQLQuery(WOQLCore):
             else:
                 t = lastsubj["@type"]
         if "@type" in self._cursor:
-            subq = self.WOQLQuery().json(self._cursor)
+            subq = WOQLQuery().json(self._cursor)
             if self._cursor["@type"] == "woql:And":
                 newq = subq
             else:
-                newq = self.WOQLQuery().woql_and(subq)
+                newq = WOQLQuery().woql_and(subq)
                 nuj = newq.json()
             for k in self._cursor:
                 del self._cursor[k]

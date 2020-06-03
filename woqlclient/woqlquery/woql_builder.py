@@ -44,21 +44,21 @@ class TripleBuilder:
             g = self.g
         newq = False
         if self._type == "woql:Triple":
-            newq = WOQLQuery().triple(self._subject, p, o)
+            newq = self.WOQLQuery().triple(self._subject, p, o)
         elif self._type == "woql:AddTriple":
-            newq = WOQLQuery().add_triple(self._subject, p, o)
+            newq = self.WOQLQuery().add_triple(self._subject, p, o)
         elif self._type == "woql:DeleteTriple":
-            newq = WOQLQuery().delete_triple(self._subject, p, o)
+            newq = self.WOQLQuery().delete_triple(self._subject, p, o)
         elif self._type == "woql:Quad":
-            newq = WOQLQuery().quad(self._subject, p, o, g)
+            newq = self.WOQLQuery().quad(self._subject, p, o, g)
         elif self._type == "woql:AddQuad":
-            newq = WOQLQuery().add_quad(self._subject, p, o, g)
+            newq = self.WOQLQuery().add_quad(self._subject, p, o, g)
         elif self._type == "woql:DeleteQuad":
-            newq = WOQLQuery().delete_quad(self._subject, p, o, g)
-        elif g is not None:
-            newq = WOQLQuery().quad(self._subject, p, o, g)
+            newq = self.WOQLQuery().delete_quad(self._subject, p, o, g)
+        elif g:
+            newq = self.WOQLQuery().quad(self._subject, p, o, g)
         else:
-            newq = WOQLQuery().triple(self._subject, p, o)
+            newq = self.WOQLQuery().triple(self._subject, p, o)
         self._query.woql_and(newq)
 
     def _get_o(self, s, p):
