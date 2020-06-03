@@ -58,7 +58,7 @@ class TestWoqlQueries:
                       "woql:query": {}
                   }
               }
-        #pp.pprint(woqlObject.json())
+        pp.pprint(woqlObject.json())
         assert woqlObject.json() == jsonObj
 
     def test_insert_method(self):
