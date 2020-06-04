@@ -5,7 +5,7 @@ import requests
 
 from .api_endpoint_const import APIEndpointConst
 from .errors import APIError
-from .utils import Utils
+from ..utils import Utils
 
 
 class DispatchRequest:

@@ -6,7 +6,7 @@ import unittest.mock as mock
 import pytest
 import requests
 from .mockResponse import mocked_requests
-from woqlclient import WOQLClient
+from terminusdb_client.woqlclient import WOQLClient
 from .woqljson.woqlStarJson import WoqlStar
 
 # def test_realCall():

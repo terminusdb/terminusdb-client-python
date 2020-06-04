@@ -14,3 +14,20 @@ class TestWoqlExtra:
         )
         assert woqlObject.json() == WoqlExtra["usingJson"]
         assert woqlObject01.json() == WoqlExtra["usingJson"]
+
+    def test_multi_using(self):
+        woql = WOQLQuery()
+        woql_object = woql.woql_and(
+            woql.using("admin/dbName/local/commit/commitID_1", woql.triple("v:A", "v:B", "v:C")),
+            woql.using("admin/dbName/local/commit/commitID_2", woql.woql_not(
+                woql.triple("v:A", "v:B", "v:C")
+            ))
+        )
+        assert woql_object == WoqlExtra['multiUsingJson']
+
+
+    def test_chain_and(self):
+        woql = WOQLQuery()
+        woql_query = woql.woql_and(woql.triple("v:A", "v:B", "v:C"),
+                                               woql.triple("v:D", "v:E", "v:F"))
+        assert woql_query.json() == WoqlExtra['chainAndJson']

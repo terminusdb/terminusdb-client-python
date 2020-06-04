@@ -5,7 +5,7 @@
 """
 import warnings
 
-from .woqlClient import *
+#from woqlclient.woqlClient import *
 
 try:
     from .woqlDataframe import *
