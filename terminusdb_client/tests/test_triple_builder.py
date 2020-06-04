@@ -2,7 +2,6 @@ import pytest
 import pprint
 import json
 from ..woqlquery.woql_query import WOQLQuery
-from ..woqlquery.woql_builder import TripleBuilder
 from .woqljson.woqlJson import WoqlJson
 
 class TestTripleBuilder:

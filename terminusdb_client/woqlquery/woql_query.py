@@ -1733,9 +1733,9 @@ class TripleBuilder:
             self._subject = s
         else:
             self._subject = False
-        self._quer
-        y = query
+        self._query = query
         self.g = g
+
 
     def label(self, lab, lang="en"):
         if lab[:2] == "v:":
