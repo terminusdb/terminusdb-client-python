@@ -20,6 +20,7 @@ class WOQLQuery:
         self._cursor = self._query
         self._chain_ended = False
         self._contains_update = False
+        self.adding_class = False
         # operators which preserve global paging
         self._paging_transitive_properties = [
             "select",
@@ -248,14 +249,16 @@ class WOQLQuery:
             pred = "scm:" + predicate
         return self._expand_variable(pred)
 
-    def _clean_path_predicate(self, predicate):
+
+    def _clean_path_predicate(self, predicate=None):
         pred = False
-        if ":" in predicate:
-            pred = predicate
-        elif self._vocab and (predicate in self._vocab):
-            pred = self._vocab[predicate]
-        else:
-            pred = "scm:" + predicate
+        if predicate is not None:
+            if predicate.index(":") is not -1:
+                pred = predicate
+            elif self._vocab and (predicate in self._vocab):
+                pred = self._vocab[predicate]
+            else:
+                pred = "scm:" + predicate
         return pred
 
     def _clean_object(self, user_obj, target=None):
@@ -296,7 +299,7 @@ class WOQLQuery:
         else:
             return {"@type": "woql:Node", "woql:node": varname}
 
-    def _clean_class(self, user_class, string_only=None):
+    def _clean_class(self, user_class=None, string_only=None):
         if type(user_class) != str:
             return ""
         if ":" not in user_class:
@@ -309,7 +312,7 @@ class WOQLQuery:
         else:
             return self._expand_variable(user_class)
 
-    def _clean_type(self, user_type, string_only):
+    def _clean_type(self, user_type=None, string_only=None):
         return self._clean_class(user_type, string_only)
 
     def _default_context(self, db_iri):
@@ -445,7 +448,7 @@ class WOQLQuery:
         self._cursor["woql:collection"] = self._jlt(collection)
         return self._add_sub_query(subq)
 
-    def comment(self, comment, subq):
+    def comment(self, comment, subq=None):
         if comment and comment == "woql:args":
             return ["woql:comment", "woql:query"]
         if self._cursor.get("@type"):
@@ -1270,7 +1273,7 @@ class WOQLQuery:
         #return WOQLLibrary()
         pass
 
-    def abstract(self, graph, subj):
+    def abstract(self, graph=None, subj=None):
         """
         Internal Triple-builder functions which allow chaining of partial queries
         """
@@ -1279,7 +1282,7 @@ class WOQLQuery:
         self._triple_builder._add_po("terminus:tag", "terminus:abstract", graph)
         return self
 
-    def node(self, node, node_type):
+    def node(self, node, node_type=None):
         if not self._triple_builder:
             self._create_triple_builder(node, node_type)
         self._triple_builder._subject = node
@@ -1300,10 +1303,13 @@ class WOQLQuery:
         if self._triple_builder is None:
             self._create_triple_builder()
         if self.adding_class is not None:
-            part = self._find_last_subject(self.cursor)
+            part = self._find_last_subject(self._cursor)
             g = False
             if part is not None:
-                gpart = part["woql:graph_filter"] or part["woql:graph"]
+                if part["woql:graph_filter"] is not None:
+                    gpart = part["woql:graph"]
+                else:
+                    gpart = part["woql:graph_filter"]
             if gpart is not None:
                 g = gpart["@value"]
             nq = WOQLQuery().add_property(pro_id, type, g).domain(self.adding_class)
@@ -1348,13 +1354,13 @@ class WOQLQuery:
         self._triple_builder._add_po("rdfs:domain", d)
         return self
 
-    def label(self, lan, lang):
+    def label(self, lan, lang=None):
         if self._triple_builder is None:
             self._create_triple_builder()
         self._triple_builder.label(lan, lang)
         return self
 
-    def description(self, c, lang):
+    def description(self, c, lang=None):
         if self._triple_builder is None:
             self._create_triple_builder()
         self._triple_builder.description(c, lang)
@@ -1367,7 +1373,8 @@ class WOQLQuery:
         if self._triple_builder is None:
             self._create_triple_builder()
         for i in parent_list:
-            pn = self._clean_class(parent_list[i])
+            ipl = parent_list[i]
+            pn = self._clean_class(ipl)
             self._triple_builder._add_po("rdfs:subClassOf", pn)
         return self
 
@@ -1490,11 +1497,14 @@ class WOQLQuery:
             ap.updated()
         return ap
 
-    def add_property(self, p, t, graph=None):
+    def add_property(self, p=None, t=None, graph=None):
         if graph is None:
             graph = self.graph
         ap = WOQLQuery
-        t = ap._clean_type(t, True) if t is not None else "xsd:string"
+        if t is not None:
+            t = "xsd:string"
+        else:
+            t = ap._clean_type(t, True)
         if p is not None:
             p = ap._clean_path_predicate(p)
             # TODO: cleaning
@@ -2098,7 +2108,7 @@ class WOQLQuery:
             box_prop.description(descr)
         return WOQLQuery.woql_and(box_class, box_prop)
 
-    def doctype(self, user_type, graph):
+    def doctype(self, user_type, graph=None):
         return WOQLQuery().add_class(user_type,graph).parent("Document")
 
 class TripleBuilder:
@@ -2136,7 +2146,9 @@ class TripleBuilder:
     def graph(self, g):
         self.g = g
 
-    def description(self, c, lang="en"):
+    def description(self, c, lang=None):
+        if not lang:
+            lang = "en"
         if c[:2] == "v:":
             d = c
         else:
