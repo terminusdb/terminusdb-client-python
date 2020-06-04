@@ -56,6 +56,7 @@ class WOQLQuery:
 
         #attribute for schema
         self._graph = graph
+        self._adding_class = None
 
     # WOQLCore methods
     def _parameter_error(self, message):
@@ -392,7 +393,7 @@ class WOQLQuery:
         used for triplebuilder to chain further calls - when they may be inside ands or ors or subqueries
         @param {object} json"""
         if "woql:query_list" in json:
-            temp_json = copy.copy(json["woql:query_list"])
+            temp_json = copy.deepcopy(json["woql:query_list"])
             while len(temp_json) > 0:
                 item = temp_json.pop()
                 if self._find_last_subject(item):
@@ -1297,19 +1298,19 @@ class WOQLQuery:
             like string|integer|datatime|nonNegativeInteger|positiveInteger etc ..
             (you don't need the prefix xsd for specific a type)
         """
-        if self._triple_builder is None:
+        if not self._triple_builder:
             self._create_triple_builder()
-        if self.adding_class is not None:
+        if self._adding_class:
             part = self._find_last_subject(self.cursor)
             g = False
             if part is not None:
                 gpart = part["woql:graph_filter"] or part["woql:graph"]
             if gpart is not None:
                 g = gpart["@value"]
-            nq = WOQLQuery().add_property(pro_id, type, g).domain(self.adding_class)
+            nq = WOQLQuery().add_property(pro_id, type, g).domain(self._adding_class)
             combine = self.WOQLQuery().json(self.query)
             nwoql = self.WOQLQuery().woql_and(combine, nq)
-            nwoql.adding_class = self.adding_class
+            nwoql._adding_class = self._adding_class
             return nwoql.updated()
         else:
             pro_id = self._clean_predicate(pro_id)
@@ -1336,26 +1337,26 @@ class WOQLQuery:
         return self
 
     def graph(self, g):
-        if self._triple_builder is None:
+        if not self._triple_builder:
             self._create_triple_builder()
         self._triple_builder.graph(g)
         return self
 
     def domain(self, d):
-        if self._triple_builder is None:
+        if not self._triple_builder:
             self._create_triple_builder()
         d = self._cleanClass(d)
         self._triple_builder._add_po("rdfs:domain", d)
         return self
 
-    def label(self, lan, lang):
-        if self._triple_builder is None:
+    def label(self, lan, lang="en"):
+        if not self._triple_builder:
             self._create_triple_builder()
         self._triple_builder.label(lan, lang)
         return self
 
-    def description(self, c, lang):
-        if self._triple_builder is None:
+    def description(self, c, lang="en"):
+        if not self._triple_builder:
             self._create_triple_builder()
         self._triple_builder.description(c, lang)
         return self
@@ -1364,7 +1365,7 @@ class WOQLQuery:
         """Specifies that a new class should have parents class
         param {array} parentList the list of parent class []
         """
-        if self._triple_builder is None:
+        if not self._triple_builder:
             self._create_triple_builder()
         for i in parent_list:
             pn = self._clean_class(parent_list[i])
@@ -1372,40 +1373,30 @@ class WOQLQuery:
         return self
 
     def max(self, m):
-        if self._triple_builder is not None:
+        if self._triple_builder:
             self._triple_builder.card(m, "max")
         return self
 
     def cardinality(self, m):
-        if self._triple_builder is not None:
+        if self._triple_builder:
             self._triple_builder.card(m, "cardinality")
         return self
 
     def min(self, m):
-        if self._triple_builder is not None:
+        if self._triple_builder:
             self._triple_builder.card(m, "min")
         return self
 
-    def _create_triple_builder(self, node, _type):
+    def _create_triple_builder(self, node=None, user_type=None):
         s = node
-        t = _type
+        t = user_type
         lastsubj = self._find_last_subject(self._cursor)
         g = False
         if lastsubj:
-            subj = lastsubj["woql:graph_filter"]
-            if subj:
-                gobj = subj
-            else:
-                gobj = lastsubj["woql:graph"]
-            if gobj is not None:
-                g = gobj["@value"]
-            else:
-                g = False
-            s = lastsubj["woql:subject"]
-            if _type is not None:
-                t = _type
-            else:
-                t = lastsubj["@type"]
+            gobj = lastsubj["woql:graph_filter"] if lastsubj.get("woql:graph_filter") else lastsubj["woql:graph"]
+            g = gobj["@value"] if gobj else False
+            s = lastsubj['woql:subject']
+            t = user_type if user_type else lastsubj["@type"]
         if "@type" in self._cursor:
             subq = self.WOQLQuery().json(self._cursor)
             if self._cursor["@type"] == "woql:And":
@@ -1422,11 +1413,12 @@ class WOQLQuery:
         self._triple_builder = TripleBuilder(t, self, s, g)
 
     def add_class(self, c, graph=None):
-        graph = self.graph
+        if not graph:
+            graph = self._graph
         ap = WOQLQuery()
-        if c is not None:
+        if c:
             c = ap._clean_class(c, True)
-            ap.adding_class = c
+            ap._adding_class = c
             ap.add_quad(c, "rdf:type", "owl:Class", graph)
         return ap
 
@@ -2121,8 +2113,7 @@ class TripleBuilder:
             self._subject = s
         else:
             self._subject = False
-        self._quer
-        y = query
+        self._query = query
         self.g = g
 
     def label(self, lab, lang="en"):
