@@ -5,7 +5,7 @@ import requests
 
 from .api_endpoint_const import APIEndpointConst
 from .errors import APIError
-from .utils import Utils
+from ..utils import Utils
 
 
 class DispatchRequest:
@@ -39,7 +39,7 @@ class DispatchRequest:
         # Utils.encodeURIComponent(payload['terminus:user_key'])}
         if basic_auth:
             headers["Authorization"] = "Basic %s" % b64encode(
-                (":" + basic_auth).encode("utf-8")
+                (basic_auth).encode("utf-8")
             ).decode("utf-8")
             if jwt:
                 headers["HUB_AUTHORIZATION"] = "Bearer %s" % jwt
@@ -111,7 +111,7 @@ class DispatchRequest:
         # the server in the response return always content-type application/json
         except ValueError:
             # if the response type is not a json
-            # print("Value Error", err)
+            print("Value Error", err)
             return request_response.text
 
         """

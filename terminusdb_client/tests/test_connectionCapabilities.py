@@ -87,8 +87,7 @@ connection_capabilities.set_capabilities(ConnectResponse)
 
 class TestCapabilitiesActions:
     def test_connection_capability_object(self):
-        print("test")
-        # assert connection_capabilities.connection == ConnectionDump
+        assert connection_capabilities.connection == ConnectionDump
 
     def test_form_resource_name(self):
         assert (
