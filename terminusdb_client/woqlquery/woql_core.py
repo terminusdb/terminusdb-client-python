@@ -125,16 +125,16 @@ def _copy_json(orig, rollup=None):
         if type(part) == list:
             nupart = []
             for item in part:
-                if type(item) not in [bool, str, int, float]:
+                if type(item) == dict:
                     sub = _copy_json(item, rollup)
-                    if not sub or not utils.empty(sub):
+                    if not sub:
                         nupart.append(sub)
                 else:
                     nupart = nupart.append(item)
             nuj[key] = nupart
-        elif type(part) not in [bool, str, int, float]:
+        elif type(part) == dict:
             query = _copy_json(part, rollup)
-            if not query or not utils.empty(query):
+            if not query:
                 nuj[key] = query
         else:
             nuj[key] = part

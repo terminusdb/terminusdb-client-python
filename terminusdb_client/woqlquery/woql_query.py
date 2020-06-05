@@ -171,7 +171,7 @@ class WOQLQuery:
 
     def _arop(self, arg):
         """Wraps arithmetic operators in the appropriate json-ld"""
-        if type(arg) not in [bool, str, int, float]:
+        if type(arg) == dict:
             if hasattr(arg, "json"):
                 return arg.json()
             else:
@@ -221,7 +221,7 @@ class WOQLQuery:
     def _clean_subject(self, obj):
         """Transforms whatever is passed in as the subject into the appropriate json-ld for variable or id"""
         subj = False
-        if type(obj) not in [bool, str, int, float]:
+        if type(obj) == dict:
             return obj
         elif type(obj) == str:
             if ":" in obj:
@@ -237,7 +237,7 @@ class WOQLQuery:
     def _clean_predicate(self, predicate):
         """Transforms whatever is passed in as the predicate (id or variable) into the appropriate json-ld form """
         pred = False
-        if type(predicate) not in [bool, str, int, float]:
+        if type(predicate) == dict:
             return predicate
         if type(predicate) != str:
             self._parameter_error("Predicate must be a URI string")
@@ -276,7 +276,7 @@ class WOQLQuery:
             if not target:
                 target = "xsd:decimal"
             obj["woql:datatype"] = self._jlt(user_obj, target)
-        elif type(user_obj) not in [bool, str, int, float]:
+        elif type(user_obj) == dict:
             if "@value" in user_obj:
                 obj["woql:datatype"] = user_obj
             else:
@@ -469,7 +469,7 @@ class WOQLQuery:
             return self._parameter_error(
                 "Select must be given a list of variable names"
             )
-        if type(queries[-1]) not in [bool, str, int, float] and hasattr(
+        if type(queries[-1]) == dict and hasattr(
             queries[-1], "json"
         ):
             embedquery = queries.pop()
