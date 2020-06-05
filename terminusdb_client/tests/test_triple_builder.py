@@ -41,7 +41,7 @@ class TestTripleBuilder:
     def test_comment_method(self):
         woqlObject = WOQLQuery().comment("my comment")
         woqlObject01 = WOQLQuery().node("doc:x", "add_quad").comment("my comment")
-        jsonObj = {"@type": "woql:Comment", "woql:comment": {"@type": "xsd:string", "@value": "my comment"}, 'woql:query': {}}
+        jsonObj = {"@type": "woql:Comment", "woql:comment": {"@type": "xsd:string", "@value": "my comment"}}
         pp.pprint(woqlObject.json())
         assert woqlObject.json() == jsonObj
 

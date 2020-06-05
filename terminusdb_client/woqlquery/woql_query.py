@@ -259,7 +259,7 @@ class WOQLQuery:
     def _clean_path_predicate(self, predicate=None):
         pred = False
         if predicate is not None:
-            if predicate.index(":") is not -1:
+            if ":" in predicate:
                 pred = predicate
             elif self._vocab and (predicate in self._vocab):
                 pred = self._vocab[predicate]
@@ -404,8 +404,9 @@ class WOQLQuery:
             temp_json = copy.deepcopy(json["woql:query_list"])
             while len(temp_json) > 0:
                 item = temp_json.pop()
-                if self._find_last_subject(item):
-                    return item
+                subitem = self._find_last_subject(item)
+                if(subitem):
+                    return subitem
         if "woql:query" in json:
             item = self._find_last_subject(json["woql:query"])
             if item:
@@ -1375,8 +1376,7 @@ class WOQLQuery:
         """
         if not self._triple_builder:
             self._create_triple_builder()
-        for i in parent_list:
-            ipl = parent_list[i]
+        for ipl in parent_list:
             pn = self._clean_class(ipl)
             self._triple_builder._add_po("rdfs:subClassOf", pn)
         return self
@@ -1402,7 +1402,7 @@ class WOQLQuery:
         lastsubj = self._find_last_subject(self._cursor)
         g = False
         if lastsubj:
-            gobj = lastsubj["woql:graph_filter"] if lastsubj.get("woql:graph_filter") else lastsubj["woql:graph"]
+            gobj = lastsubj["woql:graph_filter"] if lastsubj.get("woql:graph_filter") else lastsubj.get("woql:graph")
             g = gobj["@value"] if gobj else False
             s = lastsubj['woql:subject']
             t = user_type if user_type else lastsubj["@type"]
