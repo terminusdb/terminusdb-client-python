@@ -3,9 +3,9 @@ from base64 import b64encode
 
 import requests
 
+from ..utils import Utils
 from .api_endpoint_const import APIEndpointConst
 from .errors import APIError
-from ..utils import Utils
 
 
 class DispatchRequest:

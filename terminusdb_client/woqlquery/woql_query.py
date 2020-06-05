@@ -1,9 +1,9 @@
+import copy
 import re
 
-import copy
 import terminusdb_client.woql_utils as utils
-
 import terminusdb_client.woqlquery.woql_core as core
+
 
 class WOQLQuery:
     def __init__(self, query=None, graph="schema/main"):
@@ -55,7 +55,7 @@ class WOQLQuery:
         self.concatenate = self.concat
         self.typecast = self.cast
 
-        #attribute for schema
+        # attribute for schema
         self._graph = graph
         self._adding_class = None
 
@@ -193,7 +193,7 @@ class WOQLQuery:
         return vobj
 
     def _wlist(self, wvar):
-        #TODO: orig is Nonetype
+        # TODO: orig is Nonetype
         """takes input that can be either a string (variable name)
         or an array - each element of the array is a member of the list"""
         if type(wvar) == str:
@@ -249,7 +249,6 @@ class WOQLQuery:
         else:
             pred = "scm:" + predicate
         return self._expand_variable(pred)
-
 
     def _clean_path_predicate(self, predicate=None):
         pred = False
@@ -432,7 +431,7 @@ class WOQLQuery:
 
     def _wrap_cursor_with_and(self):
         new_json = WOQLQuery().json(self._cursor)
-        self._cursor={}
+        self._cursor = {}
         self.woql_and(new_json, {})
         self._cursor = self._cursor["woql:query_list"][1]["woql:query"]
 
@@ -487,7 +486,7 @@ class WOQLQuery:
         queries = list(args)
         if self._cursor.get("@type") and self._cursor["@type"] != "woql:And":
             new_json = WOQLQuery().json(self._cursor)
-            self._cursor={}
+            self._cursor = {}
             queries = [new_json] + queries
         if queries and queries[0] == "woql:args":
             return ["woql:query_list"]
@@ -497,7 +496,12 @@ class WOQLQuery:
         for item in queries:
             index = len(self._cursor["woql:query_list"])
             onevar = self._qle(item, index)
-            if "woql:query" in onevar and "@type" in onevar["woql:query"] and "woql:query_list" in onevar["woql:query"] and onevar["woql:query"]["@type"] == "woql:And":
+            if (
+                "woql:query" in onevar
+                and "@type" in onevar["woql:query"]
+                and "woql:query_list" in onevar["woql:query"]
+                and onevar["woql:query"]["@type"] == "woql:And"
+            ):
                 for each in onevar["woql:query"]["woql:query_list"]:
                     qjson = each["woql:query"]
                     if qjson:
@@ -787,7 +791,7 @@ class WOQLQuery:
                 "Delete Quad takes four parameters, the last should be a graph id"
             )
         self._cursor["@type"] = "woql:AddQuad"
-        self._cursor['woql:graph'] = self._clean_graph(graph)
+        self._cursor["woql:graph"] = self._clean_graph(graph)
         return self._updated()
 
     def when(self, query, consequent=None):
@@ -836,9 +840,9 @@ class WOQLQuery:
         self._cursor["@type"] = "woql:Plus"
         self._cursor["woql:first"] = self._arop(new_args.pop(0))
         if len(new_args) > 1:
-            self._cursor = self._jobj(WOQLQuery().plus(*args))
+            self._cursor = self._jobj(WOQLQuery().plus(*new_args))
         else:
-            self._cursor["woql:second"] = self._arop(args[0])
+            self._cursor["woql:second"] = self._arop(new_args[0])
         return self
 
     def minus(self, *args):
@@ -849,10 +853,10 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:Minus"
         self._cursor["woql:first"] = self._arop(new_args.pop(0))
-        if len(new_args) > 1:
+        if len(new_args) > 1:           
             self._cursor["woql:second"] = self._jobj(WOQLQuery().minus(*new_args))
         else:
-            self._cursor["woql:second"] = self._arop(args[0])
+            self._cursor["woql:second"] = self._arop(new_args[0])
         return self
 
     def times(self, *args):
@@ -866,7 +870,7 @@ class WOQLQuery:
         if len(new_args) > 1:
             self._cursor["woql:second"] = self._jobj(WOQLQuery().times(*new_args))
         else:
-            self._cursor["woql:second"] = self._arop(args[0])
+            self._cursor["woql:second"] = self._arop(new_args[0])
         return self
 
     def divide(self, *args):
@@ -880,7 +884,7 @@ class WOQLQuery:
         if len(new_args) > 1:
             self._cursor["woql:second"] = self._jobj(WOQLQuery().divide(*new_args))
         else:
-            self._cursor["woql:second"] = self._arop(args[0])
+            self._cursor["woql:second"] = self._arop(new_args[0])
         return self
 
     def div(self, *args):
@@ -894,7 +898,7 @@ class WOQLQuery:
         if len(new_args) > 1:
             self._cursor["woql:second"] = self._jobj(WOQLQuery().div(*new_args))
         else:
-            self._cursor["woql:second"] = self._arop(args[0])
+            self._cursor["woql:second"] = self._arop(new_args[0])
         return self
 
     def exp(self, first, second):
@@ -1059,7 +1063,7 @@ class WOQLQuery:
                 nlist.append(slist[0])
             for idx, item in enumerate(slist):
                 if item and item == "v:":
-                    slist2 = re.split("([^\w_])", slist[idx + 1])
+                    slist2 = re.split(r"([^\w_])", slist[idx + 1])
                     x_var = slist2.pop(0)
                     nlist.append("v:" + x_var)
                     rest = "".join(slist2)
@@ -1271,7 +1275,7 @@ class WOQLQuery:
             return self.triple(subj, pred, obj)
 
     def lib(self):
-        #return WOQLLibrary()
+        # return WOQLLibrary()
         pass
 
     def abstract(self, graph=None, subj=None):
@@ -1307,10 +1311,18 @@ class WOQLQuery:
             part = self._find_last_subject(self._cursor)
             g = False
             if part:
-                gpart = part["woql:graph_filter"] if part.get("woql:graph_filter") else part["woql:graph"]
+                gpart = (
+                    part["woql:graph_filter"]
+                    if part.get("woql:graph_filter")
+                    else part["woql:graph"]
+                )
             if gpart:
                 g = gpart["@value"]
-            nq = WOQLQuery().add_property(pro_id, property_type, g).domain(self._adding_class)
+            nq = (
+                WOQLQuery()
+                .add_property(pro_id, property_type, g)
+                .domain(self._adding_class)
+            )
             combine = self.WOQLQuery().json(self._query)
             nwoql = self.WOQLQuery().woql_and(combine, nq)
             nwoql._adding_class = self._adding_class
@@ -1397,9 +1409,13 @@ class WOQLQuery:
         lastsubj = self._find_last_subject(self._cursor)
         g = False
         if lastsubj:
-            gobj = lastsubj["woql:graph_filter"] if lastsubj.get("woql:graph_filter") else lastsubj["woql:graph"]
+            gobj = (
+                lastsubj["woql:graph_filter"]
+                if lastsubj.get("woql:graph_filter")
+                else lastsubj["woql:graph"]
+            )
             g = gobj["@value"] if gobj else False
-            s = lastsubj['woql:subject']
+            s = lastsubj["woql:subject"]
             t = user_type if user_type else lastsubj["@type"]
         if "@type" in self._cursor:
             subq = WOQLQuery().json(self._cursor)
@@ -1611,7 +1627,7 @@ class WOQLQuery:
             if desc:
                 cq.description(desc)
             confs.append(cq)
-            if i < len(choices)-1:
+            if i < len(choices) - 1:
                 nextid = listid + "_" + i
             else:
                 nextid = "rdf:nil"
@@ -1690,9 +1706,7 @@ class WOQLQuery:
             ),
             # string refinement datatypes
             self.add_datatype("xdd:email", "Email", "A valid email address", graph),
-            self.add_datatype(
-                "xdd:html", "HTML", "A string with embedded HTML", graph
-            ),
+            self.add_datatype("xdd:html", "HTML", "A string with embedded HTML", graph),
             self.add_datatype("xdd:json", "JSON", "A JSON encoded string", graph),
             self.add_datatype("xdd:url", "URL", "A valid http(s) URL", graph),
         )
@@ -2094,7 +2108,8 @@ class WOQLQuery:
         return WOQLQuery().woql_and(box_class, box_prop)
 
     def doctype(self, user_type, graph=None):
-        return WOQLQuery().add_class(user_type,graph).parent("Document")
+        return WOQLQuery().add_class(user_type, graph).parent("Document")
+
 
 class TripleBuilder:
     """
@@ -2118,7 +2133,6 @@ class TripleBuilder:
             self._subject = False
         self._query = query
         self._graph = g
-
 
     def label(self, lab, lang="en"):
         if lab[:2] == "v:":
