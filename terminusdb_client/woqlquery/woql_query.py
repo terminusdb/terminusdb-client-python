@@ -76,8 +76,9 @@ class WOQLQuery:
         if sub_query:
             self._cursor["woql:query"] = self._jobj(sub_query)
         else:
-            self._cursor["woql:query"] = {}
-            self.curson = {}
+            nv = {}
+            self._cursor["woql:query"] = nv
+            self._cursor = nv
         return self
 
     def _contains_update_check(self, json=None):
@@ -160,12 +161,12 @@ class WOQLQuery:
 
     def _wfrom(self, opts):
         """JSON LD Format Descriptor"""
-        if opts and opts.format:
+        if opts and opts.get("format"):
             self._cursor["woql:format"] = {
                 "@type": "woql:Format",
-                "woql:format_type": {"@value": opts.format, "@type": "xsd:string"},
+                "woql:format_type": {"@value": opts["format"], "@type": "xsd:string"},
             }
-            if opts.format_header:
+            if opts.get("format_header"):
                 self._cursor["woql:format"]["woql:format_header"] = {
                     "@value": True,
                     "@type": "xsd:boolean",
@@ -191,7 +192,7 @@ class WOQLQuery:
         for idx, item in enumerate(target_list):
             co_item = self._clean_object(item)
             co_item["@type"] = "woql:ArrayElement"
-            co_item["woql:index"] = self._jlt(idx, "xsd:nonNegativeInteger`")
+            co_item["woql:index"] = self._jlt(idx, "xsd:nonNegativeInteger")
             vobj["woql:array_element"].append(co_item)
         return vobj
 
@@ -200,7 +201,7 @@ class WOQLQuery:
         """takes input that can be either a string (variable name)
         or an array - each element of the array is a member of the list"""
         if type(wvar) == str:
-            self._expand_variable(wvar, True)
+            return self._expand_variable(wvar, True)
         if type(wvar) == list:
             ret = {"@type": "woql:Array", "woql:array_element": []}
             for idx, item in enumerate(wvar):
@@ -208,7 +209,7 @@ class WOQLQuery:
                 if type(co_item) == str:
                     co_item = {"node": co_item}
                 co_item["@type"] = "woql:ArrayElement"
-                co_item["woql:index"] = self._jlt(idx, "xsd:nonNegativeInteger`")
+                co_item["woql:index"] = self._jlt(idx, "xsd:nonNegativeInteger")
                 ret["woql:array_element"].append(co_item)
             return ret
 
@@ -268,7 +269,7 @@ class WOQLQuery:
         """Transforms whatever is passed in as the object of a triple into the appropriate json-ld form (variable, literal or id)"""
         obj = {"@type": "woql:Datatype"}
         if type(user_obj) == str:
-            if ":" in user_obj:
+            if(self._looks_like_class(user_obj)):
                 return self._clean_class(user_obj)
             elif self._vocab and (user_obj in self._vocab):
                 return self._clean_class(self._vocab[user_obj])
@@ -278,12 +279,32 @@ class WOQLQuery:
             if not target:
                 target = "xsd:decimal"
             obj["woql:datatype"] = self._jlt(user_obj, target)
+        elif type(user_obj) == int:
+            if not target:
+                target = "xsd:integer"
+            obj["woql:datatype"] = self._jlt(user_obj, target)
+        elif type(user_obj) == type(True):
+            if not target:
+                target = "xsd:boolean"
+            obj["woql:datatype"] = self._jlt(user_obj, target)
         elif type(user_obj) == dict:
             if "@value" in user_obj:
                 obj["woql:datatype"] = user_obj
             else:
                 return user_obj
+        else: 
+            obj["woql:datatype"] = self._jlt(str(user_obj))
         return obj
+    
+    def _looks_like_class(self, cstring):
+        if (':' not in cstring ):
+            return False
+        pref = cstring.split(':')[0]
+        if (pref == 'v' or pref == 'scm'):
+            return True
+        if (utils.STANDARD_URLS.get(pref)): 
+            return True
+        return False        
 
     def _clean_graph(self, graph):
         """Transforms a graph filter or graph id into the proper json-ld form"""
@@ -321,8 +342,7 @@ class WOQLQuery:
     def _default_context(self, db_iri):
         default = copy.copy(utils.STANDARD_URLS)
         default["scm"] = db_iri + "/schema#"
-        default["doc"] = db_iri + "/document/"
-        default["db"] = db_iri + "/"
+        default["doc"] = db_iri + "/data/"
         return default
 
     def _get_context(self, query=None):
@@ -402,7 +422,7 @@ class WOQLQuery:
             while len(temp_json) > 0:
                 item = temp_json.pop()
                 subitem = self._find_last_subject(item)
-                if(subitem):
+                if subitem:
                     return subitem
         if "woql:query" in json:
             item = self._find_last_subject(json["woql:query"])
@@ -472,7 +492,7 @@ class WOQLQuery:
             return self._parameter_error(
                 "Select must be given a list of variable names"
             )
-        if type(queries[-1]) == dict and hasattr(queries[-1], "json"):
+        if hasattr(queries[-1], "json"):
             embedquery = queries.pop()
         else:
             embedquery = False
@@ -600,8 +620,8 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:Equals"
-        self._cursor["woql:left"] = self._clean_class(left)
-        self._cursor["woql:right"] = self._clean_class(right)
+        self._cursor["woql:left"] = self._clean_object(left)
+        self._cursor["woql:right"] = self._clean_object(right)
         return self
 
     def substr(self, string, length, substring, before=0, after=0):
@@ -709,18 +729,17 @@ class WOQLQuery:
                         map_type = onemap[2]
                     oasv = self._asv(onemap[0], onemap[1], map_type)
                     self._query.append(oasv)
-        elif type(args[0]) in [float, str]:
+        elif type(args[0]) in [int, str]:
             if len(args) > 2:
                 map_type = args[2]
             else:
                 map_type = False
-            oasv = self._asv(args[0], args[1], type)
+            oasv = self._asv(args[0], args[1], map_type)
             self._query.append(oasv)
+        elif hasattr(args[0], "json"):
+            self._query.append(args[0].json())
         elif type(args[0]) == dict:
-            if hasattr(args[0], "json"):
-                self._query.append(args[0].json)
-            else:
-                self._query.append(args[0])
+            self._query.append(args[0])
         return self
 
     def file(self, fpath, opts):
@@ -804,10 +823,11 @@ class WOQLQuery:
         self._cursor["@type"] = "woql:When"
         self._add_sub_query(query)
         if consequent:
-            self._cursor["woql:consequent"] = self._jobj(consequent)
+            newv = self._jobj(consequent)
         else:
-            self._cursor["woql:consequent"] = {}
-        self._cursor = self._cursor["woql:consequent"]
+            newv = {}
+        self._cursor["woql:consequent"] = newv
+        self._cursor = newv
         return self
 
     def trim(self, untrimmed, trimmed):
@@ -1410,7 +1430,11 @@ class WOQLQuery:
         lastsubj = self._find_last_subject(self._cursor)
         g = False
         if lastsubj:
-            gobj = lastsubj["woql:graph_filter"] if lastsubj.get("woql:graph_filter") else lastsubj.get("woql:graph")
+            gobj = (
+                lastsubj["woql:graph_filter"]
+                if lastsubj.get("woql:graph_filter")
+                else lastsubj.get("woql:graph")
+            )
             g = gobj["@value"] if gobj else False
             s = lastsubj["woql:subject"]
             t = user_type if user_type else lastsubj["@type"]
@@ -1429,35 +1453,35 @@ class WOQLQuery:
         self._triple_builder = TripleBuilder(t, self, s, g)
 
     def add_class(self, c, graph=None):
+        if (self._cursor.get('@type')):
+            self._wrap_cursor_with_and()
         if not graph:
             graph = self._graph
-        ap = WOQLQuery()
         if c:
-            c = ap._clean_class(c, True)
-            ap._adding_class = c
-            ap.add_quad(c, "rdf:type", "owl:Class", graph)
-        return ap
+            c = self._clean_class(c, True)
+            self._adding_class = c
+            self.add_quad(c, "rdf:type", "owl:Class", graph)
+        return self 
 
     def insert_class_data(self, data, ref_graph):
         """
             Adds a bunch of class data in one go
         """
-        ap = WOQLQuery()
         if data.get("id"):
-            c = ap._clean_class(data["id"], True)
-            ap = WOQLQuery().add_class(c, ref_graph)
+            self.add_class(data["id"], ref_graph)
             if data.get("label"):
-                ap.label(data["label"])
+                self.label(data["label"])
             if data.get("description"):
-                ap.description(data["description"])
+                self.description(data["description"])
             if data.get("parent"):
                 if not isinstance(data["parent"], list):
                     data["parent"] = [data["parent"]]
-                    ap.parent(*data["parent"])
+                self.parent(*data["parent"])
             for k in data:
                 if k not in ["id", "label", "description", "parent"]:
-                    ap.insert_property_data(k, data[k], ref_graph)
-        return ap
+                    data[k]["domain"] = data["id"]
+                    self.insert_property_data(data[k], ref_graph)
+        return self
 
     def doctype_data(self, data, ref_graph):
         if not data.get("parent"):
@@ -1468,22 +1492,21 @@ class WOQLQuery:
         return self.insert_class_data(data, ref_graph)
 
     def insert_property_data(self, data, ref_graph):
-        ap = WOQLQuery()
         if data.get("id"):
-            c = ap._clean_class(data["id"], True)
-            ap.add_class(c, ref_graph)
+            self.add_property(data["id"], ref_graph)
             if data.get("label"):
-                ap.label(data["label"])
+                self.label(data["label"])
             if data.get("description"):
-                ap.description(data["description"])
-            if data.get("parent"):
-                if not isinstance(data["parent"], list):
-                    data["parent"] = [data["parent"]]
-                    ap.parent(*data["parent"])
-            for k in data:
-                if k not in ["id", "label", "description", "parent"]:
-                    ap.insert_property_data(k, data[k], ref_graph)
-        return ap
+                self.description(data["description"])
+            if data.get("domain"):
+                self.domain(data["domain"])
+            if data.get("max"):
+                self.max(data["max"])
+            if data.get("min"):
+                self.min(data["min"])
+            if data.get("cardinality"):
+                self.cardinality(data["cardinality"])
+        return self
 
     def delete_class(self, c, graph=None):
         if not graph:

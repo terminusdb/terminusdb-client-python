@@ -1,3 +1,15 @@
+WOQL_STAR = {   '@type': 'woql:Triple',
+    'woql:object': {   '@type': 'woql:Variable',
+                       'woql:variable_name': {   '@type': 'xsd:string',
+                                                 '@value': 'Object'}},
+    'woql:predicate': {   '@type': 'woql:Variable',
+                          'woql:variable_name': {   '@type': 'xsd:string',
+                                                    '@value': 'Predicate'}},
+    'woql:subject': {   '@type': 'woql:Variable',
+                        'woql:variable_name': {   '@type': 'xsd:string',
+                                                  '@value': 'Subject'}}
+}
+
 WoqlJson = {
     "quadJson": {
         "@type": "woql:Quad",
@@ -96,6 +108,7 @@ WoqlJson = {
     },
     "orderbyJson": {
         "@type": "woql:OrderBy",
+        "woql:query": WOQL_STAR,
         "woql:variable_ordering": [
             {
                 "@type": "woql:VariableOrdering",
@@ -108,7 +121,7 @@ WoqlJson = {
             {
                 "@type": "woql:VariableOrdering",
                 "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 1},
-                "woql:ascending": {"@type": "xsd:boolean", "@value": "true"},
+                "woql:ascending": {"@type": "xsd:boolean", "@value": True},
                 "woql:variable": {
                     "@type": "woql:Variable",
                     "woql:variable_name": {"@value": "B", "@type": "xsd:string"},
@@ -117,28 +130,13 @@ WoqlJson = {
             {
                 "@type": "woql:VariableOrdering",
                 "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 2},
-                "woql:ascending": {"@type": "xsd:boolean", "@value": "true"},
+                "woql:ascending": {"@type": "xsd:boolean", "@value": True},
                 "woql:variable": {
                     "@type": "woql:Variable",
                     "woql:variable_name": {"@value": "C", "@type": "xsd:string"},
                 },
             },
         ],
-        "woql:query": {
-            "@type": "woql:Triple",
-            "woql:subject": {
-                "@type": "woql:Variable",
-                "woql:variable_name": {"@value": "A", "@type": "xsd:string"},
-            },
-            "woql:predicate": {
-                "@type": "woql:Variable",
-                "woql:variable_name": {"@value": "B", "@type": "xsd:string"},
-            },
-            "woql:object": {
-                "@type": "woql:Variable",
-                "woql:variable_name": {"@value": "C", "@type": "xsd:string"},
-            },
-        },
     },
     "isAJson": {
         "@type": "woql:IsA",

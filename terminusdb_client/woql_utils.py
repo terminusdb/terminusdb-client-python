@@ -1,17 +1,17 @@
 import urllib.parse
 
-# TODO: it's not constant anymore
-# need to add addURLPrefix
 STANDARD_URLS = {
-    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-    "xsd": "http://www.w3.org/2001/XMLSchema#",
-    "owl": "http://www.w3.org/2002/07/owl#",
-    "tcs": "http://terminusdb.com/schema/tcs#",
-    "xdd": "http://terminusdb.com/schema/xdd#",
-    "v": "http://terminusdb.com/woql/variable/",
-    "terminus": "http://terminusdb.com/schema/terminus#",
-    "vio": "http://terminusdb.com/schema/vio#",
+    "rdf": 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+    "rdfs": 'http://www.w3.org/2000/01/rdf-schema#',
+    "xsd": 'http://www.w3.org/2001/XMLSchema#',
+    "xdd": 'http://terminusdb.com/schema/xdd#',
+    "owl": 'http://www.w3.org/2002/07/owl#',
+    "terminus": 'http://terminusdb.com/schema/terminus#',
+    "vio": 'http://terminusdb.com/schema/vio#',
+    "repo": 'http://terminusdb.com/schema/repository#',
+    "layer": 'http://terminusdb.com/schema/layer#',
+    "woql": 'http://terminusdb.com/schema/woql#',
+    "ref": 'http://terminusdb.com/schema/ref#',
 }
 
 
@@ -21,7 +21,7 @@ def encode_uri_component(value):
 
 def uri_encode_payload(payload):
     if isinstance(payload, str):
-        return self.encodeURIComponent(payload)
+        return encode_uri_component(payload)
     payload_arr = []
     if isinstance(payload, dict):
         for key, value in payload.items():
@@ -30,16 +30,16 @@ def uri_encode_payload(payload):
             """
             if isinstance(value, dict):
                 # for keyElement,valueElement in value.items():
-                payload_arr.append(self.encodeURIComponent(value))
+                payload_arr.append(encode_uri_component(value))
             else:
-                payload_arr.append(self.encodeURIComponent({key: value}))
+                payload_arr.append(encode_uri_component({key: value}))
 
     return "&".join(payload_arr)
 
 
 def add_params_to_url(url, payload):
     if payload:
-        params = self.URIEncodePayload(payload)
+        params = uri_encode_payload(payload)
         if params:
             url = "{}?{}".format(url, params)
     return url
@@ -57,7 +57,7 @@ def add_namespaces_to_variable(var):
 def add_namespaces_to_variables(variables):
     nvars = []
     for v_item in variables:
-        nvars.append(self.addNamespacesToVariable(v_item))
+        nvars.append(add_namespaces_to_variable(v_item))
     return nvars
 
 
@@ -104,10 +104,10 @@ def valid_url(string):
 
 
 def url_fraqment(url):
-    bite = url.split("#")
-    if len(bits) <= 1:
-        if not valid_url(url):
-            bits = url.split(":")
+    bits = url.split("#")
+    if(len(bits) > 1):
+        return bits[1]    
+    return url
 
 
 def label_from_url(url):
