@@ -1,8 +1,11 @@
 import copy
+import pprint
 import re
 
 import terminusdb_client.woql_utils as utils
 import terminusdb_client.woqlquery.woql_core as core
+
+pp = pprint.PrettyPrinter(indent=4)
 
 
 class WOQLQuery:
@@ -171,7 +174,7 @@ class WOQLQuery:
 
     def _arop(self, arg):
         """Wraps arithmetic operators in the appropriate json-ld"""
-        if type(arg) not in [bool, str, int, float]:
+        if type(arg) == dict:
             if hasattr(arg, "json"):
                 return arg.json()
             else:
@@ -221,7 +224,7 @@ class WOQLQuery:
     def _clean_subject(self, obj):
         """Transforms whatever is passed in as the subject into the appropriate json-ld for variable or id"""
         subj = False
-        if type(obj) not in [bool, str, int, float]:
+        if type(obj) == dict:
             return obj
         elif type(obj) == str:
             if ":" in obj:
@@ -237,7 +240,7 @@ class WOQLQuery:
     def _clean_predicate(self, predicate):
         """Transforms whatever is passed in as the predicate (id or variable) into the appropriate json-ld form """
         pred = False
-        if type(predicate) not in [bool, str, int, float]:
+        if type(predicate) == dict:
             return predicate
         if type(predicate) != str:
             self._parameter_error("Predicate must be a URI string")
@@ -275,7 +278,7 @@ class WOQLQuery:
             if not target:
                 target = "xsd:decimal"
             obj["woql:datatype"] = self._jlt(user_obj, target)
-        elif type(user_obj) not in [bool, str, int, float]:
+        elif type(user_obj) == dict:
             if "@value" in user_obj:
                 obj["woql:datatype"] = user_obj
             else:
@@ -468,9 +471,7 @@ class WOQLQuery:
             return self._parameter_error(
                 "Select must be given a list of variable names"
             )
-        if type(queries[-1]) not in [bool, str, int, float] and hasattr(
-            queries[-1], "json"
-        ):
+        if type(queries[-1]) == dict and hasattr(queries[-1], "json"):
             embedquery = queries.pop()
         else:
             embedquery = False
@@ -486,7 +487,7 @@ class WOQLQuery:
         queries = list(args)
         if self._cursor.get("@type") and self._cursor["@type"] != "woql:And":
             new_json = WOQLQuery().json(self._cursor)
-            self._cursor = {}
+            self._cursor.clear()
             queries = [new_json] + queries
         if queries and queries[0] == "woql:args":
             return ["woql:query_list"]
@@ -569,7 +570,7 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         arguments = self.triple(sub, pred, obj)
         if sub and sub == "woql:args":
-            return arguments.concat(["woql:graph_filter"])
+            return arguments.append("woql:graph_filter")
         if not graph:
             return self._parameter_error(
                 "Quad takes four parameters, the last should be a graph filter"
@@ -594,7 +595,7 @@ class WOQLQuery:
         if left and left == "woql:args":
             return ["woql:left", "woql:right"]
         if left is None or right is None:
-            return self.self._parameter_error("Equals takes two parameters")
+            return self._parameter_error("Equals takes two parameters")
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:Equals"
@@ -658,7 +659,7 @@ class WOQLQuery:
         self._cursor["@type"] = "woql:ReadObject"
         self._cursor["woql:document_uri"] = iri
         self._cursor["woql:document"] = self._expand_variable(output_var)
-        return self._wfroms(out_format)
+        return self._wfrom(out_format)
 
     def get(self, as_vars, query_resource):
         """Takes an as structure"""
@@ -771,7 +772,7 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         triple_args = self.triple(subject, predicate, object_or_literal)
         if subject and subject == "woql:args":
-            return triple_args.concat(["woql:graph"])
+            return triple_args.append("woql:graph")
         if not graph:
             return self._parameter_error(
                 "Delete Quad takes four parameters, the last should be a graph id"
@@ -1323,8 +1324,8 @@ class WOQLQuery:
                 .add_property(pro_id, property_type, g)
                 .domain(self._adding_class)
             )
-            combine = self.WOQLQuery().json(self._query)
-            nwoql = self.WOQLQuery().woql_and(combine, nq)
+            combine = WOQLQuery().json(self._query)
+            nwoql = WOQLQuery().woql_and(combine, nq)
             nwoql._adding_class = self._adding_class
             return nwoql._updated()
         else:
@@ -1423,8 +1424,8 @@ class WOQLQuery:
                 newq = subq
             else:
                 newq = WOQLQuery().woql_and(subq)
-                nuj = newq.json()
-            self._cursor = {}
+            nuj = newq.json()
+            self._cursor.clear()
             for i in nuj:
                 self._cursor[i] = nuj[i]
         else:
@@ -2131,7 +2132,7 @@ class TripleBuilder:
             self._subject = s
         else:
             self._subject = False
-        self._query = query
+        self._parent_query = query
         self._graph = g
 
     def label(self, lab, lang="en"):
@@ -2152,7 +2153,8 @@ class TripleBuilder:
             d = c
         else:
             d = {"@value": c, "@type": "xsd:string", "@language": lang}
-        return self._add_po("rdfs:comment", d)
+        x = self._add_po("rdfs:comment", d)
+        return x
 
     def _add_po(self, p, o, g=None):
         if not g:
@@ -2174,17 +2176,17 @@ class TripleBuilder:
             newq = WOQLQuery().quad(self._subject, p, o, g)
         else:
             newq = WOQLQuery().triple(self._subject, p, o)
-        self._query.woql_and(newq)
+        return self._parent_query.woql_and(newq)
 
     def _get_o(self, s, p):
         if self._cursor["@type"] == "woql:And":
             for i in self._cursor["query_list"]:
                 subq = self._cursor["query_list"][i]["woql:query"]
                 if (
-                    subq._query["woql:subject"] == s
-                    and subq._query["woql:predicate"] == p
+                    subq._parent_query["woql:subject"] == s
+                    and subq._parent_query["woql:predicate"] == p
                 ):
-                    return subq._query["woql:object"]
+                    return subq._parent_query["woql:object"]
         return False
 
     def card(self, n, which):

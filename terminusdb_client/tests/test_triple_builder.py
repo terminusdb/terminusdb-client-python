@@ -32,16 +32,20 @@ class TestTripleBuilder:
         assert woqlObject2.json() == WoqlJson["labelMethodJson2"]
 
     def test_add_class_and_description_method(self):
-        WOQLQuery().add_class("NewClass").description("A new class object.")
-        # pp.pprint(woqlObject._cursor)
-        # print("-------")
-        # pp.pprint(woqlObject.json())
-        # print("-----")
-        # pp.pprint(WoqlJson["addClassDescJson"])
-        assert False
-        # assert woqlObject.json() == WoqlJson["addClassDescJson"]
+        woqlObject = (
+            WOQLQuery().add_class("NewClass").description("A new class object.")
+        )
+        pp.pprint(woqlObject._cursor)
+        print("-------")
+        pp.pprint(woqlObject._query)
+        print("-------")
+        pp.pprint(woqlObject.json())
+        print("-----")
+        pp.pprint(WoqlJson["addClassDescJson"])
+        # assert False
+        assert woqlObject.json() == WoqlJson["addClassDescJson"]
 
-    def test_comment(self):
+    def test_comment_method(self):
         woqlObject = WOQLQuery().comment("my comment")
         woqlObject01 = WOQLQuery().node("doc:x", "add_quad").comment("my comment")
         jsonObj = {
@@ -49,13 +53,14 @@ class TestTripleBuilder:
             "woql:comment": {"@type": "xsd:string", "@value": "my comment"},
             "woql:query": {},
         }
+        pp.pprint(woqlObject.json())
         assert woqlObject.json() == jsonObj
 
     def test_abstract_method(self):
         woqlObject = WOQLQuery().node("doc:x", "add_quad").abstract()
         assert woqlObject.json() == WoqlJson["nodeAbstractJson"]
 
-    def test_chained_doctype(self):
+    def test_chained_doctype_method(self):
         woqlObject = (
             WOQLQuery()
             .doctype("MyDoc")
@@ -80,27 +85,27 @@ class TestTripleBuilder:
         )
         assert woqlObject.json() == WoqlJson["chainInsertJson"]
 
-    def test_cardinality(self):
+    def test_cardinality_method(self):
         woqlObject = WOQLQuery().add_property("P", "string").cardinality(3)
         assert woqlObject.json() == WoqlJson["propCardinalityJson"]
 
-    def test_property_min(self):
+    def test_property_min_method(self):
         woqlObject = WOQLQuery().add_property("P", "string").min(2)
         assert woqlObject.json() == WoqlJson["propMinJson"]
 
-    def test_max(self):
+    def test_max_method(self):
         woqlObject = WOQLQuery().add_property("P", "string").max(4)
         assert woqlObject.json() == WoqlJson["propertyMaxJson"]
 
-    def test_node_property(self):
+    def test_node_property_method(self):
         woqlObject = WOQLQuery().node("doc:x", "add_triple").property("myprop", "value")
         assert woqlObject.json() == WoqlJson["addNodePropJson"]
 
-    def test_node_parent(self):
+    def test_node_parent_method(self):
         woqlObject = WOQLQuery().node("doc:x", "add_quad").parent("classParentName")
         assert woqlObject.json() == WoqlJson["nodeParentJson"]
 
-    def test_class_description(self):
+    def test_class_description_method(self):
         woqlObject = (
             WOQLQuery().add_class("NewClass").description("A new class object.")
         )
