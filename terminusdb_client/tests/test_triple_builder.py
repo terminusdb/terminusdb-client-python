@@ -1,6 +1,4 @@
 import pytest
-import pprint
-import json
 from ..woqlquery.woql_query import WOQLQuery
 from .woqljson.woqlJson import WoqlJson
 

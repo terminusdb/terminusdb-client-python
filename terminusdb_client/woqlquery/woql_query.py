@@ -761,7 +761,7 @@ class WOQLQuery:
         self._cursor["@type"] = "woql:AddTriple"
         return self._updated()
 
-    def delete_quad(self, subject, predicate, object_or_literal, graph):
+    def delete_quad(self, subject, predicate, object_or_literal, graph=None):
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         triple_args = self.triple(subject, predicate, object_or_literal)
