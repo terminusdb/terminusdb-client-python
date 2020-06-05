@@ -35,3 +35,53 @@ class TestTripleBuilder:
         #pp.pprint(WoqlJson["addClassDescJson"])
         assert False
         #assert woqlObject.json() == WoqlJson["addClassDescJson"]
+
+    def test_comment(self):
+        woqlObject = WOQLQuery().comment("my comment")
+        woqlObject01 = WOQLQuery().node("doc:x", "add_quad").comment("my comment")
+        jsonObj = {"@type": "woql:Comment", "woql:comment": {"@type": "xsd:string", "@value": "my comment"}, 'woql:query': {}}
+        assert woqlObject.json() == jsonObj
+
+
+    def test_abstract_method(self):
+        woqlObject = WOQLQuery().node("doc:x", "add_quad").abstract()
+        assert woqlObject.json() == WoqlJson['nodeAbstractJson']
+
+
+    def test_chained_doctype(self):
+        woqlObject = WOQLQuery().doctype("MyDoc").label("abc").description("abcd").property("prop", "dateTime").label("aaa").property("prop2", "integer").label("abe")
+        assert woqlObject.json() == WoqlJson['chainDoctypeJson']
+
+    def test_chained_insert_method(self):
+        woqlObject = WOQLQuery().insert("v:Node_ID", "v:Type").label("v:Label").description("v:Description").property("prop", "v:Prop").property("prop", "v:Prop2").parent("myParentClass")
+        assert woqlObject.json() == WoqlJson['chainInsertJson']
+
+
+    def test_cardinality(self):
+        woqlObject = WOQLQuery().add_property("P", "string").cardinality(3)
+        assert woqlObject.json() == WoqlJson['propCardinalityJson']
+
+
+    def test_property_min(self):
+        woqlObject = WOQLQuery().add_property("P", "string").min(2)
+        assert woqlObject.json() == WoqlJson['propMinJson']
+
+
+    def test_max(self):
+        woqlObject = WOQLQuery().add_property("P", "string").max(4)
+        assert woqlObject.json() == WoqlJson['propertyMaxJson']
+
+
+    def test_node_property(self):
+        woqlObject = WOQLQuery().node("doc:x", "add_triple").property("myprop", "value")
+        assert woqlObject.json() == WoqlJson['addNodePropJson']
+
+
+    def test_node_parent(self):
+        woqlObject = WOQLQuery().node("doc:x", "add_quad").parent("classParentName");
+        assert woqlObject.json() == WoqlJson['nodeParentJson']
+
+
+    def test_class_description(self):
+        woqlObject = WOQLQuery().add_class("NewClass").description("A new class object.")
+        assert woqlObject.json() == WoqlJson['addClassDescJson']
