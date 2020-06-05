@@ -27,6 +27,11 @@ class TestTripleBuilder:
         assert woqlObject2.json() == WoqlJson["labelMethodJson2"]
 
     def test_add_class_and_description_method(self):
-        print(WOQLQuery().add_class("NewClass")._cursor)
         woqlObject=WOQLQuery().add_class("NewClass").description("A new class object.")
-        assert woqlObject.json() == WoqlJson["addClassDescJson"]
+        #pp.pprint(woqlObject._cursor)
+        #print("-------")
+        #pp.pprint(woqlObject.json())
+        #print("-----")
+        #pp.pprint(WoqlJson["addClassDescJson"])
+        assert False
+        #assert woqlObject.json() == WoqlJson["addClassDescJson"]

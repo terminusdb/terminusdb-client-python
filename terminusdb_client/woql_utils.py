@@ -77,3 +77,37 @@ def empty(obj):
     #         if hasattr(obj,key):
     #             return False
     return True
+
+def shorten(url, prefixes=None):
+    prefixes = prefixes if prefixes else STANDARD_URLS
+    for pref, val in prefixes.items():
+        short_url = url[:len(val)]
+        if val == short_url:
+            return f"{pref}:{short_url}"
+    return url
+
+def is_data_type(stype):
+    sh = shorten(stype)
+    if sh and (sh[:4] == "xsd:" or sh[:4] == "xdd:"):
+        return True
+    return False
+
+def valid_url(string):
+    if string and (string[:7] == 'http://' or string[:8] == 'https://'):
+        return True
+    return False
+
+def url_fraqment(url):
+    bite = url.split('#')
+    if len(bits) <= 1:
+        if not valid_url(url):
+            bits = url.split(':')
+
+def label_from_url(url):
+    nurl = url_fraqment(url)
+    nurl = nurl if nurl else url
+    last_char = nurl.rfind('/')
+    if last_char < len(nurl)-1:
+        nurl = nurl[last_char+1:]
+    nurl = nurl.replace('_', ' ')
+    return nurl[0].upper() + nurl[1:]

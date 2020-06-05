@@ -203,9 +203,9 @@ class WOQLQuery:
                 co_item = self._clean_object(item)
                 if type(co_item) == str:
                     co_item = {"node": co_item}
-                    co_item["@type"] = "woql:ArrayElement"
-                    co_item["woql:index"] = self._jlt(idx, "xsd:nonNegativeInteger`")
-                    ret["woql:array_element"].append(co_item)
+                co_item["@type"] = "woql:ArrayElement"
+                co_item["woql:index"] = self._jlt(idx, "xsd:nonNegativeInteger`")
+                ret["woql:array_element"].append(co_item)
             return ret
 
     def _qle(self, query, idx):
@@ -372,8 +372,8 @@ class WOQLQuery:
 
     def execute(self, client, commit_msg):
         """Executes the query using the passed client to connect to a server"""
-        if self.query.get("@context"):
-            self.query["@context"] = client.conCapabilities._get_json_context()
+        if self._query.get("@context"):
+            self._query["@context"] = client.conCapabilities._get_json_context()
         self._query["@context"]["woql"] = "http://terminusdb.com/schema/woql#"
         # for owl:oneOf choice lists
         self._query["@context"]["_"] = "_:"
@@ -497,10 +497,10 @@ class WOQLQuery:
             if "woql:query" in onevar and "@type" in onevar["woql:query"] and "woql:query_list" in onevar["woql:query"] and onevar["woql:query"]["@type"] == "woql:And":
                 for each in onevar["woql:query"]["woql:query_list"]:
                     qjson = each["woql:query"]
-                if qjson:
-                    index = len(self._cursor["woql:query_list"])
-                    subvar = self._qle(qjson, index)
-                    self._cursor["woql:query_list"].append(subvar)
+                    if qjson:
+                        index = len(self._cursor["woql:query_list"])
+                        subvar = self._qle(qjson, index)
+                        self._cursor["woql:query_list"].append(subvar)
             else:
                 self._cursor["woql:query_list"].append(onevar)
         return self
@@ -784,7 +784,7 @@ class WOQLQuery:
                 "Delete Quad takes four parameters, the last should be a graph id"
             )
         self._cursor["@type"] = "woql:AddQuad"
-        self._clean_graph(graph)
+        self._cursor['woql:graph'] = self._clean_graph(graph)
         return self._updated()
 
     def when(self, query, consequent=None):
@@ -1056,7 +1056,7 @@ class WOQLQuery:
                 nlist.append(slist[0])
             for idx, item in enumerate(slist):
                 if item and item == "v:":
-                    slist2 = re.split(r"[^\w_]", slist[idx + 1])
+                    slist2 = re.split("([^\w_])", slist[idx + 1])
                     x_var = slist2.pop(0)
                     nlist.append("v:" + x_var)
                     rest = "".join(slist2)
@@ -1262,7 +1262,7 @@ class WOQLQuery:
             obj = "v:Object"
         if graph is None:
             graph = False
-        if graph is not None:
+        if graph:
             return self.quad(subj, pred, obj, graph)
         else:
             return self.triple(subj, pred, obj)
@@ -1301,17 +1301,17 @@ class WOQLQuery:
         if not self._triple_builder:
             self._create_triple_builder()
         if self._adding_class:
-            part = self._find_last_subject(self.cursor)
+            part = self._find_last_subject(self._cursor)
             g = False
-            if part is not None:
-                gpart = part["woql:graph_filter"] or part["woql:graph"]
-            if gpart is not None:
+            if part:
+                gpart = part["woql:graph_filter"] if part.get("woql:graph_filter") else part["woql:graph"]
+            if gpart:
                 g = gpart["@value"]
-            nq = WOQLQuery().add_property(pro_id, type, g).domain(self._adding_class)
-            combine = self.WOQLQuery().json(self.query)
+            nq = WOQLQuery().add_property(pro_id, property_type, g).domain(self._adding_class)
+            combine = self.WOQLQuery().json(self._query)
             nwoql = self.WOQLQuery().woql_and(combine, nq)
             nwoql._adding_class = self._adding_class
-            return nwoql.updated()
+            return nwoql._updated()
         else:
             pro_id = self._clean_predicate(pro_id)
             self._triple_builder._add_po(pro_id, property_type)
@@ -1319,20 +1319,20 @@ class WOQLQuery:
 
     def insert(self, insert_id, insert_type, ref_graph=None):
         insert_type = self._clean_type(insert_type, True)
-        if ref_graph is not None:
+        if ref_graph:
             return self.add_quad(insert_id, "type", insert_type, ref_graph)
         return self.add_triple(insert_id, "type", insert_type)
 
     def insert_data(self, data, ref_graph):
-        if data.type and data.id:
-            data_type = self._clean_type(data.type, True)
-            self.insert(data.id, data_type, ref_graph)
-            if data.label is not None:
-                self.label(data.label)
-            if data.description is not None:
-                self.description(data.description)
+        if data.get("type") and data.get("id"):
+            data_type = self._clean_type(data["type"], True)
+            self.insert(data["id"], data_type, ref_graph)
+            if data.get("label"):
+                self.label(data["label"])
+            if data.get("description"):
+                self.description(data["description"])
             for k in data:
-                if ["id", "label", "type", "description"].indexOf(k) == -1:
+                if k not in ["id", "label", "type", "description"]:
                     self.property(k, data[k])
         return self
 
@@ -1345,7 +1345,7 @@ class WOQLQuery:
     def domain(self, d):
         if not self._triple_builder:
             self._create_triple_builder()
-        d = self._cleanClass(d)
+        d = self._clean_class(d)
         self._triple_builder._add_po("rdfs:domain", d)
         return self
 
@@ -1398,14 +1398,13 @@ class WOQLQuery:
             s = lastsubj['woql:subject']
             t = user_type if user_type else lastsubj["@type"]
         if "@type" in self._cursor:
-            subq = self.WOQLQuery().json(self._cursor)
+            subq = WOQLQuery().json(self._cursor)
             if self._cursor["@type"] == "woql:And":
                 newq = subq
             else:
-                newq = self.WOQLQuery().woql_and(subq)
+                newq = WOQLQuery().woql_and(subq)
                 nuj = newq.json()
-            for k in self._cursor:
-                del self._cursor[k]
+            self._cursor = {}
             for i in nuj:
                 self._cursor[i] = nuj[i]
         else:
@@ -1426,122 +1425,122 @@ class WOQLQuery:
         """
             Adds a bunch of class data in one go
         """
-        ap = WOQLQuery
-        if data.id is not None:
-            c = ap._clean_class(data.id, True)
-            ap = self.WOQLQuery().add_class(c, ref_graph)
-            if data.label is not None:
-                ap.label(data.label)
-            if data.description is not None:
-                ap.description(data.description)
-            if data.parent is not None:
-                if not isinstance(data.parent, list):
-                    data.parent = [data.parent]
-                    """ap.parent(...data.parent) TODO"""
+        ap = WOQLQuery()
+        if data.get("id"):
+            c = ap._clean_class(data["id"], True)
+            ap = WOQLQuery().add_class(c, ref_graph)
+            if data.get("label"):
+                ap.label(data["label"])
+            if data.get("description"):
+                ap.description(data["description"])
+            if data.get("parent"):
+                if not isinstance(data["parent"], list):
+                    data["parent"] = [data["parent"]]
+                    ap.parent(*data["parent"])
             for k in data:
-                if ["id", "label", "description", "parent"].indexOf(k) == -1:
+                if k not in ["id", "label", "description", "parent"]:
                     ap.insert_property_data(k, data[k], ref_graph)
         return ap
 
     def doctype_data(self, data, ref_graph):
-        if data.parent is None:
-            data.parent = []
-        if not isinstance(data.parent, list):
-            data.parent = [data.parent]
-        data.parent.append("Document")
+        if not data.get("parent"):
+            data["parent"] = []
+        if not isinstance(data["parent"], list):
+            data["parent"] = [data["parent"]]
+        data["parent"].append("Document")
         return self.insert_class_data(data, ref_graph)
 
     def insert_property_data(self, data, ref_graph):
-        ap = WOQLQuery
-        if data.id is not None:
-            c = ap._clean_class(data.id, True)
+        ap = WOQLQuery()
+        if data.get("id"):
+            c = ap._clean_class(data["id"], True)
             ap.add_class(c, ref_graph)
-            if data.label is not None:
-                ap.label(data.label)
-            if data.description is not None:
-                ap.description(data.description)
-            if data.parent is not None:
-                if not isinstance(data.parent, list):
-                    data.parent = [data.parent]
-                    """ap.parent(...data.parent) TODO"""
+            if data.get("label"):
+                ap.label(data["label"])
+            if data.get("description"):
+                ap.description(data["description"])
+            if data.get("parent"):
+                if not isinstance(data["parent"], list):
+                    data["parent"] = [data["parent"]]
+                    ap.parent(*data["parent"])
             for k in data:
-                if ["id", "label", "description", "parent"].indexOf(k) == -1:
+                if k not in ["id", "label", "description", "parent"]:
                     ap.insert_property_data(k, data[k], ref_graph)
         return ap
 
     def delete_class(self, c, graph=None):
-        if graph is None:
-            graph = self.graph
-        ap = WOQLQuery
-        if c is not None:
+        if not graph:
+            graph = self._graph
+        ap = WOQLQuery()
+        if c:
             c = ap._clean_class(c, True)
             ap.woql_and(
-                WOQLQuery.delete_quad(c, "v:Outgoing", "v:Value", graph),
-                WOQLQuery.opt().delete_quad("v:Other", "v:Incoming", c, graph),
+                WOQLQuery().delete_quad(c, "v:Outgoing", "v:Value", graph),
+                WOQLQuery().opt().delete_quad("v:Other", "v:Incoming", c, graph),
             )
-            ap.updated()
+            ap._updated()
         return ap
 
     def add_property(self, p, t, graph=None):
-        if graph is None:
-            graph = self.graph
-        ap = WOQLQuery
-        t = ap._clean_type(t, True) if t is not None else "xsd:string"
-        if p is not None:
+        if not graph:
+            graph = self._graph
+        ap = WOQLQuery()
+        t = ap._clean_type(t, True) if t else "xsd:string"
+        if p:
             p = ap._clean_path_predicate(p)
             # TODO: cleaning
-            if utils.type_helper._is_data_type(t) is not None:
+            if utils.is_data_type(t):
                 ap.woql_and(
-                    WOQLQuery.add_quad(p, "rdf:type", "owl:DatatypeProperty", graph),
-                    WOQLQuery.add_quad(p, "rdfs:range", t, graph),
+                    WOQLQuery().add_quad(p, "rdf:type", "owl:DatatypeProperty", graph),
+                    WOQLQuery().add_quad(p, "rdfs:range", t, graph),
                 )
             else:
                 ap.woql_and(
-                    WOQLQuery.add_quad(p, "rdf:type", "owl:ObjectProperty", graph),
-                    WOQLQuery.add_quad(p, "rdfs:range", t, graph),
+                    WOQLQuery().add_quad(p, "rdf:type", "owl:ObjectProperty", graph),
+                    WOQLQuery().add_quad(p, "rdfs:range", t, graph),
                 )
             ap._updated()
         return ap
 
     def delete_property(self, p, graph=None):
-        if graph is None:
-            graph = self.graph
-        ap = WOQLQuery
-        if p is not None:
+        if not graph:
+            graph = self._graph
+        ap = WOQLQuery()
+        if p:
             p = ap._clean_path_predicate(p)
-            # TODO: cleaning
             ap.woql_and(
-                WOQLQuery.delete_quad(p, "v:All", "v:Al2", graph),
-                WOQLQuery.delete_quad("v:Al3", "v:Al4", p, graph),
+                WOQLQuery().delete_quad(p, "v:All", "v:Al2", graph),
+                WOQLQuery().delete_quad("v:Al3", "v:Al4", p, graph),
             )
-            ap.updated()
+            ap._updated()
         return ap
 
-    def box_classes(self, prefix, classes, excepts, graph=None):
-        if graph is None:
-            graph = self.graph
-        prefix = prefix or "scm:"
+    def box_classes(self, classes, excepts, prefix=None, graph=None):
+        if not graph:
+            graph = self._graph
+        if not prefix:
+            prefix = "scm:"
         subs = []
         for i in classes:
-            subs.append(WOQLQuery.sub(classes[i], "v:Cid"))
+            subs.append(WOQLQuery().sub(classes[i], "v:Cid"))
         nsubs = []
         for i in excepts:
-            nsubs.append(WOQLQuery.woql_not().sub(excepts[i], "v:Cid"))
+            nsubs.append(WOQLQuery().woql_not().sub(excepts[i], "v:Cid"))
         idgens = [
-            WOQLQuery.re("#(.)(.*)", "v:Cid", ["v:AllB", "v:FirstB", "v:RestB"]),
-            WOQLQuery.lower("v:FirstB", "v:Lower"),
-            WOQLQuery.concat(["v:Lower", "v:RestB"], "v:Propname"),
-            WOQLQuery.concat(["Scoped", "v:FirstB", "v:RestB"], "v:Cname"),
-            WOQLQuery.idgen(prefix, ["v:Cname"], "v:ClassID"),
-            WOQLQuery.idgen(prefix, ["v:Propname"], "v:PropID"),
+            WOQLQuery().re("#(.)(.*)", "v:Cid", ["v:AllB", "v:FirstB", "v:RestB"]),
+            WOQLQuery().lower("v:FirstB", "v:Lower"),
+            WOQLQuery().concat(["v:Lower", "v:RestB"], "v:Propname"),
+            WOQLQuery().concat(["Scoped", "v:FirstB", "v:RestB"], "v:Cname"),
+            WOQLQuery().idgen(prefix, ["v:Cname"], "v:ClassID"),
+            WOQLQuery().idgen(prefix, ["v:Propname"], "v:PropID"),
         ]
-        woql_filter = WOQLQuery.woql_and(
-            WOQLQuery.quad("v:Cid", "rdf:type", "owl:Class", graph),
-            WOQLQuery.woql_not().node("v:Cid").abstract(graph),
-            WOQLQuery.woql_and(*idgens),
-            WOQLQuery.quad("v:Cid", "label", "v:Label", graph),
-            WOQLQuery.concat("Box Class generated for class v:Cid", "v:CDesc", graph),
-            WOQLQuery.concat(
+        woql_filter = WOQLQuery().woql_and(
+            WOQLQuery().quad("v:Cid", "rdf:type", "owl:Class", graph),
+            WOQLQuery().woql_not().node("v:Cid").abstract(graph),
+            WOQLQuery().woql_and(*idgens),
+            WOQLQuery().quad("v:Cid", "label", "v:Label", graph),
+            WOQLQuery().concat("Box Class generated for class v:Cid", "v:CDesc", graph),
+            WOQLQuery().concat(
                 "Box Property generated to link box v:ClassID to class v:Cid",
                 "v:PDesc",
                 graph,
@@ -1579,64 +1578,64 @@ class WOQLQuery:
         graph=None,
         parent=None,
     ):
-        if graph is None:
-            graph = self.graph
+        if not graph:
+            graph = self._graph
         clist = []
-        if cls.indexOf(":") == -1:
+        if ":" not in cls:
             listid = "_:" + cls
         else:
             listid = "_:" + cls.split(":")[1]
         lastid = listid
         wq = WOQLQuery().add_class(cls, graph).label(clslabel)
-        if clsdesc is not None:
+        if clsdesc:
             wq.description(clsdesc)
-        if parent is not None:
+        if parent:
             wq.parent(parent)
         confs = [wq]
         for i in choices:
-            if choices[i] is None:
+            if not choices[i]:
                 continue
             if type(choices[i]) == list:
                 chid = choices[i][0]
                 clab = choices[i][1]
-                desc = choices[i][2] or False
+                desc = choices[i][2] if len(choices[i]) >= 3 else False
             else:
                 chid = choices[i]
-                clab = utils.labelFromURL(chid)
+                clab = utils.label_from_url(chid)
                 desc = False
-            cq = WOQLQuery.insert(chid, cls, graph).label(clab)
-            if desc is not None:
+            cq = WOQLQuery().insert(chid, cls, graph).label(clab)
+            if desc:
                 cq.description(desc)
             confs.append(cq)
-            if i < len(choices) == -1:
+            if i < len(choices)-1:
                 nextid = listid + "_" + i
             else:
                 nextid = "rdf:nil"
-            clist.append(WOQLQuery.add_quad(lastid, "rdf:first", chid, graph))
-            clist.append(WOQLQuery.add_quad(lastid, "rdf:rest", nextid, graph))
+            clist.append(WOQLQuery().add_quad(lastid, "rdf:first", chid, graph))
+            clist.append(WOQLQuery().add_quad(lastid, "rdf:rest", nextid, graph))
             lastid = nextid
-        oneof = WOQLQuery.woql_and(
-            WOQLQuery.add_quad(cls, "owl:oneOf", listid, graph), *clist
+        oneof = WOQLQuery().woql_and(
+            WOQLQuery().add_quad(cls, "owl:oneOf", listid, graph), *clist
         )
-        return WOQLQuery.woql_and(*confs, oneof)
+        return WOQLQuery().woql_and(*confs, oneof)
 
     def libs(self, libs, parent, graph, prefix):
         bits = []
-        if libs.indexOf("xdd") != -1:
+        if "xdd" in libs:
             bits.append(self._load_xdd(graph))
-            if libs.indexOf("box") != -1:
-                bits.append(self.load_xdd_boxes(parent, graph, prefix))
-                bits.append(self.load_xsd_boxes(parent, graph, prefix))
-        elif libs.indexOf("box") != -1:
-            bits.append(self.load_xsd_boxes(parent, graph, prefix))
+            if "box" in libs:
+                bits.append(self._load_xdd_boxes(parent, graph, prefix))
+                bits.append(self._load_xsd_boxes(parent, graph, prefix))
+        elif "box" in libs:
+            bits.append(self._load_xsd_boxes(parent, graph, prefix))
         if len(bits) > 1:
-            return WOQLQuery.woql_and(*bits)
+            return WOQLQuery().woql_and(*bits)
         return bits[0]
 
-    def load_xdd(self, graph=None):
-        if graph is None:
-            graph = self.graph
-        return WOQLQuery.woql_and(
+    def _load_xdd(self, graph=None):
+        if not graph:
+            graph = self._graph
+        return WOQLQuery().woql_and(
             # geograhpic datatypes
             self.add_datatype(
                 "xdd:coordinate",
@@ -1695,18 +1694,18 @@ class WOQLQuery:
         )
 
     def add_datatype(self, d_id, label, descr, graph=None):
-        if graph is None:
-            graph = self.graph
+        if not graph:
+            graph = self._graph
         # utility function for creating a datatype in woql
         dt = WOQLQuery().insert(d_id, "rdfs:Datatype", graph).label(label)
-        if descr is not None:
+        if descr:
             dt.description(descr)
         return dt
 
-    def load_xsd_boxes(self, parent, graph, prefix):
+    def _load_xsd_boxes(self, parent, graph, prefix):
         # Loads box classes for all of the useful xsd classes the format is to generate the box classes for xsd:anyGivenType
         # as class(prefix:AnyGivenType) -> property(prefix:anyGivenType) -> datatype(xsd:anyGivenType)
-        return WOQLQuery.woql_and(
+        return WOQLQuery().woql_and(
             self.box_datatype(
                 "xsd:anySimpleType",
                 "Any Simple Type",
@@ -1990,10 +1989,10 @@ class WOQLQuery:
             ),
         )
 
-    def load_xdd_boxes(self, parent, graph, prefix):
+    def _load_xdd_boxes(self, parent, graph, prefix):
         # Generates a query to create box classes for all of the xdd datatypes. the format is to generate the box classes for xdd:anyGivenType
         # as class(prefix:AnyGivenType) -> property(prefix:anyGivenType) -> datatype(xdd:anyGivenType)
-        return WOQLQuery.woql_and(
+        return WOQLQuery().woql_and(
             self.box_datatype(
                 "xdd:coordinate",
                 "Coordinate",
@@ -2071,24 +2070,24 @@ class WOQLQuery:
     ):
         # utility function for boxing a datatype in woql
         # format is (predicate) prefix:datatype (domain) prefix:Datatype (range) xsd:datatype
-        if graph is None:
-            graph = self.graph
-        prefix = prefix or "scm:"
+        if not graph:
+            graph = self._graph
+        prefix = prefix if prefix else "scm:"
         ext = datatype.split(":")[1]
-        box_class_id = prefix + ext.charAt(0).toUpperCase() + ext.slice(1)
-        box_prop_id = prefix + ext.charAt(0).toLowerCase() + ext.slice(1)
+        box_class_id = prefix + ext[0].upper() + ext[1:]
+        box_prop_id = prefix + ext[0].lower() + ext[1:]
         box_class = self._add_class(box_class_id, graph).label(label)
         box_class.description("Boxed Class for " + datatype)
-        if parent is not None:
+        if parent:
             box_class.parent(parent)
         box_prop = (
             self._add_property(box_prop_id, datatype, graph)
             .label(label)
             .domain(box_class_id)
         )
-        if descr is not None:
+        if descr:
             box_prop.description(descr)
-        return WOQLQuery.woql_and(box_class, box_prop)
+        return WOQLQuery().woql_and(box_class, box_prop)
 
     def doctype(self, user_type, graph):
         return WOQLQuery().add_class(user_type,graph).parent("Document")
@@ -2101,20 +2100,20 @@ class TripleBuilder:
         type is add_quad / remove_quad / add_triple / remove_triple
      """
 
-    def __init__(self, _type=None, query=None, s=None, g=None):
+    def __init__(self, ops_type=None, query=None, s=None, g=None):
         """
         what accumulation type are we
         """
-        if _type is not None and _type.find(":") == -1:
-            _type = "woql:" + _type
-        self._type = _type
+        if ops_type and ops_type.find(":") == -1:
+            ops_type = "woql:" + ops_type
+        self._type = ops_type
         self._cursor = query._cursor
-        if s is not None:
+        if s:
             self._subject = s
         else:
             self._subject = False
         self._query = query
-        self.g = g
+        self._graph = g
 
     def label(self, lab, lang="en"):
         if lab[:2] == "v:":
@@ -2125,18 +2124,18 @@ class TripleBuilder:
         return x
 
     def graph(self, g):
-        self.g = g
+        self._graph = g
 
     def description(self, c, lang="en"):
         if c[:2] == "v:":
             d = c
         else:
             d = {"@value": c, "@type": "xsd:string", "@language": lang}
-        return self._addPO("rdfs:comment", d)
+        return self._add_po("rdfs:comment", d)
 
     def _add_po(self, p, o, g=None):
-        if g is None:
-            g = self.g
+        if not g:
+            g = self._graph
         newq = False
         if self._type == "woql:Triple":
             newq = WOQLQuery().triple(self._subject, p, o)
@@ -2185,7 +2184,7 @@ class TripleBuilder:
                 "owl:cardinality", {"@value": n, "@type": "xsd:nonNegativeInteger"}
             )
         od = self._get_o(os, "rdfs:domain")
-        if od is not None:
+        if od:
             cardcls = self._subject
             self._subject = od
             self._add_po("rdfs:subClassOf", cardcls)
