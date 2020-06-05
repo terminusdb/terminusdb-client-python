@@ -1,15 +1,15 @@
 WoqlMath = {
-    "divJson":{
-          '@type': 'woql:Div',
-          'woql:first': {
-            '@type': 'woql:ArithmeticValue',
-            'woql:datatype': { '@type': 'xsd:decimal', '@value': '2' }
-          },
-          'woql:second': {
-            '@type': 'woql:ArithmeticValue',
-            'woql:datatype': { '@type': 'xsd:decimal', '@value': '1' }
-          }
+    "divJson": {
+        "@type": "woql:Div",
+        "woql:first": {
+            "@type": "woql:ArithmeticValue",
+            "woql:datatype": {"@type": "xsd:decimal", "@value": "2"},
         },
+        "woql:second": {
+            "@type": "woql:ArithmeticValue",
+            "woql:datatype": {"@type": "xsd:decimal", "@value": "1"},
+        },
+    },
     "minusJson": {
         "@type": "woql:Minus",
         "woql:first": {

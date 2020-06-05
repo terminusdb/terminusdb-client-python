@@ -234,9 +234,9 @@ class TestWoqlQueries:
         # TODO: no expected output
         woqlObject = WOQLQuery().div("2", "1")
         pp.pprint(woqlObject.json())
-        pp.pprint(WoqlMath["divJson"])  
-        
-        assert woqlObject.json() == WoqlMath["divJson"]  
+        pp.pprint(WoqlMath["divJson"])
+
+        assert woqlObject.json() == WoqlMath["divJson"]
 
     def test_get_method(self):
         # TODO: orig assume to be dict

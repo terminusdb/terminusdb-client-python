@@ -853,7 +853,7 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:Minus"
         self._cursor["woql:first"] = self._arop(new_args.pop(0))
-        if len(new_args) > 1:           
+        if len(new_args) > 1:
             self._cursor["woql:second"] = self._jobj(WOQLQuery().minus(*new_args))
         else:
             self._cursor["woql:second"] = self._arop(new_args[0])
