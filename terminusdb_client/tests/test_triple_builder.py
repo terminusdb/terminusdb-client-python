@@ -30,6 +30,8 @@ class TestTripleBuilder:
         woqlObject=WOQLQuery().add_class("NewClass").description("A new class object.")
         pp.pprint(woqlObject._cursor)
         print("-------")
+        pp.pprint(woqlObject._query)
+        print("-------")
         pp.pprint(woqlObject.json())
         print("-----")
         pp.pprint(WoqlJson["addClassDescJson"])
