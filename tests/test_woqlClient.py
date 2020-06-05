@@ -5,7 +5,6 @@ import unittest.mock as mock
 
 import pytest
 import requests
-from connectionObjDump import ConnectionDump
 from mockResponse import mocked_requests
 from woqlclient import WOQLClient
 from woqljson.woqlStarJson import WoqlStar
@@ -49,7 +48,7 @@ def test_connection(mocked_requests, monkeypatch):
         "http://localhost:6363/", headers={"Authorization": "Basic OmFkbWluOm15a2V5"}
     )
 
-    #assert __woql_client__.conCapabilities.connection == ConnectionDump
+    # assert __woql_client__.conCapabilities.connection == ConnectionDump
 
 
 @mock.patch("requests.post", side_effect=mocked_requests)
