@@ -1,5 +1,6 @@
-from .connectCapabilitiesResponse import ConnectResponse
 from terminusdb_client.woqlclient.api_endpoint_const import APIEndpointConst
+
+from .connectCapabilitiesResponse import ConnectResponse
 
 
 def mocked_requests(*args, **kwargs):

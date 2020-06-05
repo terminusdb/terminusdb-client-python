@@ -1,6 +1,5 @@
-import terminusdb_client.woql_utils as utils
-
 # helper functions for WOQLCore
+
 
 def _get_clause_and_remainder(pat):
     """Breaks a graph pattern up into two parts - the next clause, and the remainder of the string
