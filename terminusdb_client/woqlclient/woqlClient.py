@@ -141,7 +141,7 @@ class WOQLClient:
     def set(self, **kwargs):  # bad naming
         self.conConfig.update(**kwargs)
 
-    def create_database(self, dbid, label, **kwargs):
+    def create_database(self, dbid, accountid, details):
         """
         Create a Terminus Database by posting
         a terminus:Database document to the Terminus Server
@@ -150,8 +150,10 @@ class WOQLClient:
         ----------
         dbid : str
             ID of the specific database to create
-        label : str
-            Terminus label
+        details : dictionary with the following properties: 
+            label: textual name of db
+            comment: text description of db
+            base_uri: uri to use for prefixing internal documents 
         key : str, optional
             you can omit the key if you have set it before
         kwargs
@@ -166,23 +168,10 @@ class WOQLClient:
         WOQLClient(server="http://localhost:6363").createDatabase("someDB", "Database Label", "password")
         """
         self.db(dbid)
-        if kwargs.get("accountid"):
-            self.account(kwargs["accountid"])  # where does accountid comes from
-
-        comment = kwargs.get("comment", label)
-        username = self.account()
-
-        doc = {
-            "label": label,
-            "comment": comment,
-            "prefixes": {
-                "scm": f"terminus://{username}/{dbid}/schema#",
-                "doc": f"terminus://{username}/{dbid}/data/",
-            },
-        }
+        self.account(accountid)  
 
         return self.dispatch(
-            APIEndpointConst.CREATE_DATABASE, self.conConfig.db_url(), doc
+            APIEndpointConst.CREATE_DATABASE, self.conConfig.db_url(), details
         )
 
     def delete_database(self, dbid, accountid=None):
