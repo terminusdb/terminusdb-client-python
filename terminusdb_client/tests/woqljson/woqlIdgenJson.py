@@ -1,4 +1,4 @@
-WoqlIdgen = {
+WOQL_IDGEN_JSON = {
     "@type": "woql:IDGenerator",
     "woql:base": {
         "@type": "woql:Datatype",

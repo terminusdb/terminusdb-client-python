@@ -283,7 +283,7 @@ class WOQLQuery:
             if not target:
                 target = "xsd:integer"
             obj["woql:datatype"] = self._jlt(user_obj, target)
-        elif type(user_obj) == type(True):
+        elif type(user_obj) == bool:
             if not target:
                 target = "xsd:boolean"
             obj["woql:datatype"] = self._jlt(user_obj, target)

@@ -1,4 +1,4 @@
-WoqlJoin = {
+WOQL_JOIN_SPLIT_JSON = {
     "joinJson": {
         "@type": "woql:Join",
         "woql:join_list": {

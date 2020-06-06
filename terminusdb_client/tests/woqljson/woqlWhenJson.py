@@ -1,4 +1,4 @@
-WoqlWhen = {
+WOQL_WHEN_JSON = {
     "@type": "woql:When",
     "woql:query": {"@type": "woql:True"},
     "woql:consequent": {

@@ -3,36 +3,37 @@ import pprint
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 # expected results
-from .woqljson.woqlAndJson import WoqlAndJson
-from .woqljson.woqlCastJson import WoqlCastJson
-from .woqljson.woqlConcatJson import WoqlConcatJson
-from .woqljson.woqlIdgenJson import WoqlIdgen
-from .woqljson.woqlInsertJson import WoqlInsert
-from .woqljson.woqlJoinSplitJson import WoqlJoin
-from .woqljson.woqlJson import WOQL_STAR, WoqlJson
-from .woqljson.woqlMathJson import WoqlMath
-from .woqljson.woqlOrJson import WoqlOr
-from .woqljson.woqlTrimJson import WoqlTrim
-from .woqljson.woqlWhenJson import WoqlWhen
+from .woqljson.woqlAndJson import WOQL_AND_JSON
+from .woqljson.woqlCastJson import WOQL_CAST_JSON
+from .woqljson.woqlConcatJson import WOQL_CONCAT_JSON
+from .woqljson.woqlDeleteJson import WOQL_DELETE_JSON
+from .woqljson.woqlIdgenJson import WOQL_IDGEN_JSON
+from .woqljson.woqlInsertJson import WOQL_INSERT_JSON
+from .woqljson.woqlJoinSplitJson import WOQL_JOIN_SPLIT_JSON
+from .woqljson.woqlJson import WOQL_JSON, WOQL_STAR
+from .woqljson.woqlMathJson import WOQL_MATH_JSON
+from .woqljson.woqlOrJson import WOQL_OR_JSON
+from .woqljson.woqlTrimJson import WOQL_TRIM_JSON
+from .woqljson.woqlWhenJson import WOQL_WHEN_JSON
 
 pp = pprint.PrettyPrinter(indent=4)
 
 
 class TestWoqlQueries:
     def test_start_properties_values(self):
-        woqlObject = WOQLQuery()
-        assert woqlObject._chain_ended == False
-        assert woqlObject._contains_update == False
-        assert woqlObject._vocab["type"] == "rdf:type"
+        woql_object = WOQLQuery()
+        assert woql_object._chain_ended == False
+        assert woql_object._contains_update == False
+        assert woql_object._vocab["type"] == "rdf:type"
 
     def test_limit_method(self):
-        woqlObject = WOQLQuery().limit(10)
-        limitJson = {}
-        assert woqlObject.json() == limitJson
+        woql_object = WOQLQuery().limit(10)
+        limit_json = {}
+        assert woql_object.json() == limit_json
 
     def test_start_method(self):
-        woqlObject = WOQLQuery().limit(10).start(0).star()
-        jsonObj = {
+        woql_object = WOQLQuery().limit(10).start(0).star()
+        json_obj = {
             "@type": "woql:Limit",
             "woql:limit": {
                 "@type": "woql:Datatype",
@@ -48,20 +49,20 @@ class TestWoqlQueries:
             },
         }
 
-        pp.pprint(woqlObject.json())
-        assert woqlObject.json() == jsonObj
+        pp.pprint(woql_object.json())
+        assert woql_object.json() == json_obj
 
     def test_insert_method(self):
-        woqlObject = WOQLQuery().insert("v:Bike_URL", "Bicycle")
-        pp.pprint(woqlObject.json())
-        pp.pprint(WoqlInsert["onlyNode"])
-        assert woqlObject.json() == WoqlInsert["onlyNode"]
+        woql_object = WOQLQuery().insert("v:Bike_URL", "Bicycle")
+        pp.pprint(woql_object.json())
+        pp.pprint(WOQL_INSERT_JSON["onlyNode"])
+        assert woql_object.json() == WOQL_INSERT_JSON["onlyNode"]
 
     def test_doctype_method(self):
         # TODO: test in js does not exist
-        woqlObject = WOQLQuery().doctype("Station")
-        pp.pprint(woqlObject.json())
-        jsonObj = {
+        woql_object = WOQLQuery().doctype("Station")
+        pp.pprint(woql_object.json())
+        json_obj = {
             "@type": "woql:And",
             "woql:query_list": [
                 {
@@ -104,13 +105,13 @@ class TestWoqlQueries:
             ],
         }
 
-        assert woqlObject.json() == jsonObj
+        assert woql_object.json() == json_obj
 
     def test_woql_not_method(self):
-        woqlObject = WOQLQuery().woql_not(WOQLQuery().triple("a", "b", "c"))
-        woqlObjectChain = WOQLQuery().woql_not()
-        woqlObjectChain.triple("a", "b", "c")
-        jsonObj = {
+        woql_object = WOQLQuery().woql_not(WOQLQuery().triple("a", "b", "c"))
+        woql_object_chain = WOQLQuery().woql_not()
+        woql_object_chain.triple("a", "b", "c")
+        json_obj = {
             "@type": "woql:Not",
             "woql:query": {
                 "@type": "woql:Triple",
@@ -122,78 +123,71 @@ class TestWoqlQueries:
                 },
             },
         }
-        assert woqlObject.json() == jsonObj
-        assert woqlObjectChain.json() == jsonObj
+        assert woql_object.json() == json_obj
+        assert woql_object_chain.json() == json_obj
 
     def test_woql_and_method(self):
-        woqlObject = WOQLQuery().woql_and(
+        woql_object = WOQLQuery().woql_and(
             WOQLQuery().triple("a", "b", "c"), WOQLQuery().triple("1", "2", "3")
         )
 
-        assert woqlObject.json() == WoqlAndJson
+        assert woql_object.json() == WOQL_AND_JSON
 
     def test_woql_or_method(self):
-        woqlObject = WOQLQuery().woql_or(
+        woql_object = WOQLQuery().woql_or(
             WOQLQuery().triple("a", "b", "c"), WOQLQuery().triple("1", "2", "3")
         )
-        jsonObj = {
-            "or": [
-                {"triple": ["doc:a", "scm:b", {"@language": "en", "@value": "c"}]},
-                {"triple": ["doc:1", "scm:2", {"@language": "en", "@value": "3"}]},
-            ]
-        }
-
-        assert woqlObject.json() == WoqlOr
+        assert woql_object.json() == WOQL_OR_JSON
 
     def test_when_method(self):
         # TODO: chcek chaining
-        woqlObject = WOQLQuery().when(True, WOQLQuery().add_class("id"))
-        woqlObjectChain = WOQLQuery().when(True).add_class("id")
+        woql_object = WOQLQuery().when(True, WOQLQuery().add_class("id"))
+        woql_object_chain = WOQLQuery().when(True).add_class("id")
         print("___first try___")
-        pp.pprint(woqlObject.json())
+        pp.pprint(woql_object.json())
         print("___second try___")
-        pp.pprint(woqlObjectChain._cursor)
-        pp.pprint(woqlObjectChain.json())
+        pp.pprint(woql_object_chain._cursor)
+        pp.pprint(woql_object_chain.json())
         print("___right answer___")
-        pp.pprint(WoqlWhen)
-        assert woqlObject.json() == WoqlWhen
-        assert woqlObjectChain.json() == WoqlWhen
+        pp.pprint(WOQL_WHEN_JSON)
+        assert woql_object.json() == WOQL_WHEN_JSON
+        assert woql_object_chain.json() == WOQL_WHEN_JSON
 
     def test_opt_method(self):
-        woqlObject = WOQLQuery().opt(WOQLQuery().star())
-        woqlObjectChain = WOQLQuery().opt().star()
-        jsonObj = {"@type": "woql:Optional", "woql:query": WOQL_STAR}
-        assert woqlObject.json() == jsonObj
-        assert woqlObjectChain.json() == jsonObj
+        woql_object = WOQLQuery().opt(WOQLQuery().star())
+        woql_object_chain = WOQLQuery().opt().star()
+        json_obj = {"@type": "woql:Optional", "woql:query": WOQL_STAR}
+        assert woql_object.json() == json_obj
+        assert woql_object_chain.json() == json_obj
 
     def test_woql_from_method(self):
-        woqlObject = WOQLQuery().woql_from("schema/main", WOQLQuery().star())
-        woqlObjectChain = WOQLQuery().woql_from("schema/main").star()
-        jsonObj = {
+        woql_object = WOQLQuery().woql_from("schema/main", WOQLQuery().star())
+        woql_object_chain = WOQLQuery().woql_from("schema/main").star()
+        json_obj = {
             "@type": "woql:From",
             "woql:graph_filter": {"@type": "xsd:string", "@value": "schema/main"},
             "woql:query": WOQL_STAR,
         }
-        assert woqlObject.json() == woqlObjectChain.json()
-        assert woqlObjectChain.json() == jsonObj
+        assert woql_object.json() == woql_object_chain.json()
+        assert woql_object_chain.json() == json_obj
 
     def test_star_method(self):
-        woqlObject = WOQLQuery().star()
-        assert woqlObject.json() == WOQL_STAR
+        woql_object = WOQLQuery().star()
+        assert woql_object.json() == WOQL_STAR
 
     def test_select_method(self):
         # TODO: chain won't work
-        woqlObject = WOQLQuery().select("V1", WOQLQuery().star())
-        woqlObjectMultiple = WOQLQuery().select("V1", "V2", WOQLQuery().star())
-        woqlObjectChain = WOQLQuery().select("V1").star()
-        woqlObjectChainMultiple = WOQLQuery().select("V1", "V2").star()
+        woql_object = WOQLQuery().select("V1", WOQLQuery().star())
+        woql_object_multiple = WOQLQuery().select("V1", "V2", WOQLQuery().star())
+        woql_object_chain = WOQLQuery().select("V1").star()
+        woql_object_chain_multiple = WOQLQuery().select("V1", "V2").star()
 
-        assert woqlObjectChainMultiple.json() == woqlObjectMultiple.json()
-        assert woqlObject.json() == woqlObjectChain.json()
+        assert woql_object_chain_multiple.json() == woql_object_multiple.json()
+        assert woql_object.json() == woql_object_chain.json()
 
     def test_eq_method(self):
-        woqlObject = WOQLQuery().eq("a", "b")
-        jsonObj = {
+        woql_object = WOQLQuery().eq("a", "b")
+        json_obj = {
             "@type": "woql:Equals",
             "woql:left": {
                 "@type": "woql:Datatype",
@@ -204,61 +198,59 @@ class TestWoqlQueries:
                 "woql:datatype": {"@type": "xsd:string", "@value": "b"},
             },
         }
-        pp.pprint(woqlObject.json())
-        assert woqlObject.json() == jsonObj
+        pp.pprint(woql_object.json())
+        assert woql_object.json() == json_obj
 
     def test_trim_method(self):
-        woqlObject = WOQLQuery().trim("a", "b")
-        assert woqlObject.json() == WoqlTrim
+        woql_object = WOQLQuery().trim("a", "b")
+        assert woql_object.json() == WOQL_TRIM_JSON
 
     def test_eval_method(self):
-        woqlObject = WOQLQuery().eval("1+2", "b")
-        assert woqlObject.json() == WoqlMath["evalJson"]
+        woql_object = WOQLQuery().eval("1+2", "b")
+        assert woql_object.json() == WOQL_MATH_JSON["evalJson"]
 
     def test_minus_method(self):
         # TODO: interesting args
-        woqlObject = WOQLQuery().minus("2", "1")
-        pp.pprint(woqlObject.json())
-        pp.pprint(WoqlMath["minusJson"])
-        assert woqlObject.json() == WoqlMath["minusJson"]
+        woql_object = WOQLQuery().minus("2", "1")
+        pp.pprint(woql_object.json())
+        pp.pprint(WOQL_MATH_JSON["minusJson"])
+        assert woql_object.json() == WOQL_MATH_JSON["minusJson"]
 
     def test_plus_method(self):
         # TODO: interesting args
-        woqlObject = WOQLQuery().plus("2", "1")
-        pp.pprint(woqlObject.json())
-        pp.pprint(WoqlMath["plusJson"])
-        assert woqlObject.json() == WoqlMath["plusJson"]
+        woql_object = WOQLQuery().plus("2", "1")
+        pp.pprint(woql_object.json())
+        pp.pprint(WOQL_MATH_JSON["plusJson"])
+        assert woql_object.json() == WOQL_MATH_JSON["plusJson"]
 
     def test_times_method(self):
         # TODO: interesting args
-        woqlObject = WOQLQuery().times("2", "1")
-        pp.pprint(woqlObject.json())
-        pp.pprint(WoqlMath["timesJson"])
-        assert woqlObject.json() == WoqlMath["timesJson"]
+        woql_object = WOQLQuery().times("2", "1")
+        pp.pprint(woql_object.json())
+        pp.pprint(WOQL_MATH_JSON["timesJson"])
+        assert woql_object.json() == WOQL_MATH_JSON["timesJson"]
 
     def test_divide_method(self):
         # TODO: interesting args
-        woqlObject = WOQLQuery().divide("2", "1")
-        jsonObj = {"divide": ["2", "1"]}
-        pp.pprint(woqlObject.json())
-        pp.pprint(WoqlMath["divideJson"])
-        assert woqlObject.json() == WoqlMath["divideJson"]
+        woql_object = WOQLQuery().divide("2", "1")
+        pp.pprint(woql_object.json())
+        pp.pprint(WOQL_MATH_JSON["divideJson"])
+        assert woql_object.json() == WOQL_MATH_JSON["divideJson"]
 
     def test_exp_method(self):
-        woqlObject = WOQLQuery().exp("2", "1")
-        assert woqlObject.json() == WoqlMath["expJson"]
+        woql_object = WOQLQuery().exp("2", "1")
+        assert woql_object.json() == WOQL_MATH_JSON["expJson"]
 
     def test_div_method(self):
         # TODO: no expected output
-        woqlObject = WOQLQuery().div("2", "1")
-        pp.pprint(woqlObject.json())
-        pp.pprint(WoqlMath["divJson"])
-
-        assert woqlObject.json() == WoqlMath["divJson"]
+        woql_object = WOQLQuery().div("2", "1")
+        pp.pprint(woql_object.json())
+        pp.pprint(WOQL_MATH_JSON["divJson"])
+        assert woql_object.json() == WOQL_MATH_JSON["divJson"]
 
     def test_get_method(self):
-        woqlObject = WOQLQuery().get(WOQLQuery().woql_as("a", "b"), "Target")
-        jsonObj = {
+        woql_object = WOQLQuery().get(WOQLQuery().woql_as("a", "b"), "Target")
+        json_obj = {
             "@type": "woql:Get",
             "woql:as_vars": [
                 {
@@ -269,15 +261,15 @@ class TestWoqlQueries:
             ],
             "woql:query_resource": "Target",
         }
-        pp.pprint(woqlObject.json())
-        assert woqlObject.json() == jsonObj
+        pp.pprint(woql_object.json())
+        assert woql_object.json() == json_obj
 
     def test_woql_as_method(self):
-        woqlObject = WOQLQuery().woql_as("Source", "Target")
-        woqlObject2 = (
+        woql_object = WOQLQuery().woql_as("Source", "Target")
+        woql_object2 = (
             WOQLQuery().woql_as("Source", "Target").woql_as("Source2", "Target2")
         )
-        jsonObj2 = [
+        json_obj2 = [
             {
                 "@type": "woql:NamedAsVar",
                 "woql:identifier": {"@type": "xsd:string", "@value": "Source"},
@@ -290,20 +282,20 @@ class TestWoqlQueries:
             },
         ]
 
-        assert woqlObject.json() == [jsonObj2[0]]
-        assert woqlObject2.json() == jsonObj2
+        assert woql_object.json() == [json_obj2[0]]
+        assert woql_object2.json() == json_obj2
 
     def test_remote_method(self):
-        woqlObject = WOQLQuery().remote({"url": "http://url"})
-        jsonObj = {
+        woql_object = WOQLQuery().remote({"url": "http://url"})
+        json_obj = {
             "@type": "woql:RemoteResource",
             "woql:remote_uri": {"@type": "xsd:anyURI", "@value": {"url": "http://url"}},
         }
-        assert woqlObject.json() == jsonObj
+        assert woql_object.json() == json_obj
 
     def test_post_method(self):
-        woqlObject = WOQLQuery().post("my_json_file", {"format": "panda_json"})
-        jsonObj = {
+        woql_object = WOQLQuery().post("my_json_file", {"format": "panda_json"})
+        json_obj = {
             "@type": "woql:PostResource",
             "woql:file": {"@type": "xsd:string", "@value": "my_json_file"},
             "woql:format": {
@@ -311,22 +303,22 @@ class TestWoqlQueries:
                 "woql:format_type": {"@value": "panda_json", "@type": "xsd:string"},
             },
         }
-        assert woqlObject.json() == jsonObj
+        assert woql_object.json() == json_obj
 
     def test_idgen_method(self):
         # TODO: 1 or 2 element? (potential off-by-1 thing)
-        woqlObject = WOQLQuery().idgen(
+        woql_object = WOQLQuery().idgen(
             "doc:Station", ["v:Start_ID"], "v:Start_Station_URL"
         )
-        pp.pprint(woqlObject.json())
-        pp.pprint(WoqlIdgen)
-        assert woqlObject.json() == WoqlIdgen
+        pp.pprint(woql_object.json())
+        pp.pprint(WOQL_IDGEN_JSON)
+        assert woql_object.json() == WOQL_IDGEN_JSON
 
     def test_typecast_method(self):
-        woqlObject = WOQLQuery().typecast(
+        woql_object = WOQLQuery().typecast(
             "v:Duration", "xsd:integer", "v:Duration_Cast"
         )
-        jsonObj = {
+        json_obj = {
             "@type": "woql:Typecast",
             "woql:typecast_value": {
                 "@type": "woql:Variable",
@@ -341,46 +333,46 @@ class TestWoqlQueries:
                 },
             },
         }
-        pp.pprint(woqlObject.json())
-        assert woqlObject.json() == jsonObj
+        pp.pprint(woql_object.json())
+        assert woql_object.json() == json_obj
 
     def test_cast_method(self):
-        woqlObject = WOQLQuery().cast("v:Duration", "xsd:integer", "v:Duration_Cast")
-        pp.pprint(woqlObject.json())
-        pp.pprint(WoqlCastJson)
-        assert woqlObject.json() == WoqlCastJson
+        woql_object = WOQLQuery().cast("v:Duration", "xsd:integer", "v:Duration_Cast")
+        pp.pprint(woql_object.json())
+        pp.pprint(WOQL_CAST_JSON)
+        assert woql_object.json() == WOQL_CAST_JSON
 
     def test_re_method(self):
         # TODO: orig is Nontype again, in _copy_json
-        woqlObject = WOQLQuery().re(".*", "v:string", "v:formated")
-        jsonObj = {
+        woql_object = WOQLQuery().re(".*", "v:string", "v:formated")
+        json_obj = {
             "re": [
                 {"@value": ".*", "@type": "xsd:string"},
                 "v:string",
                 {"list": ["v:formated"]},
             ]
         }
-        assert woqlObject.json() == jsonObj
+        assert woql_object.json() == json_obj
 
     def test_join_method(self):
-        woqlObject = WOQLQuery().join(["v:A_obj", "v:B_obj"], ", ", "v:output")
-        assert woqlObject.json() == WoqlJoin["joinJson"]
+        woql_object = WOQLQuery().join(["v:A_obj", "v:B_obj"], ", ", "v:output")
+        assert woql_object.json() == WOQL_JOIN_SPLIT_JSON["joinJson"]
 
     def test_split_method(self):
         # TODO: orig is Nontype again, in _copy_json
-        woqlObject = WOQLQuery().split("A, B, C", ", ", "v:list_obj")
-        jsonObj = {
+        woql_object = WOQLQuery().split("A, B, C", ", ", "v:list_obj")
+        json_obj = {
             "split": [
                 {"@value": "A, B, C", "@type": "xsd:string"},
                 {"@type": "xsd:string", "@value": ", "},
                 "v:list_obj",
             ]
         }
-        assert woqlObject.json() == jsonObj
+        assert woql_object.json() == json_obj
 
     def test_member_method(self):
-        woqlObject = WOQLQuery().member("v:member", "v:list_obj")
-        jsonObj = {
+        woql_object = WOQLQuery().member("v:member", "v:list_obj")
+        json_obj = {
             "@type": "woql:Member",
             "woql:member": {
                 "@type": "woql:Variable",
@@ -391,151 +383,151 @@ class TestWoqlQueries:
                 "woql:variable_name": {"@value": "list_obj", "@type": "xsd:string",},
             },
         }
-        assert woqlObject.json() == jsonObj
+        assert woql_object.json() == json_obj
 
     def test_concat_method(self):
-        woqlObject = WOQLQuery().concat("v:Duration yo v:Duration_Cast", "x")
-        assert woqlObject.json() == WoqlConcatJson
+        woql_object = WOQLQuery().concat("v:Duration yo v:Duration_Cast", "x")
+        assert woql_object.json() == WOQL_CONCAT_JSON
 
     def test_group_by_method(self):
-        woqlObject = (
+        woql_object = (
             WOQLQuery()
             .group_by(["v:A", "v:B"], ["v:C"], "v:New")
             .triple("v:A", "v:B", "v:C")
         )
-        pp.pprint(woqlObject.json())
+        pp.pprint(woql_object.json())
         print("---------")
-        pp.pprint(WoqlJson["groupbyJson"])
-        assert woqlObject.json() == WoqlJson["groupbyJson"]
+        pp.pprint(WOQL_JSON["groupbyJson"])
+        assert woql_object.json() == WOQL_JSON["groupbyJson"]
 
     def test_order_by_method_asc(self):
-        woqlObject = WOQLQuery().order_by("v:A", "v:B asc", "v:C asc").star()
-        pp.pprint(woqlObject.json())
+        woql_object = WOQLQuery().order_by("v:A", "v:B asc", "v:C asc").star()
+        pp.pprint(woql_object.json())
         print("____xxxx___")
-        pp.pprint(WoqlJson["orderbyJson"])
-        assert woqlObject.json() == WoqlJson["orderbyJson"]
+        pp.pprint(WOQL_JSON["orderbyJson"])
+        assert woql_object.json() == WOQL_JSON["orderbyJson"]
 
 
 class TestTripleBuilder:
     def test_triple_method(self):
-        woqlObject = WOQLQuery().triple("a", "b", "c")
-        assert woqlObject.json() == WoqlJson["trypleJson"]
+        woql_object = WOQLQuery().triple("a", "b", "c")
+        assert woql_object.json() == WOQL_JSON["tripleJson"]
 
     def test_quad_method(self):
-        woqlObject = WOQLQuery().quad("a", "b", "c", "d")
-        jsonObj = {
-            "quad": ["doc:a", "scm:b", {"@language": "en", "@value": "c"}, "db:d"]
-        }
-        assert woqlObject.json() == WoqlJson["quadJson"]
+        woql_object = WOQLQuery().quad("a", "b", "c", "d")
+        assert woql_object.json() == WOQL_JSON["quadJson"]
 
     def test_add_class_method(self):
-        woqlObject = WOQLQuery().add_class("id")
-        assert woqlObject.json() == WoqlJson["addClassJson"]
+        woql_object = WOQLQuery().add_class("id")
+        assert woql_object.json() == WOQL_JSON["addClassJson"]
 
     def test_delete_class_method(self):
-        woqlObject = WOQLQuery().delete_class("id")
-        assert woqlObject.json() == WoqlDeleteJson
+        woql_object = WOQLQuery().delete_class("id")
+        assert woql_object.json() == WOQL_DELETE_JSON
 
     def test_sub_method(self):
-        woqlObject = WOQLQuery().sub("ClassA", "ClassB")
-        assert woqlObject.json() == WoqlJson["subsumptionJson"]
+        woql_object = WOQLQuery().sub("ClassA", "ClassB")
+        assert woql_object.json() == WOQL_JSON["subsumptionJson"]
 
     def test_isa_method(self):
-        woqlObject = WOQLQuery().isa("instance", "Class")
-        jsonObj = {"isa": ["scm:instance", "owl:Class"]}
-        assert woqlObject.json() == WoqlJson["isAJson"]
+        woql_object = WOQLQuery().isa("instance", "Class")
+        assert woql_object.json() == WOQL_JSON["isAJson"]
 
     def test_delete_method(self):
         # TODO: no js tests
-        woqlObject = WOQLQuery().delete(
+        woql_object = WOQLQuery().delete(
             {"triple": ["doc:a", "scm:b", {"@language": "en", "@value": "c"}]}
         )
-        jsonObj = {
+        json_obj = {
             "delete": [
                 {"triple": ["doc:a", "scm:b", {"@language": "en", "@value": "c"}]}
             ]
         }
-        assert woqlObject.json() == jsonObj
+        assert woql_object.json() == json_obj
 
     def test_delete_triple_method(self):
-        woqlObject = WOQLQuery().delete_triple("a", "b", "c")
-        assert woqlObject.json() == WoqlJson["deleteTripleJson"]
+        woql_object = WOQLQuery().delete_triple("a", "b", "c")
+        assert woql_object.json() == WOQL_JSON["deleteTripleJson"]
 
     def test_delete_quad_method(self):
-        woqlObject = WOQLQuery().delete_quad("a", "b", "c", "d")
-        assert woqlObject.json() == WoqlJson["deleteQuadJson"]
+        woql_object = WOQLQuery().delete_quad("a", "b", "c", "d")
+        assert woql_object.json() == WOQL_JSON["deleteQuadJson"]
 
     def test_add_triple_method(self):
-        woqlObject = WOQLQuery().add_triple("a", "b", "c")
-        assert woqlObject.json() == WoqlJson["addTripleJson"]
+        woql_object = WOQLQuery().add_triple("a", "b", "c")
+        assert woql_object.json() == WOQL_JSON["addTripleJson"]
 
     def test_add_quad_method(self):
-        woqlObject = WOQLQuery().add_quad("a", "b", "c", "d")
-        assert woqlObject.json() == WoqlJson["addQuadJson"]
+        woql_object = WOQLQuery().add_quad("a", "b", "c", "d")
+        assert woql_object.json() == WOQL_JSON["addQuadJson"]
 
     def test_add_property_method(self):
-        woqlObject = WOQLQuery().add_property("some_property", "string")
-        assert woqlObject.json() == WoqlJson["addPropertyJson"]
+        woql_object = WOQLQuery().add_property("some_property", "string")
+        assert woql_object.json() == WOQL_JSON["addPropertyJson"]
 
     def test_delete_property_method(self):
-        woqlObject = WOQLQuery().delete_property("some_property", "string")
-        assert woqlObject.json() == WoqlJson["deletePropertyJson"]
+        woql_object = WOQLQuery().delete_property("some_property", "string")
+        assert woql_object.json() == WOQL_JSON["deletePropertyJson"]
 
 
 class TestTripleBuilderChainer:
     def test_node_method(self):
-        woqlObject = WOQLQuery().node("some_node", "add_quad")
-        pp.pprint(woqlObject)
-        assert woqlObject.json() == {}
+        woql_object = WOQLQuery().node("some_node", "add_quad")
+        pp.pprint(woql_object)
+        assert woql_object.json() == {}
 
     def test_graph_method(self):
-        woqlObject = WOQLQuery().node("a", "AddQuad").graph("schema/main")
-        woqlObject2 = (
+        woql_object = WOQLQuery().node("a", "AddQuad").graph("schema/main")
+        woql_object2 = (
             WOQLQuery()
             .node("doc:x", "add_quad")
             .graph("schema/main")
             .label("my label", "en")
         )
 
-        assert woqlObject.json() == {}
-        assert woqlObject2.json() == WoqlJson["graphMethodJson"]
+        assert woql_object.json() == {}
+        assert woql_object2.json() == WOQL_JSON["graphMethodJson"]
 
     def test_node_and_label_method(self):
-        woqlObject = WOQLQuery().node("doc:x", "add_quad").label("my label", "en")
-        woqlObject2 = WOQLQuery().node("doc:x", "add_quad").label("v:label")
-        assert woqlObject.json() == WoqlJson["labelMethodJson"]
-        assert woqlObject2.json() == WoqlJson["labelMethodJson2"]
+        woql_object = WOQLQuery().node("doc:x", "add_quad").label("my label", "en")
+        woql_object2 = WOQLQuery().node("doc:x", "add_quad").label("v:label")
+        assert woql_object.json() == WOQL_JSON["labelMethodJson"]
+        assert woql_object2.json() == WOQL_JSON["labelMethodJson2"]
 
     def test_add_class_and_description_method(self):
-        woqlObject = (
+        woql_object = (
             WOQLQuery().add_class("NewClass").description("A new class object.")
         )
-        pp.pprint(woqlObject._cursor)
+        pp.pprint(woql_object._cursor)
         print("-------")
-        pp.pprint(woqlObject._query)
+        pp.pprint(woql_object._query)
         print("-------")
-        pp.pprint(woqlObject.json())
+        pp.pprint(woql_object.json())
         print("-----")
-        pp.pprint(WoqlJson["addClassDescJson"])
+        pp.pprint(WOQL_JSON["addClassDescJson"])
         # assert False
-        assert woqlObject.json() == WoqlJson["addClassDescJson"]
+        assert woql_object.json() == WOQL_JSON["addClassDescJson"]
 
     def test_comment_method(self):
-        woqlObject = WOQLQuery().comment("my comment")
-        woqlObject01 = WOQLQuery().node("doc:x", "add_quad").comment("my comment")
-        jsonObj = {
+        # TODO: what's going on with the 2nd woql?
+        woql_object = WOQLQuery().comment("my comment")
+        woql_object01 = (
+            WOQLQuery().node("doc:x", "add_quad").comment("my comment")
+        )  # ??
+        json_obj = {
             "@type": "woql:Comment",
             "woql:comment": {"@type": "xsd:string", "@value": "my comment"},
         }
-        pp.pprint(woqlObject.json())
-        assert woqlObject.json() == jsonObj
+        pp.pprint(woql_object.json())
+        assert woql_object.json() == json_obj
+        assert False
 
     def test_abstract_method(self):
-        woqlObject = WOQLQuery().node("doc:x", "add_quad").abstract()
-        assert woqlObject.json() == WoqlJson["nodeAbstractJson"]
+        woql_object = WOQLQuery().node("doc:x", "add_quad").abstract()
+        assert woql_object.json() == WOQL_JSON["nodeAbstractJson"]
 
     def test_chained_doctype_method(self):
-        woqlObject = (
+        woql_object = (
             WOQLQuery()
             .doctype("MyDoc")
             .label("abc")
@@ -545,10 +537,10 @@ class TestTripleBuilderChainer:
             .property("prop2", "integer")
             .label("abe")
         )
-        assert woqlObject.json() == WoqlJson["chainDoctypeJson"]
+        assert woql_object.json() == WOQL_JSON["chainDoctypeJson"]
 
     def test_chained_insert_method(self):
-        woqlObject = (
+        woql_object = (
             WOQLQuery()
             .insert("v:Node_ID", "v:Type")
             .label("v:Label")
@@ -557,30 +549,32 @@ class TestTripleBuilderChainer:
             .property("prop", "v:Prop2")
             .parent("myParentClass")
         )
-        assert woqlObject.json() == WoqlJson["chainInsertJson"]
+        assert woql_object.json() == WOQL_JSON["chainInsertJson"]
 
     def test_cardinality_method(self):
-        woqlObject = WOQLQuery().add_property("P", "string").cardinality(3)
-        assert woqlObject.json() == WoqlJson["propCardinalityJson"]
+        woql_object = WOQLQuery().add_property("P", "string").cardinality(3)
+        assert woql_object.json() == WOQL_JSON["propCardinalityJson"]
 
     def test_property_min_method(self):
-        woqlObject = WOQLQuery().add_property("P", "string").min(2)
-        assert woqlObject.json() == WoqlJson["propMinJson"]
+        woql_object = WOQLQuery().add_property("P", "string").min(2)
+        assert woql_object.json() == WOQL_JSON["propMinJson"]
 
     def test_max_method(self):
-        woqlObject = WOQLQuery().add_property("P", "string").max(4)
-        assert woqlObject.json() == WoqlJson["propertyMaxJson"]
+        woql_object = WOQLQuery().add_property("P", "string").max(4)
+        assert woql_object.json() == WOQL_JSON["propertyMaxJson"]
 
     def test_node_property_method(self):
-        woqlObject = WOQLQuery().node("doc:x", "add_triple").property("myprop", "value")
-        assert woqlObject.json() == WoqlJson["addNodePropJson"]
+        woql_object = (
+            WOQLQuery().node("doc:x", "add_triple").property("myprop", "value")
+        )
+        assert woql_object.json() == WOQL_JSON["addNodePropJson"]
 
     def test_node_parent_method(self):
-        woqlObject = WOQLQuery().node("doc:x", "add_quad").parent("classParentName")
-        assert woqlObject.json() == WoqlJson["nodeParentJson"]
+        woql_object = WOQLQuery().node("doc:x", "add_quad").parent("classParentName")
+        assert woql_object.json() == WOQL_JSON["nodeParentJson"]
 
     def test_class_description_method(self):
-        woqlObject = (
+        woql_object = (
             WOQLQuery().add_class("NewClass").description("A new class object.")
         )
-        assert woqlObject.json() == WoqlJson["addClassDescJson"]
+        assert woql_object.json() == WOQL_JSON["addClassDescJson"]

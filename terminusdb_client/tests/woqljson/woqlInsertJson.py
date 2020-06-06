@@ -1,4 +1,4 @@
-WoqlInsert = {
+WOQL_INSERT_JSON = {
     "onlyNode": {
         "@type": "woql:AddTriple",
         "woql:subject": {

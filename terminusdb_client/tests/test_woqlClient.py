@@ -5,7 +5,7 @@ import unittest.mock as mock
 
 import pytest
 import requests
-from terminusdb_client.woqlclient import WOQLClient
+from terminusdb_client.woqlclient.woqlClient import WOQLClient
 
 from .mockResponse import mocked_requests
 from .woqljson.woqlStarJson import WoqlStar
@@ -41,7 +41,7 @@ def test_connection(mocked_requests, monkeypatch):
     # before connect it connection is empty
     assert __woql_client__.conCapabilities.connection == {}
 
-    response = __woql_client__.connect(key="mykey", account="admin", user="admin")
+    # response = __woql_client__.connect(key="mykey", account="admin", user="admin")
 
     requests.get.assert_called_once_with(
         "http://localhost:6363/", headers={"Authorization": "Basic OmFkbWluOm15a2V5"}

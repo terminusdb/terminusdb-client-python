@@ -1,4 +1,4 @@
-WoqlMath = {
+WOQL_MATH_JSON = {
     "divJson": {
         "@type": "woql:Div",
         "woql:first": {

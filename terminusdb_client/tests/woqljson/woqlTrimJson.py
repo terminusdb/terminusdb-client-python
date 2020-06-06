@@ -1,4 +1,4 @@
-WoqlTrim = {
+WOQL_TRIM_JSON = {
     "@type": "woql:Trim",
     "woql:untrimmed": {
         "@type": "woql:Datatype",

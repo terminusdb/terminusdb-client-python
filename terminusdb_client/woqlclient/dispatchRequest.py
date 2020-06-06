@@ -2,8 +2,8 @@
 from base64 import b64encode
 
 import requests
+import terminusdb_client.woql_utils as utils
 
-from ..utils import Utils
 from .api_endpoint_const import APIEndpointConst
 from .errors import APIError
 
@@ -14,7 +14,7 @@ class DispatchRequest:
 
     @staticmethod
     def __get_call(url, headers, payload):
-        url = Utils.addParamsToUrl(url, payload)
+        url = utils.add_params_to_url(url, payload)
 
         return requests.get(url, headers=headers)
 
@@ -28,7 +28,7 @@ class DispatchRequest:
 
     @staticmethod
     def __delete_call(url, headers, payload):
-        url = Utils.addParamsToUrl(url, payload)
+        url = utils.add_params_to_url(url, payload)
         return requests.delete(url, headers=headers)
 
     @staticmethod
@@ -36,7 +36,7 @@ class DispatchRequest:
         headers = {}
 
         # if (payload and ('terminus:user_key' in  payload)):
-        # Utils.encodeURIComponent(payload['terminus:user_key'])}
+        # utils.encodeURIComponent(payload['terminus:user_key'])}
         if basic_auth:
             headers["Authorization"] = "Basic %s" % b64encode(
                 (basic_auth).encode("utf-8")
@@ -111,7 +111,7 @@ class DispatchRequest:
         # the server in the response return always content-type application/json
         except ValueError:
             # if the response type is not a json
-            print("Value Error", err)
+            # print("Value Error", err)
             return request_response.text
 
         """

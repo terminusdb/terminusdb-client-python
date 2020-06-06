@@ -14,7 +14,7 @@ WOQL_STAR = {
     },
 }
 
-WoqlJson = {
+WOQL_JSON = {
     "quadJson": {
         "@type": "woql:Quad",
         "woql:subject": {"@type": "woql:Node", "woql:node": "doc:a"},
@@ -25,7 +25,7 @@ WoqlJson = {
         },
         "woql:graph_filter": {"@type": "xsd:string", "@value": "d"},
     },
-    "trypleJson": {
+    "tripleJson": {
         "@type": "woql:Triple",
         "woql:subject": {"@type": "woql:Node", "woql:node": "doc:a"},
         "woql:predicate": {"@type": "woql:Node", "woql:node": "scm:b"},
