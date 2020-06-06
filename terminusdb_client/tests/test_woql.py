@@ -446,7 +446,7 @@ class TestTripleBuilder:
         assert woqlObject.json() == WoqlJson["isAJson"]
 
     def test_delete_method(self):
-        #TODO: no js tests
+        # TODO: no js tests
         woqlObject = WOQLQuery().delete(
             {"triple": ["doc:a", "scm:b", {"@language": "en", "@value": "c"}]}
         )
