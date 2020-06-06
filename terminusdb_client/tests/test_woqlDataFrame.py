@@ -5,31 +5,31 @@ import pytest
 # import unittest.mock as mock
 # from woqlclient import WOQLQuery
 # from woqlclient import WOQLClient
-import woqlclient as woql
-from woqlclient.woqlDataframe import EmptyException
+import terminusdb_client.woqldataframe.woqlDataframe as woql
+from terminusdb_client.woqldataframe.woqlDataframe import EmptyException
 
 MOCK_RESULT = {
     "bindings": [
         {
-            "http://terminusdb.com/woql/variable/Product": {
+            "Product": {
                 "@type": "http://www.w3.org/2001/XMLSchema#string",
                 "@value": "STRAWBERRY CANDY",
             },
-            "http://terminusdb.com/woql/variable/Qty": {
+            "Qty": {
                 "@type": "http://www.w3.org/2001/XMLSchema#decimal",
                 "@value": 10,
             },
-            "http://terminusdb.com/woql/variable/Stock": "http://195.201.12.87:6365/rational_warehouse/document/Stock110_101752_2019-12-22T00%3A00%3A00",
-            "http://terminusdb.com/woql/variable/Warehouse": {
+            "Stock": "http://195.201.12.87:6365/rational_warehouse/document/Stock110_101752_2019-12-22T00%3A00%3A00",
+            "Warehouse": {
                 "@language": "en",
                 "@value": "Pittsburg",
             },
-            "http://terminusdb.com/woql/variable/buyers_buy_product": "http://195.201.12.87:6365/rational_warehouse/document/Product101752",
-            "http://terminusdb.com/woql/variable/stockDate": {
+            "buyers_buy_product": "http://195.201.12.87:6365/rational_warehouse/document/Product101752",
+            "stockDate": {
                 "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
                 "@value": "2019-12-22T00:00:00",
             },
-            "http://terminusdb.com/woql/variable/warehouseCode": "http://195.201.12.87:6365/rational_warehouse/document/Warehouse110",
+            "warehouseCode": "http://195.201.12.87:6365/rational_warehouse/document/Warehouse110",
         },
     ],
     "graphs": [],
@@ -57,6 +57,7 @@ TEST_TYPE_VALUE = [
 class TestWoqlDataFrame:
     def test_extract_header_method(self):
         df_header = woql.extract_header(MOCK_RESULT)
+        print(df_header)
         assert df_header == [
             ("Product", "http://www.w3.org/2001/XMLSchema#string"),
             ("Qty", "http://www.w3.org/2001/XMLSchema#decimal"),

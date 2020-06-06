@@ -2,6 +2,7 @@ from terminusdb_client.woqlclient.api_endpoint_const import APIEndpointConst
 
 from .connectCapabilitiesResponse import ConnectResponse
 
+from .getSchemaTurtleResponse import RESPONSE
 
 def mocked_requests(*args, **kwargs):
     class MockResponse:
@@ -37,9 +38,7 @@ def mocked_requests(*args, **kwargs):
                 self._json_data = ConnectResponse
 
             elif action_type == APIEndpointConst.GET_TRIPLES:
-                with open("getSchemaTurtleResponse.txt") as text_file:
-                    self._text = text_file.read()
-                    text_file.close()
+                self._text = RESPONSE
 
             # elif action_type == APIEndpointConst.WOQL_SELECT:
             #   with open("tests/getAllClassQueryResponse.json") as json_file:
