@@ -6,14 +6,14 @@ WOQL_IDGEN_JSON = {
     },
     "woql:key_list": {
         "@type": "woql:Array",
-        "woql:array_element": {
+        "woql:array_element": [{
             "@type": "woql:ArrayElement",
-            "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 0},
-        },
-        "woql:variable_name": {"@type": "xsd:string", "@value": "Start_ID"},
+            "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 1-1},
+            "woql:variable_name": {"@type": "xsd:string", "@value": "Start_ID"},
+        }],
     },
     "woql:uri": {
         "@type": "woql:Variable",
-        "woql:variable_name": {"@type": "xsd:string", "@value": "End_ID"},
+        "woql:variable_name": {"@type": "xsd:string", "@value": "Start_Station_URL"},
     },
 }

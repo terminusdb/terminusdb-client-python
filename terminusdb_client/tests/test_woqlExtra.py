@@ -12,8 +12,8 @@ class TestWoqlExtra:
         woqlObject01 = WOQLQuery().using(
             "userName/dbName/local/commit/commitID", woqlTriple
         )
-        assert woqlObject.json() == WoqlExtra["usingJson"]
-        assert woqlObject01.json() == WoqlExtra["usingJson"]
+        assert woqlObject.to_dict() == WoqlExtra["usingJson"]
+        assert woqlObject01.to_dict() == WoqlExtra["usingJson"]
 
     def test_multi_using(self):
         woql = WOQLQuery()
@@ -33,4 +33,4 @@ class TestWoqlExtra:
         woql_query = woql.woql_and(
             woql.triple("v:A", "v:B", "v:C"), woql.triple("v:D", "v:E", "v:F")
         )
-        assert woql_query.json() == WoqlExtra["chainAndJson"]
+        assert woql_query.to_dict() == WoqlExtra["chainAndJson"]

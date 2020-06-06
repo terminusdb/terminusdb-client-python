@@ -7,12 +7,12 @@ WOQL_JOIN_SPLIT_JSON = {
                 {
                     "@type": "woql:ArrayElement",
                     "woql:variable_name": {"@value": "A_obj", "@type": "xsd:string"},
-                    "woql:index": {"@type": "xsd:nonNegativeInteger`", "@value": 0},
+                    "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 0},
                 },
                 {
                     "@type": "woql:ArrayElement",
                     "woql:variable_name": {"@value": "B_obj", "@type": "xsd:string"},
-                    "woql:index": {"@type": "xsd:nonNegativeInteger`", "@value": 1},
+                    "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 1},
                 },
             ],
         },

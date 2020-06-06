@@ -1,7 +1,7 @@
 import copy
 import pprint
 import re
-
+import json
 import terminusdb_client.woql_utils as utils
 import terminusdb_client.woqlquery.woql_core as core
 
@@ -126,8 +126,8 @@ class WOQLQuery:
 
     def _jobj(self, qobj):
         """Transforms a javascript representation of a query into a json object if needs be"""
-        if hasattr(qobj, "json"):
-            return qobj.json()
+        if hasattr(qobj, "to_dict"):
+            return qobj.to_dict()
         if qobj is True:
             return {"@type": "woql:True"}
         return qobj
@@ -176,8 +176,8 @@ class WOQLQuery:
     def _arop(self, arg):
         """Wraps arithmetic operators in the appropriate json-ld"""
         if type(arg) == dict:
-            if hasattr(arg, "json"):
-                return arg.json()
+            if hasattr(arg, "to_dict"):
+                return arg.to_dict()
             else:
                 return arg
         var = self._clean_object(arg, "xsd:decimal")
@@ -404,14 +404,28 @@ class WOQLQuery:
         self._query["@context"]["_"] = "_:"
         return client.query(self, commit_msg)
 
-    def json(self, json=None):
+    def to_json(self):
+        return self._json()
+
+    def from_json(self, input_json):
+        return self._json(input_json)
+
+    def _json(self, input_json=None):
         """converts back and forward from json
         if the argument is present, the current query is set to it,
         if the argument is not present, the current json version of this query is returned"""
-        if json:
-            self._query = core._copy_json(json)
+        if(input_json): 
+            self.from_dict(json.loads(input_json))
             return self
-        return core._copy_json(self._query, True)
+        else:
+            return json.dumps(self.to_dict())
+
+    def to_dict(self):
+        return core._copy_dict(self._query, True)
+
+    def from_dict(self, dictdata):
+        self._query = core._copy_dict(dictdata)
+        return self
 
     def _find_last_subject(self, json):
         """Finds the last woql element that has a woql:subject in it and returns the json for that
@@ -454,7 +468,7 @@ class WOQLQuery:
                         self._vocab[spl[0]] = spl[1]
 
     def _wrap_cursor_with_and(self):
-        new_json = WOQLQuery().json(self._cursor)
+        new_json = WOQLQuery().from_dict(self._cursor)
         self._cursor = {}
         self.woql_and(new_json, {})
         self._cursor = self._cursor["woql:query_list"][1]["woql:query"]
@@ -492,7 +506,7 @@ class WOQLQuery:
             return self._parameter_error(
                 "Select must be given a list of variable names"
             )
-        if hasattr(queries[-1], "json"):
+        if hasattr(queries[-1], "to_dict"):
             embedquery = queries.pop()
         else:
             embedquery = False
@@ -507,7 +521,7 @@ class WOQLQuery:
     def woql_and(self, *args):
         queries = list(args)
         if self._cursor.get("@type") and self._cursor["@type"] != "woql:And":
-            new_json = WOQLQuery().json(self._cursor)
+            new_json = WOQLQuery().from_dict(self._cursor)
             self._cursor.clear()
             queries = [new_json] + queries
         if queries and queries[0] == "woql:args":
@@ -539,7 +553,7 @@ class WOQLQuery:
         if queries and queries[0] == "woql:args":
             return ["woql:query_list"]
         if self._cursor.get("@type") and self._cursor["@type"] != "woql:Or":
-            new_json = WOQLQuery().json(self._cursor)
+            new_json = WOQLQuery().from_dict(self._cursor)
             for key in self._cursor:
                 del self._cursor[key]
             queries = [new_json] + queries
@@ -687,10 +701,10 @@ class WOQLQuery:
         if as_vars and as_vars == "woql:args":
             return ["woql:as_vars", "woql:query_resource"]
         self._cursor["@type"] = "woql:Get"
-        if hasattr(as_vars, "json"):
-            self._cursor["woql:as_vars"] = as_vars.json()
+        if hasattr(as_vars, "to_dict"):
+            self._cursor["woql:as_vars"] = as_vars.to_dict()
         else:
-            self._cursor["woql:as_vars"] = WOQLQuery().woql_as(*as_vars).json()
+            self._cursor["woql:as_vars"] = WOQLQuery().woql_as(*as_vars).to_dict()
         if query_resource:
             self._cursor["woql:query_resource"] = self._jobj(query_resource)
         else:
@@ -705,10 +719,10 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:Put"
-        if hasattr(as_vars, "json"):
-            self._cursor["woql:as_vars"] = as_vars.json()
+        if hasattr(as_vars, "to_dict"):
+            self._cursor["woql:as_vars"] = as_vars.to_dict()
         else:
-            self._cursor["woql:as_vars"] = WOQLQuery().woql_as(*as_vars).json()
+            self._cursor["woql:as_vars"] = WOQLQuery().woql_as(*as_vars).to_dict()
         if query_resource:
             self._cursor["woql:query_resource"] = self._jobj(query_resource)
         else:
@@ -736,8 +750,8 @@ class WOQLQuery:
                 map_type = False
             oasv = self._asv(args[0], args[1], map_type)
             self._query.append(oasv)
-        elif hasattr(args[0], "json"):
-            self._query.append(args[0].json())
+        elif hasattr(args[0], "to_dict"):
+            self._query.append(args[0].to_dict())
         elif type(args[0]) == dict:
             self._query.append(args[0])
         return self
@@ -846,8 +860,8 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:Eval"
-        if hasattr(arith, "json"):
-            self._cursor["woql:expression"] = arith.json()
+        if hasattr(arith, "to_dict"):
+            self._cursor["woql:expression"] = arith.to_dict()
         else:
             self._cursor["woql:expression"] = arith
         self._cursor["woql:result"] = self._clean_object(res)
@@ -1198,7 +1212,7 @@ class WOQLQuery:
                 "Order by must be passed at least one variables to order the query"
             )
 
-        if type(ordered_varlist[-1]) == dict and hasattr(ordered_varlist[-1], "json"):
+        if type(ordered_varlist[-1]) == dict and hasattr(ordered_varlist[-1], "to_dict"):
             embedquery = ordered_varlist.pop()
         else:
             embedquery = False
@@ -1345,7 +1359,7 @@ class WOQLQuery:
                 .add_property(pro_id, property_type, g)
                 .domain(self._adding_class)
             )
-            combine = WOQLQuery().json(self._query)
+            combine = WOQLQuery().from_dict(self._query)
             nwoql = WOQLQuery().woql_and(combine, nq)
             nwoql._adding_class = self._adding_class
             return nwoql._updated()
@@ -1439,12 +1453,12 @@ class WOQLQuery:
             s = lastsubj["woql:subject"]
             t = user_type if user_type else lastsubj["@type"]
         if "@type" in self._cursor:
-            subq = WOQLQuery().json(self._cursor)
+            subq = WOQLQuery().from_dict(self._cursor)
             if self._cursor["@type"] == "woql:And":
                 newq = subq
             else:
                 newq = WOQLQuery().woql_and(subq)
-            nuj = newq.json()
+            nuj = newq.to_dict()
             self._cursor.clear()
             for i in nuj:
                 self._cursor[i] = nuj[i]
@@ -2119,7 +2133,7 @@ class WOQLQuery:
         if parent:
             box_class.parent(parent)
         box_prop = (
-            self._add_property(box_prop_id, datatype, graph)
+            self.add_property(box_prop_id, datatype, graph)
             .label(label)
             .domain(box_class_id)
         )
