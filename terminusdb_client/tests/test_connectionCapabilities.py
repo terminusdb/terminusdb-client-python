@@ -1,12 +1,13 @@
-# import sys
-# sys.path.append('woqlclient')
 
 import pytest
-from AllServerRecords import AllServerRecords
-from connectCapabilitiesResponse import ConnectResponse
-from DBRecord import dbRecordObj
-from serverRecordsFromCap import serverRecordsFromCap
-from woqlclient import ConnectionCapabilities
+
+from terminusdb_client.woqlclient.connectionCapabilities import ConnectionCapabilities
+from .connectCapabilitiesResponse import ConnectResponse
+from .DBRecord import dbRecordObj
+from .serverRecordsFromCap import serverRecordsFromCap
+from .AllServerRecords import AllServerRecords
+from .connectionObjDump import ConnectionDump
+
 
 url = "http://localhost:6363/"
 json_context = {
