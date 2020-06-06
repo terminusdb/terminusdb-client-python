@@ -1,6 +1,6 @@
 import sys
 
-from woqlclient.id_parser import IDParser
+from terminusdb_client.woqlclient.id_parser import IDParser
 
 sys.path.append("woqlclient")
 

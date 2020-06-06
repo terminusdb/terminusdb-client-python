@@ -1,4 +1,4 @@
-from woqlclient import ConnectionConfig
+from terminusdb_client.woqlclient.connectionConfig import ConnectionConfig
 
 
 class TestConnectionConfig:

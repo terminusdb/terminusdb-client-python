@@ -1,5 +1,7 @@
 from ..woqlquery.woql_query import WOQLQuery
 from .woqljson.woqlExtraJson import WoqlExtra
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
 
 
 class TestWoqlExtra:
@@ -16,21 +18,24 @@ class TestWoqlExtra:
         assert woqlObject01.to_dict() == WoqlExtra["usingJson"]
 
     def test_multi_using(self):
-        woql = WOQLQuery()
-        woql_object = woql.woql_and(
-            woql.using(
-                "admin/dbName/local/commit/commitID_1", woql.triple("v:A", "v:B", "v:C")
+        woql_object = WOQLQuery()
+        woql_object.woql_and(
+            WOQLQuery().using(
+                "admin/dbName/local/commit/commitID_1", WOQLQuery().triple("v:A", "v:B", "v:C")
             ),
-            woql.using(
+            WOQLQuery().using(
                 "admin/dbName/local/commit/commitID_2",
-                woql.woql_not(woql.triple("v:A", "v:B", "v:C")),
+                WOQLQuery().woql_not(WOQLQuery().triple("v:A", "v:B", "v:C")),
             ),
         )
-        assert woql_object == WoqlExtra["multiUsingJson"]
+        pp.pprint(woql_object.to_dict())
+        print("___XXX___")
+        pp.pprint( WoqlExtra["multiUsingJson"])
+        assert woql_object.to_dict() == WoqlExtra["multiUsingJson"]
 
     def test_chain_and(self):
-        woql = WOQLQuery()
-        woql_query = woql.woql_and(
-            woql.triple("v:A", "v:B", "v:C"), woql.triple("v:D", "v:E", "v:F")
+        woql_query = WOQLQuery()
+        woql_query.woql_and(
+            WOQLQuery().triple("v:A", "v:B", "v:C"), WOQLQuery().triple("v:D", "v:E", "v:F")
         )
         assert woql_query.to_dict() == WoqlExtra["chainAndJson"]

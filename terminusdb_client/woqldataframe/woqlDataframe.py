@@ -9,11 +9,6 @@ class EmptyException(Exception):
     pass
 
 
-def _get_var_name(uri):
-    (_, var_name) = re.split("^http://terminusdb.com/woql/variable/", uri, maxsplit=1)
-    return var_name
-
-
 def _is_empty(query):
     return len(query["bindings"]) == 0
 
@@ -36,7 +31,7 @@ def extract_header(query):
     Examples
     --------
     >>> result = {'bindings': [{
-    ...           'http://terminusdb.com/woql/variable/Product': {'@type': 'http://www.w3.org/2001/XMLSchema#string',
+    ...           'Product': {'@type': 'http://www.w3.org/2001/XMLSchema#string',
     ...           '@value': 'STRAWBERRY CANDY'}
     ...           }], "graphs": []}
     >>> woql.extract_header(result)
@@ -53,8 +48,7 @@ def extract_header(query):
         raise EmptyException("Query is empty")
 
     bindings = query["bindings"][0]
-    for k, v in bindings.items():
-        name = _get_var_name(k)
+    for name, v in bindings.items():
         if type(v) == dict and ("@type" in v):
             ty = v["@type"]
         else:
@@ -85,7 +79,7 @@ def extract_column(query, name, ty):
     Examples
     --------
     >>> result = {'bindings': [{
-    ...           'http://terminusdb.com/woql/variable/Product': {'@type': 'http://www.w3.org/2001/XMLSchema#string',
+    ...           Product': {'@type': 'http://www.w3.org/2001/XMLSchema#string',
     ...           '@value': 'STRAWBERRY CANDY'}
     ...           }], "graphs": []}
     >>> woql.extract_column(result, 'Product', 'http://www.w3.org/2001/XMLSchema#string')
@@ -101,7 +95,7 @@ def extract_column(query, name, ty):
     column = []
     for binding in bindings:
         for k, v in binding.items():
-            if k == ("http://terminusdb.com/woql/variable/" + name):
+            if k == (name):
                 if isinstance(v, dict):
                     value = type_value_map(ty, v["@value"])
                 else:

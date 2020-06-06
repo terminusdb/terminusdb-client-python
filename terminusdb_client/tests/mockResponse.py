@@ -37,7 +37,7 @@ def mocked_requests(*args, **kwargs):
                 self._json_data = ConnectResponse
 
             elif action_type == APIEndpointConst.GET_TRIPLES:
-                with open("terminusdb_client/tests/getSchemaTurtleResponse.txt") as text_file:
+                with open("getSchemaTurtleResponse.txt") as text_file:
                     self._text = text_file.read()
                     text_file.close()
 
