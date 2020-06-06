@@ -269,7 +269,7 @@ class WOQLQuery:
         """Transforms whatever is passed in as the object of a triple into the appropriate json-ld form (variable, literal or id)"""
         obj = {"@type": "woql:Datatype"}
         if type(user_obj) == str:
-            if(self._looks_like_class(user_obj)):
+            if self._looks_like_class(user_obj):
                 return self._clean_class(user_obj)
             elif self._vocab and (user_obj in self._vocab):
                 return self._clean_class(self._vocab[user_obj])
@@ -292,19 +292,19 @@ class WOQLQuery:
                 obj["woql:datatype"] = user_obj
             else:
                 return user_obj
-        else: 
+        else:
             obj["woql:datatype"] = self._jlt(str(user_obj))
         return obj
-    
+
     def _looks_like_class(self, cstring):
-        if (':' not in cstring ):
+        if ":" not in cstring:
             return False
-        pref = cstring.split(':')[0]
-        if (pref == 'v' or pref == 'scm'):
+        pref = cstring.split(":")[0]
+        if pref == "v" or pref == "scm":
             return True
-        if (utils.STANDARD_URLS.get(pref)): 
+        if utils.STANDARD_URLS.get(pref):
             return True
-        return False        
+        return False
 
     def _clean_graph(self, graph):
         """Transforms a graph filter or graph id into the proper json-ld form"""
@@ -1453,7 +1453,7 @@ class WOQLQuery:
         self._triple_builder = TripleBuilder(t, self, s, g)
 
     def add_class(self, c, graph=None):
-        if (self._cursor.get('@type')):
+        if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         if not graph:
             graph = self._graph
@@ -1461,7 +1461,7 @@ class WOQLQuery:
             c = self._clean_class(c, True)
             self._adding_class = c
             self.add_quad(c, "rdf:type", "owl:Class", graph)
-        return self 
+        return self
 
     def insert_class_data(self, data, ref_graph):
         """

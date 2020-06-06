@@ -1,13 +1,17 @@
-WOQL_STAR = {   '@type': 'woql:Triple',
-    'woql:object': {   '@type': 'woql:Variable',
-                       'woql:variable_name': {   '@type': 'xsd:string',
-                                                 '@value': 'Object'}},
-    'woql:predicate': {   '@type': 'woql:Variable',
-                          'woql:variable_name': {   '@type': 'xsd:string',
-                                                    '@value': 'Predicate'}},
-    'woql:subject': {   '@type': 'woql:Variable',
-                        'woql:variable_name': {   '@type': 'xsd:string',
-                                                  '@value': 'Subject'}}
+WOQL_STAR = {
+    "@type": "woql:Triple",
+    "woql:object": {
+        "@type": "woql:Variable",
+        "woql:variable_name": {"@type": "xsd:string", "@value": "Object"},
+    },
+    "woql:predicate": {
+        "@type": "woql:Variable",
+        "woql:variable_name": {"@type": "xsd:string", "@value": "Predicate"},
+    },
+    "woql:subject": {
+        "@type": "woql:Variable",
+        "woql:variable_name": {"@type": "xsd:string", "@value": "Subject"},
+    },
 }
 
 WoqlJson = {

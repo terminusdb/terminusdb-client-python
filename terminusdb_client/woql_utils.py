@@ -1,17 +1,17 @@
 import urllib.parse
 
 STANDARD_URLS = {
-    "rdf": 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-    "rdfs": 'http://www.w3.org/2000/01/rdf-schema#',
-    "xsd": 'http://www.w3.org/2001/XMLSchema#',
-    "xdd": 'http://terminusdb.com/schema/xdd#',
-    "owl": 'http://www.w3.org/2002/07/owl#',
-    "terminus": 'http://terminusdb.com/schema/terminus#',
-    "vio": 'http://terminusdb.com/schema/vio#',
-    "repo": 'http://terminusdb.com/schema/repository#',
-    "layer": 'http://terminusdb.com/schema/layer#',
-    "woql": 'http://terminusdb.com/schema/woql#',
-    "ref": 'http://terminusdb.com/schema/ref#',
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "xdd": "http://terminusdb.com/schema/xdd#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "terminus": "http://terminusdb.com/schema/terminus#",
+    "vio": "http://terminusdb.com/schema/vio#",
+    "repo": "http://terminusdb.com/schema/repository#",
+    "layer": "http://terminusdb.com/schema/layer#",
+    "woql": "http://terminusdb.com/schema/woql#",
+    "ref": "http://terminusdb.com/schema/ref#",
 }
 
 
@@ -105,8 +105,8 @@ def valid_url(string):
 
 def url_fraqment(url):
     bits = url.split("#")
-    if(len(bits) > 1):
-        return bits[1]    
+    if len(bits) > 1:
+        return bits[1]
     return url
 
 
