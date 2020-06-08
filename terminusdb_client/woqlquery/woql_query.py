@@ -395,14 +395,14 @@ class WOQLQuery:
     def _vocabulary(self, vocab):
         self._vocab = vocab
 
-    def execute(self, client, commit_msg):
+    def execute(self, client, commit_msg=None):
         """Executes the query using the passed client to connect to a server"""
         if self._query.get("@context"):
             self._query["@context"] = client.conCapabilities._get_json_context()
-        self._query["@context"]["woql"] = "http://terminusdb.com/schema/woql#"
-        # for owl:oneOf choice lists
-        self._query["@context"]["_"] = "_:"
-        return client.query(self, commit_msg)
+        if commit_msg is None:
+            return client.query(self)
+        else:
+            return client.query(self, commit_msg)
 
     def to_json(self):
         return self._json()
@@ -414,11 +414,11 @@ class WOQLQuery:
         """converts back and forward from json
         if the argument is present, the current query is set to it,
         if the argument is not present, the current json version of this query is returned"""
-        if(input_json): 
+        if(input_json):
             self.from_dict(json.loads(input_json))
             return self
         else:
-            return json.dumps(self.to_dict())
+            return json.dumps(self.to_dict(), sort_keys=True)
 
     def to_dict(self):
         return core._copy_dict(self._query, True)

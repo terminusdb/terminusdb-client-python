@@ -264,6 +264,9 @@ class WOQLClient:
         # woql.containsUpdate()
         query_obj = self.generate_commit(commit_msg)
 
+        if type(woql_query) != dict and hasattr(woql_query, "to_dict"):
+            woql_query = woql_query.to_dict()
+
         if type(file_list) == dict:
             file_dict = query_obj
             for name in file_list:
@@ -272,13 +275,13 @@ class WOQLClient:
                 file_dict[name] = (name, stream, "text/plain")
             file_dict["query"] = (
                 None,
-                json.dumps(woql_query),
+                json.dumps(woql_query, sort_keys=True),
                 "application/json",
             )
             payload = None
         else:
             file_dict = None
-            query_obj["query"] = json.dumps(woql_query)
+            query_obj["query"] = json.dumps(woql_query, sort_keys=True)
             payload = query_obj
 
         return self.dispatch(

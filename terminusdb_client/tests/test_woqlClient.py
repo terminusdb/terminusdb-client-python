@@ -220,6 +220,6 @@ def test_query(mocked_requests, mocked_requests2):
         },
         json={
             "commit_info": {"author": "admin", "message": "Automatically Added Commit"},
-            "query": json.dumps(WoqlStar),
+            "query": json.dumps(WoqlStar, sort_keys=True),
         },
     )
