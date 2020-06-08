@@ -167,10 +167,12 @@ class WOQLClient:
         --------
         WOQLClient(server="http://localhost:6363").createDatabase("someDB", "Database Label", "password")
         """
-        # if not base_uri, we will add default here
-        if "base_uri" not in details:
-            details["base_uri"] = f"terminus://{accountid}/{dbid}/data/"
-
+        # if no prefixes, we will add default here
+        if "prefixes" not in details:
+            details["prefixes"] = {
+   "scm": f"terminusdb://{accountid}/{dbid}/schema#",
+   "doc": f"terminusdb://{accountid}/{dbid}/data/"
+}
         self.db(dbid)
         self.account(accountid)
 
