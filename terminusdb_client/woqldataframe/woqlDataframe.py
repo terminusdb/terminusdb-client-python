@@ -1,8 +1,18 @@
 # woqlDataframe.py
 import re
 
-import numpy as np
-import pandas as pd
+import warnings
+
+try:
+    import numpy as np
+    import pandas as pd
+except ImportError:
+    msg = (
+        "woqlDataframe requirements are not installed.\n\n"
+        "If you want to use woqlDataframe, please pip install as follows:\n\n"
+        "  python -m pip install -U terminus-client-python[dataframe]"
+    )
+    warnings.warn(msg)
 
 
 class EmptyException(Exception):

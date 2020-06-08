@@ -13,7 +13,7 @@
 import os
 import sys
 
-from woqlclient import __version__
+from terminusdb_client import __version__
 
 sys.path.insert(0, os.path.abspath("../.."))
 

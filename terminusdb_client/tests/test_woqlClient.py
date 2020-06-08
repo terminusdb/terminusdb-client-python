@@ -67,7 +67,11 @@ def test_create_database(mocked_requests, mocked_requests2):
         },
         json={
             "label": "my first db",
-            "comment": "my first db comment"
+            "comment": "my first db comment",
+            "prefixes": {
+   "scm": f"terminusdb://admin/myFirstTerminusDB/schema#",
+   "doc": f"terminusdb://admin/myFirstTerminusDB/data/"
+}
         },
     )
 
@@ -92,6 +96,10 @@ def test_create_database_and_change_account(mocked_requests, mocked_requests2):
         json={
             "label": "my first db",
             "comment": "my first db comment",
+            "prefixes": {
+   "scm": f"terminusdb://my_new_account/myFirstTerminusDB/schema#",
+   "doc": f"terminusdb://my_new_account/myFirstTerminusDB/data/"
+}
         },
     )
 
@@ -212,6 +220,6 @@ def test_query(mocked_requests, mocked_requests2):
         },
         json={
             "commit_info": {"author": "admin", "message": "Automatically Added Commit"},
-            "query": json.dumps(WoqlStar),
+            "query": json.dumps(WoqlStar, sort_keys=True),
         },
     )

@@ -150,10 +150,10 @@ class WOQLClient:
         ----------
         dbid : str
             ID of the specific database to create
-        details : dictionary with the following properties: 
+        details : dictionary with the following properties:
             label: textual name of db
             comment: text description of db
-            base_uri: uri to use for prefixing internal documents 
+            base_uri: uri to use for prefixing internal documents
         key : str, optional
             you can omit the key if you have set it before
         kwargs
@@ -167,8 +167,14 @@ class WOQLClient:
         --------
         WOQLClient(server="http://localhost:6363").createDatabase("someDB", "Database Label", "password")
         """
+        # if no prefixes, we will add default here
+        if "prefixes" not in details:
+            details["prefixes"] = {
+   "scm": f"terminusdb://{accountid}/{dbid}/schema#",
+   "doc": f"terminusdb://{accountid}/{dbid}/data/"
+}
         self.db(dbid)
-        self.account(accountid)  
+        self.account(accountid)
 
         return self.dispatch(
             APIEndpointConst.CREATE_DATABASE, self.conConfig.db_url(), details
@@ -258,6 +264,9 @@ class WOQLClient:
         # woql.containsUpdate()
         query_obj = self.generate_commit(commit_msg)
 
+        if type(woql_query) != dict and hasattr(woql_query, "to_dict"):
+            woql_query = woql_query.to_dict()
+
         if type(file_list) == dict:
             file_dict = query_obj
             for name in file_list:
@@ -266,13 +275,13 @@ class WOQLClient:
                 file_dict[name] = (name, stream, "text/plain")
             file_dict["query"] = (
                 None,
-                woql_query.to_json(),
+                json.dumps(woql_query, sort_keys=True),
                 "application/json",
             )
             payload = None
         else:
             file_dict = None
-            query_obj["query"] = woql_query.to_json()
+            query_obj["query"] = json.dumps(woql_query, sort_keys=True)
             payload = query_obj
 
         return self.dispatch(

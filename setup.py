@@ -35,7 +35,7 @@ setuptools.setup(
     install_requires=requires,
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "License :: OSI Approved :: Apache Software License (Apache License 2.0)",
         "Operating System :: OS Independent",
     ],
     setup_requires=["pytest-runner"],

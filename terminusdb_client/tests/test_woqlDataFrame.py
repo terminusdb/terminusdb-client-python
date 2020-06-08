@@ -5,35 +5,37 @@ import pytest
 # import unittest.mock as mock
 # from woqlclient import WOQLQuery
 # from woqlclient import WOQLClient
-import woqlclient as woql
-from woqlclient.woqlDataframe import EmptyException
+import terminusdb_client.woqldataframe.woqlDataframe as woql
+from terminusdb_client.woqldataframe.woqlDataframe import EmptyException
 
-MOCK_RESULT = {
-    "bindings": [
-        {
-            "http://terminusdb.com/woql/variable/Product": {
-                "@type": "http://www.w3.org/2001/XMLSchema#string",
-                "@value": "STRAWBERRY CANDY",
+@pytest.fixture
+def mock_result():
+    return {
+        "bindings": [
+            {
+                "Product": {
+                    "@type": "http://www.w3.org/2001/XMLSchema#string",
+                    "@value": "STRAWBERRY CANDY",
+                },
+                "Qty": {
+                    "@type": "http://www.w3.org/2001/XMLSchema#decimal",
+                    "@value": 10,
+                },
+                "Stock": "http://195.201.12.87:6365/rational_warehouse/document/Stock110_101752_2019-12-22T00%3A00%3A00",
+                "Warehouse": {
+                    "@language": "en",
+                    "@value": "Pittsburg",
+                },
+                "buyers_buy_product": "http://195.201.12.87:6365/rational_warehouse/document/Product101752",
+                "stockDate": {
+                    "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+                    "@value": "2019-12-22T00:00:00",
+                },
+                "warehouseCode": "http://195.201.12.87:6365/rational_warehouse/document/Warehouse110",
             },
-            "http://terminusdb.com/woql/variable/Qty": {
-                "@type": "http://www.w3.org/2001/XMLSchema#decimal",
-                "@value": 10,
-            },
-            "http://terminusdb.com/woql/variable/Stock": "http://195.201.12.87:6365/rational_warehouse/document/Stock110_101752_2019-12-22T00%3A00%3A00",
-            "http://terminusdb.com/woql/variable/Warehouse": {
-                "@language": "en",
-                "@value": "Pittsburg",
-            },
-            "http://terminusdb.com/woql/variable/buyers_buy_product": "http://195.201.12.87:6365/rational_warehouse/document/Product101752",
-            "http://terminusdb.com/woql/variable/stockDate": {
-                "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
-                "@value": "2019-12-22T00:00:00",
-            },
-            "http://terminusdb.com/woql/variable/warehouseCode": "http://195.201.12.87:6365/rational_warehouse/document/Warehouse110",
-        },
-    ],
-    "graphs": [],
-}
+        ],
+        "graphs": [],
+    }
 
 TEST_TYPE = [
     ("http://www.w3.org/2001/XMLSchema#string", np.unicode_),
@@ -55,8 +57,9 @@ TEST_TYPE_VALUE = [
 
 
 class TestWoqlDataFrame:
-    def test_extract_header_method(self):
-        df_header = woql.extract_header(MOCK_RESULT)
+    def test_extract_header_method(self, mock_result):
+        df_header = woql.extract_header(mock_result)
+        print(df_header)
         assert df_header == [
             ("Product", "http://www.w3.org/2001/XMLSchema#string"),
             ("Qty", "http://www.w3.org/2001/XMLSchema#decimal"),
@@ -71,9 +74,9 @@ class TestWoqlDataFrame:
         with pytest.raises(EmptyException):
             df_header = woql.extract_header({"bindings": []})
 
-    def test_extract_column_method(self):
+    def test_extract_column_method(self, mock_result):
         df_column = woql.extract_column(
-            MOCK_RESULT, "Product", "http://www.w3.org/2001/XMLSchema#string"
+            mock_result, "Product", "http://www.w3.org/2001/XMLSchema#string"
         )
         assert df_column == ["STRAWBERRY CANDY"]
 
@@ -93,6 +96,6 @@ class TestWoqlDataFrame:
         with pytest.raises(Exception, match=r"Unknown rdf type! .*"):
             woql.type_value_map("some type that cause error", "some val")
 
-    def test_query_to_df_method(self):
-        df = woql.query_to_df(MOCK_RESULT)
+    def test_query_to_df_method(self, mock_result):
+        df = woql.query_to_df(mock_result)
         assert df.shape == (1, 7)
