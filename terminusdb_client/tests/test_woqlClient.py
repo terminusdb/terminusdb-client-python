@@ -67,7 +67,8 @@ def test_create_database(mocked_requests, mocked_requests2):
         },
         json={
             "label": "my first db",
-            "comment": "my first db comment"
+            "comment": "my first db comment",
+            "base_uri": "terminus://admin/myFirstTerminusDB/data/"
         },
     )
 
@@ -92,6 +93,7 @@ def test_create_database_and_change_account(mocked_requests, mocked_requests2):
         json={
             "label": "my first db",
             "comment": "my first db comment",
+            "base_uri": "terminus://my_new_account/myFirstTerminusDB/data/"
         },
     )
 

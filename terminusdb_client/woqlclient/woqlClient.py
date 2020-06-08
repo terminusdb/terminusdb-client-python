@@ -150,10 +150,10 @@ class WOQLClient:
         ----------
         dbid : str
             ID of the specific database to create
-        details : dictionary with the following properties: 
+        details : dictionary with the following properties:
             label: textual name of db
             comment: text description of db
-            base_uri: uri to use for prefixing internal documents 
+            base_uri: uri to use for prefixing internal documents
         key : str, optional
             you can omit the key if you have set it before
         kwargs
@@ -167,8 +167,12 @@ class WOQLClient:
         --------
         WOQLClient(server="http://localhost:6363").createDatabase("someDB", "Database Label", "password")
         """
+        # if not base_uri, we will add default here
+        if "base_uri" not in details:
+            details["base_uri"] = f"terminus://{accountid}/{dbid}/data/"
+
         self.db(dbid)
-        self.account(accountid)  
+        self.account(accountid)
 
         return self.dispatch(
             APIEndpointConst.CREATE_DATABASE, self.conConfig.db_url(), details
