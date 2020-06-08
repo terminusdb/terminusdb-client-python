@@ -219,7 +219,6 @@ def test_query(mocked_requests, mocked_requests2):
             "content-type": "application/json",
         },
         json={
-            "commit_info": {"author": "admin", "message": "Automatically Added Commit"},
-            "query": json.dumps(WoqlStar, sort_keys=True),
+            "query": WoqlStar,
         },
     )

@@ -21,6 +21,7 @@ from .woqljson.woqlMathJson import WOQL_MATH_JSON
 from .woqljson.woqlOrJson import WOQL_OR_JSON
 from .woqljson.woqlTrimJson import WOQL_TRIM_JSON
 from .woqljson.woqlWhenJson import WOQL_WHEN_JSON
+from .test_connectionCapabilities import json_context
 
 from .mockResponse import mocked_requests
 
@@ -593,11 +594,14 @@ class TestTripleBuilderChainer:
 
     @mock.patch("requests.post", side_effect=mocked_requests)
     @mock.patch("requests.get", side_effect=mocked_requests)
-    def test_execute_mehtod(self, mocked_requests, mocked_requests2):
+    def test_execute_method(self, mocked_requests, mocked_requests2):
         woql_client = WOQLClient("http://localhost:6363")
         woql_client.connect(user="admin", account="admin", key="root", db="myDBName")
         woql_object = WOQLQuery().star()
         woql_object.execute(woql_client)
+
+        mycon = WOQL_STAR
+        mycon["@context"] = json_context
 
         requests.post.assert_called_once_with(
             "http://localhost:6363/woql/admin/myDBName/local/branch/master",
@@ -606,7 +610,6 @@ class TestTripleBuilderChainer:
                 "content-type": "application/json",
             },
             json={
-                "commit_info": {"author": "admin", "message": "Automatically Added Commit"},
-                "query": json.dumps(WOQL_STAR, sort_keys=True),
+                "query": mycon,
             },
         )

@@ -32,7 +32,7 @@ class DispatchRequest:
         return requests.delete(url, headers=headers)
 
     @staticmethod
-    def __autorization_header(basic_auth=None, jwt=None):
+    def __autorization_header(basic_auth=None, remote_auth=None):
         headers = {}
 
         # if (payload and ('terminus:user_key' in  payload)):
@@ -41,27 +41,28 @@ class DispatchRequest:
             headers["Authorization"] = "Basic %s" % b64encode(
                 (basic_auth).encode("utf-8")
             ).decode("utf-8")
-            if jwt:
-                headers["HUB_AUTHORIZATION"] = "Bearer %s" % jwt
-        # payload.pop('terminus:user_key')
-        elif jwt:
-            headers["Authorization"] = "Bearer %s" % jwt
-
+        if remote_auth and remote_auth["type"] == "jwt":
+            headers["Authorization-Remote"] = "Bearer %s" % remote_auth["key"]
+        elif remote_auth and remote_auth["type"] == "basic":
+            rauthstr = remote_auth['user'] + ":" + remote_auth["key"] 
+            headers["Authorization-Remote"] = "Basic %s" % b64encode(
+                (rauthstr).encode("utf-8")
+            ).decode("utf-8")
         return headers
 
     # url, action, payload, basic_auth, jwt=null
 
     @classmethod
     def send_request_by_action(
-        cls, url, action, payload={}, basic_auth=None, jwt=None, file_dict=None
+        cls, url, action, payload={}, basic_auth=None, remote_auth=None, file_dict=None
     ):
         # payload default as empty dict is against PEP
-        print("Sending to URL____________", url)
-        print("Send Request By Action_____________", action)
+        # print("Sending to URL____________", url)
+        # print("Send Request By Action_____________", action)
 
         try:
             request_response = None
-            headers = cls.__autorization_header(basic_auth, jwt)
+            headers = cls.__autorization_header(basic_auth, remote_auth)
 
             if action in [
                 APIEndpointConst.GET_TRIPLES,

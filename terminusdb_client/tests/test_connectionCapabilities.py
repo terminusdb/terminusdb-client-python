@@ -11,19 +11,19 @@ from .connectionObjDump import ConnectionDump
 
 url = "http://localhost:6363/"
 json_context = {
-    "doc": "terminus:///terminus/document/",
-    "layer": "http://terminusdb.com/schema/layer#",
-    "owl": "http://www.w3.org/2002/07/owl#",
-    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-    "ref": "http://terminusdb.com/schema/ref#",
-    "repo": "http://terminusdb.com/schema/repository#",
-    "terminus": "http://terminusdb.com/schema/terminus#",
-    "vio": "http://terminusdb.com/schema/vio#",
-    "woql": "http://terminusdb.com/schema/woql#",
-    "xdd": "http://terminusdb.com/schema/xdd#",
-    "xsd": "http://www.w3.org/2001/XMLSchema#",
-    "scm": "terminus://universal#",
+    'doc': 'terminus:///terminus/document/',
+    'layer': 'http://terminusdb.com/schema/layer#',
+    'owl': 'http://www.w3.org/2002/07/owl#',
+    'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+    'rdfs': 'http://www.w3.org/2000/01/rdf-schema#',
+    'ref': 'http://terminusdb.com/schema/ref#',
+    'repo': 'http://terminusdb.com/schema/repository#',
+    'terminus': 'http://terminusdb.com/schema/terminus#',
+    'vio': 'http://terminusdb.com/schema/vio#',
+    'woql': 'http://terminusdb.com/schema/woql#',
+    'xdd': 'http://terminusdb.com/schema/xdd#',
+    'xsd': 'http://www.w3.org/2001/XMLSchema#',
+    '_': '_:',
 }
 
 dbrec = {

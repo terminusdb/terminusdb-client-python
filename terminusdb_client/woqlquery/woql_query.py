@@ -84,7 +84,7 @@ class WOQLQuery:
     def _contains_update_check(self, json=None):
         """Does this query contain an update"""
         if not json:
-            json = self.query
+            json = self._query
         if json["@type"] in self._update_operators:
             return True
         if json.get("woql:consequent") and self._contains_update_check(
@@ -398,8 +398,8 @@ class WOQLQuery:
 
     def execute(self, client, commit_msg=None):
         """Executes the query using the passed client to connect to a server"""
-        if self._query.get("@context"):
-            self._query["@context"] = client.conCapabilities._get_json_context()
+        if self._query.get('@context'):
+            self._query['@context'] = client.conCapabilities._get_json_context()
         if commit_msg is None:
             return client.query(self)
         else:
