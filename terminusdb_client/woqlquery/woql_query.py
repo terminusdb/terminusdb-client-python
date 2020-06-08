@@ -2128,7 +2128,7 @@ class WOQLQuery:
         ext = datatype.split(":")[1]
         box_class_id = prefix + ext[0].upper() + ext[1:]
         box_prop_id = prefix + ext[0].lower() + ext[1:]
-        box_class = self._add_class(box_class_id, graph).label(label)
+        box_class = self.add_class(box_class_id, graph).label(label)
         box_class.description("Boxed Class for " + datatype)
         if parent:
             box_class.parent(parent)

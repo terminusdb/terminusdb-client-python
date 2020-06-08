@@ -266,13 +266,13 @@ class WOQLClient:
                 file_dict[name] = (name, stream, "text/plain")
             file_dict["query"] = (
                 None,
-                json.dumps(woql_query),
+                woql_query.to_json(),
                 "application/json",
             )
             payload = None
         else:
             file_dict = None
-            query_obj["query"] = json.dumps(woql_query)
+            query_obj["query"] = woql_query.to_json()
             payload = query_obj
 
         return self.dispatch(
