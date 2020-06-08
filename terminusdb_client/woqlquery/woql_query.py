@@ -216,11 +216,12 @@ class WOQLQuery:
     def _qle(self, query, idx):
         """Query List Element Constructor"""
         qobj = self._jobj(query)
-        return {
+        iqle = {
             "@type": "woql:QueryListElement",
             "woql:index": self._jlt(idx, "nonNegativeInteger"),
             "woql:query": qobj,
         }
+        return iqle
 
     def _clean_subject(self, obj):
         """Transforms whatever is passed in as the subject into the appropriate json-ld for variable or id"""
@@ -531,7 +532,7 @@ class WOQLQuery:
             self._cursor["woql:query_list"] = []
         for item in queries:
             index = len(self._cursor["woql:query_list"])
-            onevar = self._qle(item, index)
+            onevar = self._qle(item, index)            
             if (
                 "woql:query" in onevar
                 and "@type" in onevar["woql:query"]
@@ -696,7 +697,7 @@ class WOQLQuery:
         self._cursor["woql:document"] = self._expand_variable(output_var)
         return self._wfrom(out_format)
 
-    def get(self, as_vars, query_resource):
+    def get(self, as_vars, query_resource=None):
         """Takes an as structure"""
         if as_vars and as_vars == "woql:args":
             return ["woql:as_vars", "woql:query_resource"]
@@ -712,7 +713,7 @@ class WOQLQuery:
         self._cursor = self._cursor["woql:query_resource"]
         return self
 
-    def put(self, as_vars, query_resource, query):
+    def put(self, as_vars, query_resource, query=None):
         """Takes an array of variables, an optional array of column names"""
         if as_vars and as_vars == "woql:args":
             return ["woql:as_vars", "woql:query", "woql:query_resource"]

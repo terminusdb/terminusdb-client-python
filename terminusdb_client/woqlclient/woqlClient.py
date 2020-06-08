@@ -281,9 +281,9 @@ class WOQLClient:
             payload = None
         else:
             file_dict = None
-            query_obj["query"] = json.dumps(woql_query, sort_keys=True)
+            query_obj["query"] = woql_query
             payload = query_obj
-
+ 
         return self.dispatch(
             APIEndpointConst.WOQL_QUERY, self.conConfig.query_url(), payload, file_dict
         )
