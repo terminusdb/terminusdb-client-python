@@ -16,9 +16,7 @@ test_requirements = [
     "pytest-xdist",
 ]
 
-extras_require = {
-    "dataframe": ["numpy >= 1.13.0", "pandas >= 0.23.0",],
-}
+extras_require = {"dataframe": ["numpy >= 1.13.0", "pandas >= 0.23.0"]}
 
 setuptools.setup(
     name="terminus-client-python",

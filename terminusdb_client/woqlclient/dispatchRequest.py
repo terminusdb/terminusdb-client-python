@@ -54,7 +54,13 @@ class DispatchRequest:
 
     @classmethod
     def send_request_by_action(
-        cls, url, action, payload=None, basic_auth=None, remote_auth=None, file_dict=None
+        cls,
+        url,
+        action,
+        payload=None,
+        basic_auth=None,
+        remote_auth=None,
+        file_dict=None,
     ):
         # payload default as empty dict is against PEP
         # print("Sending to URL____________", url)

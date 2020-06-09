@@ -11,9 +11,9 @@ from .mockResponse import mocked_requests
 sys.path.append("woqlclient")
 
 
-def send_dispatch_request(
-    url, action_type, payload={}, basic_auth=None
-):  # don't use empty dict as default
+def send_dispatch_request(url, action_type, payload=None, basic_auth=None):
+    if payload is None:
+        payload = {}
     return DispatchRequest.send_request_by_action(url, action_type, payload, basic_auth)
 
 

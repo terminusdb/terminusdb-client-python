@@ -31,7 +31,7 @@ class DocumentTemplate:
         return temp
 
         @staticmethod
-        def format_document(doc, schema_url, options=None, urlId=None):
+        def format_document(doc, schema_url, options=None, url_id=None):
             document = {}
             if isinstance(doc, dict):
                 document["@context"] = doc["@context"]
@@ -53,7 +53,7 @@ class DocumentTemplate:
 
                 document["@type"] = "terminus:APIUpdate"
 
-                if urlId:
-                    document["@id"] = urlId
+                if url_id:
+                    document["@id"] = url_id
 
             return document

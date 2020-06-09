@@ -5,17 +5,17 @@ class IDParser:
     def __init__(self):
         pass
 
-    def _valid_url(self, input):
-        if input is None:
+    def _valid_url(self, input_str):
+        if input_str is None:
             return False
-        if input[:7] == "http://" or input[:8] == "https://":
+        if input_str[:7] == "http://" or input_str[:8] == "https://":
             return True
         return False
 
-    def _valid_id_string(self, input, _=None):
-        if type(input) != str:
+    def _valid_id_string(self, input_str, _=None):
+        if type(input_str) != str:
             return False
-        if (":" in input) or (" " in input) or ("/" in input):
+        if (":" in input_str) or (" " in input_str) or ("/" in input_str):
             return False
         return True
 
