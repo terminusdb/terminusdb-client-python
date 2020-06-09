@@ -1,7 +1,8 @@
 import copy
+import json
 import pprint
 import re
-import json
+
 import terminusdb_client.woql_utils as utils
 import terminusdb_client.woqlquery.woql_core as core
 
@@ -398,8 +399,8 @@ class WOQLQuery:
 
     def execute(self, client, commit_msg=None):
         """Executes the query using the passed client to connect to a server"""
-        if self._query.get('@context'):
-            self._query['@context'] = client.conCapabilities._get_json_context()
+        if self._query.get("@context"):
+            self._query["@context"] = client.conCapabilities._get_json_context()
         if commit_msg is None:
             return client.query(self)
         else:
@@ -415,7 +416,7 @@ class WOQLQuery:
         """converts back and forward from json
         if the argument is present, the current query is set to it,
         if the argument is not present, the current json version of this query is returned"""
-        if(input_json):
+        if input_json:
             self.from_dict(json.loads(input_json))
             return self
         else:
@@ -532,7 +533,7 @@ class WOQLQuery:
             self._cursor["woql:query_list"] = []
         for item in queries:
             index = len(self._cursor["woql:query_list"])
-            onevar = self._qle(item, index)            
+            onevar = self._qle(item, index)
             if (
                 "woql:query" in onevar
                 and "@type" in onevar["woql:query"]
@@ -1213,7 +1214,9 @@ class WOQLQuery:
                 "Order by must be passed at least one variables to order the query"
             )
 
-        if type(ordered_varlist[-1]) == dict and hasattr(ordered_varlist[-1], "to_dict"):
+        if type(ordered_varlist[-1]) == dict and hasattr(
+            ordered_varlist[-1], "to_dict"
+        ):
             embedquery = ordered_varlist.pop()
         else:
             embedquery = False

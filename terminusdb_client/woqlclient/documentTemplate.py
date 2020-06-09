@@ -3,8 +3,8 @@ class DocumentTemplate:
         pass
 
     @staticmethod
-    def createDBTemplate(server, dbID, label, **kwargs):
-        dbURL = "{}{}".format(server, dbID)
+    def create_db_template(server, db_id, label, **kwargs):
+        db_url = "{}{}".format(server, db_id)
         comment = kwargs.get("comment")
         language = kwargs.get("language", "en")
         allow_origin = kwargs.get("allow_origin", "*")
@@ -13,7 +13,7 @@ class DocumentTemplate:
             "@context": {
                 "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
                 "terminus": "http://terminusdb.com/schema/terminus#",
-                "_": dbURL,
+                "_": db_url,
             },
             "terminus:document": {
                 "@type": "terminus:Database",
@@ -22,7 +22,7 @@ class DocumentTemplate:
                     "@type": "xsd:string",
                     "@value": allow_origin,
                 },
-                "@id": dbURL,
+                "@id": db_url,
             },
             "@type": "terminus:APIUpdate",
         }
@@ -31,8 +31,7 @@ class DocumentTemplate:
         return temp
 
         @staticmethod
-        def formatDocument(doc, schemaURL, options=None, urlId=None):
-            print("i am enetering here \n")
+        def format_document(doc, schema_url, options=None, urlId=None):
             document = {}
             if isinstance(doc, dict):
                 document["@context"] = doc["@context"]
@@ -46,7 +45,7 @@ class DocumentTemplate:
                     and options["terminus:encoding"] == "terminus:turtle"
                 ):
                     document["terminus:turtle"] = doc
-                    # document['terminus:schema'] = schemaURL
+                    # document['terminus:schema'] = schema_url
                     del document["terminus:turtle"]["@context"]
                 else:
                     document["terminus:document"] = doc

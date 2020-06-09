@@ -1,4 +1,4 @@
-serverRecordsFromCap = {
+server_records_from_cap = {
     "@id": "doc:server",
     "@type": "terminus:Server",
     "rdfs:comment": {"@language": "en", "@value": "The current Database Server itself"},

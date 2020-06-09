@@ -1,4 +1,4 @@
-dbRecordObj = {
+db_record_obj = {
     "@id": "doc:Database%5fadmin%7Caaaaaa",
     "@type": "terminus:Database",
     "rdfs:comment": {"@language": "en", "@value": "dasdasdds"},

@@ -1,5 +1,4 @@
 # woqlDataframe.py
-import re
 
 import warnings
 

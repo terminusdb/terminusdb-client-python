@@ -2,10 +2,11 @@ import sys
 import unittest.mock as mock
 
 import requests
-from .connectCapabilitiesResponse import ConnectResponse
-from .mockResponse import mocked_requests
 from terminusdb_client.woqlclient.api_endpoint_const import APIEndpointConst
 from terminusdb_client.woqlclient.dispatchRequest import DispatchRequest
+
+from .connectCapabilitiesResponse import ConnectResponse
+from .mockResponse import mocked_requests
 
 sys.path.append("woqlclient")
 
@@ -47,10 +48,7 @@ def test_create_database(mocked_requests):
             "Authorization": "Basic YWRtaW46cm9vdA==",
             "content-type": "application/json",
         },
-        json={
-            "label": "my first db",
-            "comment": "my first db"            
-        },
+        json={"label": "my first db", "comment": "my first db"},
     )
 
 

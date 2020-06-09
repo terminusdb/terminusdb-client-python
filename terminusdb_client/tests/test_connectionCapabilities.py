@@ -1,29 +1,27 @@
-
 import pytest
-
 from terminusdb_client.woqlclient.connectionCapabilities import ConnectionCapabilities
-from .connectCapabilitiesResponse import ConnectResponse
-from .DBRecord import dbRecordObj
-from .serverRecordsFromCap import serverRecordsFromCap
-from .AllServerRecords import AllServerRecords
-from .connectionObjDump import ConnectionDump
 
+from .AllServerRecords import AllServerRecords
+from .connectCapabilitiesResponse import ConnectResponse
+from .connectionObjDump import ConnectionDump
+from .DBRecord import db_record_obj
+from .serverRecordsFromCap import server_records_from_cap
 
 url = "http://localhost:6363/"
 json_context = {
-    'doc': 'terminus:///terminus/document/',
-    'layer': 'http://terminusdb.com/schema/layer#',
-    'owl': 'http://www.w3.org/2002/07/owl#',
-    'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-    'rdfs': 'http://www.w3.org/2000/01/rdf-schema#',
-    'ref': 'http://terminusdb.com/schema/ref#',
-    'repo': 'http://terminusdb.com/schema/repository#',
-    'terminus': 'http://terminusdb.com/schema/terminus#',
-    'vio': 'http://terminusdb.com/schema/vio#',
-    'woql': 'http://terminusdb.com/schema/woql#',
-    'xdd': 'http://terminusdb.com/schema/xdd#',
-    'xsd': 'http://www.w3.org/2001/XMLSchema#',
-    '_': '_:',
+    "doc": "terminus:///terminus/document/",
+    "layer": "http://terminusdb.com/schema/layer#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "ref": "http://terminusdb.com/schema/ref#",
+    "repo": "http://terminusdb.com/schema/repository#",
+    "terminus": "http://terminusdb.com/schema/terminus#",
+    "vio": "http://terminusdb.com/schema/vio#",
+    "woql": "http://terminusdb.com/schema/woql#",
+    "xdd": "http://terminusdb.com/schema/xdd#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "_": "_:",
 }
 
 dbrec = {
@@ -102,7 +100,7 @@ class TestCapabilitiesActions:
 
     def test_get_server_record(self):
         x = connection_capabilities._get_server_record()
-        assert x == serverRecordsFromCap
+        assert x == server_records_from_cap
 
     def test_get_json_context(self):
         assert connection_capabilities.get_json_context() == json_context
@@ -117,10 +115,12 @@ class TestCapabilitiesActions:
             )
 
     def test_get_db_record(self):
-        assert connection_capabilities._get_db_record("aaaaaa", "admin") == dbRecordObj
+        assert (
+            connection_capabilities._get_db_record("aaaaaa", "admin") == db_record_obj
+        )
 
     def test_extract_metadata(self):
-        assert connection_capabilities._extract_metadata(dbRecordObj) == dbrec
+        assert connection_capabilities._extract_metadata(db_record_obj) == dbrec
 
     def test_get_db_metadata(self):
         assert connection_capabilities._get_db_metadata("aaaaaa", "admin") == dbrec

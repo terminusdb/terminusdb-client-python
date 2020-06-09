@@ -1,6 +1,5 @@
 # import sys
 # sys.path.append('woqlclient')
-import json
 import unittest.mock as mock
 
 import pytest
@@ -9,10 +8,6 @@ from terminusdb_client.woqlclient.woqlClient import WOQLClient
 
 from .mockResponse import mocked_requests
 from .woqljson.woqlStarJson import WoqlStar
-
-# def test_realCall():
-# resp=WOQLClient.directDeleteDatabase("http://localhost:6363/test0009","root")
-# print('test_realCall',resp)
 
 
 def mock_func_with_1arg(_):
@@ -27,21 +22,15 @@ def mock_func_no_arg():
     return True
 
 
-def test_connection_error():
-    # this test is weird
-    WOQLClient("http://localhost:6363")
-    print("___MOCKED______", mocked_requests("http://...").status_code)
-
-
 @mock.patch("requests.get", side_effect=mocked_requests)
 def test_connection(mocked_requests, monkeypatch):
 
-    __woql_client__ = WOQLClient("http://localhost:6363")
+    woql_client = WOQLClient("http://localhost:6363")
 
     # before connect it connection is empty
-    assert __woql_client__.conCapabilities.connection == {}
+    assert woql_client.conCapabilities.connection == {}
 
-    response = __woql_client__.connect(key="root", account="admin", user="admin")
+    woql_client.connect(key="root", account="admin", user="admin")
 
     requests.get.assert_called_once_with(
         "http://localhost:6363/", headers={"Authorization": "Basic YWRtaW46cm9vdA=="}
@@ -51,13 +40,17 @@ def test_connection(mocked_requests, monkeypatch):
 @mock.patch("requests.post", side_effect=mocked_requests)
 @mock.patch("requests.get", side_effect=mocked_requests)
 def test_create_database(mocked_requests, mocked_requests2):
-    __woql_client__ = WOQLClient(
+    woql_client = WOQLClient(
         "http://localhost:6363", user="admin", key="root", account="admin"
     )
-    __woql_client__.connect()
-    assert __woql_client__.basic_auth() == "admin:root"
+    woql_client.connect()
+    assert woql_client.basic_auth() == "admin:root"
 
-    __woql_client__.create_database("myFirstTerminusDB", "admin", { "label": "my first db", "comment": "my first db comment"})
+    woql_client.create_database(
+        "myFirstTerminusDB",
+        "admin",
+        {"label": "my first db", "comment": "my first db comment"},
+    )
 
     requests.post.assert_called_once_with(
         "http://localhost:6363/db/admin/myFirstTerminusDB",
@@ -69,9 +62,9 @@ def test_create_database(mocked_requests, mocked_requests2):
             "label": "my first db",
             "comment": "my first db comment",
             "prefixes": {
-   "scm": f"terminusdb://admin/myFirstTerminusDB/schema#",
-   "doc": f"terminusdb://admin/myFirstTerminusDB/data/"
-}
+                "scm": "terminusdb://admin/myFirstTerminusDB/schema#",
+                "doc": "terminusdb://admin/myFirstTerminusDB/data/",
+            },
         },
     )
 
@@ -79,12 +72,14 @@ def test_create_database(mocked_requests, mocked_requests2):
 @mock.patch("requests.post", side_effect=mocked_requests)
 @mock.patch("requests.get", side_effect=mocked_requests)
 def test_create_database_and_change_account(mocked_requests, mocked_requests2):
-    __woql_client__ = WOQLClient(
+    woql_client = WOQLClient(
         "http://localhost:6363", user="admin", key="root", account="admin"
     )
-    __woql_client__.connect()
-    __woql_client__.create_database(
-        "myFirstTerminusDB", "my_new_account", { "label": "my first db", "comment": "my first db comment"}
+    woql_client.connect()
+    woql_client.create_database(
+        "myFirstTerminusDB",
+        "my_new_account",
+        {"label": "my first db", "comment": "my first db comment"},
     )
 
     requests.post.assert_called_once_with(
@@ -97,32 +92,29 @@ def test_create_database_and_change_account(mocked_requests, mocked_requests2):
             "label": "my first db",
             "comment": "my first db comment",
             "prefixes": {
-   "scm": f"terminusdb://my_new_account/myFirstTerminusDB/schema#",
-   "doc": f"terminusdb://my_new_account/myFirstTerminusDB/data/"
-}
+                "scm": "terminusdb://my_new_account/myFirstTerminusDB/schema#",
+                "doc": "terminusdb://my_new_account/myFirstTerminusDB/data/",
+            },
         },
     )
 
-    __woql_client__.basic_auth() == "admin:root"
-
+    assert woql_client.basic_auth() == "admin:root"
 
 
 @mock.patch("requests.delete", side_effect=mocked_requests)
 @mock.patch("requests.get", side_effect=mocked_requests)
 def test_delete_database(mocked_requests, mocked_requests2, monkeypatch):
-    __woql_client__ = WOQLClient("http://localhost:6363")
+    woql_client = WOQLClient("http://localhost:6363")
 
-    __woql_client__.connect(user="admin", account="admin", key="root")
-
-    monkeypatch.setattr(
-        __woql_client__.conCapabilities, "capabilities_permit", mock_func_with_1arg
-    )
+    woql_client.connect(user="admin", account="admin", key="root")
 
     monkeypatch.setattr(
-        __woql_client__.conCapabilities, "remove_db", mock_func_with_2arg
+        woql_client.conCapabilities, "capabilities_permit", mock_func_with_1arg
     )
 
-    __woql_client__.delete_database("myFirstTerminusDB")
+    monkeypatch.setattr(woql_client.conCapabilities, "remove_db", mock_func_with_2arg)
+
+    woql_client.delete_database("myFirstTerminusDB")
 
     requests.delete.assert_called_once_with(
         "http://localhost:6363/db/admin/myFirstTerminusDB",
@@ -133,9 +125,9 @@ def test_delete_database(mocked_requests, mocked_requests2, monkeypatch):
 @mock.patch("requests.get", side_effect=mocked_requests)
 @mock.patch("requests.post", side_effect=mocked_requests)
 def test_branch(mocked_requests, mocked_requests2):
-    __woql_client__ = WOQLClient("http://localhost:6363")
-    __woql_client__.connect(user="admin", account="admin", key="root", db="myDBName")
-    __woql_client__.branch("my_new_branch")
+    woql_client = WOQLClient("http://localhost:6363")
+    woql_client.connect(user="admin", account="admin", key="root", db="myDBName")
+    woql_client.branch("my_new_branch")
 
     requests.post.assert_called_once_with(
         "http://localhost:6363/branch/admin/myDBName/local/branch/my_new_branch",
@@ -150,10 +142,10 @@ def test_branch(mocked_requests, mocked_requests2):
 @mock.patch("requests.get", side_effect=mocked_requests)
 @mock.patch("requests.post", side_effect=mocked_requests)
 def test_create_graph(mocked_requests, mocked_requests2):
-    __woql_client__ = WOQLClient("http://localhost:6363")
-    __woql_client__.connect(user="admin", account="admin", key="root", db="myDBName")
+    woql_client = WOQLClient("http://localhost:6363")
+    woql_client.connect(user="admin", account="admin", key="root", db="myDBName")
 
-    __woql_client__.create_graph("instance", "mygraph", "add a new graph")
+    woql_client.create_graph("instance", "mygraph", "add a new graph")
 
     requests.post.assert_called_once_with(
         "http://localhost:6363/graph/admin/myDBName/local/branch/master/instance/mygraph",
@@ -168,20 +160,20 @@ def test_create_graph(mocked_requests, mocked_requests2):
 @mock.patch("requests.get", side_effect=mocked_requests)
 @mock.patch("requests.post", side_effect=mocked_requests)
 def test_wrong_graph_type(mocked_requests, mocked_requests2):
-    __woql_client__ = WOQLClient("http://localhost:6363")
-    __woql_client__.connect(user="admin", account="admin", key="root", db="myDBName")
+    woql_client = WOQLClient("http://localhost:6363")
+    woql_client.connect(user="admin", account="admin", key="root", db="myDBName")
 
     with pytest.raises(ValueError):
-        __woql_client__.create_graph("wrong_graph_name", "mygraph", "add a new graph")
+        woql_client.create_graph("wrong_graph_name", "mygraph", "add a new graph")
 
 
 @mock.patch("requests.get", side_effect=mocked_requests)
 @mock.patch("requests.delete", side_effect=mocked_requests)
 def test_delete_graph(mocked_requests, mocked_requests2):
-    __woql_client__ = WOQLClient("http://localhost:6363")
-    __woql_client__.connect(user="admin", account="admin", key="root", db="myDBName")
+    woql_client = WOQLClient("http://localhost:6363")
+    woql_client.connect(user="admin", account="admin", key="root", db="myDBName")
 
-    __woql_client__.delete_graph("instance", "mygraph", "add a new graph")
+    woql_client.delete_graph("instance", "mygraph", "add a new graph")
 
     requests.delete.assert_called_once_with(
         "http://localhost:6363/graph/admin/myDBName/local/branch/master/instance/mygraph?author=admin&message=add+a+new+graph",
@@ -191,10 +183,10 @@ def test_delete_graph(mocked_requests, mocked_requests2):
 
 @mock.patch("requests.get", side_effect=mocked_requests)
 def test_get_triples(mocked_requests):
-    __woql_client__ = WOQLClient("http://localhost:6363")
-    __woql_client__.connect(user="admin", account="admin", key="root", db="myDBName")
+    woql_client = WOQLClient("http://localhost:6363")
+    woql_client.connect(user="admin", account="admin", key="root", db="myDBName")
 
-    __woql_client__.get_triples("instance", "mygraph")
+    woql_client.get_triples("instance", "mygraph")
 
     requests.get.assert_called_with(
         "http://localhost:6363/triples/admin/myDBName/local/branch/master/instance/mygraph",
@@ -205,12 +197,12 @@ def test_get_triples(mocked_requests):
 @mock.patch("requests.post", side_effect=mocked_requests)
 @mock.patch("requests.get", side_effect=mocked_requests)
 def test_query(mocked_requests, mocked_requests2):
-    __woql_client__ = WOQLClient("http://localhost:6363")
-    __woql_client__.connect(user="admin", account="admin", key="root", db="myDBName")
+    woql_client = WOQLClient("http://localhost:6363")
+    woql_client.connect(user="admin", account="admin", key="root", db="myDBName")
 
     # WoqlStar is the query in json-ld
 
-    __woql_client__.query(WoqlStar)
+    woql_client.query(WoqlStar)
 
     requests.post.assert_called_once_with(
         "http://localhost:6363/woql/admin/myDBName/local/branch/master",
@@ -218,7 +210,5 @@ def test_query(mocked_requests, mocked_requests2):
             "Authorization": "Basic YWRtaW46cm9vdA==",
             "content-type": "application/json",
         },
-        json={
-            "query": WoqlStar,
-        },
+        json={"query": WoqlStar},
     )

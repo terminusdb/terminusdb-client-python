@@ -44,7 +44,7 @@ class DispatchRequest:
         if remote_auth and remote_auth["type"] == "jwt":
             headers["Authorization-Remote"] = "Bearer %s" % remote_auth["key"]
         elif remote_auth and remote_auth["type"] == "basic":
-            rauthstr = remote_auth['user'] + ":" + remote_auth["key"] 
+            rauthstr = remote_auth["user"] + ":" + remote_auth["key"]
             headers["Authorization-Remote"] = "Basic %s" % b64encode(
                 (rauthstr).encode("utf-8")
             ).decode("utf-8")
@@ -54,11 +54,13 @@ class DispatchRequest:
 
     @classmethod
     def send_request_by_action(
-        cls, url, action, payload={}, basic_auth=None, remote_auth=None, file_dict=None
+        cls, url, action, payload=None, basic_auth=None, remote_auth=None, file_dict=None
     ):
         # payload default as empty dict is against PEP
         # print("Sending to URL____________", url)
         # print("Send Request By Action_____________", action)
+        if payload is None:
+            payload = {}
 
         try:
             request_response = None

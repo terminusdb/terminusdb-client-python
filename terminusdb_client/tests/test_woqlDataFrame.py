@@ -5,8 +5,9 @@ import pytest
 # import unittest.mock as mock
 # from woqlclient import WOQLQuery
 # from woqlclient import WOQLClient
-import terminusdb_client.woqldataframe.woqlDataframe as woql
+import terminusdb_client.woqldataframe.woqlDataframe as woqlDF
 from terminusdb_client.woqldataframe.woqlDataframe import EmptyException
+
 
 @pytest.fixture
 def mock_result():
@@ -22,10 +23,7 @@ def mock_result():
                     "@value": 10,
                 },
                 "Stock": "http://195.201.12.87:6365/rational_warehouse/document/Stock110_101752_2019-12-22T00%3A00%3A00",
-                "Warehouse": {
-                    "@language": "en",
-                    "@value": "Pittsburg",
-                },
+                "Warehouse": {"@language": "en", "@value": "Pittsburg"},
                 "buyers_buy_product": "http://195.201.12.87:6365/rational_warehouse/document/Product101752",
                 "stockDate": {
                     "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
@@ -36,6 +34,7 @@ def mock_result():
         ],
         "graphs": [],
     }
+
 
 TEST_TYPE = [
     ("http://www.w3.org/2001/XMLSchema#string", np.unicode_),
@@ -58,8 +57,7 @@ TEST_TYPE_VALUE = [
 
 class TestWoqlDataFrame:
     def test_extract_header_method(self, mock_result):
-        df_header = woql.extract_header(mock_result)
-        print(df_header)
+        df_header = woqlDF.extract_header(mock_result)
         assert df_header == [
             ("Product", "http://www.w3.org/2001/XMLSchema#string"),
             ("Qty", "http://www.w3.org/2001/XMLSchema#decimal"),
@@ -72,30 +70,30 @@ class TestWoqlDataFrame:
 
     def test_extract_header_method_empty(self):
         with pytest.raises(EmptyException):
-            df_header = woql.extract_header({"bindings": []})
+            woqlDF.extract_header({"bindings": []})
 
     def test_extract_column_method(self, mock_result):
-        df_column = woql.extract_column(
+        df_column = woqlDF.extract_column(
             mock_result, "Product", "http://www.w3.org/2001/XMLSchema#string"
         )
         assert df_column == ["STRAWBERRY CANDY"]
 
     @pytest.mark.parametrize("data_type,expected", TEST_TYPE)
     def test_type_map_method(self, data_type, expected):
-        assert woql.type_map(data_type) == expected
+        assert woqlDF.type_map(data_type) == expected
 
     def test_type_map_method_unknown(self):
         with pytest.raises(Exception, match=r"Unknown rdf type! .*"):
-            woql.type_map("some type that cause error")
+            woqlDF.type_map("some type that cause error")
 
     @pytest.mark.parametrize("data_type, value, expected", TEST_TYPE_VALUE)
     def test_type_value_map_method(self, data_type, value, expected):
-        assert woql.type_value_map(data_type, value) == expected
+        assert woqlDF.type_value_map(data_type, value) == expected
 
     def test_type_value_map_method_unknown(self):
         with pytest.raises(Exception, match=r"Unknown rdf type! .*"):
-            woql.type_value_map("some type that cause error", "some val")
+            woqlDF.type_value_map("some type that cause error", "some val")
 
     def test_query_to_df_method(self, mock_result):
-        df = woql.query_to_df(mock_result)
+        df = woqlDF.query_to_df(mock_result)
         assert df.shape == (1, 7)

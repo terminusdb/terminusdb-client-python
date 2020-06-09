@@ -81,7 +81,7 @@ class ConnectionCapabilities:
     def get_json_context(self):
         if "@context" in self.connection:
             ctxt = self.connection["@context"]
-            ctxt['_'] = '_:' #needed to make rdf lists in owl work
+            ctxt["_"] = "_:"  # needed to make rdf lists in owl work
             return ctxt
         return {}
 

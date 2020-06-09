@@ -6,8 +6,7 @@ class ErrorMessage:
         pass
 
     @staticmethod
-    def getErrorAsMessage(url, api, err):
-        print("getErrorAsMessage")
+    def get_error_as_message(url, api, err):
         message = "Code: " + str(err["status"])
         if "body" in err:
             message += ", Message: " + err["body"]
@@ -22,7 +21,7 @@ class ErrorMessage:
         return message
 
     @staticmethod
-    def accessDeniedErrObj(action, db, server):
+    def access_denied_err_obj(action, db, server):
         err = {}
         err["status"] = 403
         err["url"] = (server or "") + (db or "")
@@ -32,21 +31,21 @@ class ErrorMessage:
         return err
 
     @classmethod
-    def getAPIErrorMessage(cls, url, api, err):
-        return "API Error" + cls.getErrorAsMessage(url, api, err)
+    def get_api_error_message(cls, url, api, err):
+        return "API Error" + cls.get_error_as_message(url, api, err)
 
     @classmethod
-    def getAccessDeniedMessage(cls, action, dbid, server):
-        errorObj = cls.accessDeniedErrObj(action, dbid, server)
-        return "Access Denied" + cls.getErrorAsMessage(None, None, errorObj)
+    def get_access_denied_message(cls, action, dbid, server):
+        error_obj = cls.access_denied_err_obj(action, dbid, server)
+        return "Access Denied" + cls.get_error_as_message(None, None, error_obj)
 
     @staticmethod
-    def getInvalidKeyMessage(extraMessage=""):
-        message = "The Api KEY is Undefined " + extraMessage
+    def get_invalid_key_message(extra_message=""):
+        message = "The Api KEY is Undefined " + extra_message
         return message
 
     @staticmethod
-    def getInvalidURIMessage(url, call):
+    def get_invalid_url_message(url, call):
         message = "Invalid argument to {}, {} is not a valid Terminus DB API endpoint".format(
             url, call
         )

@@ -1,8 +1,8 @@
 from terminusdb_client.woqlclient.api_endpoint_const import APIEndpointConst
 
 from .connectCapabilitiesResponse import ConnectResponse
-
 from .getSchemaTurtleResponse import RESPONSE
+
 
 def mocked_requests(*args, **kwargs):
     class MockResponse:
@@ -32,7 +32,6 @@ def mocked_requests(*args, **kwargs):
             self._content = "cont"
             self._url = url
             # add json data if provided
-            print("ACTION TYPE", action_type)  # why print?
 
             if action_type == APIEndpointConst.CONNECT:
                 self._json_data = ConnectResponse
