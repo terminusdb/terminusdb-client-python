@@ -2,7 +2,8 @@ init:
 	pip3 install pipenv --upgrade
 	pipenv install --dev
 test:
-	pytest terminusdb-client/tests/
+	#pytest terminusdb_client/tests/
+	tox
 ci:
 	pip3 install ./ --upgrade
 	pip3 install tox
@@ -16,7 +17,7 @@ flake8:
 	pipenv run flake8 --ignore=E501,F401,E128,E402,E731,F821 woqlclient
 
 coverage:
-	pipenv run py.test terminusdb-client/tests --cov-config .coveragerc --verbose --cov-report term --cov-report xml --cov=woqlclient tests
+	pipenv run py.test terminusdb_client/tests --cov-config .coveragerc --verbose --cov-report term --cov-report xml --cov=terminusdb_client tests
 
 #command line for release: bumpversion (patch), tag and push
 publish_patch:
