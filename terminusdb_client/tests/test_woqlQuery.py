@@ -1,4 +1,4 @@
-# import pprint
+import pprint
 import unittest.mock as mock
 
 import requests
@@ -21,11 +21,33 @@ from .woqljson.woqlMathJson import WOQL_MATH_JSON
 from .woqljson.woqlOrJson import WOQL_OR_JSON
 from .woqljson.woqlTrimJson import WOQL_TRIM_JSON
 from .woqljson.woqlWhenJson import WOQL_WHEN_JSON
-
-# pp = pprint.PrettyPrinter(indent=4)
+from .ans_doctype import *
+from .ans_triple_quad import *
+pp = pprint.PrettyPrinter(indent=4)
 
 
 class TestWoqlQueries:
+
+    @mock.patch("requests.post", side_effect=mocked_requests)
+    @mock.patch("requests.get", side_effect=mocked_requests)
+    def test_execute_method(self, mocked_requests, mocked_requests2):
+        woql_client = WOQLClient("http://localhost:6363")
+        woql_client.connect(user="admin", account="admin", key="root", db="myDBName")
+        woql_object = WOQLQuery().star()
+        woql_object.execute(woql_client)
+
+        mycon = WOQL_STAR
+        mycon["@context"] = json_context
+
+        requests.post.assert_called_once_with(
+            "http://localhost:6363/woql/admin/myDBName/local/branch/master",
+            headers={
+                "Authorization": "Basic YWRtaW46cm9vdA==",
+                "content-type": "application/json",
+            },
+            json={"query": mycon},
+        )
+
     def test_start_properties_values(self):
         woql_object = WOQLQuery()
         assert not woql_object._chain_ended
@@ -61,52 +83,13 @@ class TestWoqlQueries:
         woql_object = WOQLQuery().insert("v:Bike_URL", "Bicycle")
         assert woql_object.to_dict() == WOQL_INSERT_JSON["onlyNode"]
 
-    def test_doctype_method(self):
+    def test_doctype_method(self, doctype_without, doctype_with_label, doctype_with_des):
         woql_object = WOQLQuery().doctype("Station")
-        json_obj = {
-            "@type": "woql:And",
-            "woql:query_list": [
-                {
-                    "@type": "woql:QueryListElement",
-                    "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 0},
-                    "woql:query": {
-                        "@type": "woql:AddQuad",
-                        "woql:graph": {"@type": "xsd:string", "@value": "schema/main"},
-                        "woql:object": {"@type": "woql:Node", "woql:node": "owl:Class"},
-                        "woql:predicate": {
-                            "@type": "woql:Node",
-                            "woql:node": "rdf:type",
-                        },
-                        "woql:subject": {
-                            "@type": "woql:Node",
-                            "woql:node": "scm:Station",
-                        },
-                    },
-                },
-                {
-                    "@type": "woql:QueryListElement",
-                    "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 1},
-                    "woql:query": {
-                        "@type": "woql:AddQuad",
-                        "woql:graph": {"@type": "xsd:string", "@value": "schema/main"},
-                        "woql:object": {
-                            "@type": "woql:Node",
-                            "woql:node": "terminus:Document",
-                        },
-                        "woql:predicate": {
-                            "@type": "woql:Node",
-                            "woql:node": "rdfs:subClassOf",
-                        },
-                        "woql:subject": {
-                            "@type": "woql:Node",
-                            "woql:node": "scm:Station",
-                        },
-                    },
-                },
-            ],
-        }
-
-        assert woql_object.to_dict() == json_obj
+        woql_object_label = WOQLQuery().doctype("Station", label="Station Object")
+        woql_object_des = WOQLQuery().doctype("Station", label="Station Object", description="A bike station object.")
+        assert woql_object.to_dict() == doctype_without
+        assert woql_object_label.to_dict() == doctype_with_label
+        assert woql_object_des.to_dict() == doctype_with_des
 
     def test_woql_not_method(self):
         woql_object = WOQLQuery().woql_not(WOQLQuery().triple("a", "b", "c"))
@@ -374,13 +357,17 @@ class TestWoqlQueries:
 
 
 class TestTripleBuilder:
-    def test_triple_method(self):
+    def test_triple_method(self, triple_opt):
         woql_object = WOQLQuery().triple("a", "b", "c")
+        woql_object_opt = WOQLQuery().triple("a", "b", "c", opt=True)
         assert woql_object.to_dict() == WOQL_JSON["tripleJson"]
+        assert woql_object_opt.to_dict() == triple_opt
 
-    def test_quad_method(self):
+    def test_quad_method(self, quad_opt):
         woql_object = WOQLQuery().quad("a", "b", "c", "d")
+        woql_object_opt = WOQLQuery().quad("a", "b", "c", "d", opt=True)
         assert woql_object.to_dict() == WOQL_JSON["quadJson"]
+        assert woql_object_opt.to_dict() == quad_opt
 
     def test_add_class_method(self):
         woql_object = WOQLQuery().add_class("id")
@@ -521,23 +508,3 @@ class TestTripleBuilderChainer:
             WOQLQuery().add_class("NewClass").description("A new class object.")
         )
         assert woql_object.to_dict() == WOQL_JSON["addClassDescJson"]
-
-    @mock.patch("requests.post", side_effect=mocked_requests)
-    @mock.patch("requests.get", side_effect=mocked_requests)
-    def test_execute_method(self, mocked_requests, mocked_requests2):
-        woql_client = WOQLClient("http://localhost:6363")
-        woql_client.connect(user="admin", account="admin", key="root", db="myDBName")
-        woql_object = WOQLQuery().star()
-        woql_object.execute(woql_client)
-
-        mycon = WOQL_STAR
-        mycon["@context"] = json_context
-
-        requests.post.assert_called_once_with(
-            "http://localhost:6363/woql/admin/myDBName/local/branch/master",
-            headers={
-                "Authorization": "Basic YWRtaW46cm9vdA==",
-                "content-type": "application/json",
-            },
-            json={"query": mycon},
-        )

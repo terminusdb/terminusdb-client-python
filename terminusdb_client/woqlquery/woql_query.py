@@ -593,7 +593,9 @@ class WOQLQuery:
         self._cursor["woql:graph"] = self._jlt(graph_descriptor)
         return self._add_sub_query(query)
 
-    def triple(self, sub, pred, obj):
+    def triple(self, sub, pred, obj, opt=False):
+        if opt:
+            return self.opt().triple(sub, pred, obj)
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:Triple"
@@ -602,7 +604,9 @@ class WOQLQuery:
         self._cursor["woql:object"] = self._clean_object(obj)
         return self
 
-    def quad(self, sub, pred, obj, graph):
+    def quad(self, sub, pred, obj, graph, opt=False):
+        if opt:
+            return self.opt().quad(sub, pred, obj, graph)
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         arguments = self.triple(sub, pred, obj)
@@ -2145,8 +2149,16 @@ class WOQLQuery:
             box_prop.description(descr)
         return WOQLQuery().woql_and(box_class, box_prop)
 
-    def doctype(self, user_type, graph=None):
-        return WOQLQuery().add_class(user_type, graph).parent("Document")
+    def doctype(self, user_type, graph=None, label=None, description=None):
+        if label is None and description is None:
+            return WOQLQuery().add_class(user_type, graph).parent("Document")
+
+        result_obj = WOQLQuery().doctype(user_type, graph)
+        if isinstance(label, str) and label:
+            result_obj = result_obj.label(label)
+        if isinstance(description, str) and description:
+            result_obj = result_obj.description(description)
+        return result_obj
 
 
 class TripleBuilder:
