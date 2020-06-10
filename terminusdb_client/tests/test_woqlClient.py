@@ -6,10 +6,9 @@ import pytest
 import requests
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 
+from ..__version__ import __version__
 from .mockResponse import mocked_requests
 from .woqljson.woqlStarJson import WoqlStar
-
-from ..__version__ import __version__
 
 
 def mock_func_with_1arg(_):
@@ -71,10 +70,13 @@ def test_create_database(mocked_requests, mocked_requests2):
         },
     )
 
+
 @mock.patch("requests.post", side_effect=mocked_requests)
 @mock.patch("requests.get", side_effect=mocked_requests)
 @mock.patch("terminusdb_client.woqlclient.woqlClient.WOQLClient.create_graph")
-def test_create_database_with_schema(mocked_requests, mocked_requests2, create_schema_obj):
+def test_create_database_with_schema(
+    mocked_requests, mocked_requests2, create_schema_obj
+):
     woql_client = WOQLClient(
         "http://localhost:6363", user="admin", key="root", account="admin"
     )
@@ -84,7 +86,7 @@ def test_create_database_with_schema(mocked_requests, mocked_requests2, create_s
     woql_client.create_database(
         "myFirstTerminusDB",
         "admin",
-        {"label": "my first db", "comment": "my first db comment"}
+        {"label": "my first db", "comment": "my first db comment"},
     )
 
     WOQLClient.create_graph.assert_called_once_with(

@@ -1,13 +1,13 @@
 # woqlClient.py
 import copy
 
+from ..__version__ import __version__
 from .api_endpoint_const import APIEndpointConst
 from .connectionCapabilities import ConnectionCapabilities
 
 # from .errorMessage import *
 from .connectionConfig import ConnectionConfig
 from .dispatchRequest import DispatchRequest
-from ..__version__ import __version__
 
 # from .errors import (InvalidURIError)
 # from .errors import doc, opts
@@ -182,7 +182,9 @@ class WOQLClient:
                 APIEndpointConst.CREATE_DATABASE, self.conConfig.db_url(), details
             )
             self.create_graph(
-                "schema", "main", f"Python client {__version__} message: Creating schema graph"
+                "schema",
+                "main",
+                f"Python client {__version__} message: Creating schema graph",
             )
             return response
 

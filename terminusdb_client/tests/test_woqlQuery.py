@@ -1,10 +1,14 @@
-import pprint
+import copy
+
+# import pprint
 import unittest.mock as mock
 
 import requests
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
+from .ans_doctype import *  # noqa
+from .ans_triple_quad import *  # noqa
 from .mockResponse import mocked_requests
 from .test_connectionCapabilities import json_context
 
@@ -21,13 +25,11 @@ from .woqljson.woqlMathJson import WOQL_MATH_JSON
 from .woqljson.woqlOrJson import WOQL_OR_JSON
 from .woqljson.woqlTrimJson import WOQL_TRIM_JSON
 from .woqljson.woqlWhenJson import WOQL_WHEN_JSON
-from .ans_doctype import *
-from .ans_triple_quad import *
-pp = pprint.PrettyPrinter(indent=4)
+
+# pp = pprint.PrettyPrinter(indent=4)
 
 
 class TestWoqlQueries:
-
     @mock.patch("requests.post", side_effect=mocked_requests)
     @mock.patch("requests.get", side_effect=mocked_requests)
     def test_execute_method(self, mocked_requests, mocked_requests2):
@@ -36,7 +38,7 @@ class TestWoqlQueries:
         woql_object = WOQLQuery().star()
         woql_object.execute(woql_client)
 
-        mycon = WOQL_STAR
+        mycon = copy.deepcopy(WOQL_STAR)  # TODO: make WOQL_STAR immutable
         mycon["@context"] = json_context
 
         requests.post.assert_called_once_with(
@@ -76,17 +78,20 @@ class TestWoqlQueries:
                 },
             },
         }
-
         assert woql_object.to_dict() == json_obj
 
     def test_insert_method(self):
         woql_object = WOQLQuery().insert("v:Bike_URL", "Bicycle")
         assert woql_object.to_dict() == WOQL_INSERT_JSON["onlyNode"]
 
-    def test_doctype_method(self, doctype_without, doctype_with_label, doctype_with_des):
+    def test_doctype_method(
+        self, doctype_without, doctype_with_label, doctype_with_des
+    ):
         woql_object = WOQLQuery().doctype("Station")
         woql_object_label = WOQLQuery().doctype("Station", label="Station Object")
-        woql_object_des = WOQLQuery().doctype("Station", label="Station Object", description="A bike station object.")
+        woql_object_des = WOQLQuery().doctype(
+            "Station", label="Station Object", description="A bike station object."
+        )
         assert woql_object.to_dict() == doctype_without
         assert woql_object_label.to_dict() == doctype_with_label
         assert woql_object_des.to_dict() == doctype_with_des
