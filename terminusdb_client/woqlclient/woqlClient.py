@@ -1,5 +1,4 @@
 # woqlClient.py
-
 import copy
 
 from .api_endpoint_const import APIEndpointConst
@@ -8,6 +7,7 @@ from .connectionCapabilities import ConnectionCapabilities
 # from .errorMessage import *
 from .connectionConfig import ConnectionConfig
 from .dispatchRequest import DispatchRequest
+from ..__version__ import __version__
 
 # from .errors import (InvalidURIError)
 # from .errors import doc, opts
@@ -142,7 +142,7 @@ class WOQLClient:
     def set(self, **kwargs):  # bad naming
         self.conConfig.update(**kwargs)
 
-    def create_database(self, dbid, accountid, details):
+    def create_database(self, dbid, accountid, details, include_schema=True):
         """
         Create a Terminus Database by posting
         a terminus:Database document to the Terminus Server
@@ -176,6 +176,15 @@ class WOQLClient:
             }
         self.db(dbid)
         self.account(accountid)
+
+        if include_schema:
+            response = self.dispatch(
+                APIEndpointConst.CREATE_DATABASE, self.conConfig.db_url(), details
+            )
+            self.create_graph(
+                "schema", "main", f"Python client {__version__} message: Creating schema graph"
+            )
+            return response
 
         return self.dispatch(
             APIEndpointConst.CREATE_DATABASE, self.conConfig.db_url(), details

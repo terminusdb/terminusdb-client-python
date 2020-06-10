@@ -9,6 +9,8 @@ from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from .mockResponse import mocked_requests
 from .woqljson.woqlStarJson import WoqlStar
 
+from ..__version__ import __version__
+
 
 def mock_func_with_1arg(_):
     return True
@@ -50,6 +52,7 @@ def test_create_database(mocked_requests, mocked_requests2):
         "myFirstTerminusDB",
         "admin",
         {"label": "my first db", "comment": "my first db comment"},
+        include_schema=False,
     )
 
     requests.post.assert_called_once_with(
@@ -68,6 +71,26 @@ def test_create_database(mocked_requests, mocked_requests2):
         },
     )
 
+@mock.patch("requests.post", side_effect=mocked_requests)
+@mock.patch("requests.get", side_effect=mocked_requests)
+@mock.patch("terminusdb_client.woqlclient.woqlClient.WOQLClient.create_graph")
+def test_create_database_with_schema(mocked_requests, mocked_requests2, create_schema_obj):
+    woql_client = WOQLClient(
+        "http://localhost:6363", user="admin", key="root", account="admin"
+    )
+    woql_client.connect()
+    assert woql_client.basic_auth() == "admin:root"
+
+    woql_client.create_database(
+        "myFirstTerminusDB",
+        "admin",
+        {"label": "my first db", "comment": "my first db comment"}
+    )
+
+    WOQLClient.create_graph.assert_called_once_with(
+        "schema", "main", f"Python client {__version__} message: Creating schema graph"
+    )
+
 
 @mock.patch("requests.post", side_effect=mocked_requests)
 @mock.patch("requests.get", side_effect=mocked_requests)
@@ -80,6 +103,7 @@ def test_create_database_and_change_account(mocked_requests, mocked_requests2):
         "myFirstTerminusDB",
         "my_new_account",
         {"label": "my first db", "comment": "my first db comment"},
+        include_schema=False,
     )
 
     requests.post.assert_called_once_with(
