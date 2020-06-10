@@ -382,3 +382,6 @@ class WOQLClient:
         return DispatchRequest.send_request_by_action(
             url, action, payload, self.basic_auth(), self.jwt(), file_dict
         )
+
+    def get_metadata(self, dbid, account):
+        return self.conCapabilities._get_db_metadata(dbid, account)
