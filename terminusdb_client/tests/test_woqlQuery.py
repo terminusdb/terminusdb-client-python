@@ -10,6 +10,7 @@ from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 from .ans_doctype import *  # noqa
 from .ans_property import *  # noqa
+from .ans_insert import *  # noqa
 from .ans_triple_quad import *  # noqa
 from .mockResponse import mocked_requests
 from .test_connectionCapabilities import json_context
@@ -20,7 +21,6 @@ from .woqljson.woqlCastJson import WOQL_CAST_JSON
 from .woqljson.woqlConcatJson import WOQL_CONCAT_JSON
 from .woqljson.woqlDeleteJson import WOQL_DELETE_JSON
 from .woqljson.woqlIdgenJson import WOQL_IDGEN_JSON
-from .woqljson.woqlInsertJson import WOQL_INSERT_JSON
 from .woqljson.woqlJoinSplitJson import WOQL_JOIN_SPLIT_JSON
 from .woqljson.woqlJson import WOQL_JSON, WOQL_STAR
 from .woqljson.woqlMathJson import WOQL_MATH_JSON
@@ -82,9 +82,11 @@ class TestWoqlQueries:
         }
         assert woql_object.to_dict() == json_obj
 
-    def test_insert_method(self):
+    def test_insert_method(self, insert_without, insert_with_des):
         woql_object = WOQLQuery().insert("v:Bike_URL", "Bicycle")
-        assert woql_object.to_dict() == WOQL_INSERT_JSON["onlyNode"]
+        woql_object_des = WOQLQuery().insert("v:Bike_URL", "Bicycle", label="v:Bike_Label", description="v:Bike_Des")
+        assert woql_object.to_dict() == insert_without
+        assert woql_object_des.to_dict() == insert_with_des
 
     def test_doctype_method(
         self, doctype_without, doctype_with_label, doctype_with_des

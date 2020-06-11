@@ -1385,11 +1385,19 @@ class WOQLQuery:
                 result_obj = result_obj.description(description)
             return result_obj
 
-    def insert(self, insert_id, insert_type, ref_graph=None):
-        insert_type = self._clean_type(insert_type, True)
-        if ref_graph:
-            return self.add_quad(insert_id, "type", insert_type, ref_graph)
-        return self.add_triple(insert_id, "type", insert_type)
+    def insert(self, insert_id, insert_type, ref_graph=None, label=None, description=None):
+        if label is None and description is None:
+            insert_type = self._clean_type(insert_type, True)
+            if ref_graph:
+                return self.add_quad(insert_id, "type", insert_type, ref_graph)
+            return self.add_triple(insert_id, "type", insert_type)
+        else:
+            result_obj = self.insert(insert_id, insert_type, ref_graph)
+            if label:
+                result_obj = result_obj.label(label)
+            if description:
+                result_obj = result_obj.description(description)
+            return result_obj
 
     def insert_data(self, data, ref_graph):
         if data.get("type") and data.get("id"):
