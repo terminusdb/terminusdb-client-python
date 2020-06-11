@@ -4,7 +4,8 @@ import pprint
 import re
 
 import terminusdb_client.woql_utils as utils
-import terminusdb_client.woqlquery.woql_core as core
+
+from .woql_core import _copy_dict, _tokenize, _tokens_to_json
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -423,10 +424,10 @@ class WOQLQuery:
             return json.dumps(self.to_dict(), sort_keys=True)
 
     def to_dict(self):
-        return core._copy_dict(self._query, True)
+        return _copy_dict(self._query, True)
 
     def from_dict(self, dictdata):
-        self._query = core._copy_dict(dictdata)
+        self._query = _copy_dict(dictdata)
         return self
 
     def _find_last_subject(self, json):
@@ -450,9 +451,9 @@ class WOQLQuery:
 
     def _compile_path_pattern(self, pat):
         """Turns a textual path pattern into a JSON-LD description"""
-        toks = core._tokenize(pat)
+        toks = _tokenize(pat)
         if toks and len(toks):
-            return core._tokens_to_json(toks, self)
+            return _tokens_to_json(toks, self)
         else:
             self._parameter_error("Pattern error - could not be parsed " + pat)
 
