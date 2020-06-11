@@ -21,7 +21,6 @@ class WOQLQuery:
             self._query = query
         else:
             self._query = {}
-        self._errors = []
         self._cursor = self._query
         self._chain_ended = False
         self._contains_update = False
@@ -67,11 +66,7 @@ class WOQLQuery:
     # WOQLCore methods
     def _parameter_error(self, message):
         """Basic Error handling"""
-        self._errors.append({"type": self._cursor["@type"], "message": message})
-        return self
-
-    def _has_errors(self):
-        return len(self._errors) > 0
+        raise ValueError(message)
 
     def _add_sub_query(self, sub_query=None):
         """Internal library function which adds a subquery and sets the cursor"""
