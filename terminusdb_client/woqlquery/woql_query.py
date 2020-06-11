@@ -1338,7 +1338,7 @@ class WOQLQuery:
         self._triple_builder._subject = node
         return self
 
-    def property(self, pro_id, property_type):
+    def property(self, pro_id, property_type, label=None, description=None):
         """
         Add a property at the current class/document
 
@@ -1350,32 +1350,40 @@ class WOQLQuery:
             like string|integer|datatime|nonNegativeInteger|positiveInteger etc ..
             (you don't need the prefix xsd for specific a type)
         """
-        if not self._triple_builder:
-            self._create_triple_builder()
-        if self._adding_class:
-            part = self._find_last_subject(self._cursor)
-            g = False
-            if part:
-                gpart = (
-                    part["woql:graph_filter"]
-                    if part.get("woql:graph_filter")
-                    else part["woql:graph"]
+        if label is None and description is None:
+            if not self._triple_builder:
+                self._create_triple_builder()
+            if self._adding_class:
+                part = self._find_last_subject(self._cursor)
+                g = False
+                if part:
+                    gpart = (
+                        part["woql:graph_filter"]
+                        if part.get("woql:graph_filter")
+                        else part["woql:graph"]
+                    )
+                if gpart:
+                    g = gpart["@value"]
+                nq = (
+                    WOQLQuery()
+                    .add_property(pro_id, property_type, g)
+                    .domain(self._adding_class)
                 )
-            if gpart:
-                g = gpart["@value"]
-            nq = (
-                WOQLQuery()
-                .add_property(pro_id, property_type, g)
-                .domain(self._adding_class)
-            )
-            combine = WOQLQuery().from_dict(self._query)
-            nwoql = WOQLQuery().woql_and(combine, nq)
-            nwoql._adding_class = self._adding_class
-            return nwoql._updated()
+                combine = WOQLQuery().from_dict(self._query)
+                nwoql = WOQLQuery().woql_and(combine, nq)
+                nwoql._adding_class = self._adding_class
+                return nwoql._updated()
+            else:
+                pro_id = self._clean_predicate(pro_id)
+                self._triple_builder._add_po(pro_id, property_type)
+            return self
         else:
-            pro_id = self._clean_predicate(pro_id)
-            self._triple_builder._add_po(pro_id, property_type)
-        return self
+            result_obj = self.property(pro_id, property_type)
+            if label:
+                result_obj = result_obj.label(label)
+            if description:
+                result_obj = result_obj.description(description)
+            return result_obj
 
     def insert(self, insert_id, insert_type, ref_graph=None):
         insert_type = self._clean_type(insert_type, True)

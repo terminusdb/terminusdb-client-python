@@ -4,10 +4,12 @@ import copy
 import unittest.mock as mock
 
 import requests
+import pytest
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 from .ans_doctype import *  # noqa
+from .ans_property import *  # noqa
 from .ans_triple_quad import *  # noqa
 from .mockResponse import mocked_requests
 from .test_connectionCapabilities import json_context
@@ -95,6 +97,12 @@ class TestWoqlQueries:
         assert woql_object.to_dict() == doctype_without
         assert woql_object_label.to_dict() == doctype_with_label
         assert woql_object_des.to_dict() == doctype_with_des
+
+    def test_doctype_property_method(self, property_without, property_with_des):
+        woql_object = WOQLQuery().doctype("Journey").property("Duration", "dataTime")
+        woql_object_des = WOQLQuery().doctype("Journey").property("Duration", "dataTime", label="Journey Duration", description="Journey duration in minutes.")
+        assert woql_object.to_dict() == property_without
+        assert woql_object_des.to_dict() == property_with_des
 
     def test_woql_not_method(self):
         woql_object = WOQLQuery().woql_not(WOQLQuery().triple("a", "b", "c"))
