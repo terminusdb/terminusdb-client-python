@@ -1,6 +1,7 @@
 # import pprint
 
-from ..woqlquery.woql_query import WOQLQuery
+from terminusdb_client.woqlquery.woql_query import WOQLQuery
+
 from .woqljson.woqlExtraJson import WoqlExtra
 
 # pp = pprint.PrettyPrinter(indent=4)
