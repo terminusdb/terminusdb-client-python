@@ -4,13 +4,12 @@ import copy
 import unittest.mock as mock
 
 import requests
-import pytest
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 from .ans_doctype import *  # noqa
-from .ans_property import *  # noqa
 from .ans_insert import *  # noqa
+from .ans_property import *  # noqa
 from .ans_triple_quad import *  # noqa
 from .mockResponse import mocked_requests
 from .test_connectionCapabilities import json_context
@@ -84,7 +83,9 @@ class TestWoqlQueries:
 
     def test_insert_method(self, insert_without, insert_with_des):
         woql_object = WOQLQuery().insert("v:Bike_URL", "Bicycle")
-        woql_object_des = WOQLQuery().insert("v:Bike_URL", "Bicycle", label="v:Bike_Label", description="v:Bike_Des")
+        woql_object_des = WOQLQuery().insert(
+            "v:Bike_URL", "Bicycle", label="v:Bike_Label", description="v:Bike_Des"
+        )
         assert woql_object.to_dict() == insert_without
         assert woql_object_des.to_dict() == insert_with_des
 
@@ -102,7 +103,16 @@ class TestWoqlQueries:
 
     def test_doctype_property_method(self, property_without, property_with_des):
         woql_object = WOQLQuery().doctype("Journey").property("Duration", "dataTime")
-        woql_object_des = WOQLQuery().doctype("Journey").property("Duration", "dataTime", label="Journey Duration", description="Journey duration in minutes.")
+        woql_object_des = (
+            WOQLQuery()
+            .doctype("Journey")
+            .property(
+                "Duration",
+                "dataTime",
+                label="Journey Duration",
+                description="Journey duration in minutes.",
+            )
+        )
         assert woql_object.to_dict() == property_without
         assert woql_object_des.to_dict() == property_with_des
 
