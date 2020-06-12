@@ -14,7 +14,7 @@ test_requirements = [
     "pytest-cov",
     "pytest-mock",
     "pytest-xdist",
-    "pytest-runner"
+    "pytest-runner",
 ]
 
 extras_require = {"dataframe": ["numpy >= 1.13.0", "pandas >= 0.23.0"]}

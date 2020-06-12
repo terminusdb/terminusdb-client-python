@@ -50,7 +50,8 @@ def test_create_database(mocked_requests, mocked_requests2):
     woql_client.create_database(
         "myFirstTerminusDB",
         "admin",
-        {"label": "my first db", "comment": "my first db comment"},
+        label="my first db",
+        description="my first db comment",
         include_schema=False,
     )
 
@@ -86,7 +87,8 @@ def test_create_database_with_schema(
     woql_client.create_database(
         "myFirstTerminusDB",
         "admin",
-        {"label": "my first db", "comment": "my first db comment"},
+        label="my first db",
+        description="my first db comment",
     )
 
     WOQLClient.create_graph.assert_called_once_with(
@@ -104,7 +106,8 @@ def test_create_database_and_change_account(mocked_requests, mocked_requests2):
     woql_client.create_database(
         "myFirstTerminusDB",
         "my_new_account",
-        {"label": "my first db", "comment": "my first db comment"},
+        label="my first db",
+        description="my first db comment",
         include_schema=False,
     )
 
