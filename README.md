@@ -11,48 +11,53 @@ Python version of the TerminusDB client - for TerminusDB API and WOQLpy
 - [Python >= 3.6]
 
 ## Installation
--  Terminus Client Python can be download form PyPI using pip:
+-  TerminusDB Client can be download form PyPI using pip:
 `python -m pip install terminusdb-client`
 
-this only include the core Python Client () and WOQLQuery.
+this only include the core Python Client (WOQLClient) and WOQLQuery.
 
 If you want to use woqlDataframe:
 
-`python -m pip install terminus-client-python[dataframe]`
+`python -m pip install terminusdb-client[dataframe]`
 
 *if you are installing form `zsh` you have to quote the argument like this:*
 
-`python -m pip install 'terminus-client-python[dataframe]'`
+`python -m pip install 'terminusdb-client[dataframe]'`
 
 - Install from source:
 
-`python -m pip install git+https://github.com/terminusdb/terminus-client-python.git`
+`python -m pip install git+https://github.com/terminusdb/terminusdb-client-python.git`
 
 ## Usage
 For the [full Documentation](https://terminus-client-python.readthedocs.io/)
 
 ## Tutorials
-Visit [terminus-tutorials](https://github.com/terminusdb/terminus-tutorials) for tutorial scripts
+Visit [terminus-tutorials](https://github.com/terminusdb/terminusdb-tutorials) for tutorial scripts
 
 ## Testing
 * Clone this repository
-`git clone https://github.com/terminusdb/terminus-client-python.git`
+`git clone https://github.com/terminusdb/terminusdb-client-python.git`
 
-* Install all development dependencies and run tests
+* Install all development dependencies
 ```sh
-$ make
+$ make init
 ```
 
-* To run tests only
+* To run test files only
 ```sh
-$ pytest tests
+$ pytest terminusdb_client/tests
+```
+
+* To run full test
+```sh
+$ tox
 ```
 
 ## Report Issues
 
 If you have encounter any issues, please report it with your os and environment setup, version that you are using and a simple reproducible case.
 
-If you encounter other questions, you can ask in our community [forum](https://community.terminusdb.com/) or [Slack channel](http://bit.ly/terminusdb-slack).
+If you encounter other questions, you can ask in our community [forum](https://community.terminusdb.com/) or [Discord](https://discord.gg/Gvdqw97).
 
 ## Contribute
 
@@ -62,6 +67,6 @@ Please check [Contributing.md](Contributing.md) for more information.
 
 ## Licence
 
-GNU General Public License v3 (GPLv3)
+Apache License (Version 2.0)
 
 Copyright (c) 2019
