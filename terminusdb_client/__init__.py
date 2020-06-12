@@ -1,3 +1,2 @@
-# __all__ = ["woqlclient.woqlClient", "woql", "woqlDataframe"]
-
-# name = "terminusdb-client"
+from .woqlclient import WOQLClient  # noqa
+from .woqlquery import WOQLQuery  # noqa
