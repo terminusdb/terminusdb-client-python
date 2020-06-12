@@ -46,12 +46,19 @@ def test_parseDocumentID():
 
 
 def test_validURL():
-	fullURL="http://localhost:6363/myFirstTerminusDB";
-	idParser=IDParser()
-	assert idParser.validURL(fullURL)== True;
-
-	fullURL="localhost&899900/myFirstTerminusDB";
-	assert idParser.validURL(fullURL)== False;
+        idParser=IDParser()
+        # Normal localhost URI with port
+        assert idParser.validURL("http://localhost:6363/myFirstTerminusDB") == True
+        # Normal hostname with port
+        assert idParser.validURL('http://someURL:6363/aDatabase')
+        # Invalid URI with illegal characters
+        assert idParser.validURL('http://!illegalURI:6363@@@@@e21e21d2faf') == False
+        # Wrong port number identifier
+        assert idParser.validURL("localhost&899900/myFirstTerminusDB") == False
+        # Normal IP address
+        assert idParser.validURL("http://127.0.0.1:6363/aDatabase")
+        # IP address without port
+        assert idParser.validURL("http://127.0.0.1/aDatabase")
 
 
 def test_validIDString():
