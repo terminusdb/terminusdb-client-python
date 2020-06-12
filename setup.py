@@ -26,7 +26,7 @@ extras_require = {
 
 setuptools.setup(
     name="terminus-client-python",
-    version="0.0.20",
+    version="0.0.21",
     author="TerminusDB group",
     author_email="terminusdatabase@gmail.com",
     description="Python client for Terminus DB",
