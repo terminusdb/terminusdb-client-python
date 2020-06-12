@@ -20,9 +20,9 @@ from .dispatchRequest import DispatchRequest
 class WOQLClient:
 
     """
-        The WOQLClient constructor
+    The WOQLClient constructor
 
-        :param **kwargs Connection arguments used to configure the Client. (db=terminusDBName | server=terminusServerURL | doc=docName | key=apiKey)
+    :param **kwargs Connection arguments used to configure the Client. (db=terminusDBName | server=terminusServerURL | doc=docName | key=apiKey)
 
     """
 
