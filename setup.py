@@ -21,14 +21,14 @@ extras_require = {"dataframe": ["numpy >= 1.13.0", "pandas >= 0.23.0"]}
 
 setuptools.setup(
     name="terminusdb-client",
-    version="0.0.18",
+    version="0.0.21",
     author="TerminusDB group",
     author_email="terminusdatabase@gmail.com",
     description="Python client for Terminus DB",
     long_description=long_description,
     long_description_content_type="text/markdown",
     package_data={"": ["LICENSE"]},
-    url="https://github.com/terminusdb/terminus-client-python",
+    url="https://github.com/terminusdb/terminusdb-client-python",
     packages=setuptools.find_packages(exclude=["tests"]),
     include_package_data=True,
     install_requires=requires,
