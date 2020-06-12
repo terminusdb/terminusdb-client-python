@@ -1,4 +1,4 @@
-Terminus Client Python
+TerminusDB Client Python
 ==========================
 
 [![build status](https://api.travis-ci.com/terminusdb/terminus-client-python.svg?branch=master)](https://travis-ci.com/terminusdb/terminus-client-python)
@@ -9,26 +9,26 @@ Python terminus client for TerminusDB API and WOQLpy
 **Note: this Python client is only compatible with TerminusDB 1.0 and will no longer be maintained, please check terminusdb.com for latest new regarding Python clients**
 
 ## Requirements
-- [TerminusDB](https://github.com/terminusdb/terminus-server)
+- [TerminusDB](https://github.com/terminusdb/terminusdb-server)
 - [Python >= 3.6]
 
 ## Installation
 -  Terminus Client Python can be download form PyPI using pip:
-`python -m pip install terminus-client-python`
+`python -m pip install terminusdb-client-python`
 
 this only include the core Python Client and WOQLQuery.
 
 If you want to use woqlDataframe:
 
-`python -m pip install terminus-client-python[dataframe]`
+`python -m pip install terminusdb-client-python[dataframe]`
 
 *if you are installing form `zsh` you have to quote the argument like this:*
 
-`python -m pip install 'terminus-client-python[dataframe]'`
+`python -m pip install 'terminusdb-client-python[dataframe]'`
 
 - Install from source:
 
-`python -m pip install git+https://github.com/terminusdb/terminus-client-python.git`
+`python -m pip install git+https://github.com/terminusdb/terminusdb-client-python.git`
 
 ## Usage
 For the [full Documentation](https://terminus-client-python.readthedocs.io/)
@@ -54,7 +54,7 @@ $ pytest tests
 
 If you have encounter any issues, please report it with your os and environment setup, version that you are using and a simple reproducible case.
 
-If you encounter other questions, you can ask in our community [forum](https://community.terminusdb.com/) or [Slack channel](http://bit.ly/terminusdb-slack).
+If you encounter other questions, you can ask in our community [forum](https://terminusdb.com/community/) or [Slack channel](http://bit.ly/terminusdb-slack).
 
 ## Contribute
 
