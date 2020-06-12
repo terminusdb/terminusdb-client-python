@@ -2,7 +2,7 @@ woqlclient
 ==========
 
 
-.. autoclass:: woqlclient.WOQLClient
+.. autoclass:: terminusdb_client.WOQLClient
    :members:
    :undoc-members:
    :show-inheritance:
