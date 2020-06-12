@@ -14,7 +14,7 @@ Python version of the TerminusDB client - for TerminusDB API and WOQLpy
 -  Terminus Client Python can be download form PyPI using pip:
 `python -m pip install terminusdb-client`
 
-this only include the core Python Client and WOQLQuery.
+this only include the core Python Client () and WOQLQuery.
 
 If you want to use woqlDataframe:
 
