@@ -1,5 +1,5 @@
 language: python
-install: pip install virtualenv==20.0.21 && make && pip install tox
+install: make && pip install tox
 script:
 - make ci
 cache: pip
