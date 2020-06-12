@@ -1,20 +1,18 @@
-Terminus Client Python
+TerminusDB Client Python
 ==========================
 
 [![build status](https://api.travis-ci.com/terminusdb/terminus-client-python.svg?branch=master)](https://travis-ci.com/terminusdb/terminus-client-python)
 [![Documentation Status](https://readthedocs.org/projects/terminus-client-python/badge/?version=latest)](https://terminus-client-python.readthedocs.io/en/latest/?badge=latest)
 
-Python terminus client for TerminusDB API and WOQLpy
-
-**Note: this Python client is only compatible with TerminusDB 1.0 and will no longer be maintained, please check terminusdb.com for latest new regarding Python clients**
+Python version of the TerminusDB client - for TerminusDB API and WOQLpy
 
 ## Requirements
-- [TerminusDB](https://github.com/terminusdb/terminus-server)
+- [TerminusDB 2.0](https://github.com/terminusdb/terminus-server)
 - [Python >= 3.6]
 
 ## Installation
 -  Terminus Client Python can be download form PyPI using pip:
-`python -m pip install terminus-client-python`
+`python -m pip install terminusdb-client`
 
 this only include the core Python Client and WOQLQuery.
 
