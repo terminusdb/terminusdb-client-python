@@ -25,9 +25,9 @@ copyright = "2020, TerminusDB group"
 author = "TerminusDB group"
 
 # The short X.Y version.
-version = __version__
+version = str(__version__)
 # The full version, including alpha/beta/rc tags
-release = str(version)
+release = version
 
 master_doc = "index"
 

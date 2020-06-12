@@ -14,15 +14,15 @@ jobs:
     python: '3.6'
     script: coverage
   - stage: deploy
-    #before_deploy: cd docs && make html && touch build/html/.nojekyll && cd ../
+    before_deploy: cd docs && make html && touch build/html/.nojekyll && cd ../
     deploy:
-      #- provider: pages # deploy on github pages when merge on master
-      #  skip_cleanup: true
-      #  github_token: $GITHUB_TOKEN
-      #  keep_history: true
-      #  local_dir: docs/build/html
-      #  on:
-      #    branch: master
+      - provider: pages # deploy on github pages when merge on master
+       skip_cleanup: true
+       github_token: $GITHUB_TOKEN
+       keep_history: true
+       local_dir: docs/build/html
+       on:
+         branch: master
       - provider: pypi # deploy on pypi when tag
         user: __token__
         password: $PYPI_TOKEN

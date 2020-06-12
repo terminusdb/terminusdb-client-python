@@ -3,7 +3,10 @@
 
 def _get_clause_and_remainder(pat):
     """Breaks a graph pattern up into two parts - the next clause, and the remainder of the string
-    @param {string} pat - graph pattern fragment
+    Parameters
+    ----------
+    pat: str
+         graph pattern fragment
     """
     pat = pat.strip()
     opening = 1
@@ -51,8 +54,10 @@ def _tokenize(pat):
 
 def _tokens_to_json(seq, query):
     """Turns a sequence of tokens into the appropriate JSON-LD
-    @param {Array} seq
-    @param {*} q"""
+    Parameters
+    ----------
+    seq: list
+    query: WOQLQuery"""
     if len(seq) == 1:  # may need to be further tokenized
         ntoks = _tokenize(seq[0])
         if len(ntoks) == 1:

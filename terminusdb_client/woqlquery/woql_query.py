@@ -16,7 +16,10 @@ class WOQLQuery:
 
         Parameters
         ----------
-        query json-ld query for initialisation"""
+        query: dict
+               json-ld query for initialisation
+        graph: str
+               graph that this query is appled to, default to be schema/main"""
         if query:
             self._query = query
         else:
@@ -308,9 +311,15 @@ class WOQLQuery:
         """Transforms a graph filter or graph id into the proper json-ld form"""
         return {"@type": "xsd:string", "@value": graph}
 
-    def _expand_variable(self, varname, always=None):
+    def _expand_variable(self, varname, always=False):
         """Transforms strings that start with v: into variable json-ld structures
-        @param varname - will be transformed if it starts with v:"""
+        Parameters
+        ----------
+        varname : str
+                  will be transformed if it starts with 'v:'
+        always : bool
+                 if True it will be transformed no matter it starts with 'v:' or not. Default to be False
+        """
         if varname[:2] == "v:" or always:
             if varname[:2] == "v:":
                 varname = varname[2:]
@@ -428,7 +437,10 @@ class WOQLQuery:
     def _find_last_subject(self, json):
         """Finds the last woql element that has a woql:subject in it and returns the json for that
         used for triplebuilder to chain further calls - when they may be inside ands or ors or subqueries
-        @param {object} json"""
+        Parameters
+        ----------
+        json : dict
+               dictionary that representing the query in josn-ld"""
         if "woql:query_list" in json:
             temp_json = copy.deepcopy(json["woql:query_list"])
             while len(temp_json) > 0:
@@ -1348,13 +1360,20 @@ class WOQLQuery:
         """
         Add a property at the current class/document
 
-            @param {string} proId - property ID
-            @param {string} type  - property type (range)
-            @returns WOQLQuery object
+        A range could be another class/document or an "xsd":"http://www.w3.org/2001/XMLSchema#" type
+        like string|integer|datatime|nonNegativeInteger|positiveInteger etc ..
+        (you don't need the prefix xsd for specific a type)
 
-            A range could be another class/document or an "xsd":"http://www.w3.org/2001/XMLSchema#" type
-            like string|integer|datatime|nonNegativeInteger|positiveInteger etc ..
-            (you don't need the prefix xsd for specific a type)
+        Parameters
+        ----------
+        pro_id : str
+                 property ID
+        property_type : str
+                        property type (range)
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
         """
         if label is None and description is None:
             if not self._triple_builder:
@@ -1511,8 +1530,7 @@ class WOQLQuery:
         return self
 
     def insert_class_data(self, data, ref_graph):
-        """
-            Adds a bunch of class data in one go
+        """Adds a bunch of class data in one go
         """
         if data.get("id"):
             self.add_class(data["id"], ref_graph)
@@ -2187,11 +2205,11 @@ class WOQLQuery:
 
 
 class TripleBuilder:
-    """
-    @file Triple Builder
-        higher level composite queries - not language or api elements
-        Class for enabling building of triples from pieces
-        type is add_quad / remove_quad / add_triple / remove_triple
+    """Triple Builder
+
+    higher level composite queries - not language or api elements
+    Class for enabling building of triples from pieces
+    type is add_quad / remove_quad / add_triple / remove_triple
      """
 
     def __init__(self, ops_type=None, query=None, s=None, g=None):

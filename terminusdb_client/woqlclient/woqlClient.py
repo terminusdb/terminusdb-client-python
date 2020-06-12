@@ -19,35 +19,21 @@ from .dispatchRequest import DispatchRequest
 
 class WOQLClient:
 
-    """
-    The WOQLClient constructor
-
-    :param **kwargs Connection arguments used to configure the Client. (db=terminusDBName | server=terminusServerURL | doc=docName | key=apiKey)
-
-    """
-
     def __init__(self, server_url, **kwargs):
         # current conCapabilities context variables
-        """
+        """The WOQLClient constructor
+
         Parameters
         ----------
-        server_url str
-        key        str option key
-        user
-        jwt
-        jwt_user
-        account
-        db: set cursor to this db
-        repo: set cursor to this repo
-        branch: set branch to this id
-
+        server_url : str
+                     url of the server that this client belongs
         """
         self.conConfig = ConnectionConfig(server_url, **kwargs)
         self.conCapabilities = ConnectionCapabilities()
 
     def connect(self, **kwargs):
-        """
-        Connect to a Terminus server at the given URI with an API key
+        """Connect to a Terminus server at the given URI with an API key
+
         Stores the terminus:ServerCapability document returned
         in the conCapabilities register which stores, the url, key, capabilities,
         and database meta-data for the connected server
@@ -55,18 +41,6 @@ class WOQLClient:
         If the serverURL argument is omitted,
         self.conConfig.serverURL will be used if present
         or an error will be raise.
-
-        Parameters
-        ----------
-        key        str option key
-        user
-        jwt
-        jwt_user
-        account
-        db: set cursor to this db
-        repo: set cursor to this repo
-        branch: set branch to this id
-
 
         Returns
         -------
@@ -125,19 +99,6 @@ class WOQLClient:
 
     def uid(self, ignore_jwt=True):
         return self.conConfig.user(ignore_jwt)
-
-    """
-    Parameters
-        ----------
-        key        str option key
-        user
-        jwt
-        jwt_user
-        account
-        db: set cursor to this db
-        repo: set cursor to this repo
-        branch: set branch to this id
-    """
 
     def set(self, **kwargs):  # bad naming
         self.conConfig.update(**kwargs)
@@ -380,7 +341,6 @@ class WOQLClient:
             Payload to send to the server
         file_dict : list, optional
             List of files that are needed for the query
-
 
         Returns
         -------
