@@ -298,7 +298,7 @@ class WOQLQuery:
         if ":" not in cstring:
             return False
         pref = cstring.split(":")[0]
-        if pref == "v" or pref == "scm":
+        if pref == "v" or pref == "scm" or pref == "doc":
             return True
         if utils.STANDARD_URLS.get(pref):
             return True
@@ -550,11 +550,8 @@ class WOQLQuery:
         queries = list(args)
         if queries and queries[0] == "woql:args":
             return ["woql:query_list"]
-        if self._cursor.get("@type") and self._cursor["@type"] != "woql:Or":
-            new_json = WOQLQuery().from_dict(self._cursor)
-            for key in self._cursor:
-                del self._cursor[key]
-            queries = [new_json] + queries
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:Or"
         if "woql:query_list" not in self._cursor:
             self._cursor["woql:query_list"] = []
@@ -615,6 +612,20 @@ class WOQLQuery:
         self._cursor["@type"] = "woql:Quad"
         self._cursor["woql:graph_filter"] = self._clean_graph(graph)
         return self
+
+    def string(self, input_str):
+        return {"@type": "xsd:string", "@value": input_str}
+
+    def literal(self, input_val, input_type):
+        if ":" not in input_type:
+            input_type = "xsd:" + input_type
+        return {"@type": input_type, "@value": input_val}
+
+    def iri(self, varname):
+        return {
+            "@type": "woql:Node",
+            "woql:node": varname,
+        }
 
     def sub(self, parent, child):
         if parent and parent == "woql:args":
@@ -1028,7 +1039,7 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:IDGenerator"
-        self._cursor["woql:base"] = self._clean_object(prefix)
+        self._cursor["woql:base"] = self._clean_object(self.string(prefix))
         self._cursor["woql:key_list"] = self._vlist(input_var_list)
         self._cursor["woql:uri"] = self._clean_class(output_var)
         return self
@@ -2243,8 +2254,8 @@ class TripleBuilder:
 
     def _get_o(self, s, p):
         if self._cursor["@type"] == "woql:And":
-            for i in self._cursor["query_list"]:
-                subq = self._cursor["query_list"][i]["woql:query"]
+            for item in self._cursor["query_list"]:
+                subq = item["woql:query"]
                 if (
                     subq._parent_query["woql:subject"] == s
                     and subq._parent_query["woql:predicate"] == p
@@ -2253,26 +2264,43 @@ class TripleBuilder:
         return False
 
     def card(self, n, which):
-        os = self._subject
-        self._subject += "_" + which
-        self._add_po("rdf:type", "owl:Restriction")
-        self._add_po("owl:onProperty", os)
+        # need to generate a new id for the cardinality object
+        # and point it at the property in question via the onProperty function
+        prop = self._subject
+        if isinstance(prop, dict):
+            if prop.get("node"):
+                prop = prop["node"]
+            else:
+                return False
+        newid = str(prop) + str(which)
+        self._query.woql_and(
+            WOQLQuery()
+            .add_quad(newid, "type", "owl:Restriction", self._graph)
+            .add_quad(newid, "owl:onProperty", self._subject, self._graph)
+        )
         if which == "max":
-            self._add_po(
-                "owl:maxCardinality", {"@value": n, "@type": "xsd:nonNegativeInteger"}
+            self._query.woql_and().add_quad(
+                newid,
+                "owl:maxCardinality",
+                {"@value": n, "@type": "xsd:nonNegativeInteger"},
+                self._graph,
             )
         elif which == "min":
-            self._add_po(
-                "owl:minCardinality", {"@value": n, "@type": "xsd:nonNegativeInteger"}
+            self._query.woql_and().add_quad(
+                newid,
+                "owl:minCardinality",
+                {"@value": n, "@type": "xsd:nonNegativeInteger"},
+                self._graph,
             )
         else:
-            self._add_po(
-                "owl:cardinality", {"@value": n, "@type": "xsd:nonNegativeInteger"}
+            self._query.woql_and().add_quad(
+                newid,
+                "owl:cardinality",
+                {"@value": n, "@type": "xsd:nonNegativeInteger"},
+                self._graph,
             )
-        od = self._get_o(os, "rdfs:domain")
+        # then make the domain of the property into a subclass of the restriction
+        od = self._get_o(prop, "rdfs:domain")
         if od:
-            cardcls = self._subject
-            self._subject = od
-            self._add_po("rdfs:subClassOf", cardcls)
-        self._subject = os
+            self._query.woql_and().add_quad(od, "subClassOf", newid, self._graph)
         return self

@@ -14,12 +14,13 @@ test_requirements = [
     "pytest-cov",
     "pytest-mock",
     "pytest-xdist",
+    "pytest-runner"
 ]
 
 extras_require = {"dataframe": ["numpy >= 1.13.0", "pandas >= 0.23.0"]}
 
 setuptools.setup(
-    name="terminus-client-python",
+    name="terminusdb-client",
     version="0.0.18",
     author="TerminusDB group",
     author_email="terminusdatabase@gmail.com",
