@@ -18,7 +18,6 @@ from .dispatchRequest import DispatchRequest
 
 
 class WOQLClient:
-
     def __init__(self, server_url, **kwargs):
         # current conCapabilities context variables
         """The WOQLClient constructor
