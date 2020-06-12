@@ -1,5 +1,5 @@
 language: python
-install: make
+install: pip install tox
 script:
 - make ci
 cache: pip

@@ -6,9 +6,7 @@ test:
 	#pytest terminusdb_client/tests/
 	tox
 ci:
-	pip3 install ./ --upgrade
-	pip3 install tox
-	tox  --recreate
+	tox
 	#python -m pytest tests  --junitxml=report.xml
 
 test-readme:
