@@ -1,8 +1,9 @@
-woqlClient
-==========
+TerminusDB Client
+======================
 
+.. toctree::
+   :maxdepth: 4
 
-.. autoclass:: terminusdb_client.WOQLClient
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   woqlClient
+   woqlQuery
+   woqlDataframe
