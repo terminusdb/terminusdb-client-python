@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; Terminus Client Python &lt;module &#39;terminusdb_client.__version__&#39; from &#39;/home/travis/build/terminusdb/terminus-client-python/terminusdb_client/__version__.py&#39;&gt; documentation</title>
+  <title>Installation &mdash; TerminusDB Client &lt;module &#39;terminusdb_client.__version__&#39; from &#39;/home/travis/build/terminusdb/terminusdb-client-python/terminusdb_client/__version__.py&#39;&gt; documentation</title>
   
 
   
@@ -38,8 +38,8 @@
   <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="terminus-client-python" href="modules.html" />
-    <link rel="prev" title="Terminus Client Python’s documentation" href="index.html" /> 
+    <link rel="next" title="TerminusDB Client" href="modules.html" />
+    <link rel="prev" title="TerminusDB Client’s documentation" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -53,7 +53,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> Terminus Client Python
+            <a href="index.html" class="icon icon-home"> TerminusDB Client
           
 
           
@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                <module 'terminusdb_client.__version__' from '/home/travis/build/terminusdb/terminus-client-python/terminusdb_client/__version__.py'>
+                <module 'terminusdb_client.__version__' from '/home/travis/build/terminusdb/terminusdb-client-python/terminusdb_client/__version__.py'>
               </div>
             
           
@@ -97,7 +97,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#install-using-pip">Install using pip</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">terminus-client-python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">TerminusDB Client</a></li>
 </ul>
 
             
@@ -112,7 +112,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Terminus Client Python</a>
+          <a href="index.html">TerminusDB Client</a>
         
       </nav>
 
@@ -167,20 +167,24 @@
 <div class="section" id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p><a class="reference external" href="https://github.com/terminusdb/terminus-server">TerminusDB</a>
-(you can <a class="reference external" href="https://github.com/terminusdb/terminus-quickstart">install using Docker</a>)</p></li>
+<li><p><a class="reference external" href="https://github.com/terminusdb/terminusdb-server">TerminusDB 2.0</a>
+(you can <a class="reference external" href="https://github.com/terminusdb/terminusdb-quickstart">install using Docker</a>)</p></li>
 <li><p>Python &gt;= 3.6</p></li>
 </ul>
 </div>
 <div class="section" id="install-using-pip">
 <h2>Install using pip<a class="headerlink" href="#install-using-pip" title="Permalink to this headline">¶</a></h2>
 <p>Install form PyPI:</p>
-<p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">terminus-client-python</span></code></p>
-<p>this only include the core Python Client and WOQLQuery.</p>
+<p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">terminusdb-client</span></code></p>
+<p>this only include the core Python Client (WOQLClient) and WOQLQuery.</p>
 <p>If you want to use woqlDataframe:</p>
-<p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">terminus-client-python[dataframe]</span></code></p>
-<p>Install from source:</p>
-<p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">git+https://github.com/terminusdb/terminus-client-python.git</span></code></p>
+<p><cite>python -m pip install terminusdb-client[dataframe]</cite></p>
+<p><strong>if you are installing form `zsh` you have to quote the argument like this:</strong></p>
+<p><cite>python -m pip install ‘terminusdb-client[dataframe]’</cite></p>
+<ul class="simple">
+<li><p>Install from source:</p></li>
+</ul>
+<p><cite>python -m pip install git+https://github.com/terminusdb/terminusdb-client-python.git</cite></p>
 </div>
 </div>
 
@@ -192,10 +196,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="modules.html" class="btn btn-neutral float-right" title="terminus-client-python" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="modules.html" class="btn btn-neutral float-right" title="TerminusDB Client" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral float-left" title="Terminus Client Python’s documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="TerminusDB Client’s documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
