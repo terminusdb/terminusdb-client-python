@@ -1,4 +1,4 @@
-terminus-client-python
+TerminusDB Client
 ======================
 
 .. toctree::

@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.abspath("../.."))
 
 # -- Project information -----------------------------------------------------
 
-project = "Terminus Client Python"
+project = "TerminusDB Client"
 copyright = "2020, TerminusDB group"
 author = "TerminusDB group"
 

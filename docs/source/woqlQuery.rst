@@ -1,5 +1,5 @@
-woqlpy
-======
+woqlQuery
+=========
 
 
 .. autoclass:: terminusdb_client.WOQLQuery
