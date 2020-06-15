@@ -1,5 +1,5 @@
 TerminusDB Client
-======================
+=================
 
 .. toctree::
    :maxdepth: 4
