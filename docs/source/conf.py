@@ -23,7 +23,8 @@ copyright = "2020, TerminusDB group"
 author = "TerminusDB group"
 
 # The short X.Y version.
-from terminusdb_client import __version__
+from terminusdb_client import __version__  # isort:skip
+
 version = str(__version__)
 # The full version, including alpha/beta/rc tags
 release = version
