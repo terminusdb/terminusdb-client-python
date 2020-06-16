@@ -295,6 +295,8 @@ class WOQLQuery:
         return obj
 
     def _looks_like_class(self, cstring):
+        if cstring[:7] == "http://" or cstring[:8] == "https://" :
+            return True 
         if ":" not in cstring:
             return False
         pref = cstring.split(":")[0]
@@ -428,11 +430,10 @@ class WOQLQuery:
     def _find_last_subject(self, json):
         """Finds the last woql element that has a woql:subject in it and returns the json for that
         used for triplebuilder to chain further calls - when they may be inside ands or ors or subqueries
-        @param {object} json"""
+        @param {object} json"""        
+
         if "woql:query_list" in json:
-            temp_json = copy.deepcopy(json["woql:query_list"])
-            while len(temp_json) > 0:
-                item = temp_json.pop()
+            for item in json["woql:query_list"]:
                 subitem = self._find_last_subject(item)
                 if subitem:
                     return subitem
@@ -1341,7 +1342,7 @@ class WOQLQuery:
     def node(self, node, node_type=None):
         if not self._triple_builder:
             self._create_triple_builder(node, node_type)
-        self._triple_builder._subject = node
+        self._triple_builder._subject = self._clean_class(node, True)
         return self
 
     def property(self, pro_id, property_type, label=None, description=None):
@@ -1359,6 +1360,7 @@ class WOQLQuery:
         if label is None and description is None:
             if not self._triple_builder:
                 self._create_triple_builder()
+
             if self._adding_class:
                 part = self._find_last_subject(self._cursor)
                 g = False
@@ -1370,26 +1372,21 @@ class WOQLQuery:
                     )
                 if gpart:
                     g = gpart["@value"]
-                nq = (
-                    WOQLQuery()
-                    .add_property(pro_id, property_type, g)
-                    .domain(self._adding_class)
-                )
-                combine = WOQLQuery().from_dict(self._query)
-                nwoql = WOQLQuery().woql_and(combine, nq)
-                nwoql._adding_class = self._adding_class
-                return nwoql._updated()
+                self._triple_builder._subject = self._clean_class(pro_id, True)
+                self.add_property(pro_id, property_type, g).domain(self._adding_class)
+                return self._updated()
             else:
                 pro_id = self._clean_predicate(pro_id)
-                self._triple_builder._add_po(pro_id, property_type)
+                property_value = self._clean_object(property_type)
+                self._triple_builder._add_po(pro_id, property_value)
             return self
         else:
-            result_obj = self.property(pro_id, property_type)
+            self.property(pro_id, property_type)
             if label:
-                result_obj = result_obj.label(label)
+                self.label(label)
             if description:
-                result_obj = result_obj.description(description)
-            return result_obj
+                self.description(description)
+            return self
 
     def insert(
         self, insert_id, insert_type, ref_graph=None, label=None, description=None
@@ -1397,15 +1394,16 @@ class WOQLQuery:
         if label is None and description is None:
             insert_type = self._clean_type(insert_type, True)
             if ref_graph:
-                return self.add_quad(insert_id, "type", insert_type, ref_graph)
-            return self.add_triple(insert_id, "type", insert_type)
+                self.add_quad(insert_id, "type", insert_type, ref_graph)
+            else:
+                self.add_triple(insert_id, "type", insert_type)
         else:
-            result_obj = self.insert(insert_id, insert_type, ref_graph)
+            self.insert(insert_id, insert_type, ref_graph)
             if label:
-                result_obj = result_obj.label(label)
+                self.label(label)
             if description:
-                result_obj = result_obj.description(description)
-            return result_obj
+                self.description(description)
+        return self
 
     def insert_data(self, data, ref_graph):
         if data.get("type") and data.get("id"):
@@ -1429,7 +1427,7 @@ class WOQLQuery:
     def domain(self, d):
         if not self._triple_builder:
             self._create_triple_builder()
-        d = self._clean_class(d)
+        d = self._clean_type(d)
         self._triple_builder._add_po("rdfs:domain", d)
         return self
 
@@ -1570,24 +1568,23 @@ class WOQLQuery:
 
     def add_property(self, p, t, graph=None):
         if not graph:
-            graph = self._graph
-        ap = WOQLQuery()
-        t = ap._clean_type(t, True) if t else "xsd:string"
+            graph = self._graph        
+        t = self._clean_type(t, True) if t else "xsd:string"
         if p:
-            p = ap._clean_path_predicate(p)
+            p = self._clean_path_predicate(p)
             # TODO: cleaning
             if utils.is_data_type(t):
-                ap.woql_and(
+                self.woql_and(
                     WOQLQuery().add_quad(p, "rdf:type", "owl:DatatypeProperty", graph),
                     WOQLQuery().add_quad(p, "rdfs:range", t, graph),
                 )
             else:
-                ap.woql_and(
+                self.woql_and(
                     WOQLQuery().add_quad(p, "rdf:type", "owl:ObjectProperty", graph),
                     WOQLQuery().add_quad(p, "rdfs:range", t, graph),
                 )
-            ap._updated()
-        return ap
+            self._updated()
+        return self
 
     def delete_property(self, p, graph=None):
         if not graph:
@@ -1653,7 +1650,7 @@ class WOQLQuery:
             .description("v:PDesc")
             .domain("v:ClassID")
         )
-        nq = WOQLQuery.when(woql_filter).woql_and(cls, prop)
+        nq = WOQLQuery().when(woql_filter).woql_and(cls, prop)
         return nq._updated()
 
     def generate_choice_list(

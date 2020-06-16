@@ -1,6 +1,5 @@
 # helper functions for WOQLCore
 
-
 def _get_clause_and_remainder(pat):
     """Breaks a graph pattern up into two parts - the next clause, and the remainder of the string
     @param {string} pat - graph pattern fragment
@@ -114,6 +113,8 @@ def _copy_dict(orig, rollup=None):
             if len(orig["woql:query_list"]) == 1:
                 return _copy_dict(orig["woql:query_list"][0]["woql:query"], rollup)
         if "woql:query" in orig and orig["@type"] != "woql:Comment":
+            if type(orig["woql:query"]) == tuple: 
+                orig["woql:query"] = orig["woql:query"][0].to_dict()
             if not orig["woql:query"].get("@type"):
                 return {}
         if "woql:consequent" in orig:
