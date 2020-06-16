@@ -313,6 +313,7 @@ class WOQLQuery:
 
     def _expand_variable(self, varname, always=False):
         """Transforms strings that start with v: into variable json-ld structures
+
         Parameters
         ----------
         varname : str
@@ -449,6 +450,7 @@ class WOQLQuery:
     def _find_last_subject(self, json):
         """Finds the last woql element that has a woql:subject in it and returns the json for that
         used for triplebuilder to chain further calls - when they may be inside ands or ors or subqueries
+
         Parameters
         ----------
         json : dict
@@ -510,6 +512,7 @@ class WOQLQuery:
 
     def comment(self, comment, subq=None):
         """Adds a text comment to a query - can also be used to wrap any part of a query to turn it off
+
         Parameters
         ----------
         comment : str
@@ -529,10 +532,12 @@ class WOQLQuery:
 
     def select(self, *args):
         """Filters the query so that only the variables included in [V1...Vn] are returned in the bindings
+
         Parameters
         ----------
         args
             only these variables are returned
+
         Returns
         -------
         WOQLQuery object
@@ -564,6 +569,7 @@ class WOQLQuery:
     def woql_and(self, *args):
         """Creates a logical AND of the arguments
         Commonly used to combine WOQLQueries.
+
         Parameters
         ----------
         args : WOQLQuery objects
@@ -603,9 +609,11 @@ class WOQLQuery:
 
     def woql_or(self, *args):
         """Creates a logical OR of the arguments
+
         Parameters
         ----------
         args : WOQLQuery objects
+
         Returns
         -------
         WOQLQuery object
@@ -626,11 +634,13 @@ class WOQLQuery:
 
     def woql_from(self, graph_filter, query=None):
         """Specifies the database URL that will be the default database for the enclosed query
+
         Parameters
         ----------
         graph_filter : str
             url of the database
         query : WOQLQuery object, optional
+
         Returns
         -------
         WOQLQuery object
@@ -650,11 +660,13 @@ class WOQLQuery:
 
     def into(self, graph_descriptor, query):
         """Sets the current output graph for writing output to.
+
         Parameters
         ----------
         graph_descriptor : str
             output graph
         query : WOQLQuery object, optional
+
         Returns
         -------
         WOQLQuery object
@@ -674,6 +686,7 @@ class WOQLQuery:
 
     def triple(self, sub, pred, obj, opt=False):
         """Creates a triple pattern matching rule for the triple [S, P, O] (Subject, Predicate, Object)
+
         Parameters
         ----------
         sub : str
@@ -684,6 +697,7 @@ class WOQLQuery:
             Object
         opt : bool
             weather or not this triple is optional, default to be False
+
         Returns
         -------
         WOQLQuery object
@@ -701,6 +715,7 @@ class WOQLQuery:
 
     def quad(self, sub, pred, obj, graph, opt=False):
         """Creates a pattern matching rule for the quad [S, P, O, G] (Subject, Predicate, Object, Graph)
+
         Parameters
         ----------
         sub : str
@@ -713,6 +728,7 @@ class WOQLQuery:
             Graph
         opt : bool
             weather or not this quad is optional, default to be False
+
         Returns
         -------
         WOQLQuery object
@@ -749,12 +765,14 @@ class WOQLQuery:
 
     def sub(self, parent, child):
         """Returns true if child is a sub-class of parent, according to the current DB schema
+
         Parameters
         ----------
         parent : str
             the parent class to be checked
         child : str, optional
             the child class to be checked
+
         Returns
         -------
         bool
@@ -914,12 +932,14 @@ class WOQLQuery:
 
     def file(self, fpath, opts):
         """Provides details of a file source in a JSON format that includes a URL property
+
         Parameters
         ----------
         fpath : dict
             file data source in a JSON format
         opts : input options
             optional
+
         Returns
         -------
         WOQLQuery object
@@ -943,12 +963,14 @@ class WOQLQuery:
 
     def remote(self, uri, opts=None):
         """Provides details of a remote data source in a JSON format that includes a URL property
+
         Parameters
         ----------
         uri : str
             remote data source
         opts : input options
             optional
+
         Returns
         -------
         WOQLQuery object
@@ -990,6 +1012,7 @@ class WOQLQuery:
 
     def delete_triple(self, subject, predicate, object_or_literal):
         """Deletes any triples that match the rule [subject, predicate, object]
+
         Parameters
         ----------
         subject : str
@@ -998,6 +1021,7 @@ class WOQLQuery:
             Predicate
         object_or_literal : str
             Object or Literal
+
         Returns
         -------
         WOQLQuery object
@@ -1028,6 +1052,7 @@ class WOQLQuery:
 
     def add_triple(self, subject, predicate, object_or_literal):
         """Adds triples according to the the pattern [subject, predicate, object]
+
         Parameters
         ----------
         subject : str
@@ -1036,21 +1061,25 @@ class WOQLQuery:
             Predicate
         object_or_literal : str
             Object or Literal
+
         Returns
         -------
         WOQLQuery object
             query object that can be chained and/or execute
+
         Examples
         --------
         This example adds a triple for a comment predicate and a certain value to the document identified by doc:X:
         >>> update = WOQLQuery().add_triple("doc:X", "comment", "my comment")
         >>> qry = WOQLQuery().when(True, update)
         >>> client.update(qry.json(), 'MyDatabaseId')
+
         Notes
         --------
         To update an existing triple, it is not just a case of calling `add_triple` again.
         One needs to delete the previous triple first.
         Otherwise two triples with the same predicate but different object values will be present.
+
         See Also
         --------
         delete_triple
@@ -1066,6 +1095,7 @@ class WOQLQuery:
 
     def delete_quad(self, subject, predicate, object_or_literal, graph=None):
         """Deletes any quads that match the rule [subject, predicate, object, graph]
+
         Parameters
         ----------
         subject : str
@@ -1076,6 +1106,7 @@ class WOQLQuery:
             Object or Literal
         graph : str
             Graph
+
         Returns
         -------
         WOQLQuery object
@@ -1096,6 +1127,7 @@ class WOQLQuery:
 
     def add_quad(self, subject, predicate, object_or_literal, graph):
         """Adds quads according to the pattern [subject, predicate, object, graph]
+
         Parameters
         ----------
         subject : str
@@ -1106,6 +1138,7 @@ class WOQLQuery:
             Object or Literal
         graph : str
             Graph
+
         Returns
         -------
         WOQLQuery object
@@ -1126,14 +1159,17 @@ class WOQLQuery:
 
     def when(self, query, consequent=None):
         """When the sub-query in Condition is met, the Update query is executed
+
         Parameters
         ----------
         query : WOQLQuery object or bool
         consequent : WOQLQuery object, optional
+
         Returns
         -------
         WOQLQuery object
             query object that can be chained and/or execute
+
         Notes
         -----
         Functions which take a query as an argument advance the cursor to make the chaining of queries fall
@@ -1155,12 +1191,14 @@ class WOQLQuery:
 
     def trim(self, untrimmed, trimmed):
         """A trimmed version of untrimmed (with leading and trailing whitespace removed) is copied into trimmed
+
         Parameters
         ----------
         untrimmed : str
             original string
         trimmed : str
             WOQL varible storing the result string
+
         Returns
         -------
         WOQLQuery object
@@ -1177,12 +1215,14 @@ class WOQLQuery:
 
     def eval(self, arith, res):
         """Evaluates the Arithmetic Expression Arith and copies the output to variable V
+
         Parameters
         ----------
         arith : WOQLQuery or dict
             query or JSON-LD representing the query
         res : str
             output variable
+
         Returns
         -------
         WOQLQuery object
@@ -1202,10 +1242,12 @@ class WOQLQuery:
 
     def plus(self, *args):
         """Adds numbers N1...Nn together
+
         Parameters
         ----------
         args : int or float
             numbers to add together
+
         Returns
         -------
         WOQLQuery object
@@ -1226,10 +1268,12 @@ class WOQLQuery:
 
     def minus(self, *args):
         """Adds numbers N1...Nn together
+
         Parameters
         ----------
         args : int or float
             numbers to add together
+
         Returns
         -------
         WOQLQuery object
@@ -1250,10 +1294,12 @@ class WOQLQuery:
 
     def times(self, *args):
         """Multiplies numbers N1...Nn together
+
         Parameters
         ----------
         args : int or float
             numbers to be multiplied
+
         Returns
         -------
         WOQLQuery object
@@ -1274,10 +1320,12 @@ class WOQLQuery:
 
     def divide(self, *args):
         """Divides numbers N1...Nn by each other left, to right precedence
+
         Parameters
         ----------
         args : int or float
             numbers to be divided
+
         Returns
         -------
         WOQLQuery object
@@ -1298,10 +1346,12 @@ class WOQLQuery:
 
     def div(self, *args):
         """Division - integer division - args are divided left to right
+
         Parameters
         ----------
         args : int or float
             numbers for division
+
         Returns
         -------
         WOQLQuery
@@ -1322,12 +1372,14 @@ class WOQLQuery:
 
     def exp(self, first, second):
         """Raises A to the power of B
+
         Parameters
         ----------
         first : int or float
             base number
         second : int or float
             power of
+
         Returns
         -------
         WOQLQuery object
@@ -1353,12 +1405,14 @@ class WOQLQuery:
 
     def isa(self, element, of_type):
         """Matches if element is a member of a certain type, according to the current state of the DB
+
         Parameters
         ----------
         element : str
             element to be checked
         of_type : str
             type to be checked
+
         Returns
         -------
         bool
@@ -1388,12 +1442,14 @@ class WOQLQuery:
 
     def less(self, left, right):
         """Compares the value of v1 against v2 and returns true if v1 is less than v2
+
         Parameters
         ----------
         left : str
             first variable to compare
         right : str
             second variable to compare
+
         Returns
         -------
         WOQLQuery object
@@ -1410,12 +1466,14 @@ class WOQLQuery:
 
     def greater(self, left, right):
         """Compares the value of v1 against v2 and returns true if v1 is greater than v2
+
         Parameters
         ----------
         left : str
             first variable to compare
         right : str
             second variable to compare
+
         Returns
         -------
         WOQLQuery object
@@ -1432,13 +1490,16 @@ class WOQLQuery:
 
     def opt(self, query=None):
         """The Query in the Optional argument is specified as optional
+
         Parameters
         ----------
         query : WOQLQuery object
+
         Returns
         -------
         WOQLQuery object
             query object that can be chained and/or execute
+
         Examples
         -------
         >>> WOQLQuery().woql_and(WOQLQuery().
@@ -1457,6 +1518,7 @@ class WOQLQuery:
 
     def unique(self, prefix, key_list, uri):
         """Generates an ID for a node as a function of the passed VariableList with a specific prefix (URL base). If the values of the passed variables are the same, the output will be the same
+
         Parameters
         ----------
         prefix : str
@@ -1465,6 +1527,7 @@ class WOQLQuery:
             variable to generate id for
         uri : str
             the variable to hold the id
+
         Returns
         -------
         WOQLQuery object
@@ -1482,6 +1545,7 @@ class WOQLQuery:
 
     def idgen(self, prefix, input_var_list, output_var):
         """Generates an ID for a node as a function of the passed VariableList with a specific prefix (URL base). If the values of the passed variables are the same, the output will be the same
+
         Parameters
         ----------
         prefix : str
@@ -1490,6 +1554,7 @@ class WOQLQuery:
             variable to generate id for
         output_var : str
             the variable to hold the id
+
         Returns
         -------
         WOQLQuery object
@@ -1517,12 +1582,14 @@ class WOQLQuery:
 
     def lower(self, left, right):
         """Changes a string to lower-case - input is in u, output in l
+
         Parameters
         ----------
         left : str
             input string
         right : str
             stores output
+
         Returns
         -------
         WOQLQuery object
@@ -1540,6 +1607,7 @@ class WOQLQuery:
     def pad(self, user_input, pad, length, output):
         """
         Pads out the string input to be exactly len long by appending the pad character pad to form output
+
         Parameters
         ----------
         user_input : str
@@ -1550,6 +1618,7 @@ class WOQLQuery:
             length to pad
         output : str
             stores output
+
         Returns
         -------
         WOQLQuery object
@@ -1573,6 +1642,7 @@ class WOQLQuery:
 
     def split(self, user_input, glue, output):
         """Splits a variable apart (input) into a list of variables (output) by separating the strings together with separator
+
         Parameters
         ----------
         user_input : str
@@ -1581,6 +1651,7 @@ class WOQLQuery:
             character string to separate string into list
         output : str
             WOQL variable that stores output list
+
         Returns
         -------
         WOQLQuery object
@@ -1598,12 +1669,14 @@ class WOQLQuery:
 
     def member(self, member, mem_list):
         """Iterates through a list and returns a value for each member
+
         Parameters
         ----------
         member : str
             a WOQL variable representing an element of the list
         mem_list : str
             a WOQL list variable
+
         Returns
         -------
         WOQLQuery object
@@ -1620,12 +1693,14 @@ class WOQLQuery:
 
     def concat(self, concat_list, result):
         """Concatenates the list of variables into a string and saves the result in v
+
         Parameters
         ----------
         concat_list : list
             list of variables to concatenate
         result : str
             saves the results
+
         Returns
         -------
         WOQLQuery object
@@ -1658,6 +1733,7 @@ class WOQLQuery:
     def join(self, user_input, glue, output):
         """
         Joins a list variable together (input) into a string variable (output) by glueing the strings together with glue
+
         Parameters
         ----------
         user_input : list
@@ -1666,6 +1742,7 @@ class WOQLQuery:
             jioining character(s)
         output : str
             variable that sotres output
+
         Returns
         -------
         WOQLQuery object
@@ -1685,12 +1762,14 @@ class WOQLQuery:
         """
         Joins a list variable containing numbers together (input) into a single number
         containing the sum.
+
         Parameters
         ----------
         user_input : list
             a variable containing a list of numbers
         output : str
             a variable that stores the output
+
         Returns
         -------
         WOQLQuery object
@@ -1707,11 +1786,13 @@ class WOQLQuery:
 
     def start(self, start, query=None):
         """Specifies that the start of the query returned
+
         Parameters
         ----------
         start : int
             index of the frist result got returned
         query : WOQLQuery object, optional
+
         Returns
         -------
         WOQLQuery object
@@ -1727,11 +1808,13 @@ class WOQLQuery:
 
     def limit(self, limit, query=None):
         """Specifies that only the first Number of rows will be returned
+
         Parameters
         ----------
         limit : int
             number of maximum results returned
         query : WOQLQuery object, optional
+
         Returns
         -------
         WOQLQuery object
@@ -1749,6 +1832,7 @@ class WOQLQuery:
         """Regular Expression Call
         p is a regex pattern (.*) using normal regular expression syntax, the only unusual thing is that special characters have to be escaped twice, s is the string to be matched and m is a list of matches:
         e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
+
         Parameters
         ----------
         pattern : str
@@ -1757,6 +1841,7 @@ class WOQLQuery:
             string to be matched
         reg_list : str or list or dict
             store list of matches
+
         Returns
         -------
         WOQLQuery object
@@ -1789,9 +1874,11 @@ class WOQLQuery:
 
     def woql_not(self, query=None):
         """Creates a logical NOT of the arguments
+
         Parameters
         ----------
         query : WOQLQuery object, optional
+
         Returns
         ----------
         WOQLQuery object
@@ -1806,6 +1893,7 @@ class WOQLQuery:
 
     def cast(self, val, user_type, result):
         """Changes the type of va to type and saves the return in vb
+
         Parameters
         ----------
         val : str
@@ -1814,6 +1902,7 @@ class WOQLQuery:
             type to be changed
         rsult: str
             save the return variable
+
         Returns
         -------
         WOQLQuery object
@@ -1832,10 +1921,12 @@ class WOQLQuery:
     def order_by(self, *args):
         """
         Orders the results by the list of variables including in gvarlist, asc_or_desc is a WOQL.asc or WOQ.desc list of variables
+
         Parameters
         ----------
         gvarlist : list or dict of WOQLQuery().asc or WOQLQuery().desc objects
         query : WOQLQuery object, optional
+
         Returns
         -------
         WOQLQuery object
@@ -1879,6 +1970,7 @@ class WOQLQuery:
     def group_by(self, gvarlist, groupedvar, output, groupquery=None):
         """
         Groups the results of groupquery together by the list of variables gvarlist, using the variable groupedvar as a grouping and saves the result into variable output.
+
         Parameters
         ----------
         gvarlist : list or dict or WOQLQuery object
@@ -1889,6 +1981,7 @@ class WOQLQuery:
         output : str, optional
             output variable
         groupquery : dict, optional
+
         Returns
         -------
         WOQLQuery object
@@ -1960,6 +2053,7 @@ class WOQLQuery:
     def star(self, graph=None, subj=None, pred=None, obj=None):
         """
         Selects everything as triples in the graph identified by GraphIRI into variables Subj, Pred, Obj - by default they are "v:Subject", "v:Predicate", "v:Object"
+
         Parameters
         ----------
         GraphIRI : str
@@ -1970,6 +2064,7 @@ class WOQLQuery:
             target predicate
         Obj : str, optional
             target object
+
         Returns
         -------
         WOQLQuery object
@@ -2004,12 +2099,14 @@ class WOQLQuery:
     def node(self, node, node_type=None):
         """
         Selects nodes with the ID NodeID as the subject of subsequent sub-queries. The second argument PatternType specifies what type of sub-queries are being constructed, options are: triple, quad, update_triple, update_quad, delete_triple, delete_quad
+
         Parameters
         ----------
         node : str
             node to be selected
         node_type : str
             pattern type, optional (default is triple)
+
         Returns
         -------
         WOQLQuery object
@@ -2034,6 +2131,7 @@ class WOQLQuery:
                  property ID
         property_type : str
                         property type (range)
+
         Returns
         -------
         WOQLQuery object
@@ -2078,6 +2176,7 @@ class WOQLQuery:
         self, insert_id, insert_type, ref_graph=None, label=None, description=None
     ):
         """Inserts a new node of a specified type in a graph
+
         Parameters
         ----------
         insert_id : str
@@ -2090,21 +2189,25 @@ class WOQLQuery:
             label for the insert object
         description : str, optional
             description for the insert object
+
         Returns
         -------
         WOQLQuery object
             a query object that can be chained and/or execute
+
         Notes
         --------
         If graph parameter is None then this is a shorthand for calling :meth:`add_triple` with
         rdf:type as predicate: ``.add_triple(subject, 'rdf:type', type).``
         Otherwise :meth:`add_quad` will be called.
         It will yield a json object like follows: ``{'add_triple': ['doc:subject', 'rdf:type', 'scm:type']}``
+
         Examples
         --------
         >>> update = WOQLQuery().insert("Dog", "scm:Animal").label('Dog')
         >>> qry = WOQLQuery().when(True, update)
         >>> client.update(qry.json(), 'MyDatabaseId')
+
         See Also
         --------
         add_triple
@@ -2138,10 +2241,12 @@ class WOQLQuery:
 
     def graph(self, g):
         """Used to specify that the rest of the query should use the graph g in calls to add_quad, quad, etc
+
         Parameters
         ----------
         g : str
             target graph
+
         Returns
         -------
         WOQLQuery object
@@ -2154,10 +2259,12 @@ class WOQLQuery:
 
     def domain(self, d):
         """Specifies the domain of a new property
+
         Parameters
         ----------
         d : str
             target domain
+
         Returns
         -------
         WOQLQuery object
@@ -2172,12 +2279,14 @@ class WOQLQuery:
     def label(self, lan, lang="en"):
         """Depending on context, either adds a label match to a triple/quad or adds a label create to add_quad, add_triple
         The triple/quad that will get created will be for the rdfs:label predicate.
+
         Parameters
         ----------
         lan : str
             label to add
         lang : str, optional
             language, default is English "en"
+
         Returns
         -------
         WOQLQuery object
@@ -2190,12 +2299,14 @@ class WOQLQuery:
 
     def description(self, c, lang="en"):
         """Adds or matches a rdfs:comment field in a query
+
         Parameters
         ----------
         c : str
             description to be added
         lang : str, optional
             language, default is English "en"
+
         Returns
         -------
         WOQLQuery object
@@ -2208,17 +2319,16 @@ class WOQLQuery:
 
     def parent(self, *args):
         """Specifies that a new class should have parents listed in *args - (short hand for (a, rdfs:subClassOf b)
+
         Parameters
         ----------
         args : list
             parent classes
+
         Returns
         -------
         WOQLQuery object
             query object that can be chained and/or execute
-        """
-        """Specifies that a new class should have parents class
-        param {array} parentList the list of parent class []
         """
         if not self._triple_builder:
             self._create_triple_builder()
@@ -2229,10 +2339,12 @@ class WOQLQuery:
 
     def max(self, m):
         """Sets the maximum cardinality for a property to m
+
         Parameters
         ----------
         m : int
             maximum cardinality
+
         Returns
         -------
         WOQLQuery object
@@ -2244,10 +2356,12 @@ class WOQLQuery:
 
     def cardinality(self, m):
         """Sets the cardinality of a property to be precisely m
+
         Parameters
         ----------
         m : int
             cardinality
+
         Returns
         -------
         WOQLQuery object
@@ -2259,10 +2373,12 @@ class WOQLQuery:
 
     def min(self, m):
         """Sets the minimum cardinality for a property to m
+
         Parameters
         ----------
         m : int
             minimum cardinality
+
         Returns
         -------
         WOQLQuery object
@@ -2302,12 +2418,14 @@ class WOQLQuery:
 
     def add_class(self, classid, graph=None):
         """Generates a new Class with the given ClassID and writes it to the DB schema
+
         Parameters
         ----------
         classid : str
             class to be added
         graph : str, optional
             target graph
+
         Returns
         -------
         WOQLQuery object
@@ -2369,12 +2487,14 @@ class WOQLQuery:
 
     def delete_class(self, classid, graph=None):
         """Deletes the Class with the passed ID form the schema (and all references to it)
+
         Parameters
         ----------
         classid : str
             class to be deleted
         graph : str, optional
             target graph
+
         Returns
         -------
         WOQLQuery object
@@ -2394,6 +2514,7 @@ class WOQLQuery:
 
     def add_property(self, p, t, graph=None):
         """Generates a new Property with the given PropertyID and a range of type PropType and writes it to the DB schema
+
         Parameters
         ----------
         p : str
@@ -2402,6 +2523,7 @@ class WOQLQuery:
             type of the proerty
         graph : str, optional
             target graph
+
         Returns
         -------
         WOQLQuery object
@@ -2429,12 +2551,14 @@ class WOQLQuery:
 
     def delete_property(self, p, graph=None):
         """Deletes the property with the passed ID from the schema (and all references to it)
+
         Parameters
         ----------
         p : str
             property id to be deleted
         graph : str
             target graph ,optional
+
         Returns
         -------
         WOQLQuery object
@@ -3026,6 +3150,7 @@ class WOQLQuery:
 
     def doctype(self, user_type, graph=None, label=None, description=None):
         """Creates a new document class in the schema - equivalent to: add_quad(type, "rdf:type", "owl:Class", graph), add_quad(type, subclassof, tcs:Document, graph)
+
         Parameters
         ----------
         user_type : str
@@ -3036,6 +3161,7 @@ class WOQLQuery:
             label for the doctype
         description : str, optional
             description for the doctype
+
         Returns
         -------
         WOQLQuery object
