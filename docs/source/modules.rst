@@ -1,5 +1,5 @@
-terminus-client-python
-======================
+TerminusDB Client
+=================
 
 .. toctree::
    :maxdepth: 4

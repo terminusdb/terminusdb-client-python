@@ -13,21 +13,21 @@
 import os
 import sys
 
-from terminusdb_client import __version__
-
-sys.path.insert(0, os.path.abspath("../.."))
+sys.path.insert(0, os.path.abspath("../../"))
 
 
 # -- Project information -----------------------------------------------------
 
-project = "Terminus Client Python"
+project = "TerminusDB Client"
 copyright = "2020, TerminusDB group"
 author = "TerminusDB group"
 
 # The short X.Y version.
-version = __version__
+from terminusdb_client import __version__  # isort:skip
+
+version = str(__version__)
 # The full version, including alpha/beta/rc tags
-release = str(version)
+release = version
 
 master_doc = "index"
 

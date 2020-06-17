@@ -2,7 +2,7 @@ TerminusDB Client Python
 ==========================
 
 [![build status](https://api.travis-ci.com/terminusdb/terminusdb-client-python.svg?branch=master)](https://travis-ci.com/terminusdb/terminusdb-client-python)
-[![Documentation Status](https://readthedocs.org/projects/terminusdb-client-python/badge/?version=latest)](https://terminus-client-python.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/terminusdb-client/badge/?version=latest)](https://terminusdb-client.readthedocs.io/en/latest/?badge=latest)
 
 Python version of the TerminusDB client - for TerminusDB API and WOQLpy
 
