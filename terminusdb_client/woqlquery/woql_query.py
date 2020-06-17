@@ -295,8 +295,8 @@ class WOQLQuery:
         return obj
 
     def _looks_like_class(self, cstring):
-        if cstring[:7] == "http://" or cstring[:8] == "https://" :
-            return True 
+        if cstring[:7] == "http://" or cstring[:8] == "https://":
+            return True
         if ":" not in cstring:
             return False
         pref = cstring.split(":")[0]
@@ -430,7 +430,7 @@ class WOQLQuery:
     def _find_last_subject(self, json):
         """Finds the last woql element that has a woql:subject in it and returns the json for that
         used for triplebuilder to chain further calls - when they may be inside ands or ors or subqueries
-        @param {object} json"""        
+        @param {object} json"""
 
         if "woql:query_list" in json:
             for item in json["woql:query_list"]:
@@ -1568,7 +1568,7 @@ class WOQLQuery:
 
     def add_property(self, p, t, graph=None):
         if not graph:
-            graph = self._graph        
+            graph = self._graph
         t = self._clean_type(t, True) if t else "xsd:string"
         if p:
             p = self._clean_path_predicate(p)
