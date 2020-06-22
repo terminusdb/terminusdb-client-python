@@ -525,3 +525,14 @@ class TestTripleBuilderChainer:
     def test_chain2(self, chain_doctype):
         woql_object = WOQLQuery().doctype('MyDoc').label('abc').description('abcd').property('prop', 'dateTime').label('aaa').property('prop2', 'integer').label('abe')
         assert woql_object.to_dict() == chain_doctype    
+
+    def test_dot_chain(self):
+        woql_object = WOQLQuery().triple('A', 'B', 'C').triple('D', 'E', 'F')
+        v2 = WOQLQuery().woql_and(
+            WOQLQuery().triple('A', 'B', 'C'),
+            WOQLQuery().triple('D', 'E', 'F')
+        )
+        v3 = WOQLQuery().triple('A', 'B', 'C').woql_and().triple('D', 'E', 'F')        
+        assert woql_object.to_dict() == v2.to_dict()
+        assert woql_object.to_dict() == v3.to_dict()
+        

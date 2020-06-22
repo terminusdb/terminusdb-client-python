@@ -466,11 +466,11 @@ class WOQLQuery:
     def _wrap_cursor_with_and(self):
         if self._cursor.get('@type') == "woql:And" and self._cursor.get('woql:query_list'):
             next = len(self._cursor.get('woql:query_list'))
-            self._and({})
+            self.woql_and({})
             self._cursor = self._cursor['woql:query_list'][next]['woql:query']
         else :
             new_json = WOQLQuery().from_dict(self._cursor)
-            self._cursor = {}
+            self._cursor.clear()
             self.woql_and(new_json, {})
             self._cursor = self._cursor["woql:query_list"][1]["woql:query"]
 
