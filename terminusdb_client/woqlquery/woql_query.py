@@ -24,7 +24,7 @@ class WOQLQuery:
         self._cursor = self._query
         self._chain_ended = False
         self._contains_update = False
-        self._triple_builder_context = {}}
+        self._triple_builder_context = {}
         # operators which preserve global paging
         self._paging_transitive_properties = [
             "select",
@@ -45,7 +45,6 @@ class WOQLQuery:
 
         self._vocab = self._load_default_vocabulary()
 
-        self._triple_builder = False
 
         # alias
         self.subsumption = self.sub
@@ -61,7 +60,6 @@ class WOQLQuery:
 
         # attribute for schema
         self._graph = graph
-        self._adding_class = None
 
     # WOQLCore methods
     def _parameter_error(self, message):
@@ -432,7 +430,7 @@ class WOQLQuery:
         @param {object} json"""        
 
         if "woql:query_list" in json:
-            for item in json["woql:query_list"]:
+            for item in json["woql:query_list"][::-1]:
                 subitem = self._find_last_subject(item)
                 if subitem:
                     return subitem
@@ -1357,7 +1355,7 @@ class WOQLQuery:
         if ":" not in node_type : 
             node_type = "woql:" + node_type
         ctxt = { 'subject': node }
-        if node_type not is None:
+        if node_type is not None:
             ctxt['action'] = node_type
         self._set_context(ctxt)
         return self
@@ -1376,10 +1374,7 @@ class WOQLQuery:
             (you don't need the prefix xsd for specific a type)
         """
         if label is None and description is None:
-            if not self._triple_builder:
-                self._create_triple_builder()
-
-            if self._adding_class():
+            if self._adding_class() is not None:
                 part = self._find_last_subject(self._cursor)
                 g = False
                 if part:
@@ -1398,6 +1393,7 @@ class WOQLQuery:
         else:
             self.property(pro_id, property_type)
             if label:
+                pp.pprint(self._cursor)
                 self.label(label)
             if description:
                 self.description(description)
@@ -1480,21 +1476,22 @@ class WOQLQuery:
         s = ctxt.get("subject")
         g = ctxt.get("graph")
         lastsubj = self._find_last_subject(self._cursor)
-        if lastsubj not is None and s is None:
+        if lastsubj is not None and s is None:
             s = lastsubj.get("woql:subject")
         if type(s) == dict:
             s = s.get('woql:node')
-        else 
+        else :
             return
-        if lastsubj not is None and g is None : 
+        if lastsubj is not None and g is None : 
             gobj = lastsubj.get('woql:graph_filter')
             if gobj is None :  
                 gobj = lastsubj.get('woql:graph')
-            if not gobj is None:
+            if gobj is not None:
                 g = gobj.get("@value")
-        newid = s + "_" + node
+        newid = s + "_" + which
         self.woql_and(
-            WOQLQuery().add_quad(newid, 'type', 'owl:Restriction', g).add_quad(newid, 'owl:onProperty', s, g)
+            WOQLQuery().add_quad(newid, 'type', 'owl:Restriction', g),
+            WOQLQuery().add_quad(newid, 'owl:onProperty', s, g)
         )
         if which == 'max':
             self.woql_and(
@@ -1510,30 +1507,30 @@ class WOQLQuery:
             )
 
         od = self._get_object(s, 'rdfs:domain')
-        if od not is None : 
+        if od is not None : 
             self.woql_and(
                 WOQLQuery().add_quad(od,'rdfs:subClassOf', newid, g)
             )
         return self
     
-    def _get_object(s, p):
-        if this._cursor.get("@type") == "woql:And" :
-        for i in this._cursor['woql:query_list'] : 
-            subq = this._cursor['woql:query_list'][i].get("woql:query")
-            if( 
-                self._same_entry(subq.get("woql:subject"), s) and 
-                self._same_entry(subq.get("woql:predicate"), p)
-            ):
-                return subq.get('woql:object')
+    def _get_object(self, s, p):
+        if self._cursor.get("@type") == "woql:And" :
+            for item in self._cursor['woql:query_list'] : 
+                subq = item.get("woql:query")
+                if( 
+                    self._same_entry(subq.get("woql:subject"), s) and 
+                    self._same_entry(subq.get("woql:predicate"), p)
+                ):
+                    return subq.get('woql:object')
         return None    
 
-    def _same_entry(a, b):
+    def _same_entry(self, a, b):
         if(a == b): 
             return True
         elif(type(a) == dict and type(b) == str):
-            return this._string_matches_object(b, a)
+            return self._string_matches_object(b, a)
         elif(type(b) == dict and type(a) == str):
-            return this._string_matches_object(a, b)
+            return self._string_matches_object(a, b)
         elif(type(a) == dict and type(b) == dict):
             for k in a:
                 if(b.get(k) != a.get(k)):
@@ -1543,15 +1540,15 @@ class WOQLQuery:
                     return False
             return True
 
-    def _string_matches_object(s, obj):
+    def _string_matches_object(self, s, obj):
         n = obj.get('woql:node')
-        if n not is None :
+        if n is not None :
             return s == n
         v = obj.get('@value')
-        if v not is None :
+        if v is not None :
             return s == v
         vn = obj.get('woql:variable_name')
-        if vn not is None :
+        if vn is not None :
             return s == "v:" + vn
         return False
 
@@ -1562,15 +1559,20 @@ class WOQLQuery:
         if g is None :
             g = ctxt.get("graph")
         lastsubj = self._find_last_subject(self._cursor)
+        if s is None and lastsubj != False: 
+            s = lastsubj.get("woql:subject")
         t = ctxt.get("action")
         if t is None: 
             t = lastsubj.get("@type")
-        if g is None: 
+        if g is None and lastsubj != False: 
             gobj = lastsubj.get('woql:graph_filter')
             if gobj is None :  
                 gobj = lastsubj.get('woql:graph')
-            if not gobj is None:
+            if gobj is not None:
                 g = gobj.get("@value")
+        if g is None:
+             g = "schema/main" 
+
         if t == 'woql:AddTriple':
             self.woql_and( WOQLQuery().add_triple(s, p, o))
         elif t == 'woql:DeleteTriple':
@@ -1579,7 +1581,7 @@ class WOQLQuery:
             self.woql_and( WOQLQuery().add_quad(s, p, o, g))
         elif t == 'woql:DeleteQuad':
             self.woql_and( WOQLQuery().delete_quad(s, p, o, g))
-        elif t == 'woql:Quad' or (not g is None and t != "woql:Triple") :
+        elif t == 'woql:Quad'  :
             self.woql_and( WOQLQuery().quad(s, p, o, g))
         else:
             self.woql_and( WOQLQuery().triple(s, p, o))
@@ -1588,7 +1590,7 @@ class WOQLQuery:
 
     def _adding_class(self, string_only = False):
         ac = self._triple_builder_context.get("adding_class")
-        if ac && string_only && type(ac) == dict :
+        if ac and string_only and type(ac) == dict :
             return ac.get("woql:node")
         return ac
     
@@ -1597,7 +1599,7 @@ class WOQLQuery:
         return self
 
     def _set_context(self, ctxt):
-        for i in ctxt:
+        for i in ctxt.keys():
             self._triple_builder_context[i] = ctxt[i]
         return self
 
@@ -1707,10 +1709,10 @@ class WOQLQuery:
         if not prefix:
             prefix = "scm:"
         subs = []
-        for i in classes:
+        for i in classes.keys():
             subs.append(WOQLQuery().sub(classes[i], "v:Cid"))
         nsubs = []
-        for i in excepts:
+        for i in excepts.keys():
             nsubs.append(WOQLQuery().woql_not().sub(excepts[i], "v:Cid"))
         idgens = [
             WOQLQuery().re("#(.)(.*)", "v:Cid", ["v:AllB", "v:FirstB", "v:RestB"]),

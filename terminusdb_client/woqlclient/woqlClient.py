@@ -165,7 +165,7 @@ class WOQLClient:
                 val = self.checkout()
         if ttype == "branch":
             return base + "/branch/" + val
-        if(ttype == "ref")
+        if ttype == "ref" :
             return base + "/commit/" + val
 
     def set(self, **kwargs):  # bad naming
@@ -447,7 +447,7 @@ class WOQLClient:
         if payload is None:
             payload = {}
         return DispatchRequest.send_request_by_action(
-            url, action, payload, self.basic_auth(), self.jwt(), file_dict
+            url, action, payload, self.basic_auth(), self.remote_auth(), file_dict
         )
 
     def get_metadata(self, dbid, account):

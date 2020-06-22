@@ -70,13 +70,13 @@ class ConnectionCapabilities:
     def _extract_user_info(self, capabilities):
         info = {}
         if capabilities.get('rdfs:comment') :
-             info.notes = capabilities['rdfs:comment'].get("@value")
+             info["notes"] = capabilities['rdfs:comment'].get("@value")
         if capabilities.get('rdfs:label') :
-             info.name = capabilities['rdfs:label'].get("@value")
+             info["name"] = capabilities['rdfs:label'].get("@value")
         if capabilities.get('terminus:agent_name') :
-             info.id = capabilities['terminus:agent_name'].get("@value")
+             info["id"] = capabilities['terminus:agent_name'].get("@value")
         if capabilities.get('terminus:commit_log_id') :
-             info.author = capabilities['terminus:commit_log_id'].get("@value")
+             info["author"] = capabilities['terminus:commit_log_id'].get("@value")
         return info
 
     def get_user(self):

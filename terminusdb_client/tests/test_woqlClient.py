@@ -182,7 +182,7 @@ def test_create_graph(mocked_requests, mocked_requests2):
             "Authorization": "Basic YWRtaW46cm9vdA==",
             "content-type": "application/json",
         },
-        json={"commit_info": {"author": "admin", "message": "add a new graph"}},
+        json={"commit_info": {"author": "admin Server Admin User", "message": "add a new graph"}},
     )
 
 
@@ -205,7 +205,7 @@ def test_delete_graph(mocked_requests, mocked_requests2):
     woql_client.delete_graph("instance", "mygraph", "add a new graph")
 
     requests.delete.assert_called_once_with(
-        "http://localhost:6363/graph/admin/myDBName/local/branch/master/instance/mygraph?author=admin&message=add+a+new+graph",
+        "http://localhost:6363/graph/admin/myDBName/local/branch/master/instance/mygraph?author=admin+Server+Admin+User&message=add+a+new+graph",
         headers={"Authorization": "Basic YWRtaW46cm9vdA=="},
     )
 

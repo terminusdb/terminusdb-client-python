@@ -28,7 +28,8 @@ from .woqljson.woqlOrJson import WOQL_OR_JSON
 from .woqljson.woqlTrimJson import WOQL_TRIM_JSON
 from .woqljson.woqlWhenJson import WOQL_WHEN_JSON
 
-# pp = pprint.PrettyPrinter(indent=4)
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
 
 
 class TestWoqlQueries:
@@ -103,17 +104,19 @@ class TestWoqlQueries:
         assert woql_object_des.to_dict() == doctype_with_des
 
     def test_doctype_property_method(self, property_without, property_with_des):
-        woql_object = WOQLQuery().doctype("Journey").property("Duration", "dataTime")
+        woql_object = WOQLQuery().doctype("Journey").property("Duration", "dateTime")
         woql_object_des = (
             WOQLQuery()
             .doctype("Journey")
             .property(
                 "Duration",
-                "dataTime",
+                "dateTime",
                 label="Journey Duration",
                 description="Journey duration in minutes.",
             )
         )
+
+        pp.pprint(woql_object_des.to_dict() )
         assert woql_object.to_dict() == property_without
         assert woql_object_des.to_dict() == property_with_des
 
@@ -461,6 +464,7 @@ class TestTripleBuilderChainer:
     def test_node_and_label_method(self):
         woql_object = WOQLQuery().node("doc:x", "add_quad").label("my label", "en")
         woql_object2 = WOQLQuery().node("doc:x", "add_quad").label("v:label")
+        pp.pprint(woql_object.to_dict())
         assert woql_object.to_dict() == WOQL_JSON["labelMethodJson"]
         assert woql_object2.to_dict() == WOQL_JSON["labelMethodJson2"]
 
@@ -500,18 +504,18 @@ class TestTripleBuilderChainer:
 
     def test_max(self, property_max):
         woql_object = (
-            WOQLQuery().add_property('P', 'string').max(4)
+            WOQLQuery().add_property('P', 'string').domain("A").max(4)
         )
         assert woql_object.to_dict() == property_max
 
     def test_min(self, property_min):
         woql_object = (
-            WOQLQuery().add_property('P', 'string').min(2)
+            WOQLQuery().add_property('P', 'string').domain("A").min(2)
         )
         assert woql_object.to_dict() == property_min
 
     def test_card(self, property_cardinalty):
-        woql_object = WOQLQuery().add_property('P', 'string').cardinality(3)
+        woql_object = WOQLQuery().add_property('P', 'string').domain("A").cardinality(3)
         assert woql_object.to_dict() == property_cardinalty
 
     def test_chain1(self, chain_insert):
