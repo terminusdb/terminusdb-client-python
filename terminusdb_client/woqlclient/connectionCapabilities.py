@@ -20,6 +20,9 @@ from .errors import AccessDeniedError
 class ConnectionCapabilities:
     def __init__(self):
         self.connection = {}
+        self.user = None
+        self._jsonld_context = {}
+        self._terminusdb_context = {}
 
     def _action_to_array(self, actions):
         if isinstance(actions, list) is False:
@@ -57,8 +60,35 @@ class ConnectionCapabilities:
                         if nrec["@id"] not in self.connection:
                             self.connection[nrec["@id"]] = nrec
                         self.connection[nrec["@id"]]["terminus:authority"] = action_arr
+            elif pred == "@context": 
+                self._load_connection_context(capabilities[pred])    
             else:
                 self.connection[pred] = capabilities[pred]
+            self.user = self._extract_user_info(capabilities)
+
+
+    def _extract_user_info(self, capabilities):
+        info = {}
+        if capabilities.get('rdfs:comment') :
+             info.notes = capabilities['rdfs:comment'].get("@value")
+        if capabilities.get('rdfs:label') :
+             info.name = capabilities['rdfs:label'].get("@value")
+        if capabilities.get('terminus:agent_name') :
+             info.id = capabilities['terminus:agent_name'].get("@value")
+        if capabilities.get('terminus:commit_log_id') :
+             info.author = capabilities['terminus:commit_log_id'].get("@value")
+        return info
+
+    def get_user(self):
+        return self.user
+
+    def author(self):
+        if self.user.get("author"):
+            return self.user.get("author")
+        else:
+            return self.user.get("id") + " " + self.user.get("name")
+
+
 
     def _form_resource_name(self, dbid, account):
         if dbid == "terminus":
@@ -78,12 +108,27 @@ class ConnectionCapabilities:
                     return pred
         return None
 
+    def _load_connection_context(self, context_dict):
+        self._terminusdb_context = context_dict
+        for prefix in context_dict.keys() :
+            if prefix != "doc" :
+                self._jsonld_context[prefix] = context_dict[prefix] 
+
+    def get_context_for_outbound_query(self, woql_dict, dbid):
+        if woql_dict.get("@context") :
+            return woql_dict.get("@context")
+        else: 
+            ret = {}
+            for prefix in self._jsonld_context.keys() :
+                if prefix != "doc" :
+                    ret[prefix] = self._jsonld_context[prefix]
+            return ret             
+
     def get_json_context(self):
-        if "@context" in self.connection:
-            ctxt = self.connection["@context"]
-            ctxt["_"] = "_:"  # needed to make rdf lists in owl work
-            return ctxt
-        return {}
+        return self._jsonld_context
+    
+    def get_terminus_context(self):
+        return self._terminusdb_context
 
     def capabilities_permit(self, action, dbid=None, account=None):
         if action == APIEndpointConst.CREATE_DATABASE:

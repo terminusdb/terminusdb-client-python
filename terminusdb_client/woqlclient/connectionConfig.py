@@ -13,8 +13,7 @@ class ConnectionConfig:
         """
 
         self.__server = False
-        self.__jwt_token = False  # jwt token for authenticating to remote servers for push / fetch / clone
-        self.__jwt_user = False  # user id associated with the jwt token
+        self._remote_auth = None  # jwt token for authenticating to remote servers for push / fetch / clone
         self.__basic_auth = (
             False  # basic auth string for authenticating to local server
         )
@@ -54,8 +53,8 @@ class ConnectionConfig:
         if "db" in kwargs:
             self.db = kwargs["db"]
 
-        if "jwt" in kwargs:
-            self.set_jwt(kwargs["jwt"], kwargs["jwt_user"])
+        if "remote_auth" in kwargs:
+            self.set_remote_auth(kwargs["remote_auth"])
 
         if "key" in kwargs and "user" in kwargs:
             self.set_basic_auth(kwargs["key"], kwargs["user"])
@@ -96,12 +95,12 @@ class ConnectionConfig:
         return self.__basic_auth
 
     @property
-    def jwt(self):
-        return self.__jwt_token
+    def remote_auth(self):
+        return self._remote_auth
 
     def user(self, ignore_jwt=True):
-        if not ignore_jwt and self.__jwt_user:
-            return self.__jwt_user
+        if not ignore_jwt and self._remote_auth is not None and self._remote_auth.get("type") == "jwt":
+            return self._remote_auth.get('user')
         if self.__basic_auth:
             return self.__basic_auth.split(":")[0]
 
@@ -172,26 +171,21 @@ class ConnectionConfig:
             crl = crl + f"/${new_repo_id}"
         return crl
 
-    def fetch_url(self, repoid=None):
-        if repoid is None:
-            repoid = self.repo
-        return self.db_base("fetch") + f"/{repoid}"
+    def cloneable_url(self):
+        crl = f"{self.serverURL}{self.account}/{self.db}"
+        return crl
 
-    def rebase_url(self, source_repo=None, source_branch=None):
-        purl = self.branch_base("rebase")
-        if source_repo is not None:
-            purl = purl + f"/{source_repo}"
-            if source_branch is not None:
-                purl = purl + f"/{source_branch}"
-        return purl
+    def pull_url(self):
+        return self.branch_base("pull")
 
-    def push_url(self, target_repo=None, target_branch=None):
-        purl = self.branch_base("push")
-        if target_repo is not None:
-            purl = purl + f"/{target_repo}"
-            if target_branch is not None:
-                purl = purl + f"/{target_branch}"
-        return purl
+    def fetch_url(self):
+        return self.branch_base("fetch")
+
+    def rebase_url(self):
+        return self.branch_base("rebase")
+
+    def push_url(self):
+        return self.branch_base("push")
 
     def db_url(self):
         return self.db_base("db")
@@ -295,13 +289,5 @@ class ConnectionConfig:
         else:
             self.__refid = False
 
-    def set_jwt(self, jwt_str=None, user_id=None):
-        if jwt_str is None:
-            self.__jwt_token = False
-            if user_id is not None:
-                self.__jwt_user = user_id
-                self.__jwt_token = jwt_str
-            else:
-                self.__jwt_user = False
-        else:
-            raise ValueError(f"Invalid JWT: {jwt_str}")
+    def set_remote_auth(self, auth_dict = None):
+        self._remote_auth = auth_dict

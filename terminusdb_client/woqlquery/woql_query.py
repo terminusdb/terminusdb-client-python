@@ -24,7 +24,7 @@ class WOQLQuery:
         self._cursor = self._query
         self._chain_ended = False
         self._contains_update = False
-        self.adding_class = False
+        self._triple_builder_context = {}}
         # operators which preserve global paging
         self._paging_transitive_properties = [
             "select",
@@ -466,10 +466,15 @@ class WOQLQuery:
                         self._vocab[spl[0]] = spl[1]
 
     def _wrap_cursor_with_and(self):
-        new_json = WOQLQuery().from_dict(self._cursor)
-        self._cursor = {}
-        self.woql_and(new_json, {})
-        self._cursor = self._cursor["woql:query_list"][1]["woql:query"]
+        if self._cursor.get('@type') == "woql:And" and self._cursor.get('woql:query_list'):
+            next = len(self._cursor.get('woql:query_list'))
+            self._and({})
+            self._cursor = self._cursor['woql:query_list'][next]['woql:query']
+        else :
+            new_json = WOQLQuery().from_dict(self._cursor)
+            self._cursor = {}
+            self.woql_and(new_json, {})
+            self._cursor = self._cursor["woql:query_list"][1]["woql:query"]
 
     def using(self, collection, subq):
         if collection and collection == "woql:args":
@@ -725,7 +730,7 @@ class WOQLQuery:
         self._cursor = self._cursor["woql:query_resource"]
         return self
 
-    def put(self, as_vars, query_resource, query=None):
+    def put(self, as_vars, query, query_resource=None):
         """Takes an array of variables, an optional array of column names"""
         if as_vars and as_vars == "woql:args":
             return ["woql:as_vars", "woql:query", "woql:query_resource"]
@@ -736,11 +741,12 @@ class WOQLQuery:
             self._cursor["woql:as_vars"] = as_vars.to_dict()
         else:
             self._cursor["woql:as_vars"] = WOQLQuery().woql_as(*as_vars).to_dict()
+        self._cursor['woql:query'] = self._jobj(query)
         if query_resource:
             self._cursor["woql:query_resource"] = self._jobj(query_resource)
         else:
             self._cursor["woql:query_resource"] = {}
-        return self._add_sub_query(query)
+        return self
 
     def woql_as(self, *args):
         if args and args[0] == "woql:args":
@@ -1333,16 +1339,29 @@ class WOQLQuery:
         """
         Internal Triple-builder functions which allow chaining of partial queries
         """
-        if not self._triple_builder:
-            self._create_triple_builder(subj)
-        self._triple_builder._add_po("terminus:tag", "terminus:abstract", graph)
-        return self
+        return self._add_partial(subj, 'terminus:tag', 'terminus:abstract', graph)    
 
     def node(self, node, node_type=None):
-        if not self._triple_builder:
-            self._create_triple_builder(node, node_type)
-        self._triple_builder._subject = self._clean_class(node, True)
+        if node_type == "add_quad": 
+            node_type = "AddQuad"
+        elif node_type == "delete_quad": 
+            node_type = "DeleteQuad"
+        elif node_type == "add_triple": 
+            node_type = "AddTriple"
+        elif node_type == "delete_triple": 
+            node_type = "DeleteTriple"
+        elif node_type == "quad": 
+            node_type = "Quad"
+        elif node_type == "triple": 
+            node_type = "Triple"
+        if ":" not in node_type : 
+            node_type = "woql:" + node_type
+        ctxt = { 'subject': node }
+        if node_type not is None:
+            ctxt['action'] = node_type
+        self._set_context(ctxt)
         return self
+
 
     def property(self, pro_id, property_type, label=None, description=None):
         """
@@ -1360,7 +1379,7 @@ class WOQLQuery:
             if not self._triple_builder:
                 self._create_triple_builder()
 
-            if self._adding_class:
+            if self._adding_class():
                 part = self._find_last_subject(self._cursor)
                 g = False
                 if part:
@@ -1371,13 +1390,10 @@ class WOQLQuery:
                     )
                 if gpart:
                     g = gpart["@value"]
-                self._triple_builder._subject = self._clean_class(pro_id, True)
-                self.add_property(pro_id, property_type, g).domain(self._adding_class)
-                return self._updated()
+                nprop = WOQLQuery().add_property(pro_id, property_type).domain(self._adding_class())
+                self.woql_and(nprop)                
             else:
-                pro_id = self._clean_predicate(pro_id)
-                property_value = self._clean_object(property_type)
-                self._triple_builder._add_po(pro_id, property_value)
+                self._add_partial(None, pro_id, property_type)
             return self
         else:
             self.property(pro_id, property_type)
@@ -1418,93 +1434,180 @@ class WOQLQuery:
         return self
 
     def graph(self, g):
-        if not self._triple_builder:
-            self._create_triple_builder()
-        self._triple_builder.graph(g)
-        return self
+        return self._set_context({"graph": g})
 
     def domain(self, d):
-        if not self._triple_builder:
-            self._create_triple_builder()
-        d = self._clean_type(d)
-        self._triple_builder._add_po("rdfs:domain", d)
-        return self
+        d = self._clean_class(d)
+        return self._add_partial(None, 'rdfs:domain', d)
 
-    def label(self, lan, lang="en"):
-        if not self._triple_builder:
-            self._create_triple_builder()
-        self._triple_builder.label(lan, lang)
-        return self
+    def label(self, lab, lang="en"):
+        if lab[:2] == "v:":
+            d = lab
+        else:
+            d = {"@value": lab, "@type": "xsd:string", "@language": lang}
+        return self._add_partial(None, "rdfs:label", d)
 
-    def description(self, c, lang="en"):
-        if not self._triple_builder:
-            self._create_triple_builder()
-        self._triple_builder.description(c, lang)
-        return self
+    def description(self, desc, lang="en"):
+        if desc[:2] == "v:":
+            d = desc
+        else:
+            d = {"@value": desc, "@type": "xsd:string", "@language": lang}
+        return self._add_partial(None, "rdfs:comment", d)
 
     def parent(self, *parent_list):
         """Specifies that a new class should have parents class
         param {array} parentList the list of parent class []
         """
-        if not self._triple_builder:
-            self._create_triple_builder()
         for ipl in parent_list:
             pn = self._clean_class(ipl)
-            self._triple_builder._add_po("rdfs:subClassOf", pn)
+            self._add_partial(None, "rdfs:subClassOf", pn)
         return self
 
     def max(self, m):
-        if self._triple_builder:
-            self._triple_builder.card(m, "max")
+        self._card(m, 'max')
         return self
 
     def cardinality(self, m):
-        if self._triple_builder:
-            self._triple_builder.card(m, "cardinality")
+        self._card(m, 'cardinality')
         return self
 
     def min(self, m):
-        if self._triple_builder:
-            self._triple_builder.card(m, "min")
+        self._card(m, 'min')
+        return self
+            
+    def _card(self, n, which):
+        ctxt = self._triple_builder_context
+        s = ctxt.get("subject")
+        g = ctxt.get("graph")
+        lastsubj = self._find_last_subject(self._cursor)
+        if lastsubj not is None and s is None:
+            s = lastsubj.get("woql:subject")
+        if type(s) == dict:
+            s = s.get('woql:node')
+        else 
+            return
+        if lastsubj not is None and g is None : 
+            gobj = lastsubj.get('woql:graph_filter')
+            if gobj is None :  
+                gobj = lastsubj.get('woql:graph')
+            if not gobj is None:
+                g = gobj.get("@value")
+        newid = s + "_" + node
+        self.woql_and(
+            WOQLQuery().add_quad(newid, 'type', 'owl:Restriction', g).add_quad(newid, 'owl:onProperty', s, g)
+        )
+        if which == 'max':
+            self.woql_and(
+                WOQLQuery().add_quad(newid,'owl:maxCardinality', WOQLQuery().literal(n, "xsd:nonNegativeInteger"), g)
+            )
+        elif which == 'min' : 
+            self.woql_and(
+                WOQLQuery().add_quad(newid,'owl:minCardinality', WOQLQuery().literal(n, "xsd:nonNegativeInteger"), g)
+            )
+        else : 
+            self.woql_and(
+                WOQLQuery().add_quad(newid,'owl:cardinality', WOQLQuery().literal(n, "xsd:nonNegativeInteger"), g)
+            )
+
+        od = self._get_object(s, 'rdfs:domain')
+        if od not is None : 
+            self.woql_and(
+                WOQLQuery().add_quad(od,'rdfs:subClassOf', newid, g)
+            )
+        return self
+    
+    def _get_object(s, p):
+        if this._cursor.get("@type") == "woql:And" :
+        for i in this._cursor['woql:query_list'] : 
+            subq = this._cursor['woql:query_list'][i].get("woql:query")
+            if( 
+                self._same_entry(subq.get("woql:subject"), s) and 
+                self._same_entry(subq.get("woql:predicate"), p)
+            ):
+                return subq.get('woql:object')
+        return None    
+
+    def _same_entry(a, b):
+        if(a == b): 
+            return True
+        elif(type(a) == dict and type(b) == str):
+            return this._string_matches_object(b, a)
+        elif(type(b) == dict and type(a) == str):
+            return this._string_matches_object(a, b)
+        elif(type(a) == dict and type(b) == dict):
+            for k in a:
+                if(b.get(k) != a.get(k)):
+                    return False
+            for j in b:
+                if(b.get(j) != a.get(j)):
+                    return False
+            return True
+
+    def _string_matches_object(s, obj):
+        n = obj.get('woql:node')
+        if n not is None :
+            return s == n
+        v = obj.get('@value')
+        if v not is None :
+            return s == v
+        vn = obj.get('woql:variable_name')
+        if vn not is None :
+            return s == "v:" + vn
+        return False
+
+    def _add_partial(self, s, p, o, g = None):
+        ctxt = self._triple_builder_context
+        if s is None :
+            s = ctxt.get("subject")
+        if g is None :
+            g = ctxt.get("graph")
+        lastsubj = self._find_last_subject(self._cursor)
+        t = ctxt.get("action")
+        if t is None: 
+            t = lastsubj.get("@type")
+        if g is None: 
+            gobj = lastsubj.get('woql:graph_filter')
+            if gobj is None :  
+                gobj = lastsubj.get('woql:graph')
+            if not gobj is None:
+                g = gobj.get("@value")
+        if t == 'woql:AddTriple':
+            self.woql_and( WOQLQuery().add_triple(s, p, o))
+        elif t == 'woql:DeleteTriple':
+            self.woql_and( WOQLQuery().delete_triple(s, p, o))
+        elif t == 'woql:AddQuad':
+            self.woql_and( WOQLQuery().add_quad(s, p, o, g))
+        elif t == 'woql:DeleteQuad':
+            self.woql_and( WOQLQuery().delete_quad(s, p, o, g))
+        elif t == 'woql:Quad' or (not g is None and t != "woql:Triple") :
+            self.woql_and( WOQLQuery().quad(s, p, o, g))
+        else:
+            self.woql_and( WOQLQuery().triple(s, p, o))
         return self
 
-    def _create_triple_builder(self, node=None, user_type=None):
-        s = node
-        t = user_type
-        lastsubj = self._find_last_subject(self._cursor)
-        g = False
-        if lastsubj:
-            gobj = (
-                lastsubj["woql:graph_filter"]
-                if lastsubj.get("woql:graph_filter")
-                else lastsubj.get("woql:graph")
-            )
-            g = gobj["@value"] if gobj else False
-            s = lastsubj["woql:subject"]
-            t = user_type if user_type else lastsubj["@type"]
-        if "@type" in self._cursor:
-            subq = WOQLQuery().from_dict(self._cursor)
-            if self._cursor["@type"] == "woql:And":
-                newq = subq
-            else:
-                newq = WOQLQuery().woql_and(subq)
-            nuj = newq.to_dict()
-            self._cursor.clear()
-            for i in nuj:
-                self._cursor[i] = nuj[i]
-        else:
-            self.woql_and()
-        self._triple_builder = TripleBuilder(t, self, s, g)
+
+    def _adding_class(self, string_only = False):
+        ac = self._triple_builder_context.get("adding_class")
+        if ac && string_only && type(ac) == dict :
+            return ac.get("woql:node")
+        return ac
+    
+    def _set_adding_class(self, c):
+        self._triple_builder_context['adding_class'] = c
+        return self
+
+    def _set_context(self, ctxt):
+        for i in ctxt:
+            self._triple_builder_context[i] = ctxt[i]
+        return self
 
     def add_class(self, c, graph=None):
-        if self._cursor.get("@type"):
-            self._wrap_cursor_with_and()
         if not graph:
             graph = self._graph
         if c:
             c = self._clean_class(c, True)
-            self._adding_class = c
             self.add_quad(c, "rdf:type", "owl:Class", graph)
+            self._set_adding_class(c)
         return self
 
     def insert_class_data(self, data, ref_graph):
@@ -2180,123 +2283,3 @@ class WOQLQuery:
         if isinstance(description, str) and description:
             result_obj = result_obj.description(description)
         return result_obj
-
-
-class TripleBuilder:
-    """
-    @file Triple Builder
-        higher level composite queries - not language or api elements
-        Class for enabling building of triples from pieces
-        type is add_quad / remove_quad / add_triple / remove_triple
-     """
-
-    def __init__(self, ops_type=None, query=None, s=None, g=None):
-        """
-        what accumulation type are we
-        """
-        if ops_type and ops_type.find(":") == -1:
-            ops_type = "woql:" + ops_type
-        self._type = ops_type
-        self._cursor = query._cursor
-        if s:
-            self._subject = s
-        else:
-            self._subject = False
-        self._parent_query = query
-        self._graph = g
-
-    def label(self, lab, lang="en"):
-        if lab[:2] == "v:":
-            d = lab
-        else:
-            d = {"@value": lab, "@type": "xsd:string", "@language": lang}
-        x = self._add_po("rdfs:label", d)
-        return x
-
-    def graph(self, g):
-        self._graph = g
-
-    def description(self, c, lang=None):
-        if not lang:
-            lang = "en"
-        if c[:2] == "v:":
-            d = c
-        else:
-            d = {"@value": c, "@type": "xsd:string", "@language": lang}
-        x = self._add_po("rdfs:comment", d)
-        return x
-
-    def _add_po(self, p, o, g=None):
-        if not g:
-            g = self._graph
-        newq = False
-        if self._type == "woql:Triple":
-            newq = WOQLQuery().triple(self._subject, p, o)
-        elif self._type == "woql:AddTriple":
-            newq = WOQLQuery().add_triple(self._subject, p, o)
-        elif self._type == "woql:DeleteTriple":
-            newq = WOQLQuery().delete_triple(self._subject, p, o)
-        elif self._type == "woql:Quad":
-            newq = WOQLQuery().quad(self._subject, p, o, g)
-        elif self._type == "woql:AddQuad":
-            newq = WOQLQuery().add_quad(self._subject, p, o, g)
-        elif self._type == "woql:DeleteQuad":
-            newq = WOQLQuery().delete_quad(self._subject, p, o, g)
-        elif g:
-            newq = WOQLQuery().quad(self._subject, p, o, g)
-        else:
-            newq = WOQLQuery().triple(self._subject, p, o)
-        return self._parent_query.woql_and(newq)
-
-    def _get_o(self, s, p):
-        if self._cursor["@type"] == "woql:And":
-            for item in self._cursor["query_list"]:
-                subq = item["woql:query"]
-                if (
-                    subq._parent_query["woql:subject"] == s
-                    and subq._parent_query["woql:predicate"] == p
-                ):
-                    return subq._parent_query["woql:object"]
-        return False
-
-    def card(self, n, which):
-        # need to generate a new id for the cardinality object
-        # and point it at the property in question via the onProperty function
-        prop = self._subject
-        if isinstance(prop, dict):
-            if prop.get("node"):
-                prop = prop["node"]
-            else:
-                return False
-        newid = str(prop) + str(which)
-        self._query.woql_and(
-            WOQLQuery()
-            .add_quad(newid, "type", "owl:Restriction", self._graph)
-            .add_quad(newid, "owl:onProperty", self._subject, self._graph)
-        )
-        if which == "max":
-            self._query.woql_and().add_quad(
-                newid,
-                "owl:maxCardinality",
-                {"@value": n, "@type": "xsd:nonNegativeInteger"},
-                self._graph,
-            )
-        elif which == "min":
-            self._query.woql_and().add_quad(
-                newid,
-                "owl:minCardinality",
-                {"@value": n, "@type": "xsd:nonNegativeInteger"},
-                self._graph,
-            )
-        else:
-            self._query.woql_and().add_quad(
-                newid,
-                "owl:cardinality",
-                {"@value": n, "@type": "xsd:nonNegativeInteger"},
-                self._graph,
-            )
-        # then make the domain of the property into a subclass of the restriction
-        od = self._get_o(prop, "rdfs:domain")
-        if od:
-            self._query.woql_and().add_quad(od, "subClassOf", newid, self._graph)
-        return self

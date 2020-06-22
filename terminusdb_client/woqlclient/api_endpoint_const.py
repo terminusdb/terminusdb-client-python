@@ -11,5 +11,6 @@ class APIEndpointConst:
     CLONE = ("clone",)
     PUSH = ("push",)
     FETCH = ("fetch",)
+    PULL = ("pull",)
     REBASE = ("rebase",)
     BRANCH = "branch"
