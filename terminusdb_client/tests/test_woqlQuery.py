@@ -7,6 +7,7 @@ import requests
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
+from .ans_cardinality import *  # noqa
 from .ans_doctype import *  # noqa
 from .ans_insert import *  # noqa
 from .ans_property import *  # noqa
@@ -479,44 +480,7 @@ class TestTripleBuilderChainer:
 
     def test_abstract_method(self):
         woql_object = WOQLQuery().node("doc:x", "add_quad").abstract()
-        assert woql_object.to_dict() == WOQL_JSON["nodeAbstractJson"]
-
-    def test_chained_doctype_method(self):
-        woql_object = (
-            WOQLQuery()
-            .doctype("MyDoc")
-            .label("abc")
-            .description("abcd")
-            .property("prop", "dateTime")
-            .label("aaa")
-            .property("prop2", "integer")
-            .label("abe")
-        )
-        assert woql_object.to_dict() == WOQL_JSON["chainDoctypeJson"]
-
-    def test_chained_insert_method(self):
-        woql_object = (
-            WOQLQuery()
-            .insert("v:Node_ID", "v:Type")
-            .label("v:Label")
-            .description("v:Description")
-            .property("prop", "v:Prop")
-            .property("prop", "v:Prop2")
-            .parent("myParentClass")
-        )
-        assert woql_object.to_dict() == WOQL_JSON["chainInsertJson"]
-
-    def test_cardinality_method(self):
-        woql_object = WOQLQuery().add_property("P", "string").cardinality(3)
-        assert woql_object.to_dict() == WOQL_JSON["propCardinalityJson"]
-
-    def test_property_min_method(self):
-        woql_object = WOQLQuery().add_property("P", "string").min(2)
-        assert woql_object.to_dict() == WOQL_JSON["propMinJson"]
-
-    def test_max_method(self):
-        woql_object = WOQLQuery().add_property("P", "string").max(4)
-        assert woql_object.to_dict() == WOQL_JSON["propertyMaxJson"]
+        assert woql_object.to_dict() == WOQL_JSON["nodeAbstractJson"] 
 
     def test_node_property_method(self):
         woql_object = (
@@ -533,3 +497,27 @@ class TestTripleBuilderChainer:
             WOQLQuery().add_class("NewClass").description("A new class object.")
         )
         assert woql_object.to_dict() == WOQL_JSON["addClassDescJson"]
+
+    def test_max(self, property_max):
+        woql_object = (
+            WOQLQuery().add_property('P', 'string').max(4)
+        )
+        assert woql_object.to_dict() == property_max
+
+    def test_min(self, property_min):
+        woql_object = (
+            WOQLQuery().add_property('P', 'string').min(2)
+        )
+        assert woql_object.to_dict() == property_min
+
+    def test_card(self, property_cardinalty):
+        woql_object = WOQLQuery().add_property('P', 'string').cardinality(3)
+        assert woql_object.to_dict() == property_cardinalty
+
+    def test_chain1(self, chain_insert):
+        woql_object = WOQLQuery().insert('v:Node_ID', 'v:Type').label('v:Label').description('v:Description').property('prop', 'v:Prop').property('prop', 'v:Prop2').parent('myParentClass')
+        assert woql_object.to_dict() == chain_insert    
+
+    def test_chain2(self, chain_doctype):
+        woql_object = WOQLQuery().doctype('MyDoc').label('abc').description('abcd').property('prop', 'dateTime').label('aaa').property('prop2', 'integer').label('abe')
+        assert woql_object.to_dict() == chain_doctype    

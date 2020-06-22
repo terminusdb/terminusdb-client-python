@@ -178,7 +178,6 @@ class WOQLQuery:
             else:
                 return arg
         var = self._clean_object(arg, "xsd:decimal")
-        var["@type"] = "woql:ArithmeticValue"
         return var
 
     def _vlist(self, target_list):
