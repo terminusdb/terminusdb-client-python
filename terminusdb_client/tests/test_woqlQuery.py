@@ -1,4 +1,5 @@
 import copy
+import pprint
 
 # import pprint
 import unittest.mock as mock
@@ -28,7 +29,6 @@ from .woqljson.woqlOrJson import WOQL_OR_JSON
 from .woqljson.woqlTrimJson import WOQL_TRIM_JSON
 from .woqljson.woqlWhenJson import WOQL_WHEN_JSON
 
-import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
 
@@ -116,7 +116,7 @@ class TestWoqlQueries:
             )
         )
 
-        pp.pprint(woql_object_des.to_dict() )
+        pp.pprint(woql_object_des.to_dict())
         assert woql_object.to_dict() == property_without
         assert woql_object_des.to_dict() == property_with_des
 
@@ -484,7 +484,7 @@ class TestTripleBuilderChainer:
 
     def test_abstract_method(self):
         woql_object = WOQLQuery().node("doc:x", "add_quad").abstract()
-        assert woql_object.to_dict() == WOQL_JSON["nodeAbstractJson"] 
+        assert woql_object.to_dict() == WOQL_JSON["nodeAbstractJson"]
 
     def test_node_property_method(self):
         woql_object = (
@@ -503,36 +503,47 @@ class TestTripleBuilderChainer:
         assert woql_object.to_dict() == WOQL_JSON["addClassDescJson"]
 
     def test_max(self, property_max):
-        woql_object = (
-            WOQLQuery().add_property('P', 'string').domain("A").max(4)
-        )
+        woql_object = WOQLQuery().add_property("P", "string").domain("A").max(4)
         assert woql_object.to_dict() == property_max
 
     def test_min(self, property_min):
-        woql_object = (
-            WOQLQuery().add_property('P', 'string').domain("A").min(2)
-        )
+        woql_object = WOQLQuery().add_property("P", "string").domain("A").min(2)
         assert woql_object.to_dict() == property_min
 
     def test_card(self, property_cardinalty):
-        woql_object = WOQLQuery().add_property('P', 'string').domain("A").cardinality(3)
+        woql_object = WOQLQuery().add_property("P", "string").domain("A").cardinality(3)
         assert woql_object.to_dict() == property_cardinalty
 
     def test_chain1(self, chain_insert):
-        woql_object = WOQLQuery().insert('v:Node_ID', 'v:Type').label('v:Label').description('v:Description').property('prop', 'v:Prop').property('prop', 'v:Prop2').parent('myParentClass')
-        assert woql_object.to_dict() == chain_insert    
+        woql_object = (
+            WOQLQuery()
+            .insert("v:Node_ID", "v:Type")
+            .label("v:Label")
+            .description("v:Description")
+            .property("prop", "v:Prop")
+            .property("prop", "v:Prop2")
+            .parent("myParentClass")
+        )
+        assert woql_object.to_dict() == chain_insert
 
     def test_chain2(self, chain_doctype):
-        woql_object = WOQLQuery().doctype('MyDoc').label('abc').description('abcd').property('prop', 'dateTime').label('aaa').property('prop2', 'integer').label('abe')
-        assert woql_object.to_dict() == chain_doctype    
+        woql_object = (
+            WOQLQuery()
+            .doctype("MyDoc")
+            .label("abc")
+            .description("abcd")
+            .property("prop", "dateTime")
+            .label("aaa")
+            .property("prop2", "integer")
+            .label("abe")
+        )
+        assert woql_object.to_dict() == chain_doctype
 
     def test_dot_chain(self):
-        woql_object = WOQLQuery().triple('A', 'B', 'C').triple('D', 'E', 'F')
+        woql_object = WOQLQuery().triple("A", "B", "C").triple("D", "E", "F")
         v2 = WOQLQuery().woql_and(
-            WOQLQuery().triple('A', 'B', 'C'),
-            WOQLQuery().triple('D', 'E', 'F')
+            WOQLQuery().triple("A", "B", "C"), WOQLQuery().triple("D", "E", "F")
         )
-        v3 = WOQLQuery().triple('A', 'B', 'C').woql_and().triple('D', 'E', 'F')        
+        v3 = WOQLQuery().triple("A", "B", "C").woql_and().triple("D", "E", "F")
         assert woql_object.to_dict() == v2.to_dict()
         assert woql_object.to_dict() == v3.to_dict()
-        

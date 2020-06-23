@@ -292,7 +292,7 @@ WOQL_JSON = {
                 "@language": "en",
             },
         },
-        'woql:graph': {'@type': 'xsd:string', '@value': 'schema/main'},
+        "woql:graph": {"@type": "xsd:string", "@value": "schema/main"},
     },
     "labelMethodJson2": {
         "@type": "woql:AddQuad",
@@ -302,7 +302,7 @@ WOQL_JSON = {
             "@type": "woql:Variable",
             "woql:variable_name": {"@value": "label", "@type": "xsd:string"},
         },
-        'woql:graph': {'@type': 'xsd:string', '@value': 'schema/main'},
+        "woql:graph": {"@type": "xsd:string", "@value": "schema/main"},
     },
     "addClassDescJson": {
         "@type": "woql:And",

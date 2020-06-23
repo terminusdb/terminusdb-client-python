@@ -99,8 +99,12 @@ class ConnectionConfig:
         return self._remote_auth
 
     def user(self, ignore_jwt=True):
-        if not ignore_jwt and self._remote_auth is not None and self._remote_auth.get("type") == "jwt":
-            return self._remote_auth.get('user')
+        if (
+            not ignore_jwt
+            and self._remote_auth is not None
+            and self._remote_auth.get("type") == "jwt"
+        ):
+            return self._remote_auth.get("user")
         if self.__basic_auth:
             return self.__basic_auth.split(":")[0]
 
@@ -289,5 +293,5 @@ class ConnectionConfig:
         else:
             self.__refid = False
 
-    def set_remote_auth(self, auth_dict = None):
+    def set_remote_auth(self, auth_dict=None):
         self._remote_auth = auth_dict
