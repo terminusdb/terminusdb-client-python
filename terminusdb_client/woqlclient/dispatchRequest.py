@@ -91,6 +91,7 @@ class DispatchRequest:
                 APIEndpointConst.UPDATE_TRIPLES,
                 APIEndpointConst.CREATE_GRAPH,
                 APIEndpointConst.FETCH,
+                APIEndpointConst.PULL,
                 APIEndpointConst.PUSH,
                 APIEndpointConst.REBASE,
                 APIEndpointConst.BRANCH,

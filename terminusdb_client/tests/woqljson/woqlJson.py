@@ -267,7 +267,7 @@ WOQL_JSON = {
         ],
     },
     "graphMethodJson": {
-        "@type": "woql:Quad",
+        "@type": "woql:AddQuad",
         "woql:subject": {"@type": "woql:Node", "woql:node": "doc:x"},
         "woql:predicate": {"@type": "woql:Node", "woql:node": "rdfs:label"},
         "woql:object": {
@@ -278,10 +278,10 @@ WOQL_JSON = {
                 "@language": "en",
             },
         },
-        "woql:graph_filter": {"@type": "xsd:string", "@value": "schema/main"},
+        "woql:graph": {"@type": "xsd:string", "@value": "schema/main"},
     },
     "labelMethodJson": {
-        "@type": "woql:Triple",
+        "@type": "woql:AddQuad",
         "woql:subject": {"@type": "woql:Node", "woql:node": "doc:x"},
         "woql:predicate": {"@type": "woql:Node", "woql:node": "rdfs:label"},
         "woql:object": {
@@ -292,15 +292,17 @@ WOQL_JSON = {
                 "@language": "en",
             },
         },
+        'woql:graph': {'@type': 'xsd:string', '@value': 'schema/main'},
     },
     "labelMethodJson2": {
-        "@type": "woql:Triple",
+        "@type": "woql:AddQuad",
         "woql:subject": {"@type": "woql:Node", "woql:node": "doc:x"},
         "woql:predicate": {"@type": "woql:Node", "woql:node": "rdfs:label"},
         "woql:object": {
             "@type": "woql:Variable",
             "woql:variable_name": {"@value": "label", "@type": "xsd:string"},
         },
+        'woql:graph': {'@type': 'xsd:string', '@value': 'schema/main'},
     },
     "addClassDescJson": {
         "@type": "woql:And",
@@ -340,7 +342,7 @@ WOQL_JSON = {
         ],
     },
     "addNodePropJson": {
-        "@type": "woql:Triple",
+        "@type": "woql:AddTriple",
         "woql:subject": {"@type": "woql:Node", "woql:node": "doc:x"},
         "woql:predicate": {"@type": "woql:Node", "woql:node": "scm:myprop"},
         "woql:object": {
@@ -349,15 +351,17 @@ WOQL_JSON = {
         },
     },
     "nodeParentJson": {
-        "@type": "woql:Triple",
+        "@type": "woql:AddQuad",
         "woql:subject": {"@type": "woql:Node", "woql:node": "doc:x"},
         "woql:predicate": {"@type": "woql:Node", "woql:node": "rdfs:subClassOf"},
         "woql:object": {"@type": "woql:Node", "woql:node": "scm:classParentName"},
+        "woql:graph": {"@type": "xsd:string", "@value": "schema/main"},
     },
     "nodeAbstractJson": {
-        "@type": "woql:Triple",
+        "@type": "woql:AddQuad",
         "woql:subject": {"@type": "woql:Node", "woql:node": "doc:x"},
         "woql:predicate": {"@type": "woql:Node", "woql:node": "terminus:tag"},
         "woql:object": {"@type": "woql:Node", "woql:node": "terminus:abstract"},
+        "woql:graph": {"@type": "xsd:string", "@value": "schema/main"},
     },
 }

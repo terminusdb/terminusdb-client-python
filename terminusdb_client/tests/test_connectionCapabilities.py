@@ -9,7 +9,6 @@ from .serverRecordsFromCap import server_records_from_cap
 
 url = "http://localhost:6363/"
 json_context = {
-    "doc": "terminus:///terminus/document/",
     "layer": "http://terminusdb.com/schema/layer#",
     "owl": "http://www.w3.org/2002/07/owl#",
     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -21,7 +20,6 @@ json_context = {
     "woql": "http://terminusdb.com/schema/woql#",
     "xdd": "http://terminusdb.com/schema/xdd#",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
-    "_": "_:",
 }
 
 dbrec = {
