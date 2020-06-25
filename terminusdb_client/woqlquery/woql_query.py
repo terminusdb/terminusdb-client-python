@@ -934,7 +934,7 @@ class WOQLQuery:
             self._query.append(args[0])
         return self
 
-    def file(self, fpath, opts):
+    def file(self, fpath, opts=None):
         """Provides details of a file source in a JSON format that includes a URL property
 
         Parameters
@@ -957,6 +957,8 @@ class WOQLQuery:
         remote
             If your csv file is a uri then use :meth:`.remote` instead of `.file`.
         """
+        if opts is None:
+            opts = []
         if fpath and fpath == "woql:args":
             return ["woql:file", "woql:format"]
         if self._cursor.get("@type"):
