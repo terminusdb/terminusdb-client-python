@@ -70,6 +70,9 @@ class WOQLClient:
             self.conConfig.set_remote_auth(auth_info)
         return self.conConfig.remote_auth
 
+    def set_db(self, dbid):
+        return self.db(dbid)
+
     def db(self, dbid=None):
         if dbid:
             self.conConfig.db = dbid
