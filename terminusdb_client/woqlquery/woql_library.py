@@ -2,6 +2,10 @@ from .woql_query import WOQLQuery
 
 
 class WOQLLib:
+
+    """Patterns to help getting the most useful information from schema graphs
+    """
+
     def __init__(self, mode=None):
         if mode is None:
             self._mode = "query"
@@ -19,6 +23,7 @@ class WOQLLib:
         self._empty = ""
 
     def classes(self, values, variables=None, schema_resource=None):
+        """General Patten 1: Classes"""
         if schema_resource is not None:
             graph = schema_resource
         else:
@@ -125,6 +130,7 @@ class WOQLLib:
         return self._add_constraints(qpattern, values)
 
     def property(self, values, variables=None, schema_resource=None):
+        """General Pattern 2: Properties"""
         if schema_resource is not None:
             graph = schema_resource
         else:
@@ -196,6 +202,8 @@ class WOQLLib:
         return self._add_constraints(qpattern, values)
 
     def graphs(self, values, variables=None, cresource=None):
+        """General Pattern 3: Graphs
+        Retrieves information about the graphs in existence at any commit (and whether the commit is the head of a branch)"""
         if cresource is None:
             cresource = self._default_commit_resource
         self._default_variables = [
@@ -250,6 +258,8 @@ class WOQLLib:
         return WOQLQuery().using(cresource, compiled)
 
     def branches(self, values, variables=None, cresource=None):
+        """General Pattern 4: Retrieves Branches, Their ID, Head Commit ID, Head Commit Time
+        (if present, new branches have no commits)"""
         if cresource is None:
             cresource = self._default_commit_resource
         self._default_variables = [
@@ -279,6 +289,7 @@ class WOQLLib:
         return WOQLQuery().using(cresource, compiled)
 
     def objects(self, values, variables=None):
+        """General Pattern 5: Objects - just a list of object ids and their types"""
         self._default_variables = ["Object Type", "Object ID"]
         if variables:
             self._set_user_variables(variables)
@@ -288,6 +299,7 @@ class WOQLLib:
         return self._add_constraints(qpattern, values)
 
     def property_values(self, values, variables=None):
+        """General Pattern 6: Full Object Properties"""
         self._default_variables = [
             "Object ID",
             "Property ID",
@@ -331,6 +343,7 @@ class WOQLLib:
         return self._add_constraints(qpattern, values)
 
     def object_metadata(self, values, variables=None, schema_resource=None):
+        """General Pattern 7: Object Metadata"""
         if schema_resource is not None:
             graph = schema_resource
         else:
@@ -392,6 +405,7 @@ class WOQLLib:
         return self._add_constraints(qpattern, values)
 
     def property_metadata(self, values, variables=None, schema_resource=None):
+        """General Pattern 8: Value Metadata"""
         if schema_resource is not None:
             graph = schema_resource
         else:
@@ -439,6 +453,7 @@ class WOQLLib:
         return self._add_constraints(qpattern, values)
 
     def commits(self, values, variables=None, cresource=None):
+        """General Pattern 9: Commits"""
         if cresource is None:
             cresource = self._default_commit_resource
         self._default_variables = [
@@ -531,6 +546,7 @@ class WOQLLib:
         return WOQLQuery().using(cresource, compiled)
 
     def commit_chain(self, values, variables=None, cresource=None):
+        """General Pattern 10: Commit Chain"""
         if cresource is None:
             cresource = self._default_commit_resource
         self._default_variables = ["Head IRI", "Tail IRI", "Path"]
@@ -546,6 +562,7 @@ class WOQLLib:
         return WOQLQuery().using(cresource, compiled)
 
     def repos(self, values, variables=None, cresource=None):
+        """General Pattern 11: Repositories"""
         if cresource is None:
             cresource = self._default_commit_resource
         self._default_variables = [
@@ -585,6 +602,7 @@ class WOQLLib:
         return WOQLQuery().using(cresource, compiled)
 
     def dbs(self, values, variables=None):
+        """General Pattern 12: dbs"""
         self._default_variables = [
             "DB Name",
             "DB ID",
@@ -638,6 +656,7 @@ class WOQLLib:
         return WOQLQuery().using(self.masterdb_resource, compiled)
 
     def users(self, values, variables=None):
+        """General Pattern 13: users"""
         self._default_variables = [
             "User ID",
             "User Name",
@@ -710,6 +729,7 @@ class WOQLLib:
         return WOQLQuery().using(self.masterdb_resource, compiled)
 
     def capabilities(self, values, variables=None):
+        """General Pattern 14: capabilities"""
         self._default_variables = [
             "Capability Name",
             "Capability Type",
