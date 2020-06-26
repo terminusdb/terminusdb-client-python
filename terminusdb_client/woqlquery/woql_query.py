@@ -1,13 +1,14 @@
 import copy
 import json
-import pprint
+
+# import pprint
 import re
 
 import terminusdb_client.woql_utils as utils
 
 from .woql_core import _copy_dict, _tokenize, _tokens_to_json
 
-pp = pprint.PrettyPrinter(indent=4)
+# pp = pprint.PrettyPrinter(indent=4)
 
 
 class WOQLQuery:
@@ -2178,7 +2179,6 @@ class WOQLQuery:
         else:
             self.property(pro_id, property_type)
             if label:
-                pp.pprint(self._cursor)
                 self.label(label)
             if description:
                 self.description(description)
