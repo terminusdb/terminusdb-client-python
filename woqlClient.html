@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>woqlClient &mdash; TerminusDB Client &lt;module &#39;terminusdb_client.__version__&#39; from &#39;/home/travis/build/terminusdb/terminusdb-client-python/terminusdb_client/__version__.py&#39;&gt; documentation</title>
+  <title>WOQLClient &mdash; TerminusDB Client &lt;module &#39;terminusdb_client.__version__&#39; from &#39;/home/travis/build/terminusdb/terminusdb-client-python/terminusdb_client/__version__.py&#39;&gt; documentation</title>
   
 
   
@@ -39,7 +39,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="woqlQuery" href="woqlQuery.html" />
+    <link rel="next" title="WOQLQuery" href="woqlQuery.html" />
     <link rel="prev" title="TerminusDB Client" href="modules.html" /> 
 </head>
 
@@ -96,9 +96,9 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">TerminusDB Client</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">woqlClient</a></li>
-<li class="toctree-l2"><a class="reference internal" href="woqlQuery.html">woqlQuery</a></li>
-<li class="toctree-l2"><a class="reference internal" href="woqlDataframe.html">woqlDataframe</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">WOQLClient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="woqlQuery.html">WOQLQuery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="woqlLib.html">WOQLLib</a></li>
 </ul>
 </li>
 </ul>
@@ -149,7 +149,7 @@
         
           <li><a href="modules.html">TerminusDB Client</a> &raquo;</li>
         
-      <li>woqlClient</li>
+      <li>WOQLClient</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -169,7 +169,7 @@
            <div itemprop="articleBody">
             
   <div class="section" id="woqlclient">
-<h1>woqlClient<a class="headerlink" href="#woqlclient" title="Permalink to this headline">¶</a></h1>
+<h1>WOQLClient<a class="headerlink" href="#woqlclient" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="terminusdb_client.WOQLClient">
 <em class="property">class </em><code class="sig-prename descclassname">terminusdb_client.</code><code class="sig-name descname">WOQLClient</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">server_url</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient" title="Permalink to this definition">¶</a></dt>
@@ -221,8 +221,13 @@ or an error will be raise.</p>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="terminusdb_client.WOQLClient.jwt">
-<code class="sig-name descname">jwt</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">jwt</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">account_user</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.jwt" title="Permalink to this definition">¶</a></dt>
+<dt id="terminusdb_client.WOQLClient.remote_auth">
+<code class="sig-name descname">remote_auth</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">auth_info</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.remote_auth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLClient.set_db">
+<code class="sig-name descname">set_db</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dbid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.set_db" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -233,6 +238,16 @@ or an error will be raise.</p>
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.account">
 <code class="sig-name descname">account</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">accountid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.account" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLClient.user_account">
+<code class="sig-name descname">user_account</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.user_account" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLClient.user">
+<code class="sig-name descname">user</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.user" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -254,6 +269,25 @@ or an error will be raise.</p>
 <dt id="terminusdb_client.WOQLClient.uid">
 <code class="sig-name descname">uid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ignore_jwt</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.uid" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLClient.resource">
+<code class="sig-name descname">resource</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ttype</span></em>, <em class="sig-param"><span class="n">val</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.resource" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>str option key</strong> (<em>key</em>) – </p></li>
+<li><p><strong>user</strong> – </p></li>
+<li><p><strong>jwt</strong> – </p></li>
+<li><p><strong>jwt_user</strong> – </p></li>
+<li><p><strong>account</strong> – </p></li>
+<li><p><strong>db</strong> (<em>set cursor to this db</em>) – </p></li>
+<li><p><strong>repo</strong> (<em>set cursor to this repo</em>) – </p></li>
+<li><p><strong>branch</strong> (<em>set branch to this id</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.set">
@@ -347,28 +381,28 @@ a terminus:Database document to the Terminus Server</p>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt id="terminusdb_client.WOQLClient.pull">
+<code class="sig-name descname">pull</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">remote_source_repo</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.pull" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt id="terminusdb_client.WOQLClient.fetch">
-<code class="sig-name descname">fetch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">repo_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.fetch" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fetch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">remote_source_repo</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.fetch" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.push">
-<code class="sig-name descname">push</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target_repo</span></em>, <em class="sig-param"><span class="n">target_branch</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.push" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">push</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">remote_target_repo</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.push" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.rebase">
-<code class="sig-name descname">rebase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">remote_repo_id</span></em>, <em class="sig-param"><span class="n">remote_branch_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.rebase" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">rebase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rebase_source</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.rebase" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.clonedb">
 <code class="sig-name descname">clonedb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">clone_source</span></em>, <em class="sig-param"><span class="n">newid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.clonedb" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="terminusdb_client.WOQLClient.generate_commit">
-<code class="sig-name descname">generate_commit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="n">author</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.generate_commit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -410,7 +444,7 @@ a terminus:Database document to the Terminus Server</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="woqlQuery.html" class="btn btn-neutral float-right" title="woqlQuery" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="woqlQuery.html" class="btn btn-neutral float-right" title="WOQLQuery" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="modules.html" class="btn btn-neutral float-left" title="TerminusDB Client" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

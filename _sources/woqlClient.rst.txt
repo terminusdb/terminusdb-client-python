@@ -1,4 +1,4 @@
-woqlClient
+WOQLClient
 ==========
 
 .. autoclass:: terminusdb_client.WOQLClient
