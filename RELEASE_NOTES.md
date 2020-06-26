@@ -1,5 +1,10 @@
 # TerminusDB Client Release Notes
 ---
+## v0.1.5
+
+### Bug fixes
+Remove unwanted print
+---
 ## v0.1.4
 
 ### New
