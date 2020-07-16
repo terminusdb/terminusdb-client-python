@@ -415,8 +415,6 @@ class WOQLQuery:
         commit_msg: str
             optional, commit message for this query. Recommended for query that carrries an update.
         """
-        if self._query.get("@context"):
-            self._query["@context"] = client.conCapabilities.get_context_for_outbound_query()
         if commit_msg is None:
             return client.query(self)
         else:
