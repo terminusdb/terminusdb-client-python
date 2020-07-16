@@ -182,7 +182,12 @@ def test_create_graph(mocked_requests, mocked_requests2):
             "Authorization": "Basic YWRtaW46cm9vdA==",
             "content-type": "application/json",
         },
-        json={"commit_info": {"author": "admin Server Admin User", "message": "add a new graph"}},
+        json={
+            "commit_info": {
+                "author": "admin Server Admin User",
+                "message": "add a new graph",
+            }
+        },
     )
 
 

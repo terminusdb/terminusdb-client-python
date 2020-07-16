@@ -1,9 +1,10 @@
-terminus-client-python
-======================
+TerminusDB Client
+=================
 
 .. toctree::
    :maxdepth: 4
 
    woqlClient
    woqlQuery
+   woqlLib
    woqlDataframe

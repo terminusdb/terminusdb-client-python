@@ -2,7 +2,7 @@ TerminusDB Client Python
 ==========================
 
 [![build status](https://api.travis-ci.com/terminusdb/terminusdb-client-python.svg?branch=master)](https://travis-ci.com/terminusdb/terminusdb-client-python)
-[![Documentation Status](https://readthedocs.org/projects/terminusdb-client-python/badge/?version=latest)](https://terminus-client-python.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/terminusdb-client/badge/?version=latest)](https://terminusdb-client.readthedocs.io/en/latest/?badge=latest)
 
 Python version of the TerminusDB client - for TerminusDB API and WOQLpy
 
@@ -29,10 +29,10 @@ If you want to use woqlDataframe:
 `python -m pip install git+https://github.com/terminusdb/terminusdb-client-python.git`
 
 ## Usage
-For the [full Documentation](https://terminusdb-client-python.readthedocs.io/)
+For the [full Documentation](https://terminusdb.github.io/terminusdb-client-python/)
 
 ## Tutorials
-Visit [terminus-tutorials](https://github.com/terminusdb/terminusdb-tutorials) for tutorial scripts
+Visit [terminus-tutorials](https://github.com/terminusdb/terminusdb-tutorials) for tutorial scripts and [Create TerminusDB Graph with Python Client](https://terminusdb.com/docs/getting-started/start-tutorials/py_client/) for a python-specific one.
 
 ## Testing
 * Clone this repository

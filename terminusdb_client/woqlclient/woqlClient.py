@@ -18,36 +18,21 @@ from .dispatchRequest import DispatchRequest
 
 
 class WOQLClient:
-
-    """
-    The WOQLClient constructor
-
-    :param **kwargs Connection arguments used to configure the Client. (db=terminusDBName | server=terminusServerURL | doc=docName | key=apiKey)
-
-    """
-
     def __init__(self, server_url, **kwargs):
         # current conCapabilities context variables
-        """
+        """The WOQLClient constructor
+
         Parameters
         ----------
-        server_url str
-        key        str option key
-        user
-        jwt
-        jwt_user
-        account
-        db: set cursor to this db
-        repo: set cursor to this repo
-        branch: set branch to this id
-
+        server_url : str
+                     url of the server that this client belongs
         """
         self.conConfig = ConnectionConfig(server_url, **kwargs)
         self.conCapabilities = ConnectionCapabilities()
 
     def connect(self, **kwargs):
-        """
-        Connect to a Terminus server at the given URI with an API key
+        """Connect to a Terminus server at the given URI with an API key
+
         Stores the terminus:ServerCapability document returned
         in the conCapabilities register which stores, the url, key, capabilities,
         and database meta-data for the connected server
@@ -55,18 +40,6 @@ class WOQLClient:
         If the serverURL argument is omitted,
         self.conConfig.serverURL will be used if present
         or an error will be raise.
-
-        Parameters
-        ----------
-        key        str option key
-        user
-        jwt
-        jwt_user
-        account
-        db: set cursor to this db
-        repo: set cursor to this repo
-        branch: set branch to this id
-
 
         Returns
         -------
@@ -91,11 +64,14 @@ class WOQLClient:
         if key:
             self.conConfig.set_basic_auth(key, user)
         return self.conConfig.basic_auth
-    
-    def remote_auth(self, auth_info = None):
-        if( type(auth_info) == dict ): 
+
+    def remote_auth(self, auth_info=None):
+        if type(auth_info) == dict:
             self.conConfig.set_remote_auth(auth_info)
         return self.conConfig.remote_auth
+
+    def set_db(self, dbid):
+        return self.db(dbid)
 
     def db(self, dbid=None):
         if dbid:
@@ -113,7 +89,6 @@ class WOQLClient:
 
     def user(self):
         return self.conCapabilities.get_user()
-
 
     def repo(self, repoid=None):
         if repoid:
@@ -134,8 +109,9 @@ class WOQLClient:
     def uid(self, ignore_jwt=True):
         return self.conConfig.user(ignore_jwt)
 
-    """
-    Parameters
+    def resource(self, ttype, val=None):
+        """
+        Parameters
         ----------
         key        str option key
         user
@@ -145,27 +121,25 @@ class WOQLClient:
         db: set cursor to this db
         repo: set cursor to this repo
         branch: set branch to this id
-    """
-
-    def resource(self, ttype, val = None):
+        """
         base = self.account() + "/" + self.db() + "/"
-        if type == "db": 
+        if type == "db":
             return base
-        elif type == 'meta':
+        elif type == "meta":
             return base + "_meta"
         base = base + self.repo()
-        if type == 'repo':
+        if type == "repo":
             return base + "/_meta"
-        elif type == "commits": 
+        elif type == "commits":
             return base + "/_commits"
         if val is None:
             if ttype == "ref":
                 val = self.ref()
-            else: 
+            else:
                 val = self.checkout()
         if ttype == "branch":
             return base + "/branch/" + val
-        if ttype == "ref" :
+        if ttype == "ref":
             return base + "/commit/" + val
 
     def set(self, **kwargs):  # bad naming
@@ -328,7 +302,11 @@ class WOQLClient:
         if type(woql_query) != dict and hasattr(woql_query, "to_dict"):
             woql_query = woql_query.to_dict()
         if not woql_query.get("@context"):
-            woql_query["@context"] = self.conCapabilities.get_context_for_outbound_query(woql_query, self.db())
+            woql_query[
+                "@context"
+            ] = self.conCapabilities.get_context_for_outbound_query(
+                woql_query, self.db()
+            )
 
         if type(file_list) == dict:
             file_dict = query_obj
@@ -367,38 +345,58 @@ class WOQLClient:
 
     def pull(self, remote_source_repo):
         rc_args = self._prepare_revision_control_args(remote_source_repo)
-        if(rc_args and rc_args.get("remote") and rc_args.get("remote_branch")):
-            return self.dispatch(APIEndpointConst.PULL, self.conConfig.pull_url(), rc_args)
-        else: 
-            raise ValueError("Pull parameter error - you must specify a valid remote source and branch to pull from")
+        if rc_args and rc_args.get("remote") and rc_args.get("remote_branch"):
+            return self.dispatch(
+                APIEndpointConst.PULL, self.conConfig.pull_url(), rc_args
+            )
+        else:
+            raise ValueError(
+                "Pull parameter error - you must specify a valid remote source and branch to pull from"
+            )
 
     def fetch(self, remote_source_repo):
         rc_args = self._prepare_revision_control_args(remote_source_repo)
-        if(rc_args and rc_args.get("remote") and rc_args.get("remote_branch")):
-            return self.dispatch(APIEndpointConst.FETCH, self.conConfig.fetch_url(), rc_args)
-        else: 
-            raise ValueError("Fetch parameter error - you must specify a valid remote source and branch to pull from")
+        if rc_args and rc_args.get("remote") and rc_args.get("remote_branch"):
+            return self.dispatch(
+                APIEndpointConst.FETCH, self.conConfig.fetch_url(), rc_args
+            )
+        else:
+            raise ValueError(
+                "Fetch parameter error - you must specify a valid remote source and branch to pull from"
+            )
 
     def push(self, remote_target_repo):
         rc_args = self._prepare_revision_control_args(remote_target_repo)
-        if(rc_args and rc_args.get("remote") and rc_args.get("remote_branch")):
-            return self.dispatch(APIEndpointConst.PUSH, self.conConfig.push_url(), rc_args)
-        else: 
-            raise ValueError("Push parameter error - you must specify a valid remote target")
+        if rc_args and rc_args.get("remote") and rc_args.get("remote_branch"):
+            return self.dispatch(
+                APIEndpointConst.PUSH, self.conConfig.push_url(), rc_args
+            )
+        else:
+            raise ValueError(
+                "Push parameter error - you must specify a valid remote target"
+            )
 
     def rebase(self, rebase_source):
         rc_args = self._prepare_revision_control_args(rebase_source)
-        if rc_args and rc_args.get("rebase_from") :
-            return self.dispatch(APIEndpointConst.REBASE, self.conConfig.rebase_url(), rc_args)
-        else: 
-            raise ValueError("Rebase parameter error - you must specify a valid rebase source to rebase from")
+        if rc_args and rc_args.get("rebase_from"):
+            return self.dispatch(
+                APIEndpointConst.REBASE, self.conConfig.rebase_url(), rc_args
+            )
+        else:
+            raise ValueError(
+                "Rebase parameter error - you must specify a valid rebase source to rebase from"
+            )
 
     def clonedb(self, clone_source, newid):
         rc_args = self._prepare_revision_control_args(clone_source)
-        if rc_args and rc_args.get("remote_url") :
-            return self.dispatch(APIEndpointConst.CLONE, self.conConfig.clone_url(newid), rc_args)
-        else: 
-            raise ValueError("Clone parameter error - you must specify a valid id for the cloned database")
+        if rc_args and rc_args.get("remote_url"):
+            return self.dispatch(
+                APIEndpointConst.CLONE, self.conConfig.clone_url(newid), rc_args
+            )
+        else:
+            raise ValueError(
+                "Clone parameter error - you must specify a valid id for the cloned database"
+            )
 
     def _generate_commit(self, msg, author=None):
         if author:
@@ -409,13 +407,12 @@ class WOQLClient:
         ci = {"commit_info": {"author": mes_author, "message": msg}}
         return ci
 
-    def _prepare_revision_control_args( self, rc_args = None):
-        if rc_args is None: 
+    def _prepare_revision_control_args(self, rc_args=None):
+        if rc_args is None:
             return False
         if not rc_args.get("author"):
             rc_args["author"] = self.conCapabilities.author()
-        return rc_args  
-
+        return rc_args
 
     def dispatch(
         self, action, url, payload=None, file_dict=None
@@ -433,7 +430,6 @@ class WOQLClient:
             Payload to send to the server
         file_dict : list, optional
             List of files that are needed for the query
-
 
         Returns
         -------

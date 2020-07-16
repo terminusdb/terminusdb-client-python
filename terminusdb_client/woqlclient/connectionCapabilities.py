@@ -6,9 +6,9 @@ from .api_endpoint_const import APIEndpointConst
 from .errorMessage import ErrorMessage
 from .errors import AccessDeniedError
 
-import pprint
+#import pprint
 
-pp = pprint.PrettyPrinter(indent=4)
+#pp = pprint.PrettyPrinter(indent=4)
 
 """
     Creates an entry in the connection registry for the server

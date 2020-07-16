@@ -1,6 +1,5 @@
-woqlclient
+WOQLClient
 ==========
-
 
 .. autoclass:: terminusdb_client.WOQLClient
    :members:
