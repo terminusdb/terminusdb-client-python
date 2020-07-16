@@ -395,7 +395,7 @@ class WOQLQuery:
     def execute(self, client, commit_msg=None):
         """Executes the query using the passed client to connect to a server"""
         if self._query.get("@context"):
-            self._query["@context"] = client.conCapabilities._get_json_context()
+            self._query["@context"] = client.conCapabilities.get_context_for_outbound_query()
         if commit_msg is None:
             return client.query(self)
         else:
@@ -1043,7 +1043,7 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:IDGenerator"
-        self._cursor["woql:base"] = self._clean_object(self.string(prefix))
+        self._cursor["woql:base"] = self._clean_object(self.iri(prefix))
         self._cursor["woql:key_list"] = self._vlist(input_var_list)
         self._cursor["woql:uri"] = self._clean_class(output_var)
         return self
@@ -1393,7 +1393,6 @@ class WOQLQuery:
         else:
             self.property(pro_id, property_type)
             if label:
-                pp.pprint(self._cursor)
                 self.label(label)
             if description:
                 self.description(description)

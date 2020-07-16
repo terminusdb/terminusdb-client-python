@@ -451,4 +451,4 @@ class WOQLClient:
         )
 
     def get_metadata(self, dbid, account):
-        return self.conCapabilities._get_db_metadata(dbid, account)
+        return self.conCapabilities.get_database(dbid, account)

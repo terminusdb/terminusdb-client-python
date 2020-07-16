@@ -6,78 +6,62 @@ from .api_endpoint_const import APIEndpointConst
 from .errorMessage import ErrorMessage
 from .errors import AccessDeniedError
 
+import pprint
+
+pp = pprint.PrettyPrinter(indent=4)
 
 """
     Creates an entry in the connection registry for the server
     and all the databases that the client has access to
     maps the input authorties to a per-db array for internal storage and easy
     access control checks
-    {doc:dbid => {terminus:authority =>
-    [terminus:woql_select, terminus:create_document, auth3, ...]}}
+    {doc:dbid => {system:authority =>
+    [system:woql_select, system:create_document, auth3, ...]}}
 """
 
 
 class ConnectionCapabilities:
     def __init__(self):
-        self.connection = {}
         self.user = None
+        self.dbdocs = {}
+        self.orgdocs = {}
+        self.databases = None
         self._jsonld_context = {}
-        self._terminusdb_context = {}
+        self._systemdb_context = {}
 
-    def _action_to_array(self, actions):
-        if isinstance(actions, list) is False:
-            return []
-        action_list = []
-        for item in actions:
-            action_list.append(item["@id"])
-
-        return action_list
+    def _clear(self):
+        self.user = None
+        self.dbdocs = {}
+        self.orgdocs = {}
+        self._jsonld_context = {}
+        self._systemdb_context = {}
 
     def set_capabilities(self, capabilities=None):
-        self.connection = {}
+        self._clear()
+        self.databases = None
         if capabilities is not None:
-            self.capabilitiesKeys = capabilities.keys()
-        else:
-            self.capabilitiesKeys = []
-
-        for pred in self.capabilitiesKeys:
-            if (pred == "terminus:authority") and (pred in capabilities):
-                if type(capabilities[pred]) == list:
-                    auths = capabilities[pred]
-                else:
-                    auths = [capabilities[pred]]
-                for item in auths:
-                    access = item["terminus:access"]
-                    scope = access["terminus:authority_scope"]
-                    actions = access["terminus:action"]
-                    if type(scope) != list:
-                        scope = [scope]
-                    if type(actions) == list:
-                        action_arr = [obj["@id"] for obj in actions]
-                    else:
-                        action_arr = []
-                    for nrec in scope:
-                        if nrec["@id"] not in self.connection:
-                            self.connection[nrec["@id"]] = nrec
-                        self.connection[nrec["@id"]]["terminus:authority"] = action_arr
-            elif pred == "@context": 
-                self._load_connection_context(capabilities[pred])    
-            else:
-                self.connection[pred] = capabilities[pred]
-            self.user = self._extract_user_info(capabilities)
+            ctxt = capabilities.get('@context')
+            if ctxt is not None:
+                self._load_connection_context(ctxt)
+        self.user = self._extract_user_info(capabilities)
+        return self._extract_database_organizations()
 
 
-    def _extract_user_info(self, capabilities):
-        info = {}
-        if capabilities.get('rdfs:comment') :
-             info["notes"] = capabilities['rdfs:comment'].get("@value")
-        if capabilities.get('rdfs:label') :
-             info["name"] = capabilities['rdfs:label'].get("@value")
-        if capabilities.get('terminus:agent_name') :
-             info["id"] = capabilities['terminus:agent_name'].get("@value")
-        if capabilities.get('terminus:commit_log_id') :
-             info["author"] = capabilities['terminus:commit_log_id'].get("@value")
-        return info
+    def get_databases(self):
+        if self.databases is None:            
+            self.databases = self._databases_from_dbdocs()
+        return self.databases
+    
+    def set_databases(self, newdbs):
+        self.databases = newdbs
+    
+    def get_database(self, dbid, orgid):
+        if self.databases is None:
+            self.databases = self._databases_from_dbdocs()
+        for db in self.databases:
+            if(db["id"] == dbid and db["organization"] == orgid):
+                return db
+        return None
 
     def get_user(self):
         return self.user
@@ -86,160 +70,236 @@ class ConnectionCapabilities:
         if self.user.get("author"):
             return self.user.get("author")
         else:
-            return self.user.get("id") + " " + self.user.get("name")
+            return self.user.get("id") 
 
+    def _databases_from_dbdocs(self):
+        dbs = []
+        for docid in self.dbdocs.keys():
+            if(self.dbdocs[docid]["system"] == False):
+                dbs.append(self._get_db_rec(self.dbdocs[docid]))
+        return dbs
 
+    def set_roles(self, role_output):
+        cntnt = role_output.get("bindings")
+        if(cntnt is None):
+            return False
+        for pred in cntnt:
+            onerec = {}
+            onerec["dbdocid"] = pred['Database_ID']
+            onerec["organization"] = pred['Organization']['@value']
+            roles = self._multiple_rdf_objects(pred['Owner_Role_Obj'], "system:Role")
+            self.dbdocs[onerec["dbdocid"]] = roles
+        self._extract_database_organizations()
 
-    def _form_resource_name(self, dbid, account):
-        if dbid == "terminus":
-            return "terminus"
-        return f"{account}|{dbid}"
-
-    def find_resource_document_id(self, dbid, account):
-        testrn = self._form_resource_name(dbid, account)
-        for pred in self.connection.keys():
-            rec = self.connection[pred]
-            if "terminus:resource_name" in rec:
-                resource_name = rec["terminus:resource_name"]
-                if (
-                    "@value" in resource_name
-                    and rec["terminus:resource_name"]["@value"] == testrn
-                ):
-                    return pred
-        return None
-
-    def _load_connection_context(self, context_dict):
-        self._terminusdb_context = context_dict
-        for prefix in context_dict.keys() :
-            if prefix != "doc" :
-                self._jsonld_context[prefix] = context_dict[prefix] 
-
-    def get_context_for_outbound_query(self, woql_dict, dbid):
-        if woql_dict.get("@context") :
-            return woql_dict.get("@context")
-        else: 
-            ret = {}
-            for prefix in self._jsonld_context.keys() :
-                if prefix != "doc" :
-                    ret[prefix] = self._jsonld_context[prefix]
-            return ret             
-
-    def get_json_context(self):
-        return self._jsonld_context
+        rdb = role_output.get("databases")
+        if(rdb):
+            self.set_databases(rdb)
+        odb = role_output.get("organizations")
+        if(odb):
+            self.set_organizations(odb)
+        
+    def get_organizations(self):
+        if self.organizations is None:
+            self.organizations = self._organizations_from_orgdocs()
+        return self.organizations
     
-    def get_terminus_context(self):
-        return self._terminusdb_context
+    def set_organizations(self, newdbs):
+        self.organizations = newdbs
+    
+    def get_organization(self, orgid):
+        if self.organizations is None:
+            self.organizations = self._organizations_from_orgdocs()
+        for org in self.organizations:
+            if(org["id"] == orgid):
+                return org
+        return None
 
-    def capabilities_permit(self, action, dbid=None, account=None):
-        if action == APIEndpointConst.CREATE_DATABASE:
-            rec = self._get_server_record()
-        elif dbid is not None:
-            rec = self._get_db_record(dbid, account)
+    def _organizations_from_orgdocs(self):
+        return self.orgdocs.values()
+
+    def actions_permitted(self, actions, resnames):
+        actlist = self._toarr(actions)
+        reslist = self._toarr(resnames)
+        for i in actlist.keys():
+            for j in reslist.keys():
+                if self._roles_cover_resource_action(actlist[i], reslist[j]):
+                    return False
+        return True                    
+
+    def get_context_for_outbound_query(self, woql, dbid):
+        ob = woql
+        if(ob is None):
+            ob = self.get_system_context()
         else:
-            raise ValueError("no dbid provided in capabilities check ", action, dbid)
-        if rec:
-            auths = rec.get("terminus:authority")
-            terminus_action_name = "terminus:" + action
-            if auths and terminus_action_name in auths:
+            for pred in self._jsonld_context.keys():
+                if pred != "doc":
+                    ob[pred] = self._jsonld_context[pred]
+        ob["_"] = "_:"
+        return ob
+
+    def _is_system_db(self, dbid):
+        if dbid == "_system": 
+            return True
+        return False
+   
+    def get_json_context(self):
+        return self._jsonld_context 
+
+    def set_json_context(self, ctxt):
+        self._jsonld_context = ctxt
+
+    def get_system_context(self):
+        return self._systemdb_context 
+
+    def _roles_cover_resource_action(self, action, resname):
+        for docid in self.user["roles"].keys():
+            if self._role_covers_resource_action(self.user["roles"][docid], action, resname):
                 return True
-            else:
-                raise ValueError("No record found for connection: ", action, dbid)
-        raise AccessDeniedError(
-            ErrorMessage.getAccessDeniedMessage(action, dbid, account)
-        )
+        return False
 
-    def _get_server_record(self):
-        """retrieves the meta-data record returned by connect for the connected server
-           Returns
-           =======
-           {terminus:Server} JSON server record as returned by WOQLClient.connect
-        """
-        for obj in self.connection.values():
-            if isinstance(obj, dict) and obj.get("@type") == "terminus:Server":
-                return obj
-        return None
+    def _role_covers_resource_action(self, role, action, resname):
+        for docid in role["capabilities"].keys():
+            if self._capability_covers_resource_action(role["capabilities"][docid], action, resname):
+                return True
+        return False
 
-    def _get_db_record(self, dbid, account):
-        """retrieves the meta-data record returned by connect for a particular database
-           Returns
-           =======
-           {terminus:Database} terminus:Database JSON document as returned by WOQLClient.connect
-        """
-        docid = self.find_resource_document_id(dbid, account)
-        if docid is not None:
-            return self.connection[docid]
-        return None
+    def _capability_covers_resource_action(self, cap, action, resname):
+        if action[0:7] != "system:":
+            action = "system:" + action
+        if action not in cap["actions"]:
+            return False
+        if resname not in cap["resources"]:
+            return False
+        return True
 
-    def _extract_metadata(self, dbrec):
-        meta = {"db": "", "account": "", "title": "", "description": ""}
-        if ("terminus:resource_name" in dbrec) and (
-            "@value" in dbrec["terminus:resource_name"]
-        ):
-            rn = dbrec["terminus:resource_name"]["@value"]
-            if rn == "terminus":
-                meta["db"] = rn
-            elif type(rn) is str and rn:
-                bits = rn.split("|")
-                if len(bits) == 1:
-                    meta["db"] = rn
-                else:
-                    meta["account"] = bits[0]
-                    meta["db"] = bits[1]
-        if "rdfs:label" in dbrec:
-            if type(dbrec["rdfs:label"]) == list:
-                label = dbrec["rdfs:label"][0]
-            else:
-                label = dbrec["rdfs:label"]
-            if label is not None and label and "@value" in label:
-                meta["title"] = label["@value"]
-            else:
-                meta["title"] = meta["db"]
-        if "rdfs:comment" in dbrec:
-            if type(dbrec["rdfs:comment"]) == list:
-                cmt = dbrec["rdfs:comment"][0]
-            else:
-                cmt = dbrec["rdfs:comment"]
-            if cmt is not None and cmt and "@value" in cmt:
-                meta["description"] = cmt["@value"]
-        return meta
+    def _extract_user_info(self, capabilities):
+        info = self._extract_rdf_basics(capabilities)
+        info["id"] = self._single_rdf_value("system:agent_name", capabilities)
+        info["roles"] = self._multiple_rdf_objects(capabilities['system:role'], "system:Role")
+        return info
 
-    def _get_db_metadata(self, dbid, account):
-        dbrec = self._get_db_record(dbid, account)
-        if dbrec is not None:
-            return self._extract_metadata(dbrec)
+    def _extract_user_role(self, jrole):
+        nrole = self._extract_rdf_basics(jrole)
+        nrole["capabilities"] = self._multiple_rdf_objects(jrole["system:capability"], "system:Capability")
+        return nrole
 
-    def remove_db(self, dbid=None, account=None):
-        """
-          removes a database record from the connection registry (after deletion, for example)
-          @param {String} [dbid] optional DB ID - if omitted current connection config db will be used
-          @param {String} [srvr] optional server URL - if omitted current connection config server will be used
-          @returns {[terminus:Database]} array of terminus:Database JSON documents as returned by WOQLClient.
-        """
-        docid = self.find_resource_document_id(dbid, account)
-        if docid is not None:
-            del self.connection[docid]
+    def _extract_role_capability(self, jcap):
+        nrole = self._extract_rdf_basics(jcap)
+        nrole["actions"] = self._extract_multiple_ids(jcap["system:action"])
+        nrole["resources"] = self._extract_capability_resources(jcap["system:capability_scope"])
+        return nrole
 
-    def get_server_db_records(self):
-        """
-          returns all records about databases on the currently connected server
-        """
-        dbrecs = {}
-        for oid in self.connection:
-            if (
-                isinstance(self.connection[oid], dict)
-                and self.connection[oid].get("@type") == "terminus:Database"
-            ):
-                dbrecs[oid] = self.connection[oid]
-        return dbrecs
+    def _extract_capability_resources(self, scope):
+        rnames = []
+        resources = self._toarr(scope)
+        for res in resources:
+            rnames.append(self._extract_resource_name(res))
+            rid = res.get("@id")
+            rtype = res.get("@type")
+            if not (rid is None or rtype is None):
+                exist = self.dbdocs.get(rid)
+                if exist is None and (rtype == "system:SystemDatabase" or rtype == "system:Database"):
+                    self.dbdocs[rid] = self._extract_database(res)
+                if rtype == "system:Organization" and self.orgdocs.get(rid) is None:
+                    self.orgdocs[rid] = self._extract_organization(res)
+        return rnames                           
 
-    def get_server_db_metadata(self):
-        """
-          returns a meta data list {db: title: description:}  about all databases on the currently connected server
-        """
-        dbrecs = self.get_server_db_records()
-        metas = []
-        for oid in dbrecs:
-            met = self._extract_metadata(dbrecs[oid])
-            if met is not None:
-                metas.append(met)
-        return metas
+    def _extract_resource_name(self, jres):
+        id = self._single_rdf_value('system:resource_name', jres)
+        if id is None:
+            id = self._single_rdf_value("system:organization_name", jres)
+        if id is None:
+            id = self._single_rdf_value("system:database_name", jres)
+        return id
+
+    def _extract_database(self, jres):
+        db = self._extract_rdf_basics(jres)
+        db["id"] = self._extract_resource_name(jres)
+        if jres.get("@type") == "system:SystemDatabase":
+            db["system"] = True
+        else:
+            db["system"] = False
+        return db
+
+    def _get_db_rec(self, rec):
+        urec = {}
+        for pred in rec.keys():
+            if pred != "system":
+                urec[pred] = rec[pred]
+        return urec
+
+    def _extract_database_organizations(self):
+        for docid in self.dbdocs.keys():
+            for odocid in self.orgdocs.keys():
+                if docid in self.orgdocs[odocid]["databases"]:
+                    self.dbdocs[docid]["organization"] = self.orgdocs[odocid]["id"] 
+
+    def _extract_organization(self, jres):
+        org = self._extract_rdf_basics(jres)
+        org["id"] = self._extract_resource_name(jres)
+        dbs = jres.get("system:organization_database")
+        kids = jres.get("system:organization_child")
+        incs = jres.get("system:resource_includes")
+        if dbs is not None:
+            org["databases"] = self._extract_multiple_ids(dbs)
+        if kids is not None:
+            org["children"] = self._extract_multiple_ids(kids)
+        if incs is not None:
+            org["includes"] = self._extract_multiple_ids(incs)
+        return org
+
+    def _extract_multiple_ids(self, jres):
+        jids = self._toarr(jres)
+        ids = []
+        for k in jids:
+            ids.append(k["@id"])
+        return ids
+        
+    def _multiple_rdf_objects(self, rdf, type):
+        nvals = {}
+        vals = self._toarr(rdf)
+        for n in vals:
+            if(isinstance(n, dict)):
+                nid = n.get("@id")
+                if nid is not None :
+                    nvals[nid] = self._extract_rdf_object(type, n)
+        return nvals
+
+    def _extract_rdf_object(self, type, jres):
+        if type == "system:Role":
+            return self._extract_user_role(jres)
+        elif type == "system:Capability":
+            return self._extract_role_capability(jres)
+
+    def _extract_rdf_basics(self, jres):
+        info = {}
+        info["label"] = self._single_rdf_value("rdfs:label", jres)
+        info["comment"] = self._single_rdf_value("rdfs:comment", jres)
+        return info
+
+    def _single_rdf_value(self, pred, rdf):
+        if rdf.get(pred) is None:
+            return ""
+        if isinstance(rdf[pred], list):
+            return rdf[pred][0]['@value']
+        return rdf[pred]['@value']        
+
+    def _multiple_rdf_values(self, pred, rdf):
+        vals = []
+        if rdf.get(pred) is None:
+            return vals
+        rdflist = self._toarr(rdf.get(pred))
+        for item in rdflist:
+            vals.append(item["@value"])
+        return vals 
+
+    def _toarr(self, el):
+        if isinstance(el, list):
+            return el
+        return [el]
+
+    def _load_connection_context(self, ctxt):
+        self._systemdb_context = ctxt
+        for k in ctxt.keys():
+            if(k != "doc"):
+                self._jsonld_context[k] = ctxt[k]
