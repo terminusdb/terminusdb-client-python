@@ -64,6 +64,9 @@ class WOQLQuery:
         # attribute for schema
         self._graph = graph
 
+    def __add__(self, other):
+        return WOQLQuery().woql_and(self, other)
+
     # WOQLCore methods
     def _parameter_error(self, message):
         """Basic Error handling"""
