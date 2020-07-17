@@ -1,6 +1,12 @@
 # TerminusDB Client Release Notes
 
 ---
+## v0.2.1
+
+### Bug fixes
+- bug fix for delete_database in WOQLClient
+
+---
 ## v0.2.0
 
 ### New

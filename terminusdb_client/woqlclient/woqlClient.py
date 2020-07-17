@@ -235,7 +235,6 @@ class WOQLClient:
         json_response = self.dispatch(
             APIEndpointConst.DELETE_DATABASE, self.conConfig.db_url()
         )
-        self.conCapabilities.remove_db(self.db(), self.account())
         return json_response
 
     def create_graph(self, graph_type, graph_id, commit_msg):
