@@ -1,11 +1,5 @@
-import copy
 import pprint
 
-# import pprint
-import unittest.mock as mock
-
-import requests
-from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 from .ans_cardinality import *  # noqa
@@ -13,8 +7,6 @@ from .ans_doctype import *  # noqa
 from .ans_insert import *  # noqa
 from .ans_property import *  # noqa
 from .ans_triple_quad import *  # noqa
-from .mockResponse import mocked_requests
-from .test_connectionCapabilities import json_context
 
 # expected results
 from .woqljson.woqlAndJson import WOQL_AND_JSON
@@ -29,11 +21,13 @@ from .woqljson.woqlOrJson import WOQL_OR_JSON
 from .woqljson.woqlTrimJson import WOQL_TRIM_JSON
 from .woqljson.woqlWhenJson import WOQL_WHEN_JSON
 
+# import pprint
+
+
 pp = pprint.PrettyPrinter(indent=4)
 
 
 class TestWoqlQueries:
-
     def test_start_properties_values(self):
         woql_object = WOQLQuery()
         assert not woql_object._chain_ended

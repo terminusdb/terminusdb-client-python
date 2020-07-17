@@ -155,6 +155,7 @@ def test_wrong_graph_type(mocked_requests, mocked_requests2):
     with pytest.raises(ValueError):
         woql_client.create_graph("wrong_graph_name", "mygraph", "add a new graph")
 
+
 @mock.patch("requests.get", side_effect=mocked_requests)
 def test_get_triples(mocked_requests):
     woql_client = WOQLClient("http://localhost:6363")

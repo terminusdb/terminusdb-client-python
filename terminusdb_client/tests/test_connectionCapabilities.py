@@ -1,16 +1,7 @@
-import pytest
-from terminusdb_client.woqlclient.connectionCapabilities import ConnectionCapabilities
-
-from .AllServerRecords import AllServerRecords
-from .connectCapabilitiesResponse import ConnectResponse
-from .connectionObjDump import ConnectionDump
-from .DBRecord import db_record_obj
-from .serverRecordsFromCap import server_records_from_cap
-
 url = "http://localhost:6363/"
 json_context = {
-    '_': '_:', 
-    'doc': 'terminusdb:///system/data/',
+    "_": "_:",
+    "doc": "terminusdb:///system/data/",
     "layer": "http://terminusdb.com/schema/layer#",
     "owl": "http://www.w3.org/2002/07/owl#",
     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -79,4 +70,3 @@ dbrecs = [
         "description": "The master database contains the meta-data about databases, users and roles",
     },
 ]
-
