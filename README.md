@@ -7,7 +7,7 @@ TerminusDB Client Python
 Python version of the TerminusDB client - for TerminusDB API and WOQLpy
 
 ## Requirements
-- [TerminusDB 2.0](https://github.com/terminusdb/terminusdb-server)
+- [TerminusDB 2.0.5](https://github.com/terminusdb/terminusdb-server)
 - [Python >= 3.6]
 
 ## Previous Versions

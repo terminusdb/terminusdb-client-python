@@ -100,7 +100,7 @@ class DispatchRequest:
                 request_response = cls.__post_call(url, headers, payload, file_dict)
 
             if request_response.status_code == 200:
-                #print("hellow ")
+                # print("hellow ")
                 return request_response.json()  # if not a json not it raises an error
             else:
                 # Raise an exception if a request is unsuccessful
@@ -120,7 +120,7 @@ class DispatchRequest:
 
         # to be reviewed
         # the server in the response return always content-type application/json
-        except ValueError as err:
+        except ValueError:
             # if the response type is not a json
             return request_response
 
