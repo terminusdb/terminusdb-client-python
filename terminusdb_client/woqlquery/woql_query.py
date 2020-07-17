@@ -758,6 +758,12 @@ class WOQLQuery:
     def string(self, input_str):
         return {"@type": "xsd:string", "@value": input_str}
 
+    def boolean(self, input_bool):
+        if input_bool:
+            return {"@type": "xsd:boolean", "@value": True}
+        else:
+            return {"@type": "xsd:boolean", "@value": False}
+
     def literal(self, input_val, input_type):
         if ":" not in input_type:
             input_type = "xsd:" + input_type
