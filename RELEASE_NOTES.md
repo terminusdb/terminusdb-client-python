@@ -1,4 +1,12 @@
 # TerminusDB Client Release Notes
+
+---
+## v0.2.0
+
+### New
+- added `+` operator for WOQLQuery object.
+- update connectionCapabilities to match with TerminusDB 2.0.5
+
 ---
 ## v0.1.5
 
