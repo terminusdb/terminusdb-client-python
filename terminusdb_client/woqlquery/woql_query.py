@@ -384,6 +384,7 @@ class WOQLQuery:
             "range": "rdfs:range",
             "domain": "rdfs:domain",
             "subClassOf": "rdfs:subClassOf",
+            "boolean": "xsd:boolean",
             "string": "xsd:string",
             "integer": "xsd:integer",
             "decimal": "xsd:decimal",
