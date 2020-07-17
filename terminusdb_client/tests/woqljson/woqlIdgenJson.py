@@ -1,9 +1,6 @@
 WOQL_IDGEN_JSON = {
     "@type": "woql:IDGenerator",
-    "woql:base": {
-        "@type": "woql:Datatype",
-        "woql:datatype": {"@type": "xsd:string", "@value": "doc:Station"},
-    },
+    "woql:base": {"@type": "woql:Node", "woql:node": "doc:Station"},
     "woql:key_list": {
         "@type": "woql:Array",
         "woql:array_element": [

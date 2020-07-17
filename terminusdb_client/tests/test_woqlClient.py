@@ -29,7 +29,6 @@ def test_connection(mocked_requests, monkeypatch):
     woql_client = WOQLClient("http://localhost:6363")
 
     # before connect it connection is empty
-    assert woql_client.conCapabilities.connection == {}
 
     woql_client.connect(key="root", account="admin", user="admin")
 
@@ -130,27 +129,6 @@ def test_create_database_and_change_account(mocked_requests, mocked_requests2):
     assert woql_client.basic_auth() == "admin:root"
 
 
-@mock.patch("requests.delete", side_effect=mocked_requests)
-@mock.patch("requests.get", side_effect=mocked_requests)
-def test_delete_database(mocked_requests, mocked_requests2, monkeypatch):
-    woql_client = WOQLClient("http://localhost:6363")
-
-    woql_client.connect(user="admin", account="admin", key="root")
-
-    monkeypatch.setattr(
-        woql_client.conCapabilities, "capabilities_permit", mock_func_with_1arg
-    )
-
-    monkeypatch.setattr(woql_client.conCapabilities, "remove_db", mock_func_with_2arg)
-
-    woql_client.delete_database("myFirstTerminusDB")
-
-    requests.delete.assert_called_once_with(
-        "http://localhost:6363/db/admin/myFirstTerminusDB",
-        headers={"Authorization": "Basic YWRtaW46cm9vdA=="},
-    )
-
-
 @mock.patch("requests.get", side_effect=mocked_requests)
 @mock.patch("requests.post", side_effect=mocked_requests)
 def test_branch(mocked_requests, mocked_requests2):
@@ -170,50 +148,12 @@ def test_branch(mocked_requests, mocked_requests2):
 
 @mock.patch("requests.get", side_effect=mocked_requests)
 @mock.patch("requests.post", side_effect=mocked_requests)
-def test_create_graph(mocked_requests, mocked_requests2):
-    woql_client = WOQLClient("http://localhost:6363")
-    woql_client.connect(user="admin", account="admin", key="root", db="myDBName")
-
-    woql_client.create_graph("instance", "mygraph", "add a new graph")
-
-    requests.post.assert_called_once_with(
-        "http://localhost:6363/graph/admin/myDBName/local/branch/master/instance/mygraph",
-        headers={
-            "Authorization": "Basic YWRtaW46cm9vdA==",
-            "content-type": "application/json",
-        },
-        json={
-            "commit_info": {
-                "author": "admin Server Admin User",
-                "message": "add a new graph",
-            }
-        },
-    )
-
-
-@mock.patch("requests.get", side_effect=mocked_requests)
-@mock.patch("requests.post", side_effect=mocked_requests)
 def test_wrong_graph_type(mocked_requests, mocked_requests2):
     woql_client = WOQLClient("http://localhost:6363")
     woql_client.connect(user="admin", account="admin", key="root", db="myDBName")
 
     with pytest.raises(ValueError):
         woql_client.create_graph("wrong_graph_name", "mygraph", "add a new graph")
-
-
-@mock.patch("requests.get", side_effect=mocked_requests)
-@mock.patch("requests.delete", side_effect=mocked_requests)
-def test_delete_graph(mocked_requests, mocked_requests2):
-    woql_client = WOQLClient("http://localhost:6363")
-    woql_client.connect(user="admin", account="admin", key="root", db="myDBName")
-
-    woql_client.delete_graph("instance", "mygraph", "add a new graph")
-
-    requests.delete.assert_called_once_with(
-        "http://localhost:6363/graph/admin/myDBName/local/branch/master/instance/mygraph?author=admin+Server+Admin+User&message=add+a+new+graph",
-        headers={"Authorization": "Basic YWRtaW46cm9vdA=="},
-    )
-
 
 @mock.patch("requests.get", side_effect=mocked_requests)
 def test_get_triples(mocked_requests):

@@ -127,10 +127,10 @@ class ConnectionCapabilities:
         return True                    
 
     def get_context_for_outbound_query(self, woql, dbid):
-        ob = woql
-        if(ob is None):
+        if(woql is None):
             ob = self.get_system_context()
         else:
+            ob = {}
             for pred in self._jsonld_context.keys():
                 if pred != "doc":
                     ob[pred] = self._jsonld_context[pred]
@@ -175,18 +175,30 @@ class ConnectionCapabilities:
     def _extract_user_info(self, capabilities):
         info = self._extract_rdf_basics(capabilities)
         info["id"] = self._single_rdf_value("system:agent_name", capabilities)
-        info["roles"] = self._multiple_rdf_objects(capabilities['system:role'], "system:Role")
+        croles = capabilities.get('system:role')
+        if croles is not None:
+            info["roles"] = self._multiple_rdf_objects(croles, "system:Role")
+        else : 
+            info["roles"] = []
         return info
 
     def _extract_user_role(self, jrole):
         nrole = self._extract_rdf_basics(jrole)
-        nrole["capabilities"] = self._multiple_rdf_objects(jrole["system:capability"], "system:Capability")
+        croles = jrole.get('system:capability')
+        if croles is not None:
+            nrole["capabilities"] = self._multiple_rdf_objects(croles, "system:Capability")
+        else :
+            nrole["capabilities"] = []
         return nrole
 
     def _extract_role_capability(self, jcap):
         nrole = self._extract_rdf_basics(jcap)
-        nrole["actions"] = self._extract_multiple_ids(jcap["system:action"])
-        nrole["resources"] = self._extract_capability_resources(jcap["system:capability_scope"])
+        acts = jcap.get('system:action')
+        resources = jcap.get('system:capability_scope')
+        if acts is not None:
+            nrole["actions"] = self._extract_multiple_ids(acts)
+        if resources is not None:
+            nrole["resources"] = self._extract_capability_resources(resources)
         return nrole
 
     def _extract_capability_resources(self, scope):

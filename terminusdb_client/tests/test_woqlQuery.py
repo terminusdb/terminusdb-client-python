@@ -33,25 +33,6 @@ pp = pprint.PrettyPrinter(indent=4)
 
 
 class TestWoqlQueries:
-    @mock.patch("requests.post", side_effect=mocked_requests)
-    @mock.patch("requests.get", side_effect=mocked_requests)
-    def test_execute_method(self, mocked_requests, mocked_requests2):
-        woql_client = WOQLClient("http://localhost:6363")
-        woql_client.connect(user="admin", account="admin", key="root", db="myDBName")
-        woql_object = WOQLQuery().star()
-        woql_object.execute(woql_client)
-
-        mycon = copy.deepcopy(WOQL_STAR)  # TODO: make WOQL_STAR immutable
-        mycon["@context"] = json_context
-
-        requests.post.assert_called_once_with(
-            "http://localhost:6363/woql/admin/myDBName/local/branch/master",
-            headers={
-                "Authorization": "Basic YWRtaW46cm9vdA==",
-                "content-type": "application/json",
-            },
-            json={"query": mycon},
-        )
 
     def test_start_properties_values(self):
         woql_object = WOQLQuery()
