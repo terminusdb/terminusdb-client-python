@@ -1,14 +1,11 @@
 # connectionCapabilities.py
 
-from .api_endpoint_const import APIEndpointConst
 
 # const UTILS = require('./utils.js');
-from .errorMessage import ErrorMessage
-from .errors import AccessDeniedError
 
-#import pprint
+# import pprint
 
-#pp = pprint.PrettyPrinter(indent=4)
+# pp = pprint.PrettyPrinter(indent=4)
 
 """
     Creates an entry in the connection registry for the server
@@ -40,26 +37,25 @@ class ConnectionCapabilities:
         self._clear()
         self.databases = None
         if capabilities is not None:
-            ctxt = capabilities.get('@context')
+            ctxt = capabilities.get("@context")
             if ctxt is not None:
                 self._load_connection_context(ctxt)
         self.user = self._extract_user_info(capabilities)
         return self._extract_database_organizations()
 
-
     def get_databases(self):
-        if self.databases is None:            
+        if self.databases is None:
             self.databases = self._databases_from_dbdocs()
         return self.databases
-    
+
     def set_databases(self, newdbs):
         self.databases = newdbs
-    
+
     def get_database(self, dbid, orgid):
         if self.databases is None:
             self.databases = self._databases_from_dbdocs()
         for db in self.databases:
-            if(db["id"] == dbid and db["organization"] == orgid):
+            if db["id"] == dbid and db["organization"] == orgid:
                 return db
         return None
 
@@ -70,47 +66,47 @@ class ConnectionCapabilities:
         if self.user.get("author"):
             return self.user.get("author")
         else:
-            return self.user.get("id") 
+            return self.user.get("id")
 
     def _databases_from_dbdocs(self):
         dbs = []
         for docid in self.dbdocs.keys():
-            if(self.dbdocs[docid]["system"] == False):
+            if self.dbdocs[docid]["system"] == False:
                 dbs.append(self._get_db_rec(self.dbdocs[docid]))
         return dbs
 
     def set_roles(self, role_output):
         cntnt = role_output.get("bindings")
-        if(cntnt is None):
+        if cntnt is None:
             return False
         for pred in cntnt:
             onerec = {}
-            onerec["dbdocid"] = pred['Database_ID']
-            onerec["organization"] = pred['Organization']['@value']
-            roles = self._multiple_rdf_objects(pred['Owner_Role_Obj'], "system:Role")
+            onerec["dbdocid"] = pred["Database_ID"]
+            onerec["organization"] = pred["Organization"]["@value"]
+            roles = self._multiple_rdf_objects(pred["Owner_Role_Obj"], "system:Role")
             self.dbdocs[onerec["dbdocid"]] = roles
         self._extract_database_organizations()
 
         rdb = role_output.get("databases")
-        if(rdb):
+        if rdb:
             self.set_databases(rdb)
         odb = role_output.get("organizations")
-        if(odb):
+        if odb:
             self.set_organizations(odb)
-        
+
     def get_organizations(self):
         if self.organizations is None:
             self.organizations = self._organizations_from_orgdocs()
         return self.organizations
-    
+
     def set_organizations(self, newdbs):
         self.organizations = newdbs
-    
+
     def get_organization(self, orgid):
         if self.organizations is None:
             self.organizations = self._organizations_from_orgdocs()
         for org in self.organizations:
-            if(org["id"] == orgid):
+            if org["id"] == orgid:
                 return org
         return None
 
@@ -124,7 +120,7 @@ class ConnectionCapabilities:
             for j in reslist.keys():
                 if self._roles_cover_resource_action(actlist[i], reslist[j]):
                     return False
-        return True                    
+        return True
 
     def get_context_for_outbound_query(self, woql, dbid):
         if(woql is None):
@@ -138,28 +134,32 @@ class ConnectionCapabilities:
         return ob
 
     def _is_system_db(self, dbid):
-        if dbid == "_system": 
+        if dbid == "_system":
             return True
         return False
-   
+
     def get_json_context(self):
-        return self._jsonld_context 
+        return self._jsonld_context
 
     def set_json_context(self, ctxt):
         self._jsonld_context = ctxt
 
     def get_system_context(self):
-        return self._systemdb_context 
+        return self._systemdb_context
 
     def _roles_cover_resource_action(self, action, resname):
         for docid in self.user["roles"].keys():
-            if self._role_covers_resource_action(self.user["roles"][docid], action, resname):
+            if self._role_covers_resource_action(
+                self.user["roles"][docid], action, resname
+            ):
                 return True
         return False
 
     def _role_covers_resource_action(self, role, action, resname):
         for docid in role["capabilities"].keys():
-            if self._capability_covers_resource_action(role["capabilities"][docid], action, resname):
+            if self._capability_covers_resource_action(
+                role["capabilities"][docid], action, resname
+            ):
                 return True
         return False
 
@@ -210,14 +210,16 @@ class ConnectionCapabilities:
             rtype = res.get("@type")
             if not (rid is None or rtype is None):
                 exist = self.dbdocs.get(rid)
-                if exist is None and (rtype == "system:SystemDatabase" or rtype == "system:Database"):
+                if exist is None and (
+                    rtype == "system:SystemDatabase" or rtype == "system:Database"
+                ):
                     self.dbdocs[rid] = self._extract_database(res)
                 if rtype == "system:Organization" and self.orgdocs.get(rid) is None:
                     self.orgdocs[rid] = self._extract_organization(res)
-        return rnames                           
+        return rnames
 
     def _extract_resource_name(self, jres):
-        id = self._single_rdf_value('system:resource_name', jres)
+        id = self._single_rdf_value("system:resource_name", jres)
         if id is None:
             id = self._single_rdf_value("system:organization_name", jres)
         if id is None:
@@ -244,7 +246,7 @@ class ConnectionCapabilities:
         for docid in self.dbdocs.keys():
             for odocid in self.orgdocs.keys():
                 if docid in self.orgdocs[odocid]["databases"]:
-                    self.dbdocs[docid]["organization"] = self.orgdocs[odocid]["id"] 
+                    self.dbdocs[docid]["organization"] = self.orgdocs[odocid]["id"]
 
     def _extract_organization(self, jres):
         org = self._extract_rdf_basics(jres)
@@ -266,14 +268,14 @@ class ConnectionCapabilities:
         for k in jids:
             ids.append(k["@id"])
         return ids
-        
+
     def _multiple_rdf_objects(self, rdf, type):
         nvals = {}
         vals = self._toarr(rdf)
         for n in vals:
-            if(isinstance(n, dict)):
+            if isinstance(n, dict):
                 nid = n.get("@id")
-                if nid is not None :
+                if nid is not None:
                     nvals[nid] = self._extract_rdf_object(type, n)
         return nvals
 
@@ -293,8 +295,8 @@ class ConnectionCapabilities:
         if rdf.get(pred) is None:
             return ""
         if isinstance(rdf[pred], list):
-            return rdf[pred][0]['@value']
-        return rdf[pred]['@value']        
+            return rdf[pred][0]["@value"]
+        return rdf[pred]["@value"]
 
     def _multiple_rdf_values(self, pred, rdf):
         vals = []
@@ -303,7 +305,7 @@ class ConnectionCapabilities:
         rdflist = self._toarr(rdf.get(pred))
         for item in rdflist:
             vals.append(item["@value"])
-        return vals 
+        return vals
 
     def _toarr(self, el):
         if isinstance(el, list):
@@ -313,5 +315,5 @@ class ConnectionCapabilities:
     def _load_connection_context(self, ctxt):
         self._systemdb_context = ctxt
         for k in ctxt.keys():
-            if(k != "doc"):
+            if k != "doc":
                 self._jsonld_context[k] = ctxt[k]

@@ -301,9 +301,9 @@ class WOQLClient:
             query_obj = {}
         if type(woql_query) != dict and hasattr(woql_query, "to_dict"):
             woql_query = woql_query.to_dict()
-        woql_query[
-            "@context"
-        ] = self.conCapabilities.get_context_for_outbound_query(None, self.db())
+        woql_query["@context"] = self.conCapabilities.get_context_for_outbound_query(
+            None, self.db()
+        )
         if type(file_list) == dict:
             file_dict = query_obj
             for name in file_list:
