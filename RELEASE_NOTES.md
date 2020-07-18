@@ -3,6 +3,13 @@
 ---
 ## v0.2.1
 
+### New
+- adding boolean method in WOQLQuery
+- adding dataType mapping for boolean so now "boolean" will be register as "xsd:boolean" in WOQLQuery
+
+---
+## v0.2.1
+
 ### Bug fixes
 - bug fix for delete_database in WOQLClient
 
