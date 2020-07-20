@@ -1,4 +1,18 @@
 # TerminusDB Client Release Notes
+
+---
+## v0.2.1
+
+### Bug fixes
+- bug fix for delete_database in WOQLClient
+
+---
+## v0.2.0
+
+### New
+- added `+` operator for WOQLQuery object.
+- update connectionCapabilities to match with TerminusDB 2.0.5
+
 ---
 ## v0.1.5
 

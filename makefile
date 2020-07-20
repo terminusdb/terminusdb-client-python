@@ -24,8 +24,8 @@ publish_patch:
 	#git remote add upstream git@github.com:terminusdb/terminus-client-python.git
 	git pull upstream master
 	bumpversion patch
-	git push upstream dev
-	git push upstream dev:master
+	git push upstream master
+	git push upstream master:dev
 	git push upstream --tags
 
 publish_release:

@@ -71,7 +71,7 @@ class ConnectionCapabilities:
     def _databases_from_dbdocs(self):
         dbs = []
         for docid in self.dbdocs.keys():
-            if self.dbdocs[docid]["system"] == False:
+            if not self.dbdocs[docid]["system"]:
                 dbs.append(self._get_db_rec(self.dbdocs[docid]))
         return dbs
 
@@ -123,7 +123,7 @@ class ConnectionCapabilities:
         return True
 
     def get_context_for_outbound_query(self, woql, dbid):
-        if(woql is None):
+        if woql is None:
             ob = self.get_system_context()
         else:
             ob = {}
@@ -175,26 +175,28 @@ class ConnectionCapabilities:
     def _extract_user_info(self, capabilities):
         info = self._extract_rdf_basics(capabilities)
         info["id"] = self._single_rdf_value("system:agent_name", capabilities)
-        croles = capabilities.get('system:role')
+        croles = capabilities.get("system:role")
         if croles is not None:
             info["roles"] = self._multiple_rdf_objects(croles, "system:Role")
-        else : 
+        else:
             info["roles"] = []
         return info
 
     def _extract_user_role(self, jrole):
         nrole = self._extract_rdf_basics(jrole)
-        croles = jrole.get('system:capability')
+        croles = jrole.get("system:capability")
         if croles is not None:
-            nrole["capabilities"] = self._multiple_rdf_objects(croles, "system:Capability")
-        else :
+            nrole["capabilities"] = self._multiple_rdf_objects(
+                croles, "system:Capability"
+            )
+        else:
             nrole["capabilities"] = []
         return nrole
 
     def _extract_role_capability(self, jcap):
         nrole = self._extract_rdf_basics(jcap)
-        acts = jcap.get('system:action')
-        resources = jcap.get('system:capability_scope')
+        acts = jcap.get("system:action")
+        resources = jcap.get("system:capability_scope")
         if acts is not None:
             nrole["actions"] = self._extract_multiple_ids(acts)
         if resources is not None:
@@ -219,12 +221,12 @@ class ConnectionCapabilities:
         return rnames
 
     def _extract_resource_name(self, jres):
-        id = self._single_rdf_value("system:resource_name", jres)
-        if id is None:
-            id = self._single_rdf_value("system:organization_name", jres)
-        if id is None:
-            id = self._single_rdf_value("system:database_name", jres)
-        return id
+        sys_id = self._single_rdf_value("system:resource_name", jres)
+        if sys_id is None:
+            sys_id = self._single_rdf_value("system:organization_name", jres)
+        if sys_id is None:
+            sys_id = self._single_rdf_value("system:database_name", jres)
+        return sys_id
 
     def _extract_database(self, jres):
         db = self._extract_rdf_basics(jres)
@@ -269,20 +271,20 @@ class ConnectionCapabilities:
             ids.append(k["@id"])
         return ids
 
-    def _multiple_rdf_objects(self, rdf, type):
+    def _multiple_rdf_objects(self, rdf, con_type):
         nvals = {}
         vals = self._toarr(rdf)
         for n in vals:
             if isinstance(n, dict):
                 nid = n.get("@id")
                 if nid is not None:
-                    nvals[nid] = self._extract_rdf_object(type, n)
+                    nvals[nid] = self._extract_rdf_object(con_type, n)
         return nvals
 
-    def _extract_rdf_object(self, type, jres):
-        if type == "system:Role":
+    def _extract_rdf_object(self, con_type, jres):
+        if con_type == "system:Role":
             return self._extract_user_role(jres)
-        elif type == "system:Capability":
+        elif con_type == "system:Capability":
             return self._extract_role_capability(jres)
 
     def _extract_rdf_basics(self, jres):
