@@ -142,7 +142,7 @@ def test_branch(mocked_requests, mocked_requests2):
             "Authorization": "Basic YWRtaW46cm9vdA==",
             "content-type": "application/json",
         },
-        json={"origin": "admin/myDBName/local/branch/master"},
+        json={"origin": "admin/myDBName/local/branch/main"},
     )
 
 
@@ -163,7 +163,7 @@ def test_get_triples(mocked_requests):
     woql_client.get_triples("instance", "mygraph")
 
     requests.get.assert_called_with(
-        "http://localhost:6363/triples/admin/myDBName/local/branch/master/instance/mygraph",
+        "http://localhost:6363/triples/admin/myDBName/local/branch/main/instance/mygraph",
         headers={"Authorization": "Basic YWRtaW46cm9vdA=="},
     )
 
@@ -179,7 +179,7 @@ def test_query(mocked_requests, mocked_requests2):
     woql_client.query(WoqlStar)
 
     requests.post.assert_called_once_with(
-        "http://localhost:6363/woql/admin/myDBName/local/branch/master",
+        "http://localhost:6363/woql/admin/myDBName/local/branch/main",
         headers={
             "Authorization": "Basic YWRtaW46cm9vdA==",
             "content-type": "application/json",

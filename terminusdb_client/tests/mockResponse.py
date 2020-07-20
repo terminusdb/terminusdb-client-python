@@ -62,13 +62,13 @@ def mocked_requests(*args, **kwargs):
 
     elif (
         args[0]
-        == "http://localhost:6363/graph/admin/myDBName/local/branch/master/instance/mygraph"
+        == "http://localhost:6363/graph/admin/myDBName/local/branch/main/instance/mygraph"
     ):
         return MockResponse(args[0], 200, APIEndpointConst.CREATE_GRAPH)
 
     elif (
         args[0]
-        == "http://localhost:6363/triples/admin/myDBName/local/branch/master/instance/mygraph"
+        == "http://localhost:6363/triples/admin/myDBName/local/branch/main/instance/mygraph"
     ):
         return MockResponse(args[0], 200, APIEndpointConst.GET_TRIPLES)
 

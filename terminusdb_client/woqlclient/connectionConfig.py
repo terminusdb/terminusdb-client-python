@@ -22,7 +22,7 @@ class ConnectionConfig:
         self.__accountid = False
         self.__dbid = False
 
-        self.__default_branch_id = "master"
+        self.__default_branch_id = "main"
         self.__default_repo_id = "local"
         # default repository and branch ids
         self.__branchid = self.__default_branch_id
