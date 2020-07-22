@@ -25,7 +25,8 @@
 
 ### Bug fixes
 
-Remove unwanted `print`
+- Remove unwanted `print`
+
 ---
 ## v0.1.4
 
