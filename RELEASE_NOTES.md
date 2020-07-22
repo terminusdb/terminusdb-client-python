@@ -1,7 +1,7 @@
 # TerminusDB Client Release Notes
 
 ---
-## v0.2.1
+## v0.2.2
 
 ### New
 - adding boolean method in WOQLQuery
@@ -24,7 +24,8 @@
 ## v0.1.5
 
 ### Bug fixes
-Remove unwanted print
+
+Remove unwanted `print`
 ---
 ## v0.1.4
 
