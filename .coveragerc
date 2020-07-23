@@ -1,2 +1,3 @@
 [run]
-omit = src/woqlclient/packages/*
+omit = */test*
+source = terminusdb_client
