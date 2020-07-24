@@ -41,23 +41,50 @@ For the [full Documentation](https://terminusdb.github.io/terminusdb-client-pyth
 Visit [terminus-tutorials](https://github.com/terminusdb/terminusdb-tutorials) for tutorial scripts and [Create TerminusDB Graph with Python Client](https://terminusdb.com/docs/getting-started/start-tutorials/py_client/) for a python-specific one.
 
 ## Testing
-* Clone this repository
+
+1. Clone this repository
 `git clone https://github.com/terminusdb/terminusdb-client-python.git`
 
-* Install all development dependencies
+2. Install all development dependencies
 ```sh
 $ make init
 ```
 
-* To run test files only
+3. (a) To run test files only
 ```sh
 $ pytest terminusdb_client/tests
 ```
 
-* To run full test
+3. (b) To run full test
 ```sh
 $ tox
 ```
+
+## Documentation
+
+Documentation on the latest version can be found [here](https://terminusdb.github.io/terminusdb-client-python/).
+
+### generating documentation locally
+
+1. Clone this repository
+`git clone https://github.com/terminusdb/terminusdb-client-python.git`
+
+2. Install all development dependencies
+```sh
+$ make init
+```
+
+3. Change directory to docs
+```sh
+$ cd docs/
+```
+
+4. Build with Sphinx
+```sh
+$ make html
+```
+
+The output files are under `docs/build/html`, open `index.html` in your browser to inspect.
 
 ## Report Issues
 
