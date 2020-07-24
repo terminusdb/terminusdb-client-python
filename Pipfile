@@ -15,6 +15,7 @@ sphinx_rtd_theme = "*"
 sphinxcontrib-napoleon = "*"
 pandas = "*"
 tox = "*"
+interrogate = "*"
 
 [packages]
 requests = "*"
