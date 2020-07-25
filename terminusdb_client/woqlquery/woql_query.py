@@ -1975,6 +1975,8 @@ class WOQLQuery:
                 cmds = item.split(" ")
                 if len(cmds) > 1 and cmds[1].strip().lower() == "asc":
                     obj["woql:ascending"] = self._jlt(True, "xsd:boolean")
+                else:
+                    obj["woql:ascending"] = self._jlt(False, "xsd:boolean")
                 varname = cmds[0].strip()
                 obj["woql:variable"] = self._varj(varname)
                 self._cursor["woql:variable_ordering"].append(obj)
