@@ -1,6 +1,5 @@
 import random
 import string
-import pytest
 from terminusdb_client.woqlclient.connectionConfig import ConnectionConfig
 
 
@@ -8,6 +7,11 @@ class TestConnectionConfig:
     start_server_url = "http://localhost:6363/"
     start_dbid = "testDB"
     local_user = "admin"
+    # Set of random string values that can as replacements for dummy id valuess
+    # i.e accountid,branchid,refid etc
+    id_value = ''.join(random.choice(
+        string.ascii_uppercase + string.ascii_lowercase
+    ) for _ in range(16))
     # to be review !!!!!
     connection_config = ConnectionConfig(
         start_server_url,
@@ -52,34 +56,66 @@ class TestConnectionConfig:
         assert self.connection_config.remote_auth == auth_dict
 
     def test_update(self):
-        id_value = ''.join(random.choice(
-            string.ascii_uppercase + string.ascii_lowercase
-        ) for _ in range(16))
-        self.connection_config.update(db=id_value)
-        self.connection_config.update(account=id_value)
-        self.connection_config.update(repo=id_value)
-        self.connection_config.update(branch=id_value)
-        self.connection_config.update(ref=id_value)
-        self.connection_config.update(repo=id_value)
-        assert self.connection_config.db == id_value
-        assert self.connection_config.account == id_value
-        assert self.connection_config.repo == id_value
-        assert self.connection_config.branch == id_value
-        assert self.connection_config.ref == id_value
-        assert self.connection_config.repo == id_value
+        self.connection_config.update(db=self.id_value)
+        self.connection_config.update(account=self.id_value)
+        self.connection_config.update(repo=self.id_value)
+        self.connection_config.update(branch=self.id_value)
+        self.connection_config.update(ref=self.id_value)
+        self.connection_config.update(repo=self.id_value)
+        assert self.connection_config.db == self.id_value
+        assert self.connection_config.account == self.id_value
+        assert self.connection_config.repo == self.id_value
+        assert self.connection_config.branch == self.id_value
+        assert self.connection_config.ref == self.id_value
+        assert self.connection_config.repo == self.id_value
 
     def test_clear_cursor(self):
-        id_value = ''.join(random.choice(
-            string.ascii_uppercase + string.ascii_lowercase
-        ) for _ in range(16))
-        self.connection_config.update(branch=id_value)
-        self.connection_config.update(repo=id_value)
-        self.connection_config.update(account=id_value)
-        self.connection_config.update(db=id_value)
-        self.connection_config.update(ref=id_value)
+        self.connection_config.update(branch=self.id_value)
+        self.connection_config.update(repo=self.id_value)
+        self.connection_config.update(account=self.id_value)
+        self.connection_config.update(db=self.id_value)
+        self.connection_config.update(ref=self.id_value)
         self.connection_config.clear_cursor()
-        assert self.connection_config.branch != id_value
-        assert self.connection_config.repo != id_value
+        assert self.connection_config.branch != self.id_value
+        assert self.connection_config.repo != self.id_value
         assert self.connection_config.account is False
         assert self.connection_config.db is False
         assert self.connection_config.ref is False
+
+    def test_user(self):
+        assert self.connection_config.user() == self.local_user
+        auth_dict = {type: "jwt", "key": "eyJhbGciOiJIUzI1NiIsInR5c"}
+        self.connection_config.update(remote=auth_dict)
+        assert self.connection_config.user() == self.local_user
+
+    def test_set_basic_auth(self):
+        assert self.connection_config.set_basic_auth() is None
+        self.connection_config.set_basic_auth(api_key="admin_testDB_Password")
+        basic_auth = self.connection_config.basic_auth
+        assert basic_auth == "admin:admin_testDB_Password"
+
+    def test_db_url_fragmen(self):
+        self.connection_config.update(db=self.id_value)
+        self.connection_config.update(account=self.id_value)
+        db_url_fragment = self.connection_config.db_url_fragment()
+        assert db_url_fragment == f'{self.id_value}/{self.id_value}'
+
+    def test_db_base(self):
+        self.connection_config.update(db=self.id_value)
+        self.connection_config.update(account=self.id_value)
+        db_base = self.connection_config.db_base('push')
+        assert (
+            db_base
+            == f"http://localhost:6363/push/{self.id_value}/{self.id_value}"
+        )
+
+    def test_repo_base(self):
+        self.connection_config.update(db=self.id_value)
+        self.connection_config.update(account=self.id_value)
+        db_base = self.connection_config.db_base('pull')
+        default_base = self.connection_config.repo_base('pull')
+        assert default_base == f"http://localhost:6363/pull/{self.id_value}/{self.id_value}/local"
+        self.connection_config.update(repo=self.id_value)
+        updated_base = self.connection_config.db_base('pull')
+        assert updated_base == f"http://localhost:6363/pull/{self.id_value}/{self.id_value}"
+
