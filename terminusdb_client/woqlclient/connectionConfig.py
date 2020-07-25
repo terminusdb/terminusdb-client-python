@@ -209,17 +209,6 @@ class ConnectionConfig:
         self.__dbid = False
         self.__refid = False
 
-    def set_server_connection(self, surl, key=None, jwt=None):
-        if self.set_server(surl):
-            if key is not None:
-                if not self.set_basic_auth(key):
-                    return False
-            if jwt is not None:
-                if not self.set_jwt(jwt):
-                    return False
-            return True
-        return False
-
     @account.setter
     def account(self, input_str):
         if input_str is None:
