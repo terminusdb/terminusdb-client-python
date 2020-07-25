@@ -19,7 +19,7 @@ These previous version(s) works with these version(s) of TerminusDB:
 - 0.1.5 - works with TerminusDB server / console v2.0.4
 
 ## Installation
--  TerminusDB Client can be download form PyPI using pip:
+-  TerminusDB Client can be downloaded form PyPI using pip:
 `python -m pip install terminusdb-client`
 
 This only includes the core Python Client (WOQLClient) and WOQLQuery.
@@ -37,7 +37,7 @@ If you want to use woqlDataframe:
 `python -m pip install git+https://github.com/terminusdb/terminusdb-client-python.git`
 
 ## Usage
-For the [full Documentation](https://terminusdb.github.io/terminusdb-client-python/)
+Please check the [full Documentation](https://terminusdb.github.io/terminusdb-client-python/)
 
 ## Tutorials
 Visit [terminus-tutorials](https://github.com/terminusdb/terminus-tutorials/tree/master/bike-tutorial/python) for tutorial scripts and [Create TerminusDB Graph with Python Client](https://terminusdb.com/docs/getting-started/start-tutorials/py_client/) for a python-specific one.
@@ -66,7 +66,7 @@ $ tox
 
 Documentation on the latest version can be found [here](https://terminusdb.github.io/terminusdb-client-python/).
 
-### generating documentation locally
+### Generating Documentation Locally
 
 1. Clone this repository
 `git clone https://github.com/terminusdb/terminusdb-client-python.git`
