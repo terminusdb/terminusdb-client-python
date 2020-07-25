@@ -8,19 +8,21 @@ Python version of the TerminusDB client - for TerminusDB API and WOQLpy
 
 ## Requirements
 - [TerminusDB 2.0.5](https://github.com/terminusdb/terminusdb-server)
-- [Python >= 3.6]
+- Python >= 3.6
 
-## Previous Versions
+## Release Notes and Previous Versions
+
+- Please check [RELEASE_NOTES.md](RELEASE_NOTES.md) to find out what has changed.
 
 These previous version(s) works with these version(s) of TerminusDB:
 
 - 0.1.5 - works with TerminusDB server / console v2.0.4
 
 ## Installation
--  TerminusDB Client can be download form PyPI using pip:
+-  TerminusDB Client can be downloaded form PyPI using pip:
 `python -m pip install terminusdb-client`
 
-this only include the core Python Client (WOQLClient) and WOQLQuery.
+This only includes the core Python Client (WOQLClient) and WOQLQuery.
 
 If you want to use woqlDataframe:
 
@@ -35,10 +37,10 @@ If you want to use woqlDataframe:
 `python -m pip install git+https://github.com/terminusdb/terminusdb-client-python.git`
 
 ## Usage
-For the [full Documentation](https://terminusdb.github.io/terminusdb-client-python/)
+Please check the [full Documentation](https://terminusdb.github.io/terminusdb-client-python/)
 
 ## Tutorials
-Visit [terminus-tutorials](https://github.com/terminusdb/terminusdb-tutorials) for tutorial scripts and [Create TerminusDB Graph with Python Client](https://terminusdb.com/docs/getting-started/start-tutorials/py_client/) for a python-specific one.
+Visit [terminus-tutorials](https://github.com/terminusdb/terminus-tutorials/tree/master/bike-tutorial/python) for tutorial scripts and [Create TerminusDB Graph with Python Client](https://terminusdb.com/docs/getting-started/start-tutorials/py_client/) for a python-specific one.
 
 ## Testing
 
@@ -64,7 +66,7 @@ $ tox
 
 Documentation on the latest version can be found [here](https://terminusdb.github.io/terminusdb-client-python/).
 
-### generating documentation locally
+### Generating Documentation Locally
 
 1. Clone this repository
 `git clone https://github.com/terminusdb/terminusdb-client-python.git`
@@ -88,13 +90,13 @@ The output files are under `docs/build/html`, open `index.html` in your browser 
 
 ## Report Issues
 
-If you have encounter any issues, please report it with your os and environment setup, version that you are using and a simple reproducible case.
+If you encounter any issues, please report them with your os and environment setup, the version that you are using and a simple reproducible case.
 
-If you encounter other questions, you can ask in our community [forum](https://community.terminusdb.com/) or [Discord](https://discord.gg/Gvdqw97).
+If you have other questions, you can ask in our community [forum](https://community.terminusdb.com/) or [Discord](https://discord.gg/Gvdqw97).
 
 ## Contribute
 
-It will be nice, if you open an issue first so that we can know what is going on, then, fork this repo and push in your ideas. Do not forget to add a bit of test(s) of what value you adding.
+It will be nice, if you open an issue first so that we can know what is going on, then, fork this repo and push in your ideas. Do not forget to add some test(s) of what value you adding.
 
 Please check [Contributing.md](Contributing.md) for more information.
 
