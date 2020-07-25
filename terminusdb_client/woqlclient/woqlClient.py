@@ -123,14 +123,14 @@ class WOQLClient:
         branch: set branch to this id
         """
         base = self.account() + "/" + self.db() + "/"
-        if type == "db":
+        if ttype == "db":
             return base
-        elif type == "meta":
+        elif ttype == "meta":
             return base + "_meta"
         base = base + self.repo()
-        if type == "repo":
+        if ttype == "repo":
             return base + "/_meta"
-        elif type == "commits":
+        elif ttype == "commits":
             return base + "/_commits"
         if val is None:
             if ttype == "ref":
