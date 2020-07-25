@@ -65,14 +65,75 @@ class WOQLClient:
         return json_obj
 
     def copy(self):
+        """Create a copy of this client.
+
+        Returns
+        -------
+        WOQLClient
+            The copied client instance.
+
+        Examples
+        --------
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> clone = client.copy()
+        >>> assert client is not clone
+        """
         return copy.deepcopy(self)
 
     def basic_auth(self, key=None, user=None):
+        """Set or get the ``user:password`` for basic HTTP authentication to the server.
+
+        If ``key`` is not provided, then the config will not be updated.
+
+        Parameters
+        ----------
+        key : str, optional
+            Optional password to use when authenticating to the server.
+        user : str, optional
+            Optional user name to use when authenticating to the server.
+
+        Returns
+        -------
+        str:
+            The basic authentication credentials in ``user:password`` format.
+
+        Examples
+        --------
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> client.basic_auth()
+        False
+        >>> client.basic_auth("password", "admin")
+        'admin:password'
+        >>> client.basic_auth()
+        'admin:password'
+        """
         if key:
             self.conConfig.set_basic_auth(key, user)
         return self.conConfig.basic_auth
 
     def remote_auth(self, auth_info=None):
+        """Set or get the JWT token used for authenticating to the server.
+
+        If ``auth_info`` is not provided, then the config will not be updated.
+
+        Parameters
+        ----------
+        auth_info : dict, optional
+            Optional dict of authentication info containing
+            ``"type"``, ``"user"`` and ``"key"`` keys.
+
+        Returns
+        -------
+        dict
+            The remote authentication info.
+
+        Examples
+        --------
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> client.remote_auth()
+        >>> client.remote_auth({"type": "jwt", "user": "admin", "key": "<token>"})
+        {'type': 'jwt', 'user': 'admin', 'key': '<token>'}
+        """
         if type(auth_info) == dict:
             self.conConfig.set_remote_auth(auth_info)
         return self.conConfig.remote_auth
@@ -86,6 +147,30 @@ class WOQLClient:
         return self.conConfig.db
 
     def account(self, accountid=None):
+        """Set or get the account identifier.
+
+        If ``accountid`` is not provided, then the config will not be updated.
+
+        Parameters
+        ----------
+        accountid : str, optional
+            Optional account identifer to set in the config.
+
+        Returns
+        -------
+        str
+            The current account name.
+
+        Examples
+        --------
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> client.account()
+        False
+        >>> client.account("<account>")
+        '<account>'
+        >>> client.account()
+        '<account>'
+        """
         if accountid:
             self.conConfig.account = accountid
         return self.conConfig.account
@@ -98,12 +183,60 @@ class WOQLClient:
         return self.conCapabilities.get_user()
 
     def repo(self, repoid=None):
+        """Set or get the repository identifier.
+
+        If ``repoid`` is not provided, then the config will not be updated.
+
+        Parameters
+        ----------
+        repoid : str, optional
+            Optional repository identifier to set in the config.
+
+        Returns
+        -------
+        str
+            The current respository identifier.
+
+        Examples
+        --------
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> client.repo()
+        'local'
+        >>> client.repo("<repository>")
+        '<repository>'
+        >>> client.repo()
+        '<repository>'
+        """
         if repoid:
             self.conConfig.repo = repoid
 
         return self.conConfig.repo
 
     def ref(self, refid=None):
+        """Set or get the ref pointer (pointer to a commit within the branch).
+
+        If ``refid`` is not provided, then the config will not be updated.
+
+        Parameters
+        ----------
+        refid : str, optional
+            Optional ref pointer to set in the config.
+
+        Returns
+        -------
+        str
+            The current ref pointer.
+
+        Examples
+        --------
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> client.ref()
+        False
+        >>> client.ref("<branch>")
+        '<branch>'
+        >>> client.ref()
+        '<branch>'
+        """
         if refid:
             self.conConfig.ref = refid
         return self.conConfig.ref
