@@ -20,30 +20,37 @@ from .dispatchRequest import DispatchRequest
 class WOQLClient:
     def __init__(self, server_url, **kwargs):
         # current conCapabilities context variables
-        """The WOQLClient constructor
+        """The WOQLClient constructor.
 
         Parameters
         ----------
         server_url : str
-                     url of the server that this client belongs
+            URL of the server that this client will connect to.
+        \**kwargs
+            Configuration options used to construct a :class:`ConnectionConfig` instance.
         """
         self.conConfig = ConnectionConfig(server_url, **kwargs)
         self.conCapabilities = ConnectionCapabilities()
 
     def connect(self, **kwargs):
-        """Connect to a Terminus server at the given URI with an API key
+        """Connect to a Terminus server at the given URI with an API key.
 
         Stores the terminus:ServerCapability document returned
         in the conCapabilities register which stores, the url, key, capabilities,
-        and database meta-data for the connected server
+        and database meta-data for the connected server.
 
-        If the serverURL argument is omitted,
-        self.conConfig.serverURL will be used if present
+        If the ``serverURL`` argument is omitted,
+        :attr:`self.conConfig.serverURL` will be used if present
         or an error will be raise.
+
+        Parameters
+        ----------
+        \**kwargs
+            Configuration options added to :attr:`conConfig`.
 
         Returns
         -------
-        dict or raise an InvalidURIError
+        dict or raise an InvalidURIError.
 
         Examples
         -------
@@ -110,17 +117,41 @@ class WOQLClient:
         return self.conConfig.user(ignore_jwt)
 
     def resource(self, ttype, val=None):
-        """
+        """Create a resource identifier string based on the current config.
+
         Parameters
         ----------
-        key        str option key
-        user
-        jwt
-        jwt_user
-        account
-        db: set cursor to this db
-        repo: set cursor to this repo
-        branch: set branch to this id
+        ttype : str
+            Type of resource. One of ["db", "meta", "repo", "commits", "ref", "branch"].
+        val : str, optional
+            Branch or commit identifier.
+
+        Returns
+        -------
+        str
+            The constructed resource string.
+
+        Examples
+        --------
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> client.account("<account>")
+        '<account>'
+        >>> client.db("<db>")
+        '<db>'
+        >>> client.repo("<repo>")
+        '<repo>'
+        >>> client.resource("db")
+        '<account>/<db>/'
+        >>> client.resource("meta")
+        '<account>/<db>/_meta'
+        >>> client.resource("commits")
+        '<account>/<db>/<repo>/_commits'
+        >>> client.resource("repo")
+        '<account>/<db>/<repo>/_meta'
+        >>> client.resource("ref", "<reference>")
+        '<account>/<db>/<repo>/commit/<reference>'
+        >>> client.resource("branch", "<branch>")
+        '<account>/<db>/<repo>/branch/<branch>'
         """
         base = self.account() + "/" + self.db() + "/"
         if type == "db":
@@ -154,21 +185,23 @@ class WOQLClient:
         prefixes=None,
         include_schema=True,
     ):
-        """
-        Create a Terminus Database by posting
-        a terminus:Database document to the Terminus Server
+        """Create a TerminusDB database by posting
+        a terminus:Database document to the Terminus Server.
 
         Parameters
         ----------
         dbid : str
-            ID of the specific database to create
-        label: textual name of db
-        description: text description of db
-        prefixes: prefixes
-        key : str, optional
-            you can omit the key if you have set it before
-        kwargs
-            Optional arguments that ``createDatabase`` takes
+            Unique identifier of the database.
+        accountid : str
+            Account identifier.
+        label : str, optional
+            Database name.
+        description : str, optional
+            Database description.
+        prefixes
+            TODO
+        include_schema : bool
+            TODO
 
         Returns
         -------
@@ -176,7 +209,8 @@ class WOQLClient:
 
         Examples
         --------
-        WOQLClient(server="http://localhost:6363").createDatabase("someDB", "Database Label", "password")
+        >>> client = WOQLClient(server="http://localhost:6363")
+        >>> client..createDatabase("someDB", "Database Label", "password")
         """
         details = {}
         # if no prefixes, we will add default here
@@ -210,14 +244,17 @@ class WOQLClient:
         )
 
     def delete_database(self, dbid, accountid=None):
-        """Delete a TerminusDB database
+        """Delete a TerminusDB database.
+
+        If ``accountid`` is provided, then the account in the config will be updated
+        and the new value will be used in future requests to the server.
 
         Parameters
         ----------
         dbid : str
-            ID of the database to delete
-        key : str, optional
-            you need the key if you didn't set before
+            Identifier of the database to delete.
+        accountid : str, optional
+            Optional account identifier.
 
         Returns
         -------
@@ -225,7 +262,9 @@ class WOQLClient:
 
         Examples
         -------
-        >>> WOQLClient(server="http://localhost:6363").deleteDatabase("someDBToDelete", "password")
+        >>> client = WOQLClient(server="http://localhost:6363")
+        >>> client.deleteDatabase("someDBToDelete", "password")
+        dict
         """
 
         self.db(dbid)
@@ -412,23 +451,22 @@ class WOQLClient:
     def dispatch(
         self, action, url, payload=None, file_dict=None
     ):  # don't use dict as default
-        """
-        Directly dispatch to a Terminus database.
+        """Directly dispatch to a TerminusDB database.
 
         Parameters
         ----------
+        action
+            The action to perform on the server.
         url : str
-            The server URL to point the action at
-        connectionKey : str
-            API key to the document
+            The server URL to point the action at.
         payload : dict
-            Payload to send to the server
+            Payload to send to the server.
         file_dict : list, optional
-            List of files that are needed for the query
+            List of files to include in the query.
 
         Returns
         -------
-        dict or raise an InvalidURIError
+        dict or raise an InvalidURIError.
         """
 
         # check if we can perform this action or raise an AccessDeniedError error
