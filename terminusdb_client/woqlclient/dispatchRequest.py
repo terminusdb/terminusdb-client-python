@@ -13,23 +13,23 @@ class DispatchRequest:
         pass
 
     @staticmethod
-    def __get_call(url, headers, payload):
+    def __get_call(url, headers, payload, cert=None):
         url = utils.add_params_to_url(url, payload)
 
-        return requests.get(url, headers=headers)
+        return requests.get(url, headers=headers, verify=False)
 
     @staticmethod
-    def __post_call(url, headers, payload, file_dict=None):
+    def __post_call(url, headers, payload, file_dict=None,  cert=None):
         if file_dict:
-            return requests.post(url, json=payload, headers=headers, files=file_dict)
+            return requests.post(url, json=payload, headers=headers, files=file_dict, verify=False)
         else:
             headers["content-type"] = "application/json"
-            return requests.post(url, json=payload, headers=headers)
+            return requests.post(url, json=payload, headers=headers, verify=False)
 
     @staticmethod
-    def __delete_call(url, headers, payload):
+    def __delete_call(url, headers, payload, cert=None):
         url = utils.add_params_to_url(url, payload)
-        return requests.delete(url, headers=headers)
+        return requests.delete(url, headers=headers, cert=cert)
 
     @staticmethod
     def __autorization_header(basic_auth=None, remote_auth=None):
@@ -61,7 +61,9 @@ class DispatchRequest:
         basic_auth=None,
         remote_auth=None,
         file_dict=None,
+        cert=None,
     ):
+
         # payload default as empty dict is against PEP
         # print("Sending to URL____________", url)
         # print("Send Request By Action_____________", action)
@@ -77,13 +79,13 @@ class DispatchRequest:
                 APIEndpointConst.CONNECT,
                 APIEndpointConst.CLASS_FRAME,
             ]:
-                request_response = cls.__get_call(url, headers, payload)
+                request_response = cls.__get_call(url, headers, payload, cert=cert)
 
             elif action in [
                 APIEndpointConst.DELETE_DATABASE,
                 APIEndpointConst.DELETE_GRAPH,
             ]:
-                request_response = cls.__delete_call(url, headers, payload)
+                request_response = cls.__delete_call(url, headers, payload, cert=cert)
 
             elif action in [
                 APIEndpointConst.WOQL_QUERY,
@@ -97,7 +99,7 @@ class DispatchRequest:
                 APIEndpointConst.BRANCH,
                 APIEndpointConst.CLONE,
             ]:
-                request_response = cls.__post_call(url, headers, payload, file_dict)
+                request_response = cls.__post_call(url, headers, payload, file_dict, cert=cert)
 
             if request_response.status_code == 200:
                 # print("hellow ")
