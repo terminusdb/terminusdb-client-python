@@ -1,3 +1,5 @@
+import random
+import string
 from terminusdb_client.woqlclient.connectionConfig import ConnectionConfig
 
 
@@ -38,3 +40,18 @@ class TestConnectionConfig:
 
     def test_check_basic_auth(self):
         assert self.connection_config.basic_auth == "admin:mykey"
+
+    def test_set_remote_auth(self):
+        auth_dict = {type: "jwt", "key": "eyJhbGciOiJIUzI1NiIsInR5c"}
+        self.connection_config.set_remote_auth(auth_dict)
+        assert self.connection_config.remote_auth == auth_dict
+        auth_dict = {type: "basic", "user": self.local_user,
+                     "key": "admin_testDB_Password"}
+        self.connection_config.update(remote_auth=auth_dict)
+        assert self.connection_config.remote_auth == auth_dict
+
+    def test_update(self):
+        """
+        Use hypothesis here to test the values.
+        """
+        pass
