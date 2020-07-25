@@ -410,6 +410,26 @@ class WOQLClient:
         return json_response
 
     def create_graph(self, graph_type, graph_id, commit_msg):
+        """Create a new graph in the current database context.
+
+        Parameters
+        ----------
+        graph_type : str
+            Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
+        graph_id : str
+            Graph identifier.
+        commit_msg : str
+            Commit message.
+
+        Returns
+        -------
+        dict
+
+        Raises
+        ------
+        ValueError
+            If the value of ``graph_type`` is invalid.
+        """
         if graph_type in ["inference", "schema", "instance"]:
             commit = self._generate_commit(commit_msg)
             return self.dispatch(
@@ -423,6 +443,26 @@ class WOQLClient:
         )
 
     def delete_graph(self, graph_type, graph_id, commit_msg):
+        """Delete a graph from the current database context.
+
+        Parameters
+        ----------
+        graph_type : str
+            Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
+        graph_id : str
+            Graph identifier.
+        commit_msg : str
+            Commit message.
+
+        Returns
+        -------
+        dict
+
+        Raises
+        ------
+        ValueError
+            If the value of ``graph_type`` is invalid.
+        """
         if graph_type in ["inference", "schema", "instance"]:
             commit = self._generate_commit(commit_msg)
             return self.dispatch(
@@ -436,12 +476,42 @@ class WOQLClient:
         )
 
     def get_triples(self, graph_type, graph_id):
+        """Retrieve the contents of the specified graph in Turtle format.
+
+        Parameters
+        ----------
+        graph_type : str
+            Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
+        graph_id : str
+            Graph identifier.
+
+        Returns
+        -------
+        dict
+        """
         return self.dispatch(
             APIEndpointConst.GET_TRIPLES,
             self.conConfig.triples_url(graph_type, graph_id),
         )
 
     def update_triples(self, graph_type, graph_id, turtle, commit_msg):
+        """Replace the contents of the specified graph with the given triples in Turtle format.
+
+        Parameters
+        ----------
+        graph_type : str
+            Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
+        graph_id : str
+            Graph identifier.
+        turtle
+            Valid set of triples in Turtle format.
+        commit_msg : str
+            Commit message.
+
+        Returns
+        -------
+        dict
+        """
         commit = self._generate_commit(commit_msg)
         commit.turtle = turtle
         return self.dispatch(
@@ -451,6 +521,17 @@ class WOQLClient:
         )
 
     def get_class_frame(self, class_name):
+        """Retrieve a class frame for the specified class.
+
+        Parameters
+        ----------
+        class_name : str
+            Class name.
+
+        Returns
+        -------
+        dict
+        """
         opts = {"class": class_name}
         return self.dispatch(
             APIEndpointConst.CLASS_FRAME,
@@ -459,6 +540,22 @@ class WOQLClient:
         )
 
     def query(self, woql_query, commit_msg=None, file_list=None):
+        """Execute a WOQL query on the current database context and return the results.
+
+        Parameters
+        ----------
+        woql_query : WOQLQuery
+            Query to execute.
+        commit_msg : str, optional
+            Commit message.
+        file_list : dict, optional
+            Dict mapping file names to file paths.
+
+        Returns
+        -------
+        dict
+            Query result.
+        """
         if (
             hasattr(woql_query, "_contains_update_check")
             and woql_query._contains_update_check()
@@ -497,6 +594,17 @@ class WOQLClient:
         )
 
     def branch(self, new_branch_id):
+        """Create a branch starting from the current branch.
+
+        Parameters
+        ----------
+        new_branch_id : str
+            New branch identifier.
+
+        Returns
+        -------
+        dict
+        """
         if self.ref():
             source = {
                 "origin": f"{self.account()}/{self.db()}/{self.repo()}/commit/{self.ref()}"
@@ -522,6 +630,27 @@ class WOQLClient:
             )
 
     def fetch(self, remote_source_repo):
+        """Fetch updates from a remote repository to the current database.
+
+        Parameters
+        ----------
+        remote_source_repo : dict
+            Remote repository identifier containing ``"remote"`` and ``"remote_branch"`` keys.
+
+        Returns
+        -------
+        dict
+
+        Raises
+        ------
+        ValueError
+            If the ``remote_source_repo`` is missing required keys.
+
+        Examples
+        --------
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> client.fetch({"author": "<author>", "remote": "<remote>", "remote_branch": "<branch>"})
+        """
         rc_args = self._prepare_revision_control_args(remote_source_repo)
         if rc_args and rc_args.get("remote") and rc_args.get("remote_branch"):
             return self.dispatch(
@@ -533,6 +662,27 @@ class WOQLClient:
             )
 
     def push(self, remote_target_repo):
+        """Push changes to the current database and branch to a remote repository.
+
+        Parameters
+        ----------
+        remote_target_repo : dict
+            Remote repository identifier containing ``"remote"`` and ``"remote_branch"`` keys.
+
+        Returns
+        -------
+        dict
+
+        Raises
+        ------
+        ValueError
+            If the ``remote_target_repo`` is missing required keys.
+
+        Examples
+        --------
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> client.push({"author": "<author>", "remote": "<remote>", "remote_branch": "<branch>"})
+        """
         rc_args = self._prepare_revision_control_args(remote_target_repo)
         if rc_args and rc_args.get("remote") and rc_args.get("remote_branch"):
             return self.dispatch(
@@ -544,6 +694,31 @@ class WOQLClient:
             )
 
     def rebase(self, rebase_source):
+        """Rebase the current branch onto the specified remote branch.
+
+        Notes
+        -----
+        The "remote" repo lives in the local database.
+
+        Parameters
+        ----------
+        rebase_source : dict
+            Dict containing a ``"rebase_from"`` key.
+
+        Returns
+        -------
+        dict
+
+        Raises
+        ------
+        ValueError
+            If the ``rebase_source`` is missing required keys.
+
+        Examples
+        --------
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> client.rebase({"rebase_from": "<branch>"})
+        """
         rc_args = self._prepare_revision_control_args(rebase_source)
         if rc_args and rc_args.get("rebase_from"):
             return self.dispatch(
@@ -555,6 +730,29 @@ class WOQLClient:
             )
 
     def clonedb(self, clone_source, newid):
+        """Clone a remote repository and create a local copy.
+
+        Parameters
+        ----------
+        clone_source : dict
+            Dict containing a ``"remote_url"`` key.
+        newid : str
+            Identifier of the new repository to create.
+
+        Returns
+        -------
+        dict
+
+        Raises
+        ------
+        ValueError
+            If the ``clone_source`` is missing required keys.
+
+        Examples
+        --------
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> client.clonedb({"remote_url": "<remote_url>"})
+        """
         rc_args = self._prepare_revision_control_args(clone_source)
         if rc_args and rc_args.get("remote_url"):
             return self.dispatch(
@@ -566,6 +764,26 @@ class WOQLClient:
             )
 
     def _generate_commit(self, msg, author=None):
+        """Pack the specified commit info into a dict format expected by the server.
+
+        Parameters
+        ----------
+        msg : str
+            Commit message.
+        author : str
+            Commit author.
+
+        Returns
+        -------
+        dict
+            Formatted commit info.
+
+        Examples
+        --------
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> client._generate_commit("<message>", "<author">)
+        {'commit_info': {'author': '<author>', 'message': '<message>'}}
+        """
         if author:
             mes_author = author
         else:
