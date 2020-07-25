@@ -33,7 +33,7 @@ def test_connection(mocked_requests, monkeypatch):
     woql_client.connect(key="root", account="admin", user="admin")
 
     requests.get.assert_called_once_with(
-        "http://localhost:6363/", headers={"Authorization": "Basic YWRtaW46cm9vdA=="}
+        "http://localhost:6363/", headers={"Authorization": "Basic YWRtaW46cm9vdA=="}, verify=False
     )
 
 
@@ -60,6 +60,7 @@ def test_create_database(mocked_requests, mocked_requests2):
             "Authorization": "Basic YWRtaW46cm9vdA==",
             "content-type": "application/json",
         },
+        verify=False,
         json={
             "label": "my first db",
             "comment": "my first db comment",
@@ -116,6 +117,7 @@ def test_create_database_and_change_account(mocked_requests, mocked_requests2):
             "Authorization": "Basic YWRtaW46cm9vdA==",
             "content-type": "application/json",
         },
+        verify=False,
         json={
             "label": "my first db",
             "comment": "my first db comment",
@@ -142,6 +144,7 @@ def test_branch(mocked_requests, mocked_requests2):
             "Authorization": "Basic YWRtaW46cm9vdA==",
             "content-type": "application/json",
         },
+        verify=False,
         json={"origin": "admin/myDBName/local/branch/main"},
     )
 
@@ -166,6 +169,7 @@ def test_get_triples(mocked_requests):
     requests.get.assert_called_with(
         "http://localhost:6363/triples/admin/myDBName/local/branch/main/instance/mygraph",
         headers={"Authorization": "Basic YWRtaW46cm9vdA=="},
+        verify=False
     )
 
 
@@ -185,5 +189,6 @@ def test_query(mocked_requests, mocked_requests2):
             "Authorization": "Basic YWRtaW46cm9vdA==",
             "content-type": "application/json",
         },
+        verify=False,
         json={"query": WoqlStar},
     )

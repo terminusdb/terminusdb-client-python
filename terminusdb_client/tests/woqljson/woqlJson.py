@@ -117,6 +117,7 @@ WOQL_JSON = {
             {
                 "@type": "woql:VariableOrdering",
                 "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 0},
+                "woql:ascending": {"@type": "xsd:boolean", "@value": True},
                 "woql:variable": {
                     "@type": "woql:Variable",
                     "woql:variable_name": {"@value": "A", "@type": "xsd:string"},
@@ -125,7 +126,7 @@ WOQL_JSON = {
             {
                 "@type": "woql:VariableOrdering",
                 "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 1},
-                "woql:ascending": {"@type": "xsd:boolean", "@value": True},
+                "woql:ascending": {"@type": "xsd:boolean", "@value": False},
                 "woql:variable": {
                     "@type": "woql:Variable",
                     "woql:variable_name": {"@value": "B", "@type": "xsd:string"},

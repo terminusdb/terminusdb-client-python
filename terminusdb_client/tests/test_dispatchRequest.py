@@ -26,7 +26,8 @@ def test_connect_call(mocked_requests):
     )
 
     requests.get.assert_called_once_with(
-        "http://localhost:6363/", headers={"Authorization": "Basic YWRtaW46cm9vdA=="}
+        "http://localhost:6363/", headers={"Authorization": "Basic YWRtaW46cm9vdA=="}, 
+        verify=False
     )
     assert response == ConnectResponse
 
@@ -48,6 +49,7 @@ def test_create_database(mocked_requests):
             "Authorization": "Basic YWRtaW46cm9vdA==",
             "content-type": "application/json",
         },
+        verify=False,
         json={"label": "my first db", "comment": "my first db"},
     )
 
@@ -62,5 +64,6 @@ def test_delete_database(mocked_requests):
     requests.delete.assert_called_once_with(
         "http://localhost:6363/db/admin/myFirstTerminusDB",
         headers={"Authorization": "Basic YWRtaW46cm9vdA=="},
+        verify=False
     )
     # print("call_args_list", requests.delete.call_args_list)

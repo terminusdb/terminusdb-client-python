@@ -19,9 +19,11 @@ class DispatchRequest:
         return requests.get(url, headers=headers, verify=False)
 
     @staticmethod
-    def __post_call(url, headers, payload, file_dict=None,  cert=None):
+    def __post_call(url, headers, payload, file_dict=None, cert=None):
         if file_dict:
-            return requests.post(url, json=payload, headers=headers, files=file_dict, verify=False)
+            return requests.post(
+                url, json=payload, headers=headers, files=file_dict, verify=False
+            )
         else:
             headers["content-type"] = "application/json"
             return requests.post(url, json=payload, headers=headers, verify=False)
@@ -29,7 +31,7 @@ class DispatchRequest:
     @staticmethod
     def __delete_call(url, headers, payload, cert=None):
         url = utils.add_params_to_url(url, payload)
-        return requests.delete(url, headers=headers, cert=cert)
+        return requests.delete(url, headers=headers, verify=False)
 
     @staticmethod
     def __autorization_header(basic_auth=None, remote_auth=None):
@@ -79,13 +81,13 @@ class DispatchRequest:
                 APIEndpointConst.CONNECT,
                 APIEndpointConst.CLASS_FRAME,
             ]:
-                request_response = cls.__get_call(url, headers, payload, cert=cert)
+                request_response = cls.__get_call(url, headers, payload)
 
             elif action in [
                 APIEndpointConst.DELETE_DATABASE,
                 APIEndpointConst.DELETE_GRAPH,
             ]:
-                request_response = cls.__delete_call(url, headers, payload, cert=cert)
+                request_response = cls.__delete_call(url, headers, payload)
 
             elif action in [
                 APIEndpointConst.WOQL_QUERY,
@@ -99,7 +101,9 @@ class DispatchRequest:
                 APIEndpointConst.BRANCH,
                 APIEndpointConst.CLONE,
             ]:
-                request_response = cls.__post_call(url, headers, payload, file_dict, cert=cert)
+                request_response = cls.__post_call(
+                    url, headers, payload, file_dict
+                )
 
             if request_response.status_code == 200:
                 # print("hellow ")

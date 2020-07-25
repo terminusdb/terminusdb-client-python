@@ -29,7 +29,7 @@ class WOQLClient:
         """
         self.conConfig = ConnectionConfig(server_url, **kwargs)
         self.conCapabilities = ConnectionCapabilities()
-        self.cert = kwargs.get('cert')
+        self.cert = kwargs.get("cert")
 
     def connect(self, **kwargs):
         """Connect to a Terminus server at the given URI with an API key
@@ -54,13 +54,20 @@ class WOQLClient:
         if len(kwargs) > 0:
             self.conConfig.update(**kwargs)
         if self.cert is None:
-            self.cert = kwargs.get('cert')
-        
+            self.cert = kwargs.get("cert")
+
         json_obj = self.dispatch(APIEndpointConst.CONNECT, self.conConfig.server)
         self.conCapabilities.set_capabilities(json_obj)
         return json_obj
 
     def copy(self):
+        """
+        Creates a copy of the client with the same context as the current one
+
+        Returns
+        -------
+        woqlClient object
+        """
         return copy.deepcopy(self)
 
     def basic_auth(self, key=None, user=None):
@@ -241,6 +248,21 @@ class WOQLClient:
         return json_response
 
     def create_graph(self, graph_type, graph_id, commit_msg):
+        """Adds a graph to a TerminusDB database
+
+        Parameters
+        ----------
+        graph_type : str
+            type of graph to create (instance, schema, inference)
+        graph_id : str
+            the id of the graph (e.g. main)
+        commit_mg : str
+            A message that will be written to the commit log to describe the change
+
+        Examples
+        -------
+        >>> WOQLClient(server="http://localhost:6363").create_graph("schema", "main", "adding schema graph")
+        """
         if graph_type in ["inference", "schema", "instance"]:
             commit = self._generate_commit(commit_msg)
             return self.dispatch(
@@ -254,6 +276,21 @@ class WOQLClient:
         )
 
     def delete_graph(self, graph_type, graph_id, commit_msg):
+        """Deletes a graph from a TerminusDB database
+
+        Parameters
+        ----------
+        graph_type : str
+            type of graph to delete (instance, schema, inference)
+        graph_id : str
+            the id of the graph (e.g. main)
+        commit_mg : str
+            A message that will be written to the commit log to describe the change
+
+        Examples
+        -------
+        >>> WOQLClient(server="http://localhost:6363").delete_graph("schema", "main", "adding schema graph")
+        """
         if graph_type in ["inference", "schema", "instance"]:
             commit = self._generate_commit(commit_msg)
             return self.dispatch(
@@ -267,12 +304,42 @@ class WOQLClient:
         )
 
     def get_triples(self, graph_type, graph_id):
+        """Retrieves the contents of the specified graph as triples encoded in turtle format
+
+        Parameters
+        ----------
+        graph_type : str
+            type of graph to create (instance, schema, inference)
+        graph_id : str
+            the id of the graph (e.g. main)
+
+        Examples
+        -------
+        >>> WOQLClient(server="http://localhost:6363").get_triples("schema", "main", "adding schema graph")
+        """
         return self.dispatch(
             APIEndpointConst.GET_TRIPLES,
             self.conConfig.triples_url(graph_type, graph_id),
         )
 
     def update_triples(self, graph_type, graph_id, turtle, commit_msg):
+        """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
+
+        Parameters
+        ----------
+        graph_type : str
+            type of graph to create (instance, schema, inference)
+        graph_id : str
+            the id of the graph (e.g. main)
+        turtle: str
+            A string encoding triples in turtle (ttl) format
+        commit_mg : str
+            A message that will be written to the commit log to describe the change
+
+        Examples
+        -------
+        >>> WOQLClient(server="http://localhost:6363").update_triples("schema", "main", "@prefix=.....", "adding schema triples")
+        """
         commit = self._generate_commit(commit_msg)
         commit.turtle = turtle
         return self.dispatch(
@@ -281,15 +348,21 @@ class WOQLClient:
             commit,
         )
 
-    def get_class_frame(self, class_name):
-        opts = {"class": class_name}
-        return self.dispatch(
-            APIEndpointConst.CLASS_FRAME,
-            self.conConfig.class_frame_url(class_name),
-            opts,
-        )
-
     def query(self, woql_query, commit_msg=None, file_list=None):
+        """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
+
+        Parameters
+        ----------
+        woql_query : dict or WOQLQuery object
+            A woql query as an object or dict
+        commit_mg : str
+            A message that will be written to the commit log to describe the change
+        file_list:
+
+        Examples
+        -------
+        >>> WOQLClient(server="http://localhost:6363").query(woql, "updating graph")
+        """
         if (
             hasattr(woql_query, "_contains_update_check")
             and woql_query._contains_update_check()
@@ -328,6 +401,17 @@ class WOQLClient:
         )
 
     def branch(self, new_branch_id):
+        """Creates a new branch with the given id (starting from current context of client)
+
+        Parameters
+        ----------
+        new_branch_id : str
+            The ID of the new branch to create
+
+        Examples
+        -------
+        >>> WOQLClient(server="http://localhost:6363").branch("dev")
+        """
         if self.ref():
             source = {
                 "origin": f"{self.account()}/{self.db()}/{self.repo()}/commit/{self.ref()}"
@@ -342,6 +426,17 @@ class WOQLClient:
         )
 
     def pull(self, remote_source_repo):
+        """Pulls changes from a branch in a remote repo to a local branch
+
+        Parameters
+        ----------
+        remote_source_repo : dict
+            details of the remote to pull from [remote, remote_branch]
+
+        Examples
+        -------
+        >>> WOQLClient(server="http://localhost:6363").pull({remote: "origin", "remote_branch": "main", "author": "admin", "message": "message"})
+        """
         rc_args = self._prepare_revision_control_args(remote_source_repo)
         if rc_args and rc_args.get("remote") and rc_args.get("remote_branch"):
             return self.dispatch(
@@ -352,18 +447,23 @@ class WOQLClient:
                 "Pull parameter error - you must specify a valid remote source and branch to pull from"
             )
 
-    def fetch(self, remote_source_repo):
-        rc_args = self._prepare_revision_control_args(remote_source_repo)
-        if rc_args and rc_args.get("remote") and rc_args.get("remote_branch"):
-            return self.dispatch(
-                APIEndpointConst.FETCH, self.conConfig.fetch_url(), rc_args
-            )
-        else:
-            raise ValueError(
-                "Fetch parameter error - you must specify a valid remote source and branch to pull from"
-            )
+    def fetch(self, remote_id):
+        return self.dispatch(
+            APIEndpointConst.FETCH, self.conConfig.fetch_url(remote_id)
+        )
 
     def push(self, remote_target_repo):
+        """Push changes from a branch to a remote repo
+
+        Parameters
+        ----------
+        remote_source_repo : dict
+            details of the remote to push to [remote, remote_branch, message]
+
+        Examples
+        -------
+        >>> WOQLClient(server="http://localhost:6363").push({remote: "origin", "remote_branch": "main", "author": "admin", "message": "message"})
+        """
         rc_args = self._prepare_revision_control_args(remote_target_repo)
         if rc_args and rc_args.get("remote") and rc_args.get("remote_branch"):
             return self.dispatch(
@@ -375,6 +475,17 @@ class WOQLClient:
             )
 
     def rebase(self, rebase_source):
+        """Rebase merges one branch into another - rebases from the passed branch into the current context branch
+
+        Parameters
+        ----------
+        rebase_source : dict
+            details of the branch to pull from [rebase_from, author, message]
+
+        Examples
+        -------
+        >>> WOQLClient(server="http://localhost:6363").rebase({rebase_from: "dev", "author": "admin", "message": "message"})
+        """
         rc_args = self._prepare_revision_control_args(rebase_source)
         if rc_args and rc_args.get("rebase_from"):
             return self.dispatch(
@@ -386,6 +497,19 @@ class WOQLClient:
             )
 
     def clonedb(self, clone_source, newid):
+        """Clones a remote repo and creates a local copy
+
+        Parameters
+        ----------
+        clone_source : dict
+            details of the database to clone [remote_url, label, comment, author, message]
+        newid :
+            the id of the cloned database to be created
+
+        Examples
+        -------
+        >>> WOQLClient(server="http://localhost:6363").clonedb({remote_url: "https://hub.terminusdb.com/ai/models", "label": "AI modelling DB"})
+        """
         rc_args = self._prepare_revision_control_args(clone_source)
         if rc_args and rc_args.get("remote_url"):
             return self.dispatch(
@@ -441,14 +565,59 @@ class WOQLClient:
         if payload is None:
             payload = {}
         return DispatchRequest.send_request_by_action(
-            url, action, payload, self.basic_auth(), self.remote_auth(), file_dict, self.cert
+            url,
+            action,
+            payload,
+            self.basic_auth(),
+            self.remote_auth(),
+            file_dict,
+            self.cert,
         )
 
-    def get_metadata(self, dbid, account):
-        return self.get_database(dbid, account)
-
     def get_database(self, dbid, account):
-        return self.conCapabilities.get_database(dbid, account)        
+        """
+        Returns metadata (id, organization, label, comment) about the requested database
+        Parameters
+        ----------
+        dbid : str
+            The id of the database
+        account : str
+            The account / organization id that the user is acting through
+
+        Returns
+        -------
+        dict or None if not found
+        """
+        return self.conCapabilities.get_database(dbid, account)
 
     def get_databases(self):
-        return self.conCapabilities.get_databases()        
+        """
+        Returns a list of database metadata records for all databases the user has access to
+
+        Returns
+        -------
+        list of dicts
+        """
+        return self.conCapabilities.get_databases()
+
+    def get_metadata(self, dbid, account):
+        """
+        Alias of get_database above - deprecated - included for backwards compatibility
+        """
+        return self.get_database(dbid, account)
+
+    """
+    Unstable / Experimental Endpoints
+
+    The below API endpoints are not yet officially released
+
+    They are part of the server API (not desktop) and will be finalized and
+    officially released when that package is released. They should be considered
+    unreliable and unstable until then and use is unsupported and at your own risk
+    """
+
+    def get_class_frame(self, class_name):
+        opts = {"class": class_name}
+        return self.dispatch(
+            APIEndpointConst.CLASS_FRAME, self.conConfig.class_frame_url(), opts,
+        )

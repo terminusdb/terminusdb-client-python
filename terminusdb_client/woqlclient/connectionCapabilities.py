@@ -175,7 +175,7 @@ class ConnectionCapabilities:
     def _extract_user_info(self, capabilities):
         info = self._extract_rdf_basics(capabilities)
         info["id"] = self._single_rdf_value("system:agent_name", capabilities)
-        info["author"] = self._single_rdf_value('system:user_identifier', capabilities)
+        info["author"] = self._single_rdf_value("system:user_identifier", capabilities)
         croles = capabilities.get("system:role")
         if croles is not None:
             info["roles"] = self._multiple_rdf_objects(croles, "system:Role")

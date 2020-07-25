@@ -24,6 +24,8 @@ class ConnectionConfig:
 
         self.__default_branch_id = "main"
         self.__default_repo_id = "local"
+        self.__system_db = "_system"
+
         # default repository and branch ids
         self.__branchid = self.__default_branch_id
         self.__repoid = self.__default_repo_id
@@ -109,7 +111,7 @@ class ConnectionConfig:
             return self.__basic_auth.split(":")[0]
 
     def db_url_fragment(self):
-        if self.db == "terminus":
+        if self.db == self.__system_db:
             return self.db
         return f"{self.account}/{self.db}"
 
@@ -143,7 +145,7 @@ class ConnectionConfig:
         return base
 
     def schema_url(self, sgid):
-        if self.db == "terminus":
+        if self.db == self.__system_db:
             schema = self.db_base("schema")
         else:
             schema = self.branch_base("schema")
@@ -152,17 +154,17 @@ class ConnectionConfig:
         return schema
 
     def query_url(self):
-        if self.db == "terminus":
+        if self.db == self.__system_db:
             return self.db_base("woql")
         return self.branch_base("woql")
 
     def class_frame_url(self):
-        if self.db == "terminus":
+        if self.db == self.__system_db:
             return self.db_base("frame")
         return self.branch_base("frame")
 
     def triples_url(self, graph_type, graph_id="main"):
-        if self.db == "terminus":
+        if self.db == self.__system_db:
             base_url = self.db_base("triples")
         else:
             base_url = self.branch_base("triples")
@@ -170,20 +172,21 @@ class ConnectionConfig:
         return f"{base_url}/{graph_type}/{graph_id}"
 
     def clone_url(self, new_repo_id=None):
-        crl = f"{self.serverURL}clone/{self.account}"
+        crl = f"{self.__server}clone/{self.account}"
         if new_repo_id is not None:
             crl = crl + f"/${new_repo_id}"
         return crl
 
     def cloneable_url(self):
-        crl = f"{self.serverURL}{self.account}/{self.db}"
+        crl = f"{self.__server}{self.account}/{self.db}"
         return crl
 
     def pull_url(self):
         return self.branch_base("pull")
 
-    def fetch_url(self):
-        return self.branch_base("fetch")
+    def fetch_url(self, remote_name):
+        furl = self.branch_base("fetch")
+        return furl + "/" + remote_name + "/_commits"
 
     def rebase_url(self):
         return self.branch_base("rebase")
@@ -208,17 +211,6 @@ class ConnectionConfig:
         self.__accountid = False
         self.__dbid = False
         self.__refid = False
-
-    def set_server_connection(self, surl, key=None, jwt=None):
-        if self.set_server(surl):
-            if key is not None:
-                if not self.set_basic_auth(key):
-                    return False
-            if jwt is not None:
-                if not self.set_jwt(jwt):
-                    return False
-            return True
-        return False
 
     @account.setter
     def account(self, input_str):

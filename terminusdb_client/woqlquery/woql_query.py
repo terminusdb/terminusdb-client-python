@@ -1949,7 +1949,7 @@ class WOQLQuery:
 
         Examples
         -------
-        Examples of 3 different usage patterns of order argument 
+        Examples of 3 different usage patterns of order argument
             >>> test1 = WOQLQuery().select("v:Time").using("_commits").woql_and(
             ...        WOQLQuery().order_by("v:Time", order="asc").triple("v:A", "ref:commit_timestamp", "v:Time")
             ... )
@@ -1964,7 +1964,7 @@ class WOQLQuery:
             ...         WOQLQuery().triple("v:A", "ref:commit_timestamp", "v:Time"),
             ...         WOQLQuery().triple("v:A", "ref:commit_message", "v:Message")
             ...     )
-            ... )             
+            ... )
         """
 
         ordered_varlist = list(args)
@@ -1977,7 +1977,7 @@ class WOQLQuery:
 
         if not ordered_varlist or len(ordered_varlist) == 0:
             return self._parameter_error(
-                "Order by must be passed at least one variables to order the query"
+                "Order by must be passed at least one variable to order the query"
             )
 
         if type(ordered_varlist[-1]) == dict and hasattr(
@@ -1986,10 +1986,12 @@ class WOQLQuery:
             embedquery = ordered_varlist.pop()
         else:
             embedquery = False
-        #if not isinstance(data["parent"], list):
+        # if not isinstance(data["parent"], list):
         if isinstance(order, list):
-            if(len(args) != len(order)):
-                print("ERROR ARG LENGTH MISMATCH")        
+            if len(args) != len(order):
+                return self._parameter_error(
+                    "Order array must be same length as variable array"
+                )
 
         for idx, item in enumerate(ordered_varlist):
             if type(item) == str:
@@ -2001,13 +2003,13 @@ class WOQLQuery:
                     iorder = order
                 if isinstance(order, list):
                     iorder = order[idx]
-                    if(iorder is None):
+                    if iorder is None:
                         iorder = "asc"
                 if isinstance(order, dict):
                     iorder = order.get(item)
-                    if(iorder is None):
+                    if iorder is None:
                         iorder = "asc"
-                if(iorder == 'desc'):
+                if iorder == "desc":
                     obj["woql:ascending"] = self._jlt(False, "xsd:boolean")
                 else:
                     obj["woql:ascending"] = self._jlt(True, "xsd:boolean")
