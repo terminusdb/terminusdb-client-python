@@ -1,5 +1,6 @@
 import random
 import string
+import pytest
 from terminusdb_client.woqlclient.connectionConfig import ConnectionConfig
 
 
@@ -51,7 +52,34 @@ class TestConnectionConfig:
         assert self.connection_config.remote_auth == auth_dict
 
     def test_update(self):
-        """
-        Use hypothesis here to test the values.
-        """
-        pass
+        id_value = ''.join(random.choice(
+            string.ascii_uppercase + string.ascii_lowercase
+        ) for _ in range(16))
+        self.connection_config.update(db=id_value)
+        self.connection_config.update(account=id_value)
+        self.connection_config.update(repo=id_value)
+        self.connection_config.update(branch=id_value)
+        self.connection_config.update(ref=id_value)
+        self.connection_config.update(repo=id_value)
+        assert self.connection_config.db == id_value
+        assert self.connection_config.account == id_value
+        assert self.connection_config.repo == id_value
+        assert self.connection_config.branch == id_value
+        assert self.connection_config.ref == id_value
+        assert self.connection_config.repo == id_value
+
+    def test_clear_cursor(self):
+        id_value = ''.join(random.choice(
+            string.ascii_uppercase + string.ascii_lowercase
+        ) for _ in range(16))
+        self.connection_config.update(branch=id_value)
+        self.connection_config.update(repo=id_value)
+        self.connection_config.update(account=id_value)
+        self.connection_config.update(db=id_value)
+        self.connection_config.update(ref=id_value)
+        self.connection_config.clear_cursor()
+        assert self.connection_config.branch != id_value
+        assert self.connection_config.repo != id_value
+        assert self.connection_config.account is False
+        assert self.connection_config.db is False
+        assert self.connection_config.ref is False
