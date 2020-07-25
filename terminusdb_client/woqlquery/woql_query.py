@@ -503,7 +503,7 @@ class WOQLQuery:
             self.woql_and(new_json, {})
             self._cursor = self._cursor["woql:query_list"][1]["woql:query"]
 
-    def using(self, collection, subq):
+    def using(self, collection, subq=None):
         if collection and collection == "woql:args":
             return ["woql:collection", "woql:query"]
         if self._cursor.get("@type"):
@@ -1933,7 +1933,7 @@ class WOQLQuery:
         self._cursor["woql:typecast_result"] = self._clean_object(result)
         return self
 
-    def order_by(self, *args):
+    def order_by(self, *args, order="asc"):
         """
         Orders the results by the list of variables including in gvarlist, asc_or_desc is a WOQL.asc or WOQ.desc list of variables
 
@@ -1946,7 +1946,27 @@ class WOQLQuery:
         -------
         WOQLQuery object
             query object that can be chained and/or execute
+
+        Examples
+        -------
+        Examples of 3 different usage patterns of order argument 
+            >>> test1 = WOQLQuery().select("v:Time").using("_commits").woql_and(
+            ...        WOQLQuery().order_by("v:Time", order="asc").triple("v:A", "ref:commit_timestamp", "v:Time")
+            ... )
+            >>> test2 = WOQLQuery().select("v:Time", "v:Message").using("_commits").woql_and(
+            ...     WOQLQuery().order_by("v:Time", "v:Message", order={"v:Time": "desc", "v:Message": "asc"}).woql_and(
+            ...         WOQLQuery().triple("v:A", "ref:commit_timestamp", "v:Time"),
+            ...         WOQLQuery().triple("v:A", "ref:commit_message", "v:Message")
+            ...     )
+            ... )
+            >>> test3 = WOQLQuery().select("v:Time", "v:Message").using("_commits").woql_and(
+            ...     WOQLQuery().order_by("v:Time", "v:Message", order=["desc", "asc"]).woql_and(
+            ...         WOQLQuery().triple("v:A", "ref:commit_timestamp", "v:Time"),
+            ...         WOQLQuery().triple("v:A", "ref:commit_message", "v:Message")
+            ...     )
+            ... )             
         """
+
         ordered_varlist = list(args)
         if ordered_varlist and ordered_varlist == "woql:args":
             return ["woql:variable_ordering", "woql:query"]
@@ -1966,19 +1986,32 @@ class WOQLQuery:
             embedquery = ordered_varlist.pop()
         else:
             embedquery = False
+        #if not isinstance(data["parent"], list):
+        if isinstance(order, list):
+            if(len(args) != len(order)):
+                print("ERROR ARG LENGTH MISMATCH")        
+
         for idx, item in enumerate(ordered_varlist):
             if type(item) == str:
                 obj = {
                     "@type": "woql:VariableOrdering",
                     "woql:index": self._jlt(idx, "xsd:nonNegativeInteger"),
                 }
-                cmds = item.split(" ")
-                if len(cmds) > 1 and cmds[1].strip().lower() == "asc":
-                    obj["woql:ascending"] = self._jlt(True, "xsd:boolean")
-                else:
+                if isinstance(order, str):
+                    iorder = order
+                if isinstance(order, list):
+                    iorder = order[idx]
+                    if(iorder is None):
+                        iorder = "asc"
+                if isinstance(order, dict):
+                    iorder = order.get(item)
+                    if(iorder is None):
+                        iorder = "asc"
+                if(iorder == 'desc'):
                     obj["woql:ascending"] = self._jlt(False, "xsd:boolean")
-                varname = cmds[0].strip()
-                obj["woql:variable"] = self._varj(varname)
+                else:
+                    obj["woql:ascending"] = self._jlt(True, "xsd:boolean")
+                obj["woql:variable"] = self._varj(item)
                 self._cursor["woql:variable_ordering"].append(obj)
             else:
                 self._cursor["woql:variable_ordering"].append(ordered_varlist[idx])

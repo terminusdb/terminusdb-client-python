@@ -3,9 +3,9 @@
 
 # const UTILS = require('./utils.js');
 
-# import pprint
+import pprint
 
-# pp = pprint.PrettyPrinter(indent=4)
+pp = pprint.PrettyPrinter(indent=4)
 
 """
     Creates an entry in the connection registry for the server
@@ -175,6 +175,7 @@ class ConnectionCapabilities:
     def _extract_user_info(self, capabilities):
         info = self._extract_rdf_basics(capabilities)
         info["id"] = self._single_rdf_value("system:agent_name", capabilities)
+        info["author"] = self._single_rdf_value('system:user_identifier', capabilities)
         croles = capabilities.get("system:role")
         if croles is not None:
             info["roles"] = self._multiple_rdf_objects(croles, "system:Role")
@@ -216,7 +217,7 @@ class ConnectionCapabilities:
                     rtype == "system:SystemDatabase" or rtype == "system:Database"
                 ):
                     self.dbdocs[rid] = self._extract_database(res)
-                if rtype == "system:Organization" and self.orgdocs.get(rid) is None:
+                if rtype == "system:Organization":
                     self.orgdocs[rid] = self._extract_organization(res)
         return rnames
 
@@ -247,7 +248,8 @@ class ConnectionCapabilities:
     def _extract_database_organizations(self):
         for docid in self.dbdocs.keys():
             for odocid in self.orgdocs.keys():
-                if docid in self.orgdocs[odocid]["databases"]:
+                dbs = self.orgdocs[odocid].get("databases")
+                if dbs is not None and docid in dbs:
                     self.dbdocs[docid]["organization"] = self.orgdocs[odocid]["id"]
 
     def _extract_organization(self, jres):
