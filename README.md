@@ -38,7 +38,7 @@ If you want to use woqlDataframe:
 For the [full Documentation](https://terminusdb.github.io/terminusdb-client-python/)
 
 ## Tutorials
-Visit [terminus-tutorials](https://github.com/terminusdb/terminusdb-tutorials) for tutorial scripts and [Create TerminusDB Graph with Python Client](https://terminusdb.com/docs/getting-started/start-tutorials/py_client/) for a python-specific one.
+Visit [terminus-tutorials](https://github.com/terminusdb/terminus-tutorials/tree/master/bike-tutorial/python) for tutorial scripts and [Create TerminusDB Graph with Python Client](https://terminusdb.com/docs/getting-started/start-tutorials/py_client/) for a python-specific one.
 
 ## Testing
 
