@@ -1,4 +1,4 @@
-import random
+import secrets
 import string
 
 from terminusdb_client.woqlclient.connectionConfig import ConnectionConfig
@@ -11,7 +11,7 @@ class TestConnectionConfig:
     # Set of random string values that can as replacements for dummy id valuess
     # i.e accountid,branchid,refid etc
     id_value = "".join(
-        random.choice(string.ascii_uppercase + string.ascii_lowercase)
+        secrets.choice(string.ascii_uppercase + string.ascii_lowercase)
         for _ in range(16)
     )
     # to be review !!!!!
@@ -120,6 +120,7 @@ class TestConnectionConfig:
             default_base
             == f"http://localhost:6363/pull/{self.id_value}/{self.id_value}/local"
         )
+
         self.connection_config.update(repo=self.id_value)
         updated_base = self.connection_config.db_base("pull")
         assert (
