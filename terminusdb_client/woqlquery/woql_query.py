@@ -3330,7 +3330,7 @@ class WOQLQuery:
             result_obj = result_obj.description(description)
         return result_obj
 
-    def vars(self, varray):
+    def vars(self, *args):
         """Generate variables to be used in WOQLQueries
         Parameters
         ----------
@@ -3341,4 +3341,7 @@ class WOQLQuery:
         list
             List of strings prefixed with "v:"
         """
-        return list(map(lambda var: "v:" + var, varray))
+        vars_tuple = tuple(f"v:{arg}" for arg in args)
+        if len(vars_tuple) == 1:
+            vars_tuple = vars_tuple[0]
+        return vars_tuple
