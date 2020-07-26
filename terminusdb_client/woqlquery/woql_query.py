@@ -3329,3 +3329,16 @@ class WOQLQuery:
         if isinstance(description, str) and description:
             result_obj = result_obj.description(description)
         return result_obj
+
+    def vars(self, varray):
+        """Generate variables to be used in WOQLQueries
+        Parameters
+        ----------
+        varray : list
+            list of strings
+        Returns
+        -------
+        list
+            List of strings prefixed with "v:"
+        """
+        return list(map(lambda var: "v:" + var, varray))
