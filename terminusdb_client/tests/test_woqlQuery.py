@@ -530,3 +530,9 @@ class TestTripleBuilderChainer:
         v3 = WOQLQuery().triple("A", "B", "C").woql_and().triple("D", "E", "F")
         assert woql_object.to_dict() == v2.to_dict()
         assert woql_object.to_dict() == v3.to_dict()
+
+    def test_vars(self):
+        single_vars = WOQLQuery().vars("a")
+        vars1, vars2, vars3 = WOQLQuery().vars("a", "b", "c")
+        assert single_vars == "v:a"
+        assert (vars1, vars2, vars3) == ("v:a", "v:b", "v:c")
