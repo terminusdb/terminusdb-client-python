@@ -158,7 +158,7 @@ class WOQLClient:
     def create_database(
         self,
         dbid,
-        accountid,
+        accountid=None,
         label=None,
         description=None,
         prefixes=None,
@@ -172,49 +172,38 @@ class WOQLClient:
         ----------
         dbid : str
             ID of the specific database to create
+        accountid: str
+            ID of the organization in which to create the DB (defaults to 'admin')
         label: textual name of db
         description: text description of db
         prefixes: prefixes
-        key : str, optional
-            you can omit the key if you have set it before
-        kwargs
-            Optional arguments that ``createDatabase`` takes
-
+       
         Returns
         -------
         dict
 
         Examples
         --------
-        WOQLClient(server="http://localhost:6363").createDatabase("someDB", "Database Label", "password")
+        WOQLClient(server="http://localhost:6363").createDatabase("someDB", "Database Label", "admin")
         """
         details = {}
-        # if no prefixes, we will add default here
-        if prefixes is None:
-            details["prefixes"] = {
-                "scm": f"terminusdb://{accountid}/{dbid}/schema#",
-                "doc": f"terminusdb://{accountid}/{dbid}/data/",
-            }
-
         if label:
             details["label"] = label
+        else: 
+            details["label"] = dbid
         if description:
             details["comment"] = description
-
+        else:
+            details["comment"] = ""
+        if include_schema:
+            details["schema"] = True
+        if prefixes:
+            details["schema"] = prefixes
+        if accountid is None:
+            accountid = self.user_account()
+        
         self.db(dbid)
         self.account(accountid)
-
-        if include_schema:
-            response = self.dispatch(
-                APIEndpointConst.CREATE_DATABASE, self.conConfig.db_url(), details
-            )
-            self.create_graph(
-                "schema",
-                "main",
-                f"Python client {__version__} message: Creating schema graph",
-            )
-            return response
-
         return self.dispatch(
             APIEndpointConst.CREATE_DATABASE, self.conConfig.db_url(), details
         )

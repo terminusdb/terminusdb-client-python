@@ -1,5 +1,19 @@
 # TerminusDB Client Release Notes
 
+## v0.3.0
+
+### New
+
+- Updated create database to take advantage of default prefixes and schema graph creation happening on server
+- Integrated all Revision Control API operations fully
+- .vars() method - add v: to woql variables
+
+### Bug Fixes / Improvements
+
+- Added 3 varities of ordering specification as optional arguments to order_by
+- fixed bug to make order_by("desc") work
+
+
 ---
 ## v0.2.1
 
