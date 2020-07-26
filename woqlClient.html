@@ -175,13 +175,17 @@
 <dt id="terminusdb_client.WOQLClient">
 <em class="property">class </em><code class="sig-prename descclassname">terminusdb_client.</code><code class="sig-name descname">WOQLClient</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">server_url</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Client for querying a TerminusDB server using WOQL queries.</p>
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.__init__">
 <code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">server_url</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>The WOQLClient constructor</p>
+<dd><p>The WOQLClient constructor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>server_url</strong> (<em>str</em>) – url of the server that this client belongs</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>server_url</strong> (<em>str</em>) – URL of the server that this client will connect to.</p></li>
+<li><p><strong>**kwargs</strong> – Configuration options used to construct a <code class="xref py py-class docutils literal notranslate"><span class="pre">ConnectionConfig</span></code> instance.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -189,23 +193,27 @@
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.connect">
 <code class="sig-name descname">connect</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.connect" title="Permalink to this definition">¶</a></dt>
-<dd><p>Connect to a Terminus server at the given URI with an API key</p>
+<dd><p>Connect to a Terminus server at the given URI with an API key.</p>
 <p>Stores the terminus:ServerCapability document returned
 in the conCapabilities register which stores, the url, key, capabilities,
-and database meta-data for the connected server</p>
-<p>If the serverURL argument is omitted,
-self.conConfig.serverURL will be used if present
+and database meta-data for the connected server.</p>
+<p>If the <code class="docutils literal notranslate"><span class="pre">serverURL</span></code> argument is omitted,
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">self.conConfig.serverURL</span></code> will be used if present
 or an error will be raise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> – Configuration options added to <code class="xref py py-attr docutils literal notranslate"><span class="pre">conConfig</span></code>.</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>dict or raise an InvalidURIError</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">woql</span><span class="o">.</span><span class="n">WOQLClient</span><span class="p">()</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">serverUrl</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">server_url</span><span class="o">=</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;&lt;key&gt;&quot;</span><span class="p">)</span>
 <span class="go">dict</span>
 </pre></div>
 </div>
@@ -214,101 +222,387 @@ or an error will be raise.</p>
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.copy">
 <code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.copy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Create a deep copy of this client.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The copied client instance.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#terminusdb_client.WOQLClient" title="terminusdb_client.WOQLClient">WOQLClient</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clone</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">client</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">clone</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.basic_auth">
 <code class="sig-name descname">basic_auth</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">user</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.basic_auth" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Set or get the <code class="docutils literal notranslate"><span class="pre">user:password</span></code> for basic HTTP authentication to the server.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">key</span></code> is not provided, then the config will not be updated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em><em>, </em><em>optional</em>) – Optional password to use when authenticating to the server.</p></li>
+<li><p><strong>user</strong> (<em>str</em><em>, </em><em>optional</em>) – Optional user name to use when authenticating to the server.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The basic authentication credentials in <code class="docutils literal notranslate"><span class="pre">user:password</span></code> format.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">basic_auth</span><span class="p">()</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">basic_auth</span><span class="p">(</span><span class="s2">&quot;password&quot;</span><span class="p">,</span> <span class="s2">&quot;admin&quot;</span><span class="p">)</span>
+<span class="go">&#39;admin:password&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">basic_auth</span><span class="p">()</span>
+<span class="go">&#39;admin:password&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.remote_auth">
 <code class="sig-name descname">remote_auth</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">auth_info</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.remote_auth" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Set or get the JWT token used for authenticating to the server.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">auth_info</span></code> is not provided, then the config will not be updated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>auth_info</strong> (<em>dict</em><em>, </em><em>optional</em>) – Optional dict of authentication info containing
+<code class="docutils literal notranslate"><span class="pre">&quot;type&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;user&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;key&quot;</span></code> keys.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The remote authentication info.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">remote_auth</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">remote_auth</span><span class="p">({</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;jwt&quot;</span><span class="p">,</span> <span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="s2">&quot;admin&quot;</span><span class="p">,</span> <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;token&gt;&quot;</span><span class="p">})</span>
+<span class="go">{&#39;type&#39;: &#39;jwt&#39;, &#39;user&#39;: &#39;admin&#39;, &#39;key&#39;: &#39;&lt;token&gt;&#39;}</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.set_db">
 <code class="sig-name descname">set_db</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dbid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.set_db" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Set and return the current database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dbid</strong> (<em>str</em><em>, </em><em>optional</em>) – Database identifer to set in the config.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The current database identifier.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">set_db</span><span class="p">(</span><span class="s2">&quot;&lt;database&gt;&quot;</span><span class="p">)</span>
+<span class="go">&#39;&lt;database&gt;&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.db">
 <code class="sig-name descname">db</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dbid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.db" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Set or get the current database.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">dbid</span></code> is not provided, then the config will not be updated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dbid</strong> (<em>str</em><em>, </em><em>optional</em>) – Optional database identifier to set in the config.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The current database identifier.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">db</span><span class="p">()</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="s2">&quot;&lt;database&gt;&quot;</span><span class="p">)</span>
+<span class="go">&#39;&lt;database&gt;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">db</span><span class="p">()</span>
+<span class="go">&#39;&lt;database&gt;&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.account">
 <code class="sig-name descname">account</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">accountid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.account" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Set or get the account identifier.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">accountid</span></code> is not provided, then the config will not be updated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>accountid</strong> (<em>str</em><em>, </em><em>optional</em>) – Optional account identifier to set in the config.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The current account name.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">account</span><span class="p">()</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">account</span><span class="p">(</span><span class="s2">&quot;&lt;account&gt;&quot;</span><span class="p">)</span>
+<span class="go">&#39;&lt;account&gt;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">account</span><span class="p">()</span>
+<span class="go">&#39;&lt;account&gt;&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.user_account">
 <code class="sig-name descname">user_account</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.user_account" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the current user identifier.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>User identifier.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">user_account</span><span class="p">()</span>
+<span class="go">&#39;&lt;uid&gt;&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.user">
 <code class="sig-name descname">user</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.user" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the current user’s information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">user</span><span class="p">()</span>
+<span class="go">{&#39;id&#39;: &#39;&lt;uid&gt;&#39;, &#39;author&#39;: &#39;&lt;author&gt;&#39;, &#39;roles&#39;: [], &#39;label&#39;: &#39;&lt;label&gt;&#39;, &#39;comment&#39;: &#39;&lt;comment&gt;&#39;}</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.repo">
 <code class="sig-name descname">repo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">repoid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.repo" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Set or get the repository identifier.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">repoid</span></code> is not provided, then the config will not be updated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>repoid</strong> (<em>str</em><em>, </em><em>optional</em>) – Optional repository identifier to set in the config.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The current repository identifier.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">repo</span><span class="p">()</span>
+<span class="go">&#39;local&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">repo</span><span class="p">(</span><span class="s2">&quot;&lt;repository&gt;&quot;</span><span class="p">)</span>
+<span class="go">&#39;&lt;repository&gt;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">repo</span><span class="p">()</span>
+<span class="go">&#39;&lt;repository&gt;&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.ref">
 <code class="sig-name descname">ref</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">refid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.ref" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Set or get the ref pointer (pointer to a commit within the branch).</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">refid</span></code> is not provided, then the config will not be updated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>refid</strong> (<em>str</em><em>, </em><em>optional</em>) – Optional ref pointer to set in the config.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The current ref pointer.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">ref</span><span class="p">()</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="s2">&quot;&lt;branch&gt;&quot;</span><span class="p">)</span>
+<span class="go">&#39;&lt;branch&gt;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">ref</span><span class="p">()</span>
+<span class="go">&#39;&lt;branch&gt;&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.checkout">
 <code class="sig-name descname">checkout</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">branchid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.checkout" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Set or get the current branch identifier.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">branchid</span></code> is not provided, then the config will not be updated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>branchid</strong> (<em>str</em><em>, </em><em>optional</em>) – Optional branch identifier to set in the config.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The current branch identifier.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">checkout</span><span class="p">()</span>
+<span class="go">&#39;main&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">checkout</span><span class="p">(</span><span class="s2">&quot;&lt;branch&gt;&quot;</span><span class="p">)</span>
+<span class="go">&#39;&lt;branch&gt;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">checkout</span><span class="p">()</span>
+<span class="go">&#39;&lt;branch&gt;&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.uid">
 <code class="sig-name descname">uid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ignore_jwt</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.uid" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the current user identifier.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ignore_jwt</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the local user identifier will be returned rather than the one set in the JWT.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The local or JWT user identifier.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">uid</span><span class="p">()</span>
+<span class="go">&#39;&lt;uid&gt;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">uid</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="go">&#39;&lt;jwt_uid&gt;&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.resource">
 <code class="sig-name descname">resource</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ttype</span></em>, <em class="sig-param"><span class="n">val</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.resource" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Create a resource identifier string based on the current config.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>str option key</strong> (<em>key</em>) – </p></li>
-<li><p><strong>user</strong> – </p></li>
-<li><p><strong>jwt</strong> – </p></li>
-<li><p><strong>jwt_user</strong> – </p></li>
-<li><p><strong>account</strong> – </p></li>
-<li><p><strong>db</strong> (<em>set cursor to this db</em>) – </p></li>
-<li><p><strong>repo</strong> (<em>set cursor to this repo</em>) – </p></li>
-<li><p><strong>branch</strong> (<em>set branch to this id</em>) – </p></li>
+<li><p><strong>ttype</strong> (<em>str</em>) – Type of resource. One of [“db”, “meta”, “repo”, “commits”, “ref”, “branch”].</p></li>
+<li><p><strong>val</strong> (<em>str</em><em>, </em><em>optional</em>) – Branch or commit identifier.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The constructed resource string.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">account</span><span class="p">(</span><span class="s2">&quot;&lt;account&gt;&quot;</span><span class="p">)</span>
+<span class="go">&#39;&lt;account&gt;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="s2">&quot;&lt;db&gt;&quot;</span><span class="p">)</span>
+<span class="go">&#39;&lt;db&gt;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">repo</span><span class="p">(</span><span class="s2">&quot;&lt;repo&gt;&quot;</span><span class="p">)</span>
+<span class="go">&#39;&lt;repo&gt;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="s2">&quot;db&quot;</span><span class="p">)</span>
+<span class="go">&#39;&lt;account&gt;/&lt;db&gt;/&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="s2">&quot;meta&quot;</span><span class="p">)</span>
+<span class="go">&#39;&lt;account&gt;/&lt;db&gt;/_meta&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="s2">&quot;commits&quot;</span><span class="p">)</span>
+<span class="go">&#39;&lt;account&gt;/&lt;db&gt;/&lt;repo&gt;/_commits&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="s2">&quot;repo&quot;</span><span class="p">)</span>
+<span class="go">&#39;&lt;account&gt;/&lt;db&gt;/&lt;repo&gt;/_meta&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="s2">&quot;ref&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;reference&gt;&quot;</span><span class="p">)</span>
+<span class="go">&#39;&lt;account&gt;/&lt;db&gt;/&lt;repo&gt;/commit/&lt;reference&gt;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="s2">&quot;branch&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;branch&gt;&quot;</span><span class="p">)</span>
+<span class="go">&#39;&lt;account&gt;/&lt;db&gt;/&lt;repo&gt;/branch/&lt;branch&gt;&#39;</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.set">
 <code class="sig-name descname">set</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.set" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Update multiple config values on the current context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> – Dict of config options to set.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">set</span><span class="p">({</span><span class="s2">&quot;account&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;account&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;branch&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;branch&gt;&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.create_database">
 <code class="sig-name descname">create_database</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dbid</span></em>, <em class="sig-param"><span class="n">accountid</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">prefixes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">include_schema</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.create_database" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a Terminus Database by posting
-a terminus:Database document to the Terminus Server</p>
+<dd><p>Create a TerminusDB database by posting
+a terminus:Database document to the Terminus Server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dbid</strong> (<em>str</em>) – ID of the specific database to create</p></li>
-<li><p><strong>label</strong> (<em>textual name of db</em>) – </p></li>
-<li><p><strong>description</strong> (<em>text description of db</em>) – </p></li>
-<li><p><strong>prefixes</strong> (<em>prefixes</em>) – </p></li>
-<li><p><strong>key</strong> (<em>str</em><em>, </em><em>optional</em>) – you can omit the key if you have set it before</p></li>
-<li><p><strong>kwargs</strong> – Optional arguments that <code class="docutils literal notranslate"><span class="pre">createDatabase</span></code> takes</p></li>
+<li><p><strong>dbid</strong> (<em>str</em>) – Unique identifier of the database.</p></li>
+<li><p><strong>accountid</strong> (<em>str</em>) – Account identifier.</p></li>
+<li><p><strong>label</strong> (<em>str</em><em>, </em><em>optional</em>) – Database name.</p></li>
+<li><p><strong>description</strong> (<em>str</em><em>, </em><em>optional</em>) – Database description.</p></li>
+<li><p><strong>prefixes</strong> (<em>dict</em><em>, </em><em>optional</em>) – <p>Optional dict containing <code class="docutils literal notranslate"><span class="pre">&quot;doc&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;scm&quot;</span></code> keys.</p>
+<dl class="simple">
+<dt>doc (str)</dt><dd><p>IRI to use when <code class="docutils literal notranslate"><span class="pre">doc:</span></code> prefixes are expanded. Defaults to <code class="docutils literal notranslate"><span class="pre">terminusdb:///data</span></code>.</p>
+</dd>
+<dt>scm (str)</dt><dd><p>IRI to use when <code class="docutils literal notranslate"><span class="pre">scm:</span></code> prefixes are expanded. Defaults to <code class="docutils literal notranslate"><span class="pre">terminusdb:///schema</span></code>.</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>include_schema</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, a main schema graph will be created, otherwise only a main instance graph will be created.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -319,18 +613,23 @@ a terminus:Database document to the Terminus Server</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<p>WOQLClient(server=”<a class="reference external" href="http://localhost:6363">http://localhost:6363</a>”).createDatabase(“someDB”, “Database Label”, “password”)</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">create_database</span><span class="p">(</span><span class="s2">&quot;someDB&quot;</span><span class="p">,</span> <span class="s2">&quot;Database Label&quot;</span><span class="p">,</span> <span class="s2">&quot;password&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.delete_database">
 <code class="sig-name descname">delete_database</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dbid</span></em>, <em class="sig-param"><span class="n">accountid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.delete_database" title="Permalink to this definition">¶</a></dt>
-<dd><p>Delete a TerminusDB database</p>
+<dd><p>Delete a TerminusDB database.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">accountid</span></code> is provided, then the account in the config will be updated
+and the new value will be used in future requests to the server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dbid</strong> (<em>str</em>) – ID of the database to delete</p></li>
-<li><p><strong>key</strong> (<em>str</em><em>, </em><em>optional</em>) – you need the key if you didn’t set before</p></li>
+<li><p><strong>dbid</strong> (<em>str</em>) – Identifier of the database to delete.</p></li>
+<li><p><strong>accountid</strong> (<em>str</em><em>, </em><em>optional</em>) – Optional account identifier.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -341,7 +640,9 @@ a terminus:Database document to the Terminus Server</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">WOQLClient</span><span class="p">(</span><span class="n">server</span><span class="o">=</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">deleteDatabase</span><span class="p">(</span><span class="s2">&quot;someDBToDelete&quot;</span><span class="p">,</span> <span class="s2">&quot;password&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">delete_database</span><span class="p">(</span><span class="s2">&quot;&lt;database&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;account&gt;&quot;</span><span class="p">)</span>
+<span class="go">dict</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -349,81 +650,296 @@ a terminus:Database document to the Terminus Server</p>
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.create_graph">
 <code class="sig-name descname">create_graph</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">graph_type</span></em>, <em class="sig-param"><span class="n">graph_id</span></em>, <em class="sig-param"><span class="n">commit_msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.create_graph" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="terminusdb_client.WOQLClient.delete_graph">
-<code class="sig-name descname">delete_graph</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">graph_type</span></em>, <em class="sig-param"><span class="n">graph_id</span></em>, <em class="sig-param"><span class="n">commit_msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.delete_graph" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="terminusdb_client.WOQLClient.get_triples">
-<code class="sig-name descname">get_triples</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">graph_type</span></em>, <em class="sig-param"><span class="n">graph_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_triples" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="terminusdb_client.WOQLClient.update_triples">
-<code class="sig-name descname">update_triples</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">graph_type</span></em>, <em class="sig-param"><span class="n">graph_id</span></em>, <em class="sig-param"><span class="n">turtle</span></em>, <em class="sig-param"><span class="n">commit_msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.update_triples" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="terminusdb_client.WOQLClient.get_class_frame">
-<code class="sig-name descname">get_class_frame</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">class_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_class_frame" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="terminusdb_client.WOQLClient.query">
-<code class="sig-name descname">query</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">woql_query</span></em>, <em class="sig-param"><span class="n">commit_msg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">file_list</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.query" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="terminusdb_client.WOQLClient.branch">
-<code class="sig-name descname">branch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">new_branch_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.branch" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="terminusdb_client.WOQLClient.pull">
-<code class="sig-name descname">pull</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">remote_source_repo</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.pull" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="terminusdb_client.WOQLClient.fetch">
-<code class="sig-name descname">fetch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">remote_source_repo</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.fetch" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="terminusdb_client.WOQLClient.push">
-<code class="sig-name descname">push</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">remote_target_repo</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.push" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="terminusdb_client.WOQLClient.rebase">
-<code class="sig-name descname">rebase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rebase_source</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.rebase" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="terminusdb_client.WOQLClient.clonedb">
-<code class="sig-name descname">clonedb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">clone_source</span></em>, <em class="sig-param"><span class="n">newid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.clonedb" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="terminusdb_client.WOQLClient.dispatch">
-<code class="sig-name descname">dispatch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">action</span></em>, <em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="n">payload</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">file_dict</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.dispatch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Directly dispatch to a Terminus database.</p>
+<dd><p>Create a new graph in the current database context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>url</strong> (<em>str</em>) – The server URL to point the action at</p></li>
-<li><p><strong>connectionKey</strong> (<em>str</em>) – API key to the document</p></li>
-<li><p><strong>payload</strong> (<em>dict</em>) – Payload to send to the server</p></li>
-<li><p><strong>file_dict</strong> (<em>list</em><em>, </em><em>optional</em>) – List of files that are needed for the query</p></li>
+<li><p><strong>graph_type</strong> (<em>str</em>) – Graph type, either <code class="docutils literal notranslate"><span class="pre">&quot;inference&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;instance&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;schema&quot;</span></code>.</p></li>
+<li><p><strong>graph_id</strong> (<em>str</em>) – Graph identifier.</p></li>
+<li><p><strong>commit_msg</strong> (<em>str</em>) – Commit message.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p></p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dict or raise an InvalidURIError</p>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the value of <code class="docutils literal notranslate"><span class="pre">graph_type</span></code> is invalid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLClient.delete_graph">
+<code class="sig-name descname">delete_graph</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">graph_type</span></em>, <em class="sig-param"><span class="n">graph_id</span></em>, <em class="sig-param"><span class="n">commit_msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.delete_graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a graph from the current database context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>graph_type</strong> (<em>str</em>) – Graph type, either <code class="docutils literal notranslate"><span class="pre">&quot;inference&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;instance&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;schema&quot;</span></code>.</p></li>
+<li><p><strong>graph_id</strong> (<em>str</em>) – Graph identifier.</p></li>
+<li><p><strong>commit_msg</strong> (<em>str</em>) – Commit message.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the value of <code class="docutils literal notranslate"><span class="pre">graph_type</span></code> is invalid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLClient.get_triples">
+<code class="sig-name descname">get_triples</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">graph_type</span></em>, <em class="sig-param"><span class="n">graph_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_triples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the contents of the specified graph in Turtle format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>graph_type</strong> (<em>str</em>) – Graph type, either <code class="docutils literal notranslate"><span class="pre">&quot;inference&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;instance&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;schema&quot;</span></code>.</p></li>
+<li><p><strong>graph_id</strong> (<em>str</em>) – Graph identifier.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLClient.update_triples">
+<code class="sig-name descname">update_triples</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">graph_type</span></em>, <em class="sig-param"><span class="n">graph_id</span></em>, <em class="sig-param"><span class="n">turtle</span></em>, <em class="sig-param"><span class="n">commit_msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.update_triples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace the contents of the specified graph with the given triples in Turtle format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>graph_type</strong> (<em>str</em>) – Graph type, either <code class="docutils literal notranslate"><span class="pre">&quot;inference&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;instance&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;schema&quot;</span></code>.</p></li>
+<li><p><strong>graph_id</strong> (<em>str</em>) – Graph identifier.</p></li>
+<li><p><strong>turtle</strong> – Valid set of triples in Turtle format.</p></li>
+<li><p><strong>commit_msg</strong> (<em>str</em>) – Commit message.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLClient.get_class_frame">
+<code class="sig-name descname">get_class_frame</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">class_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_class_frame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a class frame for the specified class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>class_name</strong> (<em>str</em>) – Class name.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLClient.query">
+<code class="sig-name descname">query</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">woql_query</span></em>, <em class="sig-param"><span class="n">commit_msg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">file_list</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a WOQL query on the current database context and return the results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>woql_query</strong> (<a class="reference internal" href="woqlQuery.html#terminusdb_client.WOQLQuery" title="terminusdb_client.WOQLQuery"><em>WOQLQuery</em></a>) – Query to execute.</p></li>
+<li><p><strong>commit_msg</strong> (<em>str</em><em>, </em><em>optional</em>) – Commit message.</p></li>
+<li><p><strong>file_list</strong> (<em>dict</em><em>, </em><em>optional</em>) – Dict mapping file names to file paths.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Query result.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLClient.branch">
+<code class="sig-name descname">branch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">new_branch_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.branch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a branch starting from the current branch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>new_branch_id</strong> (<em>str</em>) – New branch identifier.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLClient.pull">
+<code class="sig-name descname">pull</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">remote_source_repo</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.pull" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pull updates from a remote repository to the current database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>remote_source_repo</strong> (<em>dict</em>) – Remote repository identifier containing <code class="docutils literal notranslate"><span class="pre">&quot;remote&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;remote_branch&quot;</span></code> keys.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the <code class="docutils literal notranslate"><span class="pre">remote_source_repo</span></code> is missing required keys.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">pull</span><span class="p">({</span><span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;author&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;remote&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;remote&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;remote_branch&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;branch&gt;&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLClient.fetch">
+<code class="sig-name descname">fetch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">remote_source_repo</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.fetch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch updates from a remote repository to the current database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>remote_source_repo</strong> (<em>dict</em>) – Remote repository identifier containing <code class="docutils literal notranslate"><span class="pre">&quot;remote&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;remote_branch&quot;</span></code> keys.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the <code class="docutils literal notranslate"><span class="pre">remote_source_repo</span></code> is missing required keys.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">fetch</span><span class="p">({</span><span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;author&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;remote&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;remote&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;remote_branch&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;branch&gt;&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLClient.push">
+<code class="sig-name descname">push</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">remote_target_repo</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.push" title="Permalink to this definition">¶</a></dt>
+<dd><p>Push changes to the current database and branch to a remote repository.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>remote_target_repo</strong> (<em>dict</em>) – Remote repository identifier containing <code class="docutils literal notranslate"><span class="pre">&quot;remote&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;remote_branch&quot;</span></code> keys.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the <code class="docutils literal notranslate"><span class="pre">remote_target_repo</span></code> is missing required keys.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">push</span><span class="p">({</span><span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;author&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;remote&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;remote&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;remote_branch&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;branch&gt;&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLClient.rebase">
+<code class="sig-name descname">rebase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rebase_source</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.rebase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rebase the current branch onto the specified remote branch.</p>
+<p class="rubric">Notes</p>
+<p>The “remote” repo lives in the local database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rebase_source</strong> (<em>dict</em>) – Dict containing a <code class="docutils literal notranslate"><span class="pre">&quot;rebase_from&quot;</span></code> key.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the <code class="docutils literal notranslate"><span class="pre">rebase_source</span></code> is missing required keys.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">rebase</span><span class="p">({</span><span class="s2">&quot;rebase_from&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;branch&gt;&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLClient.clonedb">
+<code class="sig-name descname">clonedb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">clone_source</span></em>, <em class="sig-param"><span class="n">newid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.clonedb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clone a remote repository and create a local copy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>clone_source</strong> (<em>dict</em>) – Dict containing a <code class="docutils literal notranslate"><span class="pre">&quot;remote_url&quot;</span></code> key.</p></li>
+<li><p><strong>newid</strong> (<em>str</em>) – Identifier of the new repository to create.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the <code class="docutils literal notranslate"><span class="pre">clone_source</span></code> is missing required keys.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">clonedb</span><span class="p">({</span><span class="s2">&quot;remote_url&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;remote_url&gt;&quot;</span><span class="p">},</span> <span class="s2">&quot;&lt;newid&gt;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLClient.dispatch">
+<code class="sig-name descname">dispatch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">action</span></em>, <em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="n">payload</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">file_dict</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.dispatch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directly dispatch to a TerminusDB database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>action</strong> – The action to perform on the server.</p></li>
+<li><p><strong>url</strong> (<em>str</em>) – The server URL to point the action at.</p></li>
+<li><p><strong>payload</strong> (<em>dict</em>) – Payload to send to the server.</p></li>
+<li><p><strong>file_dict</strong> (<em>list</em><em>, </em><em>optional</em>) – List of files to include in the query.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -431,7 +947,16 @@ a terminus:Database document to the Terminus Server</p>
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.get_metadata">
 <code class="sig-name descname">get_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dbid</span></em>, <em class="sig-param"><span class="n">account</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_metadata" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get a list of database metadata records for all databases the user has access to.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list of dicts</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
