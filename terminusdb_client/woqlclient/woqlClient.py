@@ -995,4 +995,10 @@ class WOQLClient:
         )
 
     def get_metadata(self, dbid, account):
+        """Get a list of database metadata records for all databases the user has access to.
+
+        Returns
+        -------
+        list of dicts
+        """
         return self.conCapabilities.get_database(dbid, account)
