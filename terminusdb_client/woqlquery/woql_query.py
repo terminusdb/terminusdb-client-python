@@ -3334,12 +3334,12 @@ class WOQLQuery:
         """Generate variables to be used in WOQLQueries
         Parameters
         ----------
-        varray : list
-            list of strings
+        args
+            string arguments
         Returns
         -------
-        list
-            List of strings prefixed with "v:"
+        tuple/string
+            args prefixed with "v:"
         """
         vars_tuple = tuple(f"v:{arg}" for arg in args)
         if len(vars_tuple) == 1:
