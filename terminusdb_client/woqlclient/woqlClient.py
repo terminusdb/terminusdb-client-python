@@ -19,7 +19,6 @@ from .dispatchRequest import DispatchRequest
 
 class WOQLClient:
     def __init__(self, server_url, **kwargs):
-        # current conCapabilities context variables
         """The WOQLClient constructor.
 
         Parameters
@@ -54,7 +53,8 @@ class WOQLClient:
 
         Examples
         -------
-        >>> woql.WOQLClient().connect(serverUrl, key)
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> client.connect(server_url="http://localhost:6363", key="<key>")
         dict
         """
         if len(kwargs) > 0:
@@ -139,9 +139,51 @@ class WOQLClient:
         return self.conConfig.remote_auth
 
     def set_db(self, dbid):
+        """Set and return the current dataase.
+
+        Parameters
+        ----------
+        dbid : str, optional
+            Database identifer to set in the config.
+
+        Returns
+        -------
+        str
+            The current database identifier.
+
+        Examples
+        --------
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> client.set_db("<database>")
+        '<database>'
+        """
         return self.db(dbid)
 
     def db(self, dbid=None):
+        """Set or get the current dataase.
+
+        If ``dbid`` is not provided, then the config will not be updated.
+
+        Parameters
+        ----------
+        dbid : str, optional
+            Optional database identifer to set in the config.
+
+        Returns
+        -------
+        str
+            The current database identifier.
+
+        Examples
+        --------
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> client.db()
+        False
+        >>> client.db("<database>")
+        '<database>'
+        >>> client.db()
+        '<database>'
+        """
         if dbid:
             self.conConfig.db = dbid
         return self.conConfig.db
@@ -176,10 +218,35 @@ class WOQLClient:
         return self.conConfig.account
 
     def user_account(self):
+        """Get the current user identifier.
+
+        Returns
+        -------
+        str
+            User identifier.
+
+        Examples
+        --------
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> client.user_account()
+        '<uid>'
+        """
         u = self.conCapabilities.get_user()
         return u.id
 
     def user(self):
+        """Get the current user's information.
+
+        Returns
+        -------
+        dict
+
+        Examples
+        --------
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> client.user()
+        {'id': '<uid>', 'author': '<author>', 'roles': [], 'label': '<label>', 'comment': '<comment>'}
+        """
         return self.conCapabilities.get_user()
 
     def repo(self, repoid=None):
@@ -242,11 +309,55 @@ class WOQLClient:
         return self.conConfig.ref
 
     def checkout(self, branchid=None):
+        """Set or get the current branch identifier.
+
+        If ``branchid`` is not provided, then the config will not be updated.
+
+        Parameters
+        ----------
+        branchid : str, optional
+            Optional branch identifer to set in the config.
+
+        Returns
+        -------
+        str
+            The current branch identifier.
+
+        Examples
+        --------
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> client.checkout()
+        'main'
+        >>> client.checkout("<branch>")
+        '<branch>'
+        >>> client.checkout()
+        '<branch>'
+        """
         if branchid:
             self.conConfig.branch = branchid
         return self.conConfig.branch
 
     def uid(self, ignore_jwt=True):
+        """Get the current user identifier.
+
+        Parameters
+        ----------
+        ignore_jwt : bool, optional
+            If ``True``, the local user identifier will be returned rather than the one set in the JWT.
+
+        Returns
+        -------
+        str
+            The local or JWT user identifier.
+
+        Examples
+        --------
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> client.uid()
+        '<uid>'
+        >>> client.uid(False)
+        '<jwt_uid>'
+        """
         return self.conConfig.user(ignore_jwt)
 
     def resource(self, ttype, val=None):
@@ -307,6 +418,18 @@ class WOQLClient:
             return base + "/commit/" + val
 
     def set(self, **kwargs):  # bad naming
+        """Update multiple config values on the current context.
+
+        Parameters
+        ----------
+        \**kwargs
+            Dict of config options to set.
+
+        Examples
+        --------
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> client.set({"account": "<account>", "branch": "<branch>"})
+        """
         self.conConfig.update(**kwargs)
 
     def create_database(
@@ -342,8 +465,8 @@ class WOQLClient:
 
         Examples
         --------
-        >>> client = WOQLClient(server="http://localhost:6363")
-        >>> client..createDatabase("someDB", "Database Label", "password")
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> client.create_database("someDB", "Database Label", "password")
         """
         details = {}
         # if no prefixes, we will add default here
@@ -395,8 +518,8 @@ class WOQLClient:
 
         Examples
         -------
-        >>> client = WOQLClient(server="http://localhost:6363")
-        >>> client.deleteDatabase("someDBToDelete", "password")
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> client.delete_database("<database>", "<account>")
         dict
         """
 
@@ -619,6 +742,27 @@ class WOQLClient:
         )
 
     def pull(self, remote_source_repo):
+        """Pull updates from a remote repository to the current database.
+
+        Parameters
+        ----------
+        remote_source_repo : dict
+            Remote repository identifier containing ``"remote"`` and ``"remote_branch"`` keys.
+
+        Returns
+        -------
+        dict
+
+        Raises
+        ------
+        ValueError
+            If the ``remote_source_repo`` is missing required keys.
+
+        Examples
+        --------
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> client.pull({"author": "<author>", "remote": "<remote>", "remote_branch": "<branch>"})
+        """
         rc_args = self._prepare_revision_control_args(remote_source_repo)
         if rc_args and rc_args.get("remote") and rc_args.get("remote_branch"):
             return self.dispatch(
@@ -751,7 +895,7 @@ class WOQLClient:
         Examples
         --------
         >>> client = WOQLClient("http://localhost:6363")
-        >>> client.clonedb({"remote_url": "<remote_url>"})
+        >>> client.clonedb({"remote_url": "<remote_url>"}, "<newid>")
         """
         rc_args = self._prepare_revision_control_args(clone_source)
         if rc_args and rc_args.get("remote_url"):
@@ -781,7 +925,7 @@ class WOQLClient:
         Examples
         --------
         >>> client = WOQLClient("http://localhost:6363")
-        >>> client._generate_commit("<message>", "<author">)
+        >>> client._generate_commit("<message>", "<author>")
         {'commit_info': {'author': '<author>', 'message': '<message>'}}
         """
         if author:
