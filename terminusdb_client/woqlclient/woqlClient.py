@@ -51,7 +51,7 @@ class WOQLClient:
 
         Returns
         -------
-        dict or raise an InvalidURIError.
+        dict
 
         Examples
         -------
@@ -67,7 +67,7 @@ class WOQLClient:
         return json_obj
 
     def copy(self):
-        """Create a copy of this client.
+        """Create a deep copy of this client.
 
         Returns
         -------
@@ -141,7 +141,7 @@ class WOQLClient:
         return self.conConfig.remote_auth
 
     def set_db(self, dbid):
-        """Set and return the current dataase.
+        """Set and return the current database.
 
         Parameters
         ----------
@@ -162,14 +162,14 @@ class WOQLClient:
         return self.db(dbid)
 
     def db(self, dbid=None):
-        """Set or get the current dataase.
+        """Set or get the current database.
 
         If ``dbid`` is not provided, then the config will not be updated.
 
         Parameters
         ----------
         dbid : str, optional
-            Optional database identifer to set in the config.
+            Optional database identifier to set in the config.
 
         Returns
         -------
@@ -198,7 +198,7 @@ class WOQLClient:
         Parameters
         ----------
         accountid : str, optional
-            Optional account identifer to set in the config.
+            Optional account identifier to set in the config.
 
         Returns
         -------
@@ -264,7 +264,7 @@ class WOQLClient:
         Returns
         -------
         str
-            The current respository identifier.
+            The current repository identifier.
 
         Examples
         --------
@@ -318,7 +318,7 @@ class WOQLClient:
         Parameters
         ----------
         branchid : str, optional
-            Optional branch identifer to set in the config.
+            Optional branch identifier to set in the config.
 
         Returns
         -------
@@ -981,7 +981,7 @@ class WOQLClient:
 
         Returns
         -------
-        dict or raise an InvalidURIError.
+        dict
         """
 
         # check if we can perform this action or raise an AccessDeniedError error
