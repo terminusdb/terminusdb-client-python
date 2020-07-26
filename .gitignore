@@ -20,7 +20,7 @@ woqlclient/*.egg-info/
 coverage.xml
 report.xml
 .coverage
-terminus_client_coverage/
+terminusdb_client_coverage/
 
 *.so
 *~
