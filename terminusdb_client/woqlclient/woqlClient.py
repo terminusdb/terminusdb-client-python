@@ -1,4 +1,4 @@
-# woqlClient.py
+"""woqlClient.py"""
 import copy
 
 from ..__version__ import __version__
@@ -18,6 +18,8 @@ from .dispatchRequest import DispatchRequest
 
 
 class WOQLClient:
+    """Client for querying a TerminusDB server using WOQL queries."""
+
     def __init__(self, server_url, **kwargs):
         """The WOQLClient constructor.
 
@@ -942,6 +944,19 @@ class WOQLClient:
         return ci
 
     def _prepare_revision_control_args(self, rc_args=None):
+        """Ensure the ``"author"`` field in the specified argument dict is set.
+        If ``"author"`` is not in ``rc_args``, the current author value will be set.
+
+        Parameters
+        ----------
+        rc_args : dict, optional
+            Optional dict containing arguments used in revision control actions.
+
+        Returns
+        -------
+        dict or bool
+            ``False`` if ``rc_args`` is not provided, other the modified ``rc_args``.
+        """
         if rc_args is None:
             return False
         if not rc_args.get("author"):
