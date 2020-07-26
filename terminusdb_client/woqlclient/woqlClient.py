@@ -189,7 +189,7 @@ class WOQLClient:
         details = {}
         if label:
             details["label"] = label
-        else: 
+        else:
             details["label"] = dbid
         if description:
             details["comment"] = description
@@ -201,7 +201,7 @@ class WOQLClient:
             details["schema"] = prefixes
         if accountid is None:
             accountid = self.user_account()
-        
+
         self.db(dbid)
         self.account(accountid)
         return self.dispatch(

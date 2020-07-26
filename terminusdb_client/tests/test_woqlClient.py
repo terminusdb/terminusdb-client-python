@@ -65,11 +65,7 @@ def test_create_database(mocked_requests, mocked_requests2):
         verify=False,
         json={
             "label": "my first db",
-            "comment": "my first db comment",
-            "prefixes": {
-                "scm": "terminusdb://admin/myFirstTerminusDB/schema#",
-                "doc": "terminusdb://admin/myFirstTerminusDB/data/",
-            },
+            "comment": "my first db comment"            
         },
     )
 
@@ -81,7 +77,7 @@ def test_create_database_with_schema(
     mocked_requests, mocked_requests2, create_schema_obj
 ):
     woql_client = WOQLClient(
-        "http://localhost:6363", user="admin", key="root", account="admin"
+        "http://localhost:6363", user="admin", account="admin", key="root"
     )
     woql_client.connect()
     assert woql_client.basic_auth() == "admin:root"
@@ -91,10 +87,21 @@ def test_create_database_with_schema(
         "admin",
         label="my first db",
         description="my first db comment",
+        include_schema=True,
     )
 
-    WOQLClient.create_graph.assert_called_once_with(
-        "schema", "main", f"Python client {__version__} message: Creating schema graph"
+    requests.post.assert_called_once_with(
+        "http://localhost:6363/db/admin/myFirstTerminusDB",
+        headers={
+            "Authorization": "Basic YWRtaW46cm9vdA==",
+            "content-type": "application/json",
+        },
+        verify=False,
+        json={
+            "label": "my first db",
+            "comment": "my first db comment",
+            "schema": True           
+        },
     )
 
 
@@ -102,7 +109,7 @@ def test_create_database_with_schema(
 @mock.patch("requests.get", side_effect=mocked_requests)
 def test_create_database_and_change_account(mocked_requests, mocked_requests2):
     woql_client = WOQLClient(
-        "http://localhost:6363", user="admin", key="root", account="admin"
+        "http://localhost:6363", user="admin", account="admin", key="root"
     )
     woql_client.connect()
     woql_client.create_database(
@@ -122,11 +129,7 @@ def test_create_database_and_change_account(mocked_requests, mocked_requests2):
         verify=False,
         json={
             "label": "my first db",
-            "comment": "my first db comment",
-            "prefixes": {
-                "scm": "terminusdb://my_new_account/myFirstTerminusDB/schema#",
-                "doc": "terminusdb://my_new_account/myFirstTerminusDB/data/",
-            },
+            "comment": "my first db comment",           
         },
     )
 
