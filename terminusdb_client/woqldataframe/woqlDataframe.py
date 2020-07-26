@@ -15,10 +15,36 @@ except ImportError:
 
 
 class EmptyException(Exception):
+    """ Exception inherited from the built-in Exception Class
+
+    Parameters
+    ----------
+    msg : str
+        Error message that is describing the exception
+
+    Raises
+    ------
+    EmptyException
+        If the result table of the query is empty
+
+    """
     pass
 
 
 def _is_empty(query):
+    """Checks if the result table of a query is empty
+
+    Parameters
+    ----------
+    query : dict
+            JSON of the result of the query
+
+    Returns
+    -------
+    bool
+        TRUE if the result table is empty, else FALSE
+
+    """
     return len(query["bindings"]) == 0
 
 
