@@ -28,7 +28,6 @@ class EmptyException(Exception):
         If the result table of the query is empty
 
     """
-    pass
 
 
 def _is_empty(query):
