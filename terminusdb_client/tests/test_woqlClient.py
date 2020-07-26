@@ -51,7 +51,7 @@ def test_create_database(mocked_requests, mocked_requests2):
         "admin",
         label="my first db",
         description="my first db comment",
-        schema=False,
+        include_schema=False,
     )
 
     requests.post.assert_called_once_with(
@@ -107,7 +107,7 @@ def test_create_database_and_change_account(mocked_requests, mocked_requests2):
         "my_new_account",
         label="my first db",
         description="my first db comment",
-        schema=False,
+        include_schema=False,
     )
 
     requests.post.assert_called_once_with(

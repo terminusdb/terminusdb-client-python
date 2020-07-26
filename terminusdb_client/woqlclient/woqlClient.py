@@ -441,7 +441,7 @@ class WOQLClient:
         label=None,
         description=None,
         prefixes=None,
-        schema=True,
+        include_schema=True,
     ):
         """Create a TerminusDB database by posting
         a terminus:Database document to the Terminus Server.
@@ -463,7 +463,7 @@ class WOQLClient:
                 IRI to use when ``doc:`` prefixes are expanded. Defaults to ``terminusdb:///data``.
             scm (str)
                 IRI to use when ``scm:`` prefixes are expanded. Defaults to ``terminusdb:///schema``.
-        schema : bool
+        include_schema : bool
             If ``True``, a main schema graph will be created, otherwise only a main instance graph will be created.
 
         Returns
@@ -491,7 +491,7 @@ class WOQLClient:
         self.db(dbid)
         self.account(accountid)
 
-        if schema:
+        if include_schema:
             response = self.dispatch(
                 APIEndpointConst.CREATE_DATABASE, self.conConfig.db_url(), details
             )
