@@ -360,7 +360,11 @@ class TestWoqlQueries:
         assert woql_object.to_dict() == WOQL_JSON["groupbyJson"]
 
     def test_order_by_method_asc(self):
-        woql_object = WOQLQuery().order_by("v:A", "v:B", "v:C", order=['asc', 'desc', 'asc']).star()
+        woql_object = (
+            WOQLQuery()
+            .order_by("v:A", "v:B", "v:C", order=["asc", "desc", "asc"])
+            .star()
+        )
         assert woql_object.to_dict() == WOQL_JSON["orderbyJson"]
 
 

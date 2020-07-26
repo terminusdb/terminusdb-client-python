@@ -33,7 +33,9 @@ def test_connection(mocked_requests, monkeypatch):
     woql_client.connect(key="root", account="admin", user="admin")
 
     requests.get.assert_called_once_with(
-        "http://localhost:6363/", headers={"Authorization": "Basic YWRtaW46cm9vdA=="}, verify=False
+        "http://localhost:6363/",
+        headers={"Authorization": "Basic YWRtaW46cm9vdA=="},
+        verify=False,
     )
 
 
@@ -169,7 +171,7 @@ def test_get_triples(mocked_requests):
     requests.get.assert_called_with(
         "http://localhost:6363/triples/admin/myDBName/local/branch/main/instance/mygraph",
         headers={"Authorization": "Basic YWRtaW46cm9vdA=="},
-        verify=False
+        verify=False,
     )
 
 

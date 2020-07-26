@@ -101,9 +101,7 @@ class DispatchRequest:
                 APIEndpointConst.BRANCH,
                 APIEndpointConst.CLONE,
             ]:
-                request_response = cls.__post_call(
-                    url, headers, payload, file_dict
-                )
+                request_response = cls.__post_call(url, headers, payload, file_dict)
 
             if request_response.status_code == 200:
                 # print("hellow ")
