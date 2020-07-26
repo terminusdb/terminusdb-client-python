@@ -18,6 +18,10 @@ flake8:
 coverage:
 	pipenv run py.test terminusdb_client/tests --cov-config .coveragerc --verbose --cov-report term --cov-report xml --cov=terminusdb_client terminusdb_client/tests
 
+# Command to  generate a coverage report html
+coverage_html:
+	coverage html -d terminus_client_coverage
+
 interrogate:
 	interrogate -v -I -i -p -s terminusdb_client/woqlclient/woqlClient.py terminusdb_client/woqldataframe/woqlDataframe.py terminusdb_client/woqlquery/woql_query.py terminusdb_client/woqlquery/woql_library.py
 
