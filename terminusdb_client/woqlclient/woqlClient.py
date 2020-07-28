@@ -56,7 +56,7 @@ class WOQLClient:
         if self.cert is None:
             self.cert = kwargs.get("cert")
 
-        json_obj = self.dispatch(APIEndpointConst.CONNECT, self.conConfig.server)
+        json_obj = self.dispatch(APIEndpointConst.CONNECT, self.conConfig.api)
         self.conCapabilities.set_capabilities(json_obj)
         return json_obj
 
@@ -198,7 +198,7 @@ class WOQLClient:
         if include_schema:
             details["schema"] = True
         if prefixes:
-            details["schema"] = prefixes
+            details["prefixes"] = prefixes
         if accountid is None:
             accountid = self.user_account()
 
@@ -215,8 +215,8 @@ class WOQLClient:
         ----------
         dbid : str
             ID of the database to delete
-        key : str, optional
-            you need the key if you didn't set before
+        accountid : str, optional
+            the account id in which the database resides (defaults to "admin")
 
         Returns
         -------
@@ -224,7 +224,7 @@ class WOQLClient:
 
         Examples
         -------
-        >>> WOQLClient(server="http://localhost:6363").deleteDatabase("someDBToDelete", "password")
+        >>> WOQLClient(server="http://localhost:6363").deleteDatabase("someDBToDelete", "admin")
         """
 
         self.db(dbid)
@@ -594,6 +594,18 @@ class WOQLClient:
         Alias of get_database above - deprecated - included for backwards compatibility
         """
         return self.get_database(dbid, account)
+
+    def server(self):
+        """
+        Returns the URL of the currently connected server
+        """
+        return self.conConfig.server
+
+    def api(self):
+        """
+        Returns the URL of the currently connected server
+        """
+        return self.conConfig.api
 
     """
     Unstable / Experimental Endpoints

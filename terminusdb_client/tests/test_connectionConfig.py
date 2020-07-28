@@ -14,7 +14,7 @@ class TestConnectionConfig:
         account=local_user,
     )
 
-    db_url = "http://localhost:6363/db/admin/testDB"
+    db_url = "http://localhost:6363/api/db/admin/testDB"
 
     def test_get_sever_url(self):
         assert self.connection_config.server == self.start_server_url
@@ -25,7 +25,7 @@ class TestConnectionConfig:
         assert self.connection_config.db_url() == self.db_url
         assert (
             self.connection_config.query_url()
-            == "http://localhost:6363/woql/admin/testDB/local/branch/myBranch"
+            == "http://localhost:6363/api/woql/admin/testDB/local/branch/myBranch"
         )
 
     def test_change_server(self):
@@ -33,7 +33,7 @@ class TestConnectionConfig:
         self.connection_config.ref = new_ref
         assert (
             self.connection_config.query_url()
-            == "http://localhost:6363/woql/admin/testDB/local/commit/" + new_ref
+            == "http://localhost:6363/api/woql/admin/testDB/local/commit/" + new_ref
         )
 
     def test_check_basic_auth(self):

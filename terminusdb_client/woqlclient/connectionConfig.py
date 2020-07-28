@@ -25,6 +25,7 @@ class ConnectionConfig:
         self.__default_branch_id = "main"
         self.__default_repo_id = "local"
         self.__system_db = "_system"
+        self.__api_extension = "api/"
 
         # default repository and branch ids
         self.__branchid = self.__default_branch_id
@@ -39,6 +40,7 @@ class ConnectionConfig:
         surl = parser.parse_server_url(server_url)
         if surl:
             self.__server = surl
+            self.__api = self.__server + self.__api_extension
         else:
             raise ValueError(f"Invalid Server URL: {server_url}")
 
@@ -71,6 +73,10 @@ class ConnectionConfig:
     @property
     def server(self):
         return self.__server
+
+    @property
+    def api(self):
+        return self.__api
 
     @property
     def db(self):
@@ -116,7 +122,7 @@ class ConnectionConfig:
         return f"{self.account}/{self.db}"
 
     def db_base(self, action):
-        return f"{self.server}{action}/{self.db_url_fragment()}"
+        return f"{self.api}{action}/{self.db_url_fragment()}"
 
     def branch_url(self, branch_id):
         base_url = self.repo_base("branch")
@@ -172,13 +178,13 @@ class ConnectionConfig:
         return f"{base_url}/{graph_type}/{graph_id}"
 
     def clone_url(self, new_repo_id=None):
-        crl = f"{self.__server}clone/{self.account}"
+        crl = f"{self.api}clone/{self.account}"
         if new_repo_id is not None:
             crl = crl + f"/${new_repo_id}"
         return crl
 
     def cloneable_url(self):
-        crl = f"{self.__server}{self.account}/{self.db}"
+        crl = f"{self.server}{self.account}/{self.db}"
         return crl
 
     def pull_url(self):

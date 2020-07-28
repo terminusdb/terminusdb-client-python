@@ -33,7 +33,7 @@ def test_connection(mocked_requests, monkeypatch):
     woql_client.connect(key="root", account="admin", user="admin")
 
     requests.get.assert_called_once_with(
-        "http://localhost:6363/",
+        "http://localhost:6363/api/",
         headers={"Authorization": "Basic YWRtaW46cm9vdA=="},
         verify=False,
     )
@@ -57,7 +57,7 @@ def test_create_database(mocked_requests, mocked_requests2):
     )
 
     requests.post.assert_called_once_with(
-        "http://localhost:6363/db/admin/myFirstTerminusDB",
+        "http://localhost:6363/api/db/admin/myFirstTerminusDB",
         headers={
             "Authorization": "Basic YWRtaW46cm9vdA==",
             "content-type": "application/json",
@@ -91,7 +91,7 @@ def test_create_database_with_schema(
     )
 
     requests.post.assert_called_once_with(
-        "http://localhost:6363/db/admin/myFirstTerminusDB",
+        "http://localhost:6363/api/db/admin/myFirstTerminusDB",
         headers={
             "Authorization": "Basic YWRtaW46cm9vdA==",
             "content-type": "application/json",
@@ -121,7 +121,7 @@ def test_create_database_and_change_account(mocked_requests, mocked_requests2):
     )
 
     requests.post.assert_called_once_with(
-        "http://localhost:6363/db/my_new_account/myFirstTerminusDB",
+        "http://localhost:6363/api/db/my_new_account/myFirstTerminusDB",
         headers={
             "Authorization": "Basic YWRtaW46cm9vdA==",
             "content-type": "application/json",
@@ -144,7 +144,7 @@ def test_branch(mocked_requests, mocked_requests2):
     woql_client.branch("my_new_branch")
 
     requests.post.assert_called_once_with(
-        "http://localhost:6363/branch/admin/myDBName/local/branch/my_new_branch",
+        "http://localhost:6363/api/branch/admin/myDBName/local/branch/my_new_branch",
         headers={
             "Authorization": "Basic YWRtaW46cm9vdA==",
             "content-type": "application/json",
@@ -172,7 +172,7 @@ def test_get_triples(mocked_requests):
     woql_client.get_triples("instance", "mygraph")
 
     requests.get.assert_called_with(
-        "http://localhost:6363/triples/admin/myDBName/local/branch/main/instance/mygraph",
+        "http://localhost:6363/api/triples/admin/myDBName/local/branch/main/instance/mygraph",
         headers={"Authorization": "Basic YWRtaW46cm9vdA=="},
         verify=False,
     )
@@ -189,7 +189,7 @@ def test_query(mocked_requests, mocked_requests2):
     woql_client.query(WoqlStar)
 
     requests.post.assert_called_once_with(
-        "http://localhost:6363/woql/admin/myDBName/local/branch/main",
+        "http://localhost:6363/api/woql/admin/myDBName/local/branch/main",
         headers={
             "Authorization": "Basic YWRtaW46cm9vdA==",
             "content-type": "application/json",
