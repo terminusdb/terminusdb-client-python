@@ -1,11 +1,20 @@
 # from .errorMessage import ErrorMessage
+import warnings
 from base64 import b64encode
 
 import requests
 import terminusdb_client.woql_utils as utils
+from urllib3.exceptions import InsecureRequestWarning
 
 from .api_endpoint_const import APIEndpointConst
 from .errors import APIError
+
+
+def _verify_check(url):
+    if url[:17] == "https://127.0.0.1" or url[:7] == "http://":
+        return False
+    else:
+        return True
 
 
 class DispatchRequest:
@@ -15,23 +24,40 @@ class DispatchRequest:
     @staticmethod
     def __get_call(url, headers, payload, cert=None):
         url = utils.add_params_to_url(url, payload)
-
-        return requests.get(url, headers=headers, verify=False)
+        if not _verify_check(url):
+            warnings.simplefilter("ignore", InsecureRequestWarning)
+        result = requests.get(url, headers=headers, verify=_verify_check(url))
+        warnings.resetwarnings()
+        return result
 
     @staticmethod
     def __post_call(url, headers, payload, file_dict=None, cert=None):
+        if not _verify_check(url):
+            warnings.simplefilter("ignore", InsecureRequestWarning)
         if file_dict:
-            return requests.post(
-                url, json=payload, headers=headers, files=file_dict, verify=False
+            result = requests.post(
+                url,
+                json=payload,
+                headers=headers,
+                files=file_dict,
+                verify=_verify_check(url),
             )
         else:
             headers["content-type"] = "application/json"
-            return requests.post(url, json=payload, headers=headers, verify=False)
+            result = requests.post(
+                url, json=payload, headers=headers, verify=_verify_check(url)
+            )
+        warnings.resetwarnings()
+        return result
 
     @staticmethod
     def __delete_call(url, headers, payload, cert=None):
         url = utils.add_params_to_url(url, payload)
-        return requests.delete(url, headers=headers, verify=False)
+        if not _verify_check(url):
+            warnings.simplefilter("ignore", InsecureRequestWarning)
+        result = requests.delete(url, headers=headers, verify=_verify_check(url))
+        warnings.resetwarnings()
+        return result
 
     @staticmethod
     def __autorization_header(basic_auth=None, remote_auth=None):

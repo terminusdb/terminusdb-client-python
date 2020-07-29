@@ -6,7 +6,6 @@ import pytest
 import requests
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 
-from ..__version__ import __version__
 from .mockResponse import mocked_requests
 from .woqljson.woqlStarJson import WoqlStar
 
@@ -63,10 +62,7 @@ def test_create_database(mocked_requests, mocked_requests2):
             "content-type": "application/json",
         },
         verify=False,
-        json={
-            "label": "my first db",
-            "comment": "my first db comment"            
-        },
+        json={"label": "my first db", "comment": "my first db comment"},
     )
 
 
@@ -97,11 +93,7 @@ def test_create_database_with_schema(
             "content-type": "application/json",
         },
         verify=False,
-        json={
-            "label": "my first db",
-            "comment": "my first db comment",
-            "schema": True           
-        },
+        json={"label": "my first db", "comment": "my first db comment", "schema": True},
     )
 
 
@@ -127,10 +119,7 @@ def test_create_database_and_change_account(mocked_requests, mocked_requests2):
             "content-type": "application/json",
         },
         verify=False,
-        json={
-            "label": "my first db",
-            "comment": "my first db comment",           
-        },
+        json={"label": "my first db", "comment": "my first db comment"},
     )
 
     assert woql_client.basic_auth() == "admin:root"

@@ -177,7 +177,7 @@ class WOQLClient:
         label: textual name of db
         description: text description of db
         prefixes: prefixes
-       
+
         Returns
         -------
         dict
