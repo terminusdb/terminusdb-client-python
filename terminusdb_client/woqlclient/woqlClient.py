@@ -21,7 +21,7 @@ class WOQLClient:
     """Client for querying a TerminusDB server using WOQL queries."""
 
     def __init__(self, server_url, **kwargs):
-        """The WOQLClient constructor.
+        r"""The WOQLClient constructor.
 
         Parameters
         ----------
@@ -34,7 +34,7 @@ class WOQLClient:
         self.conCapabilities = ConnectionCapabilities()
 
     def connect(self, **kwargs):
-        """Connect to a Terminus server at the given URI with an API key.
+        r"""Connect to a Terminus server at the given URI with an API key.
 
         Stores the terminus:ServerCapability document returned
         in the conCapabilities register which stores, the url, key, capabilities,
@@ -420,7 +420,7 @@ class WOQLClient:
             return base + "/commit/" + val
 
     def set(self, **kwargs):  # bad naming
-        """Update multiple config values on the current context.
+        r"""Update multiple config values on the current context.
 
         Parameters
         ----------

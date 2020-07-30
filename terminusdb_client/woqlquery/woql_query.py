@@ -86,6 +86,8 @@ class WOQLQuery:
         """Does this query contain an update"""
         if not json:
             json = self._query
+        if not isinstance(json, dict):
+            return False
         if json["@type"] in self._update_operators:
             return True
         if json.get("woql:consequent") and self._contains_update_check(
