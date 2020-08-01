@@ -146,7 +146,7 @@ class WOQLQuery:
             vname = vname[2:]
         asvar["woql:variable_name"] = {"@type": "xsd:string", "@value": vname}
         if obj_type:
-            asvar["woql:var_type"] = self._jlt(obj_type, "xsd:anyURI")
+            asvar["woql:var_type"] = obj_type
         return asvar
 
     def _add_asv(self, cursor, asv):
@@ -2210,6 +2210,8 @@ class WOQLQuery:
                         if part.get("woql:graph_filter")
                         else part["woql:graph"]
                     )
+                else:
+                    gpart = None
                 if gpart:
                     gpart["@value"]
                 nprop = (
