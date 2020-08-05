@@ -90,8 +90,6 @@ class TestWoqlQueries:
                 description="Journey duration in minutes.",
             )
         )
-
-        pp.pprint(woql_object_des.to_dict())
         assert woql_object.to_dict() == property_without
         assert woql_object_des.to_dict() == property_with_des
 
