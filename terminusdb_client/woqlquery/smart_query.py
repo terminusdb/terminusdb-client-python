@@ -42,7 +42,7 @@ class WOQLClass:
     def add_property(self, pro_id:str, property_type: Union[str,'WOQLClass'], label:str =None, description:str =None):
         if isinstance(property_type, str):
             self.query_obj = self.query_obj.property(pro_id, property_type, label, description)
-        elif isinstance(property_type, 'WOQLClass'):
+        elif isinstance(property_type, WOQLClass):
             self.query_obj = self.query_obj.property(pro_id, property_type.id, label, description)
         else:
             raise ValueError("property_type needs to be either string or WOQLClass")

@@ -45,7 +45,7 @@ class TestWOQLClass:
         assert woql_object.description == "A bike station object."
         assert woql_object.to_dict() ==  doctype_with_des
 
-    def test_add__datatype_property(
+    def test_add_datatype_property(
         self, property_without, property_with_des
     ):
         woql_object = WOQLClass("Journey")
@@ -55,3 +55,11 @@ class TestWOQLClass:
         woql_object = WOQLClass("Journey")
         woql_object.add_property("Duration", "dateTime", label="Journey Duration", description="Journey duration in minutes.")
         assert woql_object.to_dict() == property_with_des
+
+    def test_add_object_property(
+        self, obj_property_without
+    ):
+        station_obj = WOQLClass("Station")
+        woql_object = WOQLClass("Journey")
+        woql_object.add_property("start_station", station_obj)
+        assert woql_object.to_dict() == obj_property_without
