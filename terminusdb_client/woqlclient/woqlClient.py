@@ -688,7 +688,7 @@ class WOQLClient:
                 request_file_dict[name] = (name, open(path, "rb"), "application/binary")
             payload = None
         else:
-            file_dict = None
+            request_file_dict = None
             payload = query_obj
 
         return self.dispatch(
