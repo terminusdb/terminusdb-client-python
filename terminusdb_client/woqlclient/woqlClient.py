@@ -1,5 +1,6 @@
 """woqlClient.py"""
 import copy
+import json
 
 from ..__version__ import __version__
 from .api_endpoint_const import APIEndpointConst
@@ -684,7 +685,7 @@ class WOQLClient:
                 file_dict[name] = (name, stream, "text/plain")
             file_dict["query"] = (
                 None,
-                woql_query,
+                json.dumps(woql_query),
                 "application/json",
             )
             payload = None
