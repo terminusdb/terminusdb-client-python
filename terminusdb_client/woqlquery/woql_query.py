@@ -408,7 +408,7 @@ class WOQLQuery:
     def _vocabulary(self, vocab):
         self._vocab = vocab
 
-    def execute(self, client, commit_msg=None):
+    def execute(self, client, commit_msg=None, file_dict=None):
         """Executes the query using the passed client to connect to a server
 
         Parameters
@@ -417,11 +417,14 @@ class WOQLQuery:
             client that provide connection to the database for the query to execute.
         commit_msg: str
             optional, commit message for this query. Recommended for query that carrries an update.
+        file_dict:
+            File dictionary to be associated with post name => filename, for multipart POST
+
         """
         if commit_msg is None:
-            return client.query(self)
+            return client.query(self, file_dict=file_dict)
         else:
-            return client.query(self, commit_msg)
+            return client.query(self, commit_msg, file_dict=file_dict)
 
     def to_json(self):
         """Dumps the JSON-LD format of the query in a json string"""

@@ -31,15 +31,15 @@ class DispatchRequest:
         return result
 
     @staticmethod
-    def __post_call(url, headers, payload, file_dict=None, cert=None):
+    def __post_call(url, headers, payload, file_list=None, cert=None):
         if not _verify_check(url):
             warnings.simplefilter("ignore", InsecureRequestWarning)
-        if file_dict:
+        if file_list:
             result = requests.post(
                 url,
                 json=payload,
                 headers=headers,
-                files=file_dict,
+                files=file_list,
                 verify=_verify_check(url),
             )
         else:
@@ -88,7 +88,7 @@ class DispatchRequest:
         payload=None,
         basic_auth=None,
         remote_auth=None,
-        file_dict=None,
+        file_list=None,
         cert=None,
     ):
 
@@ -127,7 +127,7 @@ class DispatchRequest:
                 APIEndpointConst.BRANCH,
                 APIEndpointConst.CLONE,
             ]:
-                request_response = cls.__post_call(url, headers, payload, file_dict)
+                request_response = cls.__post_call(url, headers, payload, file_list)
 
             if request_response.status_code == 200:
                 # print("hellow ")
