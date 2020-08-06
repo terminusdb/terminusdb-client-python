@@ -679,21 +679,20 @@ class WOQLClient:
         )
         query_obj["query"] = woql_query
         if type(file_dict) == dict:
-            file_list = []
+            request_file_dict = {}
             for name in query_obj:
                 query_obj_value = query_obj[name]
-                file_list.append((name, (None, json.dumps(query_obj_value), "application/json")))
+                request_file_dict[name] = (name, json.dumps(query_obj_value), "application/json")
             for name in file_dict:
                 path = file_dict[name]
-                stream = open(path, "rb")
-                file_list.append((name, (name, stream, "text/plain")))
+                request_file_dict[name] = (name, open(path, "rb"), "application/binary")
             payload = None
         else:
             file_dict = None
             payload = query_obj
 
         return self.dispatch(
-            APIEndpointConst.WOQL_QUERY, self.conConfig.query_url(), payload, file_list
+            APIEndpointConst.WOQL_QUERY, self.conConfig.query_url(), payload, request_file_dict
         )
 
     def branch(self, new_branch_id):
