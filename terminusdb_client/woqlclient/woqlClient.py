@@ -654,6 +654,7 @@ class WOQLClient:
         commit_mg : str
             A message that will be written to the commit log to describe the change
         file_list:
+            Files to be associated with post arguments for multipart POST
 
         Examples
         -------

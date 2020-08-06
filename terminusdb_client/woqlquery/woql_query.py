@@ -1018,7 +1018,7 @@ class WOQLQuery:
         self._cursor["woql:remote_uri"] = {"@type": "xsd:anyURI", "@value": uri}
         return self._wfrom(opts)
 
-    def post(self, fpath, opts):
+    def post(self, fpath, opts=None):
         if fpath and fpath == "woql:args":
             return ["woql:file", "woql:format"]
         if self._cursor.get("@type"):
