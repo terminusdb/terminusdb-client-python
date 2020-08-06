@@ -15,6 +15,13 @@
 
 
 ---
+## v0.2.2
+
+### New
+- adding boolean method in WOQLQuery
+- adding dataType mapping for boolean so now "boolean" will be register as "xsd:boolean" in WOQLQuery
+
+---
 ## v0.2.1
 
 ### Bug fixes
@@ -31,7 +38,9 @@
 ## v0.1.5
 
 ### Bug fixes
-Remove unwanted print
+
+- Remove unwanted `print`
+
 ---
 ## v0.1.4
 
