@@ -899,7 +899,7 @@ class WOQLClient:
         return rc_args
 
     def dispatch(
-        self, action, url, payload=None, file_list=None
+        self, action, url, payload=None, file_dict=None
     ):
         """Directly dispatch to a TerminusDB database.
 
@@ -911,9 +911,8 @@ class WOQLClient:
             The server URL to point the action at.
         payload : dict
             Payload to send to the server.
-        file_list : list, optional
-            List of tuples to include in the query.
-            See: https://2.python-requests.org/en/master/user/advanced/#multipart
+        file_dict : dict, optional
+            Dict of files to include in the query.
 
         Returns
         -------
@@ -932,7 +931,7 @@ class WOQLClient:
             payload,
             self.basic_auth(),
             self.remote_auth(),
-            file_list,
+            file_dict,
             self.cert,
         )
 
