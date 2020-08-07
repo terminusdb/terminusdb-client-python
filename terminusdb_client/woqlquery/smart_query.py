@@ -2,6 +2,13 @@ from typing import Union, List
 from .woql_query import WOQLQuery
 from ..woqlclient import WOQLClient
 
+WOQLTYPE_TO_PYTYPE = {
+"string": str,
+"boolean": bool,
+"integer": int,
+"decimal": float
+}
+
 class WOQLClass:
     def __init__(self, id:str, label:str =None, description:str =None, property:dict = None):
         self.id = id
@@ -21,6 +28,15 @@ class WOQLClass:
                             item.get('type'),
                             item.get('label'),
                             item.get('description'))
+
+    def __str__(self):
+        return self.id
+
+    def __eq__(self, other):
+        if isinstance(other, WOQLClass):
+            return self.id == other.id
+        else:
+            return False
 
     @property
     def label(self) -> str:
@@ -60,7 +76,7 @@ class WOQLClass:
 class WOQLObj:
     def __init__(self, id:str, obj_type:WOQLClass, label:str =None, description:str =None, property:dict = None):
         self.id = id
-        self.woql_id = self._idgen(id)
+        self.woql_id = self._idgen()
         self.label = label
         self.description = description
         self._type = obj_type
@@ -70,14 +86,27 @@ class WOQLObj:
         else:
             self._property = {}
 
-    def _idgen(self, id:str) -> str:
-        # mimic what a idgen would do in the back end
-        pass
+    def __str__(self):
+        return self.id
 
-    def add_property(self, pro_id:str, pro_value: Union[str,'WOQLObj']):
+    def _idgen(self) -> str:
+        # mimic what a idgen would do in the back end
+        # TODO: quote the ids ot make it url firendly
+        return f"doc:{self._type.id}_{self.id}"
+
+    def add_property(self, pro_id:str, pro_value: Anything):
         # check if the pro_value matches the property of the self._type
         # add new prop in self._property
-        pass
+        prop = self._type._property.get(pro_id)
+        if prop is None:
+            raise ValueError(f"No {pro_id} property in {self._type.id}")
+        if isinstance(pro_value, WOQLObj):
+            if pro_value._type != prop['type']:
+                raise ValueError(f"{pro_id} property in {self._type.id} is of type {prop['type']} not {pro_value._type}")
+
+        else:
+            if not isinstance(pro_value, WOQLTYPE_TO_PYTYPE[prop['type']]):
+                raise ValueError(f"{pro_id} property in {self._type.id} is of type {prop['type']} not {type(pro_value)}")
 
 class TerminusDB:
     def __init__(
