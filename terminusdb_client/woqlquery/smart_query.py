@@ -94,7 +94,7 @@ class WOQLObj:
         # TODO: quote the ids ot make it url firendly
         return f"doc:{self._type.id}_{self.id}"
 
-    def add_property(self, pro_id:str, pro_value: Anything):
+    def add_property(self, pro_id:str, pro_value):
         # check if the pro_value matches the property of the self._type
         # add new prop in self._property
         prop = self._type._property.get(pro_id)
