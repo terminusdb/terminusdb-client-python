@@ -1,4 +1,5 @@
 from .woqlDataframe import (  # noqa
+    EmptyException,
     extract_column,
     extract_header,
     query_to_df,

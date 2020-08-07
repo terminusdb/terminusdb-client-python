@@ -103,7 +103,6 @@ class WOQLObj:
         if isinstance(pro_value, WOQLObj):
             if pro_value._type != prop['type']:
                 raise ValueError(f"{pro_id} property in {self._type.id} is of type {prop['type']} not {pro_value._type}")
-
         else:
             if not isinstance(pro_value, WOQLTYPE_TO_PYTYPE[prop['type']]):
                 raise ValueError(f"{pro_id} property in {self._type.id} is of type {prop['type']} not {type(pro_value)}")
