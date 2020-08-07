@@ -42,6 +42,11 @@ class DispatchRequest:
                 files=file_dict,
                 verify=_verify_check(url),
             )
+            # Close the files although request should do this :(
+            for key in file_dict:
+                (_, stream, _) = file_dict[key]
+                if type(stream) != str:
+                    stream.close()
         else:
             headers["content-type"] = "application/json"
             result = requests.post(

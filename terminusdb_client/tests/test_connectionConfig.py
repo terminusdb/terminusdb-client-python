@@ -109,7 +109,7 @@ class TestConnectionConfig:
         self.connection_config.update(db=self.id_value)
         self.connection_config.update(account=self.id_value)
         db_base = self.connection_config.db_base("push")
-        assert db_base == f"http://localhost:6363/push/{self.id_value}/{self.id_value}"
+        assert db_base == f"http://localhost:6363/api/push/{self.id_value}/{self.id_value}"
 
     def test_repo_base(self):
         self.connection_config.update(db=self.id_value)
@@ -118,14 +118,14 @@ class TestConnectionConfig:
         default_base = self.connection_config.repo_base("pull")
         assert (
             default_base
-            == f"http://localhost:6363/pull/{self.id_value}/{self.id_value}/local"
+            == f"http://localhost:6363/api/pull/{self.id_value}/{self.id_value}/local"
         )
 
         self.connection_config.update(repo=self.id_value)
         updated_base = self.connection_config.db_base("pull")
         assert (
             updated_base
-            == f"http://localhost:6363/pull/{self.id_value}/{self.id_value}"
+            == f"http://localhost:6363/api/pull/{self.id_value}/{self.id_value}"
         )
 
     def test_account(self):

@@ -1,5 +1,6 @@
 """woqlClient.py"""
 import copy
+import json
 
 from ..__version__ import __version__
 from .api_endpoint_const import APIEndpointConst
@@ -644,7 +645,7 @@ class WOQLClient:
             commit,
         )
 
-    def query(self, woql_query, commit_msg=None, file_list=None):
+    def query(self, woql_query, commit_msg=None, file_dict=None):
         """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
 
         Parameters
@@ -653,7 +654,8 @@ class WOQLClient:
             A woql query as an object or dict
         commit_mg : str
             A message that will be written to the commit log to describe the change
-        file_list:
+        file_dict:
+            File dictionary to be associated with post name => filename, for multipart POST
 
         Examples
         -------
@@ -675,25 +677,22 @@ class WOQLClient:
         woql_query["@context"] = self.conCapabilities.get_context_for_outbound_query(
             None, self.db()
         )
-        if type(file_list) == dict:
-            file_dict = query_obj
-            for name in file_list:
-                path = file_list[name]
-                stream = open(path, "rb")
-                file_dict[name] = (name, stream, "text/plain")
-            file_dict["query"] = (
-                None,
-                woql_query,
-                "application/json",
-            )
+        query_obj["query"] = woql_query
+        if type(file_dict) == dict:
+            request_file_dict = {}
+            for name in query_obj:
+                query_obj_value = query_obj[name]
+                request_file_dict[name] = (name, json.dumps(query_obj_value), "application/json")
+            for name in file_dict:
+                path = file_dict[name]
+                request_file_dict[name] = (name, open(path, "rb"), "application/binary")
             payload = None
         else:
-            file_dict = None
-            query_obj["query"] = woql_query
+            request_file_dict = None
             payload = query_obj
 
         return self.dispatch(
-            APIEndpointConst.WOQL_QUERY, self.conConfig.query_url(), payload, file_dict
+            APIEndpointConst.WOQL_QUERY, self.conConfig.query_url(), payload, request_file_dict
         )
 
     def branch(self, new_branch_id):
@@ -901,7 +900,7 @@ class WOQLClient:
 
     def dispatch(
         self, action, url, payload=None, file_dict=None
-    ):  # don't use dict as default
+    ):
         """Directly dispatch to a TerminusDB database.
 
         Parameters
@@ -912,8 +911,8 @@ class WOQLClient:
             The server URL to point the action at.
         payload : dict
             Payload to send to the server.
-        file_dict : list, optional
-            List of files to include in the query.
+        file_dict : dict, optional
+            Dict of files to include in the query.
 
         Returns
         -------
