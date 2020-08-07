@@ -215,7 +215,40 @@ def type_value_map(ty_rdf, value):
 
 
 def query_to_df(query):
-    """Convert a query to a data frame.
+    """DEPRECATED in 0.3.0: use result_to_df instead.
+
+    Converts result query binding to a pandas DataFrame. This only works for homogeneous query results
+
+    Parameters
+    ----------
+    query : dict
+            JSON of the result of the query
+
+    Returns
+    -------
+    pandas.DataFrame
+        The pandas DataFrame that is converted from the result.
+
+    Examples
+    --------
+    >>> result = {'bindings': [{
+    ...           'http://terminusdb.com/woql/variable/Product': {'@type': 'http://www.w3.org/2001/XMLSchema#string',
+    ...           '@value': 'STRAWBERRY CANDY'}
+    ...           }], "graphs": []}
+    >>> woql.query_to_df(result)
+                Product
+    0  STRAWBERRY CANDY
+
+    See Also
+    --------
+    WOQLQuery : create a WOQLQuery
+    WOQLClient : create a WOQLClient
+    """
+    return result_to_df(query)
+
+
+def result_to_df(query):
+    """Convert a query result to a data frame.
 
     Converts result query binding to a pandas DataFrame. This only works for homogeneous query results
 
