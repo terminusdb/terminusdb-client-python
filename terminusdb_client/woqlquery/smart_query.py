@@ -96,7 +96,6 @@ class WOQLObj:
 
     def add_property(self, pro_id:str, pro_value):
         # check if the pro_value matches the property of the self._type
-        # add new prop in self._property
         prop = self._type._property.get(pro_id)
         if prop is None:
             raise ValueError(f"No {pro_id} property in {self._type.id}")
@@ -106,6 +105,7 @@ class WOQLObj:
         else:
             if not isinstance(pro_value, WOQLTYPE_TO_PYTYPE[prop['type']]):
                 raise ValueError(f"{pro_id} property in {self._type.id} is of type {prop['type']} not {type(pro_value)}")
+        # add new prop in self._property
 
 class TerminusDB:
     def __init__(
@@ -123,4 +123,7 @@ class TerminusDB:
             #get all classes from db and store them
 
     def add_class(self, obj:Union[WOQLClass,List[WOQLClass]]):
+        pass
+
+    def add_object(self, obj:Union[WOQLObj,List[WOQLObj]]):
         pass
