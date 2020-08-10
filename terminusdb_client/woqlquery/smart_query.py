@@ -94,7 +94,7 @@ class WOQLObj:
         # TODO: quote the ids ot make it url firendly
         return f"doc:{self._type.id}_{self.id}"
 
-    def add_property(self, pro_id:str, pro_value):
+    def add_property(self, pro_id:str, pro_value, label:str =None, description:str =None):
         # check if the pro_value matches the property of the self._type
         prop = self._type._property.get(pro_id)
         if prop is None:
@@ -106,6 +106,8 @@ class WOQLObj:
             if not isinstance(pro_value, WOQLTYPE_TO_PYTYPE[prop['type']]):
                 raise ValueError(f"{pro_id} property in {self._type.id} is of type {prop['type']} not {type(pro_value)}")
         # add new prop in self._property
+        self._property[pro_id] = {'value': pro_value, 'label': label, 'description': description}
+        return self
 
 class TerminusDB:
     def __init__(
@@ -123,7 +125,15 @@ class TerminusDB:
             #get all classes from db and store them
 
     def add_class(self, obj:Union[WOQLClass,List[WOQLClass]]):
-        pass
+        if isinstance(obj, WOQLClass):
+            self.clases[obj.id] = obj
+            return obj.query_obj.execute(self._client)
+        elif isinstance(obj, list):
+            for item in obj:
+                self.classes[item.id] = item
+            return WOQLQuery().woql_and(*obj).execute(self._client)
+        else:
+            raise ValueError("object(s) added need to be WOQLClass object or a list of WOQLClass objects.")
 
     def add_object(self, obj:Union[WOQLObj,List[WOQLObj]]):
         pass
