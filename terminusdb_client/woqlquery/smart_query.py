@@ -1,4 +1,6 @@
+from datetime import datetime
 from typing import Union, List
+from urllib.parse import quote
 from .woql_query import WOQLQuery
 from ..woqlclient import WOQLClient
 
@@ -6,7 +8,8 @@ WOQLTYPE_TO_PYTYPE = {
 "string": str,
 "boolean": bool,
 "integer": int,
-"decimal": float
+"decimal": float,
+"dateTime": datetime
 }
 
 class WOQLClass:
@@ -76,12 +79,15 @@ class WOQLClass:
 class WOQLObj:
     def __init__(self, id:str, obj_type:WOQLClass, label:str =None, description:str =None, property:dict = None):
         self.id = id
+        self._type = obj_type
         self.woql_id = self._idgen()
         self.label = label
         self.description = description
-        self._type = obj_type
 
         if property is not None:
+            for pro_id, prop in property.items():
+                prop_val = prop.get('value')
+                self._check_prop(pro_id, prop_val)
             self._property = property
         else:
             self._property = {}
@@ -92,10 +98,9 @@ class WOQLObj:
     def _idgen(self) -> str:
         # mimic what a idgen would do in the back end
         # TODO: quote the ids ot make it url firendly
-        return f"doc:{self._type.id}_{self.id}"
+        return f"doc:{quote(self._type.id)}_{quote(self.id)}"
 
-    def add_property(self, pro_id:str, pro_value, label:str =None, description:str =None):
-        # check if the pro_value matches the property of the self._type
+    def _check_prop(self, pro_id, pro_value):
         prop = self._type._property.get(pro_id)
         if prop is None:
             raise ValueError(f"No {pro_id} property in {self._type.id}")
@@ -105,6 +110,10 @@ class WOQLObj:
         else:
             if not isinstance(pro_value, WOQLTYPE_TO_PYTYPE[prop['type']]):
                 raise ValueError(f"{pro_id} property in {self._type.id} is of type {prop['type']} not {type(pro_value)}")
+
+    def add_property(self, pro_id:str, pro_value, label:str =None, description:str =None):
+        # check if the pro_value matches the property of the self._type
+        self._check_prop(self, pro_id, pro_value)
         # add new prop in self._property
         self._property[pro_id] = {'value': pro_value, 'label': label, 'description': description}
         return self
