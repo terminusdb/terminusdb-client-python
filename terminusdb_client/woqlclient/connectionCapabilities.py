@@ -123,15 +123,8 @@ class ConnectionCapabilities:
         return True
 
     def get_context_for_outbound_query(self, woql, dbid):
-        if woql is None:
-            ob = self.get_system_context()
-        else:
-            ob = {}
-            for pred in self._jsonld_context.keys():
-                if pred != "doc":
-                    ob[pred] = self._jsonld_context[pred]
-        ob["_"] = "_:"
-        return ob
+        """TODO: This should be refactored later"""
+        return {}
 
     def _is_system_db(self, dbid):
         if dbid == "_system":
