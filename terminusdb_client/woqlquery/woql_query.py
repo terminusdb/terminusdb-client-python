@@ -1902,13 +1902,34 @@ class WOQLQuery:
         Returns
         ----------
         WOQLQuery object
-            query object that can be chained and/or execute
+            query object that can be chained and/or executed
         """
         if query and query == "woql:args":
             return ["woql:query"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:Not"
+        return self._add_sub_query(query)
+
+    def count(self,countvar,query=None):
+        """Counds the number of solutions in the given query
+
+        Parameters
+        ----------
+        result : A variable or non-negative integer with the count
+        query : The query from which to count the number of results
+
+        Returns
+        ----------
+        WOQLQuery object
+           query object that can be chained and/or executed
+        """
+        if countvar and countvar == "woql:args":
+            return ["woql:count", "woql:query"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "woql:Count"
+        self._cursor["woql:count"] = self._clean_object(countvar)
         return self._add_sub_query(query)
 
     def cast(self, val, user_type, result):
