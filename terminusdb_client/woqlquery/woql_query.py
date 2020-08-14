@@ -305,7 +305,7 @@ class WOQLQuery:
         if ":" not in cstring:
             return False
         pref = cstring.split(":")[0]
-        if pref == "v" or pref == "scm" or pref == "doc":
+        if pref == "v" or pref == "scm" or pref == "doc" or pref == "terminusdb":
             return True
         if utils.STANDARD_URLS.get(pref):
             return True
@@ -470,6 +470,42 @@ class WOQLQuery:
         if "woql:subject" in json:
             return json
         return False
+
+    def _find_last_property(self, json):
+        """Finds the last woql property that has a woql:subject in it and returns the json for that
+        used for triplebuilder to chain further calls - when they may be inside ands or ors or subqueries
+
+        Parameters
+        ----------
+        json : dict
+               dictionary that representing the query in josn-ld"""
+        if "woql:query_list" in json:
+            for item in json["woql:query_list"][::-1]:
+                subitem = self._find_last_property(item)
+                if subitem:
+                    return subitem
+        if "woql:query" in json:
+            item = self._find_last_property(json["woql:query"])
+            if item:
+                return item
+        if "woql:subject" in json and self._is_property_triple(json.get('woql:predicate'), json.get('woql:object')):
+            return json
+        return False
+
+    def _is_property_triple(self, pred, obj):
+        if isinstance(pred, dict):
+            p = pred.get('woql:node')
+        else:
+            p = pred
+        if isinstance(obj, dict):
+            o = obj.get('woql:node')
+        else:
+            o = obj
+        if(o == 'owl:ObjectProperty' or o == 'owl:DatatypeProperty'):
+            return True
+        if(p == 'rdfs:domain' or p == 'rdfs:range'):
+            return True
+        return False        
 
     def _compile_path_pattern(self, pat):
         """Turns a textual path pattern into a JSON-LD description"""
@@ -2137,6 +2173,9 @@ class WOQLQuery:
         else:
             return self.triple(subj, pred, obj)
 
+    def all(self, subj=None, pred=None, obj=None, graph=None):
+        return self.star(subj=subj, pred=pred, obj=obj, graph=graph)
+
     def lib(self):
         # return WOQLLibrary()
         pass
@@ -2618,7 +2657,7 @@ class WOQLQuery:
                     self.insert_property_data(data[k], ref_graph)
         return self
 
-    def doctype_data(self, data, ref_graph):
+    def insert_doctype_data(self, data, ref_graph):
         if not data.get("parent"):
             data["parent"] = []
         if not isinstance(data["parent"], list):

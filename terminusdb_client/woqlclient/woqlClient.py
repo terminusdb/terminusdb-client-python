@@ -653,7 +653,8 @@ class WOQLClient:
             A woql query as an object or dict
         commit_mg : str
             A message that will be written to the commit log to describe the change
-        file_list:
+        file_list: dict
+            A dict containing a list of files to be posted as part of the query (.post...)
 
         Examples
         -------
