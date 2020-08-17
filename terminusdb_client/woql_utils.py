@@ -1,4 +1,4 @@
-from typing import List, Dict, Union, Optional
+from typing import List, Dict, Union, Optional, Tuple
 import urllib.parse
 
 STANDARD_URLS = {
@@ -16,11 +16,11 @@ STANDARD_URLS = {
 }
 
 
-def encode_uri_component(value: Union(Dict, Tuple)) -> str:
+def encode_uri_component(value) -> str:
     return urllib.parse.urlencode(value, doseq=True)
 
 
-def uri_encode_payload(payload: Union(str, Dict)) -> str:
+def uri_encode_payload(payload: Union[str, Dict]) -> str:
     if isinstance(payload, str):
         return encode_uri_component(payload)
     payload_arr = []
@@ -55,7 +55,7 @@ def add_namespaces_to_variable(var: str) -> str:
     return var
 
 
-def add_namespaces_to_variables(variables: List) -> str:
+def add_namespaces_to_variables(variables: List) -> List:
     nvars = []
     for v_item in variables:
         nvars.append(add_namespaces_to_variable(v_item))
@@ -82,7 +82,7 @@ def empty(obj: Dict) -> bool:
     return True
 
 
-def shorten(url: str, prefixes: Optional(Dict) = None) -> str:
+def shorten(url: str, prefixes: Optional[Dict] = None) -> str:
     prefixes = prefixes if prefixes else STANDARD_URLS
     for pref, val in prefixes.items():
         short_url = url[: len(val)]
