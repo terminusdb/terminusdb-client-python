@@ -1,3 +1,4 @@
+from typing import List, Dict, Union, Optional
 import urllib.parse
 
 STANDARD_URLS = {
@@ -15,11 +16,11 @@ STANDARD_URLS = {
 }
 
 
-def encode_uri_component(value):
+def encode_uri_component(value: Union(Dict, Tuple)) -> str:
     return urllib.parse.urlencode(value, doseq=True)
 
 
-def uri_encode_payload(payload):
+def uri_encode_payload(payload: Union(str, Dict)) -> str:
     if isinstance(payload, str):
         return encode_uri_component(payload)
     payload_arr = []
@@ -37,7 +38,7 @@ def uri_encode_payload(payload):
     return "&".join(payload_arr)
 
 
-def add_params_to_url(url, payload):
+def add_params_to_url(url: str, payload: str) -> str:
     if payload:
         params = uri_encode_payload(payload)
         if params:
@@ -48,20 +49,20 @@ def add_params_to_url(url, payload):
 # below are utils for WOQLQuery
 
 
-def add_namespaces_to_variable(var):
+def add_namespaces_to_variable(var: str) -> str:
     if var[:2] != "v:":
         return "v:" + var
     return var
 
 
-def add_namespaces_to_variables(variables):
+def add_namespaces_to_variables(variables: List) -> str:
     nvars = []
     for v_item in variables:
         nvars.append(add_namespaces_to_variable(v_item))
     return nvars
 
 
-def empty(obj):
+def empty(obj: Dict) -> bool:
     """ * is the object empty?
      * returns true if the json object is empty
      """
@@ -81,7 +82,7 @@ def empty(obj):
     return True
 
 
-def shorten(url, prefixes=None):
+def shorten(url: str, prefixes: Optional(Dict) = None) -> str:
     prefixes = prefixes if prefixes else STANDARD_URLS
     for pref, val in prefixes.items():
         short_url = url[: len(val)]
@@ -90,27 +91,43 @@ def shorten(url, prefixes=None):
     return url
 
 
-def is_data_type(stype):
+def is_data_type(stype: str) -> bool:
+    """
+    function:
+        validate xsd or xdd
+    """
     sh = shorten(stype)
     if sh and (sh[:4] == "xsd:" or sh[:4] == "xdd:"):
         return True
     return False
 
 
-def valid_url(string):
+def valid_url(string: str) -> bool:
+    """
+    function:
+        validate url returns true or false
+    """
     if string and (string[:7] == "http://" or string[:8] == "https://"):
         return True
     return False
 
 
-def url_fraqment(url):
+def url_fraqment(url: str) -> str:
+    """
+    function:
+        takes url ("www.something.com/some_page/#someword") and return id ("someword")
+    """
     bits = url.split("#")
     if len(bits) > 1:
         return bits[1]
     return url
 
 
-def label_from_url(url):
+def label_from_url(url: str) -> str:
+    """
+    function:
+        takes url ('http://www.domin.com') and return lable('www.domin.com')
+    """
     nurl = url_fraqment(url)
     nurl = nurl if nurl else url
     last_char = nurl.rfind("/")
