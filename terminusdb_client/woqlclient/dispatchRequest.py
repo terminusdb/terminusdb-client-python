@@ -112,13 +112,13 @@ class DispatchRequest:
                 APIEndpointConst.CONNECT,
                 APIEndpointConst.CLASS_FRAME,
             ]:
-                request_response = cls.__get_call(url, headers, payload)
+                request_response = cls.__get_call(url, headers, payload, insecure=insecure)
 
             elif action in [
                 APIEndpointConst.DELETE_DATABASE,
                 APIEndpointConst.DELETE_GRAPH,
             ]:
-                request_response = cls.__delete_call(url, headers, payload)
+                request_response = cls.__delete_call(url, headers, payload, insecure=insecure)
 
             elif action in [
                 APIEndpointConst.WOQL_QUERY,
@@ -132,7 +132,7 @@ class DispatchRequest:
                 APIEndpointConst.BRANCH,
                 APIEndpointConst.CLONE,
             ]:
-                request_response = cls.__post_call(url, headers, payload, file_dict)
+                request_response = cls.__post_call(url, headers, payload, file_dict, insecure=insecure)
 
             if request_response.status_code == 200:
                 # print("hellow ")
