@@ -33,7 +33,7 @@ class WOQLClient:
         """
         self.conConfig = ConnectionConfig(server_url, **kwargs)
         self.conCapabilities = ConnectionCapabilities()
-        self.cert = kwargs.get("cert")
+        self.insecure = kwargs.get("insecure")
 
     def connect(self, **kwargs):
         r"""Connect to a Terminus server at the given URI with an API key.
@@ -63,8 +63,8 @@ class WOQLClient:
         """
         if len(kwargs) > 0:
             self.conConfig.update(**kwargs)
-        if self.cert is None:
-            self.cert = kwargs.get("cert")
+        if self.insecure is None:
+            self.insecure = kwargs.get("insecure")
 
         json_obj = self.dispatch(APIEndpointConst.CONNECT, self.conConfig.api)
         self.conCapabilities.set_capabilities(json_obj)
@@ -932,7 +932,7 @@ class WOQLClient:
             self.basic_auth(),
             self.remote_auth(),
             file_dict,
-            self.cert,
+            self.insecure,
         )
 
     def get_database(self, dbid, account):

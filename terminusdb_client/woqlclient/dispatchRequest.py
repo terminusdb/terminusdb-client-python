@@ -10,8 +10,8 @@ from .api_endpoint_const import APIEndpointConst
 from .errors import APIError
 
 
-def _verify_check(url):
-    if url[:17] == "https://127.0.0.1" or url[:7] == "http://":
+def _verify_check(url, insecure=False):
+    if url[:17] == "https://127.0.0.1" or url[:7] == "http://" or insecure:
         return False
     else:
         return True
@@ -22,7 +22,7 @@ class DispatchRequest:
         pass
 
     @staticmethod
-    def __get_call(url, headers, payload, cert=None):
+    def __get_call(url, headers, payload, insecure=False):
         url = utils.add_params_to_url(url, payload)
         if not _verify_check(url):
             warnings.simplefilter("ignore", InsecureRequestWarning)
@@ -31,7 +31,7 @@ class DispatchRequest:
         return result
 
     @staticmethod
-    def __post_call(url, headers, payload, file_dict=None, cert=None):
+    def __post_call(url, headers, payload, file_dict=None, insecure=False):
         if not _verify_check(url):
             warnings.simplefilter("ignore", InsecureRequestWarning)
         if file_dict:
@@ -56,7 +56,7 @@ class DispatchRequest:
         return result
 
     @staticmethod
-    def __delete_call(url, headers, payload, cert=None):
+    def __delete_call(url, headers, payload, insecure=False):
         url = utils.add_params_to_url(url, payload)
         if not _verify_check(url):
             warnings.simplefilter("ignore", InsecureRequestWarning)
@@ -94,7 +94,7 @@ class DispatchRequest:
         basic_auth=None,
         remote_auth=None,
         file_dict=None,
-        cert=None,
+        insecure=False,
     ):
 
         # payload default as empty dict is against PEP
