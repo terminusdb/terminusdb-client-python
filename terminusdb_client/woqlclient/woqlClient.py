@@ -30,6 +30,7 @@ class WOQLClient:
             URL of the server that this client will connect to.
         \**kwargs
             Configuration options used to construct a :class:`ConnectionConfig` instance.
+            Passing insecure=True will skip HTTPS certificate checking.
         """
         self.conConfig = ConnectionConfig(server_url, **kwargs)
         self.conCapabilities = ConnectionCapabilities()
