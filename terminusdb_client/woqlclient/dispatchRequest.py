@@ -10,8 +10,8 @@ from .api_endpoint_const import APIEndpointConst
 from .errors import APIError
 
 
-def _verify_check(url):
-    if url[:17] == "https://127.0.0.1" or url[:7] == "http://":
+def _verify_check(url, insecure=False):
+    if url[:17] == "https://127.0.0.1" or url[:7] == "http://" or insecure:
         return False
     else:
         return True
@@ -22,17 +22,17 @@ class DispatchRequest:
         pass
 
     @staticmethod
-    def __get_call(url, headers, payload, cert=None):
+    def __get_call(url, headers, payload, insecure=False):
         url = utils.add_params_to_url(url, payload)
-        if not _verify_check(url):
+        if not _verify_check(url, insecure):
             warnings.simplefilter("ignore", InsecureRequestWarning)
-        result = requests.get(url, headers=headers, verify=_verify_check(url))
+        result = requests.get(url, headers=headers, verify=_verify_check(url, insecure))
         warnings.resetwarnings()
         return result
 
     @staticmethod
-    def __post_call(url, headers, payload, file_dict=None, cert=None):
-        if not _verify_check(url):
+    def __post_call(url, headers, payload, file_dict=None, insecure=False):
+        if not _verify_check(url, insecure):
             warnings.simplefilter("ignore", InsecureRequestWarning)
         if file_dict:
             result = requests.post(
@@ -40,7 +40,7 @@ class DispatchRequest:
                 json=payload,
                 headers=headers,
                 files=file_dict,
-                verify=_verify_check(url),
+                verify=_verify_check(url, insecure),
             )
             # Close the files although request should do this :(
             for key in file_dict:
@@ -50,7 +50,7 @@ class DispatchRequest:
         else:
             headers["content-type"] = "application/json"
             result = requests.post(
-                url, json=payload, headers=headers, verify=_verify_check(url)
+                url, json=payload, headers=headers, verify=_verify_check(url, insecure)
             )
         warnings.resetwarnings()
         return result
@@ -81,11 +81,11 @@ class DispatchRequest:
         return result
 
     @staticmethod
-    def __delete_call(url, headers, payload, cert=None):
+    def __delete_call(url, headers, payload, insecure=False):
         url = utils.add_params_to_url(url, payload)
-        if not _verify_check(url):
+        if not _verify_check(url, insecure):
             warnings.simplefilter("ignore", InsecureRequestWarning)
-        result = requests.delete(url, headers=headers, verify=_verify_check(url))
+        result = requests.delete(url, headers=headers, verify=_verify_check(url, insecure))
         warnings.resetwarnings()
         return result
 
@@ -119,7 +119,7 @@ class DispatchRequest:
         basic_auth=None,
         remote_auth=None,
         file_dict=None,
-        cert=None,
+        insecure=False,
     ):
 
         # payload default as empty dict is against PEP
@@ -137,13 +137,13 @@ class DispatchRequest:
                 APIEndpointConst.CONNECT,
                 APIEndpointConst.CLASS_FRAME,
             ]:
-                request_response = cls.__get_call(url, headers, payload)
+                request_response = cls.__get_call(url, headers, payload, insecure=insecure)
 
             elif action in [
                 APIEndpointConst.DELETE_DATABASE,
                 APIEndpointConst.DELETE_GRAPH,
             ]:
-                request_response = cls.__delete_call(url, headers, payload)
+                request_response = cls.__delete_call(url, headers, payload, insecure=insecure)
 
             elif action in [
                 APIEndpointConst.WOQL_QUERY,
@@ -157,7 +157,7 @@ class DispatchRequest:
                 APIEndpointConst.BRANCH,
                 APIEndpointConst.CLONE,
             ]:
-                request_response = cls.__post_call(url, headers, payload, file_dict)
+                request_response = cls.__post_call(url, headers, payload, file_dict, insecure=insecure)
 
             elif action in [
                 APIEndpointConst.INSERT_TRIPLES,
