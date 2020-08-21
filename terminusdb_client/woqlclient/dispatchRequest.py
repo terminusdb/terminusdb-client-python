@@ -24,15 +24,15 @@ class DispatchRequest:
     @staticmethod
     def __get_call(url, headers, payload, insecure=False):
         url = utils.add_params_to_url(url, payload)
-        if not _verify_check(url):
+        if not _verify_check(url, insecure):
             warnings.simplefilter("ignore", InsecureRequestWarning)
-        result = requests.get(url, headers=headers, verify=_verify_check(url))
+        result = requests.get(url, headers=headers, verify=_verify_check(url, insecure))
         warnings.resetwarnings()
         return result
 
     @staticmethod
     def __post_call(url, headers, payload, file_dict=None, insecure=False):
-        if not _verify_check(url):
+        if not _verify_check(url, insecure):
             warnings.simplefilter("ignore", InsecureRequestWarning)
         if file_dict:
             result = requests.post(
@@ -40,7 +40,7 @@ class DispatchRequest:
                 json=payload,
                 headers=headers,
                 files=file_dict,
-                verify=_verify_check(url),
+                verify=_verify_check(url, insecure),
             )
             # Close the files although request should do this :(
             for key in file_dict:
@@ -50,7 +50,7 @@ class DispatchRequest:
         else:
             headers["content-type"] = "application/json"
             result = requests.post(
-                url, json=payload, headers=headers, verify=_verify_check(url)
+                url, json=payload, headers=headers, verify=_verify_check(url, insecure)
             )
         warnings.resetwarnings()
         return result
@@ -58,9 +58,9 @@ class DispatchRequest:
     @staticmethod
     def __delete_call(url, headers, payload, insecure=False):
         url = utils.add_params_to_url(url, payload)
-        if not _verify_check(url):
+        if not _verify_check(url, insecure):
             warnings.simplefilter("ignore", InsecureRequestWarning)
-        result = requests.delete(url, headers=headers, verify=_verify_check(url))
+        result = requests.delete(url, headers=headers, verify=_verify_check(url, insecure))
         warnings.resetwarnings()
         return result
 
