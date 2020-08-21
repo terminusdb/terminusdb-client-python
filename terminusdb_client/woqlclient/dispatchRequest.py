@@ -56,6 +56,31 @@ class DispatchRequest:
         return result
 
     @staticmethod
+    def __put_call(url, headers, payload, file_dict=None, cert=None):
+        if not _verify_check(url):
+            warnings.simplefilter("ignore", InsecureRequestWarning)
+        if file_dict:
+            result = requests.post(
+                url,
+                json=payload,
+                headers=headers,
+                files=file_dict,
+                verify=_verify_check(url),
+            )
+            # Close the files although request should do this :(
+            for key in file_dict:
+                (_, stream, _) = file_dict[key]
+                if type(stream) != str:
+                    stream.close()
+        else:
+            headers["content-type"] = "application/json"
+            result = requests.put(
+                url, json=payload, headers=headers, verify=_verify_check(url)
+            )
+        warnings.resetwarnings()
+        return result
+
+    @staticmethod
     def __delete_call(url, headers, payload, cert=None):
         url = utils.add_params_to_url(url, payload)
         if not _verify_check(url):
@@ -133,6 +158,12 @@ class DispatchRequest:
                 APIEndpointConst.CLONE,
             ]:
                 request_response = cls.__post_call(url, headers, payload, file_dict)
+
+            elif action in [
+                APIEndpointConst.INSERT_TRIPLES,
+            ]:
+                request_response = cls.__put_call(url, headers, payload, file_dict)
+
 
             if request_response.status_code == 200:
                 # print("hellow ")

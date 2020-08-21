@@ -2,6 +2,7 @@ class APIEndpointConst:
     CONNECT = "connect"
     GET_TRIPLES = "get_triples"
     UPDATE_TRIPLES = "update_triples"
+    INSERT_TRIPLES = "insert_triples"
     CLASS_FRAME = "class_frame"
     WOQL_QUERY = "woql_query"
     DELETE_DATABASE = "delete_database"

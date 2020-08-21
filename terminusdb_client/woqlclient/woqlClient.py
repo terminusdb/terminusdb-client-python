@@ -638,9 +638,35 @@ class WOQLClient:
         dict
         """
         commit = self._generate_commit(commit_msg)
-        commit.turtle = turtle
+        commit['turtle'] = turtle
         return self.dispatch(
             APIEndpointConst.UPDATE_TRIPLES,
+            self.conConfig.triples_url(graph_type, graph_id),
+            commit,
+        )
+
+    def insert_triples(self, graph_type, graph_id, turtle, commit_msg):
+        """Inserts into the specified graph with the triples encoded in turtle format.
+
+        Parameters
+        ----------
+        graph_type : str
+            Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
+        graph_id : str
+            Graph identifier.
+        turtle
+            Valid set of triples in Turtle format.
+        commit_msg : str
+            Commit message.
+
+        Returns
+        -------
+        dict
+        """
+        commit = self._generate_commit(commit_msg)
+        commit['turtle'] = turtle
+        return self.dispatch(
+            APIEndpointConst.INSERT_TRIPLES,
             self.conConfig.triples_url(graph_type, graph_id),
             commit,
         )

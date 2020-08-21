@@ -180,7 +180,7 @@ class ConnectionConfig:
     def clone_url(self, new_repo_id=None):
         crl = f"{self.api}clone/{self.account}"
         if new_repo_id is not None:
-            crl = crl + f"/${new_repo_id}"
+            crl = crl + f"/{new_repo_id}"
         return crl
 
     def cloneable_url(self):
