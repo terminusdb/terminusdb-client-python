@@ -119,7 +119,7 @@ class WOQLClient:
         return self.conConfig.basic_auth
 
     def remote_auth(self, auth_info=None):
-        """Set or get the JWT token used for authenticating to the server.
+        """Set or get the Basic auth or JWT token used for authenticating to the server.
 
         If ``auth_info`` is not provided, then the config will not be updated.
 
@@ -141,7 +141,7 @@ class WOQLClient:
         >>> client.remote_auth({"type": "jwt", "user": "admin", "key": "<token>"})
         {'type': 'jwt', 'user': 'admin', 'key': '<token>'}
         """
-        if type(auth_info) == dict:
+        if auth_info:
             self.conConfig.set_remote_auth(auth_info)
         return self.conConfig.remote_auth
 
@@ -722,19 +722,22 @@ class WOQLClient:
             APIEndpointConst.WOQL_QUERY, self.conConfig.query_url(), payload, request_file_dict
         )
 
-    def branch(self, new_branch_id):
+    def branch(self, new_branch_id, empty=False):
         """Create a branch starting from the current branch.
 
         Parameters
         ----------
         new_branch_id : str
             New branch identifier.
-
+        empty : bool
+            Create an empty branch if true (no starting commit)
         Returns
         -------
         dict
         """
-        if self.ref():
+        if empty:
+            source = {}
+        elif self.ref():
             source = {
                 "origin": f"{self.account()}/{self.db()}/{self.repo()}/commit/{self.ref()}"
             }
@@ -767,7 +770,7 @@ class WOQLClient:
         Examples
         --------
         >>> client = WOQLClient("https://127.0.0.1:6363/")
-        >>> client.pull({"author": "<author>", "remote": "<remote>", "remote_branch": "<branch>"})
+        >>> client.pull({"remote": "<remote>", "remote_branch": "<branch>"})
         """
         rc_args = self._prepare_revision_control_args(remote_source_repo)
         if rc_args and rc_args.get("remote") and rc_args.get("remote_branch"):
