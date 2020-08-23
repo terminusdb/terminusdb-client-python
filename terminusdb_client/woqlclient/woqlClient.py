@@ -30,10 +30,11 @@ class WOQLClient:
             URL of the server that this client will connect to.
         \**kwargs
             Configuration options used to construct a :class:`ConnectionConfig` instance.
+            Passing insecure=True will skip HTTPS certificate checking.
         """
         self.conConfig = ConnectionConfig(server_url, **kwargs)
         self.conCapabilities = ConnectionCapabilities()
-        self.cert = kwargs.get("cert")
+        self.insecure = kwargs.get("insecure")
 
     def connect(self, **kwargs):
         r"""Connect to a Terminus server at the given URI with an API key.
@@ -63,8 +64,8 @@ class WOQLClient:
         """
         if len(kwargs) > 0:
             self.conConfig.update(**kwargs)
-        if self.cert is None:
-            self.cert = kwargs.get("cert")
+        if self.insecure is None:
+            self.insecure = kwargs.get("insecure")
 
         json_obj = self.dispatch(APIEndpointConst.CONNECT, self.conConfig.api)
         self.conCapabilities.set_capabilities(json_obj)
@@ -118,7 +119,7 @@ class WOQLClient:
         return self.conConfig.basic_auth
 
     def remote_auth(self, auth_info=None):
-        """Set or get the JWT token used for authenticating to the server.
+        """Set or get the Basic auth or JWT token used for authenticating to the server.
 
         If ``auth_info`` is not provided, then the config will not be updated.
 
@@ -140,7 +141,7 @@ class WOQLClient:
         >>> client.remote_auth({"type": "jwt", "user": "admin", "key": "<token>"})
         {'type': 'jwt', 'user': 'admin', 'key': '<token>'}
         """
-        if type(auth_info) == dict:
+        if auth_info:
             self.conConfig.set_remote_auth(auth_info)
         return self.conConfig.remote_auth
 
@@ -638,9 +639,35 @@ class WOQLClient:
         dict
         """
         commit = self._generate_commit(commit_msg)
-        commit.turtle = turtle
+        commit['turtle'] = turtle
         return self.dispatch(
             APIEndpointConst.UPDATE_TRIPLES,
+            self.conConfig.triples_url(graph_type, graph_id),
+            commit,
+        )
+
+    def insert_triples(self, graph_type, graph_id, turtle, commit_msg):
+        """Inserts into the specified graph with the triples encoded in turtle format.
+
+        Parameters
+        ----------
+        graph_type : str
+            Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
+        graph_id : str
+            Graph identifier.
+        turtle
+            Valid set of triples in Turtle format.
+        commit_msg : str
+            Commit message.
+
+        Returns
+        -------
+        dict
+        """
+        commit = self._generate_commit(commit_msg)
+        commit['turtle'] = turtle
+        return self.dispatch(
+            APIEndpointConst.INSERT_TRIPLES,
             self.conConfig.triples_url(graph_type, graph_id),
             commit,
         )
@@ -695,19 +722,22 @@ class WOQLClient:
             APIEndpointConst.WOQL_QUERY, self.conConfig.query_url(), payload, request_file_dict
         )
 
-    def branch(self, new_branch_id):
+    def branch(self, new_branch_id, empty=False):
         """Create a branch starting from the current branch.
 
         Parameters
         ----------
         new_branch_id : str
             New branch identifier.
-
+        empty : bool
+            Create an empty branch if true (no starting commit)
         Returns
         -------
         dict
         """
-        if self.ref():
+        if empty:
+            source = {}
+        elif self.ref():
             source = {
                 "origin": f"{self.account()}/{self.db()}/{self.repo()}/commit/{self.ref()}"
             }
@@ -740,7 +770,7 @@ class WOQLClient:
         Examples
         --------
         >>> client = WOQLClient("https://127.0.0.1:6363/")
-        >>> client.pull({"author": "<author>", "remote": "<remote>", "remote_branch": "<branch>"})
+        >>> client.pull({"remote": "<remote>", "remote_branch": "<branch>"})
         """
         rc_args = self._prepare_revision_control_args(remote_source_repo)
         if rc_args and rc_args.get("remote") and rc_args.get("remote_branch"):
@@ -932,7 +962,7 @@ class WOQLClient:
             self.basic_auth(),
             self.remote_auth(),
             file_dict,
-            self.cert,
+            self.insecure,
         )
 
     def get_database(self, dbid, account):

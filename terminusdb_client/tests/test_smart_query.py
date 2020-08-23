@@ -1,6 +1,7 @@
+from datetime import datetime
 import pprint
 
-from terminusdb_client.woqlquery.smart_query import WOQLClass
+from terminusdb_client.woqlquery.smart_query import WOQLClass, WOQLObj
 
 from .ans_doctype import *  # noqa
 from .ans_property import *  # noqa
@@ -63,3 +64,44 @@ class TestWOQLClass:
         woql_object = WOQLClass("Journey")
         woql_object.add_property("start_station", station_obj)
         assert woql_object.to_dict() == obj_property_without
+
+class TestWOQLObj:
+    def test_init_int_prop(self):
+        my_id = "my_journey"
+        my_label = "My Journey"
+        my_des = "This is my journey to work"
+        my_prop = {"Duration": {'value':30}}
+        journey_class = WOQLClass("Journey")
+        journey_class.add_property("Duration", "integer", label="Journey Duration", description="Journey duration in minutes.")
+        woql_obj = WOQLObj(my_id, journey_class, my_label, my_des, property=my_prop)
+
+        assert woql_obj.id == my_id
+        assert woql_obj.label == my_label
+        assert woql_obj.description == my_des
+        assert woql_obj._type == journey_class
+        assert woql_obj._property == my_prop
+
+        def test_init_dt_prop(self):
+            my_id = "my_journey"
+            my_label = "My Journey"
+            my_des = "This is my journey to work"
+            my_prop = {"Duration": {'value':datetime("2020-08-08")}}
+            journey_class = WOQLClass("Journey")
+            journey_class.add_property("Duration", "dateTime", label="Journey Duration", description="Journey duration in minutes.")
+            woql_obj = WOQLObj(my_id, journey_class, my_label, my_des, property=my_prop)
+
+            assert woql_obj.id == my_id
+            assert woql_obj.label == my_label
+            assert woql_obj.description == my_des
+            assert woql_obj._type == journey_class
+            assert woql_obj._property == my_prop
+
+    def test_idgen(self):
+        journey_class = WOQLClass("Journey")
+        woql_obj = WOQLObj("my_journey", journey_class)
+        assert woql_obj.woql_id == f"doc:Journey_my_journey"
+
+    def test_idgen_quote(self):
+        journey_class = WOQLClass("My Journey")
+        woql_obj = WOQLObj("my journey", journey_class)
+        assert woql_obj.woql_id == f"doc:My%20Journey_my%20journey"
