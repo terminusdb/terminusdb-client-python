@@ -1,5 +1,6 @@
-from typing import Union, List
+from typing import Union, List, Dict
 from .woql_query import WOQLQuery
+from .woql_library import WOQLLib
 from ..woqlclient import WOQLClient
 
 WOQLTYPE_TO_PYTYPE = {
@@ -40,6 +41,8 @@ class WOQLClass:
 
     @property
     def label(self) -> str:
+        if self._label is None:
+            return ""
         return self._label
 
     @label.setter
@@ -49,6 +52,8 @@ class WOQLClass:
 
     @property
     def description(self) -> str:
+        if self._description is None:
+            return ""
         return self._description
 
     @description.setter
@@ -114,19 +119,37 @@ class TerminusDB:
         self, server_url:str, db_id:str, key:str ="root", account:str ="admin", user:str ="admin", db_label:str =None, db_description:str =None, **kwargs
         ):
 
-        self._client = WOQLCLient(server_url , **kwargs)
+        self._client = WOQLClient(server_url , **kwargs)
         self._client.connect(key, account, user)
         existing = self._client.get_database(db_id, self._client.uid())
         if not existing:
             self._client.create_database(db_id, account, db_label, db_description)
-            self.classes = {}
+            self.classes: Dict[str, WOQLClass] = {}
         else:
             self._client.db(db_id)
             #get all classes from db and store them
+            cls_result = WOQLLib().classes().execute(self._client)
+            for item in cls_result['bindings']:
+                class_id = item['Class ID'].split('#')[-1]
+                class_name = item['Class Name']['@value']
+                class_des = item['Description']['@value']
+                self.classes['class_id'] = WOQLClass(class_id, class_name, class_des)
+            #get all peoperties from db and add to classes
+            prop_result = WOQLLib().property().execute(self._client)
+            for item in prop_result['bindings']:
+                prop_domain = item['Property Domain'].split('#')[-1]
+                prop_id = item['Property ID'].split('#')[-1]
+                prop_name = item['Property Name']['@value']
+                prop_des = item['Property Description']['@value']
+                prop_type = item['Property Domain'].split('#')[-1]
+                if item['Property Type']['@value'] == 'Object':
+                    prop_type = self.classes[prop_type]
+                self.classes[prop_domain].add_property(prop_id, prop_type, prop_name, prop_des)
+
 
     def add_class(self, obj:Union[WOQLClass,List[WOQLClass]]):
         if isinstance(obj, WOQLClass):
-            self.clases[obj.id] = obj
+            self.classes[obj.id] = obj
             return obj.query_obj.execute(self._client)
         elif isinstance(obj, list):
             for item in obj:
