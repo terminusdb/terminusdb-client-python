@@ -731,6 +731,7 @@ class WOQLClient:
             New branch identifier.
         empty : bool
             Create an empty branch if true (no starting commit)
+
         Returns
         -------
         dict
