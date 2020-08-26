@@ -156,6 +156,9 @@ class DispatchRequest:
                 APIEndpointConst.REBASE,
                 APIEndpointConst.BRANCH,
                 APIEndpointConst.CLONE,
+                APIEndpointConst.RESET,
+                APIEndpointConst.OPTIMIZE,
+                APIEndpointConst.SQUASH,
             ]:
                 request_response = cls.__post_call(url, headers, payload, file_dict, insecure=insecure)
 
