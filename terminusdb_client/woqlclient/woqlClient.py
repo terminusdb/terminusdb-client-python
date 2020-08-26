@@ -929,7 +929,7 @@ class WOQLClient:
         return rc_args
 
     def dispatch(
-        self, action, url, payload=None, file_dict=None
+        self, action, url, payload={}, file_dict=None
     ):
         """Directly dispatch to a TerminusDB database.
 
@@ -953,8 +953,6 @@ class WOQLClient:
         # review the access control
         # self.conCapabilities.capabilitiesPermit(action)
         # url, action, payload={}, basic_auth, jwt=None, file_dict=None)
-        if payload is None:
-            payload = {}
         return DispatchRequest.send_request_by_action(
             url,
             action,
