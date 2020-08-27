@@ -15,3 +15,6 @@ class APIEndpointConst:
     PULL = ("pull",)
     REBASE = ("rebase",)
     BRANCH = "branch"
+    RESET = "reset"
+    OPTIMIZE = "optimize"
+    SQUASH = "squash"

@@ -197,6 +197,15 @@ class ConnectionConfig:
     def rebase_url(self):
         return self.branch_base("rebase")
 
+    def reset_url(self):
+        return self.branch_base("reset")
+
+    def optimize_url(self, path):
+        return f'{self.api}optimize/{path}'
+
+    def squash_url(self):
+        return self.branch_base("squash")
+
     def push_url(self):
         return self.branch_base("push")
 

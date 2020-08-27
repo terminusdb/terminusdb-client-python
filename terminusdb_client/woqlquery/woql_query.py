@@ -561,11 +561,13 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:Select"
-        if not queries:
+        if queries != [] and not queries:
             return self._parameter_error(
                 "Select must be given a list of variable names"
             )
-        if hasattr(queries[-1], "to_dict"):
+        if queries == []:
+            embedquery = False
+        elif hasattr(queries[-1], "to_dict"):
             embedquery = queries.pop()
         else:
             embedquery = False
