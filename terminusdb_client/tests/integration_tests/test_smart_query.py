@@ -5,29 +5,15 @@ from urllib3.util.retry import Retry
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from terminusdb_client.woqlquery.smart_query import TerminusDB
 
+test_url = 'http://127.0.0.1:6363'
 
-@pytest.fixture(scope="module")
-def main_app_url(session_scoped_container_getter):
-    """ Wait for the api to become responsive """
-    request_session = requests.Session()
-    retries = Retry(total=5,
-                    backoff_factor=0.1,
-                    status_forcelist=[500, 502, 503, 504])
-    request_session.mount("http://", HTTPAdapter(max_retries=retries))
-    service = session_scoped_container_getter.get("terminusdb-server").network_info[0]
-    api_url = f"http://{service.hostname}:{service.host_port}"
-    #assert request_session.get(api_url)
-    return api_url #f"http://127.0.0.1:{service.host_port}"
-
-def test_main_service_run(main_app_url):
-    result = requests.get(main_app_url)
+def test_main_service_run():
+    result = requests.get(test_url)
     assert result.status_code == 200
 
-def test_init_terminusdb(main_app_url):
-    db = TerminusDB(main_app_url, "test")
-    print(main_app_url)
+def test_init_terminusdb():
+    db = TerminusDB(test_url, "test")
     print(db._client.db("test"))
-    #assert False
     assert db is not None
 
 
