@@ -75,7 +75,7 @@ class DispatchRequest:
         else:
             headers["content-type"] = "application/json"
             result = requests.put(
-                url, json=payload, headers=headers, verify=_verify_check(url, insurec)
+                url, json=payload, headers=headers, verify=_verify_check(url, insecure)
             )
         warnings.resetwarnings()
         return result
