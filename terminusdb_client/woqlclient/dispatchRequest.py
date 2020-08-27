@@ -56,7 +56,7 @@ class DispatchRequest:
         return result
 
     @staticmethod
-    def __put_call(url, headers, payload, file_dict=None, cert=None):
+    def __put_call(url, headers, payload, file_dict=None, insecure=None):
         if not _verify_check(url):
             warnings.simplefilter("ignore", InsecureRequestWarning)
         if file_dict:
@@ -165,7 +165,7 @@ class DispatchRequest:
             elif action in [
                 APIEndpointConst.INSERT_TRIPLES,
             ]:
-                request_response = cls.__put_call(url, headers, payload, file_dict)
+                request_response = cls.__put_call(url, headers, payload, file_dict, insecure=insecure)
 
 
             if request_response.status_code == 200:
