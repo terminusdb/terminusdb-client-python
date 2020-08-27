@@ -5,4 +5,5 @@ pytest>=3
 pytest-cov
 pytest-mock
 pytest-xdist
+pytest-docker-compose
 pytest-runner
