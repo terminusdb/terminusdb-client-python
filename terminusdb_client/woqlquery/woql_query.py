@@ -579,6 +579,44 @@ class WOQLQuery:
             self._cursor["woql:variable_list"].append(onevar)
         return self._add_sub_query(embedquery)
 
+    def distinct(self, *args):
+        """Ensures that the solutions for the variables [V1...Vn] are distinct
+
+        Parameters
+        ----------
+        args
+            The variables to make distinct
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        """Select the set of variables that the result will return"""
+        queries = list(args)
+        if queries and queries[0] == "woql:args":
+            return ["woql:variable_list", "woql:query"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "woql:Distinct"
+        if queries != [] and not queries:
+            return self._parameter_error(
+                "Distinct must be given a list of variable names"
+            )
+        if queries == []:
+            embedquery = False
+        elif hasattr(queries[-1], "to_dict"):
+            embedquery = queries.pop()
+        else:
+            embedquery = False
+        self._cursor["woql:variable_list"] = []
+        for idx, item in enumerate(queries):
+            onevar = self._varj(item)
+            onevar["@type"] = "woql:VariableListElement"
+            onevar["woql:index"] = self._jlt(idx, "nonNegativeInteger")
+            self._cursor["woql:variable_list"].append(onevar)
+        return self._add_sub_query(embedquery)
+
     def woql_and(self, *args):
         """Creates a logical AND of the arguments
         Commonly used to combine WOQLQueries.
