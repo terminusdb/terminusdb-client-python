@@ -6,7 +6,6 @@ from urllib3.util.retry import Retry
 
 from terminusdb_client.woqlquery.smart_query import TerminusDB
 
-
 @pytest.fixture(scope="module")
 def docker_url(pytestconfig):
     # we are using subprocess in case we need to access some of the outputs
@@ -34,6 +33,7 @@ def test_main_service_run(docker_url):
 
 def test_init_terminusdb(docker_url):
     db = TerminusDB(docker_url, "test")
+
     print(db._client.db("test"))
     assert db is not None
 

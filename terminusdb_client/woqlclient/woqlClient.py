@@ -731,6 +731,7 @@ class WOQLClient:
             New branch identifier.
         empty : bool
             Create an empty branch if true (no starting commit)
+
         Returns
         -------
         dict
@@ -845,6 +846,93 @@ class WOQLClient:
                 "Rebase parameter error - you must specify a valid rebase source to rebase from"
             )
 
+    def reset(self, commit_path):
+        """Reset the current branch HEAD to the specified commith path.
+
+        Notes
+        -----
+        The "remote" repo can live in the local database.
+
+        Parameters
+        ----------
+        commit_path : string
+            Path to the commit, for instance admin/database/local/commit/234980523ffaf93.
+
+        Returns
+        -------
+        dict
+
+        Examples
+        --------
+        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client.checkout("some_branch")
+        >>> client.reset('admin/database/local/commit/234980523ffaf93')
+        """
+
+        return self.dispatch(
+            APIEndpointConst.RESET, self.conConfig.reset_url(),
+            {'commit_descriptor': commit_path}
+        )
+
+    def optimize(self, path):
+        """Optimize the specified path.
+
+        Notes
+        -----
+        The "remote" repo can live in the local database.
+
+        Parameters
+        ----------
+        path : string
+            Path to optimize, for instance admin/database/_meta for the repo graph.
+
+        Returns
+        -------
+        dict
+
+        Examples
+        --------
+        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client.optimize('admin/database/_meta')
+        """
+        return self.dispatch(
+            APIEndpointConst.RESET, self.conConfig.optimize_url(path)
+        )
+
+    def squash(self, msg, author=None):
+        """Squash the current branch HEAD into a commit
+
+        Notes
+        -----
+        The "remote" repo can live in the local database.
+
+        Parameters
+        ----------
+        msg : string
+            Message for the newly created squash commit
+        author : string
+            Author of the commit
+
+        Returns
+        -------
+        dict
+            A dict with the new commit id:
+            {'@type' : 'api:SquashResponse',
+             'api:commit' : Commit,
+             'api:old_commit' : Old_Commit,
+             'api:status' : "api:success"}
+
+        Examples
+        --------
+        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client.connect(user="admin", key="root", account="admin", db="some_db")
+        >>> client.squash('This is a squash commit message!')
+        """
+        commit_object = self._generate_commit(msg, author)
+        return self.dispatch(
+            APIEndpointConst.SQUASH, self.conConfig.squash_url(), commit_object
+        )
+
     def clonedb(self, clone_source, newid):
         """Clone a remote repository and create a local copy.
 
@@ -929,7 +1017,7 @@ class WOQLClient:
         return rc_args
 
     def dispatch(
-        self, action, url, payload=None, file_dict=None
+        self, action, url, payload={}, file_dict=None
     ):
         """Directly dispatch to a TerminusDB database.
 
@@ -953,8 +1041,6 @@ class WOQLClient:
         # review the access control
         # self.conCapabilities.capabilitiesPermit(action)
         # url, action, payload={}, basic_auth, jwt=None, file_dict=None)
-        if payload is None:
-            payload = {}
         return DispatchRequest.send_request_by_action(
             url,
             action,

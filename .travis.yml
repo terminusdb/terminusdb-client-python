@@ -2,7 +2,13 @@ language: python
 install: make && pip install tox
 script:
 - make ci
+services:
+  - docker
 cache: pip
+
+before_install:
+  - sudo docker run -p 6363:6363 -it -e 'TERMINUSDB_HTTPS_ENABLED=false' terminusdb/terminusdb-server:dev
+
 jobs:
   include:
   - stage: test
