@@ -11,9 +11,13 @@ def docker_url(pytestconfig):
     # we are using subprocess in case we need to access some of the outputs
     # most likely
     docker_compose_path = pytestconfig.getoption("docker_compose")
-    subprocess.run(
-        ["docker-compose", "--file", f"{os.path.dirname(os.path.realpath(__file__))}"+"/test_docker_compose.yml", "up", "-d"], check=True
+    output = subprocess.run(
+        ["docker-compose", "--file", docker_compose_path, "up", "-d"],
+        stderr=subprocess.PIPE
     )
+    if output.returncode != 0:
+
+        raise RuntimeError(output.stderr)
     # is_server_started = False
     #
     # # while not is_server_started:
