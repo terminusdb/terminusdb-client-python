@@ -196,9 +196,9 @@ class TerminusDB:
         self._client = WOQLClient(server_url, **kwargs)
         self._client.connect(key=key, account=account, user=user)
         existing = self._client.get_database(db_id, self._client.uid())
+        self.classes: Dict[str, WOQLClass] = {}
         if not existing:
             self._client.create_database(db_id, account, db_label, db_description)
-            self.classes: Dict[str, WOQLClass] = {}
         else:
             self._client.db(db_id)
             # get all classes from db and store them
@@ -250,3 +250,7 @@ class TerminusDB:
             raise ValueError(
                 "Object(s) added need to be WOQLClass object or a list of WOQLClass objects."
             )
+
+    def run(self, query: Union[WOQLQuery,Dict]):
+        """Run a query either in WOQLQuery format or json_ld in dictionary presentation"""
+        return self._client.query(query)

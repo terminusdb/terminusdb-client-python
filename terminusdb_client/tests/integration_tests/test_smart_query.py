@@ -4,8 +4,10 @@ import subprocess
 import pytest
 import requests
 
-from terminusdb_client.woqlquery.smart_query import TerminusDB
+from terminusdb_client.woqlquery.smart_query import WOQLClass, WOQLObj, TerminusDB
+from terminusdb_client.woqlquery.woql_library import WOQLLib
 
+from .ans_test_db import *  # noqa
 
 @pytest.fixture(scope="module")
 def docker_url(pytestconfig):
@@ -45,6 +47,18 @@ def test_main_service_run(docker_url):
 
 def test_init_terminusdb(docker_url):
     db = TerminusDB(docker_url, "test")
+    assert db._client.db("test") == "test"
 
-    print(db._client.db("test"))
-    assert db is not None
+def test_add_class(docker_url, one_class_obj):
+    db = TerminusDB(docker_url, "test")
+    my_class = WOQLClass(
+        "Journey", label="Bike Journey", description="Bike Journey object that capture each bike joourney."
+    )
+    db.add_class(my_class)
+    print(db.run(WOQLLib().classes()))
+    assert db.run(WOQLLib().classes()) == one_class_obj
+
+def add_obj(docker_url, one_class_obj):
+    # should be after test_add_class
+    db = TerminusDB(docker_url, "test")
+    assert db.run(WOQLLib().classes()) == one_class_obj
