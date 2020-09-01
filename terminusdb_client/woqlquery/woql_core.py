@@ -37,7 +37,7 @@ def _get_clause_and_remainder(pat):
         return ret
     for idx, char in enumerate(pat[1:]):
         if char in [",", "|", "+", "{"]:
-            return [pat[:idx], pat[idx:]]
+            return [pat[:idx+1], pat[idx+1:]]
     return [pat]
 
 
