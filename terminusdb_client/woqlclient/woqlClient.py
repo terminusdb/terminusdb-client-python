@@ -639,7 +639,7 @@ class WOQLClient:
         dict
         """
         commit = self._generate_commit(commit_msg)
-        commit['turtle'] = turtle
+        commit["turtle"] = turtle
         return self.dispatch(
             APIEndpointConst.UPDATE_TRIPLES,
             self.conConfig.triples_url(graph_type, graph_id),
@@ -665,7 +665,7 @@ class WOQLClient:
         dict
         """
         commit = self._generate_commit(commit_msg)
-        commit['turtle'] = turtle
+        commit["turtle"] = turtle
         return self.dispatch(
             APIEndpointConst.INSERT_TRIPLES,
             self.conConfig.triples_url(graph_type, graph_id),
@@ -709,7 +709,11 @@ class WOQLClient:
             request_file_dict = {}
             for name in query_obj:
                 query_obj_value = query_obj[name]
-                request_file_dict[name] = (name, json.dumps(query_obj_value), "application/json")
+                request_file_dict[name] = (
+                    name,
+                    json.dumps(query_obj_value),
+                    "application/json",
+                )
             for name in file_dict:
                 path = file_dict[name]
                 request_file_dict[name] = (name, open(path, "rb"), "application/binary")
@@ -719,7 +723,10 @@ class WOQLClient:
             payload = query_obj
 
         return self.dispatch(
-            APIEndpointConst.WOQL_QUERY, self.conConfig.query_url(), payload, request_file_dict
+            APIEndpointConst.WOQL_QUERY,
+            self.conConfig.query_url(),
+            payload,
+            request_file_dict,
         )
 
     def branch(self, new_branch_id, empty=False):
@@ -870,8 +877,9 @@ class WOQLClient:
         """
 
         return self.dispatch(
-            APIEndpointConst.RESET, self.conConfig.reset_url(),
-            {'commit_descriptor': commit_path}
+            APIEndpointConst.RESET,
+            self.conConfig.reset_url(),
+            {"commit_descriptor": commit_path},
         )
 
     def optimize(self, path):
@@ -895,9 +903,7 @@ class WOQLClient:
         >>> client = WOQLClient("https://127.0.0.1:6363/")
         >>> client.optimize('admin/database/_meta')
         """
-        return self.dispatch(
-            APIEndpointConst.RESET, self.conConfig.optimize_url(path)
-        )
+        return self.dispatch(APIEndpointConst.RESET, self.conConfig.optimize_url(path))
 
     def squash(self, msg, author=None):
         """Squash the current branch HEAD into a commit
@@ -1016,9 +1022,7 @@ class WOQLClient:
             rc_args["author"] = self.conCapabilities.author()
         return rc_args
 
-    def dispatch(
-        self, action, url, payload={}, file_dict=None
-    ):
+    def dispatch(self, action, url, payload=None, file_dict=None):
         """Directly dispatch to a TerminusDB database.
 
         Parameters
@@ -1041,6 +1045,10 @@ class WOQLClient:
         # review the access control
         # self.conCapabilities.capabilitiesPermit(action)
         # url, action, payload={}, basic_auth, jwt=None, file_dict=None)
+
+        if payload is None:
+            payload = {}
+
         return DispatchRequest.send_request_by_action(
             url,
             action,

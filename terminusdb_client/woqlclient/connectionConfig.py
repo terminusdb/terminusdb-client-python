@@ -201,7 +201,7 @@ class ConnectionConfig:
         return self.branch_base("reset")
 
     def optimize_url(self, path):
-        return f'{self.api}optimize/{path}'
+        return f"{self.api}optimize/{path}"
 
     def squash_url(self):
         return self.branch_base("squash")

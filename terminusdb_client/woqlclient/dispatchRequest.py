@@ -56,7 +56,7 @@ class DispatchRequest:
         return result
 
     @staticmethod
-    def __put_call(url, headers, payload, file_dict=None, cert=None):
+    def __put_call(url, headers, payload, file_dict=None, insecure=None):
         if not _verify_check(url):
             warnings.simplefilter("ignore", InsecureRequestWarning)
         if file_dict:
@@ -75,7 +75,7 @@ class DispatchRequest:
         else:
             headers["content-type"] = "application/json"
             result = requests.put(
-                url, json=payload, headers=headers, verify=_verify_check(url)
+                url, json=payload, headers=headers, verify=_verify_check(url, insecure)
             )
         warnings.resetwarnings()
         return result
@@ -85,7 +85,9 @@ class DispatchRequest:
         url = utils.add_params_to_url(url, payload)
         if not _verify_check(url, insecure):
             warnings.simplefilter("ignore", InsecureRequestWarning)
-        result = requests.delete(url, headers=headers, verify=_verify_check(url, insecure))
+        result = requests.delete(
+            url, headers=headers, verify=_verify_check(url, insecure)
+        )
         warnings.resetwarnings()
         return result
 
@@ -137,13 +139,17 @@ class DispatchRequest:
                 APIEndpointConst.CONNECT,
                 APIEndpointConst.CLASS_FRAME,
             ]:
-                request_response = cls.__get_call(url, headers, payload, insecure=insecure)
+                request_response = cls.__get_call(
+                    url, headers, payload, insecure=insecure
+                )
 
             elif action in [
                 APIEndpointConst.DELETE_DATABASE,
                 APIEndpointConst.DELETE_GRAPH,
             ]:
-                request_response = cls.__delete_call(url, headers, payload, insecure=insecure)
+                request_response = cls.__delete_call(
+                    url, headers, payload, insecure=insecure
+                )
 
             elif action in [
                 APIEndpointConst.WOQL_QUERY,
@@ -160,13 +166,16 @@ class DispatchRequest:
                 APIEndpointConst.OPTIMIZE,
                 APIEndpointConst.SQUASH,
             ]:
-                request_response = cls.__post_call(url, headers, payload, file_dict, insecure=insecure)
+                request_response = cls.__post_call(
+                    url, headers, payload, file_dict, insecure=insecure
+                )
 
             elif action in [
                 APIEndpointConst.INSERT_TRIPLES,
             ]:
-                request_response = cls.__put_call(url, headers, payload, file_dict)
-
+                request_response = cls.__put_call(
+                    url, headers, payload, file_dict, insecure=insecure
+                )
 
             if request_response.status_code == 200:
                 # print("hellow ")
