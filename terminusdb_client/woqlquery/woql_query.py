@@ -2148,6 +2148,20 @@ class WOQLQuery:
         self._cursor["woql:path"] = self._varj(path)
         return self
 
+    def path(self, subject, pattern, obj, path):
+        if subject and subject == "woql:args":
+            return ["woql:subject", "woql:path_pattern", "woql:object", "woql:path"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "woql:Path"
+        self._cursor["woql:subject"] = self._clean_subject(subject)
+        if type(pattern) == str:
+            pattern = self._compile_path_pattern(pattern)
+        self._cursor["woql:path_pattern"] = pattern
+        self._cursor["woql:object"] = self._clean_object(obj)
+        self._cursor["woql:path"] = self._varj(path)
+        return self
+
     def size(self, graph, size):
         if graph and graph == "woql:args":
             return ["woql:resource", "woql:size"]
