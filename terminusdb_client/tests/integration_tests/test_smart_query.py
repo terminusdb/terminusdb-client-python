@@ -50,16 +50,20 @@ def test_init_terminusdb(docker_url):
     db = TerminusDB(docker_url, "test")
     assert db._client.db("test") == "test"
 
-def test_add_class(docker_url, one_class_obj):
+def test_add_class_and_object(docker_url, one_class_obj, one_class_prop, one_object, one_prop_val):
     db = TerminusDB(docker_url, "test")
     my_class = WOQLClass(
         "Journey", label="Bike Journey", description="Bike Journey object that capture each bike joourney."
     )
+    my_class.add_property("Duration", "integer")
     db.add_class(my_class)
-    print(db.run(WOQLLib().classes()))
-    assert db.run(WOQLLib().classes()) == one_class_obj
 
-def add_obj(docker_url, one_class_obj):
-    # should be after test_add_class
-    db = TerminusDB(docker_url, "test")
     assert db.run(WOQLLib().classes()) == one_class_obj
+    assert db.run(WOQLLib().property()) == one_class_prop
+
+    my_obj = WOQLObj("myobj", my_class)
+    my_obj.add_property("Duration", 75)
+    db.add_object(my_obj)
+
+    assert db.run(WOQLLib().objects()) == one_object
+    assert db.run(WOQLLib().property_values()) == one_prop_val

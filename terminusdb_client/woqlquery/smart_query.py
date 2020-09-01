@@ -119,7 +119,7 @@ class WOQLObj:
         self.label = label
         self.description = description
         self.query_obj = WOQLQuery().insert(
-            self.woql_id, obj_type, label=label, description=description
+            self.woql_id, obj_type.id, label=label, description=description
         )
 
         if obj_property is not None:
@@ -160,7 +160,7 @@ class WOQLObj:
         self, pro_id: str, pro_value, label: str = None, description: str = None
     ):
         # check if the pro_value matches the property of the self._type
-        self._check_prop(self, pro_id, pro_value)
+        self._check_prop(pro_id, pro_value)
         # add new prop in self._property
         self._property[pro_id] = {
             "value": pro_value,
@@ -207,7 +207,7 @@ class TerminusDB:
                 class_id = item["Class ID"].split("#")[-1]
                 class_name = item["Class Name"]["@value"]
                 class_des = item["Description"]["@value"]
-                self.classes["class_id"] = WOQLClass(class_id, class_name, class_des)
+                self.classes[class_id] = WOQLClass(class_id, class_name, class_des)
             # get all peoperties from db and add to classes
             prop_result = WOQLLib().property().execute(self._client)
             for item in prop_result["bindings"]:
@@ -238,7 +238,7 @@ class TerminusDB:
     def add_object(self, obj: Union[WOQLObj, List[WOQLObj]]):
         if isinstance(obj, WOQLObj):
             # check if class is in db
-            if obj._type in self.classes:
+            if obj._type.id in self.classes:
                 return obj.query_obj.execute(self._client)
             else:
                 raise ValueError("Class of object(s) is not in the schema.")

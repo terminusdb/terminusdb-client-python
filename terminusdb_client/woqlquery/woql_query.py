@@ -917,7 +917,7 @@ class WOQLQuery:
         self._cursor["woql:document_uri"] = json_or_iri
         return self._updated()
 
-    def read_object(self, iri, output_var, out_format):
+    def read_object(self, iri, output_var):
         if iri and iri == "woql:args":
             return ["woql:document"]
         if self._cursor.get("@type"):
@@ -925,7 +925,7 @@ class WOQLQuery:
         self._cursor["@type"] = "woql:ReadObject"
         self._cursor["woql:document_uri"] = iri
         self._cursor["woql:document"] = self._expand_variable(output_var)
-        return self._wfrom(out_format)
+        return self
 
     def get(self, as_vars, query_resource=None):
         """Takes an as structure"""
