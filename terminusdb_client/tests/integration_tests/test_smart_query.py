@@ -1,8 +1,9 @@
-import subprocess
 import os
+import subprocess
 
 import pytest
 import requests
+
 from terminusdb_client.woqlquery.smart_query import TerminusDB
 
 
@@ -10,10 +11,16 @@ from terminusdb_client.woqlquery.smart_query import TerminusDB
 def docker_url(pytestconfig):
     # we are using subprocess in case we need to access some of the outputs
     # most likely
-    docker_compose_path = pytestconfig.getoption("docker_compose")
+    pytestconfig.getoption("docker_compose")
     output = subprocess.run(
-        ["docker-compose", "--file", docker_compose_path, "up", "-d"],
-        stderr=subprocess.PIPE
+        [
+            "docker-compose",
+            "--file",
+            os.path.dirname(os.path.realpath(__file__)) + "/test-docker-compose.yml",
+            "up",
+            "-d",
+        ],
+        stderr=subprocess.PIPE,
     )
     if output.returncode != 0:
 

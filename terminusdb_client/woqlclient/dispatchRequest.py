@@ -3,8 +3,9 @@ import warnings
 from base64 import b64encode
 
 import requests
-import terminusdb_client.woql_utils as utils
 from urllib3.exceptions import InsecureRequestWarning
+
+import terminusdb_client.woql_utils as utils
 
 from .api_endpoint_const import APIEndpointConst
 from .errors import APIError

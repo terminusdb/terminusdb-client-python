@@ -107,7 +107,9 @@ class TestWOQLObj:
                 label="Journey Duration",
                 description="Journey duration in minutes.",
             )
-            woql_obj = WOQLObj(my_id, journey_class, my_label, my_des, obj_property=my_prop)
+            woql_obj = WOQLObj(
+                my_id, journey_class, my_label, my_des, obj_property=my_prop
+            )
 
             assert woql_obj.id == my_id
             assert woql_obj.label == my_label

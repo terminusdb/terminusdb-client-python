@@ -2,6 +2,7 @@ import sys
 import unittest.mock as mock
 
 import requests
+
 from terminusdb_client.woqlclient.api_endpoint_const import APIEndpointConst
 from terminusdb_client.woqlclient.dispatchRequest import DispatchRequest
 

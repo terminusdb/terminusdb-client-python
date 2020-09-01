@@ -1116,5 +1116,7 @@ class WOQLClient:
     def get_class_frame(self, class_name):
         opts = {"class": class_name}
         return self.dispatch(
-            APIEndpointConst.CLASS_FRAME, self.conConfig.class_frame_url(), opts,
+            APIEndpointConst.CLASS_FRAME,
+            self.conConfig.class_frame_url(),
+            opts,
         )

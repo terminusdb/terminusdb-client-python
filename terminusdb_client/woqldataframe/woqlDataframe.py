@@ -15,7 +15,7 @@ except ImportError:
 
 
 class EmptyException(Exception):
-    """ Exception inherited from the built-in Exception Class
+    """Exception inherited from the built-in Exception Class
 
     Parameters
     ----------

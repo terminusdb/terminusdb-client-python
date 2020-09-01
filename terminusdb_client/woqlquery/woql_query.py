@@ -2664,8 +2664,7 @@ class WOQLQuery:
         return self
 
     def insert_class_data(self, data, ref_graph):
-        """Adds a bunch of class data in one go
-        """
+        """Adds a bunch of class data in one go"""
         if data.get("id"):
             self.add_class(data["id"], ref_graph)
             if data.get("label"):

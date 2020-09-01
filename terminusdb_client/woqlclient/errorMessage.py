@@ -46,7 +46,9 @@ class ErrorMessage:
 
     @staticmethod
     def get_invalid_url_message(url, call):
-        message = "Invalid argument to {}, {} is not a valid Terminus DB API endpoint".format(
-            url, call
+        message = (
+            "Invalid argument to {}, {} is not a valid Terminus DB API endpoint".format(
+                url, call
+            )
         )
         return message

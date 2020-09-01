@@ -4,7 +4,7 @@ class DocumentTemplate:
 
     @staticmethod
     def create_db_template(server, db_id, label, **kwargs):
-        db_url = "{}{}".format(server, db_id)
+        db_url = f"{server}{db_id}"
         comment = kwargs.get("comment")
         language = kwargs.get("language", "en")
         allow_origin = kwargs.get("allow_origin", "*")

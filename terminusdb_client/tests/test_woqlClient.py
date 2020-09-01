@@ -4,6 +4,7 @@ import unittest.mock as mock
 
 import pytest
 import requests
+
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 
 from .mockResponse import mocked_requests
