@@ -3,8 +3,7 @@ from .woql_query import WOQLQuery
 
 class WOQLLib:
 
-    """Patterns to help getting the most useful information from schema graphs
-    """
+    """Patterns to help getting the most useful information from schema graphs"""
 
     def __init__(self, mode=None):
         if mode is None:

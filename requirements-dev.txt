@@ -10,7 +10,6 @@ autoflake==1.4            # via shed
 bandit==1.6.2             # via flake8-bandit
 black==20.8b1             # via shed
 click==7.1.2              # via black, pybetter, pyemojify
-com2ann==0.1.1            # via shed
 flake8-assertive==1.2.1   # via -r requirements-dev.in
 flake8-bandit==2.1.2      # via -r requirements-dev.in
 flake8-bugbear==20.1.4    # via -r requirements-dev.in
@@ -21,6 +20,7 @@ flake8-print==3.1.4       # via -r requirements-dev.in
 flake8==3.8.3             # via -r requirements-dev.in, flake8-assertive, flake8-bandit, flake8-bugbear, flake8-builtins, flake8-comprehensions, flake8-polyfill, flake8-print
 gitdb==4.0.5              # via gitpython
 gitpython==3.1.7          # via bandit
+importlib-metadata==1.7.0  # via flake8, flake8-comprehensions, stevedore
 isort==5.4.2              # via shed
 libcst==0.3.10            # via pybetter
 mccabe==0.6.1             # via flake8
@@ -45,3 +45,4 @@ toml==0.10.1              # via black
 typed-ast==1.4.1          # via black
 typing-extensions==3.7.4.3  # via black, libcst, typing-inspect
 typing-inspect==0.6.0     # via libcst
+zipp==3.1.0               # via importlib-metadata

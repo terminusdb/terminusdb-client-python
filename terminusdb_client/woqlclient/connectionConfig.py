@@ -8,8 +8,8 @@ class ConnectionConfig:
     def __init__(self, server_url, **kwargs):
 
         """
-          client configuration options - connected_mode = true
-          tells the client to first connect to the server before invoking other services
+        client configuration options - connected_mode = true
+        tells the client to first connect to the server before invoking other services
         """
 
         self.__server = False

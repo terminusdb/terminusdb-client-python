@@ -95,7 +95,9 @@ class WOQLClass:
         }
         return self
 
-    def to_dict(self,):
+    def to_dict(
+        self,
+    ):
         return self.query_obj.to_dict()
 
     def to_json(self):
@@ -116,11 +118,17 @@ class WOQLObj:
         self.woql_id = self._idgen()
         self.label = label
         self.description = description
+        self.query_obj = WOQLQuery().insert(
+            self.woql_id, obj_type, label=label, description=description
+        )
 
         if obj_property is not None:
             for pro_id, prop in obj_property.items():
                 prop_val = prop.get("value")
                 self._check_prop(pro_id, prop_val)
+                self.query_obj = self.query_obj.property(
+                    pro_id, prop_val, prop.get("label"), prop.get("description")
+                )
             self._property = obj_property
         else:
             self._property = {}
@@ -133,7 +141,7 @@ class WOQLObj:
         # TODO: quote the ids ot make it url firendly
         return f"doc:{quote(self._type.id)}_{quote(self.id)}"
 
-    def _check_prop(self, pro_id, pro_value):
+    def _check_prop(self, pro_id: str, pro_value):
         prop = self._type._property.get(pro_id)
         if prop is None:
             raise ValueError(f"No {pro_id} property in {self._type.id}")
@@ -159,7 +167,17 @@ class WOQLObj:
             "label": label,
             "description": description,
         }
+        # add to query_obj
+        self.query_obj = self.query_obj.property(pro_id, pro_value, label, description)
         return self
+
+    def to_dict(
+        self,
+    ):
+        return self.query_obj.to_dict()
+
+    def to_json(self):
+        return self.query_obj.to_json()
 
 
 class TerminusDB:
@@ -218,4 +236,17 @@ class TerminusDB:
             )
 
     def add_object(self, obj: Union[WOQLObj, List[WOQLObj]]):
-        pass
+        if isinstance(obj, WOQLObj):
+            # check if class is in db
+            if obj._type in self.classes:
+                return obj.query_obj.execute(self._client)
+            else:
+                raise ValueError("Class of object(s) is not in the schema.")
+        elif isinstance(obj, list):
+            for item in obj:
+                self.classes[item.id] = item
+            return WOQLQuery().woql_and(*obj).execute(self._client)
+        else:
+            raise ValueError(
+                "Object(s) added need to be WOQLClass object or a list of WOQLClass objects."
+            )
