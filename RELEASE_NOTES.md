@@ -11,6 +11,7 @@
 - Post method for CSV uploads
 - Triple endpoint for inserting turtle data directly to a graph
 - Count triples functionality added
+- [beta] Smart Query which creates and checks all the classes and object in Python
 
 ### Bug Fixes / Improvements
 
