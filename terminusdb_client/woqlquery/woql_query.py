@@ -1951,7 +1951,7 @@ class WOQLQuery:
         self._cursor["@type"] = "woql:Not"
         return self._add_sub_query(query)
 
-    def count(self,countvar,query=None):
+    def count(self, countvar, query=None):
         """Counds the number of solutions in the given query
 
         Parameters
