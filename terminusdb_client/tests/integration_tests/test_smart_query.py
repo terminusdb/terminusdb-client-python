@@ -4,10 +4,11 @@ import subprocess
 import pytest
 import requests
 
-from terminusdb_client.woqlquery.smart_query import WOQLClass, WOQLObj, TerminusDB
+from terminusdb_client.woqlquery.smart_query import TerminusDB, WOQLClass, WOQLObj
 from terminusdb_client.woqlquery.woql_library import WOQLLib
 
 from .ans_test_db import *  # noqa
+
 
 @pytest.fixture(scope="module")
 def docker_url(pytestconfig):
@@ -38,7 +39,7 @@ def docker_url(pytestconfig):
     test_url = "http://127.0.0.1:6363"
     yield test_url
     subprocess.run(["docker-compose", "down"])
-    subprocess.run(["docker-compose", "rm",  "--force", "--stop", "-v"])
+    subprocess.run(["docker-compose", "rm", "--force", "--stop", "-v"])
 
 
 def test_main_service_run(docker_url):
@@ -50,10 +51,15 @@ def test_init_terminusdb(docker_url):
     db = TerminusDB(docker_url, "test")
     assert db._client.db("test") == "test"
 
-def test_add_class_and_object(docker_url, one_class_obj, one_class_prop, one_object, one_prop_val):
+
+def test_add_class_and_object(
+    docker_url, one_class_obj, one_class_prop, one_object, one_prop_val
+):
     db = TerminusDB(docker_url, "test")
     my_class = WOQLClass(
-        "Journey", label="Bike Journey", description="Bike Journey object that capture each bike joourney."
+        "Journey",
+        label="Bike Journey",
+        description="Bike Journey object that capture each bike joourney.",
     )
     my_class.add_property("Duration", "integer")
     db.add_class(my_class)

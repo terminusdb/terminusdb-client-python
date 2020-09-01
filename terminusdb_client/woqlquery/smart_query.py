@@ -251,6 +251,6 @@ class TerminusDB:
                 "Object(s) added need to be WOQLClass object or a list of WOQLClass objects."
             )
 
-    def run(self, query: Union[WOQLQuery,Dict]):
+    def run(self, query: Union[WOQLQuery, Dict]):
         """Run a query either in WOQLQuery format or json_ld in dictionary presentation"""
         return self._client.query(query)
