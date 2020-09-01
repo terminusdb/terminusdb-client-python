@@ -38,6 +38,7 @@ def docker_url(pytestconfig):
     test_url = "http://127.0.0.1:6363"
     yield test_url
     subprocess.run(["docker-compose", "down"])
+    subprocess.run(["docker-compose", "rm",  "--force", "--stop", "-v"])
 
 
 def test_main_service_run(docker_url):
