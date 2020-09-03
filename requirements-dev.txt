@@ -21,12 +21,12 @@ flake8==3.8.3             # via -r requirements-dev.in, flake8-assertive, flake8
 gitdb==4.0.5              # via gitpython
 gitpython==3.1.7          # via bandit
 importlib-metadata==1.7.0  # via flake8, flake8-comprehensions, stevedore
-isort==5.4.2              # via shed
+isort==5.5.0              # via shed
 libcst==0.3.10            # via pybetter
 mccabe==0.6.1             # via flake8
 mypy-extensions==0.4.3    # via black, typing-inspect
 pathspec==0.8.0           # via black
-pbr==5.4.5                # via stevedore
+pbr==5.5.0                # via stevedore
 pep8-naming==0.11.1       # via -r requirements-dev.in
 pybetter==0.3.5           # via shed
 pycodestyle==2.6.0        # via flake8, flake8-bandit, flake8-print
@@ -36,10 +36,10 @@ pygments==2.6.1           # via pybetter
 pyupgrade==2.7.2          # via shed
 pyyaml==5.3.1             # via bandit, libcst
 regex==2020.7.14          # via black
-shed==0.2.4               # via -r requirements-dev.in
+shed==0.2.2               # via -r requirements-dev.in
 six==1.15.0               # via bandit, flake8-print
 smmap==3.0.4              # via gitdb
-stevedore==3.2.0          # via bandit
+stevedore==3.2.1          # via bandit
 tokenize-rt==4.0.0        # via pyupgrade
 toml==0.10.1              # via black
 typed-ast==1.4.1          # via black
