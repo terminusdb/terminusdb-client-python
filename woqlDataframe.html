@@ -39,6 +39,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="SmartQuery" href="SmartQuery.html" />
     <link rel="prev" title="WOQLLib" href="woqlLib.html" /> 
 </head>
 
@@ -99,6 +100,7 @@
 <li class="toctree-l2"><a class="reference internal" href="woqlQuery.html">WOQLQuery</a></li>
 <li class="toctree-l2"><a class="reference internal" href="woqlLib.html">WOQLLib</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">woqlDataframe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SmartQuery.html">SmartQuery</a></li>
 </ul>
 </li>
 </ul>
@@ -253,7 +255,7 @@
 <dl class="py function">
 <dt id="terminusdb_client.WOQLDataFrame.query_to_df">
 <code class="sig-prename descclassname">terminusdb_client.WOQLDataFrame.</code><code class="sig-name descname">query_to_df</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLDataFrame.query_to_df" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert a query to a data frame.</p>
+<dd><p>DEPRECATED in 0.3.0: use result_to_df instead.</p>
 <p>Converts result query binding to a pandas DataFrame. This only works for homogeneous query results</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -363,6 +365,8 @@
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="SmartQuery.html" class="btn btn-neutral float-right" title="SmartQuery" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="woqlLib.html" class="btn btn-neutral float-left" title="WOQLLib" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

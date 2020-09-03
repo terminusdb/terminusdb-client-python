@@ -100,6 +100,7 @@
 <li class="toctree-l2"><a class="reference internal" href="woqlQuery.html">WOQLQuery</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">WOQLLib</a></li>
 <li class="toctree-l2"><a class="reference internal" href="woqlDataframe.html">woqlDataframe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SmartQuery.html">SmartQuery</a></li>
 </ul>
 </li>
 </ul>
@@ -184,63 +185,63 @@
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLLib.classes">
-<code class="sig-name descname">classes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">schema_resource</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.classes" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">classes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">schema_resource</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.classes" title="Permalink to this definition">¶</a></dt>
 <dd><p>General Patten 1: Classes</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLLib.property">
-<code class="sig-name descname">property</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">schema_resource</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.property" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">property</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">schema_resource</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.property" title="Permalink to this definition">¶</a></dt>
 <dd><p>General Pattern 2: Properties</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLLib.graphs">
-<code class="sig-name descname">graphs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cresource</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.graphs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">graphs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cresource</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.graphs" title="Permalink to this definition">¶</a></dt>
 <dd><p>General Pattern 3: Graphs
 Retrieves information about the graphs in existence at any commit (and whether the commit is the head of a branch)</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLLib.branches">
-<code class="sig-name descname">branches</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cresource</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.branches" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">branches</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cresource</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.branches" title="Permalink to this definition">¶</a></dt>
 <dd><p>General Pattern 4: Retrieves Branches, Their ID, Head Commit ID, Head Commit Time
 (if present, new branches have no commits)</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLLib.objects">
-<code class="sig-name descname">objects</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.objects" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">objects</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.objects" title="Permalink to this definition">¶</a></dt>
 <dd><p>General Pattern 5: Objects - just a list of object ids and their types</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLLib.property_values">
-<code class="sig-name descname">property_values</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.property_values" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">property_values</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.property_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>General Pattern 6: Full Object Properties</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLLib.object_metadata">
-<code class="sig-name descname">object_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">schema_resource</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.object_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">object_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">schema_resource</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.object_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>General Pattern 7: Object Metadata</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLLib.property_metadata">
-<code class="sig-name descname">property_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">schema_resource</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.property_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">property_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">schema_resource</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.property_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>General Pattern 8: Value Metadata</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLLib.commits">
-<code class="sig-name descname">commits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cresource</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.commits" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">commits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cresource</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.commits" title="Permalink to this definition">¶</a></dt>
 <dd><p>General Pattern 9: Commits</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLLib.commit_chain">
-<code class="sig-name descname">commit_chain</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cresource</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.commit_chain" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">commit_chain</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cresource</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.commit_chain" title="Permalink to this definition">¶</a></dt>
 <dd><p>General Pattern 10: Commit Chain</p>
 </dd></dl>
 
@@ -252,19 +253,19 @@ Retrieves information about the graphs in existence at any commit (and whether t
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLLib.dbs">
-<code class="sig-name descname">dbs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.dbs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">dbs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.dbs" title="Permalink to this definition">¶</a></dt>
 <dd><p>General Pattern 12: dbs</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLLib.users">
-<code class="sig-name descname">users</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.users" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">users</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.users" title="Permalink to this definition">¶</a></dt>
 <dd><p>General Pattern 13: users</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLLib.capabilities">
-<code class="sig-name descname">capabilities</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.capabilities" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">capabilities</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">variables</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLLib.capabilities" title="Permalink to this definition">¶</a></dt>
 <dd><p>General Pattern 14: capabilities</p>
 </dd></dl>
 
