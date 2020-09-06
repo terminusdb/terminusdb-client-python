@@ -1,11 +1,10 @@
 import os
 import subprocess
 import time
-
-import pytest
 import requests
+import pytest
 
-from terminusdb_client.woqlquery.smart_query import TerminusDB
+from terminusdb_client.woqlquery.smart_query import TerminusDB, WOQLClass, WOQLObj, WOQLLib
 
 MAX_CONTAINER_STARTUP_TIME = 30
 
@@ -66,6 +65,10 @@ def clean_up_container():
                     "--file",
                     os.path.dirname(os.path.realpath(__file__)) + "/test-docker-compose.yml", "rm", "--force", "--stop",
                     "-v"], check=True)
+    subprocess.run(["docker-compose", "down"])
+    subprocess.run(["docker-compose", "rm", "--force", "--stop", "-v"])
+
+
 
 
 def test_main_service_run(docker_url):
@@ -75,6 +78,27 @@ def test_main_service_run(docker_url):
 
 def test_init_terminusdb(docker_url):
     db = TerminusDB(docker_url, "test")
+    assert db._client.db("test") == "test"
 
-    print(db._client.db("test"))
-    assert db is not None
+
+def test_add_class_and_object(
+    docker_url, one_class_obj, one_class_prop, one_object, one_prop_val
+):
+    db = TerminusDB(docker_url, "test")
+    my_class = WOQLClass(
+        "Journey",
+        label="Bike Journey",
+        description="Bike Journey object that capture each bike joourney.",
+    )
+    my_class.add_property("Duration", "integer")
+    db.add_class(my_class)
+
+    assert db.run(WOQLLib().classes()) == one_class_obj
+    assert db.run(WOQLLib().property()) == one_class_prop
+
+    my_obj = WOQLObj("myobj", my_class)
+    my_obj.add_property("Duration", 75)
+    db.add_object(my_obj)
+
+    assert db.run(WOQLLib().objects()) == one_object
+    assert db.run(WOQLLib().property_values()) == one_prop_val

@@ -297,7 +297,7 @@ class WOQLLib:
         )
         return self._add_constraints(qpattern, values)
 
-    def property_values(self, values, variables=None):
+    def property_values(self, values=None, variables=None):
         """General Pattern 6: Full Object Properties"""
         self._default_variables = [
             "Object ID",

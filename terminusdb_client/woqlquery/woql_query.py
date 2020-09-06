@@ -917,7 +917,7 @@ class WOQLQuery:
         self._cursor["woql:document_uri"] = json_or_iri
         return self._updated()
 
-    def read_object(self, iri, output_var, out_format):
+    def read_object(self, iri, output_var):
         if iri and iri == "woql:args":
             return ["woql:document"]
         if self._cursor.get("@type"):
@@ -925,7 +925,7 @@ class WOQLQuery:
         self._cursor["@type"] = "woql:ReadObject"
         self._cursor["woql:document_uri"] = iri
         self._cursor["woql:document"] = self._expand_variable(output_var)
-        return self._wfrom(out_format)
+        return self
 
     def get(self, as_vars, query_resource=None):
         """Takes an as structure"""
@@ -2135,6 +2135,20 @@ class WOQLQuery:
         return self._add_sub_query(groupquery)
 
     def true(self, subject, pattern, obj, path):
+        if subject and subject == "woql:args":
+            return ["woql:subject", "woql:path_pattern", "woql:object", "woql:path"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "woql:Path"
+        self._cursor["woql:subject"] = self._clean_subject(subject)
+        if type(pattern) == str:
+            pattern = self._compile_path_pattern(pattern)
+        self._cursor["woql:path_pattern"] = pattern
+        self._cursor["woql:object"] = self._clean_object(obj)
+        self._cursor["woql:path"] = self._varj(path)
+        return self
+
+    def path(self, subject, pattern, obj, path):
         if subject and subject == "woql:args":
             return ["woql:subject", "woql:path_pattern", "woql:object", "woql:path"]
         if self._cursor.get("@type"):
