@@ -1,10 +1,16 @@
 import os
 import subprocess
 import time
-import requests
-import pytest
 
-from terminusdb_client.woqlquery.smart_query import TerminusDB, WOQLClass, WOQLObj, WOQLLib
+import pytest
+import requests
+
+from terminusdb_client.woqlquery.smart_query import (
+    TerminusDB,
+    WOQLClass,
+    WOQLLib,
+    WOQLObj,
+)
 
 MAX_CONTAINER_STARTUP_TIME = 30
 
@@ -22,7 +28,7 @@ def docker_url(pytestconfig):
             "up",
             "-d",
         ],
-        stderr=subprocess.PIPE
+        stderr=subprocess.PIPE,
     )
     if output.returncode != 0:
         raise RuntimeError(output.stderr)
@@ -33,12 +39,21 @@ def docker_url(pytestconfig):
     seconds_waited = 0
     while not is_server_started:
         service = subprocess.run(
-            ["docker-compose", "--file", os.path.dirname(os.path.realpath(__file__)) + "/test-docker-compose.yml", "ps",
-             "--services", "--filter",
-             "status=running"]
-            , stdout=subprocess.PIPE, check=True)
+            [
+                "docker-compose",
+                "--file",
+                os.path.dirname(os.path.realpath(__file__))
+                + "/test-docker-compose.yml",
+                "ps",
+                "--services",
+                "--filter",
+                "status=running",
+            ],
+            stdout=subprocess.PIPE,
+            check=True,
+        )
 
-        if service.stdout == b'terminusdb-server\n':
+        if service.stdout == b"terminusdb-server\n":
             try:
                 response = requests.get(test_url)
                 assert response.status_code == 200
@@ -58,17 +73,29 @@ def docker_url(pytestconfig):
 
 
 def clean_up_container():
-    subprocess.run(["docker-compose",
-                    "--file",
-                    os.path.dirname(os.path.realpath(__file__)) + "/test-docker-compose.yml", "down"], check=True)
-    subprocess.run(["docker-compose",
-                    "--file",
-                    os.path.dirname(os.path.realpath(__file__)) + "/test-docker-compose.yml", "rm", "--force", "--stop",
-                    "-v"], check=True)
+    subprocess.run(
+        [
+            "docker-compose",
+            "--file",
+            os.path.dirname(os.path.realpath(__file__)) + "/test-docker-compose.yml",
+            "down",
+        ],
+        check=True,
+    )
+    subprocess.run(
+        [
+            "docker-compose",
+            "--file",
+            os.path.dirname(os.path.realpath(__file__)) + "/test-docker-compose.yml",
+            "rm",
+            "--force",
+            "--stop",
+            "-v",
+        ],
+        check=True,
+    )
     subprocess.run(["docker-compose", "down"])
     subprocess.run(["docker-compose", "rm", "--force", "--stop", "-v"])
-
-
 
 
 def test_main_service_run(docker_url):
