@@ -2081,6 +2081,25 @@ class WOQLQuery:
         self._cursor["@type"] = "woql:Not"
         return self._add_sub_query(query)
 
+    def immediately(self, query=None):
+        """Immediately runs side-effects without backtracking
+
+        Parameters
+        ----------
+        query : WOQLQuery object, optional
+
+        Returns
+        ----------
+        WOQLQuery object
+            query object that can be chained and/or executed
+        """
+        if query and query == "woql:args":
+            return ["woql:query"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "woql:Immediately"
+        return self._add_sub_query(query)
+
     def count(self, countvar, query=None):
         """Counds the number of solutions in the given query
 
