@@ -502,7 +502,7 @@ class WOQLClient:
             APIEndpointConst.CREATE_DATABASE, self.conConfig.db_url(), details
         )
 
-    def delete_database(self, dbid, accountid=None):
+    def delete_database(self, dbid, accountid=None, force=False):
         """Delete a TerminusDB database.
 
         If ``accountid`` is provided, then the account in the config will be updated
@@ -529,9 +529,10 @@ class WOQLClient:
         self.db(dbid)
         if accountid:
             self.account(accountid)
-
+        payload = { 'force' : force }
         json_response = self.dispatch(
-            APIEndpointConst.DELETE_DATABASE, self.conConfig.db_url()
+            APIEndpointConst.DELETE_DATABASE, self.conConfig.db_url(),
+            payload
         )
         return json_response
 
@@ -854,7 +855,7 @@ class WOQLClient:
             )
 
     def reset(self, commit_path):
-        """Reset the current branch HEAD to the specified commith path.
+        """Reset the current branch HEAD to the specified commit path.
 
         Notes
         -----
