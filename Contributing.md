@@ -16,13 +16,29 @@ To “editable” install the local Terminus Client Python:
 
 `pip3 install -e .`
 
+**to be able to run integration tests, local installation of docker is required**
+
 ## Writing tests and testing
 
 We are using [`pytest`](https://docs.pytest.org/en/latest/) for testing. All tests are stored in `/tests`
 
-To run the tests:
+To run the unittests without integration tests:
 
-`pytest tests/`
+`pytest terminusdb_client/tests/ --ignore=terminusdb_client/tests/integration_tests/`
+
+To run all tests including integration tests:
+
+`tox -e test`
+
+To run all checks and auto formating:
+
+`tox -e check`
+
+To run all tests and checks:
+
+`tox`
+
+**please make sure `tox` passes before making PR**
 
 ## Writing Documentation
 

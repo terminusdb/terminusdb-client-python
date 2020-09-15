@@ -764,6 +764,64 @@ class WOQLQuery:
         self._cursor["woql:object"] = self._clean_object(obj)
         return self
 
+    def added_triple(self, sub, pred, obj, opt=False):
+        """Creates a triple pattern matching rule for the triple [S, P, O] (Subject, Predicate, Object) added to the current commit.
+
+        Parameters
+        ----------
+        sub : str
+            Subject
+        pred : str
+            Predicate
+        obj : str
+            Object
+        opt : bool
+            weather or not this triple is optional, default to be False
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if opt:
+            return self.opt().triple(sub, pred, obj)
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "woql:AddedTriple"
+        self._cursor["woql:subject"] = self._clean_subject(sub)
+        self._cursor["woql:predicate"] = self._clean_predicate(pred)
+        self._cursor["woql:object"] = self._clean_object(obj)
+        return self
+
+    def removed_triple(self, sub, pred, obj, opt=False):
+        """Creates a triple pattern matching rule for the triple [S, P, O] (Subject, Predicate, Object) added to the current commit.
+
+        Parameters
+        ----------
+        sub : str
+            Subject
+        pred : str
+            Predicate
+        obj : str
+            Object
+        opt : bool
+            weather or not this triple is optional, default to be False
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if opt:
+            return self.opt().triple(sub, pred, obj)
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "woql:RemovedTriple"
+        self._cursor["woql:subject"] = self._clean_subject(sub)
+        self._cursor["woql:predicate"] = self._clean_predicate(pred)
+        self._cursor["woql:object"] = self._clean_object(obj)
+        return self
+
     def quad(self, sub, pred, obj, graph, opt=False):
         """Creates a pattern matching rule for the quad [S, P, O, G] (Subject, Predicate, Object, Graph)
 
@@ -797,6 +855,78 @@ class WOQLQuery:
                 "Quad takes four parameters, the last should be a graph filter"
             )
         self._cursor["@type"] = "woql:Quad"
+        self._cursor["woql:graph_filter"] = self._clean_graph(graph)
+        return self
+
+    def added_quad(self, sub, pred, obj, graph, opt=False):
+        """Creates a pattern matching rule for the quad [S, P, O, G] (Subject, Predicate, Object, Graph) added to the current commit.
+
+        Parameters
+        ----------
+        sub : str
+            Subject
+        pre : str
+            Predicate
+        obj : str
+            Object
+        gra : str
+            Graph
+        opt : bool
+            weather or not this quad is optional, default to be False
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if opt:
+            return self.opt().quad(sub, pred, obj, graph)
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        arguments = self.triple(sub, pred, obj)
+        if sub and sub == "woql:args":
+            return arguments.append("woql:graph_filter")
+        if not graph:
+            return self._parameter_error(
+                "Quad takes four parameters, the last should be a graph filter"
+            )
+        self._cursor["@type"] = "woql:AddedQuad"
+        self._cursor["woql:graph_filter"] = self._clean_graph(graph)
+        return self
+
+    def removed_quad(self, sub, pred, obj, graph, opt=False):
+        """Creates a pattern matching rule for the quad [S, P, O, G] (Subject, Predicate, Object, Graph) added to the current commit.
+
+        Parameters
+        ----------
+        sub : str
+            Subject
+        pre : str
+            Predicate
+        obj : str
+            Object
+        gra : str
+            Graph
+        opt : bool
+            weather or not this quad is optional, default to be False
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if opt:
+            return self.opt().quad(sub, pred, obj, graph)
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        arguments = self.triple(sub, pred, obj)
+        if sub and sub == "woql:args":
+            return arguments.append("woql:graph_filter")
+        if not graph:
+            return self._parameter_error(
+                "Quad takes four parameters, the last should be a graph filter"
+            )
+        self._cursor["@type"] = "woql:RemovedQuad"
         self._cursor["woql:graph_filter"] = self._clean_graph(graph)
         return self
 
@@ -1949,6 +2079,25 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:Not"
+        return self._add_sub_query(query)
+
+    def immediately(self, query=None):
+        """Immediately runs side-effects without backtracking
+
+        Parameters
+        ----------
+        query : WOQLQuery object, optional
+
+        Returns
+        ----------
+        WOQLQuery object
+            query object that can be chained and/or executed
+        """
+        if query and query == "woql:args":
+            return ["woql:query"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "woql:Immediately"
         return self._add_sub_query(query)
 
     def count(self, countvar, query=None):
