@@ -15,6 +15,17 @@ from terminusdb_client.woqlquery.smart_query import (
 MAX_CONTAINER_STARTUP_TIME = 30
 
 
+def is_docker_installed():
+    try:
+        output = subprocess.run(["docker", "--version"], stderr=subprocess.PIPE)
+    except FileNotFoundError:
+        return False
+    return output.returncode == 0
+
+
+pytestmark = pytest.mark.skipif(not is_docker_installed(), reason="docker not installed")
+
+
 @pytest.fixture(scope="module")
 def docker_url(pytestconfig):
     # we are using subprocess in case we need to access some of the outputs
