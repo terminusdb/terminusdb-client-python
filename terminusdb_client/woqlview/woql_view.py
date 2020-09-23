@@ -17,9 +17,8 @@ class WOQLView:
         display(Javascript("""
         require.config({
             paths: {
-                d3: 'https://d3js.org/d3.v5.min',
-                TerminusClient:'https://dl.bintray.com/terminusdb/terminusdb/dev/:terminusdb-client.min',
-                TerminusDBGraph:'https://dl.bintray.com/terminusdb/terminusdb/dev/:terminusdb-d3-graph.min'
+                TerminusClient:'https://dl.bintray.com/terminusdb/terminusdb/dev/terminusdb-client.min',
+                TerminusDBGraph:'https://dl.bintray.com/terminusdb/terminusdb/dev/terminusdb-d3-graph.min'
             }
         });
         """
@@ -126,7 +125,7 @@ class WOQLView:
     def show(self, result):
         display(Javascript("""
         (function(element){
-        require(['d3','TerminusClient','TerminusDBGraph'], function(d3,TerminusClient,TerminusDBGraph){
+        require(['TerminusClient','TerminusDBGraph'], function(TerminusClient,TerminusDBGraph){
 
             console.log(TerminusDBGraph);
             const resultData=%s
@@ -151,7 +150,7 @@ class WOQLView:
         """Print out the JavaScript to be executed"""
         print("""
         (function(element){
-        require(['d3','TerminusClient','TerminusDBGraph'], function(d3,TerminusClient,TerminusDBGraph){
+        require(['TerminusClient','TerminusDBGraph'], function(TerminusClient,TerminusDBGraph){
 
             console.log(TerminusDBGraph);
             const resultData=%s
