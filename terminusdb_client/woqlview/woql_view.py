@@ -4,7 +4,7 @@ try:
     from IPython.display import display, Javascript, HTML
 except ImportError:
     msg = (
-        "woqlview need to be used in Jupyter notebook\n"
+        "woqlview need to be used in Jupyter notebook.\n"
     )
     warnings.warn(msg)
 
@@ -18,8 +18,8 @@ class WOQLView:
         require.config({
             paths: {
                 d3: 'https://d3js.org/d3.v5.min',
-                TerminusClient:'https://cheuk.dev/js_scripts/terminusdb-client.min',
-                TerminusDBGraph:'https://francesca-bit.github.io/notebooktest/terminusdb-react-graph.min'
+                TerminusClient:'https://dl.bintray.com/terminusdb/terminusdb/dev/:terminusdb-client.min',
+                TerminusDBGraph:'https://dl.bintray.com/terminusdb/terminusdb/dev/:terminusdb-d3-graph.min'
             }
         });
         """
@@ -147,7 +147,8 @@ class WOQLView:
             """%(result, self.config)
                       ))
 
-    def print(self, result):
+    def print_js(self, result):
+        """Print out the JavaScript to be executed"""
         print("""
         (function(element){
         require(['d3','TerminusClient','TerminusDBGraph'], function(d3,TerminusClient,TerminusDBGraph){
