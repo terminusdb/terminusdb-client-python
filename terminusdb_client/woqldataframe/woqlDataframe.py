@@ -244,6 +244,7 @@ def query_to_df(query):
     WOQLQuery : create a WOQLQuery
     WOQLClient : create a WOQLClient
     """
+    warnings.warn("DEPRECATED in 0.3.0: use result_to_df instead.")
     return result_to_df(query)
 
 
