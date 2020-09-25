@@ -168,6 +168,7 @@ def type_map(ty_rdf):
         "http://www.w3.org/2001/XMLSchema#integer": np.int,
         "http://www.w3.org/2001/XMLSchema#dateTime": np.datetime64,
         "http://www.w3.org/2001/XMLSchema#decimal": np.double,
+        "http://www.w3.org/2001/XMLSchema#date": np.datetime64,
     }
     if ty_rdf in convert_mapping:
         return convert_mapping[ty_rdf]
@@ -206,7 +207,8 @@ def type_value_map(ty_rdf, value):
         return value
     elif ty_rdf == "http://www.w3.org/2001/XMLSchema#integer":
         return int(value)
-    elif ty_rdf == "http://www.w3.org/2001/XMLSchema#dateTime":
+    elif (ty_rdf == "http://www.w3.org/2001/XMLSchema#dateTime"
+          or ty_rdf == "http://www.w3.org/2001/XMLSchema#date"):
         return np.datetime64(value)
     elif ty_rdf == "http://www.w3.org/2001/XMLSchema#decimal":
         return float(value)
