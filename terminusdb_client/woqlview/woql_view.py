@@ -119,10 +119,23 @@ class WOQLView:
         return self
 
     def charge(self, input):
+        if self.obj is None:
+            raise SyntaxError("charge(() should be used following a node() or edge()")
         self.config += self.obj + f'.charge({input});\n'
         return self
 
-    def show(self, result):
+    def of(self, input):
+        if self.obj is None:
+            raise SyntaxError("in() should be used following a node() or edge()")
+        self.config += self.obj + f'.in("{input}");\n'
+        return self
+
+    def show(self, result:dict):
+        """Show the graph inline in the Jupyter notebook
+
+        Parameter
+        ---------
+        result: the result that is returning from a query in dict format."""
         display(Javascript("""
         (function(element){
         require(['TerminusClient','TerminusDBGraph'], function(TerminusClient,TerminusDBGraph){
@@ -146,27 +159,67 @@ class WOQLView:
             """%(result, self.config)
                       ))
 
-    def print_js(self, result):
-        """Print out the JavaScript to be executed"""
-        print("""
-        (function(element){
-        require(['TerminusClient','TerminusDBGraph'], function(TerminusClient,TerminusDBGraph){
+    def export(self, filename:str, result:dict):
+        """Export the graph into an html file
 
-            console.log(TerminusDBGraph);
-            const resultData=%s
+        Parameter
+        ---------
+        filename: the file name of the export file (without extention).
 
-            const woqlGraphConfig= TerminusClient.View.graph();
-            woqlGraphConfig.height(500).width(800);
-            %s
+        result: the result that is returning from a query in dict format."""
+        with open(filename+".html",'w',encoding = 'utf-8') as file:
+            file.write(
+            """<html>
+              <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+
+                <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.9/css/all.css" integrity="sha384-5SOiIsAziJl6AWe0HWRKTXlfcSHKmYV4RBF18PPJ173Kzn7jzMyFuTtk8JA7QQG1" crossorigin="anonymous">
+
+                <title>%s</title>
+              </head>
+              <body>
+                 <div width="500" height="600" id="mycontainer" ></div>
+              </body>
+
+              <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.js" integrity="sha512-vRqhAr2wsn+/cSsyz80psBbCcqzz2GTuhGk3bq3dAyytz4J/8XwFqMjiAGFBj+WM95lHBJ9cDf87T3P8yMrY7A==" crossorigin="anonymous"></script>
+
+              <script>
+
+              require.config({
+                paths: {
+                    TerminusClient:'https://dl.bintray.com/terminusdb/terminusdb/dev/terminusdb-client.min',
+                    TerminusDBGraph:'https://dl.bintray.com/terminusdb/terminusdb/dev/terminusdb-d3-graph.min'
+                }
+              });
+
+                require(['TerminusClient','TerminusDBGraph'], function(TerminusClient,TerminusDBGraph){
 
 
-            var result = new TerminusClient.WOQLResult(resultData);
-            let viewer = woqlGraphConfig.create(null);
+                const resultData=%s
 
-            viewer.setResult(result);
-            const graphResult= new TerminusDBGraph.GraphResultsViewer(viewer.config, viewer);
-            graphResult.load(element.get(0),true);
-            })
-            })(element)
-            """%(result, self.config)
-                      )
+                const woqlGraphConfig= new TerminusClient.View.graph();
+                woqlGraphConfig.height(500).width(800);
+                %s
+
+                var result = new TerminusClient.WOQLResult(resultData);
+                let viewer = woqlGraphConfig.create(null);
+
+                viewer.setResult(result);
+                const graphResult= new TerminusDBGraph.GraphResultsViewer(viewer.config, viewer);
+                graphResult.load("#mycontainer",true);
+
+              })
+
+              </script>
+
+
+            </html>"""%(filename,result, self.config)
+            )
+
+    def print_js_config(self, result):
+        """Print out the JavaScript config
+
+        Parameter
+        ---------
+        result: the result that is returning from a query in dict format."""
+        print(self.config)
