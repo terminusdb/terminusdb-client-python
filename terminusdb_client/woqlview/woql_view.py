@@ -127,7 +127,7 @@ class WOQLView:
     def of(self, input):
         if self.obj is None:
             raise SyntaxError("in() should be used following a node() or edge()")
-        self.config += self.obj + f'.in("{input}");\n'
+        self.obj += f'.in("{input}")'
         return self
 
     def show(self, result:dict):
