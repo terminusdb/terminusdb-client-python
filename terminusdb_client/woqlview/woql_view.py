@@ -216,7 +216,7 @@ class WOQLView:
             </html>"""%(filename,result, self.config)
             )
 
-    def print_js_config(self, result):
+    def print_js_config(self):
         """Print out the JavaScript config
 
         Parameter
