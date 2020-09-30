@@ -4,7 +4,6 @@ import time
 
 import pytest
 import requests
-
 from terminusdb_client.woqlquery.smart_query import (
     TerminusDB,
     WOQLClass,
@@ -23,7 +22,9 @@ def is_docker_installed():
     return output.returncode == 0
 
 
-pytestmark = pytest.mark.skipif(not is_docker_installed(), reason="docker not installed")
+pytestmark = pytest.mark.skipif(
+    not is_docker_installed(), reason="docker not installed"
+)
 
 
 @pytest.fixture(scope="module")

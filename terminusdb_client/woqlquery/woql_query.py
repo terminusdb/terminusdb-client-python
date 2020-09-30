@@ -1,9 +1,9 @@
 import copy
+import datetime as dt
 import json
 
 # import pprint
 import re
-import datetime as dt
 
 import terminusdb_client.woql_utils as utils
 

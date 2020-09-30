@@ -95,9 +95,7 @@ class WOQLClass:
         }
         return self
 
-    def to_dict(
-        self,
-    ):
+    def to_dict(self,):
         return self.query_obj.to_dict()
 
     def to_json(self):
@@ -171,9 +169,7 @@ class WOQLObj:
         self.query_obj = self.query_obj.property(pro_id, pro_value, label, description)
         return self
 
-    def to_dict(
-        self,
-    ):
+    def to_dict(self,):
         return self.query_obj.to_dict()
 
     def to_json(self):

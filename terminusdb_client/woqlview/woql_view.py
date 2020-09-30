@@ -1,20 +1,20 @@
+import json
 import warnings
 
 try:
-    from IPython.display import display, Javascript, HTML
+    from IPython.display import Javascript, display
 except ImportError:
-    msg = (
-        "woqlview need to be used in Jupyter notebook.\n"
-    )
+    msg = "woqlview need to be used in Jupyter notebook.\n"
     warnings.warn(msg)
 
-import json
 
 class WOQLView:
     def __init__(self):
         self.config = ""
         self.obj = None
-        display(Javascript("""
+        display(
+            Javascript(
+                """
         require.config({
             paths: {
                 TerminusClient:'https://dl.bintray.com/terminusdb/terminusdb/dev/terminusdb-client.min',
@@ -22,13 +22,14 @@ class WOQLView:
             }
         });
         """
-          )
+            )
         )
+
     def edges(self, *args):
         for item in args:
             if not isinstance(item, list):
                 raise TypeError("argument of edges need to be lists")
-        arguments = ",".join(map(str,args))
+        arguments = ",".join(map(str, args))
         self.config += f"woqlGraphConfig.edges({arguments});\n"
         return self
 
@@ -43,7 +44,7 @@ class WOQLView:
     def edge(self, start, end):
         if not isinstance(start, str) or not isinstance(end, str):
             raise TypeError("arguments of edge() need to be strings")
-        arguments = ",".join(map(lambda x: f'"{x}"',[start,end]))
+        arguments = ",".join(map(lambda x: f'"{x}"', [start, end]))
         self.obj = f"woqlGraphConfig.edge({arguments})"
         return self
 
@@ -56,7 +57,7 @@ class WOQLView:
         for item in args:
             if not isinstance(item, str):
                 raise TypeError("arguments of node() need to be strings")
-        arguments = ",".join(map(lambda x: f'"{x}"',args))
+        arguments = ",".join(map(lambda x: f'"{x}"', args))
         self.obj = f"woqlGraphConfig.node({arguments})"
         return self
 
@@ -69,13 +70,13 @@ class WOQLView:
     def distance(self, input_distance):
         if self.obj is None:
             raise SyntaxError("distance() should be used following a node() or edge()")
-        self.config += self.obj + f'.distance({input_distance});\n'
+        self.config += self.obj + f".distance({input_distance});\n"
         return self
 
     def weight(self, input_weight):
         if self.obj is None:
             raise SyntaxError("weight() should be used following a node() or edge()")
-        self.config += self.obj + f'.weight({input_weight});\n'
+        self.config += self.obj + f".weight({input_weight});\n"
         return self
 
     def color(self, input_color):
@@ -84,11 +85,11 @@ class WOQLView:
         if len(input_color) > 3:
             input_color = input_color[:3]
         if len(input_color) < 3:
-            input_color += [0]*(3-len(input_color))
+            input_color += [0] * (3 - len(input_color))
         if self.obj is None:
             raise SyntaxError("color() should be used following a node() or edge()")
-        arguments = ",".join(map(str,input_color))
-        self.config += self.obj + f'.color([{arguments}]);\n'
+        arguments = ",".join(map(str, input_color))
+        self.config += self.obj + f".color([{arguments}]);\n"
         return self
 
     def icon(self, input_dict):
@@ -96,47 +97,51 @@ class WOQLView:
             raise TypeError("argument of icon() need to be dict")
         if self.obj is None:
             raise SyntaxError("icon() should be used following a node() or edge()")
-        self.config += self.obj + f'.icon({json.dumps(input_dict)});\n'
+        self.config += self.obj + f".icon({json.dumps(input_dict)});\n"
         return self
 
     def size(self, input_size):
         if self.obj is None:
             raise SyntaxError("size() should be used following a node() or edge()")
-        self.config += self.obj + f'.size({input_size});\n'
+        self.config += self.obj + f".size({input_size});\n"
         return self
 
     def collision_radius(self, input_radius):
         if self.obj is None:
-            raise SyntaxError("collision_radius() should be used following a node() or edge()")
-        self.config += self.obj + f'.collisionRadius({input_radius});\n'
+            raise SyntaxError(
+                "collision_radius() should be used following a node() or edge()"
+            )
+        self.config += self.obj + f".collisionRadius({input_radius});\n"
         return self
 
-    def hidden(self, input):
-        if input:
-            self.config += self.obj + f'.hidden(true);\n'
+    def hidden(self, input_choice):
+        if input_choice:
+            self.config += self.obj + ".hidden(true);\n"
         else:
-            self.config += self.obj + f'.hidden(false);\n'
+            self.config += self.obj + ".hidden(false);\n"
         return self
 
-    def charge(self, input):
+    def charge(self, input_charge):
         if self.obj is None:
             raise SyntaxError("charge(() should be used following a node() or edge()")
-        self.config += self.obj + f'.charge({input});\n'
+        self.config += self.obj + f".charge({input_charge});\n"
         return self
 
-    def of(self, input):
+    def of(self, input_obj):
         if self.obj is None:
             raise SyntaxError("in() should be used following a node() or edge()")
-        self.obj += f'.in("{input}")'
+        self.obj += f'.in("{input_obj}")'
         return self
 
-    def show(self, result:dict):
+    def show(self, result: dict):
         """Show the graph inline in the Jupyter notebook
 
         Parameter
         ---------
         result: the result that is returning from a query in dict format."""
-        display(Javascript("""
+        display(
+            Javascript(
+                """
         (function(element){
         require(['TerminusClient','TerminusDBGraph'], function(TerminusClient,TerminusDBGraph){
 
@@ -156,10 +161,12 @@ class WOQLView:
             graphResult.load(element.get(0),true);
             })
             })(element)
-            """%(result, self.config)
-                      ))
+            """
+                % (result, self.config)
+            )
+        )
 
-    def export(self, filename:str, result:dict):
+    def export(self, filename: str, result: dict):
         """Export the graph into an html file
 
         Parameter
@@ -167,9 +174,9 @@ class WOQLView:
         filename: the file name of the export file (without extention).
 
         result: the result that is returning from a query in dict format."""
-        with open(filename+".html",'w',encoding = 'utf-8') as file:
+        with open(filename + ".html", "w", encoding="utf-8") as file:
             file.write(
-            """<html>
+                """<html>
               <head>
                 <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -213,7 +220,8 @@ class WOQLView:
               </script>
 
 
-            </html>"""%(filename,result, self.config)
+            </html>"""
+                % (filename, result, self.config)
             )
 
     def print_js_config(self):
@@ -222,4 +230,4 @@ class WOQLView:
         Parameter
         ---------
         result: the result that is returning from a query in dict format."""
-        print(self.config)
+        print(self.config)  # noqa

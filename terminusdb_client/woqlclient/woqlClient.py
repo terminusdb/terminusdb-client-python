@@ -529,10 +529,9 @@ class WOQLClient:
         self.db(dbid)
         if accountid:
             self.account(accountid)
-        payload = { 'force' : force }
+        payload = {"force": force}
         json_response = self.dispatch(
-            APIEndpointConst.DELETE_DATABASE, self.conConfig.db_url(),
-            payload
+            APIEndpointConst.DELETE_DATABASE, self.conConfig.db_url(), payload
         )
         return json_response
 
@@ -1117,7 +1116,5 @@ class WOQLClient:
     def get_class_frame(self, class_name):
         opts = {"class": class_name}
         return self.dispatch(
-            APIEndpointConst.CLASS_FRAME,
-            self.conConfig.class_frame_url(),
-            opts,
+            APIEndpointConst.CLASS_FRAME, self.conConfig.class_frame_url(), opts,
         )
