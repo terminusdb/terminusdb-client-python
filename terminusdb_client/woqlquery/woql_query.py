@@ -3,6 +3,7 @@ import json
 
 # import pprint
 import re
+import datetime as dt
 
 import terminusdb_client.woql_utils as utils
 
@@ -290,6 +291,10 @@ class WOQLQuery:
             if not target:
                 target = "xsd:boolean"
             obj["woql:datatype"] = self._jlt(user_obj, target)
+        elif isinstance(user_obj, dt.date):
+            if not target:
+                target = "xsd:dateTime"
+            obj["woql:datatype"] = self._jlt(user_obj.isoformat(), target)
         elif type(user_obj) == dict:
             if "@value" in user_obj:
                 obj["woql:datatype"] = user_obj
@@ -938,6 +943,14 @@ class WOQLQuery:
             return {"@type": "xsd:boolean", "@value": True}
         else:
             return {"@type": "xsd:boolean", "@value": False}
+
+    def datetime(self, input_obj):
+        if isinstance(input_obj, dt.date):
+            return {"@type": "xsd:dateTime", "@value": input_obj.isoformat()}
+        elif isinstance(input_obj, str):
+            return {"@type": "xsd:dateTime", "@value": input_obj}
+        else:
+            raise ValueError("Input need to be either string or a datetime object.")
 
     def literal(self, input_val, input_type):
         if ":" not in input_type:
