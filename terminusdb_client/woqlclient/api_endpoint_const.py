@@ -1,5 +1,8 @@
 class APIEndpointConst:
     CONNECT = "connect"
+    GET_CSV = "get_csv"
+    UPDATE_CSV = "update_csv"
+    INSERT_CSV = "insert_csv"
     GET_TRIPLES = "get_triples"
     UPDATE_TRIPLES = "update_triples"
     INSERT_TRIPLES = "insert_triples"

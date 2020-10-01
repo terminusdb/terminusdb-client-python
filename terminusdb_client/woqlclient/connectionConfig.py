@@ -169,6 +169,20 @@ class ConnectionConfig:
             return self.db_base("frame")
         return self.branch_base("frame")
 
+    def csv_url(self, graph_type=None, graph_id=None):
+        if self.db == self.__system_db:
+            base_url = self.db_base("csv")
+        else:
+            base_url = self.branch_base("csv")
+
+        if graph_type:
+            if graph_id:
+                return f"{base_url}/{graph_type}/{graph_id}"
+            else:
+                return f"{base_url}/instance/{graph_id}"
+        else:
+            return base_url
+
     def triples_url(self, graph_type, graph_id="main"):
         if self.db == self.__system_db:
             base_url = self.db_base("triples")

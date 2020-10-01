@@ -155,6 +155,7 @@ class DispatchRequest:
                 APIEndpointConst.WOQL_QUERY,
                 APIEndpointConst.CREATE_DATABASE,
                 APIEndpointConst.UPDATE_TRIPLES,
+                APIEndpointConst.UPDATE_CSV,
                 APIEndpointConst.CREATE_GRAPH,
                 APIEndpointConst.FETCH,
                 APIEndpointConst.PULL,
@@ -172,6 +173,7 @@ class DispatchRequest:
 
             elif action in [
                 APIEndpointConst.INSERT_TRIPLES,
+                APIEndpointConst.INSERT_CSV,
             ]:
                 request_response = cls.__put_call(
                     url, headers, payload, file_dict, insecure=insecure

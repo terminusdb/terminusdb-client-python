@@ -1,6 +1,7 @@
 """woqlClient.py"""
 import copy
 import json
+import os
 
 from ..__version__ import __version__
 from .api_endpoint_const import APIEndpointConst
@@ -670,6 +671,92 @@ class WOQLClient:
             APIEndpointConst.INSERT_TRIPLES,
             self.conConfig.triples_url(graph_type, graph_id),
             commit,
+        )
+
+    def get_csv(self, csv_directory = None, csv_names = None, graph_type = None, graph_id = None):
+        """Retrieves the contents of the specified graph as a CSV
+
+        Parameters
+        ----------
+        csv_directory : str
+            CSV output directory path. (defaults to current directory).
+        csv_names : list
+            Names of all csvs from the specified database to extract.
+        graph_type : str
+            Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
+        graph_id : str
+            Graph identifier.
+
+        Returns
+        -------
+        dict
+            An API success message
+        """
+        options = {}
+        if csv_directory:
+            options["csv_directory"] = csv_directory
+        else:
+            options["csv_directory"] = os.getcwd()
+
+        options["csv_names"] = csv_names
+        return self.dispatch(
+            APIEndpointConst.GET_CSV,
+            self.conConfig.csv_url(graph_type, graph_id),
+        )
+
+    def update_csv(self, csv_paths, commit_msg, graph_type = None, graph_id = None):
+        """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
+
+        Parameters
+        ----------
+        graph_type : str
+            Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
+        graph_id : str
+            Graph identifier.
+        turtle
+            Valid set of triples in Turtle format.
+        commit_msg : str
+            Commit message.
+
+        Returns
+        -------
+        dict
+            An API success message
+        """
+        commit = self._generate_commit(commit_msg)
+
+        return self.dispatch(
+            APIEndpointConst.UPDATE_TRIPLES,
+            self.conConfig.csv_url(graph_type, graph_id),
+            commit,
+            files = csv_paths
+        )
+
+    def insert_csv(self, csv_paths, commit_msg, graph_type = None, graph_id = None):
+        """Inserts into the specified graph with the triples encoded in turtle format.
+
+        Parameters
+        ----------
+        csv_paths
+            List of csvs to load. (required)
+        commit_msg : str
+            Commit message.
+        graph_type : str
+            Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
+        graph_id : str
+            Graph identifier.
+
+        Returns
+        -------
+        dict
+            An API success message
+        """
+        commit = self._generate_commit(commit_msg)
+        return self.dispatch(
+            APIEndpointConst.INSERT_CSV,
+            self.conConfig.csv_url(graph_type, graph_id),
+            commit,
+            files = csv_paths
         )
 
     def query(self, woql_query, commit_msg=None, file_dict=None):
