@@ -17,7 +17,7 @@ class WOQLView:
                 """
         require.config({
             paths: {
-                TerminusClient:'https://dl.bintray.com/terminusdb/terminusdb/dev/terminusdb-client.min',
+                TerminusClient:'https://unpkg.com/@terminusdb/terminusdb-client@3.0.3/dist/terminusdb-client.min',
                 TerminusDBGraph:'https://dl.bintray.com/terminusdb/terminusdb/dev/terminusdb-d3-graph.min'
             }
         });
@@ -194,7 +194,7 @@ class WOQLView:
 
               require.config({
                 paths: {
-                    TerminusClient:'https://dl.bintray.com/terminusdb/terminusdb/dev/terminusdb-client.min',
+                    TerminusClient:'https://unpkg.com/@terminusdb/terminusdb-client@3.0.3/dist/terminusdb-client.min',
                     TerminusDBGraph:'https://dl.bintray.com/terminusdb/terminusdb/dev/terminusdb-d3-graph.min'
                 }
               });
