@@ -149,7 +149,7 @@ class WOQLView:
             const resultData=%s
 
             const woqlGraphConfig= TerminusClient.View.graph();
-            woqlGraphConfig.height(500).width(800);
+            woqlGraphConfig.height(window.innerHeight).width(window.innerWidth);
             %s
 
 
