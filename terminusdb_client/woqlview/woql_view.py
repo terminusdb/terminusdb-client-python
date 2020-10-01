@@ -38,7 +38,7 @@ class WOQLView:
         return self
 
     def width(self, width_input):
-        self.config += f"woqlGraphConfig.height({width_input});\n"
+        self.config += f"woqlGraphConfig.width({width_input});\n"
         return self
 
     def edge(self, start, end):
@@ -185,7 +185,7 @@ class WOQLView:
                 <title>%s</title>
               </head>
               <body>
-                 <div width="500" height="600" id="mycontainer" ></div>
+                 <div style="width: 100vw; height: 100vw;" id="mycontainer" ></div>
               </body>
 
               <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.js" integrity="sha512-vRqhAr2wsn+/cSsyz80psBbCcqzz2GTuhGk3bq3dAyytz4J/8XwFqMjiAGFBj+WM95lHBJ9cDf87T3P8yMrY7A==" crossorigin="anonymous"></script>
