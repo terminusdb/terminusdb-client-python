@@ -17,6 +17,8 @@ These previous version(s) works with these version(s) of TerminusDB:
 
 - 0.1.5 - works with TerminusDB server / console v2.0.4
 - 0.2.2 - works with TerminusDB server / console v2.0.5
+- 0.3.1 - works with TerminusDB server / console v3.0.0 to console v3.0.6
+- 0.4.0 - works with TerminusDB server / console v3.0.7
 
 ## Installation
 -  TerminusDB Client can be downloaded form PyPI using pip:
