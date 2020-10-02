@@ -1,5 +1,26 @@
 # TerminusDB Python Client Release Notes
 
+## v0.4.0
+
+### New
+
+- Added WOQLView
+- Added csv io methods in WOQLClient
+
+### Bug Fixes / Improvements
+
+- Warning for using WOQLDataFrame.query_to_df()
+- WOQLDataFrame now can handle "xsd:date" datatype from TerminusDB
+- Automatically csting datetime.date and datetime.datetime object as "xsd:dateTime" when added to TerminusDB
+
+---
+
+## v0.3.1
+
+### Bug Fixes / Improvements
+
+ - Patch import error
+
 ## v0.3.0
 
 ### New
