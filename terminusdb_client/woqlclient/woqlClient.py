@@ -673,15 +673,15 @@ class WOQLClient:
             commit,
         )
 
-    def get_csv(self, csv_directory = None, csv_names = None, graph_type = None, graph_id = None):
+    def get_csv(self, csv_name, csv_directory = None, graph_type = None, graph_id = None):
         """Retrieves the contents of the specified graph as a CSV
 
         Parameters
         ----------
+        csv_name : str
+            Name of csv to dump from the specified database to extract.
         csv_directory : str
             CSV output directory path. (defaults to current directory).
-        csv_names : list
-            Names of all csvs from the specified database to extract.
         graph_type : str
             Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
         graph_id : str
@@ -693,16 +693,19 @@ class WOQLClient:
             An API success message
         """
         options = {}
-        if csv_directory:
-            options["csv_directory"] = csv_directory
-        else:
-            options["csv_directory"] = os.getcwd()
+        if not (csv_directory is str):
+            csv_directory = os.getcwd()
+        options["csv_name"] = csv_name
 
-        options["csv_names"] = csv_names
-        return self.dispatch(
+        result = self.dispatch(
             APIEndpointConst.GET_CSV,
             self.conConfig.csv_url(graph_type, graph_id),
+            options
         )
+        stream = open(f"{csv_directory}/{csv_name}", 'w')
+        stream.write(result.text)
+        stream.close()
+        return result
 
     def update_csv(self, csv_paths, commit_msg, graph_type = None, graph_id = None):
         """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
@@ -724,12 +727,19 @@ class WOQLClient:
             An API success message
         """
         commit = self._generate_commit(commit_msg)
+        if type(csv_paths) is str:
+            csv_paths = [csv_paths]
+
+        file_dict = {}
+        for path in csv_paths:
+            name = os.path.basename(os.path.normpath(path))
+            file_dict[name] = (name, open(path, "rb"), "application/binary")
 
         return self.dispatch(
             APIEndpointConst.UPDATE_TRIPLES,
             self.conConfig.csv_url(graph_type, graph_id),
             commit,
-            files = csv_paths
+            file_dict = file_dict
         )
 
     def insert_csv(self, csv_paths, commit_msg, graph_type = None, graph_id = None):
@@ -738,7 +748,7 @@ class WOQLClient:
         Parameters
         ----------
         csv_paths
-            List of csvs to load. (required)
+            csv path or list of csv paths to load. (required)
         commit_msg : str
             Commit message.
         graph_type : str
@@ -752,11 +762,20 @@ class WOQLClient:
             An API success message
         """
         commit = self._generate_commit(commit_msg)
+        file_dict = {}
+        if type(csv_paths) is str:
+            csv_paths = [csv_paths]
+
+        file_dict = {}
+        for path in csv_paths:
+            name = os.path.basename(os.path.normpath(path))
+            file_dict[name] = (name, open(path, "rb"), "application/binary")
+
         return self.dispatch(
             APIEndpointConst.INSERT_CSV,
             self.conConfig.csv_url(graph_type, graph_id),
             commit,
-            files = csv_paths
+            file_dict = file_dict
         )
 
     def query(self, woql_query, commit_msg=None, file_dict=None):

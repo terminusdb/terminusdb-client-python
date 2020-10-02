@@ -9,6 +9,7 @@ from urllib3.exceptions import InsecureRequestWarning
 from .api_endpoint_const import APIEndpointConst
 from .errors import APIError
 
+import json
 
 def _verify_check(url, insecure=False):
     if url[:17] == "https://127.0.0.1" or url[:7] == "http://" or insecure:
@@ -35,9 +36,12 @@ class DispatchRequest:
         if not _verify_check(url, insecure):
             warnings.simplefilter("ignore", InsecureRequestWarning)
         if file_dict:
+            file_dict['payload'] = ('payload',
+                                    json.dumps(payload),
+                                    "application/json",)
+
             result = requests.post(
                 url,
-                json=payload,
                 headers=headers,
                 files=file_dict,
                 verify=_verify_check(url, insecure),
@@ -60,9 +64,12 @@ class DispatchRequest:
         if not _verify_check(url):
             warnings.simplefilter("ignore", InsecureRequestWarning)
         if file_dict:
+            file_dict['payload'] = ('payload',
+                                    json.dumps(payload),
+                                    "application/json",)
+
             result = requests.post(
                 url,
-                json=payload,
                 headers=headers,
                 files=file_dict,
                 verify=_verify_check(url),
@@ -136,6 +143,7 @@ class DispatchRequest:
 
             if action in [
                 APIEndpointConst.GET_TRIPLES,
+                APIEndpointConst.GET_CSV,
                 APIEndpointConst.CONNECT,
                 APIEndpointConst.CLASS_FRAME,
             ]:
