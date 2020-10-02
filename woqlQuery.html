@@ -99,6 +99,7 @@
 <li class="toctree-l2"><a class="reference internal" href="woqlClient.html">WOQLClient</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">WOQLQuery</a></li>
 <li class="toctree-l2"><a class="reference internal" href="woqlLib.html">WOQLLib</a></li>
+<li class="toctree-l2"><a class="reference internal" href="woqlView.html">WOQLView</a></li>
 <li class="toctree-l2"><a class="reference internal" href="woqlDataframe.html">woqlDataframe</a></li>
 <li class="toctree-l2"><a class="reference internal" href="SmartQuery.html">SmartQuery</a></li>
 </ul>
@@ -390,9 +391,99 @@ Commonly used to combine WOQLQueries.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="terminusdb_client.WOQLQuery.added_triple">
+<code class="sig-name descname">added_triple</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sub</span></em>, <em class="sig-param"><span class="n">pred</span></em>, <em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">opt</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.added_triple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a triple pattern matching rule for the triple [S, P, O] (Subject, Predicate, Object) added to the current commit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sub</strong> (<em>str</em>) – Subject</p></li>
+<li><p><strong>pred</strong> (<em>str</em>) – Predicate</p></li>
+<li><p><strong>obj</strong> (<em>str</em>) – Object</p></li>
+<li><p><strong>opt</strong> (<em>bool</em>) – weather or not this triple is optional, default to be False</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>query object that can be chained and/or execute</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>WOQLQuery object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLQuery.removed_triple">
+<code class="sig-name descname">removed_triple</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sub</span></em>, <em class="sig-param"><span class="n">pred</span></em>, <em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">opt</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.removed_triple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a triple pattern matching rule for the triple [S, P, O] (Subject, Predicate, Object) added to the current commit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sub</strong> (<em>str</em>) – Subject</p></li>
+<li><p><strong>pred</strong> (<em>str</em>) – Predicate</p></li>
+<li><p><strong>obj</strong> (<em>str</em>) – Object</p></li>
+<li><p><strong>opt</strong> (<em>bool</em>) – weather or not this triple is optional, default to be False</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>query object that can be chained and/or execute</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>WOQLQuery object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.quad">
 <code class="sig-name descname">quad</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sub</span></em>, <em class="sig-param"><span class="n">pred</span></em>, <em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">graph</span></em>, <em class="sig-param"><span class="n">opt</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.quad" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a pattern matching rule for the quad [S, P, O, G] (Subject, Predicate, Object, Graph)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sub</strong> (<em>str</em>) – Subject</p></li>
+<li><p><strong>pre</strong> (<em>str</em>) – Predicate</p></li>
+<li><p><strong>obj</strong> (<em>str</em>) – Object</p></li>
+<li><p><strong>gra</strong> (<em>str</em>) – Graph</p></li>
+<li><p><strong>opt</strong> (<em>bool</em>) – weather or not this quad is optional, default to be False</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>query object that can be chained and/or execute</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>WOQLQuery object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLQuery.added_quad">
+<code class="sig-name descname">added_quad</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sub</span></em>, <em class="sig-param"><span class="n">pred</span></em>, <em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">graph</span></em>, <em class="sig-param"><span class="n">opt</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.added_quad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a pattern matching rule for the quad [S, P, O, G] (Subject, Predicate, Object, Graph) added to the current commit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sub</strong> (<em>str</em>) – Subject</p></li>
+<li><p><strong>pre</strong> (<em>str</em>) – Predicate</p></li>
+<li><p><strong>obj</strong> (<em>str</em>) – Object</p></li>
+<li><p><strong>gra</strong> (<em>str</em>) – Graph</p></li>
+<li><p><strong>opt</strong> (<em>bool</em>) – weather or not this quad is optional, default to be False</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>query object that can be chained and/or execute</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>WOQLQuery object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLQuery.removed_quad">
+<code class="sig-name descname">removed_quad</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sub</span></em>, <em class="sig-param"><span class="n">pred</span></em>, <em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">graph</span></em>, <em class="sig-param"><span class="n">opt</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.removed_quad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a pattern matching rule for the quad [S, P, O, G] (Subject, Predicate, Object, Graph) added to the current commit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -420,6 +511,11 @@ Commonly used to combine WOQLQueries.</p>
 <dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.boolean">
 <code class="sig-name descname">boolean</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_bool</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.boolean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLQuery.datetime">
+<code class="sig-name descname">datetime</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_obj</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.datetime" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1223,6 +1319,23 @@ e.g. WOQL.re(“(.).*”, “hello”, [“v:All”, “v:Sub”])</p>
 <dt id="terminusdb_client.WOQLQuery.woql_not">
 <code class="sig-name descname">woql_not</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.woql_not" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a logical NOT of the arguments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>query</strong> (<em>WOQLQuery object</em><em>, </em><em>optional</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>query object that can be chained and/or executed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>WOQLQuery object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLQuery.immediately">
+<code class="sig-name descname">immediately</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.immediately" title="Permalink to this definition">¶</a></dt>
+<dd><p>Immediately runs side-effects without backtracking</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>query</strong> (<em>WOQLQuery object</em><em>, </em><em>optional</em>) – </p>

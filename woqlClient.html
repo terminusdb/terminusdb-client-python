@@ -99,6 +99,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">WOQLClient</a></li>
 <li class="toctree-l2"><a class="reference internal" href="woqlQuery.html">WOQLQuery</a></li>
 <li class="toctree-l2"><a class="reference internal" href="woqlLib.html">WOQLLib</a></li>
+<li class="toctree-l2"><a class="reference internal" href="woqlView.html">WOQLView</a></li>
 <li class="toctree-l2"><a class="reference internal" href="woqlDataframe.html">woqlDataframe</a></li>
 <li class="toctree-l2"><a class="reference internal" href="SmartQuery.html">SmartQuery</a></li>
 </ul>
@@ -623,7 +624,7 @@ a terminus:Database document to the Terminus Server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.delete_database">
-<code class="sig-name descname">delete_database</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dbid</span></em>, <em class="sig-param"><span class="n">accountid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.delete_database" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">delete_database</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dbid</span></em>, <em class="sig-param"><span class="n">accountid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">force</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.delete_database" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete a TerminusDB database.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">accountid</span></code> is provided, then the account in the config will be updated
 and the new value will be used in future requests to the server.</p>
@@ -762,6 +763,72 @@ and the new value will be used in future requests to the server.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="terminusdb_client.WOQLClient.get_csv">
+<code class="sig-name descname">get_csv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">csv_name</span></em>, <em class="sig-param"><span class="n">csv_directory</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">graph_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">graph_id</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the contents of the specified graph as a CSV</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>csv_name</strong> (<em>str</em>) – Name of csv to dump from the specified database to extract.</p></li>
+<li><p><strong>csv_directory</strong> (<em>str</em>) – CSV output directory path. (defaults to current directory).</p></li>
+<li><p><strong>graph_type</strong> (<em>str</em>) – Graph type, either <code class="docutils literal notranslate"><span class="pre">&quot;inference&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;instance&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;schema&quot;</span></code>.</p></li>
+<li><p><strong>graph_id</strong> (<em>str</em>) – Graph identifier.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An API success message</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLClient.update_csv">
+<code class="sig-name descname">update_csv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">csv_paths</span></em>, <em class="sig-param"><span class="n">commit_msg</span></em>, <em class="sig-param"><span class="n">graph_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">graph_id</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.update_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>graph_type</strong> (<em>str</em>) – Graph type, either <code class="docutils literal notranslate"><span class="pre">&quot;inference&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;instance&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;schema&quot;</span></code>.</p></li>
+<li><p><strong>graph_id</strong> (<em>str</em>) – Graph identifier.</p></li>
+<li><p><strong>turtle</strong> – Valid set of triples in Turtle format.</p></li>
+<li><p><strong>commit_msg</strong> (<em>str</em>) – Commit message.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An API success message</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLClient.insert_csv">
+<code class="sig-name descname">insert_csv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">csv_paths</span></em>, <em class="sig-param"><span class="n">commit_msg</span></em>, <em class="sig-param"><span class="n">graph_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">graph_id</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.insert_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inserts into the specified graph with the triples encoded in turtle format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>csv_paths</strong> – csv path or list of csv paths to load. (required)</p></li>
+<li><p><strong>commit_msg</strong> (<em>str</em>) – Commit message.</p></li>
+<li><p><strong>graph_type</strong> (<em>str</em>) – Graph type, either <code class="docutils literal notranslate"><span class="pre">&quot;inference&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;instance&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;schema&quot;</span></code>.</p></li>
+<li><p><strong>graph_id</strong> (<em>str</em>) – Graph identifier.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An API success message</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="terminusdb_client.WOQLClient.query">
 <code class="sig-name descname">query</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">woql_query</span></em>, <em class="sig-param"><span class="n">commit_msg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">file_dict</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.query" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents</p>
@@ -875,7 +942,7 @@ and the new value will be used in future requests to the server.</p>
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.reset">
 <code class="sig-name descname">reset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">commit_path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.reset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reset the current branch HEAD to the specified commith path.</p>
+<dd><p>Reset the current branch HEAD to the specified commit path.</p>
 <p class="rubric">Notes</p>
 <p>The “remote” repo can live in the local database.</p>
 <dl class="field-list simple">
