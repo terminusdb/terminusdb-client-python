@@ -673,7 +673,7 @@ class WOQLClient:
             commit,
         )
 
-    def get_csv(self, csv_name, csv_directory = None, graph_type = None, graph_id = None):
+    def get_csv(self, csv_name, csv_directory=None, graph_type=None, graph_id=None):
         """Retrieves the contents of the specified graph as a CSV
 
         Parameters
@@ -700,14 +700,14 @@ class WOQLClient:
         result = self.dispatch(
             APIEndpointConst.GET_CSV,
             self.conConfig.csv_url(graph_type, graph_id),
-            options
+            options,
         )
-        stream = open(f"{csv_directory}/{csv_name}", 'w')
+        stream = open(f"{csv_directory}/{csv_name}", "w")
         stream.write(result.text)
         stream.close()
         return result
 
-    def update_csv(self, csv_paths, commit_msg, graph_type = None, graph_id = None):
+    def update_csv(self, csv_paths, commit_msg, graph_type=None, graph_id=None):
         """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
 
         Parameters
@@ -739,10 +739,10 @@ class WOQLClient:
             APIEndpointConst.UPDATE_TRIPLES,
             self.conConfig.csv_url(graph_type, graph_id),
             commit,
-            file_dict = file_dict
+            file_dict=file_dict,
         )
 
-    def insert_csv(self, csv_paths, commit_msg, graph_type = None, graph_id = None):
+    def insert_csv(self, csv_paths, commit_msg, graph_type=None, graph_id=None):
         """Inserts into the specified graph with the triples encoded in turtle format.
 
         Parameters
@@ -775,7 +775,7 @@ class WOQLClient:
             APIEndpointConst.INSERT_CSV,
             self.conConfig.csv_url(graph_type, graph_id),
             commit,
-            file_dict = file_dict
+            file_dict=file_dict,
         )
 
     def query(self, woql_query, commit_msg=None, file_dict=None):

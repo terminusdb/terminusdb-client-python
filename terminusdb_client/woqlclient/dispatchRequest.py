@@ -1,4 +1,5 @@
 # from .errorMessage import ErrorMessage
+import json
 import warnings
 from base64 import b64encode
 
@@ -9,7 +10,6 @@ from urllib3.exceptions import InsecureRequestWarning
 from .api_endpoint_const import APIEndpointConst
 from .errors import APIError
 
-import json
 
 def _verify_check(url, insecure=False):
     if url[:17] == "https://127.0.0.1" or url[:7] == "http://" or insecure:
@@ -36,9 +36,11 @@ class DispatchRequest:
         if not _verify_check(url, insecure):
             warnings.simplefilter("ignore", InsecureRequestWarning)
         if file_dict:
-            file_dict['payload'] = ('payload',
-                                    json.dumps(payload),
-                                    "application/json",)
+            file_dict["payload"] = (
+                "payload",
+                json.dumps(payload),
+                "application/json",
+            )
 
             result = requests.post(
                 url,
@@ -64,15 +66,14 @@ class DispatchRequest:
         if not _verify_check(url):
             warnings.simplefilter("ignore", InsecureRequestWarning)
         if file_dict:
-            file_dict['payload'] = ('payload',
-                                    json.dumps(payload),
-                                    "application/json",)
+            file_dict["payload"] = (
+                "payload",
+                json.dumps(payload),
+                "application/json",
+            )
 
             result = requests.post(
-                url,
-                headers=headers,
-                files=file_dict,
-                verify=_verify_check(url),
+                url, headers=headers, files=file_dict, verify=_verify_check(url),
             )
             # Close the files although request should do this :(
             for key in file_dict:
