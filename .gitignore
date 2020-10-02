@@ -1,3 +1,5 @@
+.mypy_cache/
+
 .pytest_cache/
 woqlClientP.sublime-project
 woqlClientP.sublime-workspace
