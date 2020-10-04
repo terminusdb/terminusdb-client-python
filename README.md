@@ -39,7 +39,7 @@ If you want to use woqlDataframe:
 `python -m pip install git+https://github.com/terminusdb/terminusdb-client-python.git`
 
 ## Usage
-```python
+```
 >>> from terminusdb_client import WOQLQuery, WOQLClient
 >>> client = WOQLClient(server_url = "https://127.0.0.1:6363")
 >>> client.connect(key="root", account="admin", user="admin")
