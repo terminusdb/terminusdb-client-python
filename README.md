@@ -39,7 +39,27 @@ If you want to use woqlDataframe:
 `python -m pip install git+https://github.com/terminusdb/terminusdb-client-python.git`
 
 ## Usage
-Please check the [full Documentation](https://terminusdb.github.io/terminusdb-client-python/)
+```python
+>>> from terminusdb_client import WOQLQuery, WOQLClient
+>>> client = WOQLClient(server_url = "https://127.0.0.1:6363")
+>>> client.connect(key="root", account="admin", user="admin")
+>>> client.db()
+False
+>>> client.create_database("university", accountid="admin", label="University Graph", description="graph connect
+ing students with their courses in the university")
+{'@type': 'api:DbCreateResponse', 'api:status': 'api:success'}
+>>> client.db()
+'university'
+>>> schema = WOQLQuery().doctype("student").property("name","string")
+>>> schema.execute(client, "some commit msg")
+{'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': [], 'bindings': [{}], 'delet
+es': 0, 'inserts': 5, 'transaction_retry_count': 0}
+>>> insert = WOQLQuery().insert("Bob","scm:student")
+>>> qry = WOQLQuery().when(True, insert)
+>>> client.query(qry, 'university')
+{'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': [], 'bindings': [{}], 'deletes': 0, 'inserts': 1, 'transaction_retry_count': 0}
+```
+Please check the [full Documentation](https://terminusdb.github.io/terminusdb-client-python/) for more information.
 
 ## Tutorials
 Visit [terminus-tutorials](https://github.com/terminusdb/terminus-tutorials/tree/master/bike-tutorial/python) for tutorial scripts and [Create TerminusDB Graph with Python Client](https://terminusdb.com/docs/getting-started/start-tutorials/py_client/) for a python-specific one.
