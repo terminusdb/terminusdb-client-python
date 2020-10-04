@@ -43,21 +43,23 @@ If you want to use woqlDataframe:
 >>> from terminusdb_client import WOQLQuery, WOQLClient
 >>> client = WOQLClient(server_url = "https://127.0.0.1:6363")
 >>> client.connect(key="root", account="admin", user="admin")
->>> client.db()
-False
 >>> client.create_database("university", accountid="admin", label="University Graph", description="graph connect
-ing students with their courses in the university")
+")
 {'@type': 'api:DbCreateResponse', 'api:status': 'api:success'}
->>> client.db()
-'university'
->>> schema = WOQLQuery().doctype("student").property("name","string")
->>> schema.execute(client, "some commit msg")
-{'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': [], 'bindings': [{}], 'delet
-es': 0, 'inserts': 5, 'transaction_retry_count': 0}
->>> insert = WOQLQuery().insert("Bob","scm:student")
->>> qry = WOQLQuery().when(True, insert)
->>> client.query(qry, 'university')
-{'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': [], 'bindings': [{}], 'deletes': 0, 'inserts': 1, 'transaction_retry_count': 0}
+
+>>> client.get_database("university", account="admin")
+{'label': 'University Graph', 'comment': 'graph connecting students with their courses in the university', 'id':
+ 'university', 'organization': 'admin'}
+>>> WOQLQuery().doctype("scm:student").property("scm:name", "xsd:string").execute(client, "student schema created.")
+{'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': [], 'bindings': [{}], 'deletes'
+: 0, 'inserts': 5, 'transaction_retry_count': 0}
+
+>>> WOQLQuery().insert("stu001", "scm:student").property("scm:name", "Alice").execute(client, "Adding Alice.")
+{'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': [], 'bindings': [{}], 'deletes': 0, 'inserts': 2, 'transaction_retry_count': 0}
+>>> WOQLQuery().insert("stu002", "scm:student").property("scm:name", "Bob").execute(client, "Adding Bob.")
+{'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': [], 'bindings': [{}], 'deletes': 0, 'inserts': 2, 'transaction_retry_count': 0}
+>>> client.query(WOQLQuery().star())
+{'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': ['Subject', 'Predicate', 'Object'], 'bindings': [{'Object': 'terminusdb:///schema#student', 'Predicate': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'Subject': 'terminusdb:///data/stu001'}, {'Object': {'@type': 'http://www.w3.org/2001/XMLSchema#string', '@value': 'Alice'}, 'Predicate': 'terminusdb:///schema#name', 'Subject': 'terminusdb:///data/stu001'}, {'Object': 'terminusdb:///schema#student', 'Predicate': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'Subject': 'terminusdb:///data/stu002'}, {'Object': {'@type': 'http://www.w3.org/2001/XMLSchema#string', '@value': 'Bob'}, 'Predicate': 'terminusdb:///schema#name', 'Subject': 'terminusdb:///data/stu002'}], 'deletes': 0, 'inserts': 0, 'transaction_retry_count': 0}
 ```
 Please check the [full Documentation](https://terminusdb.github.io/terminusdb-client-python/) for more information.
 
