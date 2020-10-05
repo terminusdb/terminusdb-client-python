@@ -66,6 +66,17 @@ class WOQLQuery:
         self._graph = graph
 
     def __add__(self, other):
+        """Creates a logical AND with the argument passed, for WOQLQueries.
+
+        Parameters
+        ----------
+        other : WOQLQuery object
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         return WOQLQuery().woql_and(self, other)
 
     # WOQLCore methods
@@ -936,15 +947,48 @@ class WOQLQuery:
         return self
 
     def string(self, input_str):
+        """Transforms the given string into the proper json-ld form
+
+        Parameters
+        ----------
+        input_str : str
+            the given input string
+
+        Returns
+        -------
+        dict
+        """
         return {"@type": "xsd:string", "@value": input_str}
 
     def boolean(self, input_bool):
+        """Transforms the given bool object into the proper json-ld form
+
+        Parameters
+        ----------
+        input_bool : bool
+            the given input string
+
+        Returns
+        -------
+        dict
+        """
         if input_bool:
             return {"@type": "xsd:boolean", "@value": True}
         else:
             return {"@type": "xsd:boolean", "@value": False}
 
     def datetime(self, input_obj):
+        """Transforms the given datetime object into the proper json-ld form
+
+        Parameters
+        ----------
+        input_obj : str
+            the given input dateTime object
+
+        Returns
+        -------
+        dict
+        """
         if isinstance(input_obj, dt.date):
             return {"@type": "xsd:dateTime", "@value": input_obj.isoformat()}
         elif isinstance(input_obj, str):
@@ -1598,6 +1642,18 @@ class WOQLQuery:
         return self
 
     def floor(self, user_input):
+        """The floor function of a real number x denotes the greatest integer less than or equal to x.
+
+        Parameters
+        ----------
+        user_input : int or float
+            number whose floor needs to be calculated
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         if user_input and user_input == "woql:args":
             return ["woql:argument"]
         if self._cursor.get("@type"):
@@ -2529,6 +2585,20 @@ class WOQLQuery:
         return self
 
     def insert_data(self, data, ref_graph):
+        """Creates a new node of the specified type in a graph, with description and label.
+
+        Parameters
+        ----------
+        data : dict
+            dictionary with id, label, description attributes.
+        ref_graph : str
+            target graph
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         if data.get("type") and data.get("id"):
             data_type = self._clean_type(data["type"], True)
             self.insert(data["id"], data_type, ref_graph)
@@ -2739,6 +2809,19 @@ class WOQLQuery:
         return None
 
     def _same_entry(self, a, b):
+        """
+        A function to check the given two objects, which can be of different types (str, dict), are equal or not.
+        When both the passed objects are dicts, deep comparison is done to check for the equality.
+
+        Parameters
+        ----------
+        a : str or dict
+        b : str or dict
+
+        Returns
+        -------
+        bool
+        """
         if a == b:
             return True
         elif type(a) == dict and type(b) == str:
@@ -2755,6 +2838,18 @@ class WOQLQuery:
             return True
 
     def _string_matches_object(self, s, obj):
+        """
+        A function to check if the given string is present in the passed dict or not.
+
+        Parameters
+        ----------
+        s : str
+        obj : dict
+
+        Returns
+        -------
+        bool
+        """
         n = obj.get("woql:node")
         if n is not None:
             return s == n
@@ -2866,6 +2961,20 @@ class WOQLQuery:
         return self.insert_class_data(data, ref_graph)
 
     def insert_property_data(self, data, ref_graph):
+        """A function to insert the passed property data
+
+        Parameters
+        ----------
+        data : str
+            class to be deleted
+        ref_graph : str
+            target graph
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         if data.get("id"):
             self.add_property(data["id"], ref_graph)
             if data.get("label"):
@@ -3090,10 +3199,23 @@ class WOQLQuery:
         return bits[0]
 
     def _load_xdd(self, graph=None):
+        """
+        A function to generate a query for all of the xdd datatypes.
+
+        Parameters
+        ----------
+        graph : str, optional
+            Graph
+
+        Returns
+        -------
+        WOQLQuery object
+            a query object that can be chained and/or execute
+        """
         if not graph:
             graph = self._graph
         return WOQLQuery().woql_and(
-            # geograhpic datatypes
+            # geographic datatypes
             self.add_datatype(
                 "xdd:coordinate",
                 "Coordinate",
@@ -3149,17 +3271,52 @@ class WOQLQuery:
         )
 
     def add_datatype(self, d_id, label, descr, graph=None):
+        """
+        A utility function for creating a datatype in woql.
+
+        Parameters
+        ----------
+        d_id : str
+            the datatype id
+        label : str
+            label for the datatype
+        descr : str
+            description for the datatype
+        graph : str, optional
+            Graph
+
+        Returns
+        -------
+        WOQLQuery object
+            a query object that can be chained and/or execute
+        """
         if not graph:
             graph = self._graph
-        # utility function for creating a datatype in woql
         dt = WOQLQuery().insert(d_id, "rdfs:Datatype", graph).label(label)
         if descr:
             dt.description(descr)
         return dt
 
     def _load_xsd_boxes(self, parent, graph, prefix):
-        # Loads box classes for all of the useful xsd classes the format is to generate the box classes for xsd:anyGivenType
-        # as class(prefix:AnyGivenType) -> property(prefix:anyGivenType) -> datatype(xsd:anyGivenType)
+        """
+        A function to load box classes for all of the useful xsd classes.
+        The format is to generate the box classes for xsd:anyGivenType as:
+         class(prefix:AnyGivenType) -> property(prefix:anyGivenType) -> datatype(xsd:anyGivenType)
+
+        Parameters
+        ----------
+        parent : str, optional
+            the parent class of the box_class
+        graph : str, optional
+            Graph
+        prefix : str, optional
+            prefix for the box_class_id
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         return WOQLQuery().woql_and(
             self.box_datatype(
                 "xsd:anySimpleType",
@@ -3445,8 +3602,24 @@ class WOQLQuery:
         )
 
     def _load_xdd_boxes(self, parent, graph, prefix):
-        # Generates a query to create box classes for all of the xdd datatypes. the format is to generate the box classes for xdd:anyGivenType
-        # as class(prefix:AnyGivenType) -> property(prefix:anyGivenType) -> datatype(xdd:anyGivenType)
+        """ A function to generate a query to create box classes for all of the xdd datatypes.
+        The format is to generate the box classes for xdd:anyGivenType as:
+         class(prefix:AnyGivenType) -> property(prefix:anyGivenType) -> datatype(xdd:anyGivenType)
+
+        Parameters
+        ----------
+        parent : str, optional
+            the parent class of the box_class
+        graph : str, optional
+            Graph
+        prefix : str, optional
+            prefix for the box_class_id
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         return WOQLQuery().woql_and(
             self.box_datatype(
                 "xdd:coordinate",
@@ -3523,8 +3696,30 @@ class WOQLQuery:
         graph=None,
         prefix=None,
     ):
-        # utility function for boxing a datatype in woql
-        # format is (predicate) prefix:datatype (domain) prefix:Datatype (range) xsd:datatype
+        """A utility function for boxing a datatype in woql.
+        The format is (predicate) prefix:datatype (domain) prefix:Datatype (range) xsd:datatype.
+
+        Parameters
+        ----------
+        datatype : str, optional
+            the datatype
+        label : str, optional
+            label for the data type
+        descr : str, optional
+            description for the datatype
+        parent : str, optional
+            the parent class of the box_class
+        graph : str, optional
+            Graph
+        prefix : str, optional
+            prefix for the box_class_id
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+
         if not graph:
             graph = self._graph
         prefix = prefix if prefix else "scm:"
@@ -3550,7 +3745,7 @@ class WOQLQuery:
         Parameters
         ----------
         user_type : str
-            type of the docuemnt
+            type of the document
         graph : str, optional
             target graph
         label : str, optional
