@@ -180,61 +180,23 @@
 <dl class="py method">
 <dt id="terminusdb_client.TerminusDB.__init__">
 <code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">server_url</span></em>, <em class="sig-param"><span class="n">db_id</span></em>, <em class="sig-param"><span class="n">key</span><span class="o">=</span><span class="default_value">'root'</span></em>, <em class="sig-param"><span class="n">account</span><span class="o">=</span><span class="default_value">'admin'</span></em>, <em class="sig-param"><span class="n">user</span><span class="o">=</span><span class="default_value">'admin'</span></em>, <em class="sig-param"><span class="n">db_label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">db_description</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.TerminusDB.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>The TerminusDB constructor.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>server_url</strong> (<em>str</em>) – The url of which the TerminusDB server is running.</p></li>
-<li><p><strong>db_id</strong> (<em>str</em>) – Unique identifier of the database.</p></li>
-<li><p><strong>key</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default = &quot;root&quot;</em>) – </p></li>
-<li><p><strong>account</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default = &quot;admin&quot;</em>) – ID of the organization in which to create the DB (defaults to ‘admin’)</p></li>
-<li><p><strong>user</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default = &quot;admin&quot;</em>) – </p></li>
-<li><p><strong>db_label</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default = None</em>) – Optional label to be given for the db.</p></li>
-<li><p><strong>db_description</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default = None</em>) – Optional description to be given for the db.</p></li>
-<li><p><strong>**kwargs</strong> – Configuration options used to construct a <code class="xref py py-class docutils literal notranslate"><span class="pre">ConnectionConfig</span></code> instance.
-Passing insecure=True will skip HTTPS certificate checking.</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.TerminusDB.add_class">
 <code class="sig-name descname">add_class</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.TerminusDB.add_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds one or more WOQLClass types.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>obj</strong> (<a class="reference internal" href="#terminusdb_client.WOQLClass" title="terminusdb_client.WOQLClass"><em>WOQLClass</em></a><em> or </em><em>a list of WOQLClass instances</em>) – </p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.TerminusDB.add_object">
 <code class="sig-name descname">add_object</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.TerminusDB.add_object" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds one or more WOQLObj.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>obj</strong> (<a class="reference internal" href="#terminusdb_client.WOQLObj" title="terminusdb_client.WOQLObj"><em>WOQLObj</em></a><em> or </em><em>a list of WOQLObj instances</em>) – </p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.TerminusDB.run">
 <code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.TerminusDB.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Runs a query either in WOQLQuery format or json_ld in dictionary presentation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>query</strong> (<a class="reference internal" href="woqlQuery.html#terminusdb_client.WOQLQuery" title="terminusdb_client.WOQLQuery"><em>WOQLQuery</em></a><em> or </em><em>Dict</em>) – Query which has to be executed.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>The output of the query.</p>
-</dd>
-</dl>
+<dd><p>Run a query either in WOQLQuery format or json_ld in dictionary presentation</p>
 </dd></dl>
 
 </dd></dl>
@@ -246,44 +208,15 @@ Passing insecure=True will skip HTTPS certificate checking.</p></li>
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClass.__init__">
 <code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj_id</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">obj_property</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClass.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>The WOQLClass constructor.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>obj_id</strong> (<em>str</em>) – Object id for which the instance is created.</p></li>
-<li><p><strong>label</strong> (<em>str</em><em>, </em><em>optional</em>) – Optional label to be given for the instance.</p></li>
-<li><p><strong>description</strong> (<em>str</em><em>, </em><em>optional</em>) – Optional description to be given for the instance.</p></li>
-<li><p><strong>obj_property</strong> (<em>dict</em><em>, </em><em>optional</em>) – Optional properties which can be provided during initialization.</p></li>
-</ul>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">woql_object_prop_des</span> <span class="o">=</span> <span class="n">WOQLClass</span><span class="p">(</span>
-<span class="go">        &quot;Journey&quot;,</span>
-<span class="go">        label=&quot;Journey Object&quot;,</span>
-<span class="go">        description=&quot;A car Journey object.&quot;</span>
-<span class="go">        obj_property={</span>
-<span class="go">            &quot;Duration&quot;: {</span>
-<span class="go">                &quot;type&quot;: &quot;dateTime&quot;,</span>
-<span class="go">                &quot;label&quot;: &quot;Journey Duration&quot;,</span>
-<span class="go">                &quot;description&quot;: &quot;Journey duration in minutes.&quot;,</span>
-<span class="go">            }</span>
-<span class="go">        },</span>
-<span class="go">    )</span>
-</pre></div>
-</div>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClass.label">
 <em class="property">property </em><code class="sig-name descname">label</code><a class="headerlink" href="#terminusdb_client.WOQLClass.label" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the label of the instance.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>str</p>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -291,13 +224,9 @@ Passing insecure=True will skip HTTPS certificate checking.</p></li>
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClass.description">
 <em class="property">property </em><code class="sig-name descname">description</code><a class="headerlink" href="#terminusdb_client.WOQLClass.description" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the description of the instance.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>str</p>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -305,52 +234,17 @@ Passing insecure=True will skip HTTPS certificate checking.</p></li>
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClass.add_property">
 <code class="sig-name descname">add_property</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pro_id</span></em>, <em class="sig-param"><span class="n">property_type</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClass.add_property" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds the given properties to the instance.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>pro_id</strong> (<em>str</em>) – Property id</p></li>
-<li><p><strong>property_type</strong> (<em>str</em><em> (</em><em>or</em><em>) </em><a class="reference internal" href="#terminusdb_client.WOQLClass" title="terminusdb_client.WOQLClass"><em>WOQLClass</em></a>) – Properties to be given in json or as WOQLClass instance.</p></li>
-<li><p><strong>label</strong> (<em>str</em><em>, </em><em>optional</em>) – Optional label to be given for the instance.</p></li>
-<li><p><strong>description</strong> (<em>str</em><em>, </em><em>optional</em>) – Optional description to be given for the instance.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#terminusdb_client.WOQLClass" title="terminusdb_client.WOQLClass">WOQLClass</a></p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClass.to_dict">
 <code class="sig-name descname">to_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClass.to_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the query_object as a dict.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClass.to_json">
 <code class="sig-name descname">to_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClass.to_json" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the query_object as a json.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -361,85 +255,23 @@ Passing insecure=True will skip HTTPS certificate checking.</p></li>
 <dl class="py method">
 <dt id="terminusdb_client.WOQLObj.__init__">
 <code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj_id</span></em>, <em class="sig-param"><span class="n">obj_type</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">obj_property</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLObj.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>The WOQLObj constructor.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>obj_id</strong> (<em>str</em>) – Object id for which the instance is created.</p></li>
-<li><p><strong>obj_type</strong> (<a class="reference internal" href="#terminusdb_client.WOQLClass" title="terminusdb_client.WOQLClass"><em>WOQLClass</em></a>) – WOQLClass instance which has the properties.</p></li>
-<li><p><strong>label</strong> (<em>str</em><em>, </em><em>optional</em>) – Optional label to be given for the instance.</p></li>
-<li><p><strong>description</strong> (<em>str</em><em>, </em><em>optional</em>) – Optional description to be given for the instance.</p></li>
-<li><p><strong>obj_property</strong> (<em>dict</em><em>, </em><em>optional</em>) – Optional properties which can be provided during initialization.</p></li>
-</ul>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">my_id</span> <span class="o">=</span> <span class="s2">&quot;my_journey&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">my_label</span> <span class="o">=</span> <span class="s2">&quot;My Journey&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">my_des</span> <span class="o">=</span> <span class="s2">&quot;This is my journey to work&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">my_prop</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Duration&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">}}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">journey_class</span> <span class="o">=</span> <span class="n">WOQLClass</span><span class="p">(</span><span class="s2">&quot;Journey&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">journey_class</span><span class="o">.</span><span class="n">add_property</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="s2">&quot;Duration&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="s2">&quot;integer&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Journey Duration&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Journey duration in minutes.&quot;</span><span class="p">,</span>
-<span class="gp">... </span><span class="p">)</span>
-<span class="go">&lt;terminusdb_client.woqlquery.smart_query.WOQLClass object at 0x1085618d0&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">woql_obj</span> <span class="o">=</span> <span class="n">WOQLObj</span><span class="p">(</span><span class="n">my_id</span><span class="p">,</span> <span class="n">journey_class</span><span class="p">,</span> <span class="n">my_label</span><span class="p">,</span> <span class="n">my_des</span><span class="p">,</span> <span class="n">obj_property</span><span class="o">=</span><span class="n">my_prop</span><span class="p">)</span>
-</pre></div>
-</div>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLObj.add_property">
 <code class="sig-name descname">add_property</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pro_id</span></em>, <em class="sig-param"><span class="n">pro_value</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLObj.add_property" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds the given properties to the instance.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>pro_id</strong> (<em>str</em>) – Property id</p></li>
-<li><p><strong>pro_value</strong> (<em>any</em>) – Property value which needs to be added.</p></li>
-<li><p><strong>label</strong> (<em>str</em><em>, </em><em>optional</em>) – Optional label to be given for the instance.</p></li>
-<li><p><strong>description</strong> (<em>str</em><em>, </em><em>optional</em>) – Optional description to be given for the instance.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#terminusdb_client.WOQLObj" title="terminusdb_client.WOQLObj">WOQLObj</a></p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLObj.to_dict">
 <code class="sig-name descname">to_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLObj.to_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the query_object as a dict.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLObj.to_json">
 <code class="sig-name descname">to_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLObj.to_json" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the query_object as a json.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 </dd></dl>
 
