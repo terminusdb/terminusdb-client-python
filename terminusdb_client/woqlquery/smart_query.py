@@ -23,6 +23,34 @@ class WOQLClass:
         description: str = None,
         obj_property: dict = None,
     ):
+        """The WOQLClass constructor.
+
+        Parameters
+        ----------
+        obj_id: str
+            Object id for which the instance is created.
+        label: str, optional
+            Optional label to be given for the instance.
+        description: str, optional
+            Optional description to be given for the instance.
+        obj_property: dict, optional
+            Optional properties which can be provided during initialization.
+
+        Examples
+        --------
+        >>> woql_object_prop_des = WOQLClass(
+                "Journey",
+                label="Journey Object",
+                description="A car Journey object."
+                obj_property={
+                    "Duration": {
+                        "type": "dateTime",
+                        "label": "Journey Duration",
+                        "description": "Journey duration in minutes.",
+                    }
+                },
+            )
+        """
         self.id = obj_id
         self._label = label
         self._description = description
@@ -41,9 +69,28 @@ class WOQLClass:
                 )
 
     def __str__(self):
+        """Returns the id of the instance
+
+        Returns
+        -------
+        str
+
+        """
         return self.id
 
     def __eq__(self, other):
+        """To check if the object is equal to the given object.
+
+        Parameters
+        ----------
+        other: WOQLClass
+            The other object which has to be compared with.
+
+        Returns
+        -------
+        bool
+
+        """
         if isinstance(other, WOQLClass):
             return self.id == other.id
         else:
@@ -51,23 +98,52 @@ class WOQLClass:
 
     @property
     def label(self) -> str:
+        """Returns the label of the instance.
+
+        Returns
+        -------
+        str
+
+        """
         if self._label is None:
             return ""
         return self._label
 
     @label.setter
     def label(self, label: str):
+        """Sets the label for this instance.
+
+        Parameters
+        ----------
+        label: str
+            Label which needs to be set.
+
+        """
         self.query_obj = self.query_obj.label(label)
         self._label = label
 
     @property
     def description(self) -> str:
+        """Returns the description of the instance.
+
+        Returns
+        -------
+        str
+
+        """
         if self._description is None:
             return ""
         return self._description
 
     @description.setter
     def description(self, description: str):
+        """Sets the description for this instance.
+
+        Parameters
+        ----------
+        description: str
+            description which needs to be set.
+        """
         self.query_obj = self.query_obj.description(description)
         self._description = description
 
@@ -78,6 +154,23 @@ class WOQLClass:
         label: str = None,
         description: str = None,
     ):
+        """Adds the given properties to the instance.
+
+        Parameters
+        ----------
+        pro_id: str
+            Property id
+        property_type: str (or) WOQLClass
+            Properties to be given in json or as WOQLClass instance.
+        label: str, optional
+            Optional label to be given for the instance.
+        description: str, optional
+            Optional description to be given for the instance.
+
+        Returns
+        -------
+        WOQLClass
+        """
         if isinstance(property_type, str):
             self.query_obj = self.query_obj.property(
                 pro_id, property_type, label, description
@@ -96,9 +189,23 @@ class WOQLClass:
         return self
 
     def to_dict(self,):
+        """Returns the query_object as a dict.
+
+        Returns
+        -------
+        dict
+
+        """
         return self.query_obj.to_dict()
 
     def to_json(self):
+        """Returns the query_object as a json.
+
+        Returns
+        -------
+        str
+
+        """
         return self.query_obj.to_json()
 
 
@@ -111,6 +218,37 @@ class WOQLObj:
         description: str = None,
         obj_property: dict = None,
     ):
+        """The WOQLObj constructor.
+
+        Parameters
+        ----------
+        obj_id: str
+            Object id for which the instance is created.
+        obj_type: WOQLClass
+            WOQLClass instance which has the properties.
+        label: str, optional
+            Optional label to be given for the instance.
+        description: str, optional
+            Optional description to be given for the instance.
+        obj_property: dict, optional
+            Optional properties which can be provided during initialization.
+
+        Examples
+        --------
+        >>> my_id = "my_journey"
+        >>> my_label = "My Journey"
+        >>> my_des = "This is my journey to work"
+        >>> my_prop = {"Duration": {"value": 30}}
+        >>> journey_class = WOQLClass("Journey")
+        >>> journey_class.add_property(
+        ...     "Duration",
+        ...     "integer",
+        ...     label="Journey Duration",
+        ...     description="Journey duration in minutes.",
+        ... )
+        <terminusdb_client.woqlquery.smart_query.WOQLClass object at 0x1085618d0>
+        >>> woql_obj = WOQLObj(my_id, journey_class, my_label, my_des, obj_property=my_prop)
+        """
         self.id = obj_id
         self._type = obj_type
         self.woql_id = self._idgen()
@@ -132,14 +270,41 @@ class WOQLObj:
             self._property = {}
 
     def __str__(self):
+        """Returns the id of the instance
+
+        Returns
+        -------
+        str
+        """
         return self.id
 
     def _idgen(self) -> str:
+        """Returns the id which is generated in the below format.
+        doc:{[WOQLClass_type_id]_[WOQLObj_id]}
+
+        Returns
+        -------
+        str
+
+        """
         # mimic what a idgen would do in the back end
         # TODO: quote the ids ot make it url firendly
         return f"doc:{quote(self._type.id)}_{quote(self.id)}"
 
     def _check_prop(self, pro_id: str, pro_value):
+        """Check if the given property's value belongs to the correct data type.
+
+        Parameters
+        ----------
+        pro_id: str
+            Property id
+        pro_value
+            Property value
+        Returns
+        -------
+        none or raises exception
+
+        """
         prop = self._type._property.get(pro_id)
         if prop is None:
             raise ValueError(f"No {pro_id} property in {self._type.id}")
@@ -157,6 +322,24 @@ class WOQLObj:
     def add_property(
         self, pro_id: str, pro_value, label: str = None, description: str = None
     ):
+        """Adds the given properties to the instance.
+
+        Parameters
+        ----------
+        pro_id: str
+            Property id
+        pro_value: any
+            Property value which needs to be added.
+        label: str, optional
+            Optional label to be given for the instance.
+        description: str, optional
+            Optional description to be given for the instance.
+
+        Returns
+        -------
+        WOQLObj
+
+        """
         # check if the pro_value matches the property of the self._type
         self._check_prop(pro_id, pro_value)
         # add new prop in self._property
@@ -170,9 +353,23 @@ class WOQLObj:
         return self
 
     def to_dict(self,):
+        """Returns the query_object as a dict.
+
+        Returns
+        -------
+        dict
+
+        """
         return self.query_obj.to_dict()
 
     def to_json(self):
+        """Returns the query_object as a json.
+
+        Returns
+        -------
+        str
+
+        """
         return self.query_obj.to_json()
 
 
@@ -188,6 +385,26 @@ class TerminusDB:
         db_description: str = None,
         **kwargs,
     ):
+        """The TerminusDB constructor.
+
+        Parameters
+        ----------
+        server_url: str
+            The url of which the TerminusDB server is running.
+        db_id: str
+            Unique identifier of the database.
+        key: str, optional, default = "root"
+        account: str, optional, default = "admin"
+            ID of the organization in which to create the DB (defaults to 'admin')
+        user: str, optional, default = "admin"
+        db_label: str, optional, default = None
+            Optional label to be given for the db.
+        db_description: str, optional, default = None
+            Optional description to be given for the db.
+        **kwargs
+            Configuration options used to construct a :class:`ConnectionConfig` instance.
+            Passing insecure=True will skip HTTPS certificate checking.
+        """
 
         self._client = WOQLClient(server_url, **kwargs)
         self._client.connect(key=key, account=account, user=user)
@@ -219,6 +436,12 @@ class TerminusDB:
                 )
 
     def add_class(self, obj: Union[WOQLClass, List[WOQLClass]]):
+        """Adds one or more WOQLClass types.
+        
+        Parameters
+        ----------
+        obj: WOQLClass or a list of WOQLClass instances
+        """
         if isinstance(obj, WOQLClass):
             self.classes[obj.id] = obj
             return obj.query_obj.execute(self._client)
@@ -232,6 +455,16 @@ class TerminusDB:
             )
 
     def add_object(self, obj: Union[WOQLObj, List[WOQLObj]]):
+        """Adds one or more WOQLObj.
+        
+        Parameters
+        ----------
+        obj: WOQLObj or a list of WOQLObj instances
+
+        Returns
+        -------
+
+        """
         if isinstance(obj, WOQLObj):
             # check if class is in db
             if obj._type.id in self.classes:
@@ -248,5 +481,16 @@ class TerminusDB:
             )
 
     def run(self, query: Union[WOQLQuery, Dict]):
-        """Run a query either in WOQLQuery format or json_ld in dictionary presentation"""
+        """Runs a query either in WOQLQuery format or json_ld in dictionary presentation
+        
+        Parameters
+        ----------
+        query: WOQLQuery or Dict
+            Query which has to be executed.
+
+        Returns
+        -------
+            The output of the query.
+
+        """
         return self._client.query(query)
