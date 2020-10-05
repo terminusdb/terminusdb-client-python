@@ -73,4 +73,11 @@ WOQL_MATH_JSON = {
             "woql:datatype": {"@type": "xsd:decimal", "@value": "1"},
         },
     },
+    "floorJson": {
+        "@type": "woql:Floor",
+        "woql:argument": {
+            "@type": "woql:Datatype",
+            "woql:datatype": {"@type": "xsd:decimal", "@value": "2.5"},
+        },
+    },
 }

@@ -216,6 +216,10 @@ class TestWoqlQueries:
         woql_object = WOQLQuery().div("2", "1")
         assert woql_object.to_dict() == WOQL_MATH_JSON["divJson"]
 
+    def test_floor_method(self):
+        woql_object = WOQLQuery().floor("2.5")
+        assert woql_object.to_dict() == WOQL_MATH_JSON["floorJson"]
+
     def test_get_method(self):
         woql_object = WOQLQuery().get(WOQLQuery().woql_as("a", "b"), "Target")
         json_obj = {
