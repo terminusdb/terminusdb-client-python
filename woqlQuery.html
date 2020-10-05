@@ -506,53 +506,17 @@ Commonly used to combine WOQLQueries.</p>
 <dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.string">
 <code class="sig-name descname">string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.string" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transforms the given string into the proper json-ld form</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>input_str</strong> (<em>str</em>) – the given input string</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.boolean">
 <code class="sig-name descname">boolean</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_bool</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.boolean" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transforms the given bool object into the proper json-ld form</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>input_bool</strong> (<em>bool</em>) – the given input string</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.datetime">
 <code class="sig-name descname">datetime</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_obj</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.datetime" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transforms the given datetime object into the proper json-ld form</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>input_obj</strong> (<em>str</em>) – the given input dateTime object</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.literal">
@@ -999,19 +963,7 @@ into the corrent place in the encompassing json</p>
 <dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.floor">
 <code class="sig-name descname">floor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">user_input</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.floor" title="Permalink to this definition">¶</a></dt>
-<dd><p>The floor function of a real number x denotes the greatest integer less than or equal to x.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>user_input</strong> (<em>int</em><em> or </em><em>float</em>) – number whose floor needs to be calculated</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>WOQLQuery object</p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.isa">
@@ -1639,22 +1591,7 @@ It will yield a json object like follows: <code class="docutils literal notransl
 <dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.insert_data">
 <code class="sig-name descname">insert_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">ref_graph</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.insert_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new node of the specified type in a graph, with description and label.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<em>dict</em>) – dictionary with id, label, description attributes.</p></li>
-<li><p><strong>ref_graph</strong> (<em>str</em>) – target graph</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>WOQLQuery object</p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.graph">
@@ -1827,22 +1764,7 @@ The triple/quad that will get created will be for the rdfs:label predicate.
 <dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.insert_property_data">
 <code class="sig-name descname">insert_property_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">ref_graph</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.insert_property_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>A function to insert the passed property data</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<em>str</em>) – class to be deleted</p></li>
-<li><p><strong>ref_graph</strong> (<em>str</em>) – target graph</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>WOQLQuery object</p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.delete_class">
@@ -1923,49 +1845,12 @@ The triple/quad that will get created will be for the rdfs:label predicate.
 <dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.add_datatype">
 <code class="sig-name descname">add_datatype</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d_id</span></em>, <em class="sig-param"><span class="n">label</span></em>, <em class="sig-param"><span class="n">descr</span></em>, <em class="sig-param"><span class="n">graph</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.add_datatype" title="Permalink to this definition">¶</a></dt>
-<dd><p>A utility function for creating a datatype in woql.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>d_id</strong> (<em>str</em>) – the datatype id</p></li>
-<li><p><strong>label</strong> (<em>str</em>) – label for the datatype</p></li>
-<li><p><strong>descr</strong> (<em>str</em>) – description for the datatype</p></li>
-<li><p><strong>graph</strong> (<em>str</em><em>, </em><em>optional</em>) – Graph</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>a query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>WOQLQuery object</p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.box_datatype">
 <code class="sig-name descname">box_datatype</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">datatype</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">descr</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parent</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">graph</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">prefix</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.box_datatype" title="Permalink to this definition">¶</a></dt>
-<dd><p>A utility function for boxing a datatype in woql.
-The format is (predicate) prefix:datatype (domain) prefix:Datatype (range) xsd:datatype.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>datatype</strong> (<em>str</em><em>, </em><em>optional</em>) – the datatype</p></li>
-<li><p><strong>label</strong> (<em>str</em><em>, </em><em>optional</em>) – label for the data type</p></li>
-<li><p><strong>descr</strong> (<em>str</em><em>, </em><em>optional</em>) – description for the datatype</p></li>
-<li><p><strong>parent</strong> (<em>str</em><em>, </em><em>optional</em>) – the parent class of the box_class</p></li>
-<li><p><strong>graph</strong> (<em>str</em><em>, </em><em>optional</em>) – Graph</p></li>
-<li><p><strong>prefix</strong> (<em>str</em><em>, </em><em>optional</em>) – prefix for the box_class_id</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>WOQLQuery object</p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.doctype">
@@ -1974,7 +1859,7 @@ The format is (predicate) prefix:datatype (domain) prefix:Datatype (range) xsd:d
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>user_type</strong> (<em>str</em>) – type of the document</p></li>
+<li><p><strong>user_type</strong> (<em>str</em>) – type of the docuemnt</p></li>
 <li><p><strong>graph</strong> (<em>str</em><em>, </em><em>optional</em>) – target graph</p></li>
 <li><p><strong>label</strong> (<em>str</em><em>, </em><em>optional</em>) – label for the doctype</p></li>
 <li><p><strong>description</strong> (<em>str</em><em>, </em><em>optional</em>) – description for the doctype</p></li>
