@@ -319,7 +319,14 @@ class WOQLQuery:
         if ":" not in cstring:
             return False
         pref = cstring.split(":")[0]
-        if pref == 'v' or pref == 'scm' or pref == 'doc' or pref == "terminusdb" or pref=="http" or pref=="https" :
+        if (
+            pref == "v"
+            or pref == "scm"
+            or pref == "doc"
+            or pref == "terminusdb"
+            or pref == "http"
+            or pref == "https"
+        ):
             return True
         if utils.STANDARD_URLS.get(pref):
             return True
@@ -505,24 +512,26 @@ class WOQLQuery:
             item = self._find_last_property(json["woql:query"])
             if item:
                 return item
-        if "woql:subject" in json and self._is_property_triple(json.get('woql:predicate'), json.get('woql:object')):
+        if "woql:subject" in json and self._is_property_triple(
+            json.get("woql:predicate"), json.get("woql:object")
+        ):
             return json
         return False
 
     def _is_property_triple(self, pred, obj):
         if isinstance(pred, dict):
-            p = pred.get('woql:node')
+            p = pred.get("woql:node")
         else:
             p = pred
         if isinstance(obj, dict):
-            o = obj.get('woql:node')
+            o = obj.get("woql:node")
         else:
             o = obj
-        if(o == 'owl:ObjectProperty' or o == 'owl:DatatypeProperty'):
+        if o == "owl:ObjectProperty" or o == "owl:DatatypeProperty":
             return True
-        if(p == 'rdfs:domain' or p == 'rdfs:range'):
+        if p == "rdfs:domain" or p == "rdfs:range":
             return True
-        return False        
+        return False
 
     def _compile_path_pattern(self, pat):
         """Turns a textual path pattern into a JSON-LD description"""
@@ -2252,20 +2261,16 @@ class WOQLQuery:
         return self
 
     def type_of(self, value, vtype):
-        if (value and value == 'woql:args'):
-            return ['woql:value', 'woql:type']
-        if (not value or not vtype):
-            return self._parameter_error(
-                "type_of takes two parameters, both values"
-            )
+        if value and value == "woql:args":
+            return ["woql:value", "woql:type"]
+        if not value or not vtype:
+            return self._parameter_error("type_of takes two parameters, both values")
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:TypeOf"
         self._cursor["woql:value"] = self._clean_object(value)
         self._cursor["woql:type"] = self._clean_object(vtype)
         return self
-}
-
 
     def order_by(self, *args, order="asc"):
         """
