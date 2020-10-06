@@ -707,7 +707,7 @@ class WOQLClient:
         stream.close()
         return result
 
-    def update_csv(self, csv_paths, commit_msg, graph_type=None, graph_id=None):
+    def update_csv(self, csv_paths, commit_msg=None, graph_type=None, graph_id=None):
         """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
 
         Parameters
@@ -726,6 +726,8 @@ class WOQLClient:
         dict
             An API success message
         """
+        if commit_msg is None:
+            commit_msg = f"Update csv from {csv_paths} by python client {__version__}"
         commit = self._generate_commit(commit_msg)
         if type(csv_paths) is str:
             csv_paths = [csv_paths]
@@ -742,7 +744,7 @@ class WOQLClient:
             file_dict=file_dict,
         )
 
-    def insert_csv(self, csv_paths, commit_msg, graph_type=None, graph_id=None):
+    def insert_csv(self, csv_paths, commit_msg=None, graph_type=None, graph_id=None):
         """Inserts into the specified graph with the triples encoded in turtle format.
 
         Parameters
@@ -761,6 +763,8 @@ class WOQLClient:
         dict
             An API success message
         """
+        if commit_msg is None:
+            commit_msg = f"Insert csv from {csv_paths} by python client {__version__}"
         commit = self._generate_commit(commit_msg)
         file_dict = {}
         if type(csv_paths) is str:
