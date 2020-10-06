@@ -39,7 +39,29 @@ If you want to use woqlDataframe:
 `python -m pip install git+https://github.com/terminusdb/terminusdb-client-python.git`
 
 ## Usage
-Please check the [full Documentation](https://terminusdb.github.io/terminusdb-client-python/)
+```
+>>> from terminusdb_client import WOQLQuery, WOQLClient
+>>> client = WOQLClient(server_url = "https://127.0.0.1:6363")
+>>> client.connect(key="root", account="admin", user="admin")
+>>> client.create_database("university", accountid="admin", label="University Graph", description="graph connect
+")
+{'@type': 'api:DbCreateResponse', 'api:status': 'api:success'}
+
+>>> client.get_database("university", account="admin")
+{'label': 'University Graph', 'comment': 'graph connecting students with their courses in the university', 'id':
+ 'university', 'organization': 'admin'}
+>>> WOQLQuery().doctype("scm:student").property("scm:name", "xsd:string").execute(client, "student schema created.")
+{'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': [], 'bindings': [{}], 'deletes'
+: 0, 'inserts': 5, 'transaction_retry_count': 0}
+
+>>> WOQLQuery().insert("stu001", "scm:student").property("scm:name", "Alice").execute(client, "Adding Alice.")
+{'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': [], 'bindings': [{}], 'deletes': 0, 'inserts': 2, 'transaction_retry_count': 0}
+>>> WOQLQuery().insert("stu002", "scm:student").property("scm:name", "Bob").execute(client, "Adding Bob.")
+{'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': [], 'bindings': [{}], 'deletes': 0, 'inserts': 2, 'transaction_retry_count': 0}
+>>> client.query(WOQLQuery().star())
+{'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': ['Subject', 'Predicate', 'Object'], 'bindings': [{'Object': 'terminusdb:///schema#student', 'Predicate': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'Subject': 'terminusdb:///data/stu001'}, {'Object': {'@type': 'http://www.w3.org/2001/XMLSchema#string', '@value': 'Alice'}, 'Predicate': 'terminusdb:///schema#name', 'Subject': 'terminusdb:///data/stu001'}, {'Object': 'terminusdb:///schema#student', 'Predicate': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'Subject': 'terminusdb:///data/stu002'}, {'Object': {'@type': 'http://www.w3.org/2001/XMLSchema#string', '@value': 'Bob'}, 'Predicate': 'terminusdb:///schema#name', 'Subject': 'terminusdb:///data/stu002'}], 'deletes': 0, 'inserts': 0, 'transaction_retry_count': 0}
+```
+Please check the [full Documentation](https://terminusdb.github.io/terminusdb-client-python/) for more information.
 
 ## Tutorials
 Visit [terminus-tutorials](https://github.com/terminusdb/terminus-tutorials/tree/master/bike-tutorial/python) for tutorial scripts and [Create TerminusDB Graph with Python Client](https://terminusdb.com/docs/getting-started/start-tutorials/py_client/) for a python-specific one.
