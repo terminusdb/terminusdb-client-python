@@ -1,5 +1,7 @@
 """woqlClient.py"""
 import copy
+import json
+import os
 
 from ..__version__ import __version__
 from .api_endpoint_const import APIEndpointConst
@@ -29,10 +31,11 @@ class WOQLClient:
             URL of the server that this client will connect to.
         \**kwargs
             Configuration options used to construct a :class:`ConnectionConfig` instance.
+            Passing insecure=True will skip HTTPS certificate checking.
         """
         self.conConfig = ConnectionConfig(server_url, **kwargs)
         self.conCapabilities = ConnectionCapabilities()
-        self.cert = kwargs.get("cert")
+        self.insecure = kwargs.get("insecure")
 
     def connect(self, **kwargs):
         r"""Connect to a Terminus server at the given URI with an API key.
@@ -62,8 +65,8 @@ class WOQLClient:
         """
         if len(kwargs) > 0:
             self.conConfig.update(**kwargs)
-        if self.cert is None:
-            self.cert = kwargs.get("cert")
+        if self.insecure is None:
+            self.insecure = kwargs.get("insecure")
 
         json_obj = self.dispatch(APIEndpointConst.CONNECT, self.conConfig.api)
         self.conCapabilities.set_capabilities(json_obj)
@@ -117,7 +120,7 @@ class WOQLClient:
         return self.conConfig.basic_auth
 
     def remote_auth(self, auth_info=None):
-        """Set or get the JWT token used for authenticating to the server.
+        """Set or get the Basic auth or JWT token used for authenticating to the server.
 
         If ``auth_info`` is not provided, then the config will not be updated.
 
@@ -139,7 +142,7 @@ class WOQLClient:
         >>> client.remote_auth({"type": "jwt", "user": "admin", "key": "<token>"})
         {'type': 'jwt', 'user': 'admin', 'key': '<token>'}
         """
-        if type(auth_info) == dict:
+        if auth_info:
             self.conConfig.set_remote_auth(auth_info)
         return self.conConfig.remote_auth
 
@@ -500,7 +503,7 @@ class WOQLClient:
             APIEndpointConst.CREATE_DATABASE, self.conConfig.db_url(), details
         )
 
-    def delete_database(self, dbid, accountid=None):
+    def delete_database(self, dbid, accountid=None, force=False):
         """Delete a TerminusDB database.
 
         If ``accountid`` is provided, then the account in the config will be updated
@@ -527,9 +530,9 @@ class WOQLClient:
         self.db(dbid)
         if accountid:
             self.account(accountid)
-
+        payload = {"force": force}
         json_response = self.dispatch(
-            APIEndpointConst.DELETE_DATABASE, self.conConfig.db_url()
+            APIEndpointConst.DELETE_DATABASE, self.conConfig.db_url(), payload
         )
         return json_response
 
@@ -637,14 +640,145 @@ class WOQLClient:
         dict
         """
         commit = self._generate_commit(commit_msg)
-        commit.turtle = turtle
+        commit["turtle"] = turtle
         return self.dispatch(
             APIEndpointConst.UPDATE_TRIPLES,
             self.conConfig.triples_url(graph_type, graph_id),
             commit,
         )
 
-    def query(self, woql_query, commit_msg=None, file_list=None):
+    def insert_triples(self, graph_type, graph_id, turtle, commit_msg):
+        """Inserts into the specified graph with the triples encoded in turtle format.
+
+        Parameters
+        ----------
+        graph_type : str
+            Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
+        graph_id : str
+            Graph identifier.
+        turtle
+            Valid set of triples in Turtle format.
+        commit_msg : str
+            Commit message.
+
+        Returns
+        -------
+        dict
+        """
+        commit = self._generate_commit(commit_msg)
+        commit["turtle"] = turtle
+        return self.dispatch(
+            APIEndpointConst.INSERT_TRIPLES,
+            self.conConfig.triples_url(graph_type, graph_id),
+            commit,
+        )
+
+    def get_csv(self, csv_name, csv_directory=None, graph_type=None, graph_id=None):
+        """Retrieves the contents of the specified graph as a CSV
+
+        Parameters
+        ----------
+        csv_name : str
+            Name of csv to dump from the specified database to extract.
+        csv_directory : str
+            CSV output directory path. (defaults to current directory).
+        graph_type : str
+            Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
+        graph_id : str
+            Graph identifier.
+
+        Returns
+        -------
+        dict
+            An API success message
+        """
+        options = {}
+        if not (csv_directory is str):
+            csv_directory = os.getcwd()
+        options["csv_name"] = csv_name
+
+        result = self.dispatch(
+            APIEndpointConst.GET_CSV,
+            self.conConfig.csv_url(graph_type, graph_id),
+            options,
+        )
+        stream = open(f"{csv_directory}/{csv_name}", "w")
+        stream.write(result.text)
+        stream.close()
+        return result
+
+    def update_csv(self, csv_paths, commit_msg, graph_type=None, graph_id=None):
+        """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
+
+        Parameters
+        ----------
+        graph_type : str
+            Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
+        graph_id : str
+            Graph identifier.
+        turtle
+            Valid set of triples in Turtle format.
+        commit_msg : str
+            Commit message.
+
+        Returns
+        -------
+        dict
+            An API success message
+        """
+        commit = self._generate_commit(commit_msg)
+        if type(csv_paths) is str:
+            csv_paths = [csv_paths]
+
+        file_dict = {}
+        for path in csv_paths:
+            name = os.path.basename(os.path.normpath(path))
+            file_dict[name] = (name, open(path, "rb"), "application/binary")
+
+        return self.dispatch(
+            APIEndpointConst.UPDATE_TRIPLES,
+            self.conConfig.csv_url(graph_type, graph_id),
+            commit,
+            file_dict=file_dict,
+        )
+
+    def insert_csv(self, csv_paths, commit_msg, graph_type=None, graph_id=None):
+        """Inserts into the specified graph with the triples encoded in turtle format.
+
+        Parameters
+        ----------
+        csv_paths
+            csv path or list of csv paths to load. (required)
+        commit_msg : str
+            Commit message.
+        graph_type : str
+            Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
+        graph_id : str
+            Graph identifier.
+
+        Returns
+        -------
+        dict
+            An API success message
+        """
+        commit = self._generate_commit(commit_msg)
+        file_dict = {}
+        if type(csv_paths) is str:
+            csv_paths = [csv_paths]
+
+        file_dict = {}
+        for path in csv_paths:
+            name = os.path.basename(os.path.normpath(path))
+            file_dict[name] = (name, open(path, "rb"), "application/binary")
+
+        return self.dispatch(
+            APIEndpointConst.INSERT_CSV,
+            self.conConfig.csv_url(graph_type, graph_id),
+            commit,
+            file_dict=file_dict,
+        )
+
+    def query(self, woql_query, commit_msg=None, file_dict=None):
         """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
 
         Parameters
@@ -653,8 +787,8 @@ class WOQLClient:
             A woql query as an object or dict
         commit_mg : str
             A message that will be written to the commit log to describe the change
-        file_list: dict
-            A dict containing a list of files to be posted as part of the query (.post...)
+        file_dict:
+            File dictionary to be associated with post name => filename, for multipart POST
 
         Examples
         -------
@@ -676,40 +810,48 @@ class WOQLClient:
         woql_query["@context"] = self.conCapabilities.get_context_for_outbound_query(
             None, self.db()
         )
-        if type(file_list) == dict:
-            file_dict = query_obj
-            for name in file_list:
-                path = file_list[name]
-                stream = open(path, "rb")
-                file_dict[name] = (name, stream, "text/plain")
-            file_dict["query"] = (
-                None,
-                woql_query,
-                "application/json",
-            )
+        query_obj["query"] = woql_query
+        if type(file_dict) == dict:
+            request_file_dict = {}
+            for name in query_obj:
+                query_obj_value = query_obj[name]
+                request_file_dict[name] = (
+                    name,
+                    json.dumps(query_obj_value),
+                    "application/json",
+                )
+            for name in file_dict:
+                path = file_dict[name]
+                request_file_dict[name] = (name, open(path, "rb"), "application/binary")
             payload = None
         else:
-            file_dict = None
-            query_obj["query"] = woql_query
+            request_file_dict = None
             payload = query_obj
 
         return self.dispatch(
-            APIEndpointConst.WOQL_QUERY, self.conConfig.query_url(), payload, file_dict
+            APIEndpointConst.WOQL_QUERY,
+            self.conConfig.query_url(),
+            payload,
+            request_file_dict,
         )
 
-    def branch(self, new_branch_id):
+    def branch(self, new_branch_id, empty=False):
         """Create a branch starting from the current branch.
 
         Parameters
         ----------
         new_branch_id : str
             New branch identifier.
+        empty : bool
+            Create an empty branch if true (no starting commit)
 
         Returns
         -------
         dict
         """
-        if self.ref():
+        if empty:
+            source = {}
+        elif self.ref():
             source = {
                 "origin": f"{self.account()}/{self.db()}/{self.repo()}/commit/{self.ref()}"
             }
@@ -742,7 +884,7 @@ class WOQLClient:
         Examples
         --------
         >>> client = WOQLClient("https://127.0.0.1:6363/")
-        >>> client.pull({"author": "<author>", "remote": "<remote>", "remote_branch": "<branch>"})
+        >>> client.pull({"remote": "<remote>", "remote_branch": "<branch>"})
         """
         rc_args = self._prepare_revision_control_args(remote_source_repo)
         if rc_args and rc_args.get("remote") and rc_args.get("remote_branch"):
@@ -816,6 +958,92 @@ class WOQLClient:
             raise ValueError(
                 "Rebase parameter error - you must specify a valid rebase source to rebase from"
             )
+
+    def reset(self, commit_path):
+        """Reset the current branch HEAD to the specified commit path.
+
+        Notes
+        -----
+        The "remote" repo can live in the local database.
+
+        Parameters
+        ----------
+        commit_path : string
+            Path to the commit, for instance admin/database/local/commit/234980523ffaf93.
+
+        Returns
+        -------
+        dict
+
+        Examples
+        --------
+        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client.checkout("some_branch")
+        >>> client.reset('admin/database/local/commit/234980523ffaf93')
+        """
+
+        return self.dispatch(
+            APIEndpointConst.RESET,
+            self.conConfig.reset_url(),
+            {"commit_descriptor": commit_path},
+        )
+
+    def optimize(self, path):
+        """Optimize the specified path.
+
+        Notes
+        -----
+        The "remote" repo can live in the local database.
+
+        Parameters
+        ----------
+        path : string
+            Path to optimize, for instance admin/database/_meta for the repo graph.
+
+        Returns
+        -------
+        dict
+
+        Examples
+        --------
+        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client.optimize('admin/database/_meta')
+        """
+        return self.dispatch(APIEndpointConst.RESET, self.conConfig.optimize_url(path))
+
+    def squash(self, msg, author=None):
+        """Squash the current branch HEAD into a commit
+
+        Notes
+        -----
+        The "remote" repo can live in the local database.
+
+        Parameters
+        ----------
+        msg : string
+            Message for the newly created squash commit
+        author : string
+            Author of the commit
+
+        Returns
+        -------
+        dict
+            A dict with the new commit id:
+            {'@type' : 'api:SquashResponse',
+             'api:commit' : Commit,
+             'api:old_commit' : Old_Commit,
+             'api:status' : "api:success"}
+
+        Examples
+        --------
+        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client.connect(user="admin", key="root", account="admin", db="some_db")
+        >>> client.squash('This is a squash commit message!')
+        """
+        commit_object = self._generate_commit(msg, author)
+        return self.dispatch(
+            APIEndpointConst.SQUASH, self.conConfig.squash_url(), commit_object
+        )
 
     def clonedb(self, clone_source, newid):
         """Clone a remote repository and create a local copy.
@@ -900,9 +1128,7 @@ class WOQLClient:
             rc_args["author"] = self.conCapabilities.author()
         return rc_args
 
-    def dispatch(
-        self, action, url, payload=None, file_dict=None
-    ):  # don't use dict as default
+    def dispatch(self, action, url, payload=None, file_dict=None):
         """Directly dispatch to a TerminusDB database.
 
         Parameters
@@ -913,8 +1139,8 @@ class WOQLClient:
             The server URL to point the action at.
         payload : dict
             Payload to send to the server.
-        file_dict : list, optional
-            List of files to include in the query.
+        file_dict : dict, optional
+            Dict of files to include in the query.
 
         Returns
         -------
@@ -925,8 +1151,10 @@ class WOQLClient:
         # review the access control
         # self.conCapabilities.capabilitiesPermit(action)
         # url, action, payload={}, basic_auth, jwt=None, file_dict=None)
+
         if payload is None:
             payload = {}
+
         return DispatchRequest.send_request_by_action(
             url,
             action,
@@ -934,7 +1162,7 @@ class WOQLClient:
             self.basic_auth(),
             self.remote_auth(),
             file_dict,
-            self.cert,
+            self.insecure,
         )
 
     def get_database(self, dbid, account):

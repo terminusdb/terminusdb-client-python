@@ -26,7 +26,7 @@ def uri_encode_payload(payload):
     if isinstance(payload, dict):
         for key, value in payload.items():
             """
-                if dictionary inside dictionary
+            if dictionary inside dictionary
             """
             if isinstance(value, dict):
                 # for keyElement,valueElement in value.items():
@@ -41,7 +41,7 @@ def add_params_to_url(url, payload):
     if payload:
         params = uri_encode_payload(payload)
         if params:
-            url = "{}?{}".format(url, params)
+            url = f"{url}?{params}"
     return url
 
 
@@ -62,9 +62,9 @@ def add_namespaces_to_variables(variables):
 
 
 def empty(obj):
-    """ * is the object empty?
-     * returns true if the json object is empty
-     """
+    """* is the object empty?
+    * returns true if the json object is empty
+    """
     if not obj:
         # Assume if it has a length property with a non-zero value
         # that that property is correct.

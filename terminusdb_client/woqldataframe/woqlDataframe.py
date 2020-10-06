@@ -15,7 +15,7 @@ except ImportError:
 
 
 class EmptyException(Exception):
-    """ Exception inherited from the built-in Exception Class
+    """Exception inherited from the built-in Exception Class
 
     Parameters
     ----------
@@ -168,6 +168,7 @@ def type_map(ty_rdf):
         "http://www.w3.org/2001/XMLSchema#integer": np.int,
         "http://www.w3.org/2001/XMLSchema#dateTime": np.datetime64,
         "http://www.w3.org/2001/XMLSchema#decimal": np.double,
+        "http://www.w3.org/2001/XMLSchema#date": np.datetime64,
     }
     if ty_rdf in convert_mapping:
         return convert_mapping[ty_rdf]
@@ -206,7 +207,10 @@ def type_value_map(ty_rdf, value):
         return value
     elif ty_rdf == "http://www.w3.org/2001/XMLSchema#integer":
         return int(value)
-    elif ty_rdf == "http://www.w3.org/2001/XMLSchema#dateTime":
+    elif (
+        ty_rdf == "http://www.w3.org/2001/XMLSchema#dateTime"
+        or ty_rdf == "http://www.w3.org/2001/XMLSchema#date"
+    ):
         return np.datetime64(value)
     elif ty_rdf == "http://www.w3.org/2001/XMLSchema#decimal":
         return float(value)
@@ -215,7 +219,41 @@ def type_value_map(ty_rdf, value):
 
 
 def query_to_df(query):
-    """Convert a query to a data frame.
+    """DEPRECATED in 0.3.0: use result_to_df instead.
+
+    Converts result query binding to a pandas DataFrame. This only works for homogeneous query results
+
+    Parameters
+    ----------
+    query : dict
+            JSON of the result of the query
+
+    Returns
+    -------
+    pandas.DataFrame
+        The pandas DataFrame that is converted from the result.
+
+    Examples
+    --------
+    >>> result = {'bindings': [{
+    ...           'http://terminusdb.com/woql/variable/Product': {'@type': 'http://www.w3.org/2001/XMLSchema#string',
+    ...           '@value': 'STRAWBERRY CANDY'}
+    ...           }], "graphs": []}
+    >>> woql.query_to_df(result)
+                Product
+    0  STRAWBERRY CANDY
+
+    See Also
+    --------
+    WOQLQuery : create a WOQLQuery
+    WOQLClient : create a WOQLClient
+    """
+    warnings.warn("DEPRECATED in 0.3.0: use result_to_df instead.")
+    return result_to_df(query)
+
+
+def result_to_df(query):
+    """Convert a query result to a data frame.
 
     Converts result query binding to a pandas DataFrame. This only works for homogeneous query results
 

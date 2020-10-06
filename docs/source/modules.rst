@@ -7,4 +7,6 @@ TerminusDB Client
    woqlClient
    woqlQuery
    woqlLib
+   woqlView
    woqlDataframe
+   SmartQuery

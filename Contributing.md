@@ -1,6 +1,6 @@
-# Contributing to Terminus Client Python
+# Contributing to TerminusDB Client
 
-Thanks for interested to contribute to Terminus Client Python, to get started, fork this repo and follow the [instruction setting up dev environment](#setting-up-dev-environment). If you don't have idea where to start, you can look for [`good first issue`](https://github.com/terminusdb/terminus-client-python/contribute) or `help wanted` label at issues. All pull request should follow the [Pull Request Format Guideline](#pull-request-format-guideline) and pull request (PR) that involving coding should come with [tests](#writing-tests-and-testing) and [documentations](#writing-documentation). **All pull request should be made towards `dev` branch**
+Thanks for interested to contribute to TerminusDB Client, to get started, fork this repo and follow the [instruction setting up dev environment](#setting-up-dev-environment). If you don't have idea where to start, you can look for [`good first issue`](https://github.com/terminusdb/terminusdb-client/contribute) or `help wanted` label at issues. All pull request should follow the [Pull Request Format Guideline](#pull-request-format-guideline) and pull request (PR) that involving coding should come with [tests](#writing-tests-and-testing) and [documentations](#writing-documentation). **All pull request should be made towards `dev` branch**
 
 ## Setting up dev environment
 
@@ -16,13 +16,29 @@ To “editable” install the local Terminus Client Python:
 
 `pip3 install -e .`
 
+**to be able to run integration tests, local installation of docker is required**
+
 ## Writing tests and testing
 
 We are using [`pytest`](https://docs.pytest.org/en/latest/) for testing. All tests are stored in `/tests`
 
-To run the tests:
+To run the unittests without integration tests:
 
-`pytest tests/`
+`pytest terminusdb_client/tests/ --ignore=terminusdb_client/tests/integration_tests/`
+
+To run all tests including integration tests:
+
+`tox -e test`
+
+To run all checks and auto formating:
+
+`tox -e check`
+
+To run all tests and checks:
+
+`tox`
+
+**please make sure `tox` passes before making PR**
 
 ## Writing Documentation
 

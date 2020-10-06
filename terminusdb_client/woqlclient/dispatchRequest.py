@@ -1,4 +1,5 @@
 # from .errorMessage import ErrorMessage
+import json
 import warnings
 from base64 import b64encode
 
@@ -10,8 +11,8 @@ from .api_endpoint_const import APIEndpointConst
 from .errors import APIError
 
 
-def _verify_check(url):
-    if url[:17] == "https://127.0.0.1" or url[:7] == "http://":
+def _verify_check(url, insecure=False):
+    if url[:17] == "https://127.0.0.1" or url[:7] == "http://" or insecure:
         return False
     else:
         return True
@@ -22,40 +23,79 @@ class DispatchRequest:
         pass
 
     @staticmethod
-    def __get_call(url, headers, payload, cert=None):
+    def __get_call(url, headers, payload, insecure=False):
         url = utils.add_params_to_url(url, payload)
-        if not _verify_check(url):
+        if not _verify_check(url, insecure):
             warnings.simplefilter("ignore", InsecureRequestWarning)
-        result = requests.get(url, headers=headers, verify=_verify_check(url))
+        result = requests.get(url, headers=headers, verify=_verify_check(url, insecure))
         warnings.resetwarnings()
         return result
 
     @staticmethod
-    def __post_call(url, headers, payload, file_dict=None, cert=None):
-        if not _verify_check(url):
+    def __post_call(url, headers, payload, file_dict=None, insecure=False):
+        if not _verify_check(url, insecure):
             warnings.simplefilter("ignore", InsecureRequestWarning)
         if file_dict:
+            file_dict["payload"] = (
+                "payload",
+                json.dumps(payload),
+                "application/json",
+            )
+
             result = requests.post(
                 url,
-                json=payload,
                 headers=headers,
                 files=file_dict,
-                verify=_verify_check(url),
+                verify=_verify_check(url, insecure),
             )
+            # Close the files although request should do this :(
+            for key in file_dict:
+                (_, stream, _) = file_dict[key]
+                if type(stream) != str:
+                    stream.close()
         else:
             headers["content-type"] = "application/json"
             result = requests.post(
-                url, json=payload, headers=headers, verify=_verify_check(url)
+                url, json=payload, headers=headers, verify=_verify_check(url, insecure)
             )
         warnings.resetwarnings()
         return result
 
     @staticmethod
-    def __delete_call(url, headers, payload, cert=None):
-        url = utils.add_params_to_url(url, payload)
+    def __put_call(url, headers, payload, file_dict=None, insecure=None):
         if not _verify_check(url):
             warnings.simplefilter("ignore", InsecureRequestWarning)
-        result = requests.delete(url, headers=headers, verify=_verify_check(url))
+        if file_dict:
+            file_dict["payload"] = (
+                "payload",
+                json.dumps(payload),
+                "application/json",
+            )
+
+            result = requests.post(
+                url, headers=headers, files=file_dict, verify=_verify_check(url),
+            )
+            # Close the files although request should do this :(
+            for key in file_dict:
+                (_, stream, _) = file_dict[key]
+                if type(stream) != str:
+                    stream.close()
+        else:
+            headers["content-type"] = "application/json"
+            result = requests.put(
+                url, json=payload, headers=headers, verify=_verify_check(url, insecure)
+            )
+        warnings.resetwarnings()
+        return result
+
+    @staticmethod
+    def __delete_call(url, headers, payload, insecure=False):
+        url = utils.add_params_to_url(url, payload)
+        if not _verify_check(url, insecure):
+            warnings.simplefilter("ignore", InsecureRequestWarning)
+        result = requests.delete(
+            url, headers=headers, verify=_verify_check(url, insecure)
+        )
         warnings.resetwarnings()
         return result
 
@@ -89,7 +129,7 @@ class DispatchRequest:
         basic_auth=None,
         remote_auth=None,
         file_dict=None,
-        cert=None,
+        insecure=False,
     ):
 
         # payload default as empty dict is against PEP
@@ -104,21 +144,27 @@ class DispatchRequest:
 
             if action in [
                 APIEndpointConst.GET_TRIPLES,
+                APIEndpointConst.GET_CSV,
                 APIEndpointConst.CONNECT,
                 APIEndpointConst.CLASS_FRAME,
             ]:
-                request_response = cls.__get_call(url, headers, payload)
+                request_response = cls.__get_call(
+                    url, headers, payload, insecure=insecure
+                )
 
             elif action in [
                 APIEndpointConst.DELETE_DATABASE,
                 APIEndpointConst.DELETE_GRAPH,
             ]:
-                request_response = cls.__delete_call(url, headers, payload)
+                request_response = cls.__delete_call(
+                    url, headers, payload, insecure=insecure
+                )
 
             elif action in [
                 APIEndpointConst.WOQL_QUERY,
                 APIEndpointConst.CREATE_DATABASE,
                 APIEndpointConst.UPDATE_TRIPLES,
+                APIEndpointConst.UPDATE_CSV,
                 APIEndpointConst.CREATE_GRAPH,
                 APIEndpointConst.FETCH,
                 APIEndpointConst.PULL,
@@ -126,8 +172,21 @@ class DispatchRequest:
                 APIEndpointConst.REBASE,
                 APIEndpointConst.BRANCH,
                 APIEndpointConst.CLONE,
+                APIEndpointConst.RESET,
+                APIEndpointConst.OPTIMIZE,
+                APIEndpointConst.SQUASH,
             ]:
-                request_response = cls.__post_call(url, headers, payload, file_dict)
+                request_response = cls.__post_call(
+                    url, headers, payload, file_dict, insecure=insecure
+                )
+
+            elif action in [
+                APIEndpointConst.INSERT_TRIPLES,
+                APIEndpointConst.INSERT_CSV,
+            ]:
+                request_response = cls.__put_call(
+                    url, headers, payload, file_dict, insecure=insecure
+                )
 
             if request_response.status_code == 200:
                 # print("hellow ")

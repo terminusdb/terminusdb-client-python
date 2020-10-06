@@ -8,8 +8,8 @@ class ConnectionConfig:
     def __init__(self, server_url, **kwargs):
 
         """
-          client configuration options - connected_mode = true
-          tells the client to first connect to the server before invoking other services
+        client configuration options - connected_mode = true
+        tells the client to first connect to the server before invoking other services
         """
 
         self.__server = False
@@ -169,6 +169,20 @@ class ConnectionConfig:
             return self.db_base("frame")
         return self.branch_base("frame")
 
+    def csv_url(self, graph_type=None, graph_id=None):
+        if self.db == self.__system_db:
+            base_url = self.db_base("csv")
+        else:
+            base_url = self.branch_base("csv")
+
+        if graph_type:
+            if graph_id:
+                return f"{base_url}/{graph_type}/{graph_id}"
+            else:
+                return f"{base_url}/instance/{graph_id}"
+        else:
+            return base_url
+
     def triples_url(self, graph_type, graph_id="main"):
         if self.db == self.__system_db:
             base_url = self.db_base("triples")
@@ -180,7 +194,7 @@ class ConnectionConfig:
     def clone_url(self, new_repo_id=None):
         crl = f"{self.api}clone/{self.account}"
         if new_repo_id is not None:
-            crl = crl + f"/${new_repo_id}"
+            crl = crl + f"/{new_repo_id}"
         return crl
 
     def cloneable_url(self):
@@ -196,6 +210,15 @@ class ConnectionConfig:
 
     def rebase_url(self):
         return self.branch_base("rebase")
+
+    def reset_url(self):
+        return self.branch_base("reset")
+
+    def optimize_url(self, path):
+        return f"{self.api}optimize/{path}"
+
+    def squash_url(self):
+        return self.branch_base("squash")
 
     def push_url(self):
         return self.branch_base("push")

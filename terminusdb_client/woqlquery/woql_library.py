@@ -3,8 +3,7 @@ from .woql_query import WOQLQuery
 
 class WOQLLib:
 
-    """Patterns to help getting the most useful information from schema graphs
-    """
+    """Patterns to help getting the most useful information from schema graphs"""
 
     def __init__(self, mode=None):
         if mode is None:
@@ -22,7 +21,7 @@ class WOQLLib:
         self._masterdb_doc = "terminus://terminus/data"
         self._empty = ""
 
-    def classes(self, values, variables=None, schema_resource=None):
+    def classes(self, values=None, variables=None, schema_resource=None):
         """General Patten 1: Classes"""
         if schema_resource is not None:
             graph = schema_resource
@@ -129,7 +128,7 @@ class WOQLLib:
         )
         return self._add_constraints(qpattern, values)
 
-    def property(self, values, variables=None, schema_resource=None):
+    def property(self, values=None, variables=None, schema_resource=None):
         """General Pattern 2: Properties"""
         if schema_resource is not None:
             graph = schema_resource
@@ -146,7 +145,7 @@ class WOQLLib:
         ]
         if variables:
             self._set_user_variables(variables)
-        select_vars = self._get_varlist[:6]
+        select_vars = self._get_varlist()[:6]
         qpattern = (
             WOQLQuery()
             .select(*select_vars)
@@ -201,7 +200,7 @@ class WOQLLib:
         )
         return self._add_constraints(qpattern, values)
 
-    def graphs(self, values, variables=None, cresource=None):
+    def graphs(self, values=None, variables=None, cresource=None):
         """General Pattern 3: Graphs
         Retrieves information about the graphs in existence at any commit (and whether the commit is the head of a branch)"""
         if cresource is None:
@@ -257,7 +256,7 @@ class WOQLLib:
         compiled = self._add_constraints(woql, values)
         return WOQLQuery().using(cresource, compiled)
 
-    def branches(self, values, variables=None, cresource=None):
+    def branches(self, values=None, variables=None, cresource=None):
         """General Pattern 4: Retrieves Branches, Their ID, Head Commit ID, Head Commit Time
         (if present, new branches have no commits)"""
         if cresource is None:
@@ -288,7 +287,7 @@ class WOQLLib:
         compiled = self._add_constraints(woql, values)
         return WOQLQuery().using(cresource, compiled)
 
-    def objects(self, values, variables=None):
+    def objects(self, values=None, variables=None):
         """General Pattern 5: Objects - just a list of object ids and their types"""
         self._default_variables = ["Object Type", "Object ID"]
         if variables:
@@ -298,7 +297,7 @@ class WOQLLib:
         )
         return self._add_constraints(qpattern, values)
 
-    def property_values(self, values, variables=None):
+    def property_values(self, values=None, variables=None):
         """General Pattern 6: Full Object Properties"""
         self._default_variables = [
             "Object ID",
@@ -342,7 +341,7 @@ class WOQLLib:
 
         return self._add_constraints(qpattern, values)
 
-    def object_metadata(self, values, variables=None, schema_resource=None):
+    def object_metadata(self, values=None, variables=None, schema_resource=None):
         """General Pattern 7: Object Metadata"""
         if schema_resource is not None:
             graph = schema_resource
@@ -404,7 +403,7 @@ class WOQLLib:
         )
         return self._add_constraints(qpattern, values)
 
-    def property_metadata(self, values, variables=None, schema_resource=None):
+    def property_metadata(self, values=None, variables=None, schema_resource=None):
         """General Pattern 8: Value Metadata"""
         if schema_resource is not None:
             graph = schema_resource
@@ -452,7 +451,7 @@ class WOQLLib:
         )
         return self._add_constraints(qpattern, values)
 
-    def commits(self, values, variables=None, cresource=None):
+    def commits(self, values=None, variables=None, cresource=None):
         """General Pattern 9: Commits"""
         if cresource is None:
             cresource = self._default_commit_resource
@@ -545,7 +544,7 @@ class WOQLLib:
         compiled = self._add_constraints(qpattern, values)
         return WOQLQuery().using(cresource, compiled)
 
-    def commit_chain(self, values, variables=None, cresource=None):
+    def commit_chain(self, values=None, variables=None, cresource=None):
         """General Pattern 10: Commit Chain"""
         if cresource is None:
             cresource = self._default_commit_resource
@@ -601,7 +600,7 @@ class WOQLLib:
         compiled = self._add_constraints(woql, values)
         return WOQLQuery().using(cresource, compiled)
 
-    def dbs(self, values, variables=None):
+    def dbs(self, values=None, variables=None):
         """General Pattern 12: dbs"""
         self._default_variables = [
             "DB Name",
@@ -655,7 +654,7 @@ class WOQLLib:
         compiled = self._add_constraints(woql, values)
         return WOQLQuery().using(self.masterdb_resource, compiled)
 
-    def users(self, values, variables=None):
+    def users(self, values=None, variables=None):
         """General Pattern 13: users"""
         self._default_variables = [
             "User ID",
@@ -728,7 +727,7 @@ class WOQLLib:
         compiled = self._add_constraints(woql, values)
         return WOQLQuery().using(self.masterdb_resource, compiled)
 
-    def capabilities(self, values, variables=None):
+    def capabilities(self, values=None, variables=None):
         """General Pattern 14: capabilities"""
         self._default_variables = [
             "Capability Name",

@@ -1,4 +1,5 @@
 import copy
+import datetime as dt
 import json
 
 # import pprint
@@ -290,6 +291,10 @@ class WOQLQuery:
             if not target:
                 target = "xsd:boolean"
             obj["woql:datatype"] = self._jlt(user_obj, target)
+        elif isinstance(user_obj, dt.date):
+            if not target:
+                target = "xsd:dateTime"
+            obj["woql:datatype"] = self._jlt(user_obj.isoformat(), target)
         elif type(user_obj) == dict:
             if "@value" in user_obj:
                 obj["woql:datatype"] = user_obj
@@ -408,7 +413,7 @@ class WOQLQuery:
     def _vocabulary(self, vocab):
         self._vocab = vocab
 
-    def execute(self, client, commit_msg=None):
+    def execute(self, client, commit_msg=None, file_dict=None):
         """Executes the query using the passed client to connect to a server
 
         Parameters
@@ -417,11 +422,14 @@ class WOQLQuery:
             client that provide connection to the database for the query to execute.
         commit_msg: str
             optional, commit message for this query. Recommended for query that carrries an update.
+        file_dict:
+            File dictionary to be associated with post name => filename, for multipart POST
+
         """
         if commit_msg is None:
-            return client.query(self)
+            return client.query(self, file_dict=file_dict)
         else:
-            return client.query(self, commit_msg)
+            return client.query(self, commit_msg, file_dict=file_dict)
 
     def to_json(self):
         """Dumps the JSON-LD format of the query in a json string"""
@@ -594,11 +602,51 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:Select"
-        if not queries:
+        if queries != [] and not queries:
             return self._parameter_error(
                 "Select must be given a list of variable names"
             )
-        if hasattr(queries[-1], "to_dict"):
+        if queries == []:
+            embedquery = False
+        elif hasattr(queries[-1], "to_dict"):
+            embedquery = queries.pop()
+        else:
+            embedquery = False
+        self._cursor["woql:variable_list"] = []
+        for idx, item in enumerate(queries):
+            onevar = self._varj(item)
+            onevar["@type"] = "woql:VariableListElement"
+            onevar["woql:index"] = self._jlt(idx, "nonNegativeInteger")
+            self._cursor["woql:variable_list"].append(onevar)
+        return self._add_sub_query(embedquery)
+
+    def distinct(self, *args):
+        """Ensures that the solutions for the variables [V1...Vn] are distinct
+
+        Parameters
+        ----------
+        args
+            The variables to make distinct
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        """Select the set of variables that the result will return"""
+        queries = list(args)
+        if queries and queries[0] == "woql:args":
+            return ["woql:variable_list", "woql:query"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "woql:Distinct"
+        if queries != [] and not queries:
+            return self._parameter_error(
+                "Distinct must be given a list of variable names"
+            )
+        if queries == []:
+            embedquery = False
+        elif hasattr(queries[-1], "to_dict"):
             embedquery = queries.pop()
         else:
             embedquery = False
@@ -757,6 +805,64 @@ class WOQLQuery:
         self._cursor["woql:object"] = self._clean_object(obj)
         return self
 
+    def added_triple(self, sub, pred, obj, opt=False):
+        """Creates a triple pattern matching rule for the triple [S, P, O] (Subject, Predicate, Object) added to the current commit.
+
+        Parameters
+        ----------
+        sub : str
+            Subject
+        pred : str
+            Predicate
+        obj : str
+            Object
+        opt : bool
+            weather or not this triple is optional, default to be False
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if opt:
+            return self.opt().triple(sub, pred, obj)
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "woql:AddedTriple"
+        self._cursor["woql:subject"] = self._clean_subject(sub)
+        self._cursor["woql:predicate"] = self._clean_predicate(pred)
+        self._cursor["woql:object"] = self._clean_object(obj)
+        return self
+
+    def removed_triple(self, sub, pred, obj, opt=False):
+        """Creates a triple pattern matching rule for the triple [S, P, O] (Subject, Predicate, Object) added to the current commit.
+
+        Parameters
+        ----------
+        sub : str
+            Subject
+        pred : str
+            Predicate
+        obj : str
+            Object
+        opt : bool
+            weather or not this triple is optional, default to be False
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if opt:
+            return self.opt().triple(sub, pred, obj)
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "woql:RemovedTriple"
+        self._cursor["woql:subject"] = self._clean_subject(sub)
+        self._cursor["woql:predicate"] = self._clean_predicate(pred)
+        self._cursor["woql:object"] = self._clean_object(obj)
+        return self
+
     def quad(self, sub, pred, obj, graph, opt=False):
         """Creates a pattern matching rule for the quad [S, P, O, G] (Subject, Predicate, Object, Graph)
 
@@ -793,6 +899,78 @@ class WOQLQuery:
         self._cursor["woql:graph_filter"] = self._clean_graph(graph)
         return self
 
+    def added_quad(self, sub, pred, obj, graph, opt=False):
+        """Creates a pattern matching rule for the quad [S, P, O, G] (Subject, Predicate, Object, Graph) added to the current commit.
+
+        Parameters
+        ----------
+        sub : str
+            Subject
+        pre : str
+            Predicate
+        obj : str
+            Object
+        gra : str
+            Graph
+        opt : bool
+            weather or not this quad is optional, default to be False
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if opt:
+            return self.opt().quad(sub, pred, obj, graph)
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        arguments = self.triple(sub, pred, obj)
+        if sub and sub == "woql:args":
+            return arguments.append("woql:graph_filter")
+        if not graph:
+            return self._parameter_error(
+                "Quad takes four parameters, the last should be a graph filter"
+            )
+        self._cursor["@type"] = "woql:AddedQuad"
+        self._cursor["woql:graph_filter"] = self._clean_graph(graph)
+        return self
+
+    def removed_quad(self, sub, pred, obj, graph, opt=False):
+        """Creates a pattern matching rule for the quad [S, P, O, G] (Subject, Predicate, Object, Graph) added to the current commit.
+
+        Parameters
+        ----------
+        sub : str
+            Subject
+        pre : str
+            Predicate
+        obj : str
+            Object
+        gra : str
+            Graph
+        opt : bool
+            weather or not this quad is optional, default to be False
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if opt:
+            return self.opt().quad(sub, pred, obj, graph)
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        arguments = self.triple(sub, pred, obj)
+        if sub and sub == "woql:args":
+            return arguments.append("woql:graph_filter")
+        if not graph:
+            return self._parameter_error(
+                "Quad takes four parameters, the last should be a graph filter"
+            )
+        self._cursor["@type"] = "woql:RemovedQuad"
+        self._cursor["woql:graph_filter"] = self._clean_graph(graph)
+        return self
+
     def string(self, input_str):
         return {"@type": "xsd:string", "@value": input_str}
 
@@ -801,6 +979,14 @@ class WOQLQuery:
             return {"@type": "xsd:boolean", "@value": True}
         else:
             return {"@type": "xsd:boolean", "@value": False}
+
+    def datetime(self, input_obj):
+        if isinstance(input_obj, dt.date):
+            return {"@type": "xsd:dateTime", "@value": input_obj.isoformat()}
+        elif isinstance(input_obj, str):
+            return {"@type": "xsd:dateTime", "@value": input_obj}
+        else:
+            raise ValueError("Input need to be either string or a datetime object.")
 
     def literal(self, input_val, input_type):
         if ":" not in input_type:
@@ -910,7 +1096,7 @@ class WOQLQuery:
         self._cursor["woql:document_uri"] = json_or_iri
         return self._updated()
 
-    def read_object(self, iri, output_var, out_format):
+    def read_object(self, iri, output_var):
         if iri and iri == "woql:args":
             return ["woql:document"]
         if self._cursor.get("@type"):
@@ -918,7 +1104,7 @@ class WOQLQuery:
         self._cursor["@type"] = "woql:ReadObject"
         self._cursor["woql:document_uri"] = iri
         self._cursor["woql:document"] = self._expand_variable(output_var)
-        return self._wfrom(out_format)
+        return self
 
     def get(self, as_vars, query_resource=None):
         """Takes an as structure"""
@@ -1054,7 +1240,7 @@ class WOQLQuery:
         self._cursor["woql:remote_uri"] = {"@type": "xsd:anyURI", "@value": uri}
         return self._wfrom(opts)
 
-    def post(self, fpath, opts):
+    def post(self, fpath, opts=None):
         if fpath and fpath == "woql:args":
             return ["woql:file", "woql:format"]
         if self._cursor.get("@type"):
@@ -1935,13 +2121,53 @@ class WOQLQuery:
         Returns
         ----------
         WOQLQuery object
-            query object that can be chained and/or execute
+            query object that can be chained and/or executed
         """
         if query and query == "woql:args":
             return ["woql:query"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:Not"
+        return self._add_sub_query(query)
+
+    def immediately(self, query=None):
+        """Immediately runs side-effects without backtracking
+
+        Parameters
+        ----------
+        query : WOQLQuery object, optional
+
+        Returns
+        ----------
+        WOQLQuery object
+            query object that can be chained and/or executed
+        """
+        if query and query == "woql:args":
+            return ["woql:query"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "woql:Immediately"
+        return self._add_sub_query(query)
+
+    def count(self, countvar, query=None):
+        """Counds the number of solutions in the given query
+
+        Parameters
+        ----------
+        result : A variable or non-negative integer with the count
+        query : The query from which to count the number of results
+
+        Returns
+        ----------
+        WOQLQuery object
+           query object that can be chained and/or executed
+        """
+        if countvar and countvar == "woql:args":
+            return ["woql:count", "woql:query"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "woql:Count"
+        self._cursor["woql:count"] = self._clean_object(countvar)
         return self._add_sub_query(query)
 
     def cast(self, val, user_type, result):
@@ -2107,6 +2333,20 @@ class WOQLQuery:
         return self._add_sub_query(groupquery)
 
     def true(self, subject, pattern, obj, path):
+        if subject and subject == "woql:args":
+            return ["woql:subject", "woql:path_pattern", "woql:object", "woql:path"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "woql:Path"
+        self._cursor["woql:subject"] = self._clean_subject(subject)
+        if type(pattern) == str:
+            pattern = self._compile_path_pattern(pattern)
+        self._cursor["woql:path_pattern"] = pattern
+        self._cursor["woql:object"] = self._clean_object(obj)
+        self._cursor["woql:path"] = self._varj(path)
+        return self
+
+    def path(self, subject, pattern, obj, path):
         if subject and subject == "woql:args":
             return ["woql:subject", "woql:path_pattern", "woql:object", "woql:path"]
         if self._cursor.get("@type"):
@@ -2639,8 +2879,7 @@ class WOQLQuery:
         return self
 
     def insert_class_data(self, data, ref_graph):
-        """Adds a bunch of class data in one go
-        """
+        """Adds a bunch of class data in one go"""
         if data.get("id"):
             self.add_class(data["id"], ref_graph)
             if data.get("label"):

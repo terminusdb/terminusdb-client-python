@@ -13,9 +13,11 @@ bumpversion = "*"
 sphinx = "*"
 sphinx_rtd_theme = "*"
 sphinxcontrib-napoleon = "*"
+sphinx_autodoc_typehints = "*"
 pandas = "*"
 tox = "*"
 interrogate = "*"
+docker-compose = "*"
 
 [packages]
 requests = "*"

@@ -1,4 +1,25 @@
-# TerminusDB Client Release Notes
+# TerminusDB Python Client Release Notes
+
+## v0.4.0
+
+### New
+
+- Added WOQLView
+- Added csv io methods in WOQLClient
+
+### Bug Fixes / Improvements
+
+- Warning for using WOQLDataFrame.query_to_df()
+- WOQLDataFrame now can handle "xsd:date" datatype from TerminusDB
+- Automatically csting datetime.date and datetime.datetime object as "xsd:dateTime" when added to TerminusDB
+
+---
+
+## v0.3.1
+
+### Bug Fixes / Improvements
+
+ - Patch import error
 
 ## v0.3.0
 
@@ -7,12 +28,17 @@
 - Updated create database to take advantage of default prefixes and schema graph creation happening on server
 - Integrated all Revision Control API operations fully
 - .vars() method - add v: to woql variables
+- Reset allowing you to reset a branch to an arbitrary commit
+- Post method for CSV uploads
+- Triple endpoint for inserting turtle data directly to a graph
+- Count triples functionality added
+- [beta] Smart Query which creates and checks all the classes and object in Python
 
 ### Bug Fixes / Improvements
 
 - Added 3 varities of ordering specification as optional arguments to order_by
 - fixed bug to make order_by("desc") work
-
+- Empty selects no longe error
 
 ---
 ## v0.2.2
