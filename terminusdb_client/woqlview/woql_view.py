@@ -1,4 +1,5 @@
 from __future__ import annotations
+from numbers import Number
 import json
 import warnings
 
@@ -34,11 +35,11 @@ class WOQLView:
         self.config += f"woqlGraphConfig.edges({arguments});\n"
         return self
 
-    def height(self, height_input) -> WOQLView:
+    def height(self, height_input: Number) -> WOQLView:
         self.config += f"woqlGraphConfig.height({height_input});\n"
         return self
 
-    def width(self, width_input) -> WOQLView:
+    def width(self, width_input: Number) -> WOQLView:
         self.config += f"woqlGraphConfig.width({width_input});\n"
         return self
 
@@ -68,13 +69,13 @@ class WOQLView:
         self.config += self.obj + f'.text("{input_text}");\n'
         return self
 
-    def distance(self, input_distance):
+    def distance(self, input_distance: Number):
         if self.obj is None:
             raise SyntaxError("distance() should be used following a node() or edge()")
         self.config += self.obj + f".distance({input_distance});\n"
         return self
 
-    def weight(self, input_weight) -> WOQLView:
+    def weight(self, input_weight: Number) -> WOQLView:
         if self.obj is None:
             raise SyntaxError("weight() should be used following a node() or edge()")
         self.config += self.obj + f".weight({input_weight});\n"
@@ -101,13 +102,13 @@ class WOQLView:
         self.config += self.obj + f".icon({json.dumps(input_dict)});\n"
         return self
 
-    def size(self, input_size) -> WOQLView:
+    def size(self, input_size: Number) -> WOQLView:
         if self.obj is None:
             raise SyntaxError("size() should be used following a node() or edge()")
         self.config += self.obj + f".size({input_size});\n"
         return self
 
-    def collision_radius(self, input_radius) -> WOQLView:
+    def collision_radius(self, input_radius: Number) -> WOQLView:
         if self.obj is None:
             raise SyntaxError(
                 "collision_radius() should be used following a node() or edge()"
@@ -115,20 +116,20 @@ class WOQLView:
         self.config += self.obj + f".collisionRadius({input_radius});\n"
         return self
 
-    def hidden(self, input_choice) -> WOQLView:
+    def hidden(self, input_choice: bool) -> WOQLView:
         if input_choice:
             self.config += self.obj + ".hidden(true);\n"
         else:
             self.config += self.obj + ".hidden(false);\n"
         return self
 
-    def charge(self, input_charge) -> WOQLView:
+    def charge(self, input_charge: Number) -> WOQLView:
         if self.obj is None:
             raise SyntaxError("charge(() should be used following a node() or edge()")
         self.config += self.obj + f".charge({input_charge});\n"
         return self
 
-    def of(self, input_obj) -> WOQLView:
+    def of(self, input_obj: str) -> WOQLView:
         if self.obj is None:
             raise SyntaxError("in() should be used following a node() or edge()")
         self.obj += f'.in("{input_obj}")'
