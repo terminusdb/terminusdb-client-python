@@ -70,7 +70,7 @@ class ConnectionCapabilities:
 
     def _databases_from_dbdocs(self):
         dbs = []
-        for docid in self.dbdocs():
+        for docid in self.dbdocs:
             if not self.dbdocs[docid]["system"]:
                 dbs.append(self._get_db_rec(self.dbdocs[docid]))
         return dbs
@@ -239,8 +239,8 @@ class ConnectionCapabilities:
         return urec
 
     def _extract_database_organizations(self):
-        for docid in self.dbdocs():
-            for odocid in self.orgdocs():
+        for docid in self.dbdocs:
+            for odocid in self.orgdocs:
                 dbs = self.orgdocs[odocid].get("databases")
                 if dbs is not None and docid in dbs:
                     self.dbdocs[docid]["organization"] = self.orgdocs[odocid]["id"]
