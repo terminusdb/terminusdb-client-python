@@ -482,7 +482,7 @@ class WOQLQuery:
     def _compile_path_pattern(self, pat):
         """Turns a textual path pattern into a JSON-LD description"""
         toks = _tokenize(pat)
-        if toks and toks:
+        if toks:
             return _tokens_to_json(toks, self)
         else:
             self._parameter_error("Pattern error - could not be parsed " + pat)
