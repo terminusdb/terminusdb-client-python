@@ -1,4 +1,8 @@
-from __future__ import annotations
+import sys
+if sys.version_info[0]==3 and sys.version_info[1]>7:
+    from __future__ import annotations
+else:
+    WOQLView = 'WOQLView'
 from numbers import Number
 import json
 import warnings
