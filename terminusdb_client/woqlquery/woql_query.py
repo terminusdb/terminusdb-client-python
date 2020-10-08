@@ -2264,8 +2264,6 @@ class WOQLQuery:
         self._cursor["woql:value"] = self._clean_object(value)
         self._cursor["woql:type"] = self._clean_object(vtype)
         return self
-}
-
 
     def order_by(self, *args, order="asc"):
         """
@@ -2362,8 +2360,7 @@ class WOQLQuery:
         gvarlist : list or dict or WOQLQuery object
             list of variables to group
         groupedvar : list or str
-            grouping variable(s)
-        groupquery : WOQLQuery object
+            grouping template variable(s)
         output : str, optional
             output variable
         groupquery : dict, optional
@@ -2374,12 +2371,7 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         if gvarlist and gvarlist == "woql:args":
-            return [
-                "woql:variable_list",
-                "woql:group_var",
-                "woql:grouped",
-                "woql:query",
-            ]
+            return ['woql:group_by', 'woql:group_template', 'woql:grouped', 'woql:query']
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:GroupBy"
@@ -2391,14 +2383,15 @@ class WOQLQuery:
             onevar["@type"] = "woql:VariableListElement"
             onevar["woql:index"] = self._jlt(idx, "nonNegativeInteger")
             self._cursor["woql:group_by"].append(onevar)
-        self._cursor["woql:group_template"] = []
         if type(groupedvar) == str:
-            groupedvar = [groupedvar]
-        for idx, item in enumerate(groupedvar):
-            onevar = self._varj(item)
-            onevar["@type"] = "woql:VariableListElement"
-            onevar["woql:index"] = self._jlt(idx, "nonNegativeInteger")
-            self._cursor["woql:group_template"].append(onevar)
+            self._cursor["woql:group_template"] = self._varj(groupedvar)
+        else: 
+            self._cursor["woql:group_template"] = []
+            for idx, item in enumerate(groupedvar):
+                onevar = self._varj(item)
+                onevar["@type"] = "woql:VariableListElement"
+                onevar["woql:index"] = self._jlt(idx, "nonNegativeInteger")
+                self._cursor["woql:group_template"].append(onevar)
         self._cursor["woql:grouped"] = self._varj(output)
         return self._add_sub_query(groupquery)
 
@@ -3158,11 +3151,10 @@ class WOQLQuery:
             WOQLQuery().woql_not().node("v:Cid").abstract(graph),
             WOQLQuery().woql_and(*idgens),
             WOQLQuery().quad("v:Cid", "label", "v:Label", graph),
-            WOQLQuery().concat("Box Class generated for class v:Cid", "v:CDesc", graph),
+            WOQLQuery().concat("Box Class generated for class v:Cid", "v:CDesc"),
             WOQLQuery().concat(
                 "Box Property generated to link box v:ClassID to class v:Cid",
-                "v:PDesc",
-                graph,
+                "v:PDesc"                
             ),
         )
         if len(subs):
