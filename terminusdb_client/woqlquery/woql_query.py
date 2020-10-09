@@ -1251,6 +1251,25 @@ class WOQLQuery:
         self._cursor["woql:file"] = fpath
         return self._wfrom(opts)
 
+    def once(self, query=None):
+        """Obtains only one result from subquery
+
+        Parameters
+        ----------
+        query : WOQLQuery object, optional
+
+        Returns
+        ----------
+        WOQLQuery object
+            query object that can be chained and/or executed
+        """
+        if query and query == "woql:args":
+            return ["woql:query"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "woql:Once"
+        return self._add_sub_query(query)
+
     def remote(self, uri, opts=None):
         """Provides details of a remote data source in a JSON format that includes a URL property
 
