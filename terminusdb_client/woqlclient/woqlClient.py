@@ -707,19 +707,20 @@ class WOQLClient:
         stream.close()
         return result
 
-    def update_csv(self, csv_paths, commit_msg=None, graph_type=None, graph_id=None):
-        """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
+    def update_csv(self, csv_paths, commit_msg, graph_type = None, graph_id = None):
+        """Updates the contents of the specified path with a csv, creating the appropriate
+        diff object as the commit.
 
         Parameters
         ----------
+        csv_paths : str or list
+            CSV or list of csvs to upload
+        commit_msg : str
+            Commit message.
         graph_type : str
             Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
         graph_id : str
             Graph identifier.
-        turtle
-            Valid set of triples in Turtle format.
-        commit_msg : str
-            Commit message.
 
         Returns
         -------
@@ -744,13 +745,13 @@ class WOQLClient:
             file_dict=file_dict,
         )
 
-    def insert_csv(self, csv_paths, commit_msg=None, graph_type=None, graph_id=None):
-        """Inserts into the specified graph with the triples encoded in turtle format.
+    def insert_csv(self, csv_paths, commit_msg, graph_type = None, graph_id = None):
+        """Inserts a csv into the specified path
 
         Parameters
         ----------
-        csv_paths
-            csv path or list of csv paths to load. (required)
+        csv_paths : str or list
+            CSV or list of csvs to upload
         commit_msg : str
             Commit message.
         graph_type : str
