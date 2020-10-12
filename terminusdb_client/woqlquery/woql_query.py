@@ -1403,6 +1403,18 @@ class WOQLQuery:
         self._cursor["@type"] = "woql:AddTriple"
         return self._updated()
 
+    def update_triple(self, subject, predicate, new_object):
+        return self.woql_and(
+            WOQLQuery().opt(
+                WOQLQuery()
+                .triple(subject, predicate, "v:AnyObject")
+                .delete_triple(subject, predicate, "v:AnyObject")
+                .woql_not()
+                .triple(subject, predicate, new_object)
+            ),
+            WOQLQuery().add_triple(subject, predicate, new_object),
+        )
+
     def delete_quad(self, subject, predicate, object_or_literal, graph=None):
         """Deletes any quads that match the rule [subject, predicate, object, graph]
 
@@ -1466,6 +1478,18 @@ class WOQLQuery:
         self._cursor["@type"] = "woql:AddQuad"
         self._cursor["woql:graph"] = self._clean_graph(graph)
         return self._updated()
+
+    def update_quad(self, subject, predicate, new_object, graph):
+        return self.woql_and(
+            WOQLQuery().opt(
+                WOQLQuery()
+                .quad(subject, predicate, "v:AnyObject", graph)
+                .delete_quad(subject, predicate, "v:AnyObject", graph)
+                .woql_not()
+                .quad(subject, predicate, new_object, graph)
+            ),
+            WOQLQuery().add_quad(subject, predicate, new_object, graph),
+        )
 
     def when(self, query, consequent=None):
         """When the sub-query in Condition is met, the Update query is executed
@@ -2398,7 +2422,12 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         if gvarlist and gvarlist == "woql:args":
-            return ['woql:group_by', 'woql:group_template', 'woql:grouped', 'woql:query']
+            return [
+                "woql:group_by",
+                "woql:group_template",
+                "woql:grouped",
+                "woql:query",
+            ]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:GroupBy"
@@ -2412,7 +2441,7 @@ class WOQLQuery:
             self._cursor["woql:group_by"].append(onevar)
         if type(groupedvar) == str:
             self._cursor["woql:group_template"] = self._varj(groupedvar)
-        else: 
+        else:
             self._cursor["woql:group_template"] = []
             for idx, item in enumerate(groupedvar):
                 onevar = self._varj(item)
@@ -3180,8 +3209,7 @@ class WOQLQuery:
             WOQLQuery().quad("v:Cid", "label", "v:Label", graph),
             WOQLQuery().concat("Box Class generated for class v:Cid", "v:CDesc"),
             WOQLQuery().concat(
-                "Box Property generated to link box v:ClassID to class v:Cid",
-                "v:PDesc"                
+                "Box Property generated to link box v:ClassID to class v:Cid", "v:PDesc"
             ),
         )
         if subs:

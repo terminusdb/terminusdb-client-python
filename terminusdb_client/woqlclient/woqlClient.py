@@ -707,7 +707,7 @@ class WOQLClient:
         stream.close()
         return result
 
-    def update_csv(self, csv_paths, commit_msg, graph_type = None, graph_id = None):
+    def update_csv(self, csv_paths, commit_msg, graph_type=None, graph_id=None):
         """Updates the contents of the specified path with a csv, creating the appropriate
         diff object as the commit.
 
@@ -745,7 +745,7 @@ class WOQLClient:
             file_dict=file_dict,
         )
 
-    def insert_csv(self, csv_paths, commit_msg, graph_type = None, graph_id = None):
+    def insert_csv(self, csv_paths, commit_msg, graph_type=None, graph_id=None):
         """Inserts a csv into the specified path
 
         Parameters
