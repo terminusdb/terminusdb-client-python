@@ -578,6 +578,7 @@ class WOQLQuery:
                 "The first parameter to using must be a Collection ID (string)"
             )
         self._cursor["woql:collection"] = self._jlt(collection)
+        self._cursor["@context"] = "/api/prefixes/" + collection
         return self._add_sub_query(subq)
 
     def comment(self, comment, subq=None):
