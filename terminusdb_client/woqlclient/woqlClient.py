@@ -75,7 +75,7 @@ class WOQLClient:
         self.conCapabilities.set_capabilities(json_obj)
         return json_obj
 
-    def copy(self) -> WOQLClient:
+    def copy(self) -> "WOQLClient":
         """Create a deep copy of this client.
 
         Returns
