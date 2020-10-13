@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import Dict, List, Union
 from urllib.parse import quote
 
-from ..woqlclient import WOQLClient
 from .woql_library import WOQLLib
 from .woql_query import WOQLQuery
 
@@ -405,6 +404,8 @@ class TerminusDB:
             Configuration options used to construct a :class:`ConnectionConfig` instance.
             Passing insecure=True will skip HTTPS certificate checking.
         """
+
+        from ..woqlclient import WOQLClient
 
         self._client = WOQLClient(server_url, **kwargs)
         self._client.connect(key=key, account=account, user=user)

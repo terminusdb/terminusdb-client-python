@@ -5,14 +5,12 @@ import os
 from typing import Any, BinaryIO, Dict, List, Optional, Tuple, Union
 
 from ..__version__ import __version__
+from ..woqlquery.woql_query import WOQLQuery
 from .api_endpoint_const import APIEndpointConst
 from .connectionCapabilities import ConnectionCapabilities
-
 # from .errorMessage import *
 from .connectionConfig import ConnectionConfig
 from .dispatchRequest import DispatchRequest
-
-from ..woqlquery.woql_query import WOQLQuery
 
 # from .errors import (InvalidURIError)
 # from .errors import doc, opts
@@ -842,11 +840,14 @@ class WOQLClient:
             query_obj = self._generate_commit(commit_msg)
         else:
             query_obj = {}
+
         if isinstance(woql_query, WOQLQuery):
             request_woql_query = woql_query.to_dict()
-        request_woql_query["@context"] = self.conCapabilities.get_context_for_outbound_query(
-            None, self.db()
-        )
+        else:
+            request_woql_query = woql_query
+        request_woql_query[
+            "@context"
+        ] = self.conCapabilities.get_context_for_outbound_query(None, self.db())
         query_obj["query"] = request_woql_query
         request_file_dict: Optional[Dict[str, Tuple[str, Union[str, BinaryIO], str]]]
         if file_dict is not None and type(file_dict) == dict:
