@@ -926,9 +926,15 @@ class WOQLClient:
         >>> client.pull({"remote": "<remote>", "remote_branch": "<branch>"})
         """
         rc_args = self._prepare_revision_control_args(remote_source_repo)
-        if rc_args and rc_args.get("remote") and rc_args.get("remote_branch"):  # type: ignore
+        if (
+            rc_args is not None
+            and rc_args.get("remote")
+            and rc_args.get("remote_branch")
+        ):
             return self.dispatch(
-                APIEndpointConst.PULL, self.conConfig.pull_url(), rc_args  # type: ignore
+                APIEndpointConst.PULL,
+                self.conConfig.pull_url(),
+                rc_args,
             )
         else:
             raise ValueError(
@@ -951,9 +957,13 @@ class WOQLClient:
         >>> WOQLClient(server="http://localhost:6363").push({remote: "origin", "remote_branch": "main", "author": "admin", "message": "message"})
         """
         rc_args = self._prepare_revision_control_args(remote_target_repo)
-        if rc_args and rc_args.get("remote") and rc_args.get("remote_branch"):  # type: ignore
+        if (
+            rc_args is not None
+            and rc_args.get("remote")
+            and rc_args.get("remote_branch")
+        ):
             return self.dispatch(
-                APIEndpointConst.PUSH, self.conConfig.push_url(), rc_args  # type: ignore
+                APIEndpointConst.PUSH, self.conConfig.push_url(), rc_args
             )
         else:
             raise ValueError(
@@ -987,7 +997,7 @@ class WOQLClient:
         >>> client.rebase({"rebase_from": "<branch>"})
         """
         rc_args = self._prepare_revision_control_args(rebase_source)
-        if rc_args and rc_args.get("rebase_from"):
+        if rc_args is not None and rc_args.get("rebase_from"):
             return self.dispatch(
                 APIEndpointConst.REBASE, self.conConfig.rebase_url(), rc_args
             )
@@ -1107,7 +1117,7 @@ class WOQLClient:
         >>> client.clonedb({"remote_url": "<remote_url>"}, "<newid>")
         """
         rc_args = self._prepare_revision_control_args(clone_source)
-        if rc_args and rc_args.get("remote_url"):
+        if rc_args is not None and rc_args.get("remote_url"):
             return self.dispatch(
                 APIEndpointConst.CLONE, self.conConfig.clone_url(newid), rc_args
             )
@@ -1147,7 +1157,7 @@ class WOQLClient:
 
     def _prepare_revision_control_args(
         self, rc_args: Optional[dict] = None
-    ) -> Union[bool, dict]:
+    ) -> Optional[dict]:
         """Ensure the ``"author"`` field in the specified argument dict is set.
         If ``"author"`` is not in ``rc_args``, the current author value will be set.
 
@@ -1158,11 +1168,11 @@ class WOQLClient:
 
         Returns
         -------
-        dict or bool
-            ``False`` if ``rc_args`` is not provided, otherwise the modified ``rc_args``.
+        dict, optional
+            ``None`` if ``rc_args`` is not provided, otherwise the modified ``rc_args``.
         """
         if rc_args is None:
-            return False
+            return None
         if not rc_args.get("author"):
             rc_args["author"] = self.conCapabilities.author()
         return rc_args
