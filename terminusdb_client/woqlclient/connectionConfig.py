@@ -82,21 +82,82 @@ class ConnectionConfig:
     def db(self):
         return self.__dbid
 
+    @db.setter
+    def db(self, input_str):
+        if input_str is None:
+            self.__dbid = False
+            return None
+        parser = IDParser()
+        dbid = parser.parse_dbid(input_str)
+        if dbid:
+            self.__dbid = dbid
+        else:
+            raise ValueError(f"Invalid Database ID: {input_str}")
+
     @property
     def branch(self):
         return self.__branchid
+
+    @branch.setter
+    def branch(self, input_str):
+        if input_str is None:
+            self.__branchid = self.__default_branch_id
+            return None
+        parser = IDParser()
+        bid = parser.parse_dbid(input_str)
+        if bid:
+            self.__branchid = bid
+        else:
+            raise ValueError(f"Invalid Branch ID: {input_str}")
 
     @property
     def ref(self):
         return self.__refid
 
+    # None value is a possible value, in this case we set redid to false
+    @ref.setter
+    def ref(self, input_str):
+        if input_str is not None:
+            parser = IDParser()
+            bid = parser.parse_dbid(input_str)
+            if bid:
+                self.__refid = bid
+            else:
+                raise ValueError(f"Invalid ref ID: {input_str}")
+        else:
+            self.__refid = False
+
     @property
     def account(self):
         return self.__accountid
 
+    @account.setter
+    def account(self, input_str):
+        if input_str is None:
+            self.__accountid = False
+            return None
+        parser = IDParser()
+        aid = parser.parse_dbid(input_str)
+        if aid:
+            self.__accountid = aid
+        else:
+            raise ValueError(f"Invalid Account ID: {input_str}")
+
     @property
     def repo(self):
         return self.__repoid
+
+    @repo.setter
+    def repo(self, input_str):
+        if input_str is None:
+            self.__repoid = self.__default_repo_id
+            return None
+        parser = IDParser()
+        repoid = parser.parse_dbid(input_str)
+        if repoid:
+            self.__repoid = repoid
+        else:
+            raise ValueError(f"Invalid Repo ID: {input_str}")
 
     @property
     def basic_auth(self):
@@ -241,54 +302,6 @@ class ConnectionConfig:
         self.__dbid = False
         self.__refid = False
 
-    @account.setter
-    def account(self, input_str):
-        if input_str is None:
-            self.__accountid = False
-            return None
-        parser = IDParser()
-        aid = parser.parse_dbid(input_str)
-        if aid:
-            self.__accountid = aid
-        else:
-            raise ValueError(f"Invalid Account ID: {input_str}")
-
-    @db.setter
-    def db(self, input_str):
-        if input_str is None:
-            self.__dbid = False
-            return None
-        parser = IDParser()
-        dbid = parser.parse_dbid(input_str)
-        if dbid:
-            self.__dbid = dbid
-        else:
-            raise ValueError(f"Invalid Database ID: {input_str}")
-
-    @repo.setter
-    def repo(self, input_str):
-        if input_str is None:
-            self.__repoid = self.__default_repo_id
-            return None
-        parser = IDParser()
-        repoid = parser.parse_dbid(input_str)
-        if repoid:
-            self.__repoid = repoid
-        else:
-            raise ValueError(f"Invalid Repo ID: {input_str}")
-
-    @branch.setter
-    def branch(self, input_str):
-        if input_str is None:
-            self.__branchid = self.__default_branch_id
-            return None
-        parser = IDParser()
-        bid = parser.parse_dbid(input_str)
-        if bid:
-            self.__branchid = bid
-        else:
-            raise ValueError(f"Invalid Branch ID: {input_str}")
-
     def set_basic_auth(self, api_key=None, user_id="admin"):
         if api_key is None:
             self.__basic_auth = False
@@ -300,19 +313,6 @@ class ConnectionConfig:
                 self.__basic_auth = f"{user_id}:{api_key}"
             else:
                 raise ValueError(f"Invalid API Key: {api_key}")
-
-    # None value is a possible value, in this case we set redid to false
-    @ref.setter
-    def ref(self, input_str):
-        if input_str is not None:
-            parser = IDParser()
-            bid = parser.parse_dbid(input_str)
-            if bid:
-                self.__refid = bid
-            else:
-                raise ValueError(f"Invalid ref ID: {input_str}")
-        else:
-            self.__refid = False
 
     def set_remote_auth(self, auth_dict=None):
         self._remote_auth = auth_dict
