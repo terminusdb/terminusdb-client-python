@@ -594,7 +594,7 @@ a terminus:Database document to the Terminus Server.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>dbid</strong> (<em>str</em>) – Unique identifier of the database.</p></li>
-<li><p><strong>accountid</strong> (<em>str</em>) – ID of the organization in which to create the DB (defaults to ‘admin’)</p></li>
+<li><p><strong>accountid</strong> (<em>str</em><em>, </em><em>optional</em>) – ID of the organization in which to create the DB (defaults to ‘admin’)</p></li>
 <li><p><strong>label</strong> (<em>str</em><em>, </em><em>optional</em>) – Database name.</p></li>
 <li><p><strong>description</strong> (<em>str</em><em>, </em><em>optional</em>) – Database description.</p></li>
 <li><p><strong>prefixes</strong> (<em>dict</em><em>, </em><em>optional</em>) – <p>Optional dict containing <code class="docutils literal notranslate"><span class="pre">&quot;doc&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;scm&quot;</span></code> keys.</p>
@@ -633,6 +633,7 @@ and the new value will be used in future requests to the server.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>dbid</strong> (<em>str</em>) – ID of the database to delete</p></li>
 <li><p><strong>accountid</strong> (<em>str</em><em>, </em><em>optional</em>) – the account id in which the database resides (defaults to “admin”)</p></li>
+<li><p><strong>force</strong> (<em>bool</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -772,7 +773,7 @@ and the new value will be used in future requests to the server.</p>
 <li><p><strong>csv_name</strong> (<em>str</em>) – Name of csv to dump from the specified database to extract.</p></li>
 <li><p><strong>csv_directory</strong> (<em>str</em>) – CSV output directory path. (defaults to current directory).</p></li>
 <li><p><strong>graph_type</strong> (<em>str</em>) – Graph type, either <code class="docutils literal notranslate"><span class="pre">&quot;inference&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;instance&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;schema&quot;</span></code>.</p></li>
-<li><p><strong>graph_id</strong> (<em>str</em>) – Graph identifier.</p></li>
+<li><p><strong>graph_id</strong> (<em>str</em><em>, </em><em>optional</em>) – Graph identifier.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -791,10 +792,10 @@ and the new value will be used in future requests to the server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>graph_type</strong> (<em>str</em>) – Graph type, either <code class="docutils literal notranslate"><span class="pre">&quot;inference&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;instance&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;schema&quot;</span></code>.</p></li>
-<li><p><strong>graph_id</strong> (<em>str</em>) – Graph identifier.</p></li>
-<li><p><strong>turtle</strong> – Valid set of triples in Turtle format.</p></li>
+<li><p><strong>csv_paths</strong> (<em>str</em><em> or </em><em>list of str</em>) – csv path or list of csv paths to load. (required)</p></li>
 <li><p><strong>commit_msg</strong> (<em>str</em>) – Commit message.</p></li>
+<li><p><strong>graph_type</strong> (<em>str</em>) – Graph type, either <code class="docutils literal notranslate"><span class="pre">&quot;inference&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;instance&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;schema&quot;</span></code>.</p></li>
+<li><p><strong>graph_id</strong> (<em>str</em><em>, </em><em>optional</em>) – Graph identifier.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -813,7 +814,7 @@ and the new value will be used in future requests to the server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>csv_paths</strong> – csv path or list of csv paths to load. (required)</p></li>
+<li><p><strong>csv_paths</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – csv path or list of csv paths to load. (required)</p></li>
 <li><p><strong>commit_msg</strong> (<em>str</em>) – Commit message.</p></li>
 <li><p><strong>graph_type</strong> (<em>str</em>) – Graph type, either <code class="docutils literal notranslate"><span class="pre">&quot;inference&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;instance&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;schema&quot;</span></code>.</p></li>
 <li><p><strong>graph_id</strong> (<em>str</em>) – Graph identifier.</p></li>
@@ -837,7 +838,7 @@ and the new value will be used in future requests to the server.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>woql_query</strong> (<em>dict</em><em> or </em><em>WOQLQuery object</em>) – A woql query as an object or dict</p></li>
 <li><p><strong>commit_mg</strong> (<em>str</em>) – A message that will be written to the commit log to describe the change</p></li>
-<li><p><strong>file_dict</strong> – File dictionary to be associated with post name =&gt; filename, for multipart POST</p></li>
+<li><p><strong>file_dict</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]) – File dictionary to be associated with post name =&gt; filename, for multipart POST</p></li>
 </ul>
 </dd>
 </dl>
@@ -1058,9 +1059,9 @@ and the new value will be used in future requests to the server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>action</strong> – The action to perform on the server.</p></li>
+<li><p><strong>action</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – The action to perform on the server.</p></li>
 <li><p><strong>url</strong> (<em>str</em>) – The server URL to point the action at.</p></li>
-<li><p><strong>payload</strong> (<em>dict</em>) – Payload to send to the server.</p></li>
+<li><p><strong>payload</strong> (<em>dict</em><em>, </em><em>optional</em>) – Payload to send to the server.</p></li>
 <li><p><strong>file_dict</strong> (<em>dict</em><em>, </em><em>optional</em>) – Dict of files to include in the query.</p></li>
 </ul>
 </dd>
@@ -1077,8 +1078,10 @@ and the new value will be used in future requests to the server.</p>
 <dt id="terminusdb_client.WOQLClient.get_database">
 <code class="sig-name descname">get_database</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dbid</span></em>, <em class="sig-param"><span class="n">account</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_database" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns metadata (id, organization, label, comment) about the requested database
+:type dbid: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>
 :param dbid: The id of the database
 :type dbid: str
+:type account: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>
 :param account: The account / organization id that the user is acting through
 :type account: str</p>
 <dl class="field-list simple">
@@ -1115,12 +1118,22 @@ and the new value will be used in future requests to the server.</p>
 <dt id="terminusdb_client.WOQLClient.server">
 <code class="sig-name descname">server</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.server" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the URL of the currently connected server</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.api">
 <code class="sig-name descname">api</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.api" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the URL of the currently connected server</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
