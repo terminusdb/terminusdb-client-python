@@ -3,6 +3,7 @@ if sys.version_info[0]==3 and sys.version_info[1]>7:
     from __future__ import annotations
 else:
     WOQLView = 'WOQLView'
+#noqa
 from numbers import Number
 import json
 import warnings
