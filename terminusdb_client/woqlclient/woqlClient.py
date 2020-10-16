@@ -693,22 +693,28 @@ class WOQLClient:
             An API success message
         """
         options = {}
-        if not (csv_directory is str):
+        if csv_directory is None:
             csv_directory = os.getcwd()
-        options["csv_name"] = csv_name
+        options["name"] = csv_name
 
         result = self.dispatch(
             APIEndpointConst.GET_CSV,
             self.conConfig.csv_url(graph_type, graph_id),
             options,
         )
+
         stream = open(f"{csv_directory}/{csv_name}", "w")
         stream.write(result.text)
         stream.close()
         return result
 
+<<<<<<< HEAD
     def update_csv(self, csv_paths, commit_msg, graph_type=None, graph_id=None):
         """Updates the contents of the specified path with a csv, creating the appropriate
+=======
+    def update_csv(self, csv_paths, commit_msg, graph_type = None, graph_id = None):
+        """Updates the contents of the specified csv paths, creating the appropriate
+>>>>>>> CSV name treatment fixed
         diff object as the commit.
 
         Parameters
@@ -739,14 +745,19 @@ class WOQLClient:
             file_dict[name] = (name, open(path, "rb"), "application/binary")
 
         return self.dispatch(
-            APIEndpointConst.UPDATE_TRIPLES,
+            APIEndpointConst.UPDATE_CSV,
             self.conConfig.csv_url(graph_type, graph_id),
             commit,
             file_dict=file_dict,
         )
 
+<<<<<<< HEAD
     def insert_csv(self, csv_paths, commit_msg, graph_type=None, graph_id=None):
         """Inserts a csv into the specified path
+=======
+    def insert_csv(self, csv_paths, commit_msg, graph_type = None, graph_id = None):
+        """Inserts a list of csvs into the specified path
+>>>>>>> CSV name treatment fixed
 
         Parameters
         ----------
