@@ -438,7 +438,7 @@ class TerminusDB:
 
     def add_class(self, obj: Union[WOQLClass, List[WOQLClass]]):
         """Adds one or more WOQLClass types.
-        
+
         Parameters
         ----------
         obj: WOQLClass or a list of WOQLClass instances
@@ -457,7 +457,7 @@ class TerminusDB:
 
     def add_object(self, obj: Union[WOQLObj, List[WOQLObj]]):
         """Adds one or more WOQLObj.
-        
+
         Parameters
         ----------
         obj: WOQLObj or a list of WOQLObj instances
@@ -483,7 +483,7 @@ class TerminusDB:
 
     def run(self, query: Union[WOQLQuery, Dict]):
         """Runs a query either in WOQLQuery format or json_ld in dictionary presentation
-        
+
         Parameters
         ----------
         query: WOQLQuery or Dict

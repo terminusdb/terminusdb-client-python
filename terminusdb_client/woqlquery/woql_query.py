@@ -316,12 +316,17 @@ class WOQLQuery:
         return obj
 
     def _looks_like_class(self, cstring):
-        if cstring[:7] == "http://" or cstring[:8] == "https://":
-            return True
         if ":" not in cstring:
             return False
         pref = cstring.split(":")[0]
-        if pref == "v" or pref == "scm" or pref == "doc":
+        if (
+            pref == "v"
+            or pref == "scm"
+            or pref == "doc"
+            or pref == "terminusdb"
+            or pref == "http"
+            or pref == "https"
+        ):
             return True
         if utils.STANDARD_URLS.get(pref):
             return True
@@ -490,10 +495,48 @@ class WOQLQuery:
             return json
         return False
 
+    def _find_last_property(self, json):
+        """Finds the last woql property that has a woql:subject in it and returns the json for that
+        used for triplebuilder to chain further calls - when they may be inside ands or ors or subqueries
+
+        Parameters
+        ----------
+        json : dict
+               dictionary that representing the query in josn-ld"""
+        if "woql:query_list" in json:
+            for item in json["woql:query_list"][::-1]:
+                subitem = self._find_last_property(item)
+                if subitem:
+                    return subitem
+        if "woql:query" in json:
+            item = self._find_last_property(json["woql:query"])
+            if item:
+                return item
+        if "woql:subject" in json and self._is_property_triple(
+            json.get("woql:predicate"), json.get("woql:object")
+        ):
+            return json
+        return False
+
+    def _is_property_triple(self, pred, obj):
+        if isinstance(pred, dict):
+            p = pred.get("woql:node")
+        else:
+            p = pred
+        if isinstance(obj, dict):
+            o = obj.get("woql:node")
+        else:
+            o = obj
+        if o == "owl:ObjectProperty" or o == "owl:DatatypeProperty":
+            return True
+        if p == "rdfs:domain" or p == "rdfs:range":
+            return True
+        return False
+
     def _compile_path_pattern(self, pat):
         """Turns a textual path pattern into a JSON-LD description"""
         toks = _tokenize(pat)
-        if toks and len(toks):
+        if toks:
             return _tokens_to_json(toks, self)
         else:
             self._parameter_error("Pattern error - could not be parsed " + pat)
@@ -535,6 +578,7 @@ class WOQLQuery:
                 "The first parameter to using must be a Collection ID (string)"
             )
         self._cursor["woql:collection"] = self._jlt(collection)
+        self._cursor["@context"] = "/api/prefixes/" + collection
         return self._add_sub_query(subq)
 
     def comment(self, comment, subq=None):
@@ -1208,6 +1252,25 @@ class WOQLQuery:
         self._cursor["woql:file"] = fpath
         return self._wfrom(opts)
 
+    def once(self, query=None):
+        """Obtains only one result from subquery
+
+        Parameters
+        ----------
+        query : WOQLQuery object, optional
+
+        Returns
+        ----------
+        WOQLQuery object
+            query object that can be chained and/or executed
+        """
+        if query and query == "woql:args":
+            return ["woql:query"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "woql:Once"
+        return self._add_sub_query(query)
+
     def remote(self, uri, opts=None):
         """Provides details of a remote data source in a JSON format that includes a URL property
 
@@ -1340,6 +1403,18 @@ class WOQLQuery:
         self._cursor["@type"] = "woql:AddTriple"
         return self._updated()
 
+    def update_triple(self, subject, predicate, new_object):
+        return self.woql_and(
+            WOQLQuery().opt(
+                WOQLQuery()
+                .triple(subject, predicate, "v:AnyObject")
+                .delete_triple(subject, predicate, "v:AnyObject")
+                .woql_not()
+                .triple(subject, predicate, new_object)
+            ),
+            WOQLQuery().add_triple(subject, predicate, new_object),
+        )
+
     def delete_quad(self, subject, predicate, object_or_literal, graph=None):
         """Deletes any quads that match the rule [subject, predicate, object, graph]
 
@@ -1403,6 +1478,18 @@ class WOQLQuery:
         self._cursor["@type"] = "woql:AddQuad"
         self._cursor["woql:graph"] = self._clean_graph(graph)
         return self._updated()
+
+    def update_quad(self, subject, predicate, new_object, graph):
+        return self.woql_and(
+            WOQLQuery().opt(
+                WOQLQuery()
+                .quad(subject, predicate, "v:AnyObject", graph)
+                .delete_quad(subject, predicate, "v:AnyObject", graph)
+                .woql_not()
+                .quad(subject, predicate, new_object, graph)
+            ),
+            WOQLQuery().add_quad(subject, predicate, new_object, graph),
+        )
 
     def when(self, query, consequent=None):
         """When the sub-query in Condition is met, the Update query is executed
@@ -2217,6 +2304,18 @@ class WOQLQuery:
         self._cursor["woql:typecast_result"] = self._clean_object(result)
         return self
 
+    def type_of(self, value, vtype):
+        if value and value == "woql:args":
+            return ["woql:value", "woql:type"]
+        if not value or not vtype:
+            return self._parameter_error("type_of takes two parameters, both values")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "woql:TypeOf"
+        self._cursor["woql:value"] = self._clean_object(value)
+        self._cursor["woql:type"] = self._clean_object(vtype)
+        return self
+
     def order_by(self, *args, order="asc"):
         """
         Orders the results by the list of variables including in gvarlist, asc_or_desc is a WOQL.asc or WOQ.desc list of variables
@@ -2312,8 +2411,7 @@ class WOQLQuery:
         gvarlist : list or dict or WOQLQuery object
             list of variables to group
         groupedvar : list or str
-            grouping variable(s)
-        groupquery : WOQLQuery object
+            grouping template variable(s)
         output : str, optional
             output variable
         groupquery : dict, optional
@@ -2325,8 +2423,8 @@ class WOQLQuery:
         """
         if gvarlist and gvarlist == "woql:args":
             return [
-                "woql:variable_list",
-                "woql:group_var",
+                "woql:group_by",
+                "woql:group_template",
                 "woql:grouped",
                 "woql:query",
             ]
@@ -2341,6 +2439,7 @@ class WOQLQuery:
             onevar["@type"] = "woql:VariableListElement"
             onevar["woql:index"] = self._jlt(idx, "nonNegativeInteger")
             self._cursor["woql:group_by"].append(onevar)
+
         self._cursor["woql:group_template"] = []
         if type(groupedvar) is str:
             groupedvar = [groupedvar]
@@ -2349,6 +2448,17 @@ class WOQLQuery:
             onevar["@type"] = "woql:VariableListElement"
             onevar["woql:index"] = self._jlt(idx, "nonNegativeInteger")
             self._cursor["woql:group_template"].append(onevar)
+
+        if type(groupedvar) == str:
+            self._cursor["woql:group_template"] = self._varj(groupedvar)
+        else:
+            self._cursor["woql:group_template"] = []
+            for idx, item in enumerate(groupedvar):
+                onevar = self._varj(item)
+                onevar["@type"] = "woql:VariableListElement"
+                onevar["woql:index"] = self._jlt(idx, "nonNegativeInteger")
+                self._cursor["woql:group_template"].append(onevar)
+
         self._cursor["woql:grouped"] = self._varj(output)
         return self._add_sub_query(groupquery)
 
@@ -2432,6 +2542,9 @@ class WOQLQuery:
             return self.quad(subj, pred, obj, graph)
         else:
             return self.triple(subj, pred, obj)
+
+    def all(self, subj=None, pred=None, obj=None, graph=None):
+        return self.star(subj=subj, pred=pred, obj=obj, graph=graph)
 
     def lib(self):
         # return WOQLLibrary()
@@ -2952,7 +3065,7 @@ class WOQLQuery:
                     self.insert_property_data(data[k], ref_graph)
         return self
 
-    def doctype_data(self, data, ref_graph):
+    def insert_doctype_data(self, data, ref_graph):
         if not data.get("parent"):
             data["parent"] = []
         if not isinstance(data["parent"], list):
@@ -3105,19 +3218,17 @@ class WOQLQuery:
             WOQLQuery().woql_not().node("v:Cid").abstract(graph),
             WOQLQuery().woql_and(*idgens),
             WOQLQuery().quad("v:Cid", "label", "v:Label", graph),
-            WOQLQuery().concat("Box Class generated for class v:Cid", "v:CDesc", graph),
+            WOQLQuery().concat("Box Class generated for class v:Cid", "v:CDesc"),
             WOQLQuery().concat(
-                "Box Property generated to link box v:ClassID to class v:Cid",
-                "v:PDesc",
-                graph,
+                "Box Property generated to link box v:ClassID to class v:Cid", "v:PDesc"
             ),
         )
-        if len(subs):
+        if subs:
             if len(subs) == 1:
                 woql_filter.woql_and(subs[0])
             else:
                 woql_filter.woql_and(WOQLQuery().woql_or(*subs))
-        if len(nsubs):
+        if nsubs:
             woql_filter.woql_and(WOQLQuery().woql_and(*nsubs))
         cls = (
             WOQLQuery(graph=graph)

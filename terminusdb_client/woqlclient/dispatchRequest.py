@@ -72,7 +72,7 @@ class DispatchRequest:
                 "application/json",
             )
 
-            result = requests.post(
+            result = requests.put(
                 url, headers=headers, files=file_dict, verify=_verify_check(url),
             )
             # Close the files although request should do this :(
@@ -184,6 +184,7 @@ class DispatchRequest:
                 APIEndpointConst.INSERT_TRIPLES,
                 APIEndpointConst.INSERT_CSV,
             ]:
+
                 request_response = cls.__put_call(
                     url, headers, payload, file_dict, insecure=insecure
                 )
