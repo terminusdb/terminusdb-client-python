@@ -708,13 +708,8 @@ class WOQLClient:
         stream.close()
         return result
 
-<<<<<<< HEAD
-    def update_csv(self, csv_paths, commit_msg, graph_type=None, graph_id=None):
-        """Updates the contents of the specified path with a csv, creating the appropriate
-=======
     def update_csv(self, csv_paths, commit_msg, graph_type = None, graph_id = None):
         """Updates the contents of the specified csv paths, creating the appropriate
->>>>>>> CSV name treatment fixed
         diff object as the commit.
 
         Parameters
@@ -751,13 +746,8 @@ class WOQLClient:
             file_dict=file_dict,
         )
 
-<<<<<<< HEAD
-    def insert_csv(self, csv_paths, commit_msg, graph_type=None, graph_id=None):
-        """Inserts a csv into the specified path
-=======
     def insert_csv(self, csv_paths, commit_msg, graph_type = None, graph_id = None):
         """Inserts a list of csvs into the specified path
->>>>>>> CSV name treatment fixed
 
         Parameters
         ----------
