@@ -1,3 +1,4 @@
+from numbers import Number
 import json
 import warnings
 
@@ -25,7 +26,7 @@ class WOQLView:
             )
         )
 
-    def edges(self, *args):
+    def edges(self, *args: list) :
         for item in args:
             if not isinstance(item, list):
                 raise TypeError("argument of edges need to be lists")
@@ -33,22 +34,22 @@ class WOQLView:
         self.config += f"woqlGraphConfig.edges({arguments});\n"
         return self
 
-    def height(self, height_input):
+    def height(self, height_input: Number) :
         self.config += f"woqlGraphConfig.height({height_input});\n"
         return self
 
-    def width(self, width_input):
+    def width(self, width_input: Number) :
         self.config += f"woqlGraphConfig.width({width_input});\n"
         return self
 
-    def edge(self, start, end):
+    def edge(self, start: str, end: str) :
         if not isinstance(start, str) or not isinstance(end, str):
             raise TypeError("arguments of edge() need to be strings")
         arguments = ",".join(map(lambda x: f'"{x}"', [start, end]))
         self.obj = f"woqlGraphConfig.edge({arguments})"
         return self
 
-    def node(self, *args):
+    def node(self, *args: str) :
         # if not isinstance(select_node, str):
         #     raise TypeError("argument of node() need to be string")
         # self.obj = f'woqlGraphConfig.node("{select_node}")'
@@ -61,25 +62,25 @@ class WOQLView:
         self.obj = f"woqlGraphConfig.node({arguments})"
         return self
 
-    def text(self, input_text):
+    def text(self, input_text: str) :
         if self.obj is None:
             raise SyntaxError("text() should be used following a node() or edge()")
         self.config += self.obj + f'.text("{input_text}");\n'
         return self
 
-    def distance(self, input_distance):
+    def distance(self, input_distance: Number):
         if self.obj is None:
             raise SyntaxError("distance() should be used following a node() or edge()")
         self.config += self.obj + f".distance({input_distance});\n"
         return self
 
-    def weight(self, input_weight):
+    def weight(self, input_weight: Number) :
         if self.obj is None:
             raise SyntaxError("weight() should be used following a node() or edge()")
         self.config += self.obj + f".weight({input_weight});\n"
         return self
 
-    def color(self, input_color):
+    def color(self, input_color: list) :
         if not isinstance(input_color, list):
             raise TypeError("argument of color() need to be list")
         if len(input_color) > 3:
@@ -92,7 +93,7 @@ class WOQLView:
         self.config += self.obj + f".color([{arguments}]);\n"
         return self
 
-    def icon(self, input_dict):
+    def icon(self, input_dict: dict) :
         if not isinstance(input_dict, dict):
             raise TypeError("argument of icon() need to be dict")
         if self.obj is None:
@@ -100,13 +101,13 @@ class WOQLView:
         self.config += self.obj + f".icon({json.dumps(input_dict)});\n"
         return self
 
-    def size(self, input_size):
+    def size(self, input_size: Number) :
         if self.obj is None:
             raise SyntaxError("size() should be used following a node() or edge()")
         self.config += self.obj + f".size({input_size});\n"
         return self
 
-    def collision_radius(self, input_radius):
+    def collision_radius(self, input_radius: Number) :
         if self.obj is None:
             raise SyntaxError(
                 "collision_radius() should be used following a node() or edge()"
@@ -114,20 +115,20 @@ class WOQLView:
         self.config += self.obj + f".collisionRadius({input_radius});\n"
         return self
 
-    def hidden(self, input_choice):
+    def hidden(self, input_choice: bool) :
         if input_choice:
             self.config += self.obj + ".hidden(true);\n"
         else:
             self.config += self.obj + ".hidden(false);\n"
         return self
 
-    def charge(self, input_charge):
+    def charge(self, input_charge: Number) :
         if self.obj is None:
             raise SyntaxError("charge(() should be used following a node() or edge()")
         self.config += self.obj + f".charge({input_charge});\n"
         return self
 
-    def of(self, input_obj):
+    def of(self, input_obj: str) :
         if self.obj is None:
             raise SyntaxError("in() should be used following a node() or edge()")
         self.obj += f'.in("{input_obj}")'
