@@ -44,6 +44,7 @@ WoqlExtra = {
     },
     "usingJson": {
         "@type": "woql:Using",
+        "@context": "/api/prefixes/userName/dbName/local/commit/commitID",
         "woql:collection": {
             "@type": "xsd:string",
             "@value": "userName/dbName/local/commit/commitID",
@@ -72,6 +73,7 @@ WoqlExtra = {
                 "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 0},
                 "woql:query": {
                     "@type": "woql:Using",
+                    "@context": "/api/prefixes/admin/dbName/local/commit/commitID_1",
                     "woql:collection": {
                         "@type": "xsd:string",
                         "@value": "admin/dbName/local/commit/commitID_1",
@@ -107,6 +109,7 @@ WoqlExtra = {
                 "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 1},
                 "woql:query": {
                     "@type": "woql:Using",
+                    "@context": "/api/prefixes/admin/dbName/local/commit/commitID_2",
                     "woql:collection": {
                         "@type": "xsd:string",
                         "@value": "admin/dbName/local/commit/commitID_2",

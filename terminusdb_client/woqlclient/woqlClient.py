@@ -8,6 +8,7 @@ from ..__version__ import __version__
 from ..woqlquery.woql_query import WOQLQuery
 from .api_endpoint_const import APIEndpointConst
 from .connectionCapabilities import ConnectionCapabilities
+
 # from .errorMessage import *
 from .connectionConfig import ConnectionConfig
 from .dispatchRequest import DispatchRequest
@@ -937,9 +938,7 @@ class WOQLClient:
             and rc_args.get("remote_branch")
         ):
             return self.dispatch(
-                APIEndpointConst.PULL,
-                self.conConfig.pull_url(),
-                rc_args,
+                APIEndpointConst.PULL, self.conConfig.pull_url(), rc_args,
             )
         else:
             raise ValueError(
@@ -947,7 +946,9 @@ class WOQLClient:
             )
 
     def fetch(self, remote_id: str):
-        return self.dispatch(APIEndpointConst.FETCH, self.conConfig.fetch_url(remote_id))
+        return self.dispatch(
+            APIEndpointConst.FETCH, self.conConfig.fetch_url(remote_id)
+        )
 
     def push(self, remote_target_repo: Dict[str, str]):
         """Push changes from a branch to a remote repo

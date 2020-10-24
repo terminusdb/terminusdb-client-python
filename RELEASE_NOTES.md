@@ -1,5 +1,22 @@
 # TerminusDB Python Client Release Notes
 
+## v0.5.0
+
+### New
+
+- Added typeof to python
+- Add default commit message of update csv and insert csv
+- Adding context path to Using to match with the newest version of TerminusDB
+- Add once query type
+- Adding update triple and update quad
+
+### Bug Fixes / Improvements
+
+- Fixed iri casting
+- Fixed group by and iri by default in third part
+
+---
+
 ## v0.4.0
 
 ### New

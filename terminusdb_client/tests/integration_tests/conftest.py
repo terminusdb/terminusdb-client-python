@@ -33,7 +33,7 @@ def one_class_obj():
                     "@type": "http://www.w3.org/2001/XMLSchema#string",
                     "@value": "Bike Journey object that capture each bike joourney.",
                 },
-                "Parents": [["http://terminusdb.com/schema/system#Document"]],
+                "Parents": ["http://terminusdb.com/schema/system#Document"],
             }
         ],
         "deletes": 0,
