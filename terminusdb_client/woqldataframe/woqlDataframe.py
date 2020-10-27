@@ -83,7 +83,7 @@ def extract_header(query):
 
     bindings = query["bindings"][0]
     for name, v in bindings.items():
-        if type(v) == dict and ("@type" in v):
+        if type(v) is dict and ("@type" in v):
             ty = v["@type"]
         else:
             ty = "http://www.w3.org/2001/XMLSchema#string"
