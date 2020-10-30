@@ -21,11 +21,19 @@ client = WOQLClient(server_url)
 client.connect(user=user,account=account,key=key,db=dbid)
 ```
 
+If you haven't already created the database, you can do so with the
+following query:
+
+```python
+client.create_database(dbid, label=label, description=description)
+```
+
 Once we have a client object, we can proceed with adding a schema to
 the database.
 
 ```python
-address = WQ().doctype("Address")
+address = WQ().woql_and(
+    WQ().doctype("Address")
         .label("An address record")
         .description("Record holding address information")
         .property("street", "xsd:string")
@@ -36,21 +44,31 @@ address = WQ().doctype("Address")
             .cardinality(1)
         .property("post_code", "xsd:string")
             .label("post code")
-            .max_cardinality(1)
+            .max(1)
 
-client.query(person).execute(client, "Adding Address documents to the database")
+client.query(address, "Adding Address documents to the database")
 ```
 
 We now have a schema description of what constitutes an address,
 replete with documentation of the elements, and information about the
 cardinalities of edges in the database.
 
-We can now use this document type to connect it to other elements in
+The `label` groups with the current schema object we are creating and
+gives it a human readable name. We can also use `description` to give
+a lengthier destription to any of the created schema objects.
+
+When we use `property` we group it with the current class. This
+current class is its domain. It comes together with its range as the
+second argument after the name. If we have more complex properties
+with overlapping ranges it is necessary to create them seperately.
+
+We can use this document type to connect it to other elements in
 the graph. For instance, we can create a new person document type as
 follows:
 
 ```python
-person = WQ().doctype("Person")
+person = WQ().woql_and(
+    WQ().doctype("Person")
         .label("A digital human twin")
         .description("Record holding information on an individual")
         .property("forename", "xsd:string")
@@ -60,7 +78,7 @@ person = WQ().doctype("Person")
             .label("surname")
             .cardinality(1)
         .property("address", "Address")
-            .label("The address(es) associated with an individual")
+            .label("The address(es) associated with an individual"))
 
 client.query(person, "Adding Person record")
 ```
