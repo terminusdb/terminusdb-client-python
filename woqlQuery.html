@@ -670,6 +670,23 @@ Commonly used to combine WOQLQueries.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="terminusdb_client.WOQLQuery.once">
+<code class="sig-name descname">once</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.once" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtains only one result from subquery</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>query</strong> (<em>WOQLQuery object</em><em>, </em><em>optional</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>query object that can be chained and/or executed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>WOQLQuery object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.remote">
 <code class="sig-name descname">remote</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uri</span></em>, <em class="sig-param"><span class="n">opts</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.remote" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provides details of a remote data source in a JSON format that includes a URL property</p>
@@ -785,6 +802,11 @@ Otherwise two triples with the same predicate but different object values will b
 </dd></dl>
 
 <dl class="py method">
+<dt id="terminusdb_client.WOQLQuery.update_triple">
+<code class="sig-name descname">update_triple</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">subject</span></em>, <em class="sig-param"><span class="n">predicate</span></em>, <em class="sig-param"><span class="n">new_object</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.update_triple" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.delete_quad">
 <code class="sig-name descname">delete_quad</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">subject</span></em>, <em class="sig-param"><span class="n">predicate</span></em>, <em class="sig-param"><span class="n">object_or_literal</span></em>, <em class="sig-param"><span class="n">graph</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.delete_quad" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes any quads that match the rule [subject, predicate, object, graph]</p>
@@ -827,6 +849,11 @@ Otherwise two triples with the same predicate but different object values will b
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLQuery.update_quad">
+<code class="sig-name descname">update_quad</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">subject</span></em>, <em class="sig-param"><span class="n">predicate</span></em>, <em class="sig-param"><span class="n">new_object</span></em>, <em class="sig-param"><span class="n">graph</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.update_quad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.when">
@@ -1439,6 +1466,11 @@ e.g. WOQL.re(“(.).*”, “hello”, [“v:All”, “v:Sub”])</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="terminusdb_client.WOQLQuery.type_of">
+<code class="sig-name descname">type_of</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">vtype</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.type_of" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.order_by">
 <code class="sig-name descname">order_by</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="n">order</span><span class="o">=</span><span class="default_value">'asc'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.order_by" title="Permalink to this definition">¶</a></dt>
 <dd><p>Orders the results by the list of variables including in gvarlist, asc_or_desc is a WOQL.asc or WOQ.desc list of variables</p>
@@ -1487,10 +1519,9 @@ e.g. WOQL.re(“(.).*”, “hello”, [“v:All”, “v:Sub”])</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>gvarlist</strong> (<em>list</em><em> or </em><em>dict</em><em> or </em><em>WOQLQuery object</em>) – list of variables to group</p></li>
-<li><p><strong>groupedvar</strong> (<em>list</em><em> or </em><em>str</em>) – grouping variable(s)</p></li>
-<li><p><strong>groupquery</strong> (<em>dict</em><em>, </em><em>optional</em>) – </p></li>
+<li><p><strong>groupedvar</strong> (<em>list</em><em> or </em><em>str</em>) – grouping template variable(s)</p></li>
 <li><p><strong>output</strong> (<em>str</em><em>, </em><em>optional</em>) – output variable</p></li>
-<li><p><strong>groupquery</strong> – </p></li>
+<li><p><strong>groupquery</strong> (<em>dict</em><em>, </em><em>optional</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1543,6 +1574,11 @@ e.g. WOQL.re(“(.).*”, “hello”, [“v:All”, “v:Sub”])</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLQuery.all">
+<code class="sig-name descname">all</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">subj</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pred</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">obj</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">graph</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.all" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.lib">
@@ -1820,8 +1856,8 @@ The triple/quad that will get created will be for the rdfs:label predicate.
 </dd></dl>
 
 <dl class="py method">
-<dt id="terminusdb_client.WOQLQuery.doctype_data">
-<code class="sig-name descname">doctype_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">ref_graph</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.doctype_data" title="Permalink to this definition">¶</a></dt>
+<dt id="terminusdb_client.WOQLQuery.insert_doctype_data">
+<code class="sig-name descname">insert_doctype_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">ref_graph</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.insert_doctype_data" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
