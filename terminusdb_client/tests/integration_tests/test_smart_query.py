@@ -1,6 +1,7 @@
 import os
 import subprocess
 import time
+import unittest
 
 import pytest
 import requests
@@ -132,12 +133,17 @@ def test_add_class_and_object(
     my_class.add_property("Duration", "integer")
     db.add_class(my_class)
 
-    assert db.run(WOQLLib().classes()) == one_class_obj
-    assert db.run(WOQLLib().property()) == one_class_prop
+    case = unittest.TestCase()
+    case.assertCountEqual(db.run(WOQLLib().classes()), one_class_obj)
+    case.assertCountEqual(db.run(WOQLLib().property()), one_class_prop)
+    # assert db.run(WOQLLib().classes()) == one_class_obj
+    # assert db.run(WOQLLib().property()) == one_class_prop
 
     my_obj = WOQLObj("myobj", my_class)
     my_obj.add_property("Duration", 75)
     db.add_object(my_obj)
 
-    assert db.run(WOQLLib().objects()) == one_object
-    assert db.run(WOQLLib().property_values()) == one_prop_val
+    case.assertCountEqual(db.run(WOQLLib().objects()), one_object)
+    case.assertCountEqual(db.run(WOQLLib().property_values()), one_prop_val)
+    # assert db.run(WOQLLib().objects()) == one_object
+    # assert db.run(WOQLLib().property_values()) == one_prop_val

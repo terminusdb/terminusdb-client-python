@@ -7,10 +7,10 @@ def one_class_obj():
         "@type": "api:WoqlResponse",
         "api:status": "api:success",
         "api:variable_names": [
-            "Parents",
-            "Description",
-            "Class Name",
             "Class ID",
+            "Class Name",
+            "Description",
+            "Parents",
             "Children",
             "Abstract",
         ],
@@ -48,11 +48,11 @@ def one_class_prop():
         "@type": "api:WoqlResponse",
         "api:status": "api:success",
         "api:variable_names": [
+            "Property ID",
+            "Property Name",
+            "Property Domain",
             "Property Type",
             "Property Range",
-            "Property Name",
-            "Property ID",
-            "Property Domain",
             "Property Description",
         ],
         "bindings": [
@@ -104,11 +104,11 @@ def one_prop_val():
         "@type": "api:WoqlResponse",
         "api:status": "api:success",
         "api:variable_names": [
+            "Object ID",
+            "Property ID",
+            "Property Value",
             "Value ID",
             "Value Class",
-            "Property Value",
-            "Property ID",
-            "Object ID",
         ],
         "bindings": [
             {

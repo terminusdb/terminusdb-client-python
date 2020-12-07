@@ -1,4 +1,5 @@
-# Create a Schema
+Create a Schema
+============
 
 To create a schema you need to add a document type and some
 properties. First, connect to an existing database. You will want to
@@ -6,7 +7,7 @@ make sure this database was created with a schema (the default) rather
 than schema free!  For instance, to connect to a database named
 `My_First_Schema` you can write the following:
 
-```python
+``python
 from terminusdb_client.woqlquery.woql_query import WOQLQuery as WQ
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 
@@ -19,19 +20,19 @@ repository = "local"
 
 client = WOQLClient(server_url)
 client.connect(user=user,account=account,key=key,db=dbid)
-```
+``
 
 If you haven't already created the database, you can do so with the
 following query:
 
-```python
+``python
 client.create_database(dbid, label=label, description=description)
-```
+``
 
 Once we have a client object, we can proceed with adding a schema to
 the database.
 
-```python
+``python
 address = WQ().woql_and(
     WQ().doctype("Address")
         .label("An address record")
@@ -47,7 +48,7 @@ address = WQ().woql_and(
             .max(1)
 
 client.query(address, "Adding Address documents to the database")
-```
+``
 
 We now have a schema description of what constitutes an address,
 replete with documentation of the elements, and information about the
@@ -66,7 +67,7 @@ We can use this document type to connect it to other elements in
 the graph. For instance, we can create a new person document type as
 follows:
 
-```python
+``python
 person = WQ().woql_and(
     WQ().doctype("Person")
         .label("A digital human twin")
@@ -81,7 +82,7 @@ person = WQ().woql_and(
             .label("The address(es) associated with an individual"))
 
 client.query(person, "Adding Person record")
-```
+``
 
 Now that we have a schema, it is possible to add information to the
 graph by inserting documents or triples - as long as they respect the schema!
