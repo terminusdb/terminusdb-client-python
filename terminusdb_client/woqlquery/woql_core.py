@@ -110,7 +110,7 @@ def _tokens_to_json(seq, query):
 
 
 def _copy_dict(orig, rollup=None):
-    if type(orig) == list:
+    if type(orig) is list:
         return orig
     if rollup:
         if orig.get("@type") in ["woql:And", "woql:Or"]:
@@ -119,7 +119,7 @@ def _copy_dict(orig, rollup=None):
             if len(orig["woql:query_list"]) == 1:
                 return _copy_dict(orig["woql:query_list"][0]["woql:query"], rollup)
         if "woql:query" in orig and orig["@type"] != "woql:Comment":
-            if type(orig["woql:query"]) == tuple:
+            if type(orig["woql:query"]) is tuple:
                 orig["woql:query"] = orig["woql:query"][0].to_dict()
             if not orig["woql:query"].get("@type"):
                 return {}
@@ -128,17 +128,17 @@ def _copy_dict(orig, rollup=None):
                 return {}
     nuj = {}
     for key, part in orig.items():
-        if type(part) == list:
+        if type(part) is list:
             nupart = []
             for item in part:
-                if type(item) == dict:
+                if type(item) is dict:
                     sub = _copy_dict(item, rollup)
                     if sub:
                         nupart.append(sub)
                 else:
                     nupart = nupart.append(item)
             nuj[key] = nupart
-        elif type(part) == dict:
+        elif type(part) is dict:
             query = _copy_dict(part, rollup)
             if query:
                 nuj[key] = query

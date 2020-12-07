@@ -132,7 +132,7 @@ class WOQLQuery:
     def _varj(self, varb):
         if varb[:2] == "v:":
             varb = varb[2:]
-        if type(varb) == str:
+        if type(varb) is str:
             return {
                 "@type": "woql:Variable",
                 "woql:variable_name": {"@value": varb, "@type": "xsd:string"},
@@ -150,10 +150,10 @@ class WOQLQuery:
     def _asv(self, colname_or_index, vname, obj_type=None):
         """Wraps the elements of an AS variable in the appropriate json-ld"""
         asvar = {}
-        if type(colname_or_index) == int:
+        if type(colname_or_index) is int:
             asvar["@type"] = "woql:IndexedAsVar"
             asvar["woql:index"] = self._jlt(colname_or_index, "xsd:nonNegativeInteger")
-        elif type(colname_or_index) == str:
+        elif type(colname_or_index) is str:
             asvar["@type"] = "woql:NamedAsVar"
             asvar["woql:identifier"] = self._jlt(colname_or_index)
         if vname[:2] == "v:":
@@ -190,7 +190,7 @@ class WOQLQuery:
 
     def _arop(self, arg):
         """Wraps arithmetic operators in the appropriate json-ld"""
-        if type(arg) == dict:
+        if type(arg) is dict:
             if hasattr(arg, "to_dict"):
                 return arg.to_dict()
             else:
@@ -201,7 +201,7 @@ class WOQLQuery:
     def _vlist(self, target_list):
         """Wraps value lists in the appropriate json-ld"""
         vobj = {"@type": "woql:Array", "woql:array_element": []}
-        if type(target_list) == str:
+        if type(target_list) is str:
             target_list = [target_list]
         for idx, item in enumerate(target_list):
             co_item = self._clean_object(item)
@@ -214,13 +214,13 @@ class WOQLQuery:
         # TODO: orig is Nonetype
         """takes input that can be either a string (variable name)
         or an array - each element of the array is a member of the list"""
-        if type(wvar) == str:
+        if type(wvar) is str:
             return self._expand_variable(wvar, True)
-        if type(wvar) == list:
+        if type(wvar) is list:
             ret = {"@type": "woql:Array", "woql:array_element": []}
             for idx, item in enumerate(wvar):
                 co_item = self._clean_object(item)
-                if type(co_item) == str:
+                if type(co_item) is str:
                     co_item = {"node": co_item}
                 co_item["@type"] = "woql:ArrayElement"
                 co_item["woql:index"] = self._jlt(idx, "xsd:nonNegativeInteger")
@@ -240,9 +240,9 @@ class WOQLQuery:
     def _clean_subject(self, obj):
         """Transforms whatever is passed in as the subject into the appropriate json-ld for variable or id"""
         subj = False
-        if type(obj) == dict:
+        if type(obj) is dict:
             return obj
-        elif type(obj) == str:
+        elif type(obj) is str:
             if ":" in obj:
                 subj = obj
             elif self._vocab and (obj in self._vocab):
@@ -256,7 +256,7 @@ class WOQLQuery:
     def _clean_predicate(self, predicate):
         """Transforms whatever is passed in as the predicate (id or variable) into the appropriate json-ld form """
         pred = False
-        if type(predicate) == dict:
+        if type(predicate) is dict:
             return predicate
         if type(predicate) != str:
             self._parameter_error("Predicate must be a URI string")
@@ -283,22 +283,22 @@ class WOQLQuery:
     def _clean_object(self, user_obj, target=None):
         """Transforms whatever is passed in as the object of a triple into the appropriate json-ld form (variable, literal or id)"""
         obj = {"@type": "woql:Datatype"}
-        if type(user_obj) == str:
+        if type(user_obj) is str:
             if self._looks_like_class(user_obj):
                 return self._clean_class(user_obj)
             elif self._vocab and (user_obj in self._vocab):
                 return self._clean_class(self._vocab[user_obj])
             else:
                 obj["woql:datatype"] = self._jlt(user_obj, target)
-        elif type(user_obj) == float:
+        elif type(user_obj) is float:
             if not target:
                 target = "xsd:decimal"
             obj["woql:datatype"] = self._jlt(user_obj, target)
-        elif type(user_obj) == int:
+        elif type(user_obj) is int:
             if not target:
                 target = "xsd:integer"
             obj["woql:datatype"] = self._jlt(user_obj, target)
-        elif type(user_obj) == bool:
+        elif type(user_obj) is bool:
             if not target:
                 target = "xsd:boolean"
             obj["woql:datatype"] = self._jlt(user_obj, target)
@@ -306,7 +306,7 @@ class WOQLQuery:
             if not target:
                 target = "xsd:dateTime"
             obj["woql:datatype"] = self._jlt(user_obj.isoformat(), target)
-        elif type(user_obj) == dict:
+        elif type(user_obj) is dict:
             if "@value" in user_obj:
                 obj["woql:datatype"] = user_obj
             else:
@@ -549,7 +549,7 @@ class WOQLQuery:
         bindings = result.get("bindings", [])
         for each_result in bindings:
             for item in each_result:
-                if type(item) == str:
+                if type(item) is str:
                     spl = item.split(":")
                     if len(spl) == 2 and spl[1] and spl[0] != "_":
                         self._vocab[spl[0]] = spl[1]
@@ -1197,9 +1197,9 @@ class WOQLQuery:
             return [["woql:indexed_as_var", "woql:named_as_var"]]
         if type(self._query) != list:
             self._query = []
-        if type(args[0]) == list:
+        if type(args[0]) is list:
             for onemap in args:
-                if type(onemap) == list and len(onemap) >= 2:
+                if type(onemap) is list and len(onemap) >= 2:
                     if len(onemap) == 2:
                         map_type = False
                     else:
@@ -1215,7 +1215,7 @@ class WOQLQuery:
             self._query.append(oasv)
         elif hasattr(args[0], "to_dict"):
             self._query.append(args[0].to_dict())
-        elif type(args[0]) == dict:
+        elif type(args[0]) is dict:
             self._query.append(args[0])
         return self
 
@@ -2054,7 +2054,7 @@ class WOQLQuery:
         """
         if concat_list and concat_list == "woql:args":
             return ["woql:concat_list", "woql:concatenated"]
-        if type(concat_list) == str:
+        if type(concat_list) is str:
             slist = re.split("(v:)", concat_list)
             nlist = []
             if slist[0]:
@@ -2068,7 +2068,7 @@ class WOQLQuery:
                     if rest:
                         nlist.append(rest)
             concat_list = nlist
-        if type(concat_list) == list:
+        if type(concat_list) is list:
             if self._cursor.get("@type"):
                 self._wrap_cursor_with_and()
             self._cursor["@type"] = "woql:Concatenate"
@@ -2210,11 +2210,11 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:Length"
         self._cursor["woql:length_list"] = self._vlist(var_list)
-        if type(var_len) == float:
+        if type(var_len) is float:
             self._cursor["woql:length"] = self._clean_object(
                 var_len, "xsd:nonNegativeInteger"
             )
-        elif type(var_len) == str:
+        elif type(var_len) is str:
             self._cursor["woql:length"] = self._varj(var_len)
         return self
 
@@ -2363,7 +2363,7 @@ class WOQLQuery:
                 "Order by must be passed at least one variable to order the query"
             )
 
-        if type(ordered_varlist[-1]) == dict and hasattr(
+        if type(ordered_varlist[-1]) is dict and hasattr(
             ordered_varlist[-1], "to_dict"
         ):
             embedquery = ordered_varlist.pop()
@@ -2377,7 +2377,7 @@ class WOQLQuery:
                 )
 
         for idx, item in enumerate(ordered_varlist):
-            if type(item) == str:
+            if type(item) is str:
                 obj = {
                     "@type": "woql:VariableOrdering",
                     "woql:index": self._jlt(idx, "xsd:nonNegativeInteger"),
@@ -2432,14 +2432,14 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:GroupBy"
         self._cursor["woql:group_by"] = []
-        if type(gvarlist) == str:
+        if type(gvarlist) is str:
             gvarlist = [gvarlist]
         for idx, item in enumerate(gvarlist):
             onevar = self._varj(item)
             onevar["@type"] = "woql:VariableListElement"
             onevar["woql:index"] = self._jlt(idx, "nonNegativeInteger")
             self._cursor["woql:group_by"].append(onevar)
-        if type(groupedvar) == str:
+        if type(groupedvar) is str:
             self._cursor["woql:group_template"] = self._varj(groupedvar)
         else:
             self._cursor["woql:group_template"] = []
@@ -2472,7 +2472,7 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:Path"
         self._cursor["woql:subject"] = self._clean_subject(subject)
-        if type(pattern) == str:
+        if type(pattern) is str:
             pattern = self._compile_path_pattern(pattern)
         self._cursor["woql:path_pattern"] = pattern
         self._cursor["woql:object"] = self._clean_object(obj)
@@ -2852,7 +2852,7 @@ class WOQLQuery:
         lastsubj = self._find_last_subject(self._cursor)
         if lastsubj is not None and s is None:
             s = lastsubj.get("woql:subject")
-        if type(s) == dict:
+        if type(s) is dict:
             s = s.get("woql:node")
         else:
             return
@@ -2926,11 +2926,11 @@ class WOQLQuery:
         """
         if a == b:
             return True
-        elif type(a) == dict and type(b) == str:
+        elif type(a) is dict and type(b) is str:
             return self._string_matches_object(b, a)
-        elif type(b) == dict and type(a) == str:
+        elif type(b) is dict and type(a) is str:
             return self._string_matches_object(a, b)
-        elif type(a) == dict and type(b) == dict:
+        elif type(a) is dict and type(b) is dict:
             for k in a:
                 if b.get(k) != a.get(k):
                     return False
@@ -3000,7 +3000,7 @@ class WOQLQuery:
 
     def _adding_class(self, string_only=False):
         ac = self._triple_builder_context.get("adding_class")
-        if ac and string_only and type(ac) == dict:
+        if ac and string_only and type(ac) is dict:
             return ac.get("woql:node")
         return ac
 
@@ -3261,7 +3261,7 @@ class WOQLQuery:
         for i in choices:
             if not choices[i]:
                 continue
-            if type(choices[i]) == list:
+            if type(choices[i]) is list:
                 chid = choices[i][0]
                 clab = choices[i][1]
                 desc = choices[i][2] if len(choices[i]) >= 3 else False
