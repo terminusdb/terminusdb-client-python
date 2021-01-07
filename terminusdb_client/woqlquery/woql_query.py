@@ -1195,23 +1195,32 @@ class WOQLQuery:
     def woql_as(self, *args):
         if args and args[0] == "woql:args":
             return [["woql:indexed_as_var", "woql:named_as_var"]]
-        if type(self._query) != list:
+        if type(self._query) is not list:
             self._query = []
         if type(args[0]) is list:
-            for onemap in args:
-                if type(onemap) is list and len(onemap) >= 2:
-                    if len(onemap) == 2:
-                        map_type = False
-                    else:
-                        map_type = onemap[2]
-                    oasv = self._asv(onemap[0], onemap[1], map_type)
-                    self._query.append(oasv)
-        elif type(args[0]) in [int, str]:
-            if len(args) > 2:
-                map_type = args[2]
+            if len(args) == 1:
+                for i, onemap in enumerate(args[0]):
+                    iasv = self._asv(i, onemap)
+                    self._query.append(iasv)
             else:
-                map_type = False
-            oasv = self._asv(args[0], args[1], map_type)
+                for onemap in args:
+                    if type(onemap) is list and len(onemap) >= 2:
+                        if len(onemap) == 2:
+                            map_type = False
+                        else:
+                            map_type = onemap[2]
+                        oasv = self._asv(onemap[0], onemap[1], map_type)
+                        self._query.append(oasv)
+        elif type(args[0]) in [int, str]:
+            if len(args) > 2 and type(args[2]) is str:
+                oasv = self._asv(args[0], args[1], args[2])
+            elif len(args) > 1 and type(args[1]) is str:
+                if args[1][:4] == "xsd:" or args[1][:4] == "xdd:":
+                    oasv = self._asv(len(self._query), args[0], args[1])
+                else:
+                    oasv = self._asv(args[0], args[1])
+            else:
+                oasv = self._asv(len(self._query), args[0])
             self._query.append(oasv)
         elif hasattr(args[0], "to_dict"):
             self._query.append(args[0].to_dict())

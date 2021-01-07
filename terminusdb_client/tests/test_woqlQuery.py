@@ -235,27 +235,6 @@ class TestWoqlQueries:
         }
         assert woql_object.to_dict() == json_obj
 
-    def test_woql_as_method(self):
-        woql_object = WOQLQuery().woql_as("Source", "Target")
-        woql_object2 = (
-            WOQLQuery().woql_as("Source", "Target").woql_as("Source2", "Target2")
-        )
-        json_obj2 = [
-            {
-                "@type": "woql:NamedAsVar",
-                "woql:identifier": {"@type": "xsd:string", "@value": "Source"},
-                "woql:variable_name": {"@type": "xsd:string", "@value": "Target"},
-            },
-            {
-                "@type": "woql:NamedAsVar",
-                "woql:identifier": {"@type": "xsd:string", "@value": "Source2"},
-                "woql:variable_name": {"@type": "xsd:string", "@value": "Target2"},
-            },
-        ]
-
-        assert woql_object.to_dict() == [json_obj2[0]]
-        assert woql_object2.to_dict() == json_obj2
-
     def test_remote_method(self):
         woql_object = WOQLQuery().remote({"url": "http://url"})
         json_obj = {
@@ -538,3 +517,24 @@ class TestTripleBuilderChainer:
         vars1, vars2, vars3 = WOQLQuery().vars("a", "b", "c")
         assert single_vars == "v:a"
         assert (vars1, vars2, vars3) == ("v:a", "v:b", "v:c")
+
+    def test_woql_as_method(self):
+        [x, y, z] = WOQLQuery().vars("x", "y", "z")
+        query = WOQLQuery().woql_as(x).woql_as(y).woql_as(z)
+        assert query.to_dict() == [
+            {
+                "@type": "woql:IndexedAsVar",
+                "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 0},
+                "woql:variable_name": {"@type": "xsd:string", "@value": "x"},
+            },
+            {
+                "@type": "woql:IndexedAsVar",
+                "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 1},
+                "woql:variable_name": {"@type": "xsd:string", "@value": "y"},
+            },
+            {
+                "@type": "woql:IndexedAsVar",
+                "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 2},
+                "woql:variable_name": {"@type": "xsd:string", "@value": "z"},
+            },
+        ]
