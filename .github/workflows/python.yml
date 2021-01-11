@@ -45,6 +45,8 @@ jobs:
       run: pip install tox
     - name: Run tox
       run: make init
+    - name: Install sphinx build
+      run: sudo apt install python3-sphinx
     - name: Generate docs
       run: |
         cd docs
