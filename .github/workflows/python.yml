@@ -43,6 +43,8 @@ jobs:
         python-version: '3.x'
     - name: Install tox
       run: pip install tox
+    - name: Run tox
+      run: make init
     - name: Generate docs
       run: |
         cd docs
