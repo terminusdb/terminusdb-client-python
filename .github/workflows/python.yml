@@ -65,8 +65,16 @@ jobs:
     needs: build
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     steps:
-      - name: Deploy to pypi
-        uses: pypa/gh-action-pypi-publish@v1.4.1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
+    - name: Install dependencies
+      run: |
+          python -m pip install --upgrade pip
+          python -m pip install flake8 pytest tox
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Run tox to create dist
+      run: |
+        make ci
+    - name: Deploy to pypi
+      uses: pypa/gh-action-pypi-publish@v1.4.1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
