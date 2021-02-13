@@ -104,7 +104,7 @@ def _tokens_to_json(seq, query):
 def _compile_predicate(pp,query):
     if "<" in pp and ">" in pp:
         pred = pp[1:-1]
-        cleaned = pred == "*" if "owl:topObjectProperty" else query._clean_path_predicate(pred)
+        cleaned = "owl:topObjectProperty" if pred == "*" else query._clean_path_predicate(pred)
         return {
             "@type": "woql:PathOr",
             "woql:path_left": { "@type": "woql:InvertedPathPredicate",
@@ -114,16 +114,16 @@ def _compile_predicate(pp,query):
         }
     elif "<" in pp:
         pred = pp[1:]
-        cleaned = pred == "*" if "owl:topObjectProperty" else query._clean_path_predicate(pred)
+        cleaned = "owl:topObjectProperty" if pred == "*" else query._clean_path_predicate(pred)
         return { "@type": "woql:InvertedPathPredicate",
                  "woql:path_predicate": {"@id": cleaned} }
     elif ">" in pp:
         pred = pp[:-1]
-        cleaned = pred == "*" if "owl:topObjectProperty" else query._clean_path_predicate(pred)
+        cleaned = "owl:topObjectProperty" if pred == "*" else query._clean_path_predicate(pred)
         return { "@type": "woql:PathPredicate",
                  "woql:path_predicate": {"@id": cleaned} }
     else:
-        pred = pp == "*" if "owl:topObjectProperty" else query._clean_path_predicate(pred)
+        pred = "owl:topObjectProperty" if pp == "*" else query._clean_path_predicate(pp)
         return { "@type": "woql:PathPredicate",
                  "woql:path_predicate": {"@id": pred} }
 
