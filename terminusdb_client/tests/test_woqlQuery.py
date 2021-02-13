@@ -395,6 +395,38 @@ class TestWoqlQueries:
         }
         assert woql_object.to_dict() == json_object
 
+    def test_grouped_path_query(self):
+        woql_object = WOQLQuery().path("v:X", "(<scm:hop,scm:hop>)+", "v:Y", "v:Path")
+        json_object = {
+            '@type': 'woql:Path',
+            'woql:subject': {
+                '@type': 'woql:Variable',
+                'woql:variable_name': {'@value': 'X', '@type': 'xsd:string'}
+            },
+            'woql:path_pattern': {
+                '@type': 'woql:PathPlus',
+                'woql:path_pattern': {
+                    '@type':'woql:PathSequence',
+                    'woql:path_first': {
+                        '@type': 'woql:InvertedPathPredicate',
+                        'woql:path_predicate': {'@id': 'scm:hop'}
+                    },
+                    'woql:path_second': {
+                        '@type': 'woql:PathPredicate',
+                        'woql:path_predicate': {'@id':'scm:hop'}
+                    }
+                }
+            },
+            'woql:object': {
+                '@type': 'woql:Variable',
+                'woql:variable_name': {'@value': 'Y', '@type': 'xsd:string'}
+            },
+            'woql:path': {
+                '@type': 'woql:Variable',
+                'woql:variable_name': {'@value': 'Path', '@type': 'xsd:string'}}
+        }
+        assert woql_object.to_dict() == json_object
+
 class TestTripleBuilder:
     def test_triple_method(self, triple_opt):
         woql_object = WOQLQuery().triple("a", "b", "c")

@@ -16,11 +16,11 @@ def _get_clause_and_remainder(pat):
             if char == "(":
                 opening += 1
             elif char == ")":
-                pass
+                opening -= 1
             if opening == 0:
-                rem = pat[idx + 1 :].strip()
+                rem = pat[idx+2:].strip()
                 if rem:
-                    return [pat[1:idx], rem]
+                    return [pat[1:idx+1], rem]
                 return _get_clause_and_remainder(pat[1:idx])
                 # whole thing surrounded by parentheses, strip them out and reparse
         return []
