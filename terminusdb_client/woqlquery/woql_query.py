@@ -2475,6 +2475,30 @@ class WOQLQuery:
         return self
 
     def path(self, subject, pattern, obj, path):
+        """
+        Create a path object constructed by the rules specified with pattern.
+
+        Parameters
+        ----------
+        subject : str
+            a woql subject, the node that the path started
+        pattern : str
+            a pattern which specified the edges the path is consisted of.
+            It uses pattern construction syntax such as:
+            * '(scm:edge1, scm:edge2)+' for repeated pattern,
+            * 'scm:edge1|scm:edge2' for 'or' pattern,
+            * '<scm:edge' for reverse pattern, and
+            * '(scm:edge1)[n,m] for pattern between n and m times'
+        obj : str
+            a woql object, the node that the path ended
+        path: str
+            output variable
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         if subject and subject == "woql:args":
             return ["woql:subject", "woql:path_pattern", "woql:object", "woql:path"]
         if self._cursor.get("@type"):
