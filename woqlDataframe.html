@@ -179,7 +179,7 @@
 <h1>woqlDataframe<a class="headerlink" href="#woqldataframe" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="terminusdb_client.WOQLDataFrame.extract_column">
-<code class="sig-prename descclassname">terminusdb_client.WOQLDataFrame.</code><code class="sig-name descname">extract_column</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">ty</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLDataFrame.extract_column" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">terminusdb_client.WOQLDataFrame.</span></code><code class="sig-name descname"><span class="pre">extract_column</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ty</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLDataFrame.extract_column" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extracts the column of the returned result table</p>
 <p>Extrace one specific column from the result of the query binding.</p>
 <dl class="field-list simple">
@@ -221,7 +221,7 @@
 
 <dl class="py function">
 <dt id="terminusdb_client.WOQLDataFrame.extract_header">
-<code class="sig-prename descclassname">terminusdb_client.WOQLDataFrame.</code><code class="sig-name descname">extract_header</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLDataFrame.extract_header" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">terminusdb_client.WOQLDataFrame.</span></code><code class="sig-name descname"><span class="pre">extract_header</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLDataFrame.extract_header" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extracts the header of the returned result table</p>
 <p>Extrace the result of the query binding, including the header name and their WOQL rdf data type.</p>
 <dl class="field-list simple">
@@ -259,7 +259,7 @@
 
 <dl class="py function">
 <dt id="terminusdb_client.WOQLDataFrame.query_to_df">
-<code class="sig-prename descclassname">terminusdb_client.WOQLDataFrame.</code><code class="sig-name descname">query_to_df</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLDataFrame.query_to_df" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">terminusdb_client.WOQLDataFrame.</span></code><code class="sig-name descname"><span class="pre">query_to_df</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLDataFrame.query_to_df" title="Permalink to this definition">¶</a></dt>
 <dd><p>DEPRECATED in 0.3.0: use result_to_df instead.</p>
 <p>Converts result query binding to a pandas DataFrame. This only works for homogeneous query results</p>
 <dl class="field-list simple">
@@ -296,7 +296,7 @@
 
 <dl class="py function">
 <dt id="terminusdb_client.WOQLDataFrame.type_map">
-<code class="sig-prename descclassname">terminusdb_client.WOQLDataFrame.</code><code class="sig-name descname">type_map</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ty_rdf</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLDataFrame.type_map" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">terminusdb_client.WOQLDataFrame.</span></code><code class="sig-name descname"><span class="pre">type_map</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ty_rdf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLDataFrame.type_map" title="Permalink to this definition">¶</a></dt>
 <dd><p>Mapping types from WOQL rdf to numpy data types</p>
 <p>Maps the WOQL rdf type in the result query binding to numpy data types so it can be used in constructed pandas DataFrame.</p>
 <dl class="field-list simple">
@@ -328,7 +328,7 @@
 
 <dl class="py function">
 <dt id="terminusdb_client.WOQLDataFrame.type_value_map">
-<code class="sig-prename descclassname">terminusdb_client.WOQLDataFrame.</code><code class="sig-name descname">type_value_map</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ty_rdf</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLDataFrame.type_value_map" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">terminusdb_client.WOQLDataFrame.</span></code><code class="sig-name descname"><span class="pre">type_value_map</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ty_rdf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLDataFrame.type_value_map" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts values of different WOQL rdf types to numpy data types values</p>
 <p>Converts the values in the result query binding to numpy data types according to their WOQL rdf type, so it can be used in constructed pandas DataFrame.</p>
 <dl class="field-list simple">

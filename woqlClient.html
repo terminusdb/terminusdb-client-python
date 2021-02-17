@@ -179,12 +179,12 @@
 <h1>WOQLClient<a class="headerlink" href="#woqlclient" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="terminusdb_client.WOQLClient">
-<em class="property">class </em><code class="sig-prename descclassname">terminusdb_client.</code><code class="sig-name descname">WOQLClient</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">server_url</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terminusdb_client.</span></code><code class="sig-name descname"><span class="pre">WOQLClient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">server_url</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Client for querying a TerminusDB server using WOQL queries.</p>
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">server_url</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">server_url</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>The WOQLClient constructor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -199,7 +199,7 @@ Passing insecure=True will skip HTTPS certificate checking.</p></li>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.connect">
-<code class="sig-name descname">connect</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.connect" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">connect</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.connect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Connect to a Terminus server at the given URI with an API key.</p>
 <p>Stores the terminus:ServerCapability document returned
 in the conCapabilities register which stores, the url, key, capabilities,
@@ -228,7 +228,7 @@ or an error will be raise.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.copy">
-<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.copy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">copy</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a deep copy of this client.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -248,7 +248,7 @@ or an error will be raise.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.basic_auth">
-<code class="sig-name descname">basic_auth</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">user</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.basic_auth" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">basic_auth</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.basic_auth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set or get the <code class="docutils literal notranslate"><span class="pre">user:password</span></code> for basic HTTP authentication to the server.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">key</span></code> is not provided, then the config will not be updated.</p>
 <dl class="field-list simple">
@@ -279,7 +279,7 @@ or an error will be raise.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.remote_auth">
-<code class="sig-name descname">remote_auth</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">auth_info</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.remote_auth" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">remote_auth</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">auth_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.remote_auth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set or get the Basic auth or JWT token used for authenticating to the server.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">auth_info</span></code> is not provided, then the config will not be updated.</p>
 <dl class="field-list simple">
@@ -305,7 +305,7 @@ or an error will be raise.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.set_db">
-<code class="sig-name descname">set_db</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dbid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.set_db" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_db</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.set_db" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set and return the current database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -328,7 +328,7 @@ or an error will be raise.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.db">
-<code class="sig-name descname">db</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dbid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.db" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">db</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.db" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set or get the current database.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">dbid</span></code> is not provided, then the config will not be updated.</p>
 <dl class="field-list simple">
@@ -356,7 +356,7 @@ or an error will be raise.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.account">
-<code class="sig-name descname">account</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">accountid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.account" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">account</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">accountid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.account" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set or get the account identifier.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">accountid</span></code> is not provided, then the config will not be updated.</p>
 <dl class="field-list simple">
@@ -384,7 +384,7 @@ or an error will be raise.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.user_account">
-<code class="sig-name descname">user_account</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.user_account" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">user_account</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.user_account" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the current user identifier.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -404,7 +404,7 @@ or an error will be raise.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.user">
-<code class="sig-name descname">user</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.user" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">user</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.user" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the current user’s information.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -424,7 +424,7 @@ or an error will be raise.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.repo">
-<code class="sig-name descname">repo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">repoid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.repo" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">repo</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">repoid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.repo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set or get the repository identifier.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">repoid</span></code> is not provided, then the config will not be updated.</p>
 <dl class="field-list simple">
@@ -452,7 +452,7 @@ or an error will be raise.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.ref">
-<code class="sig-name descname">ref</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">refid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.ref" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">ref</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">refid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.ref" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set or get the ref pointer (pointer to a commit within the branch).</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">refid</span></code> is not provided, then the config will not be updated.</p>
 <dl class="field-list simple">
@@ -480,7 +480,7 @@ or an error will be raise.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.checkout">
-<code class="sig-name descname">checkout</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">branchid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.checkout" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">checkout</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">branchid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.checkout" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set or get the current branch identifier.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">branchid</span></code> is not provided, then the config will not be updated.</p>
 <dl class="field-list simple">
@@ -508,7 +508,7 @@ or an error will be raise.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.uid">
-<code class="sig-name descname">uid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ignore_jwt</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.uid" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">uid</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ignore_jwt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.uid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the current user identifier.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -533,7 +533,7 @@ or an error will be raise.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.resource">
-<code class="sig-name descname">resource</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ttype</span></em>, <em class="sig-param"><span class="n">val</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.resource" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">resource</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ttype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.resource" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a resource identifier string based on the current config.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -575,7 +575,7 @@ or an error will be raise.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.set">
-<code class="sig-name descname">set</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.set" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update multiple config values on the current context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -591,7 +591,7 @@ or an error will be raise.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.create_database">
-<code class="sig-name descname">create_database</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dbid</span></em>, <em class="sig-param"><span class="n">accountid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">prefixes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">include_schema</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.create_database" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">create_database</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accountid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefixes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_schema</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.create_database" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a TerminusDB database by posting
 a terminus:Database document to the Terminus Server.</p>
 <dl class="field-list simple">
@@ -628,7 +628,7 @@ a terminus:Database document to the Terminus Server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.delete_database">
-<code class="sig-name descname">delete_database</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dbid</span></em>, <em class="sig-param"><span class="n">accountid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">force</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.delete_database" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">delete_database</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accountid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.delete_database" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete a TerminusDB database.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">accountid</span></code> is provided, then the account in the config will be updated
 and the new value will be used in future requests to the server.</p>
@@ -657,7 +657,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.create_graph">
-<code class="sig-name descname">create_graph</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">graph_type</span></em>, <em class="sig-param"><span class="n">graph_id</span></em>, <em class="sig-param"><span class="n">commit_msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.create_graph" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">create_graph</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.create_graph" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new graph in the current database context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -681,7 +681,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.delete_graph">
-<code class="sig-name descname">delete_graph</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">graph_type</span></em>, <em class="sig-param"><span class="n">graph_id</span></em>, <em class="sig-param"><span class="n">commit_msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.delete_graph" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">delete_graph</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.delete_graph" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete a graph from the current database context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -705,7 +705,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.get_triples">
-<code class="sig-name descname">get_triples</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">graph_type</span></em>, <em class="sig-param"><span class="n">graph_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_triples" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_triples</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_triples" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves the contents of the specified graph as triples encoded in turtle format</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -725,7 +725,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.update_triples">
-<code class="sig-name descname">update_triples</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">graph_type</span></em>, <em class="sig-param"><span class="n">graph_id</span></em>, <em class="sig-param"><span class="n">turtle</span></em>, <em class="sig-param"><span class="n">commit_msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.update_triples" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">update_triples</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">turtle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.update_triples" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -747,7 +747,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.insert_triples">
-<code class="sig-name descname">insert_triples</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">graph_type</span></em>, <em class="sig-param"><span class="n">graph_id</span></em>, <em class="sig-param"><span class="n">turtle</span></em>, <em class="sig-param"><span class="n">commit_msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.insert_triples" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">insert_triples</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">turtle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.insert_triples" title="Permalink to this definition">¶</a></dt>
 <dd><p>Inserts into the specified graph with the triples encoded in turtle format.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -769,7 +769,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.get_csv">
-<code class="sig-name descname">get_csv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">csv_name</span></em>, <em class="sig-param"><span class="n">csv_directory</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">graph_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">graph_id</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_csv" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_csv</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csv_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csv_directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_csv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves the contents of the specified graph as a CSV</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -791,7 +791,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.update_csv">
-<code class="sig-name descname">update_csv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">csv_paths</span></em>, <em class="sig-param"><span class="n">commit_msg</span></em>, <em class="sig-param"><span class="n">graph_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">graph_id</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.update_csv" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">update_csv</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csv_paths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.update_csv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -813,7 +813,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.insert_csv">
-<code class="sig-name descname">insert_csv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">csv_paths</span></em>, <em class="sig-param"><span class="n">commit_msg</span></em>, <em class="sig-param"><span class="n">graph_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">graph_id</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.insert_csv" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">insert_csv</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csv_paths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.insert_csv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Inserts into the specified graph with the triples encoded in turtle format.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -835,7 +835,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.query">
-<code class="sig-name descname">query</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">woql_query</span></em>, <em class="sig-param"><span class="n">commit_msg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">file_dict</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.query" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">query</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">woql_query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.query" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -854,7 +854,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.branch">
-<code class="sig-name descname">branch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">new_branch_id</span></em>, <em class="sig-param"><span class="n">empty</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.branch" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">branch</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_branch_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">empty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.branch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a branch starting from the current branch.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -874,7 +874,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.pull">
-<code class="sig-name descname">pull</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">remote_source_repo</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.pull" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">pull</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">remote_source_repo</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.pull" title="Permalink to this definition">¶</a></dt>
 <dd><p>Pull updates from a remote repository to the current database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -899,12 +899,12 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.fetch">
-<code class="sig-name descname">fetch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">remote_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.fetch" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">fetch</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">remote_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.fetch" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.push">
-<code class="sig-name descname">push</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">remote_target_repo</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.push" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">push</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">remote_target_repo</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.push" title="Permalink to this definition">¶</a></dt>
 <dd><p>Push changes from a branch to a remote repo</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -919,7 +919,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.rebase">
-<code class="sig-name descname">rebase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rebase_source</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.rebase" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">rebase</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rebase_source</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.rebase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rebase the current branch onto the specified remote branch.</p>
 <p class="rubric">Notes</p>
 <p>The “remote” repo can live in the local database.</p>
@@ -946,7 +946,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.reset">
-<code class="sig-name descname">reset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">commit_path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.reset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">reset</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commit_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.reset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reset the current branch HEAD to the specified commit path.</p>
 <p class="rubric">Notes</p>
 <p>The “remote” repo can live in the local database.</p>
@@ -971,7 +971,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.optimize">
-<code class="sig-name descname">optimize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.optimize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">optimize</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.optimize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optimize the specified path.</p>
 <p class="rubric">Notes</p>
 <p>The “remote” repo can live in the local database.</p>
@@ -995,7 +995,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.squash">
-<code class="sig-name descname">squash</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="n">author</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.squash" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">squash</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">author</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.squash" title="Permalink to this definition">¶</a></dt>
 <dd><p>Squash the current branch HEAD into a commit</p>
 <p class="rubric">Notes</p>
 <p>The “remote” repo can live in the local database.</p>
@@ -1030,7 +1030,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.clonedb">
-<code class="sig-name descname">clonedb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">clone_source</span></em>, <em class="sig-param"><span class="n">newid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.clonedb" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">clonedb</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clone_source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.clonedb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clone a remote repository and create a local copy.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1058,7 +1058,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.dispatch">
-<code class="sig-name descname">dispatch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">action</span></em>, <em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="n">payload</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">file_dict</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.dispatch" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">dispatch</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.dispatch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Directly dispatch to a TerminusDB database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1080,7 +1080,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.get_database">
-<code class="sig-name descname">get_database</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dbid</span></em>, <em class="sig-param"><span class="n">account</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_database" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_database</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">account</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_database" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns metadata (id, organization, label, comment) about the requested database
 :type dbid: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>
 :param dbid: The id of the database
@@ -1100,7 +1100,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.get_databases">
-<code class="sig-name descname">get_databases</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_databases" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_databases</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_databases" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a list of database metadata records for all databases the user has access to</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -1114,13 +1114,13 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.get_metadata">
-<code class="sig-name descname">get_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dbid</span></em>, <em class="sig-param"><span class="n">account</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_metadata</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">account</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias of get_database above - deprecated - included for backwards compatibility</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.server">
-<code class="sig-name descname">server</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.server" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">server</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.server" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the URL of the currently connected server</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1131,7 +1131,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.api">
-<code class="sig-name descname">api</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.api" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">api</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.api" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the URL of the currently connected server</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1142,7 +1142,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.get_class_frame">
-<code class="sig-name descname">get_class_frame</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">class_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_class_frame" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_class_frame</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_class_frame" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

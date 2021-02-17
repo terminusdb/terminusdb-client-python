@@ -179,11 +179,11 @@
 <p><strong>Warning: This is only a beta version</strong></p>
 <dl class="py class">
 <dt id="terminusdb_client.TerminusDB">
-<em class="property">class </em><code class="sig-prename descclassname">terminusdb_client.</code><code class="sig-name descname">TerminusDB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">server_url</span></em>, <em class="sig-param"><span class="n">db_id</span></em>, <em class="sig-param"><span class="n">key</span><span class="o">=</span><span class="default_value">'root'</span></em>, <em class="sig-param"><span class="n">account</span><span class="o">=</span><span class="default_value">'admin'</span></em>, <em class="sig-param"><span class="n">user</span><span class="o">=</span><span class="default_value">'admin'</span></em>, <em class="sig-param"><span class="n">db_label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">db_description</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.TerminusDB" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terminusdb_client.</span></code><code class="sig-name descname"><span class="pre">TerminusDB</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">server_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'root'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">account</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'admin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'admin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.TerminusDB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt id="terminusdb_client.TerminusDB.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">server_url</span></em>, <em class="sig-param"><span class="n">db_id</span></em>, <em class="sig-param"><span class="n">key</span><span class="o">=</span><span class="default_value">'root'</span></em>, <em class="sig-param"><span class="n">account</span><span class="o">=</span><span class="default_value">'admin'</span></em>, <em class="sig-param"><span class="n">user</span><span class="o">=</span><span class="default_value">'admin'</span></em>, <em class="sig-param"><span class="n">db_label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">db_description</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.TerminusDB.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">server_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'root'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">account</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'admin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'admin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.TerminusDB.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>The TerminusDB constructor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -204,7 +204,7 @@ Passing insecure=True will skip HTTPS certificate checking.</p></li>
 
 <dl class="py method">
 <dt id="terminusdb_client.TerminusDB.add_class">
-<code class="sig-name descname">add_class</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.TerminusDB.add_class" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">add_class</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.TerminusDB.add_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds one or more WOQLClass types.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -215,7 +215,7 @@ Passing insecure=True will skip HTTPS certificate checking.</p></li>
 
 <dl class="py method">
 <dt id="terminusdb_client.TerminusDB.add_object">
-<code class="sig-name descname">add_object</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.TerminusDB.add_object" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">add_object</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.TerminusDB.add_object" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds one or more WOQLObj.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -226,7 +226,7 @@ Passing insecure=True will skip HTTPS certificate checking.</p></li>
 
 <dl class="py method">
 <dt id="terminusdb_client.TerminusDB.run">
-<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.TerminusDB.run" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">run</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.TerminusDB.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Runs a query either in WOQLQuery format or json_ld in dictionary presentation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -245,11 +245,11 @@ Passing insecure=True will skip HTTPS certificate checking.</p></li>
 
 <dl class="py class">
 <dt id="terminusdb_client.WOQLClass">
-<em class="property">class </em><code class="sig-prename descclassname">terminusdb_client.</code><code class="sig-name descname">WOQLClass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj_id</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">obj_property</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClass" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terminusdb_client.</span></code><code class="sig-name descname"><span class="pre">WOQLClass</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_property</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClass.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj_id</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">obj_property</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClass.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_property</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClass.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>The WOQLClass constructor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -280,7 +280,7 @@ Passing insecure=True will skip HTTPS certificate checking.</p></li>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClass.label">
-<em class="property">property </em><code class="sig-name descname">label</code><a class="headerlink" href="#terminusdb_client.WOQLClass.label" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">label</span></code><a class="headerlink" href="#terminusdb_client.WOQLClass.label" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the label of the instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -294,7 +294,7 @@ Passing insecure=True will skip HTTPS certificate checking.</p></li>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClass.description">
-<em class="property">property </em><code class="sig-name descname">description</code><a class="headerlink" href="#terminusdb_client.WOQLClass.description" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">description</span></code><a class="headerlink" href="#terminusdb_client.WOQLClass.description" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the description of the instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -308,7 +308,7 @@ Passing insecure=True will skip HTTPS certificate checking.</p></li>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClass.add_property">
-<code class="sig-name descname">add_property</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pro_id</span></em>, <em class="sig-param"><span class="n">property_type</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClass.add_property" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">add_property</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pro_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClass.add_property" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds the given properties to the instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -330,7 +330,7 @@ Passing insecure=True will skip HTTPS certificate checking.</p></li>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClass.to_dict">
-<code class="sig-name descname">to_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClass.to_dict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">to_dict</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClass.to_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the query_object as a dict.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -344,7 +344,7 @@ Passing insecure=True will skip HTTPS certificate checking.</p></li>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClass.to_json">
-<code class="sig-name descname">to_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClass.to_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">to_json</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClass.to_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the query_object as a json.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -360,11 +360,11 @@ Passing insecure=True will skip HTTPS certificate checking.</p></li>
 
 <dl class="py class">
 <dt id="terminusdb_client.WOQLObj">
-<em class="property">class </em><code class="sig-prename descclassname">terminusdb_client.</code><code class="sig-name descname">WOQLObj</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj_id</span></em>, <em class="sig-param"><span class="n">obj_type</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">obj_property</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLObj" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terminusdb_client.</span></code><code class="sig-name descname"><span class="pre">WOQLObj</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_property</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLObj" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt id="terminusdb_client.WOQLObj.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj_id</span></em>, <em class="sig-param"><span class="n">obj_type</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">obj_property</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLObj.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_property</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLObj.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>The WOQLObj constructor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -397,7 +397,7 @@ Passing insecure=True will skip HTTPS certificate checking.</p></li>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLObj.add_property">
-<code class="sig-name descname">add_property</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pro_id</span></em>, <em class="sig-param"><span class="n">pro_value</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLObj.add_property" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">add_property</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pro_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pro_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLObj.add_property" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds the given properties to the instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -419,7 +419,7 @@ Passing insecure=True will skip HTTPS certificate checking.</p></li>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLObj.to_dict">
-<code class="sig-name descname">to_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLObj.to_dict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">to_dict</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLObj.to_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the query_object as a dict.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -433,7 +433,7 @@ Passing insecure=True will skip HTTPS certificate checking.</p></li>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLObj.to_json">
-<code class="sig-name descname">to_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLObj.to_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">to_json</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLObj.to_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the query_object as a json.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
