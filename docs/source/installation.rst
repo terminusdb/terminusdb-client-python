@@ -3,8 +3,8 @@ Installation
 
 Requirements
 ------------
-* `TerminusDB 3.0 <https://github.com/terminusdb/terminusdb-server>`_
-  (you can `install using Docker <https://github.com/terminusdb/terminusdb-quickstart>`_)
+* `TerminusDB <https://terminusdb.com/hub/download>`_
+  (you can also `install using Docker <https://github.com/terminusdb/terminusdb-quickstart>`_)
 * Python >= 3.6
 
 Install using pip
