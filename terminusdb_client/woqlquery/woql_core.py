@@ -16,11 +16,11 @@ def _get_clause_and_remainder(pat):
             if char == "(":
                 opening += 1
             elif char == ")":
-                pass
+                opening -= 1
             if opening == 0:
-                rem = pat[idx + 1 :].strip()
+                rem = pat[idx+2:].strip()
                 if rem:
-                    return [pat[1:idx], rem]
+                    return [pat[1:idx+1], rem]
                 return _get_clause_and_remainder(pat[1:idx])
                 # whole thing surrounded by parentheses, strip them out and reparse
         return []
@@ -62,14 +62,7 @@ def _tokens_to_json(seq, query):
         ntoks = _tokenize(seq[0])
         if len(ntoks) == 1:
             tok = ntoks[0].strip()
-            if tok == "*":
-                path_pred = "owl:topObjectProperty"
-            else:
-                path_pred = query._clean_path_predicate(tok)
-            return {
-                "@type": "woql:PathPredicate",
-                "woql:path_predicate": {"@id": path_pred},
-            }
+            return _compile_predicate(tok, query)
         else:
             return _tokens_to_json(ntoks, query)
     elif "|" in seq:  # binds most loosely
@@ -108,6 +101,31 @@ def _tokens_to_json(seq, query):
             "rdfs:label": "failed to parse query " + seq[0],
         }
 
+def _compile_predicate(pp,query):
+    if "<" in pp and ">" in pp:
+        pred = pp[1:-1]
+        cleaned = "owl:topObjectProperty" if pred == "*" else query._clean_path_predicate(pred)
+        return {
+            "@type": "woql:PathOr",
+            "woql:path_left": { "@type": "woql:InvertedPathPredicate",
+                                "woql:path_predicate": {"@id": cleaned} },
+            "woql:path_right": { "@type": "woql:PathPredicate",
+                                 "woql:path_predicate": {"@id": cleaned}}
+        }
+    elif "<" in pp:
+        pred = pp[1:]
+        cleaned = "owl:topObjectProperty" if pred == "*" else query._clean_path_predicate(pred)
+        return { "@type": "woql:InvertedPathPredicate",
+                 "woql:path_predicate": {"@id": cleaned} }
+    elif ">" in pp:
+        pred = pp[:-1]
+        cleaned = "owl:topObjectProperty" if pred == "*" else query._clean_path_predicate(pred)
+        return { "@type": "woql:PathPredicate",
+                 "woql:path_predicate": {"@id": cleaned} }
+    else:
+        pred = "owl:topObjectProperty" if pp == "*" else query._clean_path_predicate(pp)
+        return { "@type": "woql:PathPredicate",
+                 "woql:path_predicate": {"@id": pred} }
 
 def _copy_dict(orig, rollup=None):
     if type(orig) is list:
