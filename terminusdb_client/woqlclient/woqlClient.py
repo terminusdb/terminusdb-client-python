@@ -481,7 +481,7 @@ class WOQLClient:
         Examples
         --------
         >>> client = WOQLClient("https://127.0.0.1:6363/")
-        >>> client.create_database("someDB", "Database Label", "password")
+        >>> client.create_database("someDB", "admin", "Database Label", "My Description")
         """
         details: Dict[str, Any] = {}
         if label:
