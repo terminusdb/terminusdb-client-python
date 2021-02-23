@@ -112,229 +112,30 @@ class WOQLClient:
             raise InterfaceError("Client is not connected to a TerminusDB database.")
 
     def _get_current_commit(self):
-        woql_query = {
-            "@context": "/api/prefixes/_commits",
-            "@type": "woql:Using",
-            "woql:collection": {"@type": "xsd:string", "@value": "_commits"},
-            "woql:query": {
-                "@type": "woql:And",
-                "woql:query_list": [
-                    {
-                        "@type": "woql:QueryListElement",
-                        "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 0},
-                        "woql:query": {
-                            "@type": "woql:Triple",
-                            "woql:object": {
-                                "@type": "woql:Datatype",
-                                "woql:datatype": {
-                                    "@type": "xsd:string",
-                                    "@value": "main",
-                                },
-                            },
-                            "woql:predicate": {
-                                "@type": "woql:Node",
-                                "woql:node": "ref:branch_name",
-                            },
-                            "woql:subject": {
-                                "@type": "woql:Variable",
-                                "woql:variable_name": {
-                                    "@type": "xsd:string",
-                                    "@value": "branch",
-                                },
-                            },
-                        },
-                    },
-                    {
-                        "@type": "woql:QueryListElement",
-                        "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 1},
-                        "woql:query": {
-                            "@type": "woql:Triple",
-                            "woql:object": {
-                                "@type": "woql:Variable",
-                                "woql:variable_name": {
-                                    "@type": "xsd:string",
-                                    "@value": "commit",
-                                },
-                            },
-                            "woql:predicate": {
-                                "@type": "woql:Node",
-                                "woql:node": "ref:ref_commit",
-                            },
-                            "woql:subject": {
-                                "@type": "woql:Variable",
-                                "woql:variable_name": {
-                                    "@type": "xsd:string",
-                                    "@value": "branch",
-                                },
-                            },
-                        },
-                    },
-                ],
-            },
-        }
+        woql_query = (
+            WOQLQuery()
+            .using("_commits")
+            .triple("v:branch", "ref:branch_name", "main")
+            .triple("v:branch", "ref:ref_commit", "v:commit")
+        )
         result = self.query(woql_query)
         current_commit = result.get("bindings")[0].get("commit")
         return current_commit
 
     def _get_target_commit(self, step):
-        woql_query = {
-            "@context": "/api/prefixes/_commits",
-            "@type": "woql:Using",
-            "woql:collection": {"@type": "xsd:string", "@value": "_commits"},
-            "woql:query": {
-                "@type": "woql:And",
-                "woql:query_list": [
-                    {
-                        "@type": "woql:QueryListElement",
-                        "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 0},
-                        "woql:query": {
-                            "@type": "woql:Path",
-                            "woql:object": {
-                                "@type": "woql:Variable",
-                                "woql:variable_name": {
-                                    "@type": "xsd:string",
-                                    "@value": "target_commit",
-                                },
-                            },
-                            "woql:path": {
-                                "@type": "woql:Variable",
-                                "woql:variable_name": {
-                                    "@type": "xsd:string",
-                                    "@value": "path",
-                                },
-                            },
-                            "woql:path_pattern": {
-                                "@type": "woql:PathTimes",
-                                "woql:path_maximum": {
-                                    "@type": "xsd:positiveInteger",
-                                    "@value": str(step),
-                                },
-                                "woql:path_minimum": {
-                                    "@type": "xsd:positiveInteger",
-                                    "@value": str(step),
-                                },
-                                "woql:path_pattern": {
-                                    "@type": "woql:PathPredicate",
-                                    "woql:path_predicate": {"@id": "ref:commit_parent"},
-                                },
-                            },
-                            "woql:subject": {
-                                "@type": "woql:Variable",
-                                "woql:variable_name": {
-                                    "@type": "xsd:string",
-                                    "@value": "commit",
-                                },
-                            },
-                        },
-                    },
-                    {
-                        "@type": "woql:QueryListElement",
-                        "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 1},
-                        "woql:query": {
-                            "@type": "woql:And",
-                            "woql:query_list": [
-                                {
-                                    "@type": "woql:QueryListElement",
-                                    "woql:index": {
-                                        "@type": "xsd:nonNegativeInteger",
-                                        "@value": 0,
-                                    },
-                                    "woql:query": {
-                                        "@type": "woql:Triple",
-                                        "woql:object": {
-                                            "@type": "woql:Datatype",
-                                            "woql:datatype": {
-                                                "@type": "xsd:string",
-                                                "@value": self.checkout(),
-                                            },
-                                        },
-                                        "woql:predicate": {
-                                            "@type": "woql:Node",
-                                            "woql:node": "ref:branch_name",
-                                        },
-                                        "woql:subject": {
-                                            "@type": "woql:Variable",
-                                            "woql:variable_name": {
-                                                "@type": "xsd:string",
-                                                "@value": "branch",
-                                            },
-                                        },
-                                    },
-                                },
-                                {
-                                    "@type": "woql:QueryListElement",
-                                    "woql:index": {
-                                        "@type": "xsd:nonNegativeInteger",
-                                        "@value": 1,
-                                    },
-                                    "woql:query": {
-                                        "@type": "woql:And",
-                                        "woql:query_list": [
-                                            {
-                                                "@type": "woql:QueryListElement",
-                                                "woql:index": {
-                                                    "@type": "xsd:nonNegativeInteger",
-                                                    "@value": 0,
-                                                },
-                                                "woql:query": {
-                                                    "@type": "woql:Triple",
-                                                    "woql:object": {
-                                                        "@type": "woql:Variable",
-                                                        "woql:variable_name": {
-                                                            "@type": "xsd:string",
-                                                            "@value": "commit",
-                                                        },
-                                                    },
-                                                    "woql:predicate": {
-                                                        "@type": "woql:Node",
-                                                        "woql:node": "ref:ref_commit",
-                                                    },
-                                                    "woql:subject": {
-                                                        "@type": "woql:Variable",
-                                                        "woql:variable_name": {
-                                                            "@type": "xsd:string",
-                                                            "@value": "branch",
-                                                        },
-                                                    },
-                                                },
-                                            },
-                                            {
-                                                "@type": "woql:QueryListElement",
-                                                "woql:index": {
-                                                    "@type": "xsd:nonNegativeInteger",
-                                                    "@value": 1,
-                                                },
-                                                "woql:query": {
-                                                    "@type": "woql:Triple",
-                                                    "woql:object": {
-                                                        "@type": "woql:Variable",
-                                                        "woql:variable_name": {
-                                                            "@type": "xsd:string",
-                                                            "@value": "cid",
-                                                        },
-                                                    },
-                                                    "woql:predicate": {
-                                                        "@type": "woql:Node",
-                                                        "woql:node": "ref:commit_id",
-                                                    },
-                                                    "woql:subject": {
-                                                        "@type": "woql:Variable",
-                                                        "woql:variable_name": {
-                                                            "@type": "xsd:string",
-                                                            "@value": "target_commit",
-                                                        },
-                                                    },
-                                                },
-                                            },
-                                        ],
-                                    },
-                                },
-                            ],
-                        },
-                    },
-                ],
-            },
-        }
+        woql_query = (
+            WOQLQuery()
+            .using("_commits")
+            .path(
+                "v:commit",
+                f"ref:commit_parent{{{step},{step}}}",
+                "v:target_commit",
+                "v:path",
+            )
+            .triple("v:branch", "ref:branch_name", self.checkout())
+            .triple("v:branch", "ref:ref_commit", "v:commit")
+            .triple("v:target_commit", "ref:commit_id", "v:cid")
+        )
         result = self.query(woql_query)
         target_commit = result.get("bindings")[0].get("cid").get("@value")
         return target_commit

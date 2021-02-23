@@ -20,7 +20,7 @@ dockerpty==0.4.1          # via docker-compose
 docopt==0.6.2             # via docker-compose
 execnet==1.8.0            # via pytest-xdist
 idna==2.10                # via requests
-importlib-metadata==3.4.0  # via jsonschema, pluggy, pytest
+importlib-metadata==3.5.0  # via jsonschema, pluggy, pytest
 iniconfig==1.1.1          # via pytest
 jsonschema==3.2.0         # via docker-compose
 numpy==1.20.1             # via -r requirements.in, pandas
