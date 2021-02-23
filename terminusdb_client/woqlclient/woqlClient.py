@@ -517,7 +517,8 @@ class WOQLClient:
             return base + "/commit/" + val
 
     def set(self, **kwargs: Dict[str, Any]):  # bad naming
-        r"""Update multiple config values on the current context.
+        r"""**deprecated, use `connect` instead**
+        Update multiple config values on the current context.
 
         Parameters
         ----------
@@ -1362,6 +1363,7 @@ class WOQLClient:
         -------
         dict or None if not found
         """
+        self._check_connection()
         db_ids = []
         all_dbs = []
         for this_db in self.get_databases():
@@ -1397,6 +1399,7 @@ class WOQLClient:
         -------
         list of dicts
         """
+        self._check_connection()
         all_dbs = []
         for scope in self._capabilities["system:role"]["system:capability"][
             "system:capability_scope"
@@ -1415,30 +1418,13 @@ class WOQLClient:
         """
         Returns the URL of the currently connected server
         """
-        return self.conConfig.server
+        return self._server_url
 
     def api(self) -> str:
         """
         Returns the URL of the currently connected server
         """
-        return self.conConfig.api
-
-    """
-    Unstable / Experimental Endpoints
-
-    The below API endpoints are not yet officially released
-
-    They are part of the server API (not desktop) and will be finalized and
-    officially released when that package is released. They should be considered
-    unreliable and unstable until then and use is unsupported and at your own risk
-    """
-
-    def get_class_frame(self, class_name):
-        self._check_connection()
-        opts = {"class": class_name}
-        return self.dispatch(
-            APIEndpointConst.CLASS_FRAME, self.conConfig.class_frame_url(), opts,
-        )
+        return self._api
 
     def _db_url_fragment(self):
         if self._db == "_system":
@@ -1532,3 +1518,20 @@ class WOQLClient:
 
     def _graph_url(self, graph_type: str, gid: str):
         return self._branch_base("graph") + f"/{graph_type}/{gid}"
+
+    """
+    Unstable / Experimental Endpoints
+
+    The below API endpoints are not yet officially released
+
+    They are part of the server API (not desktop) and will be finalized and
+    officially released when that package is released. They should be considered
+    unreliable and unstable until then and use is unsupported and at your own risk
+    """
+
+    def get_class_frame(self, class_name):
+        self._check_connection()
+        opts = {"class": class_name}
+        return self.dispatch(
+            APIEndpointConst.CLASS_FRAME, self.conConfig.class_frame_url(), opts,
+        )

@@ -23,7 +23,7 @@ def mock_func_no_arg():
 
 
 @mock.patch("requests.get", side_effect=mocked_requests)
-def test_connection(mocked_requests, monkeypatch):
+def test_connection(mocked_requests):
 
     woql_client = WOQLClient("http://localhost:6363")
 
@@ -36,6 +36,16 @@ def test_connection(mocked_requests, monkeypatch):
         headers={"Authorization": "Basic YWRtaW46cm9vdA=="},
         verify=False,
     )
+
+
+@mock.patch("requests.get", side_effect=mocked_requests)
+def test_connected_flag(mocked_requests):
+    woql_client = WOQLClient("http://localhost:6363")
+    assert not woql_client._connected
+    woql_client.connect(key="root", account="admin", user="admin")
+    assert woql_client._connected
+    woql_client.close()
+    assert not woql_client._connected
 
 
 @mock.patch("requests.post", side_effect=mocked_requests)
