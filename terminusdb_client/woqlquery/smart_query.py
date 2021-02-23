@@ -409,7 +409,7 @@ class TerminusDB:
 
         self._client = WOQLClient(server_url, **kwargs)
         self._client.connect(key=key, account=account, user=user)
-        existing = self._client.get_database(db_id, self._client.uid())
+        existing = self._client.get_database(db_id, self._client.account())
         self.classes: Dict[str, WOQLClass] = {}
         if not existing:
             self._client.create_database(db_id, account, db_label, db_description)

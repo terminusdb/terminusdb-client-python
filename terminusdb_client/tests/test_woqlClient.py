@@ -32,7 +32,7 @@ def test_connection(mocked_requests, monkeypatch):
     woql_client.connect(key="root", account="admin", user="admin")
 
     requests.get.assert_called_once_with(
-        "http://localhost:6363/api/",
+        "http://localhost:6363/api",
         headers={"Authorization": "Basic YWRtaW46cm9vdA=="},
         verify=False,
     )

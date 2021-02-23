@@ -7,13 +7,15 @@ from typing import Any, BinaryIO, Dict, List, Optional, Tuple, Union
 from ..__version__ import __version__
 from ..woqlquery.woql_query import WOQLQuery
 from .api_endpoint_const import APIEndpointConst
-from .connectionCapabilities import ConnectionCapabilities
 
 # from .errorMessage import *
-from .connectionConfig import ConnectionConfig
+# from .connectionConfig import ConnectionConfig
 from .dispatchRequest import DispatchRequest
+from .errors import InterfaceError
 
-# from .errors import (InvalidURIError)
+# from .connectionCapabilities import ConnectionCapabilities
+
+
 # from .errors import doc, opts
 
 # WOQL client object
@@ -24,22 +26,41 @@ from .dispatchRequest import DispatchRequest
 class WOQLClient:
     """Client for querying a TerminusDB server using WOQL queries."""
 
-    def __init__(self, server_url: str, **kwargs) -> None:
+    def __init__(self, server_url: str, insecure=False, **kwargs) -> None:
         r"""The WOQLClient constructor.
 
         Parameters
         ----------
         server_url : str
             URL of the server that this client will connect to.
+        insecure : bool
+            weather or not the connection is insecure
         \**kwargs
             Configuration options used to construct a :class:`ConnectionConfig` instance.
             Passing insecure=True will skip HTTPS certificate checking.
         """
-        self.conConfig = ConnectionConfig(server_url, **kwargs)
-        self.conCapabilities = ConnectionCapabilities()
-        self.insecure = kwargs.get("insecure")
+        self._server_url = server_url.strip("/")
+        self._api = f"{self._server_url}/api"
+        # kwargs["inscure"] = insecure
+        # self._init_setting = kwargs
+        self._connected = False
+        # self.conConfig = ConnectionConfig(server_url, **kwargs)
+        # self.conCapabilities = ConnectionCapabilities()
+        self.insecure = insecure
+        self._commit_made = 0
 
-    def connect(self, **kwargs) -> dict:
+    def connect(
+        self,
+        account="admin",
+        db=None,
+        remote_auth=None,
+        key="root",
+        user="admin",
+        branch="main",
+        ref=None,
+        repo="local",
+        **kwargs,
+    ) -> dict:
         r"""Connect to a Terminus server at the given URI with an API key.
 
         Stores the terminus:ServerCapability document returned
@@ -61,18 +82,268 @@ class WOQLClient:
 
         Examples
         -------
-        >>> client = WOQLClient("http://localhost:6363")
-        >>> client.connect(server_url="http://localhost:6363", key="<key>")
+        >>> client = WOQLClient("https://127.0.0.1:6363", insecure=True)
+        >>> client.connect(key="root", account="admin", user="admin", db="example_db")
         dict
         """
-        if len(kwargs) > 0:
-            self.conConfig.update(**kwargs)
-        if self.insecure is None:
-            self.insecure = kwargs.get("insecure")
 
-        json_obj = self.dispatch(APIEndpointConst.CONNECT, self.conConfig.api)
-        self.conCapabilities.set_capabilities(json_obj)
-        return json_obj
+        self._account = account
+        self._db = db
+        self._remote_auth = remote_auth
+        self._key = key
+        self._user = user
+        self._branch = branch
+        self._ref = ref
+        self._repo = repo
+
+        self._connected = True
+
+        self._capabilities = self.dispatch(APIEndpointConst.CONNECT, self._api)
+        self._commit_made = 0
+        return self._capabilities
+
+    def close(self) -> None:
+        """Undo connect and close the connection. The connection will be unusable from this point forward; an Error (or subclass) exception will be raised if any operation is attempted with the connection, unless connect is call again."""
+        self._connected = False
+
+    def _check_connection(self) -> None:
+        """Raise connection InterfaceError """
+        if not self._connected:
+            raise InterfaceError("Client is not connected to a TerminusDB database.")
+
+    def _get_current_commit(self):
+        woql_query = {
+            "@context": "/api/prefixes/_commits",
+            "@type": "woql:Using",
+            "woql:collection": {"@type": "xsd:string", "@value": "_commits"},
+            "woql:query": {
+                "@type": "woql:And",
+                "woql:query_list": [
+                    {
+                        "@type": "woql:QueryListElement",
+                        "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 0},
+                        "woql:query": {
+                            "@type": "woql:Triple",
+                            "woql:object": {
+                                "@type": "woql:Datatype",
+                                "woql:datatype": {
+                                    "@type": "xsd:string",
+                                    "@value": "main",
+                                },
+                            },
+                            "woql:predicate": {
+                                "@type": "woql:Node",
+                                "woql:node": "ref:branch_name",
+                            },
+                            "woql:subject": {
+                                "@type": "woql:Variable",
+                                "woql:variable_name": {
+                                    "@type": "xsd:string",
+                                    "@value": "branch",
+                                },
+                            },
+                        },
+                    },
+                    {
+                        "@type": "woql:QueryListElement",
+                        "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 1},
+                        "woql:query": {
+                            "@type": "woql:Triple",
+                            "woql:object": {
+                                "@type": "woql:Variable",
+                                "woql:variable_name": {
+                                    "@type": "xsd:string",
+                                    "@value": "commit",
+                                },
+                            },
+                            "woql:predicate": {
+                                "@type": "woql:Node",
+                                "woql:node": "ref:ref_commit",
+                            },
+                            "woql:subject": {
+                                "@type": "woql:Variable",
+                                "woql:variable_name": {
+                                    "@type": "xsd:string",
+                                    "@value": "branch",
+                                },
+                            },
+                        },
+                    },
+                ],
+            },
+        }
+        result = self.query(woql_query)
+        current_commit = result.get("bindings")[0].get("commit")
+        return current_commit
+
+    def _get_target_commit(self, step):
+        woql_query = {
+            "@context": "/api/prefixes/_commits",
+            "@type": "woql:Using",
+            "woql:collection": {"@type": "xsd:string", "@value": "_commits"},
+            "woql:query": {
+                "@type": "woql:And",
+                "woql:query_list": [
+                    {
+                        "@type": "woql:QueryListElement",
+                        "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 0},
+                        "woql:query": {
+                            "@type": "woql:Path",
+                            "woql:object": {
+                                "@type": "woql:Variable",
+                                "woql:variable_name": {
+                                    "@type": "xsd:string",
+                                    "@value": "target_commit",
+                                },
+                            },
+                            "woql:path": {
+                                "@type": "woql:Variable",
+                                "woql:variable_name": {
+                                    "@type": "xsd:string",
+                                    "@value": "path",
+                                },
+                            },
+                            "woql:path_pattern": {
+                                "@type": "woql:PathTimes",
+                                "woql:path_maximum": {
+                                    "@type": "xsd:positiveInteger",
+                                    "@value": str(step),
+                                },
+                                "woql:path_minimum": {
+                                    "@type": "xsd:positiveInteger",
+                                    "@value": str(step),
+                                },
+                                "woql:path_pattern": {
+                                    "@type": "woql:PathPredicate",
+                                    "woql:path_predicate": {"@id": "ref:commit_parent"},
+                                },
+                            },
+                            "woql:subject": {
+                                "@type": "woql:Variable",
+                                "woql:variable_name": {
+                                    "@type": "xsd:string",
+                                    "@value": "commit",
+                                },
+                            },
+                        },
+                    },
+                    {
+                        "@type": "woql:QueryListElement",
+                        "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 1},
+                        "woql:query": {
+                            "@type": "woql:And",
+                            "woql:query_list": [
+                                {
+                                    "@type": "woql:QueryListElement",
+                                    "woql:index": {
+                                        "@type": "xsd:nonNegativeInteger",
+                                        "@value": 0,
+                                    },
+                                    "woql:query": {
+                                        "@type": "woql:Triple",
+                                        "woql:object": {
+                                            "@type": "woql:Datatype",
+                                            "woql:datatype": {
+                                                "@type": "xsd:string",
+                                                "@value": self.checkout(),
+                                            },
+                                        },
+                                        "woql:predicate": {
+                                            "@type": "woql:Node",
+                                            "woql:node": "ref:branch_name",
+                                        },
+                                        "woql:subject": {
+                                            "@type": "woql:Variable",
+                                            "woql:variable_name": {
+                                                "@type": "xsd:string",
+                                                "@value": "branch",
+                                            },
+                                        },
+                                    },
+                                },
+                                {
+                                    "@type": "woql:QueryListElement",
+                                    "woql:index": {
+                                        "@type": "xsd:nonNegativeInteger",
+                                        "@value": 1,
+                                    },
+                                    "woql:query": {
+                                        "@type": "woql:And",
+                                        "woql:query_list": [
+                                            {
+                                                "@type": "woql:QueryListElement",
+                                                "woql:index": {
+                                                    "@type": "xsd:nonNegativeInteger",
+                                                    "@value": 0,
+                                                },
+                                                "woql:query": {
+                                                    "@type": "woql:Triple",
+                                                    "woql:object": {
+                                                        "@type": "woql:Variable",
+                                                        "woql:variable_name": {
+                                                            "@type": "xsd:string",
+                                                            "@value": "commit",
+                                                        },
+                                                    },
+                                                    "woql:predicate": {
+                                                        "@type": "woql:Node",
+                                                        "woql:node": "ref:ref_commit",
+                                                    },
+                                                    "woql:subject": {
+                                                        "@type": "woql:Variable",
+                                                        "woql:variable_name": {
+                                                            "@type": "xsd:string",
+                                                            "@value": "branch",
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                            {
+                                                "@type": "woql:QueryListElement",
+                                                "woql:index": {
+                                                    "@type": "xsd:nonNegativeInteger",
+                                                    "@value": 1,
+                                                },
+                                                "woql:query": {
+                                                    "@type": "woql:Triple",
+                                                    "woql:object": {
+                                                        "@type": "woql:Variable",
+                                                        "woql:variable_name": {
+                                                            "@type": "xsd:string",
+                                                            "@value": "cid",
+                                                        },
+                                                    },
+                                                    "woql:predicate": {
+                                                        "@type": "woql:Node",
+                                                        "woql:node": "ref:commit_id",
+                                                    },
+                                                    "woql:subject": {
+                                                        "@type": "woql:Variable",
+                                                        "woql:variable_name": {
+                                                            "@type": "xsd:string",
+                                                            "@value": "target_commit",
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                        ],
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                ],
+            },
+        }
+        result = self.query(woql_query)
+        target_commit = result.get("bindings")[0].get("cid").get("@value")
+        return target_commit
+
+    def rollback(self, step=1):
+        target_commit = self._get_target_commit(step)
+        self.reset(
+            f"{self.conConfig.account}/{self.conConfig.db}/{self.conConfig.repo}/commit/{target_commit}"
+        )
 
     def copy(self) -> "WOQLClient":
         """Create a deep copy of this client.
@@ -111,15 +382,22 @@ class WOQLClient:
         --------
         >>> client = WOQLClient("http://localhost:6363")
         >>> client.basic_auth()
-        False
+        None
         >>> client.basic_auth("password", "admin")
         'admin:password'
         >>> client.basic_auth()
         'admin:password'
         """
-        if key:
-            self.conConfig.set_basic_auth(key, user)
-        return self.conConfig.basic_auth
+        if not self._connected:
+            return None
+        if key is not None:
+            self._key = key
+        if user is not None:
+            self._user = user
+        return f"{self._user}:{self._key}"
+        # if key:
+        #     self.conConfig.set_basic_auth(key, user)
+        # return self.conConfig.basic_auth
 
     def remote_auth(self, auth_info: Optional[Dict[str, str]] = None) -> Dict[str, str]:
         """Set or get the Basic auth or JWT token used for authenticating to the server.
@@ -144,9 +422,9 @@ class WOQLClient:
         >>> client.remote_auth({"type": "jwt", "user": "admin", "key": "<token>"})
         {'type': 'jwt', 'user': 'admin', 'key': '<token>'}
         """
-        if auth_info:
-            self.conConfig.set_remote_auth(auth_info)
-        return self.conConfig.remote_auth
+        if auth_info is not None:
+            self._remote_auth = auth_info
+        return self._remote_auth
 
     def set_db(self, dbid: Optional[str]) -> str:
         """Set and return the current database.
@@ -163,9 +441,9 @@ class WOQLClient:
 
         Examples
         --------
-        >>> client = WOQLClient("http://localhost:6363")
-        >>> client.set_db("<database>")
-        '<database>'
+        >>> client = WOQLClient("https://127.0.0.1:6363")
+        >>> client.set_db("database1")
+        'database1'
         """
         return self.db(dbid)
 
@@ -186,17 +464,17 @@ class WOQLClient:
 
         Examples
         --------
-        >>> client = WOQLClient("http://localhost:6363")
+        >>> client = WOQLClient(""https://127.0.0.1:6363"")
         >>> client.db()
         False
-        >>> client.db("<database>")
-        '<database>'
+        >>> client.db("database1")
+        'database1'
         >>> client.db()
-        '<database>'
+        'database1'
         """
         if dbid:
-            self.conConfig.db = dbid
-        return self.conConfig.db
+            self._db = dbid
+        return self._db
 
     def account(self, accountid: Optional[str] = None) -> str:
         """Set or get the account identifier.
@@ -215,17 +493,17 @@ class WOQLClient:
 
         Examples
         --------
-        >>> client = WOQLClient("http://localhost:6363")
+        >>> client = WOQLClient("https://127.0.0.1:6363")
         >>> client.account()
         False
-        >>> client.account("<account>")
-        '<account>'
+        >>> client.account("admin")
+        admin
         >>> client.account()
-        '<account>'
+        admin
         """
         if accountid:
-            self.conConfig.account = accountid
-        return self.conConfig.account
+            self._account = accountid
+        return self._account
 
     def user_account(self) -> str:
         """Get the current user identifier.
@@ -237,12 +515,15 @@ class WOQLClient:
 
         Examples
         --------
-        >>> client = WOQLClient("http://localhost:6363")
+        >>> client = WOQLClient("https://127.0.0.1:6363")
         >>> client.user_account()
-        '<uid>'
+        False
+        >>> client.user_account('user1')
+        user1
+        >>> client.user_account()
+        user1
         """
-        u = self.conCapabilities.get_user()
-        return u.id
+        return self._capabilities["@id"]
 
     def user(self) -> Dict[str, Any]:
         """Get the current user's information.
@@ -253,11 +534,18 @@ class WOQLClient:
 
         Examples
         --------
-        >>> client = WOQLClient("http://localhost:6363")
+        >>> client = WOQLClient("https://127.0.0.1:6363")
         >>> client.user()
         {'id': '<uid>', 'author': '<author>', 'roles': [], 'label': '<label>', 'comment': '<comment>'}
         """
-        return self.conCapabilities.get_user()
+        return self._user
+
+    def _author(self) -> str:
+        """Get the current user's identifier, if logged in to Hub, it will be their email otherwise it will be the user provided"""
+        if self._capabilities.get("system:user_identifier"):
+            return self._capabilities["system:user_identifier"]["@value"]
+        else:
+            return self._user
 
     def repo(self, repoid: Optional[str] = None) -> str:
         """Set or get the repository identifier.
@@ -276,18 +564,18 @@ class WOQLClient:
 
         Examples
         --------
-        >>> client = WOQLClient("http://localhost:6363")
+        >>> client = WOQLClient("https://127.0.0.1:6363")
         >>> client.repo()
         'local'
-        >>> client.repo("<repository>")
-        '<repository>'
+        >>> client.repo("repository1")
+        repository1
         >>> client.repo()
-        '<repository>'
+        repository1
         """
         if repoid:
-            self.conConfig.repo = repoid
+            self._repo = repoid
 
-        return self.conConfig.repo
+        return self._repo
 
     def ref(self, refid: Optional[str] = None) -> str:
         """Set or get the ref pointer (pointer to a commit within the branch).
@@ -306,17 +594,17 @@ class WOQLClient:
 
         Examples
         --------
-        >>> client = WOQLClient("http://localhost:6363")
+        >>> client = WOQLClient("https://127.0.0.1:6363")
         >>> client.ref()
         False
-        >>> client.ref("<branch>")
-        '<branch>'
+        >>> client.ref('main')
+        main
         >>> client.ref()
-        '<branch>'
+        main
         """
         if refid:
-            self.conConfig.ref = refid
-        return self.conConfig.ref
+            self._ref = refid
+        return self._ref
 
     def checkout(self, branchid: Optional[str] = None) -> str:
         """Set or get the current branch identifier.
@@ -335,17 +623,17 @@ class WOQLClient:
 
         Examples
         --------
-        >>> client = WOQLClient("http://localhost:6363")
+        >>> client = WOQLClient("https://127.0.0.1:6363")
         >>> client.checkout()
         'main'
-        >>> client.checkout("<branch>")
-        '<branch>'
+        >>> client.checkout("other_branch")
+        other_branch
         >>> client.checkout()
-        '<branch>'
+        other_branch
         """
         if branchid:
-            self.conConfig.branch = branchid
-        return self.conConfig.branch
+            self._branch = branchid
+        return self._branch
 
     def uid(self, ignore_jwt: Optional[bool] = True) -> str:
         """Get the current user identifier.
@@ -362,13 +650,13 @@ class WOQLClient:
 
         Examples
         --------
-        >>> client = WOQLClient("http://localhost:6363")
+        >>> client = WOQLClient("https://127.0.0.1:6363")
         >>> client.uid()
         '<uid>'
         >>> client.uid(False)
         '<jwt_uid>'
         """
-        return self.conConfig.user(ignore_jwt)
+        return self._capabilities["@id"]
 
     def resource(self, ttype: str, val: Optional[str] = None) -> str:
         """Create a resource identifier string based on the current config.
@@ -387,7 +675,7 @@ class WOQLClient:
 
         Examples
         --------
-        >>> client = WOQLClient("http://localhost:6363")
+        >>> client = WOQLClient("https://127.0.0.1:6363")
         >>> client.account("<account>")
         '<account>'
         >>> client.db("<db>")
@@ -407,21 +695,21 @@ class WOQLClient:
         >>> client.resource("branch", "<branch>")
         '<account>/<db>/<repo>/branch/<branch>'
         """
-        base = self.account() + "/" + self.db() + "/"
+        base = self._account + "/" + self._db + "/"
         if ttype == "db":
             return base
         elif ttype == "meta":
             return base + "_meta"
-        base = base + self.repo()
+        base = base + self._repo
         if ttype == "repo":
             return base + "/_meta"
         elif ttype == "commits":
             return base + "/_commits"
         if val is None:
             if ttype == "ref":
-                val = self.ref()
+                val = self._ref
             else:
-                val = self.checkout()
+                val = self._branch
         if ttype == "branch":
             return base + "/branch/" + val
         if ttype == "ref":
@@ -440,7 +728,7 @@ class WOQLClient:
         >>> client = WOQLClient("http://localhost:6363")
         >>> client.set({"account": "<account>", "branch": "<branch>"})
         """
-        self.conConfig.update(**kwargs)
+        self.connect(**kwargs)
 
     def create_database(
         self,
@@ -497,13 +785,13 @@ class WOQLClient:
         if prefixes:
             details["prefixes"] = prefixes
         if accountid is None:
-            accountid = self.user_account()
+            accountid = self._account
 
-        self.db(dbid)
-        self.account(accountid)
-        return self.dispatch(
-            APIEndpointConst.CREATE_DATABASE, self.conConfig.db_url(), details
-        )
+        self._db = dbid
+        self._account = accountid
+        self._connected = True
+        self._commit_made = 0
+        return self.dispatch(APIEndpointConst.CREATE_DATABASE, self._db_url(), details)
 
     def delete_database(
         self, dbid: str, accountid: Optional[str] = None, force: bool = False
@@ -532,12 +820,12 @@ class WOQLClient:
         dict
         """
 
-        self.db(dbid)
+        self._db = dbid
         if accountid:
-            self.account(accountid)
+            self._account = accountid
         payload = {"force": force}
         json_response = self.dispatch(
-            APIEndpointConst.DELETE_DATABASE, self.conConfig.db_url(), payload
+            APIEndpointConst.DELETE_DATABASE, self._db_url(), payload
         )
         return json_response
 
@@ -562,6 +850,7 @@ class WOQLClient:
         ValueError
             If the value of ``graph_type`` is invalid.
         """
+        self._check_connection()
         if graph_type in ["inference", "schema", "instance"]:
             commit = self._generate_commit(commit_msg)
             return self.dispatch(
@@ -595,11 +884,12 @@ class WOQLClient:
         ValueError
             If the value of ``graph_type`` is invalid.
         """
+        self._check_connection()
         if graph_type in ["inference", "schema", "instance"]:
             commit = self._generate_commit(commit_msg)
             return self.dispatch(
                 APIEndpointConst.DELETE_GRAPH,
-                self.conConfig.graph_url(graph_type, graph_id),
+                self._graph_url(graph_type, graph_id),
                 commit,
             )
 
@@ -621,9 +911,9 @@ class WOQLClient:
         -------
         dict
         """
+        self._check_connection()
         return self.dispatch(
-            APIEndpointConst.GET_TRIPLES,
-            self.conConfig.triples_url(graph_type, graph_id),
+            APIEndpointConst.GET_TRIPLES, self._triples_url(graph_type, graph_id),
         )
 
     def update_triples(
@@ -646,11 +936,12 @@ class WOQLClient:
         -------
         dict
         """
+        self._check_connection()
         commit = self._generate_commit(commit_msg)
         commit["turtle"] = turtle
         return self.dispatch(
             APIEndpointConst.UPDATE_TRIPLES,
-            self.conConfig.triples_url(graph_type, graph_id),
+            self._triples_url(graph_type, graph_id),
             commit,
         )
 
@@ -674,11 +965,12 @@ class WOQLClient:
         -------
         dict
         """
+        self._check_connection()
         commit = self._generate_commit(commit_msg)
         commit["turtle"] = turtle
         return self.dispatch(
             APIEndpointConst.INSERT_TRIPLES,
-            self.conConfig.triples_url(graph_type, graph_id),
+            self._triples_url(graph_type, graph_id),
             commit,
         )
 
@@ -707,15 +999,14 @@ class WOQLClient:
         dict
             An API success message
         """
+        self._check_connection()
         options = {}
         if csv_directory is None:
             csv_directory = os.getcwd()
         options["name"] = csv_name
 
         result = self.dispatch(
-            APIEndpointConst.GET_CSV,
-            self.conConfig.csv_url(graph_type, graph_id),
-            options,
+            APIEndpointConst.GET_CSV, self._csv_url(graph_type, graph_id), options,
         )
 
         stream = open(f"{csv_directory}/{csv_name}", "w")
@@ -748,6 +1039,7 @@ class WOQLClient:
         dict
             An API success message
         """
+        self._check_connection()
         if commit_msg is None:
             commit_msg = f"Update csv from {csv_paths} by python client {__version__}"
         commit = self._generate_commit(commit_msg)
@@ -763,7 +1055,7 @@ class WOQLClient:
 
         return self.dispatch(
             APIEndpointConst.UPDATE_CSV,
-            self.conConfig.csv_url(graph_type, graph_id),
+            self._csv_url(graph_type, graph_id),
             commit,
             file_dict=file_dict,
         )
@@ -793,6 +1085,7 @@ class WOQLClient:
         dict
             An API success message
         """
+        self._check_connection()
         if commit_msg is None:
             commit_msg = f"Insert csv from {csv_paths} by python client {__version__}"
         commit = self._generate_commit(commit_msg)
@@ -809,10 +1102,34 @@ class WOQLClient:
 
         return self.dispatch(
             APIEndpointConst.INSERT_CSV,
-            self.conConfig.csv_url(graph_type, graph_id),
+            self._csv_url(graph_type, graph_id),
             commit,
             file_dict=file_dict,
         )
+
+    def commit(
+        self,
+        woql_query: Union[dict, WOQLQuery],
+        commit_msg: Optional[str] = None,
+        file_dict: Optional[dict] = None,
+    ):
+        """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents and locking the commits so it cannot be rollback further than this point with the same client objcet.
+
+        Parameters
+        ----------
+        woql_query : dict or WOQLQuery object
+            A woql query as an object or dict
+        commit_mg : str
+            A message that will be written to the commit log to describe the change
+        file_dict:
+            File dictionary to be associated with post name => filename, for multipart POST
+
+        Examples
+        -------
+        >>> WOQLClient(server="http://localhost:6363").commit(woql, "updating graph")
+        """
+        self._commit_made = 0
+        return self.query(woql_query, commit_msg, file_dict)
 
     def query(
         self,
@@ -835,6 +1152,7 @@ class WOQLClient:
         -------
         >>> WOQLClient(server="http://localhost:6363").query(woql, "updating graph")
         """
+        self._check_connection()
         if (
             hasattr(woql_query, "_contains_update_check")
             and woql_query._contains_update_check()  # type: ignore
@@ -851,9 +1169,7 @@ class WOQLClient:
             request_woql_query = woql_query.to_dict()
         else:
             request_woql_query = woql_query
-        request_woql_query[
-            "@context"
-        ] = self.conCapabilities.get_context_for_outbound_query(None, self.db())
+        request_woql_query["@context"] = self._capabilities["@context"]
         query_obj["query"] = request_woql_query
         request_file_dict: Optional[Dict[str, Tuple[str, Union[str, BinaryIO], str]]]
         if file_dict is not None and type(file_dict) is dict:
@@ -873,12 +1189,12 @@ class WOQLClient:
             request_file_dict = None
             payload = query_obj
 
-        return self.dispatch(
-            APIEndpointConst.WOQL_QUERY,
-            self.conConfig.query_url(),
-            payload,
-            request_file_dict,
+        result = self.dispatch(
+            APIEndpointConst.WOQL_QUERY, self._query_url(), payload, request_file_dict,
         )
+        if result.get("insert") or result.get("delete"):
+            self._commit_made += 1
+        return result
 
     def branch(self, new_branch_id: str, empty: bool = False) -> dict:
         """Create a branch starting from the current branch.
@@ -894,19 +1210,20 @@ class WOQLClient:
         -------
         dict
         """
+        self._check_connection()
         if empty:
             source = {}
-        elif self.ref():
+        elif self._ref:
             source = {
-                "origin": f"{self.account()}/{self.db()}/{self.repo()}/commit/{self.ref()}"
+                "origin": f"{self._account}/{self._db}/{self._repo}/commit/{self._ref}"
             }
         else:
             source = {
-                "origin": f"{self.account()}/{self.db()}/{self.repo()}/branch/{self.checkout()}"
+                "origin": f"{self._account}/{self._db}/{self._repo}/branch/{self._branch}"
             }
 
         return self.dispatch(
-            APIEndpointConst.BRANCH, self.conConfig.branch_url(new_branch_id), source
+            APIEndpointConst.BRANCH, self._branch_url(new_branch_id), source
         )
 
     def pull(self, remote_source_repo: dict) -> dict:
@@ -931,6 +1248,7 @@ class WOQLClient:
         >>> client = WOQLClient("https://127.0.0.1:6363/")
         >>> client.pull({"remote": "<remote>", "remote_branch": "<branch>"})
         """
+        self._check_connection()
         rc_args = self._prepare_revision_control_args(remote_source_repo)
         if (
             rc_args is not None
@@ -946,6 +1264,7 @@ class WOQLClient:
             )
 
     def fetch(self, remote_id: str):
+        self._check_connection()
         return self.dispatch(
             APIEndpointConst.FETCH, self.conConfig.fetch_url(remote_id)
         )
@@ -962,15 +1281,14 @@ class WOQLClient:
         -------
         >>> WOQLClient(server="http://localhost:6363").push({remote: "origin", "remote_branch": "main", "author": "admin", "message": "message"})
         """
+        self._check_connection()
         rc_args = self._prepare_revision_control_args(remote_target_repo)
         if (
             rc_args is not None
             and rc_args.get("remote")
             and rc_args.get("remote_branch")
         ):
-            return self.dispatch(
-                APIEndpointConst.PUSH, self.conConfig.push_url(), rc_args
-            )
+            return self.dispatch(APIEndpointConst.PUSH, self._push_url(), rc_args)
         else:
             raise ValueError(
                 "Push parameter error - you must specify a valid remote target"
@@ -1002,6 +1320,7 @@ class WOQLClient:
         >>> client = WOQLClient("https://127.0.0.1:6363/")
         >>> client.rebase({"rebase_from": "<branch>"})
         """
+        self._check_connection()
         rc_args = self._prepare_revision_control_args(rebase_source)
         if rc_args is not None and rc_args.get("rebase_from"):
             return self.dispatch(
@@ -1035,6 +1354,7 @@ class WOQLClient:
         >>> client.reset('admin/database/local/commit/234980523ffaf93')
         """
 
+        self._check_connection()
         return self.dispatch(
             APIEndpointConst.RESET,
             self.conConfig.reset_url(),
@@ -1062,6 +1382,7 @@ class WOQLClient:
         >>> client = WOQLClient("https://127.0.0.1:6363/")
         >>> client.optimize('admin/database/_meta')
         """
+        self._check_connection()
         return self.dispatch(APIEndpointConst.RESET, self.conConfig.optimize_url(path))
 
     def squash(self, msg: str, author: Optional[str] = None) -> dict:
@@ -1093,10 +1414,9 @@ class WOQLClient:
         >>> client.connect(user="admin", key="root", account="admin", db="some_db")
         >>> client.squash('This is a squash commit message!')
         """
+        self._check_connection()
         commit_object = self._generate_commit(msg, author)
-        return self.dispatch(
-            APIEndpointConst.SQUASH, self.conConfig.squash_url(), commit_object
-        )
+        return self.dispatch(APIEndpointConst.SQUASH, self._squash_url(), commit_object)
 
     def clonedb(self, clone_source: Dict[str, str], newid: str) -> dict:
         """Clone a remote repository and create a local copy.
@@ -1122,6 +1442,7 @@ class WOQLClient:
         >>> client = WOQLClient("https://127.0.0.1:6363/")
         >>> client.clonedb({"remote_url": "<remote_url>"}, "<newid>")
         """
+        self._check_connection()
         rc_args = self._prepare_revision_control_args(clone_source)
         if rc_args is not None and rc_args.get("remote_url"):
             return self.dispatch(
@@ -1156,7 +1477,7 @@ class WOQLClient:
         if author:
             mes_author = author
         else:
-            mes_author = self.conCapabilities.author()
+            mes_author = self._author()
 
         ci = {"commit_info": {"author": mes_author, "message": msg}}
         return ci
@@ -1180,7 +1501,7 @@ class WOQLClient:
         if rc_args is None:
             return None
         if not rc_args.get("author"):
-            rc_args["author"] = self.conCapabilities.author()
+            rc_args["author"] = self._author()
         return rc_args
 
     def dispatch(
@@ -1240,7 +1561,32 @@ class WOQLClient:
         -------
         dict or None if not found
         """
-        return self.conCapabilities.get_database(dbid, account)
+        db_ids = []
+        all_dbs = []
+        for this_db in self.get_databases():
+            if this_db["system:resource_name"]["@value"] == dbid:
+                db_ids.append(this_db["@id"])
+                all_dbs.append(this_db)
+
+        resources_ids = []
+        for scope in self._capabilities["system:role"]["system:capability"][
+            "system:capability_scope"
+        ]:
+            if (
+                scope["@type"] == "system:Organization"
+                and scope["system:organization_name"]["@value"] == account
+            ):
+                if type(scope["system:resource_includes"]) is list:
+                    for resource in scope["system:resource_includes"]:
+                        resources_ids.append(resource["@id"])
+
+        target_db = None
+        for target in set(db_ids).intersection(set(resources_ids)):
+            target_db = target
+
+        for this_db in all_dbs:
+            if this_db["@id"] == target_db:
+                return this_db
 
     def get_databases(self) -> List[Dict]:
         """
@@ -1250,7 +1596,13 @@ class WOQLClient:
         -------
         list of dicts
         """
-        return self.conCapabilities.get_databases()
+        all_dbs = []
+        for scope in self._capabilities["system:role"]["system:capability"][
+            "system:capability_scope"
+        ]:
+            if scope["@type"] == "system:Database":
+                all_dbs.append(scope)
+        return all_dbs
 
     def get_metadata(self, dbid: str, account):
         """
@@ -1281,7 +1633,101 @@ class WOQLClient:
     """
 
     def get_class_frame(self, class_name):
+        self._check_connection()
         opts = {"class": class_name}
         return self.dispatch(
             APIEndpointConst.CLASS_FRAME, self.conConfig.class_frame_url(), opts,
         )
+
+    def _db_url_fragment(self):
+        if self._db == "_system":
+            return self._db
+        return f"{self._account}/{self._db}"
+
+    def _db_base(self, action: str):
+        return f"{self._api}/{action}/{self._db_url_fragment()}"
+
+    def _branch_url(self, branch_id: str):
+        base_url = self._repo_base("branch")
+        return f"{base_url}/branch/{branch_id}"
+
+    def _repo_base(self, action: str):
+        return self._db_base(action) + f"/{self._repo}"
+
+    def _branch_base(self, action: str):
+        base = self._repo_base(action)
+        if self._repo == "_meta":
+            return base
+        if self._branch == "_commits":
+            return base + f"/{self._branch}"
+        elif self._ref:
+            return base + f"/commit/{self._ref}"
+        else:
+            return base + f"/branch/{self._branch}"
+        return base
+
+    def _schema_url(self, sgid="main"):
+        if self._db == "_system":
+            schema = self._db_base("schema")
+        else:
+            schema = self._branch_base("schema")
+        return schema + f"/{sgid}"
+
+    def _query_url(self):
+        if self._db == "_system":
+            return self._db_base("woql")
+        return self._branch_base("woql")
+
+    def _class_frame_url(self):
+        if self._db == "_system":
+            return self._db_base("frame")
+        return self._branch_base("frame")
+
+    def _csv_url(self, graph_type="instance", graph_id="main"):
+        if self._db == "_system":
+            base_url = self._db_base("csv")
+        else:
+            base_url = self._branch_base("csv")
+        return f"{base_url}/{graph_type}/{graph_id}"
+
+    def _triples_url(self, graph_type="instance", graph_id="main"):
+        if self._db == "_system":
+            base_url = self._db_base("triples")
+        else:
+            base_url = self._branch_base("triples")
+        return f"{base_url}/{graph_type}/{graph_id}"
+
+    def _clone_url(self, new_repo_id: str):
+        return f"{self._api}/clone/{self._account}/{new_repo_id}"
+
+    def _cloneable_url(self):
+        crl = f"{self._server_url}/{self._account}/{self._db}"
+        return crl
+
+    def _pull_url(self):
+        return self._branch_base("pull")
+
+    def _fetch_url(self, remote_name: str):
+        furl = self._branch_base("fetch")
+        return furl + "/" + remote_name + "/_commits"
+
+    def _rebase_url(self):
+        return self._branch_base("rebase")
+
+    def _reset_url(self):
+        return self._branch_base("reset")
+
+    def _optimize_url(self, path: str):
+        return f"{self._api}/optimize/{path}"
+
+    def _squash_url(self):
+        return self._branch_base("squash")
+
+    def _push_url(self):
+        return self._branch_base("push")
+
+    def _db_url(self):
+        return self._db_base("db")
+
+    def _graph_url(self, graph_type: str, gid: str):
+        return self._branch_base("graph") + f"/{graph_type}/{gid}"

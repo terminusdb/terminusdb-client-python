@@ -1004,6 +1004,29 @@ class WOQLLib:
         )
         return self._add_constraint(pattern, noparent)
 
+    def get_commit_from_now(self, step=1):
+        return (
+            WOQLQuery()
+            .using("_commits")
+            .path(
+                "v:commit",
+                f"ref:commit_parent{{{step},{step}}}",
+                "v:target_commit",
+                "v:path",
+            )
+            .triple("v:branch", "ref:branch_name", "main")
+            .triple("v:branch", "ref:ref_commit", "v:commit")
+            .triple("v:target_commit", "ref:commit_id", "v:cid")
+        )
+
+    def get_current_commit(self):
+        return (
+            WOQLQuery()
+            .using("_commits")
+            .triple("v:branch", "ref:branch_name", "main")
+            .triple("v:branch", "ref:ref_commit", "v:commit")
+        )
+
     def _add_constraints(self, pattern, vals):
         if not vals:
             return pattern

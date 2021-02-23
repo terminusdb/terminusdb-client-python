@@ -14,6 +14,9 @@ class Error(Exception):
 class InterfaceError(Error):
     """Exception for errors related to the interface."""
 
+    def __init__(self, message):
+        self.message = message
+
 
 class DatabaseError(Error):
     """Exception for errors related to the database."""
