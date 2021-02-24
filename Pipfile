@@ -18,6 +18,7 @@ pandas = "*"
 tox = "*"
 interrogate = "*"
 docker-compose = "*"
+pre-commit ="*"
 
 [packages]
 requests = "*"

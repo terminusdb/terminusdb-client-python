@@ -7,16 +7,8 @@ from typing import Any, BinaryIO, Dict, List, Optional, Tuple, Union
 from ..__version__ import __version__
 from ..woqlquery.woql_query import WOQLQuery
 from .api_endpoint_const import APIEndpointConst
-
-# from .errorMessage import *
-# from .connectionConfig import ConnectionConfig
 from .dispatchRequest import DispatchRequest
 from .errors import InterfaceError
-
-# from .connectionCapabilities import ConnectionCapabilities
-
-
-# from .errors import doc, opts
 
 # WOQL client object
 # license Apache Version 2
@@ -733,7 +725,8 @@ class WOQLClient:
         """
         self._check_connection()
         return self.dispatch(
-            APIEndpointConst.GET_TRIPLES, self._triples_url(graph_type, graph_id),
+            APIEndpointConst.GET_TRIPLES,
+            self._triples_url(graph_type, graph_id),
         )
 
     def update_triples(
@@ -826,7 +819,9 @@ class WOQLClient:
         options["name"] = csv_name
 
         result = self.dispatch(
-            APIEndpointConst.GET_CSV, self._csv_url(graph_type, graph_id), options,
+            APIEndpointConst.GET_CSV,
+            self._csv_url(graph_type, graph_id),
+            options,
         )
 
         stream = open(f"{csv_directory}/{csv_name}", "w")
@@ -1011,7 +1006,10 @@ class WOQLClient:
             payload = query_obj
 
         result = self.dispatch(
-            APIEndpointConst.WOQL_QUERY, self._query_url(), payload, request_file_dict,
+            APIEndpointConst.WOQL_QUERY,
+            self._query_url(),
+            payload,
+            request_file_dict,
         )
         if result.get("inserts") or result.get("deletes"):
             self._commit_made += 1
@@ -1077,7 +1075,9 @@ class WOQLClient:
             and rc_args.get("remote_branch")
         ):
             return self.dispatch(
-                APIEndpointConst.PULL, self.conConfig.pull_url(), rc_args,
+                APIEndpointConst.PULL,
+                self.conConfig.pull_url(),
+                rc_args,
             )
         else:
             raise ValueError(
@@ -1552,5 +1552,7 @@ class WOQLClient:
         self._check_connection()
         opts = {"class": class_name}
         return self.dispatch(
-            APIEndpointConst.CLASS_FRAME, self.conConfig.class_frame_url(), opts,
+            APIEndpointConst.CLASS_FRAME,
+            self.conConfig.class_frame_url(),
+            opts,
         )
