@@ -21,7 +21,7 @@ flake8-print==4.0.0       # via -r requirements-dev.in
 flake8==3.8.4             # via -r requirements-dev.in, flake8-assertive, flake8-bandit, flake8-bugbear, flake8-builtins, flake8-comprehensions, flake8-polyfill, flake8-print
 gitdb==4.0.5              # via gitpython
 gitpython==3.1.13         # via bandit
-importlib-metadata==3.5.0  # via flake8, flake8-comprehensions, stevedore
+importlib-metadata==3.6.0  # via flake8, flake8-comprehensions, stevedore
 isort==5.7.0              # via shed
 libcst==0.3.17            # via pybetter, shed
 mccabe==0.6.1             # via flake8

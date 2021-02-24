@@ -46,7 +46,7 @@ def docker_url(pytestconfig):
     if output.returncode != 0:
         raise RuntimeError(output.stderr)
 
-    test_url = "http://127.0.0.1:6363"
+    test_url = "http://127.0.0.1:6366"
     is_server_started = False
 
     seconds_waited = 0

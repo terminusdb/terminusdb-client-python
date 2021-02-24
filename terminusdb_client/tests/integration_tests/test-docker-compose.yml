@@ -10,10 +10,10 @@ services:
     hostname: terminusdb-server
     tty: true
     ports:
-      - 6363:6363
+      - 6366:6366
     environment:
       - TERMINUSDB_SERVER_NAME=http://127.0.0.1
-      - TERMINUSDB_SERVER_PORT=6363
+      - TERMINUSDB_SERVER_PORT=6366
 
       # There are multiple ways to configure TerminusDB security through
       # environment variables. Several reasonable options are included below.

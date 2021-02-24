@@ -156,7 +156,9 @@ class WOQLClient:
         """
         self._check_connection()
         if steps > self._commit_made:
-            raise ValueError(f"Cannot rollback before the lst connection or commit call. Number of update queries made that can be rollback: {self._commit_made}")
+            raise ValueError(
+                f"Cannot rollback before the lst connection or commit call. Number of update queries made that can be rollback: {self._commit_made}"
+            )
         target_commit = self._get_target_commit(steps)
         self.reset(
             f"{self.conConfig.account}/{self.conConfig.db}/{self.conConfig.repo}/commit/{target_commit}"
