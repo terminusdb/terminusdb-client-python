@@ -6,7 +6,7 @@ import pytest
 import requests
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 
-from .mockResponse import mocked_requests
+from .mockResponse import MOCK_CAPABILITIES, mocked_requests
 from .woqljson.woqlStarJson import WoqlStar
 
 
@@ -196,3 +196,25 @@ def test_query(mocked_requests, mocked_requests2):
         verify=False,
         json={"query": WoqlStar},
     )
+
+
+@mock.patch("requests.get", side_effect=mocked_requests)
+@mock.patch.object(WOQLClient, "dispatch")
+def test_query_commit_count(mocked_execute, mocked_requests):
+    mocked_execute.return_value = MOCK_CAPABILITIES
+    woql_client = WOQLClient("http://localhost:6363")
+    woql_client.connect(user="admin", account="admin", key="root", db="myDBName")
+    assert woql_client._commit_made == 0
+    mocked_execute.return_value = {
+        "@type": "api:WoqlResponse",
+        "api:status": "api:success",
+        "api:variable_names": [],
+        "bindings": [{}],
+        "deletes": 0,
+        "inserts": 1,
+        "transaction_retry_count": 0,
+    }
+    woql_client.query(WoqlStar)
+    assert woql_client._commit_made == 1
+    woql_client.commit(WoqlStar)
+    assert woql_client._commit_made == 0

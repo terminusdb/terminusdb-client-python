@@ -930,8 +930,9 @@ class WOQLClient:
         -------
         >>> WOQLClient(server="http://localhost:6363").commit(woql, "updating graph")
         """
+        result = self.query(woql_query, commit_msg, file_dict)
         self._commit_made = 0
-        return self.query(woql_query, commit_msg, file_dict)
+        return result
 
     def query(
         self,
@@ -994,7 +995,7 @@ class WOQLClient:
         result = self.dispatch(
             APIEndpointConst.WOQL_QUERY, self._query_url(), payload, request_file_dict,
         )
-        if result.get("insert") or result.get("delete"):
+        if result.get("inserts") or result.get("deletes"):
             self._commit_made += 1
         return result
 
