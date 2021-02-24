@@ -140,8 +140,24 @@ class WOQLClient:
         target_commit = result.get("bindings")[0].get("cid").get("@value")
         return target_commit
 
-    def rollback(self, step=1):
-        target_commit = self._get_target_commit(step)
+    def rollback(self, steps=1) -> None:
+        """Rollback number of update queries set in steps.
+
+        Steps need to be smaller than the number of update queries made in the session. Number of update queries made in the session is counted from the last connection or commit() call.
+
+        Parameters
+        ----------
+        steps: int
+            Number of update queries to rollback.
+
+        Returns
+        -------
+        None
+        """
+        self._check_connection()
+        if steps > self._commit_made:
+            raise ValueError(f"Cannot rollback before the lst connection or commit call. Number of update queries made that can be rollback: {self._commit_made}")
+        target_commit = self._get_target_commit(steps)
         self.reset(
             f"{self.conConfig.account}/{self.conConfig.db}/{self.conConfig.repo}/commit/{target_commit}"
         )
