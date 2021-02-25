@@ -4,10 +4,12 @@
 # const UTILS = require('./utils.js');
 
 import pprint
+import warnings
 
 pp = pprint.PrettyPrinter(indent=4)
 
 """
+    **Deprecated**
     Creates an entry in the connection registry for the server
     and all the databases that the client has access to
     maps the input authorties to a per-db array for internal storage and easy
@@ -19,6 +21,9 @@ pp = pprint.PrettyPrinter(indent=4)
 
 class ConnectionCapabilities:
     def __init__(self):
+        warnings.warn(
+            "ConnectionCapabilities is deprecated.", warnings.DeprecationWarning
+        )
         self.user = None
         self.dbdocs = {}
         self.orgdocs = {}

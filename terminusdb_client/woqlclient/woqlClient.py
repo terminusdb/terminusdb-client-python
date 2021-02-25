@@ -2,6 +2,7 @@
 import copy
 import json
 import os
+import warnings
 from typing import Any, BinaryIO, Dict, List, Optional, Tuple, Union
 
 from ..__version__ import __version__
@@ -33,40 +34,48 @@ class WOQLClient:
         """
         self._server_url = server_url.strip("/")
         self._api = f"{self._server_url}/api"
-        # kwargs["inscure"] = insecure
-        # self._init_setting = kwargs
         self._connected = False
-        # self.conConfig = ConnectionConfig(server_url, **kwargs)
-        # self.conCapabilities = ConnectionCapabilities()
         self.insecure = insecure
         self._commit_made = 0
 
     def connect(
         self,
-        account="admin",
-        db=None,
-        remote_auth=None,
-        key="root",
-        user="admin",
-        branch="main",
-        ref=None,
-        repo="local",
+        account: str = "admin",
+        db: Optional[str] = None,
+        remote_auth: str = None,
+        key: str = "root",
+        user: str = "admin",
+        branch: str = "main",
+        ref: Optional[str] = None,
+        repo: str = "local",
         **kwargs,
     ) -> dict:
         r"""Connect to a Terminus server at the given URI with an API key.
 
         Stores the terminus:ServerCapability document returned
-        in the conCapabilities register which stores, the url, key, capabilities,
+        in the self._capabilities register which stores, the url, key, capabilities,
         and database meta-data for the connected server.
-
-        If the ``serverURL`` argument is omitted,
-        :attr:`self.conConfig.serverURL` will be used if present
-        or an error will be raise.
 
         Parameters
         ----------
+        account: str
+            Name of the organization account, default to be "admin"
+        db: optional, str
+            Name of the database connected
+        remote_auth: optional, str
+            Remote Auth setting
+        key: str
+            API key for connecting, default to eb "root"
+        user: str
+            Name of the user, default to be "admin"
+        branch: str
+            Branch to be connected, default to be "main"
+        ref: optional, str
+            Ref setting
+        repo: str
+            Local or remote repo, default to be "local"
         \**kwargs
-            Configuration options added to :attr:`conConfig`.
+            Extra configuration options added to :attr:`conConfig`.
 
         Returns
         -------
@@ -95,11 +104,13 @@ class WOQLClient:
         return self._capabilities
 
     def close(self) -> None:
-        """Undo connect and close the connection. The connection will be unusable from this point forward; an Error (or subclass) exception will be raised if any operation is attempted with the connection, unless connect is call again."""
+        """Undo connect and close the connection.
+
+        The connection will be unusable from this point forward; an Error (or subclass) exception will be raised if any operation is attempted with the connection, unless connect is call again."""
         self._connected = False
 
     def _check_connection(self) -> None:
-        """Raise connection InterfaceError """
+        """Raise connection InterfaceError if not connected"""
         if not self._connected:
             raise InterfaceError("Client is not connected to a TerminusDB database.")
 
@@ -539,6 +550,9 @@ class WOQLClient:
         >>> client = WOQLClient("http://localhost:6363")
         >>> client.set({"account": "<account>", "branch": "<branch>"})
         """
+        warnings.warn(
+            "set() is deprecated; use connect().", warnings.DeprecationWarning
+        )
         self.connect(**kwargs)
 
     def create_database(
@@ -1428,6 +1442,10 @@ class WOQLClient:
         """
         Alias of get_database above - deprecated - included for backwards compatibility
         """
+        warnings.warn(
+            "get_metadata() is deprecated; use get_database().",
+            warnings.DeprecationWarning,
+        )
         return self.get_database(dbid, account)
 
     def server(self) -> str:
@@ -1550,6 +1568,6 @@ class WOQLClient:
         opts = {"class": class_name}
         return self.dispatch(
             APIEndpointConst.CLASS_FRAME,
-            self.conConfig.class_frame_url(),
+            self._class_frame_url(),
             opts,
         )
