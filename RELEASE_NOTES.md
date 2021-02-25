@@ -1,5 +1,17 @@
 # TerminusDB Python Client Release Notes
 
+## v0.6.0
+
+### New
+
+- Adding commit(), close() and rollback() for the WOQLClient
+
+### Bug Fixes / Improvements
+
+- Rewrite of WOQLClient, deprecate connectionConfig and connectionCapabilities
+
+---
+
 ## v0.5.0
 
 ### New
