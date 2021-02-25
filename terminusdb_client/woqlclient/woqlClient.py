@@ -152,6 +152,7 @@ class WOQLClient:
                 f"Cannot rollback before the lst connection or commit call. Number of update queries made that can be rollback: {self._commit_made}"
             )
         target_commit = self._get_target_commit(steps)
+        self._commit_made -= steps
         self.reset(f"{self._account}/{self._db}/{self._repo}/commit/{target_commit}")
 
     def copy(self) -> "WOQLClient":
