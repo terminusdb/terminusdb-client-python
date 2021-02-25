@@ -152,9 +152,7 @@ class WOQLClient:
                 f"Cannot rollback before the lst connection or commit call. Number of update queries made that can be rollback: {self._commit_made}"
             )
         target_commit = self._get_target_commit(steps)
-        self.reset(
-            f"{self.conConfig.account}/{self.conConfig.db}/{self.conConfig.repo}/commit/{target_commit}"
-        )
+        self.reset(f"{self._account}/{self._db}/{self._repo}/commit/{target_commit}")
 
     def copy(self) -> "WOQLClient":
         """Create a deep copy of this client.
@@ -1144,9 +1142,7 @@ class WOQLClient:
         self._check_connection()
         rc_args = self._prepare_revision_control_args(rebase_source)
         if rc_args is not None and rc_args.get("rebase_from"):
-            return self.dispatch(
-                APIEndpointConst.REBASE, self.conConfig.rebase_url(), rc_args
-            )
+            return self.dispatch(APIEndpointConst.REBASE, self._rebase_url(), rc_args)
         else:
             raise ValueError(
                 "Rebase parameter error - you must specify a valid rebase source to rebase from"
@@ -1178,7 +1174,7 @@ class WOQLClient:
         self._check_connection()
         return self.dispatch(
             APIEndpointConst.RESET,
-            self.conConfig.reset_url(),
+            self._reset_url(),
             {"commit_descriptor": commit_path},
         )
 
