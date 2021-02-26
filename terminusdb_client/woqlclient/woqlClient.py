@@ -550,9 +550,7 @@ class WOQLClient:
         >>> client = WOQLClient("http://localhost:6363")
         >>> client.set({"account": "<account>", "branch": "<branch>"})
         """
-        warnings.warn(
-            "set() is deprecated; use connect().", warnings.DeprecationWarning
-        )
+        warnings.warn("set() is deprecated; use connect().", DeprecationWarning)
         self.connect(**kwargs)
 
     def create_database(
@@ -1444,7 +1442,7 @@ class WOQLClient:
         """
         warnings.warn(
             "get_metadata() is deprecated; use get_database().",
-            warnings.DeprecationWarning,
+            DeprecationWarning,
         )
         return self.get_database(dbid, account)
 

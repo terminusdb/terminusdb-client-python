@@ -13,7 +13,7 @@ class ConnectionConfig:
         client configuration options - connected_mode = true
         tells the client to first connect to the server before invoking other services
         """
-        warnings.warn("ConnectionConfig is deprecated.", warnings.DeprecationWarning)
+        warnings.warn("ConnectionConfig is deprecated.", DeprecationWarning)
         self.__server = False
         self._remote_auth = None  # jwt token for authenticating to remote servers for push / fetch / clone
         self.__basic_auth = (

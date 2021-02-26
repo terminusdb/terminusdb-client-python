@@ -21,9 +21,7 @@ pp = pprint.PrettyPrinter(indent=4)
 
 class ConnectionCapabilities:
     def __init__(self):
-        warnings.warn(
-            "ConnectionCapabilities is deprecated.", warnings.DeprecationWarning
-        )
+        warnings.warn("ConnectionCapabilities is deprecated.", DeprecationWarning)
         self.user = None
         self.dbdocs = {}
         self.orgdocs = {}
