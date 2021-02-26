@@ -106,6 +106,7 @@
 <li class="toctree-l2"><a class="reference internal" href="SmartQuery.html">SmartQuery</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
 </ul>
 
             
@@ -1545,7 +1546,29 @@ e.g. WOQL.re(“(.).*”, “hello”, [“v:All”, “v:Sub”])</p>
 <dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.path">
 <code class="sig-name descname"><span class="pre">path</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.path" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Create a path object constructed by the rules specified with pattern.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>subject</strong> (<em>str</em>) – a woql subject, the node that the path started</p></li>
+<li><p><strong>pattern</strong> (<em>str</em>) – a pattern which specified the edges the path is consisted of.
+It uses pattern construction syntax such as:
+* ‘(scm:edge1, scm:edge2)+’ for repeated pattern,
+* ‘scm:edge1|scm:edge2’ for ‘or’ pattern,
+* ‘&lt;scm:edge’ for reverse pattern, and
+* ‘(scm:edge1)[n,m] for pattern between n and m times’</p></li>
+<li><p><strong>obj</strong> (<em>str</em>) – a woql object, the node that the path ended</p></li>
+<li><p><strong>path</strong> (<em>str</em>) – output variable</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>query object that can be chained and/or execute</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>WOQLQuery object</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.size">

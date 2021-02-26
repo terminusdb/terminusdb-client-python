@@ -12,6 +12,7 @@ TerminusDB Client's documentation
 
    installation
    modules
+   tutorials
 
 
 
