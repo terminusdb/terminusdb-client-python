@@ -1,9 +1,12 @@
 import secrets
 import string
 
+import pytest
+
 from terminusdb_client.woqlclient.connectionConfig import ConnectionConfig
 
 
+@pytest.mark.skip(reason="deprecated")
 class TestConnectionConfig:
     start_server_url = "http://localhost:6363/"
     start_dbid = "testDB"
