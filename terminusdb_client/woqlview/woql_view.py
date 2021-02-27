@@ -5,26 +5,28 @@ from numbers import Number
 try:
     from IPython.display import Javascript, display
 except ImportError:
-    msg = "woqlview need to be used in Jupyter notebook.\n"
-    warnings.warn(msg)
+    pass
 
 
 class WOQLView:
     def __init__(self):
         self.config = ""
         self.obj = None
-        display(
-            Javascript(
-                """
-        require.config({
-            paths: {
-                TerminusClient:'https://unpkg.com/@terminusdb/terminusdb-client@3.0.3/dist/terminusdb-client.min',
-                TerminusDBGraph:'https://dl.bintray.com/terminusdb/terminusdb/dev/terminusdb-d3-graph.min'
-            }
-        });
-        """
+        try:
+            display(
+                Javascript(
+                    """
+            require.config({
+                paths: {
+                    TerminusClient:'https://unpkg.com/@terminusdb/terminusdb-client@3.0.3/dist/terminusdb-client.min',
+                    TerminusDBGraph:'https://dl.bintray.com/terminusdb/terminusdb/dev/terminusdb-d3-graph.min'
+                }
+            });
+            """
+                )
             )
-        )
+        except:
+            pass
 
     def edges(self, *args: list):
         for item in args:
@@ -140,32 +142,36 @@ class WOQLView:
         Parameter
         ---------
         result: the result that is returning from a query in dict format."""
-        display(
-            Javascript(
+        try:
+            display(
+                Javascript(
+                    """
+            (function(element){
+            require(['TerminusClient','TerminusDBGraph'], function(TerminusClient,TerminusDBGraph){
+
+                console.log(TerminusDBGraph);
+                const resultData=%s
+
+                const woqlGraphConfig= TerminusClient.View.graph();
+                woqlGraphConfig.height(window.innerHeight).width(window.innerWidth);
+                %s
+
+
+                var result = new TerminusClient.WOQLResult(resultData);
+                let viewer = woqlGraphConfig.create(null);
+
+                viewer.setResult(result);
+                const graphResult= new TerminusDBGraph.GraphResultsViewer(viewer.config, viewer);
+                graphResult.load(element.get(0),true);
+                })
+                })(element)
                 """
-        (function(element){
-        require(['TerminusClient','TerminusDBGraph'], function(TerminusClient,TerminusDBGraph){
-
-            console.log(TerminusDBGraph);
-            const resultData=%s
-
-            const woqlGraphConfig= TerminusClient.View.graph();
-            woqlGraphConfig.height(window.innerHeight).width(window.innerWidth);
-            %s
-
-
-            var result = new TerminusClient.WOQLResult(resultData);
-            let viewer = woqlGraphConfig.create(null);
-
-            viewer.setResult(result);
-            const graphResult= new TerminusDBGraph.GraphResultsViewer(viewer.config, viewer);
-            graphResult.load(element.get(0),true);
-            })
-            })(element)
-            """
-                % (result, self.config)
+                    % (result, self.config)
+                )
             )
-        )
+        except:
+            msg = "WOQLView().show need to be used in Jupyter notebook.\n"
+            warnings.warn(msg)
 
     def export(self, filename: str, result: dict):
         """Export the graph into an html file
