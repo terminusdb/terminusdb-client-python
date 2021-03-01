@@ -25,7 +25,7 @@ class WOQLView:
             """
                 )
             )
-        except:
+        except NameError:
             pass
 
     def edges(self, *args: list):
@@ -169,7 +169,7 @@ class WOQLView:
                     % (result, self.config)
                 )
             )
-        except:
+        except NameError:
             msg = "WOQLView().show need to be used in Jupyter notebook.\n"
             warnings.warn(msg)
 
