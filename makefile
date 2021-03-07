@@ -18,6 +18,11 @@ flake8:
 coverage:
 	pipenv run py.test terminusdb_client/tests --cov-config .coveragerc --verbose --cov-report term --cov-report xml --cov=terminusdb_client terminusdb_client/tests
 
+# Command to run test and generate a coverage report on terminal
+coverage_report:
+	pytest --cov=terminusdb_client terminusdb_client/tests/
+	coverage report
+
 # Command to  generate a coverage report html
 coverage_html:
 	coverage html -d terminusdb_client_coverage
