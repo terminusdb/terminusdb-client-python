@@ -1,3 +1,0 @@
-[run]
-omit = */test*, */__init__.py, */__version__.py
-source = terminusdb_client
