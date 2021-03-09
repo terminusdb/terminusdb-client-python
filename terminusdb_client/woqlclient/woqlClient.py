@@ -102,7 +102,7 @@ class WOQLClient:
 
         self._connected = True
 
-        self._capabilities = self.dispatch(APIEndpointConst.CONNECT, self._api)
+        self._capabilities = self.dispatch("get", self._api)
         self._commit_made = 0
         return self._capabilities
 
@@ -617,7 +617,7 @@ class WOQLClient:
         self._account = accountid
         self._connected = True
         self._commit_made = 0
-        return self.dispatch(APIEndpointConst.CREATE_DATABASE, self._db_url(), details)
+        return self.dispatch("post", self._db_url(), details)
 
     def delete_database(
         self, dbid: str, accountid: Optional[str] = None, force: bool = False
@@ -650,9 +650,7 @@ class WOQLClient:
         if accountid:
             self._account = accountid
         payload = {"force": force}
-        json_response = self.dispatch(
-            APIEndpointConst.DELETE_DATABASE, self._db_url(), payload
-        )
+        json_response = self.dispatch("delte", self._db_url(), payload)
         return json_response
 
     def create_graph(self, graph_type: str, graph_id: str, commit_msg: str) -> dict:
@@ -680,7 +678,7 @@ class WOQLClient:
         if graph_type in ["inference", "schema", "instance"]:
             commit = self._generate_commit(commit_msg)
             return self.dispatch(
-                APIEndpointConst.CREATE_GRAPH,
+                "post",
                 self.conConfig.graph_url(graph_type, graph_id),
                 commit,
             )
@@ -714,7 +712,7 @@ class WOQLClient:
         if graph_type in ["inference", "schema", "instance"]:
             commit = self._generate_commit(commit_msg)
             return self.dispatch(
-                APIEndpointConst.DELETE_GRAPH,
+                "delete",
                 self._graph_url(graph_type, graph_id),
                 commit,
             )
@@ -739,7 +737,7 @@ class WOQLClient:
         """
         self._check_connection()
         return self.dispatch(
-            APIEndpointConst.GET_TRIPLES,
+            "get",
             self._triples_url(graph_type, graph_id),
         )
 
@@ -767,7 +765,7 @@ class WOQLClient:
         commit = self._generate_commit(commit_msg)
         commit["turtle"] = turtle
         return self.dispatch(
-            APIEndpointConst.UPDATE_TRIPLES,
+            "post",
             self._triples_url(graph_type, graph_id),
             commit,
         )
@@ -796,7 +794,7 @@ class WOQLClient:
         commit = self._generate_commit(commit_msg)
         commit["turtle"] = turtle
         return self.dispatch(
-            APIEndpointConst.INSERT_TRIPLES,
+            "put",
             self._triples_url(graph_type, graph_id),
             commit,
         )
@@ -833,7 +831,7 @@ class WOQLClient:
         options["name"] = csv_name
 
         result = self.dispatch(
-            APIEndpointConst.GET_CSV,
+            "get",
             self._csv_url(graph_type, graph_id),
             options,
         )
@@ -883,7 +881,7 @@ class WOQLClient:
             file_dict[name] = (name, open(path, "rb"), "application/binary")
 
         return self.dispatch(
-            APIEndpointConst.UPDATE_CSV,
+            "post",
             self._csv_url(graph_type, graph_id),
             commit,
             file_dict=file_dict,
@@ -930,7 +928,7 @@ class WOQLClient:
             file_dict[name] = (name, open(path, "rb"), "application/binary")
 
         return self.dispatch(
-            APIEndpointConst.INSERT_CSV,
+            "put",
             self._csv_url(graph_type, graph_id),
             commit,
             file_dict=file_dict,
@@ -1020,7 +1018,7 @@ class WOQLClient:
             payload = query_obj
 
         result = self.dispatch(
-            APIEndpointConst.WOQL_QUERY,
+            "get",
             self._query_url(),
             payload,
             request_file_dict,
@@ -1055,9 +1053,7 @@ class WOQLClient:
                 "origin": f"{self._account}/{self._db}/{self._repo}/branch/{self._branch}"
             }
 
-        return self.dispatch(
-            APIEndpointConst.BRANCH, self._branch_url(new_branch_id), source
-        )
+        return self.dispatch("post", self._branch_url(new_branch_id), source)
 
     def pull(self, remote_source_repo: dict) -> dict:
         """Pull updates from a remote repository to the current database.
@@ -1089,7 +1085,7 @@ class WOQLClient:
             and rc_args.get("remote_branch")
         ):
             return self.dispatch(
-                APIEndpointConst.PULL,
+                "post",
                 self.conConfig.pull_url(),
                 rc_args,
             )
@@ -1100,9 +1096,7 @@ class WOQLClient:
 
     def fetch(self, remote_id: str):
         self._check_connection()
-        return self.dispatch(
-            APIEndpointConst.FETCH, self.conConfig.fetch_url(remote_id)
-        )
+        return self.dispatch("post", self.conConfig.fetch_url(remote_id))
 
     def push(self, remote_target_repo: Dict[str, str]):
         """Push changes from a branch to a remote repo
@@ -1123,7 +1117,7 @@ class WOQLClient:
             and rc_args.get("remote")
             and rc_args.get("remote_branch")
         ):
-            return self.dispatch(APIEndpointConst.PUSH, self._push_url(), rc_args)
+            return self.dispatch("post", self._push_url(), rc_args)
         else:
             raise ValueError(
                 "Push parameter error - you must specify a valid remote target"
@@ -1158,7 +1152,7 @@ class WOQLClient:
         self._check_connection()
         rc_args = self._prepare_revision_control_args(rebase_source)
         if rc_args is not None and rc_args.get("rebase_from"):
-            return self.dispatch(APIEndpointConst.REBASE, self._rebase_url(), rc_args)
+            return self.dispatch("post", self._rebase_url(), rc_args)
         else:
             raise ValueError(
                 "Rebase parameter error - you must specify a valid rebase source to rebase from"
@@ -1189,7 +1183,7 @@ class WOQLClient:
 
         self._check_connection()
         return self.dispatch(
-            APIEndpointConst.RESET,
+            "post",
             self._reset_url(),
             {"commit_descriptor": commit_path},
         )
@@ -1216,7 +1210,7 @@ class WOQLClient:
         >>> client.optimize('admin/database/_meta')
         """
         self._check_connection()
-        return self.dispatch(APIEndpointConst.RESET, self.conConfig.optimize_url(path))
+        return self.dispatch("post", self.conConfig.optimize_url(path))
 
     def squash(self, msg: str, author: Optional[str] = None) -> dict:
         """Squash the current branch HEAD into a commit
@@ -1249,7 +1243,7 @@ class WOQLClient:
         """
         self._check_connection()
         commit_object = self._generate_commit(msg, author)
-        return self.dispatch(APIEndpointConst.SQUASH, self._squash_url(), commit_object)
+        return self.dispatch("post", self._squash_url(), commit_object)
 
     def clonedb(self, clone_source: Dict[str, str], newid: str) -> dict:
         """Clone a remote repository and create a local copy.
@@ -1278,9 +1272,7 @@ class WOQLClient:
         self._check_connection()
         rc_args = self._prepare_revision_control_args(clone_source)
         if rc_args is not None and rc_args.get("remote_url"):
-            return self.dispatch(
-                APIEndpointConst.CLONE, self.conConfig.clone_url(newid), rc_args
-            )
+            return self.dispatch("post", self.conConfig.clone_url(newid), rc_args)
         else:
             raise ValueError(
                 "Clone parameter error - you must specify a valid id for the cloned database"
@@ -1340,12 +1332,6 @@ class WOQLClient:
     def _prepare_request(self):
         pass
 
-    def _verify_check(url, insecure=False):
-        if url[:17] == "https://127.0.0.1" or url[:7] == "http://" or insecure:
-            return False
-        else:
-            return True
-
     def dispatch(
         self,
         action: str,  # get, post, put, delete
@@ -1363,8 +1349,8 @@ class WOQLClient:
             The server URL to point the action at.
         payload : dict, optional
             Payload to send to the server.
-        file_dict : dict, optional
-            Dict of files to include in the query.
+        file_list : list, optional
+            List of files to include in the query.
 
         Returns
         -------
@@ -1375,104 +1361,125 @@ class WOQLClient:
         # review the access control
         # self.conCapabilities.capabilitiesPermit(action)
         # url, action, payload={}, basic_auth, jwt=None, file_dict=None)
-        try:
-            request_response = None
-            headers = {}
-            url = utils.add_params_to_url(url, payload)
-            verify = _verify_check(url, insecure)
 
-            if not verify:
-                warnings.simplefilter("ignore", InsecureRequestWarning)
+        request_response = None
+        headers = {}
+        # url = utils.add_params_to_url(url, payload)
+        if url[:17] == "https://127.0.0.1" or url[:7] == "http://" or insecure:
+            verify = False
+        else:
+            verify = True
 
-            # if (payload and ('terminus:user_key' in  payload)):
-            # utils.encodeURIComponent(payload['terminus:user_key'])}
-            if basic_auth:
-                headers["Authorization"] = "Basic %s" % b64encode(
-                    (basic_auth).encode("utf-8")
-                ).decode("utf-8")
-            if remote_auth and remote_auth["type"] == "jwt":
-                headers["Authorization-Remote"] = "Bearer %s" % remote_auth["key"]
-            elif remote_auth and remote_auth["type"] == "basic":
-                rauthstr = remote_auth["user"] + ":" + remote_auth["key"]
-                headers["Authorization-Remote"] = "Basic %s" % b64encode(
-                    (rauthstr).encode("utf-8")
-                ).decode("utf-8")
+        if not verify:
+            warnings.simplefilter("ignore", InsecureRequestWarning)
 
-            if action == "get":
-                request_response = requests.get(url, headers=headers, verify=verify)
+        # if (payload and ('terminus:user_key' in  payload)):
+        # utils.encodeURIComponent(payload['terminus:user_key'])}
+        if basic_auth:
+            headers["Authorization"] = "Basic %s" % b64encode(
+                (basic_auth).encode("utf-8")
+            ).decode("utf-8")
+        if remote_auth and remote_auth["type"] == "jwt":
+            headers["Authorization-Remote"] = "Bearer %s" % remote_auth["key"]
+        elif remote_auth and remote_auth["type"] == "basic":
+            rauthstr = remote_auth["user"] + ":" + remote_auth["key"]
+            headers["Authorization-Remote"] = "Basic %s" % b64encode(
+                (rauthstr).encode("utf-8")
+            ).decode("utf-8")
 
-            elif action == "delete":
-                request_response = requests.delete(url, headers=headers, verify=verify)
+        if action == "get":
+            request_response = requests.get(
+                url, headers=headers, verify=verify, params=payload
+            )
 
-            elif action in ["post", "put"]:
+        elif action == "delete":
+            request_response = requests.delete(
+                url, headers=headers, verify=verify, params=payload
+            )
 
-                if file_list:
-                    file_dict = {}
-                    for path in file_list:
-                        name = os.path.basename(os.path.normpath(path))
-                        file_dict[name] = (name, open(path, "rb"), "application/binary")
-                    file_dict["payload"] = (
-                        "payload",
-                        json.dumps(payload),
-                        "application/json",
-                    )
-                    try:
-                        if action == "post":
-                            request_response = requests.post(
-                                url,
-                                headers=headers,
-                                files=file_dict,
-                                verify=verify,
-                            )
-                        else:
-                            request_response = requests.put(
-                                url,
-                                headers=headers,
-                                files=file_dict,
-                                verify=verify,
-                            )
-                    finally:
-                        # Close the files although request should do this :(
-                        for key in file_dict:
-                            (_, stream, _) = file_dict[key]
-                            if type(stream) != str:
-                                stream.close()
-                else:
-                    headers["Content-Type"] = "application/json"
+        elif action in ["post", "put"]:
+
+            if file_list:
+                file_dict = {}
+                for path in file_list:
+                    name = os.path.basename(os.path.normpath(path))
+                    file_dict[name] = (name, open(path, "rb"), "application/binary")
+                file_dict["payload"] = (
+                    "payload",
+                    json.dumps(payload),
+                    "application/json",
+                )
+                try:
                     if action == "post":
                         request_response = requests.post(
-                            url, json=payload, headers=headers, verify=verify
+                            url,
+                            headers=headers,
+                            files=file_dict,
+                            verify=verify,
+                            params=payload,
                         )
                     else:
                         request_response = requests.put(
-                            url, json=payload, headers=headers, verify=verify
+                            url,
+                            headers=headers,
+                            files=file_dict,
+                            verify=verify,
+                            params=payload,
                         )
-
-            warnings.resetwarnings()
-
-            if request_response.status_code == 200:
-                # print("hellow ")
-                return request_response.json()  # if not a json not it raises an error
+                finally:
+                    # Close the files although request should do this :(
+                    for key in file_dict:
+                        (_, stream, _) = file_dict[key]
+                        if type(stream) != str:
+                            stream.close()
             else:
-                # Raise an exception if a request is unsuccessful
-                message = "Api Error"
-
-                if type(request_response.text) is str:
-                    message = request_response.text
-
-                raise (
-                    APIError(
-                        message,
+                # headers["Content-Type"] = "application/json"
+                if action == "post":
+                    request_response = requests.post(
                         url,
-                        request_response.json(),
-                        request_response.status_code,
+                        json=payload,
+                        headers=headers,
+                        verify=verify,
+                        params=payload,
                     )
+                else:
+                    request_response = requests.put(
+                        url,
+                        json=payload,
+                        headers=headers,
+                        verify=verify,
+                        params=payload,
+                    )
+
+        warnings.resetwarnings()
+
+        if request_response.status_code == 200:
+            # print("hellow ")
+            return request_response.text  # if not a json not it raises an error
+        elif request_response.status_code > 399 and request_response.status_code < 499:
+            pass
+        elif request_response.status_code > 499 and request_response.status_code < 599:
+            pass
+        else:
+            # Raise an exception if a request is unsuccessful
+            message = "Api Error"
+
+            if type(request_response.text) is str:
+                message = request_response.text
+
+            raise (
+                APIError(
+                    message,
+                    url,
+                    request_response.json(),
+                    request_response.status_code,
                 )
+            )
         # to be reviewed
         # the server in the response return always content-type application/json
-        except ValueError:
-            # if the response type is not a json
-            return request_response
+        # except ValueError:
+        #     # if the response type is not a json
+        #     return request_response
 
         return DispatchRequest.send_request_by_action(
             url,
@@ -1672,7 +1679,7 @@ class WOQLClient:
         self._check_connection()
         opts = {"class": class_name}
         return self.dispatch(
-            APIEndpointConst.CLASS_FRAME,
+            "get",
             self._class_frame_url(),
             opts,
         )

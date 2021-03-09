@@ -22,6 +22,10 @@ class DatabaseError(Error):
     """Exception for errors related to the database."""
 
 
+class OperationalError(DatabaseError):
+    """Exception for operational errors related to the database."""
+
+
 class AccessDeniedError(DatabaseError):
     pass
 
