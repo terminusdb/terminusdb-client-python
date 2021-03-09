@@ -5,10 +5,13 @@ import os
 import warnings
 from typing import Any, BinaryIO, Dict, List, Optional, Tuple, Union
 
+import requests
+
 from ..__version__ import __version__
 from ..woqlquery.woql_query import WOQLQuery
-from .api_endpoint_const import APIEndpointConst
-from .dispatchRequest import DispatchRequest
+
+# from .api_endpoint_const import APIEndpointConst
+# import .dispatchRequest as DispatchRequest
 from .errors import InterfaceError
 
 # WOQL client object
@@ -1334,12 +1337,21 @@ class WOQLClient:
             rc_args["author"] = self._author()
         return rc_args
 
+    def _prepare_request(self):
+        pass
+
+    def _verify_check(url, insecure=False):
+        if url[:17] == "https://127.0.0.1" or url[:7] == "http://" or insecure:
+            return False
+        else:
+            return True
+
     def dispatch(
         self,
-        action: Union[str, Tuple[str]],
+        action: str,  # get, post, put, delete
         url: str,
-        payload: Optional[dict] = None,
-        file_dict: Optional[dict] = None,
+        payload: dict = {},
+        file_list: list = [],
     ) -> dict:
         """Directly dispatch to a TerminusDB database.
 
@@ -1363,9 +1375,104 @@ class WOQLClient:
         # review the access control
         # self.conCapabilities.capabilitiesPermit(action)
         # url, action, payload={}, basic_auth, jwt=None, file_dict=None)
+        try:
+            request_response = None
+            headers = {}
+            url = utils.add_params_to_url(url, payload)
+            verify = _verify_check(url, insecure)
 
-        if payload is None:
-            payload = {}
+            if not verify:
+                warnings.simplefilter("ignore", InsecureRequestWarning)
+
+            # if (payload and ('terminus:user_key' in  payload)):
+            # utils.encodeURIComponent(payload['terminus:user_key'])}
+            if basic_auth:
+                headers["Authorization"] = "Basic %s" % b64encode(
+                    (basic_auth).encode("utf-8")
+                ).decode("utf-8")
+            if remote_auth and remote_auth["type"] == "jwt":
+                headers["Authorization-Remote"] = "Bearer %s" % remote_auth["key"]
+            elif remote_auth and remote_auth["type"] == "basic":
+                rauthstr = remote_auth["user"] + ":" + remote_auth["key"]
+                headers["Authorization-Remote"] = "Basic %s" % b64encode(
+                    (rauthstr).encode("utf-8")
+                ).decode("utf-8")
+
+            if action == "get":
+                request_response = requests.get(url, headers=headers, verify=verify)
+
+            elif action == "delete":
+                request_response = requests.delete(url, headers=headers, verify=verify)
+
+            elif action in ["post", "put"]:
+
+                if file_list:
+                    file_dict = {}
+                    for path in file_list:
+                        name = os.path.basename(os.path.normpath(path))
+                        file_dict[name] = (name, open(path, "rb"), "application/binary")
+                    file_dict["payload"] = (
+                        "payload",
+                        json.dumps(payload),
+                        "application/json",
+                    )
+                    try:
+                        if action == "post":
+                            request_response = requests.post(
+                                url,
+                                headers=headers,
+                                files=file_dict,
+                                verify=verify,
+                            )
+                        else:
+                            request_response = requests.put(
+                                url,
+                                headers=headers,
+                                files=file_dict,
+                                verify=verify,
+                            )
+                    finally:
+                        # Close the files although request should do this :(
+                        for key in file_dict:
+                            (_, stream, _) = file_dict[key]
+                            if type(stream) != str:
+                                stream.close()
+                else:
+                    headers["Content-Type"] = "application/json"
+                    if action == "post":
+                        request_response = requests.post(
+                            url, json=payload, headers=headers, verify=verify
+                        )
+                    else:
+                        request_response = requests.put(
+                            url, json=payload, headers=headers, verify=verify
+                        )
+
+            warnings.resetwarnings()
+
+            if request_response.status_code == 200:
+                # print("hellow ")
+                return request_response.json()  # if not a json not it raises an error
+            else:
+                # Raise an exception if a request is unsuccessful
+                message = "Api Error"
+
+                if type(request_response.text) is str:
+                    message = request_response.text
+
+                raise (
+                    APIError(
+                        message,
+                        url,
+                        request_response.json(),
+                        request_response.status_code,
+                    )
+                )
+        # to be reviewed
+        # the server in the response return always content-type application/json
+        except ValueError:
+            # if the response type is not a json
+            return request_response
 
         return DispatchRequest.send_request_by_action(
             url,
