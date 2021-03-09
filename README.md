@@ -1,14 +1,16 @@
 TerminusDB Client Python
 ==========================
 
-**Development status**
+**Development status ⛏️**
+
 [![build status](https://api.travis-ci.com/terminusdb/terminusdb-client-python.svg?branch=master)](https://travis-ci.com/terminusdb/terminusdb-client-python)
 [![Documentation Status](https://readthedocs.org/projects/terminusdb-client/badge/?version=latest)](https://terminusdb-client.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/terminusdb/terminusdb-client-python/branch/master/graph/badge.svg?token=BclAUaOPnQ)](https://codecov.io/gh/terminusdb/terminusdb-client-python)
 ![last commit](https://img.shields.io/github/last-commit/terminusdb/terminusdb-client-python)
 ![number of contributors](https://img.shields.io/github/contributors/terminusdb/terminusdb-client-python?color=blue)
 
-**PyPI status**
+**Release status 💎**
+
 [![PyPI version shields.io](https://img.shields.io/pypi/v/terminusdb-client.svg)](https://pypi.python.org/pypi/terminusdb-client/)
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/terminusdb-client.svg)](https://pypi.python.org/pypi/terminusdb-client/)
 [![PyPI license](https://img.shields.io/pypi/l/terminusdb-client.svg)](https://pypi.python.org/pypi/terminusdb-client/)
@@ -23,7 +25,7 @@ TerminusDB Client Python
 - [Python >=3.6](https://www.python.org/downloads)
 ## Release Notes and Previous Versions
 
-- Please check [RELEASE_NOTES.md](RELEASE_NOTES.md) to find out what has changed.
+Please check [RELEASE_NOTES.md](RELEASE_NOTES.md) to find out what has changed.
 
 These previous version(s) works with these version(s) of TerminusDB:
 
@@ -129,7 +131,7 @@ The output files are under `docs/build/html`, open `index.html` in your browser 
 
 If you encounter any issues, please report them with your os and environment setup, the version that you are using and a simple reproducible case.
 
-If you have other questions, you can ask in our community [forum](https://community.terminusdb.com/) or [Discord](https://discord.gg/Gvdqw97).
+If you have other questions, you can ask in our community [forum](https://community.terminusdb.com/) or [![Discord online](https://img.shields.io/discord/689805612053168129?color=7289da&label=Discord)](https://discord.gg/Gvdqw97).
 
 ## Contribute
 
