@@ -1,9 +1,18 @@
 TerminusDB Client Python
 ==========================
 
+**Development status**
 [![build status](https://api.travis-ci.com/terminusdb/terminusdb-client-python.svg?branch=master)](https://travis-ci.com/terminusdb/terminusdb-client-python)
 [![Documentation Status](https://readthedocs.org/projects/terminusdb-client/badge/?version=latest)](https://terminusdb-client.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/terminusdb/terminusdb-client-python/branch/master/graph/badge.svg?token=BclAUaOPnQ)](https://codecov.io/gh/terminusdb/terminusdb-client-python)
+![last commit](https://img.shields.io/github/last-commit/terminusdb/terminusdb-client-python)
+![number of contributors](https://img.shields.io/github/contributors/terminusdb/terminusdb-client-python?color=blue)
+
+**PyPI status**
+[![PyPI version shields.io](https://img.shields.io/pypi/v/terminusdb-client.svg)](https://pypi.python.org/pypi/terminusdb-client/)
+[![PyPI pyversions](https://img.shields.io/pypi/pyversions/terminusdb-client.svg)](https://pypi.python.org/pypi/terminusdb-client/)
+[![PyPI license](https://img.shields.io/pypi/l/terminusdb-client.svg)](https://pypi.python.org/pypi/terminusdb-client/)
+[![PyPI download month](https://img.shields.io/pypi/dm/terminusdb-client.svg)](https://pypi.python.org/pypi/terminusdb-client/)
 
 ### Python version of the TerminusDB client - for TerminusDB API and WOQLpy
 
