@@ -30,6 +30,7 @@ jobs:
     - name: Test with pytest
       run: |
         tox -e test
+        bash <(curl -s https://codecov.io/bash)
 
   make_docs:
     runs-on: ubuntu-latest
