@@ -983,7 +983,7 @@ class WOQLClient:
             payload = query_obj
 
         result = self.dispatch_json(
-            "get",
+            "post",
             self._query_url(),
             payload,
             request_file_dict,
@@ -1359,7 +1359,7 @@ class WOQLClient:
 
         elif action == "delete":
             request_response = requests.delete(
-                url, headers=headers, verify=verify, params=payload
+                url, headers=headers, verify=verify, json=payload
             )
 
         elif action in ["post", "put"]:
@@ -1398,14 +1398,14 @@ class WOQLClient:
                         if type(stream) != str:
                             stream.close()
             else:
-                # headers["Content-Type"] = "application/json"
+                # headers["content-type"] = "application/json"
                 if action == "post":
                     request_response = requests.post(
                         url,
                         json=payload,
                         headers=headers,
                         verify=verify,
-                        params=payload,
+                        # params=payload,
                     )
                 else:
                     request_response = requests.put(
@@ -1413,7 +1413,7 @@ class WOQLClient:
                         json=payload,
                         headers=headers,
                         verify=verify,
-                        params=payload,
+                        # params=payload,
                     )
 
         warnings.resetwarnings()
