@@ -4,10 +4,29 @@ import unittest.mock as mock
 
 import pytest
 import requests
+
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 
 from .mockResponse import MOCK_CAPABILITIES, mocked_requests
 from .woqljson.woqlStarJson import WoqlStar
+
+
+def mocked_requests_get(*args, **kwargs):
+    class MockResponse:
+        def __init__(self, json_data, status_code):
+            self.json_data = json_data
+            self.status_code = status_code
+            self.text = '{"key":"value"}'
+
+        def json(self):
+            return self.json_data
+
+    if args[0] == "http://localhost:6363/api":
+        return MockResponse({"key1": "value1"}, 200)
+    elif args[0] == "http://someotherurl.com/anothertest.json":
+        return MockResponse({"key2": "value2"}, 200)
+
+    return MockResponse(None, 404)
 
 
 def mock_func_with_1arg(_):
@@ -22,9 +41,8 @@ def mock_func_no_arg():
     return True
 
 
-@mock.patch("requests.get", side_effect=mocked_requests)
+@mock.patch("requests.get", side_effect=mocked_requests_get)
 def test_connection(mocked_requests):
-
     woql_client = WOQLClient("http://localhost:6363")
 
     # before connect it connection is empty

@@ -3,16 +3,18 @@ import copy
 import json
 import os
 import warnings
+from base64 import b64encode
 from typing import Any, BinaryIO, Dict, List, Optional, Tuple, Union
 
 import requests
+from urllib3.exceptions import InsecureRequestWarning
 
 from ..__version__ import __version__
 from ..woqlquery.woql_query import WOQLQuery
 
 # from .api_endpoint_const import APIEndpointConst
 # import .dispatchRequest as DispatchRequest
-from .errors import InterfaceError
+from .errors import DatabaseError, Error, InterfaceError
 
 # WOQL client object
 # license Apache Version 2
@@ -102,7 +104,7 @@ class WOQLClient:
 
         self._connected = True
 
-        self._capabilities = self.dispatch("get", self._api)
+        self._capabilities = self.dispatch_json("get", self._api)
         self._commit_made = 0
         return self._capabilities
 
@@ -564,7 +566,7 @@ class WOQLClient:
         description: Optional[str] = None,
         prefixes: Optional[dict] = None,
         include_schema: bool = True,
-    ) -> dict:
+    ) -> None:
         """Create a TerminusDB database by posting
         a terminus:Database document to the Terminus Server.
 
@@ -587,10 +589,6 @@ class WOQLClient:
                 IRI to use when ``scm:`` prefixes are expanded. Defaults to ``terminusdb:///schema``.
         include_schema : bool
             If ``True``, a main schema graph will be created, otherwise only a main instance graph will be created.
-
-        Returns
-        -------
-        dict
 
         Examples
         --------
@@ -617,11 +615,11 @@ class WOQLClient:
         self._account = accountid
         self._connected = True
         self._commit_made = 0
-        return self.dispatch("post", self._db_url(), details)
+        self.dispatch("post", self._db_url(), details)
 
     def delete_database(
         self, dbid: str, accountid: Optional[str] = None, force: bool = False
-    ) -> dict:
+    ) -> None:
         """Delete a TerminusDB database.
 
         If ``accountid`` is provided, then the account in the config will be updated
@@ -635,10 +633,6 @@ class WOQLClient:
             the account id in which the database resides (defaults to "admin")
         force: bool
 
-        Returns
-        -------
-        dict
-
         Examples
         -------
         >>> client = WOQLClient("https://127.0.0.1:6363/")
@@ -650,10 +644,9 @@ class WOQLClient:
         if accountid:
             self._account = accountid
         payload = {"force": force}
-        json_response = self.dispatch("delte", self._db_url(), payload)
-        return json_response
+        self.dispatch("delte", self._db_url(), payload)
 
-    def create_graph(self, graph_type: str, graph_id: str, commit_msg: str) -> dict:
+    def create_graph(self, graph_type: str, graph_id: str, commit_msg: str) -> None:
         """Create a new graph in the current database context.
 
         Parameters
@@ -665,10 +658,6 @@ class WOQLClient:
         commit_msg : str
             Commit message.
 
-        Returns
-        -------
-        dict
-
         Raises
         ------
         ValueError
@@ -677,17 +666,17 @@ class WOQLClient:
         self._check_connection()
         if graph_type in ["inference", "schema", "instance"]:
             commit = self._generate_commit(commit_msg)
-            return self.dispatch(
+            self.dispatch(
                 "post",
                 self.conConfig.graph_url(graph_type, graph_id),
                 commit,
             )
+        else:
+            raise ValueError(
+                "Create graph parameter error - you must specify a valid graph_type (inference, instance, schema), graph_id and commit message"
+            )
 
-        raise ValueError(
-            "Create graph parameter error - you must specify a valid graph_type (inference, instance, schema), graph_id and commit message"
-        )
-
-    def delete_graph(self, graph_type: str, graph_id: str, commit_msg: str) -> dict:
+    def delete_graph(self, graph_type: str, graph_id: str, commit_msg: str) -> None:
         """Delete a graph from the current database context.
 
         Parameters
@@ -699,10 +688,6 @@ class WOQLClient:
         commit_msg : str
             Commit message.
 
-        Returns
-        -------
-        dict
-
         Raises
         ------
         ValueError
@@ -711,17 +696,17 @@ class WOQLClient:
         self._check_connection()
         if graph_type in ["inference", "schema", "instance"]:
             commit = self._generate_commit(commit_msg)
-            return self.dispatch(
+            self.dispatch(
                 "delete",
                 self._graph_url(graph_type, graph_id),
                 commit,
             )
+        else:
+            raise ValueError(
+                "Delete graph parameter error - you must specify a valid graph_type (inference, instance, schema), graph_id and commit message"
+            )
 
-        raise ValueError(
-            "Delete graph parameter error - you must specify a valid graph_type (inference, instance, schema), graph_id and commit message"
-        )
-
-    def get_triples(self, graph_type: str, graph_id: str) -> dict:
+    def get_triples(self, graph_type: str, graph_id: str) -> str:
         """Retrieves the contents of the specified graph as triples encoded in turtle format
 
         Parameters
@@ -733,7 +718,7 @@ class WOQLClient:
 
         Returns
         -------
-        dict
+        str
         """
         self._check_connection()
         return self.dispatch(
@@ -743,7 +728,7 @@ class WOQLClient:
 
     def update_triples(
         self, graph_type: str, graph_id: str, turtle, commit_msg: str
-    ) -> dict:
+    ) -> None:
         """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
 
         Parameters
@@ -756,15 +741,11 @@ class WOQLClient:
             Valid set of triples in Turtle format.
         commit_msg : str
             Commit message.
-
-        Returns
-        -------
-        dict
         """
         self._check_connection()
         commit = self._generate_commit(commit_msg)
         commit["turtle"] = turtle
-        return self.dispatch(
+        self.dispatch(
             "post",
             self._triples_url(graph_type, graph_id),
             commit,
@@ -772,7 +753,7 @@ class WOQLClient:
 
     def insert_triples(
         self, graph_type: str, graph_id: str, turtle, commit_msg: str
-    ) -> dict:
+    ) -> None:
         """Inserts into the specified graph with the triples encoded in turtle format.
 
         Parameters
@@ -785,15 +766,11 @@ class WOQLClient:
             Valid set of triples in Turtle format.
         commit_msg : str
             Commit message.
-
-        Returns
-        -------
-        dict
         """
         self._check_connection()
         commit = self._generate_commit(commit_msg)
         commit["turtle"] = turtle
-        return self.dispatch(
+        self.dispatch(
             "put",
             self._triples_url(graph_type, graph_id),
             commit,
@@ -818,11 +795,6 @@ class WOQLClient:
             Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
         graph_id : str, optional
             Graph identifier.
-
-        Returns
-        -------
-        dict
-            An API success message
         """
         self._check_connection()
         options = {}
@@ -839,7 +811,6 @@ class WOQLClient:
         stream = open(f"{csv_directory}/{csv_name}", "w")
         stream.write(result.text)
         stream.close()
-        return result
 
     def update_csv(
         self,
@@ -847,7 +818,7 @@ class WOQLClient:
         commit_msg: str,
         graph_type: Optional[str] = None,
         graph_id: Optional[str] = None,
-    ) -> dict:
+    ) -> None:
         """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
 
         Parameters
@@ -860,11 +831,6 @@ class WOQLClient:
             Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
         graph_id : str, optional
             Graph identifier.
-
-        Returns
-        -------
-        dict
-            An API success message
         """
         self._check_connection()
         if commit_msg is None:
@@ -880,7 +846,7 @@ class WOQLClient:
             name = os.path.basename(os.path.normpath(path))
             file_dict[name] = (name, open(path, "rb"), "application/binary")
 
-        return self.dispatch(
+        self.dispatch(
             "post",
             self._csv_url(graph_type, graph_id),
             commit,
@@ -893,7 +859,7 @@ class WOQLClient:
         commit_msg: str,
         graph_type: Optional[str] = None,
         graph_id: Optional[str] = None,
-    ) -> dict:
+    ) -> None:
         """Inserts into the specified graph with the triples encoded in turtle format.
 
         Parameters
@@ -906,11 +872,6 @@ class WOQLClient:
             Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
         graph_id : str
             Graph identifier.
-
-        Returns
-        -------
-        dict
-            An API success message
         """
         self._check_connection()
         if commit_msg is None:
@@ -927,7 +888,7 @@ class WOQLClient:
             name = os.path.basename(os.path.normpath(path))
             file_dict[name] = (name, open(path, "rb"), "application/binary")
 
-        return self.dispatch(
+        self.dispatch(
             "put",
             self._csv_url(graph_type, graph_id),
             commit,
@@ -964,7 +925,7 @@ class WOQLClient:
         woql_query: Union[dict, WOQLQuery],
         commit_msg: Optional[str] = None,
         file_dict: Optional[dict] = None,
-    ):
+    ) -> dict:
         """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
 
         Parameters
@@ -979,6 +940,10 @@ class WOQLClient:
         Examples
         -------
         >>> WOQLClient(server="http://localhost:6363").query(woql, "updating graph")
+
+        Returns
+        -------
+        dict
         """
         self._check_connection()
         if (
@@ -1017,7 +982,7 @@ class WOQLClient:
             request_file_dict = None
             payload = query_obj
 
-        result = self.dispatch(
+        result = self.dispatch_json(
             "get",
             self._query_url(),
             payload,
@@ -1027,7 +992,7 @@ class WOQLClient:
             self._commit_made += 1
         return result
 
-    def branch(self, new_branch_id: str, empty: bool = False) -> dict:
+    def branch(self, new_branch_id: str, empty: bool = False) -> None:
         """Create a branch starting from the current branch.
 
         Parameters
@@ -1036,10 +1001,6 @@ class WOQLClient:
             New branch identifier.
         empty : bool
             Create an empty branch if true (no starting commit)
-
-        Returns
-        -------
-        dict
         """
         self._check_connection()
         if empty:
@@ -1053,7 +1014,7 @@ class WOQLClient:
                 "origin": f"{self._account}/{self._db}/{self._repo}/branch/{self._branch}"
             }
 
-        return self.dispatch("post", self._branch_url(new_branch_id), source)
+        self.dispatch("post", self._branch_url(new_branch_id), source)
 
     def pull(self, remote_source_repo: dict) -> dict:
         """Pull updates from a remote repository to the current database.
@@ -1084,7 +1045,7 @@ class WOQLClient:
             and rc_args.get("remote")
             and rc_args.get("remote_branch")
         ):
-            return self.dispatch(
+            return self.dispatch_json(
                 "post",
                 self.conConfig.pull_url(),
                 rc_args,
@@ -1094,11 +1055,11 @@ class WOQLClient:
                 "Pull parameter error - you must specify a valid remote source and branch to pull from"
             )
 
-    def fetch(self, remote_id: str):
+    def fetch(self, remote_id: str) -> dict:
         self._check_connection()
-        return self.dispatch("post", self.conConfig.fetch_url(remote_id))
+        return self.dispatch_json("post", self.conConfig.fetch_url(remote_id))
 
-    def push(self, remote_target_repo: Dict[str, str]):
+    def push(self, remote_target_repo: Dict[str, str]) -> dict:
         """Push changes from a branch to a remote repo
 
         Parameters
@@ -1109,6 +1070,10 @@ class WOQLClient:
         Examples
         -------
         >>> WOQLClient(server="http://localhost:6363").push({remote: "origin", "remote_branch": "main", "author": "admin", "message": "message"})
+
+        Returns
+        -------
+        dict
         """
         self._check_connection()
         rc_args = self._prepare_revision_control_args(remote_target_repo)
@@ -1117,7 +1082,7 @@ class WOQLClient:
             and rc_args.get("remote")
             and rc_args.get("remote_branch")
         ):
-            return self.dispatch("post", self._push_url(), rc_args)
+            return self.dispatch_json("post", self._push_url(), rc_args)
         else:
             raise ValueError(
                 "Push parameter error - you must specify a valid remote target"
@@ -1152,13 +1117,13 @@ class WOQLClient:
         self._check_connection()
         rc_args = self._prepare_revision_control_args(rebase_source)
         if rc_args is not None and rc_args.get("rebase_from"):
-            return self.dispatch("post", self._rebase_url(), rc_args)
+            return self.dispatch_json("post", self._rebase_url(), rc_args)
         else:
             raise ValueError(
                 "Rebase parameter error - you must specify a valid rebase source to rebase from"
             )
 
-    def reset(self, commit_path: str) -> dict:
+    def reset(self, commit_path: str) -> None:
         """Reset the current branch HEAD to the specified commit path.
 
         Notes
@@ -1170,10 +1135,6 @@ class WOQLClient:
         commit_path : string
             Path to the commit, for instance admin/database/local/commit/234980523ffaf93.
 
-        Returns
-        -------
-        dict
-
         Examples
         --------
         >>> client = WOQLClient("https://127.0.0.1:6363/")
@@ -1182,13 +1143,13 @@ class WOQLClient:
         """
 
         self._check_connection()
-        return self.dispatch(
+        self.dispatch(
             "post",
             self._reset_url(),
             {"commit_descriptor": commit_path},
         )
 
-    def optimize(self, path: str) -> dict:
+    def optimize(self, path: str) -> None:
         """Optimize the specified path.
 
         Notes
@@ -1200,17 +1161,13 @@ class WOQLClient:
         path : string
             Path to optimize, for instance admin/database/_meta for the repo graph.
 
-        Returns
-        -------
-        dict
-
         Examples
         --------
         >>> client = WOQLClient("https://127.0.0.1:6363/")
         >>> client.optimize('admin/database/_meta')
         """
         self._check_connection()
-        return self.dispatch("post", self.conConfig.optimize_url(path))
+        self.dispatch("post", self.conConfig.optimize_url(path))
 
     def squash(self, msg: str, author: Optional[str] = None) -> dict:
         """Squash the current branch HEAD into a commit
@@ -1243,9 +1200,9 @@ class WOQLClient:
         """
         self._check_connection()
         commit_object = self._generate_commit(msg, author)
-        return self.dispatch("post", self._squash_url(), commit_object)
+        return self.dispatch_json("post", self._squash_url(), commit_object)
 
-    def clonedb(self, clone_source: Dict[str, str], newid: str) -> dict:
+    def clonedb(self, clone_source: Dict[str, str], newid: str) -> None:
         """Clone a remote repository and create a local copy.
 
         Parameters
@@ -1254,10 +1211,6 @@ class WOQLClient:
             Dict containing a ``"remote_url"`` key.
         newid : str
             Identifier of the new repository to create.
-
-        Returns
-        -------
-        dict
 
         Raises
         ------
@@ -1272,7 +1225,7 @@ class WOQLClient:
         self._check_connection()
         rc_args = self._prepare_revision_control_args(clone_source)
         if rc_args is not None and rc_args.get("remote_url"):
-            return self.dispatch("post", self.conConfig.clone_url(newid), rc_args)
+            self.dispatch("post", self.conConfig.clone_url(newid), rc_args)
         else:
             raise ValueError(
                 "Clone parameter error - you must specify a valid id for the cloned database"
@@ -1332,13 +1285,23 @@ class WOQLClient:
     def _prepare_request(self):
         pass
 
-    def dispatch(
+    def dispatch_json(
         self,
         action: str,  # get, post, put, delete
         url: str,
         payload: dict = {},
         file_list: list = [],
     ) -> dict:
+        result = self.dispatch(action, url, payload, file_list)
+        return json.loads(result)
+
+    def dispatch(
+        self,
+        action: str,  # get, post, put, delete
+        url: str,
+        payload: dict = {},
+        file_list: list = [],
+    ) -> str:
         """Directly dispatch to a TerminusDB database.
 
         Parameters
@@ -1375,6 +1338,8 @@ class WOQLClient:
 
         # if (payload and ('terminus:user_key' in  payload)):
         # utils.encodeURIComponent(payload['terminus:user_key'])}
+        basic_auth = self.basic_auth()
+        remote_auth = self.remote_auth()
         if basic_auth:
             headers["Authorization"] = "Basic %s" % b64encode(
                 (basic_auth).encode("utf-8")
@@ -1454,42 +1419,13 @@ class WOQLClient:
         warnings.resetwarnings()
 
         if request_response.status_code == 200:
-            # print("hellow ")
             return request_response.text  # if not a json not it raises an error
-        elif request_response.status_code > 399 and request_response.status_code < 499:
-            pass
-        elif request_response.status_code > 499 and request_response.status_code < 599:
-            pass
-        else:
-            # Raise an exception if a request is unsuccessful
-            message = "Api Error"
-
-            if type(request_response.text) is str:
-                message = request_response.text
-
-            raise (
-                APIError(
-                    message,
-                    url,
-                    request_response.json(),
-                    request_response.status_code,
-                )
-            )
-        # to be reviewed
-        # the server in the response return always content-type application/json
-        # except ValueError:
-        #     # if the response type is not a json
-        #     return request_response
-
-        return DispatchRequest.send_request_by_action(
-            url,
-            action,
-            payload,
-            self.basic_auth(),
-            self.remote_auth(),
-            file_dict,
-            self.insecure,
-        )
+        elif request_response.status_code > 399 and request_response.status_code < 599:
+            try:
+                error_json = request_response.json()
+                raise DatabaseError(error_json["api:message"])
+            except Error:
+                raise DatabaseError(request_response.text)
 
     def get_database(self, dbid: str, account: str) -> Optional[dict]:
         """
