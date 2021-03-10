@@ -3,23 +3,24 @@
 TerminusDB Client Python
 ==========================
 
-![Discord online](https://img.shields.io/discord/689805612053168129?color=7289da&logo=Discord&label=Discord%20chat&style=plastic) 
-![Discourse topics](https://img.shields.io/discourse/topics?color=yellow&logo=Discourse&server=https%3A%2F%2Fdiscuss.terminusdb.com%2F&style=plastic)
-![Follow on Twitter](https://img.shields.io/twitter/follow/terminusdb?color=skyblue&label=Follow%20on%20Twitter&logo=twitter&style=plastic)
+![Discord online](https://img.shields.io/discord/689805612053168129?color=7289da&logo=Discord&label=Discord%20chat) 
+![Discourse topics](https://img.shields.io/discourse/topics?color=yellow&logo=Discourse&server=https%3A%2F%2Fdiscuss.terminusdb.com%2F)
+![Follow on Twitter](https://img.shields.io/twitter/follow/terminusdb?color=skyblue&label=Follow%20on%20Twitter&logo=twitter&style=flat)
 
 
 **Development status ⛏️**
 
 [![Build Status](https://github.com/terminusdb/terminusdb-client-python/workflows/Python%20package/badge.svg?branch=master)](https://github.com/terminusdb/terminusdb-client-python/actions)
+[![Documentation Status](https://img.shields.io/github/deployments/terminusdb/terminusdb-client-python/github-pages?label=documentation&logo=github)](https://terminusdb.github.io/terminusdb-client-python/)
 [![codecov](https://codecov.io/gh/terminusdb/terminusdb-client-python/branch/master/graph/badge.svg?token=BclAUaOPnQ)](https://codecov.io/gh/terminusdb/terminusdb-client-python)
-[![last commit](https://img.shields.io/github/last-commit/terminusdb/terminusdb-client-python?logo=github&style=plastic)](https://github.com/terminusdb/terminusdb-client-python/commits/master)
-[![number of contributors](https://img.shields.io/github/contributors/terminusdb/terminusdb-client-python?color=blue&logo=github&style=plastic)](https://github.com/terminusdb/terminusdb-client-python/graphs/contributors)
+[![last commit](https://img.shields.io/github/last-commit/terminusdb/terminusdb-client-python?logo=github)](https://github.com/terminusdb/terminusdb-client-python/commits/master)
+[![number of contributors](https://img.shields.io/github/contributors/terminusdb/terminusdb-client-python?color=blue&logo=github)](https://github.com/terminusdb/terminusdb-client-python/graphs/contributors)
 
 **Release status 💎**
 
 [![PyPI version shields.io](https://img.shields.io/pypi/v/terminusdb-client.svg?logo=pypi)](https://pypi.python.org/pypi/terminusdb-client/)
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/terminusdb-client.svg?logo=python)](https://pypi.python.org/pypi/terminusdb-client/)
-[![GitHub license](https://img.shields.io/github/license/terminusdb/terminusdb-client-python?color=pink&logo=apache&style=plastic)](https://github.com/terminusdb/terminusdb-client-python/blob/master/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/terminusdb/terminusdb-client-python?color=pink&logo=apache)](https://github.com/terminusdb/terminusdb-client-python/blob/master/LICENSE)
 [![PyPI download month](https://img.shields.io/pypi/dm/terminusdb-client.svg?logo=pypi)](https://pypi.python.org/pypi/terminusdb-client/)
 
 
