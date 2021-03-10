@@ -230,3 +230,24 @@ def test_query_commit_count(mocked_execute, mocked_requests):
     assert woql_client._commit_made == 1
     woql_client.commit(WoqlStar)
     assert woql_client._commit_made == 0
+
+
+@mock.patch("requests.post", side_effect=mocked_requests_get)
+@mock.patch("requests.get", side_effect=mocked_requests_get)
+def test_delete_database(mocked_requests, mocked_requests2):
+    woql_client = WOQLClient(
+        "http://localhost:6363", user="admin", key="root", account="admin"
+    )
+    woql_client.connect()
+    assert woql_client.basic_auth() == "admin:root"
+
+    woql_client.create_database(
+        "myFirstTerminusDB",
+        "admin",
+        label="my first db",
+        description="my first db comment",
+        include_schema=False,
+    )
+
+    with pytest.raises(UserWarning):
+        woql_client.delete_database()

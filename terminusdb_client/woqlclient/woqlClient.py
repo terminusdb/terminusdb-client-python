@@ -618,7 +618,10 @@ class WOQLClient:
         self.dispatch("post", self._db_url(), details)
 
     def delete_database(
-        self, dbid: str, accountid: Optional[str] = None, force: bool = False
+        self,
+        dbid: Optional[str] = None,
+        accountid: Optional[str] = None,
+        force: bool = False,
     ) -> None:
         """Delete a TerminusDB database.
 
@@ -640,11 +643,18 @@ class WOQLClient:
         dict
         """
 
+        if dbid is None:
+            raise UserWarning(
+                f"You are currently using the database: {self._db}. If you want to delete it, please do 'delete_database({self._db})' instead."
+            )
+
         self._db = dbid
         if accountid:
             self._account = accountid
         payload = {"force": force}
-        self.dispatch("delte", self._db_url(), payload)
+        self.dispatch("delete", self._db_url(), payload)
+        self._db = None
+        self._connected = False
 
     def create_graph(self, graph_type: str, graph_id: str, commit_msg: str) -> None:
         """Create a new graph in the current database context.
@@ -1415,6 +1425,8 @@ class WOQLClient:
                         verify=verify,
                         # params=payload,
                     )
+        else:
+            raise ValueError("action needs to be 'get', 'post', 'put' or 'delete'")
 
         warnings.resetwarnings()
 

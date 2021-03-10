@@ -43,3 +43,7 @@ class APIError(DatabaseError):
 
 class InvalidURIError(Error):
     pass
+
+
+class UserWarning(Error):
+    pass
