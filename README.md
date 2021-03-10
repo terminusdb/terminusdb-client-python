@@ -1,3 +1,5 @@
+<img src="https://assets.terminusdb.com/images/main_lockup.png" width="700px"/>
+
 TerminusDB Client Python
 ==========================
 
