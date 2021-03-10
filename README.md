@@ -8,7 +8,7 @@ TerminusDB Client Python
 ![Follow on Twitter](https://img.shields.io/twitter/follow/terminusdb?color=skyblue&label=Follow%20on%20Twitter&logo=twitter&style=flat)
 
 
-**Development status ⛏️**
+**Development status ⚙️**
 
 [![Build Status](https://github.com/terminusdb/terminusdb-client-python/workflows/Python%20package/badge.svg?branch=master)](https://github.com/terminusdb/terminusdb-client-python/actions)
 [![Documentation Status](https://img.shields.io/github/deployments/terminusdb/terminusdb-client-python/github-pages?label=documentation&logo=github)](https://terminusdb.github.io/terminusdb-client-python/)
@@ -16,7 +16,7 @@ TerminusDB Client Python
 [![last commit](https://img.shields.io/github/last-commit/terminusdb/terminusdb-client-python?logo=github)](https://github.com/terminusdb/terminusdb-client-python/commits/master)
 [![number of contributors](https://img.shields.io/github/contributors/terminusdb/terminusdb-client-python?color=blue&logo=github)](https://github.com/terminusdb/terminusdb-client-python/graphs/contributors)
 
-**Release status 💎**
+**Python Package status 📦**
 
 [![PyPI version shields.io](https://img.shields.io/pypi/v/terminusdb-client.svg?logo=pypi)](https://pypi.python.org/pypi/terminusdb-client/)
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/terminusdb-client.svg?logo=python)](https://pypi.python.org/pypi/terminusdb-client/)
