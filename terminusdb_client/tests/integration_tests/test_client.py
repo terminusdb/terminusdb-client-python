@@ -3,8 +3,6 @@ import pytest
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
-from .mock_jsons import MOCK_CAPABILITIES
-
 
 def test_happy_path(docker_url):
     # create client
@@ -13,10 +11,12 @@ def test_happy_path(docker_url):
     # test connect
     client.connect()
     assert client._connected
-    assert client._capabilities == MOCK_CAPABILITIES
-    # create db
+    # assert client._capabilities == MOCK_CAPABILITIES
+    # test create db
     client.create_database("test_happy_path")
     init_commit = client._get_current_commit()
+    assert client._db == "test_happy_path"
+    assert "test_happy_path" in client.get_databases()
     # test adding doctype
     WOQLQuery().doctype("Station").execute(client)
     assert client._commit_made == 1

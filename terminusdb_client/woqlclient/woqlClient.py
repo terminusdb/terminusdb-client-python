@@ -54,7 +54,7 @@ class WOQLClient:
         ref: Optional[str] = None,
         repo: str = "local",
         **kwargs,
-    ) -> dict:
+    ) -> None:
         r"""Connect to a Terminus server at the given URI with an API key.
 
         Stores the terminus:ServerCapability document returned
@@ -104,9 +104,15 @@ class WOQLClient:
 
         self._connected = True
 
-        self._capabilities = self.dispatch_json("get", self._api)
+        capabilities = self.dispatch_json("get", self._api)
+        self._uid = capabilities["@id"]
+        self._context = capabilities["@context"]
+        # Get the current user's identifier, if logged in to Hub, it will be their email otherwise it will be the user provided
+        if capabilities.get("system:user_identifier"):
+            self._author = capabilities["system:user_identifier"]["@value"]
+        else:
+            self._author = self._user
         self._commit_made = 0
-        return self._capabilities
 
     def close(self) -> None:
         """Undo connect and close the connection.
@@ -349,7 +355,7 @@ class WOQLClient:
         >>> client.user_account()
         user1
         """
-        return self._capabilities["@id"]
+        return self._uid
 
     def user(self) -> Dict[str, Any]:
         """Get the current user's information.
@@ -365,13 +371,6 @@ class WOQLClient:
         {'id': '<uid>', 'author': '<author>', 'roles': [], 'label': '<label>', 'comment': '<comment>'}
         """
         return self._user
-
-    def _author(self) -> str:
-        """Get the current user's identifier, if logged in to Hub, it will be their email otherwise it will be the user provided"""
-        if self._capabilities.get("system:user_identifier"):
-            return self._capabilities["system:user_identifier"]["@value"]
-        else:
-            return self._user
 
     def repo(self, repoid: Optional[str] = None) -> str:
         """Set or get the repository identifier.
@@ -482,7 +481,7 @@ class WOQLClient:
         >>> client.uid(False)
         '<jwt_uid>'
         """
-        return self._capabilities["@id"]
+        return self._uid
 
     def resource(self, ttype: str, val: Optional[str] = None) -> str:
         """Create a resource identifier string based on the current config.
@@ -972,7 +971,7 @@ class WOQLClient:
             request_woql_query = woql_query.to_dict()
         else:
             request_woql_query = woql_query
-        request_woql_query["@context"] = self._capabilities["@context"]
+        request_woql_query["@context"] = self._context
         query_obj["query"] = request_woql_query
         request_file_dict: Optional[Dict[str, Tuple[str, Union[str, BinaryIO], str]]]
         if file_dict is not None and type(file_dict) is dict:
@@ -1265,7 +1264,7 @@ class WOQLClient:
         if author:
             mes_author = author
         else:
-            mes_author = self._author()
+            mes_author = self._author
 
         ci = {"commit_info": {"author": mes_author, "message": msg}}
         return ci
@@ -1289,7 +1288,7 @@ class WOQLClient:
         if rc_args is None:
             return None
         if not rc_args.get("author"):
-            rc_args["author"] = self._author()
+            rc_args["author"] = self._author
         return rc_args
 
     def _prepare_request(self):
@@ -1462,9 +1461,9 @@ class WOQLClient:
                 all_dbs.append(this_db)
 
         resources_ids = []
-        for scope in self._capabilities["system:role"]["system:capability"][
-            "system:capability_scope"
-        ]:
+        for scope in self.dispatch_json("get", self._api)["system:role"][
+            "system:capability"
+        ]["system:capability_scope"]:
             if (
                 scope["@type"] == "system:Organization"
                 and scope["system:organization_name"]["@value"] == account
@@ -1491,9 +1490,9 @@ class WOQLClient:
         """
         self._check_connection()
         all_dbs = []
-        for scope in self._capabilities["system:role"]["system:capability"][
-            "system:capability_scope"
-        ]:
+        for scope in self.dispatch_json("get", self._api)["system:role"][
+            "system:capability"
+        ]["system:capability_scope"]:
             if scope["@type"] == "system:Database":
                 all_dbs.append(scope)
         return all_dbs
