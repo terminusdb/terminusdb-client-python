@@ -10,7 +10,7 @@ TerminusDB Client Python
 
 **Development status ⚙️**
 
-[![Build Status](https://github.com/terminusdb/terminusdb-client-python/workflows/Python%20package/badge.svg?branch=master)](https://github.com/terminusdb/terminusdb-client-python/actions)
+[![Build Status](https://img.shields.io/github/workflow/status/terminusdb/terminusdb-client-python/Python%20package?logo=github)](https://github.com/terminusdb/terminusdb-client-python/actions)
 [![Documentation Status](https://img.shields.io/github/deployments/terminusdb/terminusdb-client-python/github-pages?label=documentation&logo=github)](https://terminusdb.github.io/terminusdb-client-python/)
 [![codecov](https://codecov.io/gh/terminusdb/terminusdb-client-python/branch/master/graph/badge.svg?token=BclAUaOPnQ)](https://codecov.io/gh/terminusdb/terminusdb-client-python)
 [![last commit](https://img.shields.io/github/last-commit/terminusdb/terminusdb-client-python?logo=github)](https://github.com/terminusdb/terminusdb-client-python/commits/master)
