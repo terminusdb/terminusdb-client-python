@@ -1,8 +1,8 @@
 # Command to initialize dev enviroment
 init:
-	pip3 install pipenv --upgrade
+	python -m pip install pipenv --upgrade
 	pipenv install --dev
-	pip install -e .
+	python -m pip install -e .
 
 # Command to run test and generate a coverage report on terminal
 coverage:
