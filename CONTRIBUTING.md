@@ -26,7 +26,7 @@ To install the pre-commit hook:
 
 ## Writing tests and testing ✅
 
-We are using [`pytest`](https://docs.pytest.org/en/latest/) for testing. All tests are stored in `/tests`
+We are using [pytest](https://docs.pytest.org/en/latest/) for testing. All tests are stored in `/tests`
 
 We also use tox to run tests in a virtual enviroment, we recommend running `tox` for the frist time before you make any changes. This is to initialized the tox enviroments (or do it seperately by `tox -e deps`) and make sure all tests pass initially.
 
