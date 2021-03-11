@@ -155,7 +155,7 @@ or our [forum](https://discuss.terminusdb.com). We are also on [twitter](https:/
 
 It will be nice, if you open an issue first so that we can know what is going on, then, fork this repo and push in your ideas. Do not forget to add some test(s) of what value you adding.
 
-Please check [Contributing.md](Contributing.md) for more information.
+Please check [CONTRIBUTING.md](CONTRIBUTING.md) for more information.
 
 ## Licence
 
