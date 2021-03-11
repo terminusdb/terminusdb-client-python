@@ -18,9 +18,17 @@ To “editable” install the local Terminus Client Python:
 
 **to be able to run integration tests, local installation of docker is required**
 
+We use [shed](https://pypi.org/project/shed/) to lint our code. Although you can do it manually by running `shed`, we highly recommend setting up the pre-commit hook to do the linting automatically.
+
+To install the pre-commit hook:
+
+`pre-commit install`
+
 ## Writing tests and testing
 
 We are using [`pytest`](https://docs.pytest.org/en/latest/) for testing. All tests are stored in `/tests`
+
+We also use tox to run tests in a virtual enviroment, we recommend running `tox` for the frist time before you make any changes. This is to initialized the tox enviroments (or do it seperately by `tox -e deps`) and make sure all tests pass initially.
 
 To run the unittests without integration tests:
 
@@ -43,6 +51,17 @@ To run all tests and checks:
 ## Writing Documentation
 
 Please follow [numpydoc docstring guide](https://numpydoc.readthedocs.io/en/latest/format.html) for documentation. It is important to follow the formatting as all documentation will be automatically rendered using [Sphinx](https://www.sphinx-doc.org/).
+
+To render the documentation locally (for preview before making your PR):
+
+```
+cd docs
+make html
+```
+
+The built documentation will be in `/build/html/` which you can open `index.html` in your browser to check.
+
+*now you are in docs directry, make sure you go back to the top directry of the repo if you want to commit and push*
 
 ## Pull Request Format Guideline
 
