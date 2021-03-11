@@ -1297,8 +1297,8 @@ class WOQLClient:
         self,
         action: str,  # get, post, put, delete
         url: str,
-        payload: dict = {},
-        file_list: list = [],
+        payload: Optional[dict] = None,
+        file_list: Optional[list] = None,
     ) -> dict:
         result = self.dispatch(action, url, payload, file_list)
         return json.loads(result)
@@ -1307,8 +1307,8 @@ class WOQLClient:
         self,
         action: str,  # get, post, put, delete
         url: str,
-        payload: dict = {},
-        file_list: list = [],
+        payload: Optional[dict] = None,
+        file_list: Optional[list] = None,
     ) -> str:
         """Directly dispatch to a TerminusDB database.
 
@@ -1333,10 +1333,14 @@ class WOQLClient:
         # self.conCapabilities.capabilitiesPermit(action)
         # url, action, payload={}, basic_auth, jwt=None, file_dict=None)
 
+        if payload is None:
+            payload = {}
+        if file_list is None:
+            file_list = []
         request_response = None
         headers = {}
         # url = utils.add_params_to_url(url, payload)
-        if url[:17] == "https://127.0.0.1" or url[:7] == "http://" or insecure:
+        if url[:17] == "https://127.0.0.1" or url[:7] == "http://" or self.insecure:
             verify = False
         else:
             verify = True
