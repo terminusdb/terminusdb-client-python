@@ -653,7 +653,6 @@ class WOQLClient:
         payload = {"force": force}
         self.dispatch("delete", self._db_url(), payload)
         self._db = None
-        self._connected = False
 
     def create_graph(self, graph_type: str, graph_id: str, commit_msg: str) -> None:
         """Create a new graph in the current database context.
@@ -1495,6 +1494,21 @@ class WOQLClient:
         ]["system:capability_scope"]:
             if scope["@type"] == "system:Database":
                 all_dbs.append(scope)
+        return all_dbs
+
+    def list_databases(self) -> List[Dict]:
+        """
+        Returns a list of database ids for all databases the user has access to
+
+        Returns
+        -------
+        list of dicts
+        """
+        self._check_connection()
+        all_data = self.get_databases()
+        all_dbs = []
+        for data in all_data:
+            all_dbs.append(data["system:resource_name"]["@value"])
         return all_dbs
 
     def get_metadata(self, dbid: str, account):

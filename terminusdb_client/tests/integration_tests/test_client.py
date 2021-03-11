@@ -11,12 +11,11 @@ def test_happy_path(docker_url):
     # test connect
     client.connect()
     assert client._connected
-    # assert client._capabilities == MOCK_CAPABILITIES
     # test create db
     client.create_database("test_happy_path")
     init_commit = client._get_current_commit()
     assert client._db == "test_happy_path"
-    assert "test_happy_path" in client.get_databases()
+    assert "test_happy_path" in client.list_databases()
     # test adding doctype
     WOQLQuery().doctype("Station").execute(client)
     assert client._commit_made == 1
@@ -42,3 +41,4 @@ def test_happy_path(docker_url):
         client.rollback(2)
     client.delete_database("test_happy_path")
     assert client._db is None
+    assert "test_happy_path" not in client.list_databases()
