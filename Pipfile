@@ -6,7 +6,6 @@ verify_ssl = true
 [dev-packages]
 pytest = "*"
 pytest-mock = "*"
-autopep8 = "*"
 flake8 = "*"
 pytest-cov = "*"
 bumpversion = "*"
@@ -18,7 +17,8 @@ pandas = "*"
 tox = "*"
 interrogate = "*"
 docker-compose = "*"
-pre-commit ="*"
+pre-commit = "*"
+shed = "*"
 
 [packages]
 requests = "*"
