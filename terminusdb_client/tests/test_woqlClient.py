@@ -1,5 +1,6 @@
 # import sys
 # sys.path.append('woqlclient')
+import json
 import unittest.mock as mock
 
 import pytest
@@ -7,6 +8,7 @@ import requests
 
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 
+from .mockResponse import MOCK_CAPABILITIES
 from .woqljson.woqlStarJson import WoqlStar
 
 
@@ -21,7 +23,7 @@ def mocked_requests_get(*args, **kwargs):
             return self.json_data
 
     if "http://localhost:6363/" in args[0]:
-        return MockResponse('{"@context":"value"}', {"key1": "value1"}, 200)
+        return MockResponse(json.dumps(MOCK_CAPABILITIES), {"key1": "value1"}, 200)
 
     return MockResponse(None, 404)
 
