@@ -4,16 +4,13 @@ import json
 import os
 import warnings
 from base64 import b64encode
-from typing import Any, BinaryIO, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Union
 
 import requests
 from urllib3.exceptions import InsecureRequestWarning
 
 from ..__version__ import __version__
 from ..woqlquery.woql_query import WOQLQuery
-
-# from .api_endpoint_const import APIEndpointConst
-# import .dispatchRequest as DispatchRequest
 from .errors import DatabaseError, Error, InterfaceError
 
 # WOQL client object
@@ -227,9 +224,6 @@ class WOQLClient:
         if user is not None:
             self._user = user
         return f"{self._user}:{self._key}"
-        # if key:
-        #     self.conConfig.set_basic_auth(key, user)
-        # return self.conConfig.basic_auth
 
     def remote_auth(self, auth_info: Optional[Dict[str, str]] = None) -> Dict[str, str]:
         """Set or get the Basic auth or JWT token used for authenticating to the server.
@@ -642,19 +636,20 @@ class WOQLClient:
         dict
         """
 
-        if dbid is None:
+        if dbid is None or accountid is None:
             raise UserWarning(
-                f"You are currently using the database: {self._db}. If you want to delete it, please do 'delete_database({self._db})' instead."
+                f"You are currently using the database: {self._account}/{self._db}. If you want to delete it, please do 'delete_database({self._db},{self._account})' instead."
             )
 
         self._db = dbid
-        if accountid:
-            self._account = accountid
+        self._account = accountid
         payload = {"force": force}
         self.dispatch("delete", self._db_url(), payload)
         self._db = None
 
-    def create_graph(self, graph_type: str, graph_id: str, commit_msg: str) -> None:
+    def create_graph(
+        self, graph_type: str, graph_id: str, commit_msg: Optional[str] = None
+    ) -> None:
         """Create a new graph in the current database context.
 
         Parameters
@@ -684,7 +679,9 @@ class WOQLClient:
                 "Create graph parameter error - you must specify a valid graph_type (inference, instance, schema), graph_id and commit message"
             )
 
-    def delete_graph(self, graph_type: str, graph_id: str, commit_msg: str) -> None:
+    def delete_graph(
+        self, graph_type: str, graph_id: str, commit_msg: Optional[str] = None
+    ) -> None:
         """Delete a graph from the current database context.
 
         Parameters
@@ -760,7 +757,7 @@ class WOQLClient:
         )
 
     def insert_triples(
-        self, graph_type: str, graph_id: str, turtle, commit_msg: str
+        self, graph_type: str, graph_id: str, turtle, commit_msg: Optional[str] = None
     ) -> None:
         """Inserts into the specified graph with the triples encoded in turtle format.
 
@@ -788,6 +785,7 @@ class WOQLClient:
         self,
         csv_name: str,
         csv_directory: Optional[str] = None,
+        csv_output_name: Optional[str] = None,
         graph_type: Optional[str] = None,
         graph_id: Optional[str] = None,
     ):
@@ -797,8 +795,10 @@ class WOQLClient:
         ----------
         csv_name : str
             Name of csv to dump from the specified database to extract.
-        csv_directory : str
+        csv_directory : str, optional
             CSV output directory path. (defaults to current directory).
+        csv_output_name: str, optional
+            CSV output file name. (defaults to same csv name).
         graph_type : str
             Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
         graph_id : str, optional
@@ -808,6 +808,8 @@ class WOQLClient:
         options = {}
         if csv_directory is None:
             csv_directory = os.getcwd()
+        if csv_output_name is None:
+            csv_output_name = csv_name
         options["name"] = csv_name
 
         result = self.dispatch(
@@ -816,14 +818,14 @@ class WOQLClient:
             options,
         )
 
-        stream = open(f"{csv_directory}/{csv_name}", "w")
+        stream = open(f"{csv_directory}/{csv_output_name}", "w")
         stream.write(result.text)
         stream.close()
 
     def update_csv(
         self,
         csv_paths: Union[str, List[str]],
-        commit_msg: str,
+        commit_msg: Optional[str] = None,
         graph_type: Optional[str] = None,
         graph_id: Optional[str] = None,
     ) -> None:
@@ -849,22 +851,17 @@ class WOQLClient:
         else:
             csv_paths_list = csv_paths
 
-        file_dict = {}
-        for path in csv_paths_list:
-            name = os.path.basename(os.path.normpath(path))
-            file_dict[name] = (name, open(path, "rb"), "application/binary")
-
         self.dispatch(
             "post",
             self._csv_url(graph_type, graph_id),
             commit,
-            file_dict=file_dict,
+            file_list=csv_paths_list,
         )
 
     def insert_csv(
         self,
         csv_paths: Union[str, List[str]],
-        commit_msg: str,
+        commit_msg: Optional[str] = None,
         graph_type: Optional[str] = None,
         graph_id: Optional[str] = None,
     ) -> None:
@@ -891,16 +888,11 @@ class WOQLClient:
         else:
             csv_paths_list = csv_paths
 
-        file_dict = {}
-        for path in csv_paths_list:
-            name = os.path.basename(os.path.normpath(path))
-            file_dict[name] = (name, open(path, "rb"), "application/binary")
-
         self.dispatch(
             "put",
             self._csv_url(graph_type, graph_id),
             commit,
-            file_dict=file_dict,
+            file_list=csv_paths_list,
         )
 
     def commit(
@@ -954,17 +946,16 @@ class WOQLClient:
         dict
         """
         self._check_connection()
-        if (
-            hasattr(woql_query, "_contains_update_check")
-            and woql_query._contains_update_check()  # type: ignore
-        ):
-            if not commit_msg:
-                commit_msg = f"Update Query generated by python client {__version__}"
-            query_obj = self._generate_commit(commit_msg)
-        elif type(woql_query) is dict and commit_msg:
-            query_obj = self._generate_commit(commit_msg)
-        else:
-            query_obj = {}
+        query_obj = self._generate_commit(commit_msg)
+        # if (
+        #     hasattr(woql_query, "_contains_update_check")
+        #     and woql_query._contains_update_check()  # type: ignore
+        # ):
+        #     query_obj = self._generate_commit(commit_msg)
+        # elif type(woql_query) is dict and commit_msg:
+        #     query_obj = self._generate_commit(commit_msg)
+        # else:
+        #     query_obj = {}
 
         if isinstance(woql_query, WOQLQuery):
             request_woql_query = woql_query.to_dict()
@@ -972,7 +963,7 @@ class WOQLClient:
             request_woql_query = woql_query
         request_woql_query["@context"] = self._context
         query_obj["query"] = request_woql_query
-        request_file_dict: Optional[Dict[str, Tuple[str, Union[str, BinaryIO], str]]]
+        # request_file_dict: Optional[Dict[str, Tuple[str, Union[str, BinaryIO], str]]]
         if file_dict is not None and type(file_dict) is dict:
             request_file_dict = {}
             for name in query_obj:
@@ -982,19 +973,21 @@ class WOQLClient:
                     json.dumps(query_obj_value),
                     "application/json",
                 )
+            file_list = []
             for name in file_dict:
-                path = file_dict[name]
-                request_file_dict[name] = (name, open(path, "rb"), "application/binary")
+                file_list.append(os.path.join(file_dict[name], name))
+                # path = file_dict[name]
+                # request_file_dict[name] = (name, open(path, "rb"), "application/binary")
             payload = None
         else:
-            request_file_dict = None
+            file_list = None
             payload = query_obj
 
         result = self.dispatch_json(
             "post",
             self._query_url(),
             payload,
-            request_file_dict,
+            file_list,
         )
         if result.get("inserts") or result.get("deletes"):
             self._commit_made += 1
@@ -1096,7 +1089,7 @@ class WOQLClient:
                 "Push parameter error - you must specify a valid remote target"
             )
 
-    def rebase(self, rebase_source: Dict[str, str]) -> dict:
+    def rebase(self, rebase_source: str) -> dict:
         """Rebase the current branch onto the specified remote branch.
 
         Notes
@@ -1105,8 +1098,8 @@ class WOQLClient:
 
         Parameters
         ----------
-        rebase_source : dict
-            Dict containing a ``"rebase_from"`` key.
+        rebase_source : str
+            the source branch for the rebase
 
         Returns
         -------
@@ -1120,9 +1113,10 @@ class WOQLClient:
         Examples
         --------
         >>> client = WOQLClient("https://127.0.0.1:6363/")
-        >>> client.rebase({"rebase_from": "<branch>"})
+        >>> client.rebase("the_branch")
         """
         self._check_connection()
+        rebase_source = {"rebase_from": rebase_source}
         rc_args = self._prepare_revision_control_args(rebase_source)
         if rc_args is not None and rc_args.get("rebase_from"):
             return self.dispatch_json("post", self._rebase_url(), rc_args)
@@ -1177,7 +1171,7 @@ class WOQLClient:
         self._check_connection()
         self.dispatch("post", self.conConfig.optimize_url(path))
 
-    def squash(self, msg: str, author: Optional[str] = None) -> dict:
+    def squash(self, msg: Optional[str] = None, author: Optional[str] = None) -> dict:
         """Squash the current branch HEAD into a commit
 
         Notes
@@ -1210,13 +1204,13 @@ class WOQLClient:
         commit_object = self._generate_commit(msg, author)
         return self.dispatch_json("post", self._squash_url(), commit_object)
 
-    def clonedb(self, clone_source: Dict[str, str], newid: str) -> None:
+    def clonedb(self, clone_source: str, newid: str) -> None:
         """Clone a remote repository and create a local copy.
 
         Parameters
         ----------
-        clone_source : dict
-            Dict containing a ``"remote_url"`` key.
+        clone_source : str
+            The source url of the repo to be cloned.
         newid : str
             Identifier of the new repository to create.
 
@@ -1231,6 +1225,7 @@ class WOQLClient:
         >>> client.clonedb({"remote_url": "<remote_url>"}, "<newid>")
         """
         self._check_connection()
+        clone_source = {"remote_url": clone_source}
         rc_args = self._prepare_revision_control_args(clone_source)
         if rc_args is not None and rc_args.get("remote_url"):
             self.dispatch("post", self.conConfig.clone_url(newid), rc_args)
@@ -1239,7 +1234,9 @@ class WOQLClient:
                 "Clone parameter error - you must specify a valid id for the cloned database"
             )
 
-    def _generate_commit(self, msg: str, author: Optional[str] = None) -> dict:
+    def _generate_commit(
+        self, msg: Optional[str] = None, author: Optional[str] = None
+    ) -> dict:
         """Pack the specified commit info into a dict format expected by the server.
 
         Parameters
@@ -1264,7 +1261,8 @@ class WOQLClient:
             mes_author = author
         else:
             mes_author = self._author
-
+        if not msg:
+            msg = f"Commit via python client {__version__}"
         ci = {"commit_info": {"author": mes_author, "message": msg}}
         return ci
 
@@ -1290,9 +1288,6 @@ class WOQLClient:
             rc_args["author"] = self._author
         return rc_args
 
-    def _prepare_request(self):
-        pass
-
     def dispatch_json(
         self,
         action: str,  # get, post, put, delete
@@ -1300,6 +1295,24 @@ class WOQLClient:
         payload: Optional[dict] = None,
         file_list: Optional[list] = None,
     ) -> dict:
+        """Directly dispatch to a TerminusDB database with the returned result parsed into a dictionary.
+
+        Parameters
+        ----------
+        action
+            The action to perform on the server. It will be one of the followig: get, post, put, delete
+        url : str
+            The server URL to point the action at.
+        payload : dict, optional
+            Payload to send to the server.
+        file_list : list, optional
+            List of files to include in the query.
+
+        Returns
+        -------
+        dict
+            Dictionary convered from the json string that is passed from a successful dispatch call.
+        """
         result = self.dispatch(action, url, payload, file_list)
         return json.loads(result)
 
@@ -1315,7 +1328,7 @@ class WOQLClient:
         Parameters
         ----------
         action
-            The action to perform on the server.
+            The action to perform on the server. It will be one of the followig: get, post, put, delete
         url : str
             The server URL to point the action at.
         payload : dict, optional
@@ -1325,7 +1338,8 @@ class WOQLClient:
 
         Returns
         -------
-        dict
+        str
+            If it sccessed (status code 200) then it will return a json string that is convertable to a dictionary.
         """
 
         # check if we can perform this action or raise an AccessDeniedError error
@@ -1378,9 +1392,12 @@ class WOQLClient:
 
             if file_list:
                 file_dict = {}
+                streams = []
                 for path in file_list:
                     name = os.path.basename(os.path.normpath(path))
-                    file_dict[name] = (name, open(path, "rb"), "application/binary")
+                    stream = open(path, "rb")
+                    file_dict[name] = (name, stream, "application/binary")
+                    streams.append(stream)
                 file_dict["payload"] = (
                     "payload",
                     json.dumps(payload),
@@ -1404,11 +1421,9 @@ class WOQLClient:
                             params=payload,
                         )
                 finally:
-                    # Close the files although request should do this :(
-                    for key in file_dict:
-                        (_, stream, _) = file_dict[key]
-                        if type(stream) != str:
-                            stream.close()
+                    # Close the files
+                    for stream in streams:
+                        stream.close()
             else:
                 # headers["content-type"] = "application/json"
                 if action == "post":

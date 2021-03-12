@@ -6,6 +6,7 @@ import unittest.mock as mock
 import pytest
 import requests
 
+from terminusdb_client.__version__ import __version__
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 
 from .mockResponse import MOCK_CAPABILITIES
@@ -208,7 +209,13 @@ def test_query(mocked_requests, mocked_requests2):
             "Authorization": "Basic YWRtaW46cm9vdA==",
         },
         verify=False,
-        json={"query": WoqlStar},
+        json={
+            "commit_info": {
+                "author": "admin",
+                "message": f"Commit via python client {__version__}",
+            },
+            "query": WoqlStar,
+        },
     )
 
 
