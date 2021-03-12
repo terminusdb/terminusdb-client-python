@@ -925,7 +925,7 @@ class WOQLClient:
         woql_query: Union[dict, WOQLQuery],
         commit_msg: Optional[str] = None,
         file_dict: Optional[dict] = None,
-    ) -> dict:
+    ) -> Union[dict, str]:
         """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
 
         Parameters
@@ -947,16 +947,6 @@ class WOQLClient:
         """
         self._check_connection()
         query_obj = self._generate_commit(commit_msg)
-        # if (
-        #     hasattr(woql_query, "_contains_update_check")
-        #     and woql_query._contains_update_check()  # type: ignore
-        # ):
-        #     query_obj = self._generate_commit(commit_msg)
-        # elif type(woql_query) is dict and commit_msg:
-        #     query_obj = self._generate_commit(commit_msg)
-        # else:
-        #     query_obj = {}
-
         if isinstance(woql_query, WOQLQuery):
             request_woql_query = woql_query.to_dict()
         else:
@@ -991,6 +981,7 @@ class WOQLClient:
         )
         if result.get("inserts") or result.get("deletes"):
             self._commit_made += 1
+            return f"Commit successfully made."
         return result
 
     def branch(self, new_branch_id: str, empty: bool = False) -> None:
