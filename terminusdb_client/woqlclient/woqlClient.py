@@ -678,7 +678,7 @@ class WOQLClient:
             commit = self._generate_commit(commit_msg)
             return self.dispatch(
                 APIEndpointConst.CREATE_GRAPH,
-                self.conConfig.graph_url(graph_type, graph_id),
+                self._graph_url(graph_type, graph_id),
                 commit,
             )
 
@@ -1087,7 +1087,7 @@ class WOQLClient:
         ):
             return self.dispatch(
                 APIEndpointConst.PULL,
-                self.conConfig.pull_url(),
+                self._pull_url(),
                 rc_args,
             )
         else:
@@ -1097,9 +1097,7 @@ class WOQLClient:
 
     def fetch(self, remote_id: str):
         self._check_connection()
-        return self.dispatch(
-            APIEndpointConst.FETCH, self.conConfig.fetch_url(remote_id)
-        )
+        return self.dispatch(APIEndpointConst.FETCH, self._fetch_url(remote_id))
 
     def push(self, remote_target_repo: Dict[str, str]):
         """Push changes from a branch to a remote repo
@@ -1213,7 +1211,7 @@ class WOQLClient:
         >>> client.optimize('admin/database/_meta')
         """
         self._check_connection()
-        return self.dispatch(APIEndpointConst.RESET, self.conConfig.optimize_url(path))
+        return self.dispatch(APIEndpointConst.RESET, self._optimize_url(path))
 
     def squash(self, msg: str, author: Optional[str] = None) -> dict:
         """Squash the current branch HEAD into a commit
@@ -1276,7 +1274,7 @@ class WOQLClient:
         rc_args = self._prepare_revision_control_args(clone_source)
         if rc_args is not None and rc_args.get("remote_url"):
             return self.dispatch(
-                APIEndpointConst.CLONE, self.conConfig.clone_url(newid), rc_args
+                APIEndpointConst.CLONE, self._clone_url(newid), rc_args
             )
         else:
             raise ValueError(
