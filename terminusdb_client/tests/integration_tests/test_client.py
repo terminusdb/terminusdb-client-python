@@ -1,3 +1,7 @@
+import csv
+import filecmp
+import os
+
 import pytest
 
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
@@ -39,6 +43,43 @@ def test_happy_path(docker_url):
     assert client._commit_made == 1
     with pytest.raises(ValueError):
         client.rollback(2)
-    client.delete_database("test_happy_path")
+    client.delete_database("test_happy_path", "admin")
     assert client._db is None
     assert "test_happy_path" not in client.list_databases()
+
+
+def _generate_csv():
+    file_path = "employee_file.csv"
+    with open(file_path, mode="w") as employee_file:
+        employee_writer = csv.writer(
+            employee_file, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL
+        )
+        employee_writer.writerow(["John Smith", "Accounting", "November"])
+        employee_writer.writerow(["Erica Meyers", "IT", "March"])
+    return file_path
+
+
+def _file_clean_up(filename):
+    if os.path.exists(filename):
+        os.remove(filename)
+
+
+def test_csv_handeling(docker_url):
+    client = WOQLClient(docker_url)
+    assert not client._connected
+    # test connect
+    client.connect()
+    assert client._connected
+    # test create db
+    client.create_database("test_csv")
+    client._get_current_commit()
+    assert client._db == "test_csv"
+    assert "test_csv" in client.list_databases()
+    csv_file_path = _generate_csv()  # create testing csv
+    try:
+        client.insert_csv(csv_file_path)
+        client.get_csv(csv_file_path, csv_output_name="new_" + csv_file_path)
+        assert filecmp.cmp(csv_file_path, "new_" + csv_file_path)
+    finally:
+        _file_clean_up(csv_file_path)
+        _file_clean_up("new_" + csv_file_path)

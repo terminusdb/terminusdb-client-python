@@ -11,6 +11,48 @@ from .woql_core import _copy_dict, _tokenize, _tokens_to_json
 
 # pp = pprint.PrettyPrinter(indent=4)
 
+BLOCK_SCOPE = [
+    "select",
+    "from",
+    "start",
+    "when",
+    "opt",
+    "limit",
+]
+UPDATE_OPERATORS = [
+    "woql:AddTriple",
+    "woql:DeleteTriple",
+    "woql:AddQuad",
+    "woql:DeleteQuad",
+    "woql:DeleteObject",
+    "woql:UpdateObject",
+]
+
+SHORT_NAME_MAPPING = {
+    "type": "rdf:type",
+    "label": "rdfs:label",
+    "Class": "owl:Class",
+    "DatatypeProperty": "owl:DatatypeProperty",
+    "ObjectProperty": "owl:ObjectProperty",
+    "Document": "terminus:Document",
+    "abstract": "terminus:Document",
+    "comment": "rdfs:comment",
+    "range": "rdfs:range",
+    "domain": "rdfs:domain",
+    "subClassOf": "rdfs:subClassOf",
+    "boolean": "xsd:boolean",
+    "string": "xsd:string",
+    "integer": "xsd:integer",
+    "decimal": "xsd:decimal",
+    "email": "xdd:email",
+    "json": "xdd:json",
+    "dateTime": "xsd:dateTime",
+    "date": "xsd:date",
+    "coordinate": "xdd:coordinate",
+    "line": "xdd:coordinatePolyline",
+    "polygon": "xdd:coordinatePolygon",
+}
+
 
 class WOQLQuery:
     def __init__(self, query=None, graph="schema/main"):
@@ -31,24 +73,24 @@ class WOQLQuery:
         self._contains_update = False
         self._triple_builder_context = {}
         # operators which preserve global paging
-        self._paging_transitive_properties = [
-            "select",
-            "from",
-            "start",
-            "when",
-            "opt",
-            "limit",
-        ]
-        self._update_operators = [
-            "woql:AddTriple",
-            "woql:DeleteTriple",
-            "woql:AddQuad",
-            "woql:DeleteQuad",
-            "woql:DeleteObject",
-            "woql:UpdateObject",
-        ]
+        # self._paging_transitive_properties = [
+        #     "select",
+        #     "from",
+        #     "start",
+        #     "when",
+        #     "opt",
+        #     "limit",
+        # ]
+        # self._update_operators = [
+        #     "woql:AddTriple",
+        #     "woql:DeleteTriple",
+        #     "woql:AddQuad",
+        #     "woql:DeleteQuad",
+        #     "woql:DeleteObject",
+        #     "woql:UpdateObject",
+        # ]
 
-        self._vocab = self._load_default_vocabulary()
+        self._vocab = SHORT_NAME_MAPPING
 
         # alias
         self.subsumption = self.sub
@@ -80,18 +122,18 @@ class WOQLQuery:
         return WOQLQuery().woql_and(self, other)
 
     # WOQLCore methods
-    def _parameter_error(self, message):
-        """Basic Error handling"""
-        raise ValueError(message)
+    # def _parameter_error(self, message):
+    #     """Basic Error handling"""
+    #     raise ValueError(message)
 
     def _add_sub_query(self, sub_query=None):
         """Internal library function which adds a subquery and sets the cursor"""
         if sub_query:
-            self._cursor["woql:query"] = self._jobj(sub_query)
+            self._cursor["woql:query"] = self._coerce_to_dict(sub_query)
         else:
-            nv = {}
-            self._cursor["woql:query"] = nv
-            self._cursor = nv
+            initial_object = {}
+            self._cursor["woql:query"] = initial_object
+            self._cursor = initial_object
         return self
 
     def _contains_update_check(self, json=None):
@@ -139,8 +181,8 @@ class WOQLQuery:
             }
         return varb
 
-    def _jobj(self, qobj):
-        """Transforms a javascript representation of a query into a json object if needs be"""
+    def _coerce_to_dict(self, qobj):
+        """Transforms a object representation of a query into a dictionary object if needs be"""
         if hasattr(qobj, "to_dict"):
             return qobj.to_dict()
         if qobj is True:
@@ -229,7 +271,7 @@ class WOQLQuery:
 
     def _qle(self, query, idx):
         """Query List Element Constructor"""
-        qobj = self._jobj(query)
+        qobj = self._coerce_to_dict(query)
         iqle = {
             "@type": "woql:QueryListElement",
             "woql:index": self._jlt(idx, "nonNegativeInteger"),
@@ -250,8 +292,7 @@ class WOQLQuery:
             else:
                 subj = "doc:" + obj
             return self._expand_variable(subj)
-        self._parameter_error("Subject must be a URI string")
-        return str(obj)
+        raise ValueError("Subject must be a URI string")
 
     def _clean_predicate(self, predicate):
         """Transforms whatever is passed in as the predicate (id or variable) into the appropriate json-ld form """
@@ -259,7 +300,7 @@ class WOQLQuery:
         if type(predicate) is dict:
             return predicate
         if type(predicate) != str:
-            self._parameter_error("Predicate must be a URI string")
+            raise ValueError("Predicate must be a URI string")
             return str(predicate)
         if ":" in predicate:
             pred = predicate
@@ -393,42 +434,6 @@ class WOQLQuery:
         """Retrieves the value of the current json-ld context"""
         self._cursor["@context"] = current_context
 
-    def _load_default_vocabulary(self):
-        """vocabulary elements that can be used without prefixes in woql.py queries"""
-        return {
-            "type": "rdf:type",
-            "label": "rdfs:label",
-            "Class": "owl:Class",
-            "DatatypeProperty": "owl:DatatypeProperty",
-            "ObjectProperty": "owl:ObjectProperty",
-            "Document": "terminus:Document",
-            "abstract": "terminus:Document",
-            "comment": "rdfs:comment",
-            "range": "rdfs:range",
-            "domain": "rdfs:domain",
-            "subClassOf": "rdfs:subClassOf",
-            "boolean": "xsd:boolean",
-            "string": "xsd:string",
-            "integer": "xsd:integer",
-            "decimal": "xsd:decimal",
-            "email": "xdd:email",
-            "json": "xdd:json",
-            "dateTime": "xsd:dateTime",
-            "date": "xsd:date",
-            "coordinate": "xdd:coordinate",
-            "line": "xdd:coordinatePolyline",
-            "polygon": "xdd:coordinatePolygon",
-        }
-
-    @property
-    def _vocabulary(self, vocab):
-        """Provides the query with a 'vocabulary' a list of well known predicates that can be used without prefixes mapping: id: prefix:id ..."""
-        return self._vocab
-
-    @_vocabulary.setter
-    def _vocabulary(self, vocab):
-        self._vocab = vocab
-
     def execute(self, client, commit_msg=None, file_dict=None):
         """Executes the query using the passed client to connect to a server
 
@@ -539,7 +544,7 @@ class WOQLQuery:
         if toks:
             return _tokens_to_json(toks, self)
         else:
-            self._parameter_error("Pattern error - could not be parsed " + pat)
+            raise ValueError("Pattern error - could not be parsed " + pat)
 
     def load_vocabulary(self, client):
         """Queries the schema graph and loads all the ids found there as vocabulary that can be used without prefixes
@@ -574,7 +579,7 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:Using"
         if not collection or type(collection) != str:
-            return self._parameter_error(
+            raise ValueError(
                 "The first parameter to using must be a Collection ID (string)"
             )
         self._cursor["woql:collection"] = self._jlt(collection)
@@ -622,9 +627,7 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:Select"
         if queries != [] and not queries:
-            return self._parameter_error(
-                "Select must be given a list of variable names"
-            )
+            raise ValueError("Select must be given a list of variable names")
         if queries == []:
             embedquery = False
         elif hasattr(queries[-1], "to_dict"):
@@ -660,9 +663,7 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:Distinct"
         if queries != [] and not queries:
-            return self._parameter_error(
-                "Distinct must be given a list of variable names"
-            )
+            raise ValueError("Distinct must be given a list of variable names")
         if queries == []:
             embedquery = False
         elif hasattr(queries[-1], "to_dict"):
@@ -763,7 +764,7 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:From"
         if not graph_filter or type(graph_filter) != str:
-            return self._parameter_error(
+            raise ValueError(
                 "The first parameter to from must be a Graph Filter Expression (string)"
             )
         self._cursor["woql:graph_filter"] = self._jlt(graph_filter)
@@ -789,7 +790,7 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:Into"
         if not graph_descriptor or type(graph_descriptor) != str:
-            return self._parameter_error(
+            raise ValueError(
                 "The first parameter to from must be a Graph Filter Expression (string)"
             )
         self._cursor["woql:graph"] = self._jlt(graph_descriptor)
@@ -911,7 +912,7 @@ class WOQLQuery:
         if sub and sub == "woql:args":
             return arguments.append("woql:graph_filter")
         if not graph:
-            return self._parameter_error(
+            raise ValueError(
                 "Quad takes four parameters, the last should be a graph filter"
             )
         self._cursor["@type"] = "woql:Quad"
@@ -947,7 +948,7 @@ class WOQLQuery:
         if sub and sub == "woql:args":
             return arguments.append("woql:graph_filter")
         if not graph:
-            return self._parameter_error(
+            raise ValueError(
                 "Quad takes four parameters, the last should be a graph filter"
             )
         self._cursor["@type"] = "woql:AddedQuad"
@@ -983,7 +984,7 @@ class WOQLQuery:
         if sub and sub == "woql:args":
             return arguments.append("woql:graph_filter")
         if not graph:
-            return self._parameter_error(
+            raise ValueError(
                 "Quad takes four parameters, the last should be a graph filter"
             )
         self._cursor["@type"] = "woql:RemovedQuad"
@@ -1068,7 +1069,7 @@ class WOQLQuery:
         if parent and parent == "woql:args":
             return ["woql:parent", "woql:child"]
         if parent is None or child is None:
-            return self._parameter_error("Subsumption takes two parameters, both URIs")
+            raise ValueError("Subsumption takes two parameters, both URIs")
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:Subsumption"
@@ -1092,7 +1093,7 @@ class WOQLQuery:
         if left and left == "woql:args":
             return ["woql:left", "woql:right"]
         if left is None or right is None:
-            return self._parameter_error("Equals takes two parameters")
+            raise ValueError("Equals takes two parameters")
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:Equals"
@@ -1113,7 +1114,7 @@ class WOQLQuery:
             substring = length
             length = len(substring) + before
         if not string or not substring or type(substring) != type:
-            return self._parameter_error(
+            raise ValueError(
                 "Substr - the first and last parameters must be strings representing the full and substring variables / literals"
             )
         if self._cursor.get("@type"):
@@ -1168,7 +1169,7 @@ class WOQLQuery:
         else:
             self._cursor["woql:as_vars"] = WOQLQuery().woql_as(*as_vars).to_dict()
         if query_resource:
-            self._cursor["woql:query_resource"] = self._jobj(query_resource)
+            self._cursor["woql:query_resource"] = self._coerce_to_dict(query_resource)
         else:
             self._cursor["woql:query_resource"] = {}
         self._cursor = self._cursor["woql:query_resource"]
@@ -1185,9 +1186,9 @@ class WOQLQuery:
             self._cursor["woql:as_vars"] = as_vars.to_dict()
         else:
             self._cursor["woql:as_vars"] = WOQLQuery().woql_as(*as_vars).to_dict()
-        self._cursor["woql:query"] = self._jobj(query)
+        self._cursor["woql:query"] = self._coerce_to_dict(query)
         if query_resource:
-            self._cursor["woql:query_resource"] = self._jobj(query_resource)
+            self._cursor["woql:query_resource"] = self._coerce_to_dict(query_resource)
         else:
             self._cursor["woql:query_resource"] = {}
         return self
@@ -1449,7 +1450,7 @@ class WOQLQuery:
         if subject and subject == "woql:args":
             return triple_args.append("woql:graph")
         if not graph:
-            return self._parameter_error(
+            raise ValueError(
                 "Delete Quad takes four parameters, the last should be a graph id"
             )
         self._cursor["@type"] = "woql:DeleteQuad"
@@ -1481,7 +1482,7 @@ class WOQLQuery:
         if subject and subject == "woql:args":
             return triple_args.concat(["woql:graph"])
         if not graph:
-            return self._parameter_error(
+            raise ValueError(
                 "Delete Quad takes four parameters, the last should be a graph id"
             )
         self._cursor["@type"] = "woql:AddQuad"
@@ -1525,7 +1526,7 @@ class WOQLQuery:
         self._cursor["@type"] = "woql:When"
         self._add_sub_query(query)
         if consequent:
-            newv = self._jobj(consequent)
+            newv = self._coerce_to_dict(consequent)
         else:
             newv = {}
         self._cursor["woql:consequent"] = newv
@@ -1604,7 +1605,7 @@ class WOQLQuery:
         self._cursor["@type"] = "woql:Plus"
         self._cursor["woql:first"] = self._arop(new_args.pop(0))
         if len(new_args) > 1:
-            self._cursor = self._jobj(WOQLQuery().plus(*new_args))
+            self._cursor = self._coerce_to_dict(WOQLQuery().plus(*new_args))
         else:
             self._cursor["woql:second"] = self._arop(new_args[0])
         return self
@@ -1630,7 +1631,9 @@ class WOQLQuery:
         self._cursor["@type"] = "woql:Minus"
         self._cursor["woql:first"] = self._arop(new_args.pop(0))
         if len(new_args) > 1:
-            self._cursor["woql:second"] = self._jobj(WOQLQuery().minus(*new_args))
+            self._cursor["woql:second"] = self._coerce_to_dict(
+                WOQLQuery().minus(*new_args)
+            )
         else:
             self._cursor["woql:second"] = self._arop(new_args[0])
         return self
@@ -1656,7 +1659,9 @@ class WOQLQuery:
         self._cursor["@type"] = "woql:Times"
         self._cursor["woql:first"] = self._arop(new_args.pop(0))
         if len(new_args) > 1:
-            self._cursor["woql:second"] = self._jobj(WOQLQuery().times(*new_args))
+            self._cursor["woql:second"] = self._coerce_to_dict(
+                WOQLQuery().times(*new_args)
+            )
         else:
             self._cursor["woql:second"] = self._arop(new_args[0])
         return self
@@ -1682,7 +1687,9 @@ class WOQLQuery:
         self._cursor["@type"] = "woql:Divide"
         self._cursor["woql:first"] = self._arop(new_args.pop(0))
         if len(new_args) > 1:
-            self._cursor["woql:second"] = self._jobj(WOQLQuery().divide(*new_args))
+            self._cursor["woql:second"] = self._coerce_to_dict(
+                WOQLQuery().divide(*new_args)
+            )
         else:
             self._cursor["woql:second"] = self._arop(new_args[0])
         return self
@@ -1708,7 +1715,9 @@ class WOQLQuery:
         self._cursor["@type"] = "woql:Div"
         self._cursor["woql:first"] = self._arop(new_args.pop(0))
         if len(new_args) > 1:
-            self._cursor["woql:second"] = self._jobj(WOQLQuery().div(*new_args))
+            self._cursor["woql:second"] = self._coerce_to_dict(
+                WOQLQuery().div(*new_args)
+            )
         else:
             self._cursor["woql:second"] = self._arop(new_args[0])
         return self
@@ -2317,7 +2326,7 @@ class WOQLQuery:
         if value and value == "woql:args":
             return ["woql:value", "woql:type"]
         if not value or not vtype:
-            return self._parameter_error("type_of takes two parameters, both values")
+            raise ValueError("type_of takes two parameters, both values")
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "woql:TypeOf"
@@ -2368,7 +2377,7 @@ class WOQLQuery:
         self._cursor["woql:variable_ordering"] = []
 
         if not ordered_varlist or len(ordered_varlist) == 0:
-            return self._parameter_error(
+            raise ValueError(
                 "Order by must be passed at least one variable to order the query"
             )
 
@@ -2381,9 +2390,7 @@ class WOQLQuery:
         # if not isinstance(data["parent"], list):
         if isinstance(order, list):
             if len(args) != len(order):
-                return self._parameter_error(
-                    "Order array must be same length as variable array"
-                )
+                raise ValueError("Order array must be same length as variable array")
 
         for idx, item in enumerate(ordered_varlist):
             if type(item) is str:
@@ -3725,7 +3732,7 @@ class WOQLQuery:
         )
 
     def _load_xdd_boxes(self, parent, graph, prefix):
-        """ A function to generate a query to create box classes for all of the xdd datatypes.
+        """A function to generate a query to create box classes for all of the xdd datatypes.
         The format is to generate the box classes for xdd:anyGivenType as:
          class(prefix:AnyGivenType) -> property(prefix:anyGivenType) -> datatype(xdd:anyGivenType)
 
