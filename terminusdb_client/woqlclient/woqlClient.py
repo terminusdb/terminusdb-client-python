@@ -1219,13 +1219,7 @@ class WOQLClient:
         clone_source = {"remote_url": clone_source}
         rc_args = self._prepare_revision_control_args(clone_source)
         if rc_args is not None and rc_args.get("remote_url"):
-<<<<<<< HEAD
             self.dispatch("post", self._clone_url(newid), rc_args)
-=======
-            return self.dispatch(
-                APIEndpointConst.CLONE, self._clone_url(newid), rc_args
-            )
->>>>>>> a12d12cf9833c8fd679ae397d128272134696069
         else:
             raise ValueError(
                 "Clone parameter error - you must specify a valid id for the cloned database"
