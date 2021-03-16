@@ -30,10 +30,10 @@ class WOQLClient:
         server_url : str
             URL of the server that this client will connect to.
         insecure : bool
-            weather or not the connection is insecure
+            weather or not the connection is insecure. Passing insecure=True will skip HTTPS certificate checking.
         \**kwargs
-            Configuration options used to construct a :class:`ConnectionConfig` instance.
-            Passing insecure=True will skip HTTPS certificate checking.
+            Extra configuration options
+
         """
         self._server_url = server_url.strip("/")
         self._api = f"{self._server_url}/api"
@@ -55,9 +55,7 @@ class WOQLClient:
     ) -> None:
         r"""Connect to a Terminus server at the given URI with an API key.
 
-        Stores the terminus:ServerCapability document returned
-        in the self._capabilities register which stores, the url, key, capabilities,
-        and database meta-data for the connected server.
+        Stores the connection settings and necessary meta-data for the connected server. You need to connect before most database operations.
 
         Parameters
         ----------
@@ -67,28 +65,23 @@ class WOQLClient:
             Name of the database connected
         remote_auth: optional, str
             Remote Auth setting
-        key: str
-            API key for connecting, default to eb "root"
-        user: str
+        key: optional, str
+            API key for connecting, default to be "root"
+        user: optional, str
             Name of the user, default to be "admin"
-        branch: str
+        branch: optional, str
             Branch to be connected, default to be "main"
         ref: optional, str
             Ref setting
-        repo: str
+        repo: optional, str
             Local or remote repo, default to be "local"
         \**kwargs
-            Extra configuration options added to :attr:`conConfig`.
-
-        Returns
-        -------
-        dict
+            Extra configuration options.
 
         Examples
         -------
         >>> client = WOQLClient("https://127.0.0.1:6363", insecure=True)
         >>> client.connect(key="root", account="admin", user="admin", db="example_db")
-        dict
         """
 
         self._account = account
@@ -292,8 +285,6 @@ class WOQLClient:
     def db(self) -> str:
         """Get the current database.
 
-        If ``dbid`` is not provided, then the config will not be updated.
-
         Returns
         -------
         str
@@ -312,8 +303,6 @@ class WOQLClient:
 
     def account(self) -> str:
         """Get the account identifier.
-
-        If ``accountid`` is not provided, then the config will not be updated.
 
         Returns
         -------
@@ -342,25 +331,26 @@ class WOQLClient:
         warnings.warn("user_account() is deprecated.", DeprecationWarning)
         return self._uid
 
-    def user(self) -> Dict[str, Any]:
+    def user(self) -> str:
         """Get the current user's information.
 
         Returns
         -------
-        dict
+        str
 
         Examples
         --------
         >>> client = WOQLClient("https://127.0.0.1:6363")
+        >>> client.connect()
         >>> client.user()
-        {'id': '<uid>', 'author': '<author>', 'roles': [], 'label': '<label>', 'comment': '<comment>'}
+        "admin"
         """
         return self._user
 
     def repo(self, repoid: Optional[str] = None) -> str:
         """Set or get the repository identifier.
 
-        If ``repoid`` is not provided, then the config will not be updated.
+        If repoid is not provided, then the config will not be updated.
 
         Parameters
         ----------
@@ -406,7 +396,7 @@ class WOQLClient:
         --------
         >>> client = WOQLClient("https://127.0.0.1:6363")
         >>> client.ref()
-        False
+        None
         >>> client.ref('main')
         main
         >>> client.ref()
@@ -419,7 +409,7 @@ class WOQLClient:
     def checkout(self, branchid: Optional[str] = None) -> str:
         """Set or get the current branch identifier.
 
-        If ``branchid`` is not provided, then the config will not be updated.
+        If branchid is not provided, then the config will not be updated.
 
         Parameters
         ----------
@@ -621,11 +611,15 @@ class WOQLClient:
             the account id in which the database resides (defaults to "admin")
         force: bool
 
+        Raises
+        ------
+        UserWarning
+            If the value of dbid is None.
+
         Examples
         -------
         >>> client = WOQLClient("https://127.0.0.1:6363/")
         >>> client.delete_database("<database>", "<account>")
-        dict
         """
 
         if dbid is None:
@@ -652,7 +646,7 @@ class WOQLClient:
         Parameters
         ----------
         graph_type : str
-            Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
+            Graph type, either "inference", "instance" or "schema".
         graph_id : str
             Graph identifier.
         commit_msg : str
@@ -661,7 +655,7 @@ class WOQLClient:
         Raises
         ------
         ValueError
-            If the value of ``graph_type`` is invalid.
+            If the value of graph_type is invalid.
         """
         self._check_connection()
         if graph_type in ["inference", "schema", "instance"]:
@@ -684,7 +678,7 @@ class WOQLClient:
         Parameters
         ----------
         graph_type : str
-            Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
+            Graph type, either "inference", "instance" or "schema".
         graph_id : str
             Graph identifier.
         commit_msg : str
@@ -693,7 +687,7 @@ class WOQLClient:
         Raises
         ------
         ValueError
-            If the value of ``graph_type`` is invalid.
+            If the value of graph_type is invalid.
         """
         self._check_connection()
         if graph_type in ["inference", "schema", "instance"]:
@@ -714,7 +708,7 @@ class WOQLClient:
         Parameters
         ----------
         graph_type : str
-            Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
+            Graph type, either "inference", "instance" or "schema".
         graph_id : str
             Graph identifier.
 
@@ -736,7 +730,7 @@ class WOQLClient:
         Parameters
         ----------
         graph_type : str
-            Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
+            Graph type, either "inference", "instance" or "schema".
         graph_id : str
             Graph identifier.
         turtle
@@ -761,7 +755,7 @@ class WOQLClient:
         Parameters
         ----------
         graph_type : str
-            Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
+            Graph type, either "inference", "instance" or "schema".
         graph_id : str
             Graph identifier.
         turtle
@@ -797,9 +791,9 @@ class WOQLClient:
         csv_output_name: str, optional
             CSV output file name. (defaults to same csv name).
         graph_type : str
-            Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
+            Graph type, either "inference", "instance" or "schema". Default to be "instance"
         graph_id : str, optional
-            Graph identifier.
+            Graph identifier. Default to be "main"
         """
         self._check_connection()
         options = {}
@@ -835,9 +829,9 @@ class WOQLClient:
         commit_msg : str
             Commit message.
         graph_type : str
-            Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
+            Graph type, either "inference", "instance" or "schema". Default to be "instance"
         graph_id : str, optional
-            Graph identifier.
+            Graph identifier. Default to be "main"
         """
         self._check_connection()
         if commit_msg is None:
@@ -871,9 +865,9 @@ class WOQLClient:
         commit_msg : str
             Commit message.
         graph_type : str
-            Graph type, either ``"inference"``, ``"instance"`` or ``"schema"``.
-        graph_id : str
-            Graph identifier.
+            Graph type, either "inference", "instance" or "schema". Default to be "instance"
+        graph_id : str, optional
+            Graph identifier. Default to be "main"
         """
         self._check_connection()
         if commit_msg is None:
@@ -1010,7 +1004,7 @@ class WOQLClient:
         Parameters
         ----------
         remote_source_repo : dict
-            Remote repository identifier containing ``"remote"`` and ``"remote_branch"`` keys.
+            Remote repository identifier containing "remote" and "remote_branch" keys.
 
         Returns
         -------
@@ -1019,7 +1013,7 @@ class WOQLClient:
         Raises
         ------
         ValueError
-            If the ``remote_source_repo`` is missing required keys.
+            If the remote_source_repo is missing required keys.
 
         Examples
         --------
@@ -1095,7 +1089,7 @@ class WOQLClient:
         Raises
         ------
         ValueError
-            If the ``rebase_source`` is missing required keys.
+            If the rebase_source is missing required keys.
 
         Examples
         --------
@@ -1256,8 +1250,8 @@ class WOQLClient:
     def _prepare_revision_control_args(
         self, rc_args: Optional[dict] = None
     ) -> Optional[dict]:
-        """Ensure the ``"author"`` field in the specified argument dict is set.
-        If ``"author"`` is not in ``rc_args``, the current author value will be set.
+        """Ensure the "author" field in the specified argument dict is set.
+        If "author" is not in rc_args, the current author value will be set.
 
         Parameters
         ----------
@@ -1267,7 +1261,7 @@ class WOQLClient:
         Returns
         -------
         dict, optional
-            ``None`` if ``rc_args`` is not provided, otherwise the modified ``rc_args``.
+            None if rc_args is not provided, otherwise the modified rc_args.
         """
         if rc_args is None:
             return None
