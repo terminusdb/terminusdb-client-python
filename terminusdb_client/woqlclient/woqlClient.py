@@ -252,13 +252,15 @@ class WOQLClient:
             self._remote_auth = auth_info
         return self._remote_auth
 
-    def set_db(self, dbid: Optional[str]) -> str:
-        """Set and return the current database.
+    def set_db(self, dbid: str, account: Optional[str] = None) -> str:
+        """Set the connection to another database. This will reset the connection.
 
         Parameters
         ----------
-        dbid : str, optional
+        dbid : str
             Database identifer to set in the config.
+        account : str
+            User identifer to set in the config. If not passed in, it will use the current one.
 
         Returns
         -------
@@ -271,17 +273,25 @@ class WOQLClient:
         >>> client.set_db("database1")
         'database1'
         """
-        return self.db(dbid)
 
-    def db(self, dbid: Optional[str] = None) -> str:
-        """Set or get the current database.
+        if account is None:
+            account = self._account
+
+        return self.connect(
+            account=account,
+            db=dbid,
+            remote_auth=self._remote_auth,
+            key=self._key,
+            user=self._user,
+            branch=self._branch,
+            ref=self._ref,
+            repo=self._repo,
+        )
+
+    def db(self) -> str:
+        """Get the current database.
 
         If ``dbid`` is not provided, then the config will not be updated.
-
-        Parameters
-        ----------
-        dbid : str, optional
-            Optional database identifier to set in the config.
 
         Returns
         -------
@@ -292,25 +302,17 @@ class WOQLClient:
         --------
         >>> client = WOQLClient(""https://127.0.0.1:6363"")
         >>> client.db()
-        False
-        >>> client.db("database1")
-        'database1'
+        None
+        >>> client.connect('database')
         >>> client.db()
-        'database1'
+        'database'
         """
-        if dbid:
-            self._db = dbid
         return self._db
 
-    def account(self, accountid: Optional[str] = None) -> str:
-        """Set or get the account identifier.
+    def account(self) -> str:
+        """Get the account identifier.
 
         If ``accountid`` is not provided, then the config will not be updated.
-
-        Parameters
-        ----------
-        accountid : str, optional
-            Optional account identifier to set in the config.
 
         Returns
         -------
@@ -321,34 +323,22 @@ class WOQLClient:
         --------
         >>> client = WOQLClient("https://127.0.0.1:6363")
         >>> client.account()
-        False
-        >>> client.account("admin")
-        admin
+        None
         >>> client.account()
         admin
         """
-        if accountid:
-            self._account = accountid
         return self._account
 
     def user_account(self) -> str:
-        """Get the current user identifier.
+        """**Deprecatied** Get the current user identifier.
 
         Returns
         -------
         str
             User identifier.
 
-        Examples
-        --------
-        >>> client = WOQLClient("https://127.0.0.1:6363")
-        >>> client.user_account()
-        False
-        >>> client.user_account('user1')
-        user1
-        >>> client.user_account()
-        user1
         """
+        warnings.warn("user_account() is deprecated.", DeprecationWarning)
         return self._uid
 
     def user(self) -> Dict[str, Any]:
@@ -455,7 +445,7 @@ class WOQLClient:
         return self._branch
 
     def uid(self, ignore_jwt: Optional[bool] = True) -> str:
-        """Get the current user identifier.
+        """**Deprecated** Get the current user identifier.
 
         Parameters
         ----------
@@ -475,6 +465,7 @@ class WOQLClient:
         >>> client.uid(False)
         '<jwt_uid>'
         """
+        warnings.warn("user_account() is deprecated.", DeprecationWarning)
         return self._uid
 
     def resource(self, ttype: str, val: Optional[str] = None) -> str:
