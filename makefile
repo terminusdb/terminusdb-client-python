@@ -20,20 +20,22 @@ interrogate:
 # command line for release: bumpversion (patch), tag and push
 # assuming patches are in master
 publish_patch:
+	tox
 	pip install -U bumpversion
 	git checkout master
 	git pull origin master
 	bumpversion patch
-	git push origin master
-	git push origin master:dev
-	git push origin --tags
+	git push --no-verify origin master
+	git push --no-verify origin master:dev
+	git push --no-verify origin --tags
 
 publish_release:
+	tox
 	pip install -U bumpversion
 	git checkout dev
 	git pull origin dev
 	git pull origin master
 	bumpversion minor
-	git push origin dev
-	git push origin dev:master
-	git push origin --tags
+	git push --no-verify origin dev
+	git push --no-verify origin dev:master
+	git push --no-verify origin --tags
