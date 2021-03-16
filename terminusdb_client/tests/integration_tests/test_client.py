@@ -83,3 +83,15 @@ def test_csv_handeling(docker_url):
     finally:
         _file_clean_up(csv_file_path)
         _file_clean_up("new_" + csv_file_path)
+
+
+def test_create_graph(docker_url):
+    client = WOQLClient(docker_url)
+    assert not client._connected
+    # test connect
+    client.connect()
+    assert client._connected
+    # test create db
+    client.create_database("test_graph")
+    client.create_graph("instance", "test-one-more-graph", "create test graph")
+    client.delete_graph("instance", "test-one-more-graph", "delete test graph")
