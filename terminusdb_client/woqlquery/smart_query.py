@@ -187,7 +187,9 @@ class WOQLClass:
         }
         return self
 
-    def to_dict(self,):
+    def to_dict(
+        self,
+    ):
         """Returns the query_object as a dict.
 
         Returns
@@ -351,7 +353,9 @@ class WOQLObj:
         self.query_obj = self.query_obj.property(pro_id, pro_value, label, description)
         return self
 
-    def to_dict(self,):
+    def to_dict(
+        self,
+    ):
         """Returns the query_object as a dict.
 
         Returns
@@ -414,7 +418,7 @@ class TerminusDB:
         if not existing:
             self._client.create_database(db_id, account, db_label, db_description)
         else:
-            self._client.db(db_id)
+            self._client.set_db(db_id)
             # get all classes from db and store them
             cls_result = WOQLLib().classes().execute(self._client)
             for item in cls_result["bindings"]:

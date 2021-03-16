@@ -64,6 +64,7 @@ def _file_clean_up(filename):
         os.remove(filename)
 
 
+@pytest.mark.xfail
 def test_csv_handeling(docker_url):
     client = WOQLClient(docker_url)
     assert not client._connected

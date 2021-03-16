@@ -17,7 +17,7 @@ def test_main_service_run(docker_url):
 
 def test_init_terminusdb(docker_url):
     db = TerminusDB(docker_url, "test")
-    assert db._client.db("test") == "test"
+    assert db._client.db() == "test"
 
 
 def test_add_class_and_object(

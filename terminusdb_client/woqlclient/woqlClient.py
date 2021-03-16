@@ -873,7 +873,6 @@ class WOQLClient:
         if commit_msg is None:
             commit_msg = f"Insert csv from {csv_paths} by python client {__version__}"
         commit = self._generate_commit(commit_msg)
-        file_dict: Dict[str, Any] = {}
         if isinstance(csv_paths, str):
             csv_paths_list = [csv_paths]
         else:
@@ -972,7 +971,7 @@ class WOQLClient:
         )
         if result.get("inserts") or result.get("deletes"):
             self._commit_made += 1
-            return f"Commit successfully made."
+            return "Commit successfully made."
         return result
 
     def branch(self, new_branch_id: str, empty: bool = False) -> None:
