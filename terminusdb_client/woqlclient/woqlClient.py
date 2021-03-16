@@ -777,8 +777,8 @@ class WOQLClient:
         csv_name: str,
         csv_directory: Optional[str] = None,
         csv_output_name: Optional[str] = None,
-        graph_type: Optional[str] = None,
-        graph_id: Optional[str] = None,
+        graph_type: Optional[str] = "instance",
+        graph_id: Optional[str] = "main",
     ):
         """Retrieves the contents of the specified graph as a CSV
 
@@ -810,15 +810,15 @@ class WOQLClient:
         )
 
         stream = open(f"{csv_directory}/{csv_output_name}", "w")
-        stream.write(result.text)
+        stream.write(result)
         stream.close()
 
     def update_csv(
         self,
         csv_paths: Union[str, List[str]],
         commit_msg: Optional[str] = None,
-        graph_type: Optional[str] = None,
-        graph_id: Optional[str] = None,
+        graph_type: Optional[str] = "instance",
+        graph_id: Optional[str] = "main",
     ) -> None:
         """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
 
@@ -853,8 +853,8 @@ class WOQLClient:
         self,
         csv_paths: Union[str, List[str]],
         commit_msg: Optional[str] = None,
-        graph_type: Optional[str] = None,
-        graph_id: Optional[str] = None,
+        graph_type: Optional[str] = "instance",
+        graph_id: Optional[str] = "main",
     ) -> None:
         """Inserts into the specified graph with the triples encoded in turtle format.
 
