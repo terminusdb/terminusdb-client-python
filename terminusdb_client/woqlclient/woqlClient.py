@@ -1,4 +1,5 @@
-"""woqlClient.py"""
+"""woqlClient.py
+WOQLClient is the Python public API for TerminusDB"""
 import copy
 import json
 import os
@@ -101,7 +102,7 @@ class WOQLClient:
 
         self._connected = True
 
-        capabilities = self.dispatch_json("get", self._api)
+        capabilities = self._dispatch_json("get", self._api)
         self._uid = capabilities["@id"]
         self._context = capabilities["@context"]
         # Get the current user's identifier, if logged in to Hub, it will be their email otherwise it will be the user provided
@@ -599,7 +600,7 @@ class WOQLClient:
         self._account = accountid
         self._connected = True
         self._commit_made = 0
-        self.dispatch("post", self._db_url(), details)
+        self._dispatch("post", self._db_url(), details)
 
     def delete_database(
         self,
@@ -627,15 +628,20 @@ class WOQLClient:
         dict
         """
 
-        if dbid is None or accountid is None:
+        if dbid is None:
             raise UserWarning(
                 f"You are currently using the database: {self._account}/{self._db}. If you want to delete it, please do 'delete_database({self._db},{self._account})' instead."
             )
 
         self._db = dbid
-        self._account = accountid
+        if accountid is None:
+            warnings.warn(
+                f"Delete Database Warning: You have not specify the accountid, assuming {self._account}/{self._db}"
+            )
+        else:
+            self._account = accountid
         payload = {"force": force}
-        self.dispatch("delete", self._db_url(), payload)
+        self._dispatch("delete", self._db_url(), payload)
         self._db = None
 
     def create_graph(
@@ -660,7 +666,7 @@ class WOQLClient:
         self._check_connection()
         if graph_type in ["inference", "schema", "instance"]:
             commit = self._generate_commit(commit_msg)
-            self.dispatch(
+            self._dispatch(
                 "post",
                 self._graph_url(graph_type, graph_id),
                 commit,
@@ -692,7 +698,7 @@ class WOQLClient:
         self._check_connection()
         if graph_type in ["inference", "schema", "instance"]:
             commit = self._generate_commit(commit_msg)
-            self.dispatch(
+            self._dispatch(
                 "delete",
                 self._graph_url(graph_type, graph_id),
                 commit,
@@ -717,7 +723,7 @@ class WOQLClient:
         str
         """
         self._check_connection()
-        return self.dispatch(
+        return self._dispatch(
             "get",
             self._triples_url(graph_type, graph_id),
         )
@@ -741,7 +747,7 @@ class WOQLClient:
         self._check_connection()
         commit = self._generate_commit(commit_msg)
         commit["turtle"] = turtle
-        self.dispatch(
+        self._dispatch(
             "post",
             self._triples_url(graph_type, graph_id),
             commit,
@@ -766,7 +772,7 @@ class WOQLClient:
         self._check_connection()
         commit = self._generate_commit(commit_msg)
         commit["turtle"] = turtle
-        self.dispatch(
+        self._dispatch(
             "put",
             self._triples_url(graph_type, graph_id),
             commit,
@@ -803,7 +809,7 @@ class WOQLClient:
             csv_output_name = csv_name
         options["name"] = csv_name
 
-        result = self.dispatch(
+        result = self._dispatch(
             "get",
             self._csv_url(graph_type, graph_id),
             options,
@@ -842,7 +848,7 @@ class WOQLClient:
         else:
             csv_paths_list = csv_paths
 
-        self.dispatch(
+        self._dispatch(
             "post",
             self._csv_url(graph_type, graph_id),
             commit,
@@ -878,7 +884,7 @@ class WOQLClient:
         else:
             csv_paths_list = csv_paths
 
-        self.dispatch(
+        self._dispatch(
             "put",
             self._csv_url(graph_type, graph_id),
             commit,
@@ -963,7 +969,7 @@ class WOQLClient:
             file_list = None
             payload = query_obj
 
-        result = self.dispatch_json(
+        result = self._dispatch_json(
             "post",
             self._query_url(),
             payload,
@@ -996,7 +1002,7 @@ class WOQLClient:
                 "origin": f"{self._account}/{self._db}/{self._repo}/branch/{self._branch}"
             }
 
-        self.dispatch("post", self._branch_url(new_branch_id), source)
+        self._dispatch("post", self._branch_url(new_branch_id), source)
 
     def pull(self, remote_source_repo: dict) -> dict:
         """Pull updates from a remote repository to the current database.
@@ -1027,7 +1033,7 @@ class WOQLClient:
             and rc_args.get("remote")
             and rc_args.get("remote_branch")
         ):
-            return self.dispatch_json(
+            return self._dispatch_json(
                 "post",
                 self._pull_url(),
                 rc_args,
@@ -1039,7 +1045,7 @@ class WOQLClient:
 
     def fetch(self, remote_id: str) -> dict:
         self._check_connection()
-        return self.dispatch_json("post", self._fetch_url(remote_id))
+        return self._dispatch_json("post", self._fetch_url(remote_id))
 
     def push(self, remote_target_repo: Dict[str, str]) -> dict:
         """Push changes from a branch to a remote repo
@@ -1064,7 +1070,7 @@ class WOQLClient:
             and rc_args.get("remote")
             and rc_args.get("remote_branch")
         ):
-            return self.dispatch_json("post", self._push_url(), rc_args)
+            return self._dispatch_json("post", self._push_url(), rc_args)
         else:
             raise ValueError(
                 "Push parameter error - you must specify a valid remote target"
@@ -1100,7 +1106,7 @@ class WOQLClient:
         rebase_source = {"rebase_from": rebase_source}
         rc_args = self._prepare_revision_control_args(rebase_source)
         if rc_args is not None and rc_args.get("rebase_from"):
-            return self.dispatch_json("post", self._rebase_url(), rc_args)
+            return self._dispatch_json("post", self._rebase_url(), rc_args)
         else:
             raise ValueError(
                 "Rebase parameter error - you must specify a valid rebase source to rebase from"
@@ -1126,7 +1132,7 @@ class WOQLClient:
         """
 
         self._check_connection()
-        self.dispatch(
+        self._dispatch(
             "post",
             self._reset_url(),
             {"commit_descriptor": commit_path},
@@ -1150,7 +1156,7 @@ class WOQLClient:
         >>> client.optimize('admin/database/_meta')
         """
         self._check_connection()
-        self.dispatch("post", self._optimize_url(path))
+        self._dispatch("post", self._optimize_url(path))
 
     def squash(self, msg: Optional[str] = None, author: Optional[str] = None) -> dict:
         """Squash the current branch HEAD into a commit
@@ -1183,7 +1189,7 @@ class WOQLClient:
         """
         self._check_connection()
         commit_object = self._generate_commit(msg, author)
-        return self.dispatch_json("post", self._squash_url(), commit_object)
+        return self._dispatch_json("post", self._squash_url(), commit_object)
 
     def clonedb(self, clone_source: str, newid: str) -> None:
         """Clone a remote repository and create a local copy.
@@ -1209,7 +1215,7 @@ class WOQLClient:
         clone_source = {"remote_url": clone_source}
         rc_args = self._prepare_revision_control_args(clone_source)
         if rc_args is not None and rc_args.get("remote_url"):
-            self.dispatch("post", self._clone_url(newid), rc_args)
+            self._dispatch("post", self._clone_url(newid), rc_args)
         else:
             raise ValueError(
                 "Clone parameter error - you must specify a valid id for the cloned database"
@@ -1269,7 +1275,7 @@ class WOQLClient:
             rc_args["author"] = self._author
         return rc_args
 
-    def dispatch_json(
+    def _dispatch_json(
         self,
         action: str,  # get, post, put, delete
         url: str,
@@ -1294,10 +1300,10 @@ class WOQLClient:
         dict
             Dictionary convered from the json string that is passed from a successful dispatch call.
         """
-        result = self.dispatch(action, url, payload, file_list)
+        result = self._dispatch(action, url, payload, file_list)
         return json.loads(result)
 
-    def dispatch(
+    def _dispatch(
         self,
         action: str,  # get, post, put, delete
         url: str,
@@ -1460,7 +1466,7 @@ class WOQLClient:
                 all_dbs.append(this_db)
 
         resources_ids = []
-        for scope in self.dispatch_json("get", self._api)["system:role"][
+        for scope in self._dispatch_json("get", self._api)["system:role"][
             "system:capability"
         ]["system:capability_scope"]:
             if (
@@ -1489,7 +1495,7 @@ class WOQLClient:
         """
         self._check_connection()
         all_dbs = []
-        for scope in self.dispatch_json("get", self._api)["system:role"][
+        for scope in self._dispatch_json("get", self._api)["system:role"][
             "system:capability"
         ]["system:capability_scope"]:
             if scope["@type"] == "system:Database":

@@ -220,7 +220,7 @@ def test_query(mocked_requests, mocked_requests2):
 
 
 @mock.patch("requests.get", side_effect=mocked_requests_get)
-@mock.patch.object(WOQLClient, "dispatch_json")
+@mock.patch.object(WOQLClient, "_dispatch_json")
 def test_query_commit_count(mocked_execute, mocked_requests):
     # mocked_execute.return_value = MOCK_CAPABILITIES
     woql_client = WOQLClient("http://localhost:6363")
