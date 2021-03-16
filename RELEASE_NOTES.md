@@ -1,5 +1,28 @@
 # TerminusDB Python Client Release Notes
 
+## v1.0.0 🐮
+
+### New
+
+- Rewrite on WOQLClient to simplify structure
+- Minor WOQLClient API changes (may not be compatible with previous versions)
+
+### Changes
+
+- Deprecate WOQLClient.user_account() and WOQLClient.uid()
+- WOQLClient.delete_database() requires database name and optional account name
+- WOQLClient.db() and WOQLClient.account() no longer takes argument to change setting
+- Some of the WOQLClient methods no longer return result from backend API
+
+### Bug Fixes / Improvements
+
+- WOQLView now works in non-Jupyter interpreter except for WOQLView().show
+- Fix transcriptions of true()
+- Better error handling
+- Fix WOQLClient.create_graph() and WOQLClient.delete_graph()
+
+---
+
 ## v0.6.0
 
 ### New
