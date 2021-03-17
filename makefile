@@ -46,7 +46,7 @@ publish_release_major:
 	git checkout dev
 	git pull origin dev
 	git pull origin master
-	bumpversion minor
+	bumpversion major
 	git push --no-verify origin dev
 	git push --no-verify origin dev:master
 	git push --no-verify origin --tags
