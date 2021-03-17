@@ -86,9 +86,7 @@ def test_create_database(mocked_requests, mocked_requests2):
 
     requests.post.assert_called_once_with(
         "http://localhost:6363/api/db/admin/myFirstTerminusDB",
-        headers={
-            "Authorization": "Basic YWRtaW46cm9vdA==",
-        },
+        headers={"Authorization": "Basic YWRtaW46cm9vdA=="},
         verify=False,
         json={"label": "my first db", "comment": "my first db comment"},
     )
@@ -116,9 +114,7 @@ def test_create_database_with_schema(
 
     requests.post.assert_called_once_with(
         "http://localhost:6363/api/db/admin/myFirstTerminusDB",
-        headers={
-            "Authorization": "Basic YWRtaW46cm9vdA==",
-        },
+        headers={"Authorization": "Basic YWRtaW46cm9vdA=="},
         verify=False,
         json={"label": "my first db", "comment": "my first db comment", "schema": True},
     )
@@ -141,9 +137,7 @@ def test_create_database_and_change_account(mocked_requests, mocked_requests2):
 
     requests.post.assert_called_once_with(
         "http://localhost:6363/api/db/my_new_account/myFirstTerminusDB",
-        headers={
-            "Authorization": "Basic YWRtaW46cm9vdA==",
-        },
+        headers={"Authorization": "Basic YWRtaW46cm9vdA=="},
         verify=False,
         json={"label": "my first db", "comment": "my first db comment"},
     )
@@ -160,9 +154,7 @@ def test_branch(mocked_requests, mocked_requests2):
 
     requests.post.assert_called_once_with(
         "http://localhost:6363/api/branch/admin/myDBName/local/branch/my_new_branch",
-        headers={
-            "Authorization": "Basic YWRtaW46cm9vdA==",
-        },
+        headers={"Authorization": "Basic YWRtaW46cm9vdA=="},
         verify=False,
         json={"origin": "admin/myDBName/local/branch/main"},
     )
@@ -205,9 +197,7 @@ def test_query(mocked_requests, mocked_requests2):
 
     requests.post.assert_called_once_with(
         "http://localhost:6363/api/woql/admin/myDBName/local/branch/main",
-        headers={
-            "Authorization": "Basic YWRtaW46cm9vdA==",
-        },
+        headers={"Authorization": "Basic YWRtaW46cm9vdA=="},
         verify=False,
         json={
             "commit_info": {

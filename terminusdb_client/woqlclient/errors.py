@@ -1,16 +1,20 @@
 class Error(Exception):
     """Exception that is base class for all other error exceptions.
 
+    Attributes
+    ----------
+    message  : str
+        Error message.
     """
 
-    def __init__(self, msg=None, url=None, err_obj=None):
+    def __init__(self, message=None, url=None, err_obj=None):
         super().__init__()
-        self.msg = msg
+        self.message = message
         self.url = url
         self.error_obj = err_obj
 
     def __str__(self):
-        return self.msg
+        return self.message
 
 
 class InterfaceError(Error):
@@ -22,23 +26,30 @@ class InterfaceError(Error):
 
 class DatabaseError(Error):
     """Exception for errors related to the database."""
+
     def __init__(self, reponse=None):
         super().__init__()
-        if reponse.headers['content-type'][len()"application/json"):] == "application/json":
+        if (
+            reponse.headers["content-type"][len("application/json") :]
+            == "application/json"
+        ):
             self.error_obj = reponse.json()
             if self.error_obj.get(["api:message"]):
-                self.msg = self.error_obj["api:message"]
+                self.message = self.error_obj["api:message"]
             elif self.error_obj.get(["vio:message"]):
-                self.msg = self.error_obj["vio:message"]
+                self.message = self.error_obj["vio:message"]
             else:
-                self.msg = "Unknown Error: check DatabaseError.error_obj for details"
+                self.message = (
+                    "Unknown Error: check DatabaseError.error_obj for details"
+                )
         else:
-            self.error_obj =None
-            self.msg = reponse.text
+            self.error_obj = None
+            self.message = reponse.text
         self.status_code = reponse.status_code
 
-    def __str__():
-        return self.msg
+    def __str__(self):
+        return self.message
+
 
 class OperationalError(DatabaseError):
     """Exception for operational errors related to the database."""
@@ -51,9 +62,9 @@ class AccessDeniedError(DatabaseError):
 class APIError(DatabaseError):
     """Exceptions to do with return messages from HTTP"""
 
-    def __init__(self, msg=None, url=None, err_obj=None, status_code=None):
+    def __init__(self, message=None, url=None, err_obj=None, status_code=None):
         super().__init__()
-        self.msg = msg
+        self.message = message
         self.url = url
         self.error_obj = err_obj
         self.status_code = status_code
