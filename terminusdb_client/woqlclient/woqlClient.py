@@ -998,81 +998,111 @@ class WOQLClient:
 
         self._dispatch("post", self._branch_url(new_branch_id), source)
 
-    def pull(self, remote_source_repo: dict) -> dict:
+    def pull(
+        self,
+        remote: str = "origin",
+        remote_branch: Optional[str] = None,
+        message: Optional[str] = None,
+        author: Optional[str] = None,
+    ) -> dict:
         """Pull updates from a remote repository to the current database.
 
         Parameters
         ----------
-        remote_source_repo : dict
-            Remote repository identifier containing "remote" and "remote_branch" keys.
+        remote: str
+            remote to pull from, default "origin"
+        remote_branch: str, optional
+            remote branch to pull from, default to be your current barnch
+        message: str, optional
+            optional commit message
+        author: str, optional
+            option to overide the author of the operation
 
         Returns
         -------
         dict
 
-        Raises
-        ------
-        ValueError
-            If the remote_source_repo is missing required keys.
-
         Examples
         --------
         >>> client = WOQLClient("https://127.0.0.1:6363/")
-        >>> client.pull({"remote": "<remote>", "remote_branch": "<branch>"})
+        >>> client.pull()
         """
         self._check_connection()
-        rc_args = self._prepare_revision_control_args(remote_source_repo)
-        if (
-            rc_args is not None
-            and rc_args.get("remote")
-            and rc_args.get("remote_branch")
-        ):
-            return self._dispatch_json(
-                "post",
-                self._pull_url(),
-                rc_args,
+        if remote_branch is None:
+            remote_branch = self._branch
+        if author is None:
+            author = self._author
+        if message is None:
+            message = (
+                f"Pulling from {remote}/{remote_branch} by Python client {__version__}"
             )
-        else:
-            raise ValueError(
-                "Pull parameter error - you must specify a valid remote source and branch to pull from"
-            )
+        rc_args = {
+            "remote": remote,
+            "remote_branch": remote_branch,
+            "author": author,
+            "message": message,
+        }
+
+        return self._dispatch_json(
+            "post",
+            self._pull_url(),
+            rc_args,
+        )
 
     def fetch(self, remote_id: str) -> dict:
         self._check_connection()
         return self._dispatch_json("post", self._fetch_url(remote_id))
 
-    def push(self, remote_target_repo: Dict[str, str]) -> dict:
+    def push(
+        self,
+        remote: str = "origin",
+        remote_branch: Optional[str] = None,
+        message: Optional[str] = None,
+        author: Optional[str] = None,
+    ) -> dict:
         """Push changes from a branch to a remote repo
 
         Parameters
         ----------
-        remote_source_repo : dict
-            details of the remote to push to [remote, remote_branch, message, author]
+        remote: str
+            remote to push to, default "origin"
+        remote_branch: str, optional
+            remote branch to push to, default to be your current barnch
+        message: str, optional
+            optional commit message
+        author: str, optional
+            option to overide the author of the operation
 
         Examples
         -------
-        >>> WOQLClient(server="http://localhost:6363").push({remote: "origin", "remote_branch": "main", "author": "admin", "message": "message"})
+        >>> WOQLClient(server="http://localhost:6363").push(remote="origin", remote_branch = "main", author = "admin", message = "commit message"})
 
         Returns
         -------
         dict
         """
         self._check_connection()
-        rc_args = self._prepare_revision_control_args(remote_target_repo)
-        if (
-            rc_args is not None
-            and rc_args.get("remote")
-            and rc_args.get("remote_branch")
-        ):
-            return self._dispatch_json("post", self._push_url(), rc_args)
-        else:
-            raise ValueError(
-                "Push parameter error - you must specify a valid remote target"
+        if remote_branch is None:
+            remote_branch = self._branch
+        if author is None:
+            author = self._author
+        if message is None:
+            message = (
+                f"Pushing to {remote}/{remote_branch} by Python client {__version__}"
             )
+        rc_args = {
+            "remote": remote,
+            "remote_branch": remote_branch,
+            "author": author,
+            "message": message,
+        }
+        return self._dispatch_json("post", self._push_url(), rc_args)
 
-    def rebase(self, rebase_source: str,
-               message: Optional[str] = None,
-               author: Optional[str] = None,
+    def rebase(
+        self,
+        rebase_source: str,
+        message: Optional[str] = None,
+        author: Optional[str] = None,
     ) -> dict:
         """Rebase the current branch onto the specified remote branch.
 
@@ -1093,29 +1123,19 @@ class WOQLClient:
         -------
         dict
 
-        Raises
-        ------
-        ValueError
-            If the rebase_source is missing required keys.
-
         Examples
         --------
         >>> client = WOQLClient("https://127.0.0.1:6363/")
         >>> client.rebase("the_branch")
         """
         self._check_connection()
-        rebase_source = {"rebase_from": rebase_source}
-        if author:
-            rebase_source['author'] = author
-        if message:
-            rebase_source['message'] = message
-        rc_args = self._prepare_revision_control_args(rebase_source)
-        if rc_args is not None and rc_args.get("rebase_from"):
-            return self._dispatch_json("post", self._rebase_url(), rc_args)
-        else:
-            raise ValueError(
-                "Rebase parameter error - you must specify a valid rebase source to rebase from"
-            )
+
+        if author is None:
+            author = self._author
+        if message is None:
+            message = f"Rebase from {rebase_source} by Python client {__version__}"
+        rc_args = {"rebase_from": rebase_source, "author": author, "message": message}
+        return self._dispatch_json("post", self._rebase_url(), rc_args)
 
     def reset(self, commit_path: str) -> None:
         """Reset the current branch HEAD to the specified commit path.
@@ -1163,7 +1183,9 @@ class WOQLClient:
         self._check_connection()
         self._dispatch("post", self._optimize_url(path))
 
-    def squash(self, message: Optional[str] = None, author: Optional[str] = None) -> dict:
+    def squash(
+        self, message: Optional[str] = None, author: Optional[str] = None
+    ) -> dict:
         """Squash the current branch HEAD into a commit
 
         Notes
@@ -1196,7 +1218,9 @@ class WOQLClient:
         commit_object = self._generate_commit(msg, author)
         return self._dispatch_json("post", self._squash_url(), commit_object)
 
-    def clonedb(self, clone_source: str, newid: str) -> None:
+    def clonedb(
+        self, clone_source: str, newid: str, description: Optional[str] = None
+    ) -> None:
         """Clone a remote repository and create a local copy.
 
         Parameters
@@ -1205,26 +1229,19 @@ class WOQLClient:
             The source url of the repo to be cloned.
         newid : str
             Identifier of the new repository to create.
-
-        Raises
-        ------
-        ValueError
-            If the ``clone_source`` is missing required keys.
+        Description : str, optional
+            Optional description about the cloned database.
 
         Examples
         --------
         >>> client = WOQLClient("https://127.0.0.1:6363/")
-        >>> client.clonedb({"remote_url": "<remote_url>"}, "<newid>")
+        >>> client.clonedb("http://terminusdb.com/some_user/test_db", "my_test_db")
         """
         self._check_connection()
-        clone_source = {"remote_url": clone_source}
-        rc_args = self._prepare_revision_control_args(clone_source)
-        if rc_args is not None and rc_args.get("remote_url"):
-            self._dispatch("post", self._clone_url(newid), rc_args)
-        else:
-            raise ValueError(
-                "Clone parameter error - you must specify a valid id for the cloned database"
-            )
+        if description is None:
+            description = f"New database {newid}"
+        rc_args = {"remote_url": clone_source, "label": newid, "comment": description}
+        self._dispatch("post", self._clone_url(newid), rc_args)
 
     def _generate_commit(
         self, msg: Optional[str] = None, author: Optional[str] = None
@@ -1257,28 +1274,6 @@ class WOQLClient:
             msg = f"Commit via python client {__version__}"
         ci = {"commit_info": {"author": mes_author, "message": msg}}
         return ci
-
-    def _prepare_revision_control_args(
-        self, rc_args: Optional[dict] = None
-    ) -> Optional[dict]:
-        """Ensure the "author" field in the specified argument dict is set.
-        If "author" is not in rc_args, the current author value will be set.
-
-        Parameters
-        ----------
-        rc_args : dict, optional
-            Optional dict containing arguments used in revision control actions.
-
-        Returns
-        -------
-        dict, optional
-            None if rc_args is not provided, otherwise the modified rc_args.
-        """
-        if rc_args is None:
-            return None
-        if not rc_args.get("author"):
-            rc_args["author"] = self._author
-        return rc_args
 
     def _dispatch_json(
         self,
