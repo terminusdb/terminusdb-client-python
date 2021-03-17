@@ -32,32 +32,32 @@ class DatabaseError(Error):
         status_code from the request.Response
     """
 
-    def __init__(self, reponse=None):
+    def __init__(self, response=None):
         """Exception for errors related to the database.
 
         Parameters
         ----------
-        reponse : request.Response
+        response : request.Response
             response from the api call
         """
         super().__init__()
         if (
-            reponse.headers["content-type"][len("application/json") :]
+            response.headers["content-type"][:len("application/json")]
             == "application/json"
         ):
-            self.error_obj = reponse.json()
-            if self.error_obj.get(["api:message"]):
+            self.error_obj = response.json()
+            if self.error_obj.get("api:message"):
                 self.message = self.error_obj["api:message"]
-            elif self.error_obj.get(["vio:message"]):
-                self.message = self.error_obj["vio:message"]
+            elif "api:error" in self.error_obj and self.error_obj["api:error"].get("vio:message"):
+                self.message = self.error_obj["api:error"]["vio:message"]
             else:
                 self.message = (
                     "Unknown Error: check DatabaseError.error_obj for details"
                 )
         else:
             self.error_obj = None
-            self.message = reponse.text
-        self.status_code = reponse.status_code
+            self.message = response.text
+        self.status_code = response.status_code
 
     def __str__(self):
         return self.message

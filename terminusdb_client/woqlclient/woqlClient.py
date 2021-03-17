@@ -1427,11 +1427,10 @@ class WOQLClient:
             raise ValueError("action needs to be 'get', 'post', 'put' or 'delete'")
 
         warnings.resetwarnings()
-
         if request_response.status_code == 200:
             return request_response.text  # if not a json not it raises an error
         elif request_response.status_code > 399 and request_response.status_code < 599:
-            DatabaseError(request_response)
+            raise DatabaseError(request_response)
 
     def get_database(self, dbid: str, account: str) -> Optional[dict]:
         """
