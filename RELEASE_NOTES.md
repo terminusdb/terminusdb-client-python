@@ -13,6 +13,7 @@
 - WOQLClient.delete_database() requires database name and optional account name
 - WOQLClient.db() and WOQLClient.account() no longer takes argument to change setting
 - Some of the WOQLClient methods no longer return result from backend API
+- change of DatabaseError and APIError attributes, added new Error object
 
 ### Bug Fixes / Improvements
 

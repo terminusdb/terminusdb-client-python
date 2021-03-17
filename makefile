@@ -39,3 +39,14 @@ publish_release:
 	git push --no-verify origin dev
 	git push --no-verify origin dev:master
 	git push --no-verify origin --tags
+
+publish_release_major:
+	tox
+	pip install -U bumpversion
+	git checkout dev
+	git pull origin dev
+	git pull origin master
+	bumpversion minor
+	git push --no-verify origin dev
+	git push --no-verify origin dev:master
+	git push --no-verify origin --tags
