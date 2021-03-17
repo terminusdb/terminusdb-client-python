@@ -1215,7 +1215,7 @@ class WOQLClient:
         >>> client.squash('This is a squash commit message!')
         """
         self._check_connection()
-        commit_object = self._generate_commit(msg, author)
+        commit_object = self._generate_commit(message, author)
         return self._dispatch_json("post", self._squash_url(), commit_object)
 
     def clonedb(
