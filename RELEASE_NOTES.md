@@ -14,6 +14,7 @@
 - WOQLClient.db() and WOQLClient.account() no longer takes argument to change setting
 - Some of the WOQLClient methods no longer return result from backend API
 - change of DatabaseError and APIError attributes, added new Error object
+- change of the pull, push, rebase and clone API call
 
 ### Bug Fixes / Improvements
 
