@@ -1047,7 +1047,7 @@ class WOQLClient:
         Parameters
         ----------
         remote_source_repo : dict
-            details of the remote to push to [remote, remote_branch, message]
+            details of the remote to push to [remote, remote_branch, message, author]
 
         Examples
         -------
@@ -1070,7 +1070,10 @@ class WOQLClient:
                 "Push parameter error - you must specify a valid remote target"
             )
 
-    def rebase(self, rebase_source: str) -> dict:
+    def rebase(self, rebase_source: str,
+               message: Optional[str] = None,
+               author: Optional[str] = None,
+    ) -> dict:
         """Rebase the current branch onto the specified remote branch.
 
         Notes
@@ -1081,6 +1084,10 @@ class WOQLClient:
         ----------
         rebase_source : str
             the source branch for the rebase
+        message : str, optional
+            the commit message
+        author : str, optional
+            the commit author
 
         Returns
         -------
@@ -1098,6 +1105,10 @@ class WOQLClient:
         """
         self._check_connection()
         rebase_source = {"rebase_from": rebase_source}
+        if author:
+            rebase_source['author'] = author
+        if message:
+            rebase_source['message'] = message
         rc_args = self._prepare_revision_control_args(rebase_source)
         if rc_args is not None and rc_args.get("rebase_from"):
             return self._dispatch_json("post", self._rebase_url(), rc_args)
@@ -1152,7 +1163,7 @@ class WOQLClient:
         self._check_connection()
         self._dispatch("post", self._optimize_url(path))
 
-    def squash(self, msg: Optional[str] = None, author: Optional[str] = None) -> dict:
+    def squash(self, message: Optional[str] = None, author: Optional[str] = None) -> dict:
         """Squash the current branch HEAD into a commit
 
         Notes
@@ -1161,7 +1172,7 @@ class WOQLClient:
 
         Parameters
         ----------
-        msg : string
+        message : string
             Message for the newly created squash commit
         author : string
             Author of the commit
