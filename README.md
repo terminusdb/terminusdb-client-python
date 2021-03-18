@@ -3,7 +3,7 @@
 TerminusDB Client Python
 ==========================
 
-![Discord online](https://img.shields.io/discord/689805612053168129?color=7289da&logo=Discord&label=Discord%20chat) 
+![Discord online](https://img.shields.io/discord/689805612053168129?color=7289da&logo=Discord&label=Discord%20chat)
 ![Discourse topics](https://img.shields.io/discourse/topics?color=yellow&logo=Discourse&server=https%3A%2F%2Fdiscuss.terminusdb.com%2F)
 ![Follow on Twitter](https://img.shields.io/twitter/follow/terminusdb?color=skyblue&label=Follow%20on%20Twitter&logo=twitter&style=flat)
 
@@ -43,6 +43,7 @@ These previous version(s) works with these version(s) of TerminusDB:
 - 0.3.1 - works with TerminusDB server / console v3.0.0 to console v3.0.6
 - 0.4.0 - works with TerminusDB server / console v3.0.7
 - 0.5.0 - works with TerminusDB server / console v4.0.0
+- 0.6.1 - works with TerminusDB server / console v4.2.0
 
 ## Installation
 -  TerminusDB Client can be downloaded form PyPI using pip:
