@@ -13,7 +13,11 @@ from .woqljson.woqlAndJson import WOQL_AND_JSON
 from .woqljson.woqlCastJson import WOQL_CAST_JSON
 from .woqljson.woqlConcatJson import WOQL_CONCAT_JSON
 from .woqljson.woqlDeleteJson import WOQL_DELETE_JSON
-from .woqljson.woqlIdgenJson import WOQL_IDGEN_JSON
+from .woqljson.woqlIdgenJson import (
+    WOQL_IDGEN_JSON,
+    WOQL_RANDOM_IDGEN_JSON,
+    WOQL_UNIQUE_JSON,
+)
 from .woqljson.woqlJoinSplitJson import WOQL_JOIN_SPLIT_JSON
 from .woqljson.woqlJson import WOQL_JSON, WOQL_STAR
 from .woqljson.woqlMathJson import WOQL_MATH_JSON
@@ -255,11 +259,23 @@ class TestWoqlQueries:
         }
         assert woql_object.to_dict() == json_obj
 
+    def test_unique_method(self):
+        woql_object = WOQLQuery().unique(
+            "doc:Station", "v:Start_ID", "v:Start_Station_URL"
+        )
+        assert woql_object.to_dict() == WOQL_UNIQUE_JSON
+
     def test_idgen_method(self):
         woql_object = WOQLQuery().idgen(
             "doc:Station", "v:Start_ID", "v:Start_Station_URL"
         )
         assert woql_object.to_dict() == WOQL_IDGEN_JSON
+
+    def test_random_idgen_method(self):
+        woql_object = WOQLQuery().random_idgen(
+            "doc:Station", "v:Start_ID", "v:Start_Station_URL"
+        )
+        assert woql_object.to_dict() == WOQL_RANDOM_IDGEN_JSON
 
     def test_typecast_method(self):
         woql_object = WOQLQuery().typecast(
