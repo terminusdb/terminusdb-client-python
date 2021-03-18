@@ -1138,7 +1138,7 @@ class WOQLClient:
         return self._dispatch_json("post", self._rebase_url(), rc_args)
 
     def reset(self, commit_path: str) -> None:
-        """Reset the current branch HEAD to the specified commit path.
+        """Reset the current branch HEAD to the specified commit path. Doing it will reset the internal commit counter (self._commit_made) back to zero.
 
         Notes
         -----
@@ -1162,6 +1162,7 @@ class WOQLClient:
             self._reset_url(),
             {"commit_descriptor": commit_path},
         )
+        self._commit_made = 0
 
     def optimize(self, path: str) -> None:
         """Optimize the specified path.
