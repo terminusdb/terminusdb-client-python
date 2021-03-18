@@ -1138,7 +1138,7 @@ into the corrent place in the encompassing json</p>
 <dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.unique">
 <code class="sig-name descname"><span class="pre">unique</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uri</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.unique" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generates an ID for a node as a function of the passed VariableList with a specific prefix (URL base). If the values of the passed variables are the same, the output will be the same</p>
+<dd><p>Generates an ID for a node as a function of the passed VariableList with a specific prefix (URL base)(A.K.A Hashing) If the values of the passed variables are the same, the output will be the same</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1154,6 +1154,11 @@ into the corrent place in the encompassing json</p>
 <dd class="field-odd"><p>WOQLQuery object</p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">WOQLQuery</span><span class="p">()</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="s2">&quot;https://base.url&quot;</span><span class="p">,[</span><span class="s2">&quot;page&quot;</span><span class="p">,</span><span class="s2">&quot;1&quot;</span><span class="p">],</span><span class="s2">&quot;v:obj_id&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="mailto:{'&#37;&#52;&#48;type">{‘<span>&#64;</span>type</a>’: ‘api:WoqlResponse’, ‘api:status’: ‘api:success’, ‘api:variable_names’: [‘obj_id’], ‘bindings’: [{‘obj_id’: ‘https://base.urlacd150a6885f609532931d89844070b1’}], ‘deletes’: 0, ‘inserts’: 0, ‘transaction_retry_count’: 0}</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1175,6 +1180,37 @@ into the corrent place in the encompassing json</p>
 <dd class="field-odd"><p>WOQLQuery object</p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">WOQLQuery</span><span class="p">()</span><span class="o">.</span><span class="n">idgen</span><span class="p">(</span><span class="s2">&quot;https://base.url&quot;</span><span class="p">,[</span><span class="s2">&quot;page&quot;</span><span class="p">,</span><span class="s2">&quot;1&quot;</span><span class="p">],</span><span class="s2">&quot;v:obj_id&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="mailto:{'&#37;&#52;&#48;type">{‘<span>&#64;</span>type</a>’: ‘api:WoqlResponse’, ‘api:status’: ‘api:success’, ‘api:variable_names’: [‘obj_id’], ‘bindings’: [{‘obj_id’: ‘https://base.url_page_1’}], ‘deletes’: 0, ‘inserts’: 0, ‘transaction_retry_count’: 0}</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="terminusdb_client.WOQLQuery.random_idgen">
+<code class="sig-name descname"><span class="pre">random_idgen</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uri</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.random_idgen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Randomly generates an ID and appends to the end of the key_list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prefix</strong> (<em>str</em>) – prefix for the id</p></li>
+<li><p><strong>key_list</strong> (<em>str</em>) – variable to generate id for</p></li>
+<li><p><strong>uri</strong> (<em>str</em>) – the variable to hold the id</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>query object that can be chained and/or execute</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>WOQLQuery object</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">WOQLQuery</span><span class="p">()</span><span class="o">.</span><span class="n">random_idgen</span><span class="p">(</span><span class="s2">&quot;https://base.url&quot;</span><span class="p">,[</span><span class="s2">&quot;page&quot;</span><span class="p">,</span><span class="s2">&quot;1&quot;</span><span class="p">],</span><span class="s2">&quot;v:obj_id&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="mailto:{'&#37;&#52;&#48;type">{‘<span>&#64;</span>type</a>’: ‘api:WoqlResponse’, ‘api:status’: ‘api:success’, ‘api:variable_names’: [‘obj_id’], ‘bindings’: [{‘obj_id’: ‘http://base.url_page_1_rv1mfa59ekisdutnxx6zdt2fkockgah’}], ‘deletes’: 0, ‘inserts’: 0, ‘transaction_retry_count’: 0}</p>
 </dd></dl>
 
 <dl class="py method">
