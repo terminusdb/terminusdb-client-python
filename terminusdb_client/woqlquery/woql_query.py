@@ -1881,7 +1881,7 @@ class WOQLQuery:
         return self
 
     def unique(self, prefix, key_list, uri):
-        """Generates an ID for a node as a function of the passed VariableList with a specific prefix (URL base). If the values of the passed variables are the same, the output will be the same
+        """Generates an ID for a node as a function of the passed VariableList with a specific prefix (URL base)(A.K.A Hashing) If the values of the passed variables are the same, the output will be the same
 
         Parameters
         ----------
@@ -1896,6 +1896,12 @@ class WOQLQuery:
         -------
         WOQLQuery object
             query object that can be chained and/or execute
+
+        Examples
+        -------
+        >>> WOQLQuery().unique("https://base.url",["page","1"],"v:obj_id").execute(client)
+
+        {'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': ['obj_id'], 'bindings': [{'obj_id': 'https://base.urlacd150a6885f609532931d89844070b1'}], 'deletes': 0, 'inserts': 0, 'transaction_retry_count': 0}
         """
         if prefix and prefix == "woql:args":
             return ["woql:base", "woql:key_list", "woql:uri"]
@@ -1923,6 +1929,12 @@ class WOQLQuery:
         -------
         WOQLQuery object
             query object that can be chained and/or execute
+
+        Examples
+        -------
+        >>> WOQLQuery().idgen("https://base.url",["page","1"],"v:obj_id").execute(client)
+
+        {'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': ['obj_id'], 'bindings': [{'obj_id': 'https://base.url_page_1'}], 'deletes': 0, 'inserts': 0, 'transaction_retry_count': 0}
         """
         if prefix and prefix == "woql:args":
             return ["woql:base", "woql:key_list", "woql:uri"]
@@ -1932,6 +1944,39 @@ class WOQLQuery:
         self._cursor["woql:base"] = self._clean_object(self.iri(prefix))
         self._cursor["woql:key_list"] = self._vlist(input_var_list)
         self._cursor["woql:uri"] = self._clean_class(output_var)
+        return self
+
+    def random_idgen(self, prefix, key_list, uri):
+        """Randomly generates an ID and appends to the end of the key_list.
+
+        Parameters
+        ----------
+        prefix : str
+            prefix for the id
+        key_list : str
+            variable to generate id for
+        uri : str
+            the variable to hold the id
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+
+        Examples
+        -------
+        >>> WOQLQuery().random_idgen("https://base.url",["page","1"],"v:obj_id").execute(client)
+
+        {'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': ['obj_id'], 'bindings': [{'obj_id': 'http://base.url_page_1_rv1mfa59ekisdutnxx6zdt2fkockgah'}], 'deletes': 0, 'inserts': 0, 'transaction_retry_count': 0}
+        """
+        if prefix and prefix == "woql:args":
+            return ["woql:base", "woql:key_list", "woql:uri"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "woql:RandomIDGenerator"
+        self._cursor["woql:base"] = self._clean_object(prefix)
+        self._cursor["woql:key_list"] = self._vlist(key_list)
+        self._cursor["woql:uri"] = self._clean_class(uri)
         return self
 
     def upper(self, left, right):
