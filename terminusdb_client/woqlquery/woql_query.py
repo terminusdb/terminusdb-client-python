@@ -2337,7 +2337,7 @@ class WOQLQuery:
         self._cursor["woql:count"] = self._clean_object(countvar)
         return self._add_sub_query(query)
 
-    def cast(self, val, user_type, result):
+    def cast(self, val, user_type, result, literal_type=None):
         """Changes the type of va to type and saves the return in vb
 
         Parameters
@@ -2346,14 +2346,22 @@ class WOQLQuery:
             original variable
         user_type : str
             type to be changed
-        rsult: str
+        result: str
             save the return variable
+        literal_type: str, optional
+            literal type of`val`, can be used to treat `val` as a literal rather than an object or variable in the WOQL query.
+            If literal type is "owl:Thing" or "woql:node", `val` will be treated as object in the graph
 
         Returns
         -------
         WOQLQuery object
             query object that can be chained and/or execute
         """
+        if literal_type is not None:
+            if literal_type == "owl:Thing" or literal_type == "woql:node":
+                return self.cast(self.iri(val), user_type, result)
+            else:
+                return self.cast(self.literal(val, literal_type), user_type, result)
         if val and val == "woql:args":
             return ["woql:typecast_value", "woql:typecast_type", "woql:typecast_result"]
         if self._cursor.get("@type"):
