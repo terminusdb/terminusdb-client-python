@@ -16,10 +16,11 @@ def test_happy_path(docker_url):
     client.connect()
     assert client._connected
     # test create db
-    client.create_database("test_happy_path")
+    client.create_database("test_happy_path", prefixes={"doc": "foo://"})
     init_commit = client._get_current_commit()
     assert client._db == "test_happy_path"
     assert "test_happy_path" in client.list_databases()
+    assert client._context.get("doc") == "foo://"
     # test adding doctype
     WOQLQuery().doctype("Station").execute(client)
     assert client._commit_made == 1

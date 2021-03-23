@@ -97,12 +97,17 @@ class WOQLClient:
 
         capabilities = self._dispatch_json("get", self._api)
         self._uid = capabilities["@id"]
-        self._context = capabilities["@context"]
+
+        #
         # Get the current user's identifier, if logged in to Hub, it will be their email otherwise it will be the user provided
         if capabilities.get("system:user_identifier"):
             self._author = capabilities["system:user_identifier"]["@value"]
         else:
             self._author = self._user
+
+        if self._db is not None:
+            self._context = self._get_prefixes()
+
         self._commit_made = 0
 
     def close(self) -> None:
@@ -549,6 +554,10 @@ class WOQLClient:
         warnings.warn("set() is deprecated; use connect().", DeprecationWarning)
         self.connect(**kwargs)
 
+    def _get_prefixes(self):
+        """Get the prefixes for a given database"""
+        return self._dispatch_json("get", self._db_base("prefixes")).get("@context")
+
     def create_database(
         self,
         dbid: str,
@@ -609,11 +618,12 @@ class WOQLClient:
 
         self._check_connection(check_db=False)
 
-        self._db = dbid
         self._account = accountid
         self._connected = True
         self._commit_made = 0
+        self._db = dbid
         self._dispatch("post", self._db_url(), details)
+        self._context = self._get_prefixes()
 
     def delete_database(
         self,
