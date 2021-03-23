@@ -1900,7 +1900,6 @@ class WOQLQuery:
         Examples
         -------
         >>> WOQLQuery().unique("https://base.url",["page","1"],"v:obj_id").execute(client)
-
         {'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': ['obj_id'], 'bindings': [{'obj_id': 'https://base.urlacd150a6885f609532931d89844070b1'}], 'deletes': 0, 'inserts': 0, 'transaction_retry_count': 0}
         """
         if prefix and prefix == "woql:args":
@@ -1933,7 +1932,6 @@ class WOQLQuery:
         Examples
         -------
         >>> WOQLQuery().idgen("https://base.url",["page","1"],"v:obj_id").execute(client)
-
         {'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': ['obj_id'], 'bindings': [{'obj_id': 'https://base.url_page_1'}], 'deletes': 0, 'inserts': 0, 'transaction_retry_count': 0}
         """
         if prefix and prefix == "woql:args":
@@ -1966,7 +1964,6 @@ class WOQLQuery:
         Examples
         -------
         >>> WOQLQuery().random_idgen("https://base.url",["page","1"],"v:obj_id").execute(client)
-
         {'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': ['obj_id'], 'bindings': [{'obj_id': 'http://base.url_page_1_rv1mfa59ekisdutnxx6zdt2fkockgah'}], 'deletes': 0, 'inserts': 0, 'transaction_retry_count': 0}
         """
         if prefix and prefix == "woql:args":
