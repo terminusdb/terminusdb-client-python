@@ -302,6 +302,15 @@ class TestWoqlQueries:
         woql_object = WOQLQuery().cast("v:Duration", "xsd:integer", "v:Duration_Cast")
         assert woql_object.to_dict() == WOQL_CAST_JSON
 
+    def test_cast_method_literal(self):
+        woql_object1 = WOQLQuery().cast(
+            "1", "xsd:integer", "v:Duration_Cast", literal_type="integer"
+        )
+        woql_object2 = WOQLQuery().cast(
+            WOQLQuery().literal("1", "integer"), "xsd:integer", "v:Duration_Cast"
+        )
+        assert woql_object1.to_dict() == woql_object2.to_dict()
+
     def test_re_method(self):
         woql_object = WOQLQuery().re("!\\w+(.*)test$", "v:string", "v:formated")
         json_obj = {
