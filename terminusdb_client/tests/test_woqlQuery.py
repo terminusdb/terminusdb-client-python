@@ -311,6 +311,19 @@ class TestWoqlQueries:
         )
         assert woql_object1.to_dict() == woql_object2.to_dict()
 
+    def test_cast_method_object(self):
+        woql_object1 = WOQLQuery().cast(
+            "my_int", "xsd:integer", "v:Duration_Cast", literal_type="owl:Thing"
+        )
+        woql_object2 = WOQLQuery().cast(
+            "my_int", "xsd:integer", "v:Duration_Cast", literal_type="woql:node"
+        )
+        woql_object3 = WOQLQuery().cast(
+            WOQLQuery().iri("my_int"), "xsd:integer", "v:Duration_Cast"
+        )
+        assert woql_object1.to_dict() == woql_object3.to_dict()
+        assert woql_object2.to_dict() == woql_object3.to_dict()
+
     def test_re_method(self):
         woql_object = WOQLQuery().re("!\\w+(.*)test$", "v:string", "v:formated")
         json_obj = {
