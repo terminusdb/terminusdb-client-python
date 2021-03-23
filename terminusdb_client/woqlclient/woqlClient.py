@@ -570,6 +570,11 @@ class WOQLClient:
         include_schema : bool
             If ``True``, a main schema graph will be created, otherwise only a main instance graph will be created.
 
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
         Examples
         --------
         >>> client = WOQLClient("https://127.0.0.1:6363/")
@@ -622,6 +627,8 @@ class WOQLClient:
         ------
         UserWarning
             If the value of dbid is None.
+        InterfaceError
+            if the client does not connect to a server.
 
         Examples
         -------
@@ -665,6 +672,8 @@ class WOQLClient:
         ------
         ValueError
             If the value of graph_type is invalid.
+        InterfaceError
+            if the client does not connect to a database
         """
         self._check_connection()
         if graph_type in ["inference", "schema", "instance"]:
@@ -697,6 +706,8 @@ class WOQLClient:
         ------
         ValueError
             If the value of graph_type is invalid.
+        InterfaceError
+            if the client does not connect to a database
         """
         self._check_connection()
         if graph_type in ["inference", "schema", "instance"]:
@@ -720,6 +731,11 @@ class WOQLClient:
             Graph type, either "inference", "instance" or "schema".
         graph_id : str
             Graph identifier.
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
 
         Returns
         -------
@@ -746,6 +762,11 @@ class WOQLClient:
             Valid set of triples in Turtle format.
         commit_msg : str
             Commit message.
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
         """
         self._check_connection()
         commit = self._generate_commit(commit_msg)
@@ -771,6 +792,11 @@ class WOQLClient:
             Valid set of triples in Turtle format.
         commit_msg : str
             Commit message.
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
         """
         self._check_connection()
         commit = self._generate_commit(commit_msg)
@@ -803,6 +829,11 @@ class WOQLClient:
             Graph type, either "inference", "instance" or "schema". Default to be "instance"
         graph_id : str, optional
             Graph identifier. Default to be "main"
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
         """
         self._check_connection()
         options = {}
@@ -841,6 +872,11 @@ class WOQLClient:
             Graph type, either "inference", "instance" or "schema". Default to be "instance"
         graph_id : str, optional
             Graph identifier. Default to be "main"
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
         """
         self._check_connection()
         if commit_msg is None:
@@ -877,6 +913,11 @@ class WOQLClient:
             Graph type, either "inference", "instance" or "schema". Default to be "instance"
         graph_id : str, optional
             Graph identifier. Default to be "main"
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
         """
         self._check_connection()
         if commit_msg is None:
@@ -998,6 +1039,10 @@ class WOQLClient:
         empty : bool
             Create an empty branch if true (no starting commit)
 
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
         """
         self._check_connection()
         if empty:
@@ -1033,6 +1078,11 @@ class WOQLClient:
         author: str, optional
             option to overide the author of the operation
 
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
+
         Returns
         -------
         dict
@@ -1065,6 +1115,17 @@ class WOQLClient:
         )
 
     def fetch(self, remote_id: str) -> dict:
+        """Fatch the brach from a remote
+
+        Parameters
+        ----------
+        remote_id: str
+            id of the remote
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database"""
         self._check_connection()
         return self._dispatch_json("post", self._fetch_url(remote_id))
 
@@ -1087,6 +1148,11 @@ class WOQLClient:
             optional commit message
         author: str, optional
             option to overide the author of the operation
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
 
         Examples
         -------
@@ -1134,6 +1200,11 @@ class WOQLClient:
         author : str, optional
             the commit author
 
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
+
         Returns
         -------
         dict
@@ -1154,6 +1225,11 @@ class WOQLClient:
 
     def reset(self, commit_path: str) -> None:
         """Reset the current branch HEAD to the specified commit path.
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
 
         Notes
         -----
@@ -1181,6 +1257,11 @@ class WOQLClient:
     def optimize(self, path: str) -> None:
         """Optimize the specified path.
 
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
+
         Notes
         -----
         The "remote" repo can live in the local database.
@@ -1202,6 +1283,11 @@ class WOQLClient:
         self, message: Optional[str] = None, author: Optional[str] = None
     ) -> dict:
         """Squash the current branch HEAD into a commit
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
 
         Notes
         -----
@@ -1246,6 +1332,11 @@ class WOQLClient:
             Identifier of the new repository to create.
         Description : str, optional
             Optional description about the cloned database.
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
 
         Examples
         --------
@@ -1463,6 +1554,11 @@ class WOQLClient:
         account : str
             The account / organization id that the user is acting through
 
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
         Returns
         -------
         dict or None if not found
@@ -1499,6 +1595,11 @@ class WOQLClient:
         """
         Returns a list of database metadata records for all databases the user has access to
 
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
         Returns
         -------
         list of dicts
@@ -1515,6 +1616,11 @@ class WOQLClient:
     def list_databases(self) -> List[Dict]:
         """
         Returns a list of database ids for all databases the user has access to
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
 
         Returns
         -------
