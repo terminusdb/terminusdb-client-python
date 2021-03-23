@@ -320,7 +320,11 @@ class WOQLClient:
         return self._account
 
     def user_account(self) -> str:
-        """**Deprecatied** Get the current user identifier.
+        """**Deprecatied**
+
+        Get the current user identifier.
+
+        .. deprecated:: 1.0.0
 
         Returns
         -------
@@ -436,7 +440,10 @@ class WOQLClient:
         return self._branch
 
     def uid(self, ignore_jwt: Optional[bool] = True) -> str:
-        """**Deprecated** Get the current user identifier.
+        """**Deprecated**
+        Get the current user identifier.
+
+        .. deprecated:: 1.0.0
 
         Parameters
         ----------
@@ -456,7 +463,7 @@ class WOQLClient:
         >>> client.uid(False)
         '<jwt_uid>'
         """
-        warnings.warn("user_account() is deprecated.", DeprecationWarning)
+        warnings.warn("uid() is deprecated.", DeprecationWarning)
         return self._uid
 
     def resource(self, ttype: str, val: Optional[str] = None) -> str:
@@ -517,8 +524,12 @@ class WOQLClient:
             return base + "/commit/" + val
 
     def set(self, **kwargs: Dict[str, Any]):  # bad naming
-        r"""**deprecated, use `connect` instead**
+        r"""**deprecated**
+
         Update multiple config values on the current context.
+
+        .. deprecated:: 1.0.0
+            use `connect` instead
 
         Parameters
         ----------
@@ -1514,7 +1525,12 @@ class WOQLClient:
 
     def get_metadata(self, dbid: str, account):
         """
+        **Deprecated**
+
         Alias of get_database above - deprecated - included for backwards compatibility
+
+        .. deprecated:: 1.0.0
+            use `get_database()` instead
         """
         warnings.warn(
             "get_metadata() is deprecated; use get_database().",
