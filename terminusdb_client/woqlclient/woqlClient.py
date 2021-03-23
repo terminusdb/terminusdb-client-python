@@ -111,10 +111,15 @@ class WOQLClient:
         The connection will be unusable from this point forward; an Error (or subclass) exception will be raised if any operation is attempted with the connection, unless connect is call again."""
         self._connected = False
 
-    def _check_connection(self) -> None:
-        """Raise connection InterfaceError if not connected"""
+    def _check_connection(self, check_db=True) -> None:
+        """Raise connection InterfaceError if not connected
+        Defaults to check if a db is connected"""
         if not self._connected:
-            raise InterfaceError("Client is not connected to a TerminusDB database.")
+            raise InterfaceError("Client is not connected to a TerminusDB server.")
+        if check_db and self._db is None:
+            raise InterfaceError(
+                "No database is connected. Please either connect to a database or create a new database."
+            )
 
     def _get_current_commit(self):
         woql_query = (
@@ -586,6 +591,8 @@ class WOQLClient:
         if accountid is None:
             accountid = self._account
 
+        self._check_connection(check_db=False)
+
         self._db = dbid
         self._account = accountid
         self._connected = True
@@ -621,6 +628,8 @@ class WOQLClient:
         >>> client = WOQLClient("https://127.0.0.1:6363/")
         >>> client.delete_database("<database>", "<account>")
         """
+
+        self._check_connection(check_db=False)
 
         if dbid is None:
             raise UserWarning(
@@ -927,6 +936,11 @@ class WOQLClient:
         file_dict:
             File dictionary to be associated with post name => filename, for multipart POST
 
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
+
         Examples
         -------
         >>> WOQLClient(server="http://localhost:6363").query(woql, "updating graph")
@@ -936,10 +950,6 @@ class WOQLClient:
         dict
         """
         self._check_connection()
-        if self._db is None:
-            raise InterfaceError(
-                "No database is connected. Please either connect to a database or create a new database."
-            )
         query_obj = self._generate_commit(commit_msg)
         if isinstance(woql_query, WOQLQuery):
             request_woql_query = woql_query.to_dict()
@@ -987,6 +997,7 @@ class WOQLClient:
             New branch identifier.
         empty : bool
             Create an empty branch if true (no starting commit)
+
         """
         self._check_connection()
         if empty:
@@ -1456,7 +1467,7 @@ class WOQLClient:
         -------
         dict or None if not found
         """
-        self._check_connection()
+        self._check_connection(check_db=False)
         db_ids = []
         all_dbs = []
         for this_db in self.get_databases():
@@ -1492,7 +1503,7 @@ class WOQLClient:
         -------
         list of dicts
         """
-        self._check_connection()
+        self._check_connection(check_db=False)
         all_dbs = []
         for scope in self._dispatch_json("get", self._api)["system:role"][
             "system:capability"
@@ -1509,7 +1520,7 @@ class WOQLClient:
         -------
         list of dicts
         """
-        self._check_connection()
+        self._check_connection(check_db=False)
         all_data = self.get_databases()
         all_dbs = []
         for data in all_data:
