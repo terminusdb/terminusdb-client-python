@@ -533,6 +533,10 @@ class WOQLClient:
         warnings.warn("set() is deprecated; use connect().", DeprecationWarning)
         self.connect(**kwargs)
 
+    def _get_prefixes(self, path):
+        """Get the prefixes for a given database"""
+        return self._dispatch_json("get", self._db_base(path))
+
     def create_database(
         self,
         dbid: str,
