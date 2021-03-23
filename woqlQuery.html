@@ -1487,14 +1487,16 @@ e.g. WOQL.re(“(.).*”, “hello”, [“v:All”, “v:Sub”])</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLQuery.cast">
-<code class="sig-name descname"><span class="pre">cast</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.cast" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">cast</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">literal_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.cast" title="Permalink to this definition">¶</a></dt>
 <dd><p>Changes the type of va to type and saves the return in vb</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>val</strong> (<em>str</em>) – original variable</p></li>
 <li><p><strong>user_type</strong> (<em>str</em>) – type to be changed</p></li>
-<li><p><strong>rsult</strong> (<em>str</em>) – save the return variable</p></li>
+<li><p><strong>result</strong> (<em>str</em>) – save the return variable</p></li>
+<li><p><strong>literal_type</strong> (<em>str</em><em>, </em><em>optional</em>) – literal type of`val`, can be used to treat <cite>val</cite> as a literal rather than an object or variable in the WOQL query.
+If literal type is “owl:Thing” or “woql:node”, <cite>val</cite> will be treated as object in the graph</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
