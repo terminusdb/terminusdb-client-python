@@ -7,6 +7,7 @@ import pytest
 import requests
 
 from terminusdb_client.__version__ import __version__
+from terminusdb_client.woqlclient.errors import InterfaceError
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 
 from .mockResponse import MOCK_CAPABILITIES
@@ -207,6 +208,14 @@ def test_query(mocked_requests, mocked_requests2):
             "query": WoqlStar,
         },
     )
+
+
+@mock.patch("requests.get", side_effect=mocked_requests_get)
+def test_query_nodb(mocked_requests):
+    woql_client = WOQLClient("http://localhost:6363")
+    woql_client.connect(user="admin", account="admin", key="root")
+    with pytest.raises(InterfaceError):
+        woql_client.query(WoqlStar)
 
 
 @mock.patch("requests.get", side_effect=mocked_requests_get)

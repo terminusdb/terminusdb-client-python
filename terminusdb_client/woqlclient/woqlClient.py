@@ -936,6 +936,10 @@ class WOQLClient:
         dict
         """
         self._check_connection()
+        if self._db is None:
+            raise InterfaceError(
+                "No database is connected. Please either connect to a database or create a new database."
+            )
         query_obj = self._generate_commit(commit_msg)
         if isinstance(woql_query, WOQLQuery):
             request_woql_query = woql_query.to_dict()
