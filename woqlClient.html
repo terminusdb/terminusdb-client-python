@@ -645,6 +645,9 @@ a terminus:Database document to the Terminus Server.</p>
 <li><p><strong>include_schema</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, a main schema graph will be created, otherwise only a main instance graph will be created.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a server</p>
+</dd>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;https://127.0.0.1:6363/&quot;</span><span class="p">)</span>
@@ -673,7 +676,10 @@ and the new value will be used in future requests to the server.</p>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>UserWarning</strong> – If the value of dbid is None.</p>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>UserWarning</strong> – If the value of dbid is None.</p></li>
+<li><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a server.</p></li>
+</ul>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -701,7 +707,10 @@ and the new value will be used in future requests to the server.</p>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>ValueError</strong> – If the value of graph_type is invalid.</p>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the value of graph_type is invalid.</p></li>
+<li><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p></li>
+</ul>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
@@ -722,7 +731,10 @@ and the new value will be used in future requests to the server.</p>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>ValueError</strong> – If the value of graph_type is invalid.</p>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the value of graph_type is invalid.</p></li>
+<li><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p></li>
+</ul>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
@@ -741,11 +753,14 @@ and the new value will be used in future requests to the server.</p>
 <li><p><strong>graph_id</strong> (<em>str</em>) – Graph identifier.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>str</p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
 </dd>
 </dl>
 </dd></dl>
@@ -763,8 +778,11 @@ and the new value will be used in future requests to the server.</p>
 <li><p><strong>commit_msg</strong> (<em>str</em>) – Commit message.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -782,8 +800,11 @@ and the new value will be used in future requests to the server.</p>
 <li><p><strong>commit_msg</strong> (<em>str</em>) – Commit message.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -802,6 +823,9 @@ and the new value will be used in future requests to the server.</p>
 <li><p><strong>graph_id</strong> (<em>str</em><em>, </em><em>optional</em>) – Graph identifier. Default to be “main”</p></li>
 </ul>
 </dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -818,8 +842,11 @@ and the new value will be used in future requests to the server.</p>
 <li><p><strong>graph_id</strong> (<em>str</em><em>, </em><em>optional</em>) – Graph identifier. Default to be “main”</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -837,8 +864,11 @@ and the new value will be used in future requests to the server.</p>
 <li><p><strong>graph_id</strong> (<em>str</em><em>, </em><em>optional</em>) – Graph identifier. Default to be “main”</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -874,6 +904,9 @@ and the new value will be used in future requests to the server.</p>
 <li><p><strong>file_dict</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]) – File dictionary to be associated with post name =&gt; filename, for multipart POST</p></li>
 </ul>
 </dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
+</dd>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">WOQLClient</span><span class="p">(</span><span class="n">server</span><span class="o">=</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">woql</span><span class="p">,</span> <span class="s2">&quot;updating graph&quot;</span><span class="p">)</span>
@@ -900,8 +933,11 @@ and the new value will be used in future requests to the server.</p>
 <li><p><strong>empty</strong> (<em>bool</em>) – Create an empty branch if true (no starting commit)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -919,11 +955,14 @@ and the new value will be used in future requests to the server.</p>
 <li><p><strong>author</strong> (<em>str</em><em>, </em><em>optional</em>) – option to overide the author of the operation</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dict</p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -936,7 +975,14 @@ and the new value will be used in future requests to the server.</p>
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.fetch">
 <code class="sig-name descname"><span class="pre">fetch</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">remote_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.fetch" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Fatch the brach from a remote</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>remote_id</strong> (<em>str</em>) – id of the remote</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
+</dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
 </dd>
@@ -955,6 +1001,9 @@ and the new value will be used in future requests to the server.</p>
 <li><p><strong>message</strong> (<em>str</em><em>, </em><em>optional</em>) – optional commit message</p></li>
 <li><p><strong>author</strong> (<em>str</em><em>, </em><em>optional</em>) – option to overide the author of the operation</p></li>
 </ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -985,11 +1034,14 @@ and the new value will be used in future requests to the server.</p>
 <li><p><strong>author</strong> (<em>str</em><em>, </em><em>optional</em>) – the commit author</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dict</p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -1003,6 +1055,11 @@ and the new value will be used in future requests to the server.</p>
 <dt id="terminusdb_client.WOQLClient.reset">
 <code class="sig-name descname"><span class="pre">reset</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commit_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.reset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reset the current branch HEAD to the specified commit path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>The “remote” repo can live in the local database.</p>
 <dl class="field-list simple">
@@ -1027,6 +1084,11 @@ and the new value will be used in future requests to the server.</p>
 <dt id="terminusdb_client.WOQLClient.optimize">
 <code class="sig-name descname"><span class="pre">optimize</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.optimize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optimize the specified path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>The “remote” repo can live in the local database.</p>
 <dl class="field-list simple">
@@ -1050,6 +1112,11 @@ and the new value will be used in future requests to the server.</p>
 <dt id="terminusdb_client.WOQLClient.squash">
 <code class="sig-name descname"><span class="pre">squash</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">author</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.squash" title="Permalink to this definition">¶</a></dt>
 <dd><p>Squash the current branch HEAD into a commit</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>The “remote” repo can live in the local database.</p>
 <dl class="field-list simple">
@@ -1093,6 +1160,9 @@ and the new value will be used in future requests to the server.</p>
 <li><p><strong>Description</strong> (<em>str</em><em>, </em><em>optional</em>) – Optional description about the cloned database.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
+</dd>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;https://127.0.0.1:6363/&quot;</span><span class="p">)</span>
@@ -1117,11 +1187,14 @@ and the new value will be used in future requests to the server.</p>
 :param account: The account / organization id that the user is acting through
 :type account: str</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a server</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>dict or None if not found</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict or None if not found</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1131,11 +1204,14 @@ and the new value will be used in future requests to the server.</p>
 <code class="sig-name descname"><span class="pre">get_databases</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_databases" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a list of database metadata records for all databases the user has access to</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a server</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>list of dicts</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of dicts</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1145,11 +1221,14 @@ and the new value will be used in future requests to the server.</p>
 <code class="sig-name descname"><span class="pre">list_databases</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.list_databases" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a list of database ids for all databases the user has access to</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a server</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>list of dicts</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of dicts</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1210,7 +1289,7 @@ and the new value will be used in future requests to the server.</p>
 <dt id="terminusdb_client.woqlclient.errors.InterfaceError">
 <em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">terminusdb_client.woqlclient.errors.</span></code><code class="sig-name descname"><span class="pre">InterfaceError</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#terminusdb_client.woqlclient.errors.Error" title="terminusdb_client.woqlclient.errors.Error"><code class="xref py py-class docutils literal notranslate"><span class="pre">terminusdb_client.woqlclient.errors.Error</span></code></a></p>
-<p>Exception for errors related to the interface.</p>
+<p>Exception raised for errors that are related to the database interface rather than the database itself.</p>
 <dl class="py attribute">
 <dt id="terminusdb_client.woqlclient.errors.InterfaceError.message">
 <code class="sig-name descname"><span class="pre">message</span></code><a class="headerlink" href="#terminusdb_client.woqlclient.errors.InterfaceError.message" title="Permalink to this definition">¶</a></dt>
