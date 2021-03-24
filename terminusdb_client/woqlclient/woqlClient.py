@@ -168,7 +168,7 @@ class WOQLClient:
             .triple("v:branch", "ref:ref_commit", "v:commit")
             .path(
                 "v:commit",
-                f"ref:commit_parent+",
+                "ref:commit_parent+",
                 "v:target_commit",
                 "v:path",
             )
@@ -183,6 +183,7 @@ class WOQLClient:
         )
         result = self.query(woql_query)
         result_item = result.get("bindings")[0]
+        cid_list = [result_item["cur_cid"]["@value"]]
         result_list = [
             {
                 "commit": result_item["cur_cid"]["@value"],
@@ -195,16 +196,19 @@ class WOQLClient:
         ]
         if max_history > 1:
             for result_item in result.get("bindings"):
-                result_list.append(
-                    {
-                        "commit": result_item["cid"]["@value"],
-                        "author": result_item["author"]["@value"],
-                        "message": result_item["message"]["@value"],
-                        "timstamp": datetime.fromtimestamp(
-                            int(result_item["timestamp"]["@value"])
-                        ),
-                    }
-                )
+                cid = result_item["cid"]["@value"]
+                if cid not in cid_list:
+                    result_list.append(
+                        {
+                            "commit": result_item["cid"]["@value"],
+                            "author": result_item["author"]["@value"],
+                            "message": result_item["message"]["@value"],
+                            "timstamp": datetime.fromtimestamp(
+                                int(result_item["timestamp"]["@value"])
+                            ),
+                        }
+                    )
+                    cid_list.append(cid)
         return result_list
 
     def _get_current_commit(self):
