@@ -1,20 +1,19 @@
 # woqlDataframe.py
 
-import warnings
 from importlib import import_module
 
 
 def _import_needed(package):
     try:
         module = import_module(package)
+        return module
     except ImportError:
         msg = (
             "woqlDataframe requirements are not installed.\n\n"
             "If you want to use woqlDataframe, please pip install as follows:\n\n"
             "  python -m pip install -U terminus-client-python[dataframe]"
         )
-        warnings.warn(msg)
-    return module
+        raise ImportError(msg)
 
 
 class EmptyException(Exception):
