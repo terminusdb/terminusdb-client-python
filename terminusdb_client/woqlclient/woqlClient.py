@@ -1039,7 +1039,6 @@ class WOQLClient:
 
     def commit(self):
         """Not implementated: open transections currently not suportted. Please check back later."""
-        return result
 
     def query(
         self,
