@@ -40,7 +40,6 @@ class WOQLClient:
         self._api = f"{self._server_url}/api"
         self._connected = False
         self.insecure = insecure
-        self._commit_made = 0
 
     def connect(
         self,
@@ -108,8 +107,6 @@ class WOQLClient:
 
         if self._db is not None:
             self._context = self._get_prefixes()
-
-        self._commit_made = 0
 
     def close(self) -> None:
         """Undo connect and close the connection.
@@ -705,7 +702,6 @@ class WOQLClient:
 
         self._account = accountid
         self._connected = True
-        self._commit_made = 0
         self._db = dbid
         self._dispatch("post", self._db_url(), details)
         self._context = self._get_prefixes()
@@ -1110,7 +1106,6 @@ class WOQLClient:
             file_list,
         )
         if result.get("inserts") or result.get("deletes"):
-            self._commit_made += 1
             return "Commit successfully made."
         return result
 
