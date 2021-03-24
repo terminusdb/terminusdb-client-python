@@ -26,6 +26,9 @@ def test_happy_path(docker_url):
     assert client._commit_made == 1
     first_commit = client._get_current_commit()
     assert first_commit != init_commit
+    assert len(client.get_commit_history(2)) == 2
+    assert len(client.get_commit_history(1)) == 1
+    assert len(client.get_commit_history(0)) == 1
     # test rollback
     client.rollback()
     assert client._commit_made == 0  # back to squre 1
