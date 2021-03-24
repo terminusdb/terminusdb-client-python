@@ -8,6 +8,7 @@ from base64 import b64encode
 from typing import Any, Dict, List, Optional, Union
 
 import requests
+from datatime import datetime
 from urllib3.exceptions import InsecureRequestWarning
 
 from ..__version__ import __version__
@@ -126,11 +127,54 @@ class WOQLClient:
                 "No database is connected. Please either connect to a database or create a new database."
             )
 
+    def get_commit_history(self, max_history: int = 500) -> dict:
+        """Get the whole commit history.
+        Commit history - Commit id, author of the commit, commit message and the commit time, in the current branch from the current commit will be returned in a dictionary in the follow format:
+        {"commit_id":
+            {"author": "commit_author",
+             "message": "commit_message",
+             "timestamp: <datetime object of the timestamp>" }
+        }
+
+        Parameters
+        ----------
+        max_history: int, optional
+            maximum number of commit that would return,counting backwards form your current commit. Default is set to 500.
+        """
+        woql_query = (
+            WOQLQuery()
+            .using("_commits")
+            .select("v:cid", "v:author", "v:message", "v:timstamp")
+            .triple("v:branch", "ref:branch_name", self.checkout())
+            .triple("v:branch", "ref:ref_commit", "v:commit")
+            .path(
+                "v:commit",
+                f"ref:commit_parent{{0,{max_history}}}",
+                "v:target_commit",
+                "v:path",
+            )
+            .triple("v:target_commit", "ref:commit_id", "v:cid")
+            .triple("v:target_commit", "ref:commit_author", "v:author")
+            .triple("v:target_commit", "ref:commit_message", "v:message")
+            .triple("v:target_commit", "ref:commit_timestamp", "v:timstamp")
+        )
+        result = self.query(woql_query)
+        result_dict = {}
+        for result_item in result.get("bindings"):
+            result_dict[result.get("bindings")[0].get("commit")] = {
+                "author": result.get("bindings")[0].get("author"),
+                "message": result.get("bindings")[0].get("message"),
+                "timstamp": datetime.fromtimestamp(
+                    int(result.get("bindings")[0].get("timstamp"))
+                ),
+            }
+        return result_dict
+
     def _get_current_commit(self):
         woql_query = (
             WOQLQuery()
             .using("_commits")
-            .triple("v:branch", "ref:branch_name", "main")
+            .triple("v:branch", "ref:branch_name", self.checkout())
             .triple("v:branch", "ref:ref_commit", "v:commit")
         )
         result = self.query(woql_query)
