@@ -956,29 +956,8 @@ class WOQLClient:
             file_list=csv_paths_list,
         )
 
-    def commit(
-        self,
-        woql_query: Union[dict, WOQLQuery],
-        commit_msg: Optional[str] = None,
-        file_dict: Optional[dict] = None,
-    ):
-        """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents and locking the commits so it cannot be rollback further than this point with the same client objcet.
-
-        Parameters
-        ----------
-        woql_query : dict or WOQLQuery object
-            A woql query as an object or dict
-        commit_mg : str
-            A message that will be written to the commit log to describe the change
-        file_dict:
-            File dictionary to be associated with post name => filename, for multipart POST
-
-        Examples
-        -------
-        >>> WOQLClient(server="http://localhost:6363").commit(woql, "updating graph")
-        """
-        result = self.query(woql_query, commit_msg, file_dict)
-        self._commit_made = 0
+    def commit(self):
+        """Not implementated: open transections currently not suportted. Please check back later."""
         return result
 
     def query(
