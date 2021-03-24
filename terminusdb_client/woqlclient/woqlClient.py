@@ -156,27 +156,17 @@ class WOQLClient:
         return target_commit
 
     def rollback(self, steps=1) -> None:
-        """Rollback number of update queries set in steps.
+        """Curently not implementated. Please check back later.
 
-        Steps need to be smaller than the number of update queries made in the session. Number of update queries made in the session is counted from the last connection or commit() call.
-
-        Parameters
+        Raises
         ----------
-        steps: int
-            Number of update queries to rollback.
+        NotImplementedError
+            Since TerminusDB currently does not support open transessions. This method is not applicable to it's usage. To reset commit head, use WOQLClient.reset
 
-        Returns
-        -------
-        None
         """
-        self._check_connection()
-        if steps > self._commit_made:
-            raise ValueError(
-                f"Cannot rollback before the lst connection or commit call. Number of update queries made that can be rollback: {self._commit_made}"
-            )
-        target_commit = self._get_target_commit(steps)
-        self._commit_made -= steps
-        self.reset(f"{self._account}/{self._db}/{self._repo}/commit/{target_commit}")
+        raise NotImplementedError(
+            "Open transections are currently not supported. To reset commit head, check WOQLClient.reset"
+        )
 
     def copy(self) -> "WOQLClient":
         """Create a deep copy of this client.
