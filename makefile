@@ -25,9 +25,9 @@ publish_patch:
 	git checkout master
 	git pull origin master
 	bumpversion patch
-	git push --no-verify origin master
-	git push --no-verify origin master:dev
-	git push --no-verify origin --tags
+	git push origin master
+	git push origin master:dev
+	git push origin --tags
 
 publish_release:
 	tox
