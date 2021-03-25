@@ -40,7 +40,6 @@ class WOQLClient:
         self._api = f"{self._server_url}/api"
         self._connected = False
         self.insecure = insecure
-        self._commit_made = 0
 
     def connect(
         self,
@@ -108,8 +107,6 @@ class WOQLClient:
 
         if self._db is not None:
             self._context = self._get_prefixes()
-
-        self._commit_made = 0
 
     def close(self) -> None:
         """Undo connect and close the connection.
@@ -251,27 +248,17 @@ class WOQLClient:
         return target_commit
 
     def rollback(self, steps=1) -> None:
-        """Rollback number of update queries set in steps.
+        """Curently not implementated. Please check back later.
 
-        Steps need to be smaller than the number of update queries made in the session. Number of update queries made in the session is counted from the last connection or commit() call.
-
-        Parameters
+        Raises
         ----------
-        steps: int
-            Number of update queries to rollback.
+        NotImplementedError
+            Since TerminusDB currently does not support open transactions. This method is not applicable to it's usage. To reset commit head, use WOQLClient.reset
 
-        Returns
-        -------
-        None
         """
-        self._check_connection()
-        if steps > self._commit_made:
-            raise ValueError(
-                f"Cannot rollback before the lst connection or commit call. Number of update queries made that can be rollback: {self._commit_made}"
-            )
-        target_commit = self._get_target_commit(steps)
-        self._commit_made -= steps
-        self.reset(f"{self._account}/{self._db}/{self._repo}/commit/{target_commit}")
+        raise NotImplementedError(
+            "Open transactions are currently not supported. To reset commit head, check WOQLClient.reset"
+        )
 
     def copy(self) -> "WOQLClient":
         """Create a deep copy of this client.
@@ -715,7 +702,6 @@ class WOQLClient:
 
         self._account = accountid
         self._connected = True
-        self._commit_made = 0
         self._db = dbid
         self._dispatch("post", self._db_url(), details)
         self._context = self._get_prefixes()
@@ -1051,30 +1037,8 @@ class WOQLClient:
             file_list=csv_paths_list,
         )
 
-    def commit(
-        self,
-        woql_query: Union[dict, WOQLQuery],
-        commit_msg: Optional[str] = None,
-        file_dict: Optional[dict] = None,
-    ):
-        """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents and locking the commits so it cannot be rollback further than this point with the same client objcet.
-
-        Parameters
-        ----------
-        woql_query : dict or WOQLQuery object
-            A woql query as an object or dict
-        commit_mg : str
-            A message that will be written to the commit log to describe the change
-        file_dict:
-            File dictionary to be associated with post name => filename, for multipart POST
-
-        Examples
-        -------
-        >>> WOQLClient(server="http://localhost:6363").commit(woql, "updating graph")
-        """
-        result = self.query(woql_query, commit_msg, file_dict)
-        self._commit_made = 0
-        return result
+    def commit(self):
+        """Not implementated: open transactions currently not suportted. Please check back later."""
 
     def query(
         self,
@@ -1141,7 +1105,6 @@ class WOQLClient:
             file_list,
         )
         if result.get("inserts") or result.get("deletes"):
-            self._commit_made += 1
             return "Commit successfully made."
         return result
 
