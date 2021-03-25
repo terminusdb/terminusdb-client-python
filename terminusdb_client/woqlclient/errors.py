@@ -6,7 +6,7 @@ class Error(Exception):
 
 
 class InterfaceError(Error):
-    """Exception for errors related to the interface.
+    """Exception raised for errors that are related to the database interface rather than the database itself.
 
     Attributes
     ----------
@@ -42,13 +42,15 @@ class DatabaseError(Error):
         """
         super().__init__()
         if (
-            response.headers["content-type"][:len("application/json")]
+            response.headers["content-type"][: len("application/json")]
             == "application/json"
         ):
             self.error_obj = response.json()
             if self.error_obj.get("api:message"):
                 self.message = self.error_obj["api:message"]
-            elif "api:error" in self.error_obj and self.error_obj["api:error"].get("vio:message"):
+            elif "api:error" in self.error_obj and self.error_obj["api:error"].get(
+                "vio:message"
+            ):
                 self.message = self.error_obj["api:error"]["vio:message"]
             else:
                 self.message = (

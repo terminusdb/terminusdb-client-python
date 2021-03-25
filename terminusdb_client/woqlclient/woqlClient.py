@@ -5,6 +5,7 @@ import json
 import os
 import warnings
 from base64 import b64encode
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
 
 import requests
@@ -39,7 +40,6 @@ class WOQLClient:
         self._api = f"{self._server_url}/api"
         self._connected = False
         self.insecure = insecure
-        self._commit_made = 0
 
     def connect(
         self,
@@ -97,13 +97,16 @@ class WOQLClient:
 
         capabilities = self._dispatch_json("get", self._api)
         self._uid = capabilities["@id"]
-        self._context = capabilities["@context"]
+
+        #
         # Get the current user's identifier, if logged in to Hub, it will be their email otherwise it will be the user provided
         if capabilities.get("system:user_identifier"):
             self._author = capabilities["system:user_identifier"]["@value"]
         else:
             self._author = self._user
-        self._commit_made = 0
+
+        if self._db is not None:
+            self._context = self._get_prefixes()
 
     def close(self) -> None:
         """Undo connect and close the connection.
@@ -111,16 +114,115 @@ class WOQLClient:
         The connection will be unusable from this point forward; an Error (or subclass) exception will be raised if any operation is attempted with the connection, unless connect is call again."""
         self._connected = False
 
-    def _check_connection(self) -> None:
-        """Raise connection InterfaceError if not connected"""
+    def _check_connection(self, check_db=True) -> None:
+        """Raise connection InterfaceError if not connected
+        Defaults to check if a db is connected"""
         if not self._connected:
-            raise InterfaceError("Client is not connected to a TerminusDB database.")
+            raise InterfaceError("Client is not connected to a TerminusDB server.")
+        if check_db and self._db is None:
+            raise InterfaceError(
+                "No database is connected. Please either connect to a database or create a new database."
+            )
+
+    def get_commit_history(self, max_history: int = 500) -> list:
+        """Get the whole commit history.
+        Commit history - Commit id, author of the commit, commit message and the commit time, in the current branch from the current commit, ordered backwards in time, will be returned in a dictionary in the follow format:
+        {"commit_id":
+            {"author": "commit_author",
+             "message": "commit_message",
+             "timestamp: <datetime object of the timestamp>" }
+        }
+
+        Parameters
+        ----------
+        max_history: int, optional
+            maximum number of commit that would return, counting backwards from your current commit. Default is set to 500. It need to be nop-negitive, if input is 0 it will still give the last commit.
+        Result
+        ------
+        list
+        """
+        if max_history < 0:
+            raise ValueError("max_history needs to be non-negative.")
+        if max_history > 1:
+            limit_history = max_history - 1
+        else:
+            limit_history = 1
+        woql_query = (
+            WOQLQuery()
+            .using("_commits")
+            .limit(limit_history)
+            .select(
+                "v:cid",
+                "v:author",
+                "v:message",
+                "v:timestamp",
+                "v:cur_cid",
+                "v:cur_author",
+                "v:cur_message",
+                "v:cur_timestamp",
+            )
+            .triple("v:branch", "ref:branch_name", self.checkout())
+            .triple("v:branch", "ref:ref_commit", "v:commit")
+            .woql_or(
+                WOQLQuery()
+                .path(
+                    "v:commit",
+                    "ref:commit_parent+",
+                    "v:target_commit",
+                    "v:path",
+                )
+                .triple("v:target_commit", "ref:commit_id", "v:cid")
+                .triple("v:target_commit", "ref:commit_author", "v:author")
+                .triple("v:target_commit", "ref:commit_message", "v:message")
+                .triple("v:target_commit", "ref:commit_timestamp", "v:timestamp")
+                .triple("v:commit", "ref:commit_id", "v:cur_cid")
+                .triple("v:commit", "ref:commit_author", "v:cur_author")
+                .triple("v:commit", "ref:commit_message", "v:cur_message")
+                .triple("v:commit", "ref:commit_timestamp", "v:cur_timestamp"),
+                WOQLQuery()
+                .triple("v:commit", "ref:commit_id", "v:cur_cid")
+                .triple("v:commit", "ref:commit_author", "v:cur_author")
+                .triple("v:commit", "ref:commit_message", "v:cur_message")
+                .triple("v:commit", "ref:commit_timestamp", "v:cur_timestamp"),
+            )
+        )
+        result = self.query(woql_query).get("bindings")
+        result_item = result[0]
+        cid_list = [result_item["cur_cid"]["@value"]]
+        result_list = [
+            {
+                "commit": result_item["cur_cid"]["@value"],
+                "author": result_item["cur_author"]["@value"],
+                "message": result_item["cur_message"]["@value"],
+                "timstamp": datetime.fromtimestamp(
+                    int(result_item["cur_timestamp"]["@value"])
+                ),
+            }
+        ]
+        if max_history > 1:
+            for result_item in result:
+                if (
+                    result_item["cid"] != "system:unknown"
+                    and result_item["cid"]["@value"] not in cid_list
+                ):
+                    result_list.append(
+                        {
+                            "commit": result_item["cid"]["@value"],
+                            "author": result_item["author"]["@value"],
+                            "message": result_item["message"]["@value"],
+                            "timstamp": datetime.fromtimestamp(
+                                int(result_item["timestamp"]["@value"])
+                            ),
+                        }
+                    )
+                    cid_list.append(result_item["cid"]["@value"])
+        return result_list
 
     def _get_current_commit(self):
         woql_query = (
             WOQLQuery()
             .using("_commits")
-            .triple("v:branch", "ref:branch_name", "main")
+            .triple("v:branch", "ref:branch_name", self.checkout())
             .triple("v:branch", "ref:ref_commit", "v:commit")
         )
         result = self.query(woql_query)
@@ -146,27 +248,17 @@ class WOQLClient:
         return target_commit
 
     def rollback(self, steps=1) -> None:
-        """Rollback number of update queries set in steps.
+        """Curently not implementated. Please check back later.
 
-        Steps need to be smaller than the number of update queries made in the session. Number of update queries made in the session is counted from the last connection or commit() call.
-
-        Parameters
+        Raises
         ----------
-        steps: int
-            Number of update queries to rollback.
+        NotImplementedError
+            Since TerminusDB currently does not support open transactions. This method is not applicable to it's usage. To reset commit head, use WOQLClient.reset
 
-        Returns
-        -------
-        None
         """
-        self._check_connection()
-        if steps > self._commit_made:
-            raise ValueError(
-                f"Cannot rollback before the lst connection or commit call. Number of update queries made that can be rollback: {self._commit_made}"
-            )
-        target_commit = self._get_target_commit(steps)
-        self._commit_made -= steps
-        self.reset(f"{self._account}/{self._db}/{self._repo}/commit/{target_commit}")
+        raise NotImplementedError(
+            "Open transactions are currently not supported. To reset commit head, check WOQLClient.reset"
+        )
 
     def copy(self) -> "WOQLClient":
         """Create a deep copy of this client.
@@ -320,7 +412,11 @@ class WOQLClient:
         return self._account
 
     def user_account(self) -> str:
-        """**Deprecatied** Get the current user identifier.
+        """**Deprecatied**
+
+        Get the current user identifier.
+
+        .. deprecated:: 1.0.0
 
         Returns
         -------
@@ -436,7 +532,10 @@ class WOQLClient:
         return self._branch
 
     def uid(self, ignore_jwt: Optional[bool] = True) -> str:
-        """**Deprecated** Get the current user identifier.
+        """**Deprecated**
+        Get the current user identifier.
+
+        .. deprecated:: 1.0.0
 
         Parameters
         ----------
@@ -456,7 +555,7 @@ class WOQLClient:
         >>> client.uid(False)
         '<jwt_uid>'
         """
-        warnings.warn("user_account() is deprecated.", DeprecationWarning)
+        warnings.warn("uid() is deprecated.", DeprecationWarning)
         return self._uid
 
     def resource(self, ttype: str, val: Optional[str] = None) -> str:
@@ -517,8 +616,12 @@ class WOQLClient:
             return base + "/commit/" + val
 
     def set(self, **kwargs: Dict[str, Any]):  # bad naming
-        r"""**deprecated, use `connect` instead**
+        r"""**deprecated**
+
         Update multiple config values on the current context.
+
+        .. deprecated:: 1.0.0
+            use `connect` instead
 
         Parameters
         ----------
@@ -532,6 +635,10 @@ class WOQLClient:
         """
         warnings.warn("set() is deprecated; use connect().", DeprecationWarning)
         self.connect(**kwargs)
+
+    def _get_prefixes(self):
+        """Get the prefixes for a given database"""
+        return self._dispatch_json("get", self._db_base("prefixes")).get("@context")
 
     def create_database(
         self,
@@ -565,6 +672,11 @@ class WOQLClient:
         include_schema : bool
             If ``True``, a main schema graph will be created, otherwise only a main instance graph will be created.
 
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
         Examples
         --------
         >>> client = WOQLClient("https://127.0.0.1:6363/")
@@ -586,11 +698,13 @@ class WOQLClient:
         if accountid is None:
             accountid = self._account
 
-        self._db = dbid
+        self._check_connection(check_db=False)
+
         self._account = accountid
         self._connected = True
-        self._commit_made = 0
+        self._db = dbid
         self._dispatch("post", self._db_url(), details)
+        self._context = self._get_prefixes()
 
     def delete_database(
         self,
@@ -615,12 +729,16 @@ class WOQLClient:
         ------
         UserWarning
             If the value of dbid is None.
+        InterfaceError
+            if the client does not connect to a server.
 
         Examples
         -------
         >>> client = WOQLClient("https://127.0.0.1:6363/")
         >>> client.delete_database("<database>", "<account>")
         """
+
+        self._check_connection(check_db=False)
 
         if dbid is None:
             raise UserWarning(
@@ -656,6 +774,8 @@ class WOQLClient:
         ------
         ValueError
             If the value of graph_type is invalid.
+        InterfaceError
+            if the client does not connect to a database
         """
         self._check_connection()
         if graph_type in ["inference", "schema", "instance"]:
@@ -688,6 +808,8 @@ class WOQLClient:
         ------
         ValueError
             If the value of graph_type is invalid.
+        InterfaceError
+            if the client does not connect to a database
         """
         self._check_connection()
         if graph_type in ["inference", "schema", "instance"]:
@@ -711,6 +833,11 @@ class WOQLClient:
             Graph type, either "inference", "instance" or "schema".
         graph_id : str
             Graph identifier.
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
 
         Returns
         -------
@@ -737,6 +864,11 @@ class WOQLClient:
             Valid set of triples in Turtle format.
         commit_msg : str
             Commit message.
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
         """
         self._check_connection()
         commit = self._generate_commit(commit_msg)
@@ -762,6 +894,11 @@ class WOQLClient:
             Valid set of triples in Turtle format.
         commit_msg : str
             Commit message.
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
         """
         self._check_connection()
         commit = self._generate_commit(commit_msg)
@@ -794,6 +931,11 @@ class WOQLClient:
             Graph type, either "inference", "instance" or "schema". Default to be "instance"
         graph_id : str, optional
             Graph identifier. Default to be "main"
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
         """
         self._check_connection()
         options = {}
@@ -832,6 +974,11 @@ class WOQLClient:
             Graph type, either "inference", "instance" or "schema". Default to be "instance"
         graph_id : str, optional
             Graph identifier. Default to be "main"
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
         """
         self._check_connection()
         if commit_msg is None:
@@ -868,6 +1015,11 @@ class WOQLClient:
             Graph type, either "inference", "instance" or "schema". Default to be "instance"
         graph_id : str, optional
             Graph identifier. Default to be "main"
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
         """
         self._check_connection()
         if commit_msg is None:
@@ -885,30 +1037,8 @@ class WOQLClient:
             file_list=csv_paths_list,
         )
 
-    def commit(
-        self,
-        woql_query: Union[dict, WOQLQuery],
-        commit_msg: Optional[str] = None,
-        file_dict: Optional[dict] = None,
-    ):
-        """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents and locking the commits so it cannot be rollback further than this point with the same client objcet.
-
-        Parameters
-        ----------
-        woql_query : dict or WOQLQuery object
-            A woql query as an object or dict
-        commit_mg : str
-            A message that will be written to the commit log to describe the change
-        file_dict:
-            File dictionary to be associated with post name => filename, for multipart POST
-
-        Examples
-        -------
-        >>> WOQLClient(server="http://localhost:6363").commit(woql, "updating graph")
-        """
-        result = self.query(woql_query, commit_msg, file_dict)
-        self._commit_made = 0
-        return result
+    def commit(self):
+        """Not implementated: open transactions currently not suportted. Please check back later."""
 
     def query(
         self,
@@ -926,6 +1056,11 @@ class WOQLClient:
             A message that will be written to the commit log to describe the change
         file_dict:
             File dictionary to be associated with post name => filename, for multipart POST
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
 
         Examples
         -------
@@ -970,7 +1105,6 @@ class WOQLClient:
             file_list,
         )
         if result.get("inserts") or result.get("deletes"):
-            self._commit_made += 1
             return "Commit successfully made."
         return result
 
@@ -983,6 +1117,11 @@ class WOQLClient:
             New branch identifier.
         empty : bool
             Create an empty branch if true (no starting commit)
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
         """
         self._check_connection()
         if empty:
@@ -1018,6 +1157,11 @@ class WOQLClient:
         author: str, optional
             option to overide the author of the operation
 
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
+
         Returns
         -------
         dict
@@ -1050,6 +1194,17 @@ class WOQLClient:
         )
 
     def fetch(self, remote_id: str) -> dict:
+        """Fatch the brach from a remote
+
+        Parameters
+        ----------
+        remote_id: str
+            id of the remote
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database"""
         self._check_connection()
         return self._dispatch_json("post", self._fetch_url(remote_id))
 
@@ -1072,6 +1227,11 @@ class WOQLClient:
             optional commit message
         author: str, optional
             option to overide the author of the operation
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
 
         Examples
         -------
@@ -1119,6 +1279,11 @@ class WOQLClient:
         author : str, optional
             the commit author
 
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
+
         Returns
         -------
         dict
@@ -1139,6 +1304,11 @@ class WOQLClient:
 
     def reset(self, commit_path: str) -> None:
         """Reset the current branch HEAD to the specified commit path. Doing it will reset the internal commit counter (self._commit_made) back to zero.
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
 
         Notes
         -----
@@ -1167,6 +1337,11 @@ class WOQLClient:
     def optimize(self, path: str) -> None:
         """Optimize the specified path.
 
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
+
         Notes
         -----
         The "remote" repo can live in the local database.
@@ -1188,6 +1363,11 @@ class WOQLClient:
         self, message: Optional[str] = None, author: Optional[str] = None
     ) -> dict:
         """Squash the current branch HEAD into a commit
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
 
         Notes
         -----
@@ -1232,6 +1412,11 @@ class WOQLClient:
             Identifier of the new repository to create.
         Description : str, optional
             Optional description about the cloned database.
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
 
         Examples
         --------
@@ -1449,11 +1634,16 @@ class WOQLClient:
         account : str
             The account / organization id that the user is acting through
 
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
         Returns
         -------
         dict or None if not found
         """
-        self._check_connection()
+        self._check_connection(check_db=False)
         db_ids = []
         all_dbs = []
         for this_db in self.get_databases():
@@ -1485,11 +1675,16 @@ class WOQLClient:
         """
         Returns a list of database metadata records for all databases the user has access to
 
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
         Returns
         -------
         list of dicts
         """
-        self._check_connection()
+        self._check_connection(check_db=False)
         all_dbs = []
         for scope in self._dispatch_json("get", self._api)["system:role"][
             "system:capability"
@@ -1502,11 +1697,16 @@ class WOQLClient:
         """
         Returns a list of database ids for all databases the user has access to
 
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
         Returns
         -------
         list of dicts
         """
-        self._check_connection()
+        self._check_connection(check_db=False)
         all_data = self.get_databases()
         all_dbs = []
         for data in all_data:
@@ -1515,7 +1715,12 @@ class WOQLClient:
 
     def get_metadata(self, dbid: str, account):
         """
+        **Deprecated**
+
         Alias of get_database above - deprecated - included for backwards compatibility
+
+        .. deprecated:: 1.0.0
+            use `get_database()` instead
         """
         warnings.warn(
             "get_metadata() is deprecated; use get_database().",

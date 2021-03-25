@@ -1,5 +1,24 @@
 # TerminusDB Python Client Release Notes
 
+## v1.1.0
+
+### New
+
+- Add WOQLClient.get_commit_history()
+
+### Changes
+
+- Remove functionality of WOQLClient.commit() and WOQLClient.rollback()
+- Make import of pandas and numpy of WOQLDataFrame dynamic
+
+### Bug Fixes / Improvements
+
+- "doc:" prefix fix
+- check for database connectivity
+- literal option added in WOQLQuery.cast()
+
+---
+
 ## v1.0.0 🐮☘️
 
 ### New

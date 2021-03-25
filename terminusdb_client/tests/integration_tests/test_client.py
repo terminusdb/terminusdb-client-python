@@ -2,8 +2,6 @@ import csv
 import filecmp
 import os
 
-import pytest
-
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
@@ -16,33 +14,23 @@ def test_happy_path(docker_url):
     client.connect()
     assert client._connected
     # test create db
-    client.create_database("test_happy_path")
+    client.create_database("test_happy_path", prefixes={"doc": "foo://"})
     init_commit = client._get_current_commit()
     assert client._db == "test_happy_path"
     assert "test_happy_path" in client.list_databases()
+    assert client._context.get("doc") == "foo://"
+    assert len(client.get_commit_history()) == 1
     # test adding doctype
     WOQLQuery().doctype("Station").execute(client)
-    assert client._commit_made == 1
     first_commit = client._get_current_commit()
     assert first_commit != init_commit
-    # test rollback
-    client.rollback()
-    assert client._commit_made == 0  # back to squre 1
-    assert client._get_current_commit() == init_commit
-    # test rollback twice
-    WOQLQuery().doctype("Station").execute(client)
-    WOQLQuery().doctype("Journey").execute(client)
-    assert client._commit_made == 2
-    second_commit = client._get_current_commit()
-    assert second_commit != init_commit
-    client.rollback(2)
-    assert client._commit_made == 0  # back to squre 1
-    assert client._get_current_commit() == init_commit
-    # test rollback too much
-    WOQLQuery().doctype("Station").execute(client)
-    assert client._commit_made == 1
-    with pytest.raises(ValueError):
-        client.rollback(2)
+    commit_history = client.get_commit_history()
+    assert len(commit_history) == 2
+    assert len(client.get_commit_history(2)) == 2
+    assert len(client.get_commit_history(1)) == 1
+    assert len(client.get_commit_history(0)) == 1
+    assert commit_history[0]["commit"] == first_commit.split("_")[-1]
+    assert commit_history[1]["commit"] == init_commit.split("_")[-1]
     client.delete_database("test_happy_path", "admin")
     assert client._db is None
     assert "test_happy_path" not in client.list_databases()

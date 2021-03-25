@@ -7,6 +7,7 @@ import pytest
 import requests
 
 from terminusdb_client.__version__ import __version__
+from terminusdb_client.woqlclient.errors import InterfaceError
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 
 from .mockResponse import MOCK_CAPABILITIES
@@ -210,12 +211,19 @@ def test_query(mocked_requests, mocked_requests2):
 
 
 @mock.patch("requests.get", side_effect=mocked_requests_get)
+def test_query_nodb(mocked_requests):
+    woql_client = WOQLClient("http://localhost:6363")
+    woql_client.connect(user="admin", account="admin", key="root")
+    with pytest.raises(InterfaceError):
+        woql_client.query(WoqlStar)
+
+
+@mock.patch("requests.get", side_effect=mocked_requests_get)
 @mock.patch.object(WOQLClient, "_dispatch_json")
-def test_query_commit_count(mocked_execute, mocked_requests):
+def test_query_commit_made(mocked_execute, mocked_requests):
     # mocked_execute.return_value = MOCK_CAPABILITIES
     woql_client = WOQLClient("http://localhost:6363")
     woql_client.connect(user="admin", account="admin", key="root", db="myDBName")
-    assert woql_client._commit_made == 0
     mocked_execute.return_value = {
         "@type": "api:WoqlResponse",
         "api:status": "api:success",
@@ -225,10 +233,8 @@ def test_query_commit_count(mocked_execute, mocked_requests):
         "inserts": 1,
         "transaction_retry_count": 0,
     }
-    woql_client.query(WoqlStar)
-    assert woql_client._commit_made == 1
-    woql_client.commit(WoqlStar)
-    assert woql_client._commit_made == 0
+    result = woql_client.query(WoqlStar)
+    assert result == "Commit successfully made."
 
 
 @mock.patch("requests.post", side_effect=mocked_requests_get)
@@ -250,3 +256,11 @@ def test_delete_database(mocked_requests, mocked_requests2):
 
     with pytest.raises(UserWarning):
         woql_client.delete_database()
+
+
+@mock.patch("requests.get", side_effect=mocked_requests_get)
+def test_rollback(mocked_requests):
+    woql_client = WOQLClient("http://localhost:6363")
+    woql_client.connect(user="admin", account="admin", key="root")
+    with pytest.raises(NotImplementedError):
+        woql_client.rollback()
