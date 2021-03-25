@@ -1066,7 +1066,7 @@ and the new value will be used in future requests to the server.</p>
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.reset">
 <code class="sig-name descname"><span class="pre">reset</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commit_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.reset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reset the current branch HEAD to the specified commit path.</p>
+<dd><p>Reset the current branch HEAD to the specified commit path. Doing it will reset the internal commit counter (self._commit_made) back to zero.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#terminusdb_client.woqlclient.errors.InterfaceError" title="terminusdb_client.woqlclient.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
