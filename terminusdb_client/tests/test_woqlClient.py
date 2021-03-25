@@ -256,3 +256,11 @@ def test_delete_database(mocked_requests, mocked_requests2):
 
     with pytest.raises(UserWarning):
         woql_client.delete_database()
+
+
+@mock.patch("requests.get", side_effect=mocked_requests_get)
+def test_rollback(mocked_requests):
+    woql_client = WOQLClient("http://localhost:6363")
+    woql_client.connect(user="admin", account="admin", key="root")
+    with pytest.raises(NotImplementedError):
+        woql_client.rollback()
