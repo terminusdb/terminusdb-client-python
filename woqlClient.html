@@ -243,6 +243,35 @@
 </dd></dl>
 
 <dl class="py method">
+<dt id="terminusdb_client.WOQLClient.get_commit_history">
+<code class="sig-name descname"><span class="pre">get_commit_history</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_history</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_commit_history" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the whole commit history.
+Commit history - Commit id, author of the commit, commit message and the commit time, in the current branch from the current commit, ordered backwards in time, will be returned in a dictionary in the follow format:
+{“commit_id”:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>{“author”: “commit_author”,</dt><dd><p>“message”: “commit_message”,
+“timestamp: &lt;datetime object of the timestamp&gt;” }</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>}</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>max_history</strong> (<em>int</em><em>, </em><em>optional</em>) – maximum number of commit that would return, counting backwards from your current commit. Default is set to 500. It need to be nop-negitive, if input is 0 it will still give the last commit.</p></li>
+<li><p><strong>Result</strong> – </p></li>
+<li><p><strong>------</strong> – </p></li>
+<li><p><strong>list</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="terminusdb_client.WOQLClient.rollback">
 <code class="sig-name descname"><span class="pre">rollback</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.rollback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rollback number of update queries set in steps.</p>
