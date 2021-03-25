@@ -5,6 +5,7 @@ import json
 import os
 import warnings
 from base64 import b64encode
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
 
 import requests
@@ -126,11 +127,105 @@ class WOQLClient:
                 "No database is connected. Please either connect to a database or create a new database."
             )
 
+    def get_commit_history(self, max_history: int = 500) -> list:
+        """Get the whole commit history.
+        Commit history - Commit id, author of the commit, commit message and the commit time, in the current branch from the current commit, ordered backwards in time, will be returned in a dictionary in the follow format:
+        {"commit_id":
+            {"author": "commit_author",
+             "message": "commit_message",
+             "timestamp: <datetime object of the timestamp>" }
+        }
+
+        Parameters
+        ----------
+        max_history: int, optional
+            maximum number of commit that would return, counting backwards from your current commit. Default is set to 500. It need to be nop-negitive, if input is 0 it will still give the last commit.
+        Result
+        ------
+        list
+        """
+        if max_history < 0:
+            raise ValueError("max_history needs to be non-negative.")
+        if max_history > 1:
+            limit_history = max_history - 1
+        else:
+            limit_history = 1
+        woql_query = (
+            WOQLQuery()
+            .using("_commits")
+            .limit(limit_history)
+            .select(
+                "v:cid",
+                "v:author",
+                "v:message",
+                "v:timestamp",
+                "v:cur_cid",
+                "v:cur_author",
+                "v:cur_message",
+                "v:cur_timestamp",
+            )
+            .triple("v:branch", "ref:branch_name", self.checkout())
+            .triple("v:branch", "ref:ref_commit", "v:commit")
+            .woql_or(
+                WOQLQuery()
+                .path(
+                    "v:commit",
+                    "ref:commit_parent+",
+                    "v:target_commit",
+                    "v:path",
+                )
+                .triple("v:target_commit", "ref:commit_id", "v:cid")
+                .triple("v:target_commit", "ref:commit_author", "v:author")
+                .triple("v:target_commit", "ref:commit_message", "v:message")
+                .triple("v:target_commit", "ref:commit_timestamp", "v:timestamp")
+                .triple("v:commit", "ref:commit_id", "v:cur_cid")
+                .triple("v:commit", "ref:commit_author", "v:cur_author")
+                .triple("v:commit", "ref:commit_message", "v:cur_message")
+                .triple("v:commit", "ref:commit_timestamp", "v:cur_timestamp"),
+                WOQLQuery()
+                .triple("v:commit", "ref:commit_id", "v:cur_cid")
+                .triple("v:commit", "ref:commit_author", "v:cur_author")
+                .triple("v:commit", "ref:commit_message", "v:cur_message")
+                .triple("v:commit", "ref:commit_timestamp", "v:cur_timestamp"),
+            )
+        )
+        result = self.query(woql_query).get("bindings")
+        result_item = result[0]
+        cid_list = [result_item["cur_cid"]["@value"]]
+        result_list = [
+            {
+                "commit": result_item["cur_cid"]["@value"],
+                "author": result_item["cur_author"]["@value"],
+                "message": result_item["cur_message"]["@value"],
+                "timstamp": datetime.fromtimestamp(
+                    int(result_item["cur_timestamp"]["@value"])
+                ),
+            }
+        ]
+        if max_history > 1:
+            for result_item in result:
+                if (
+                    result_item["cid"] != "system:unknown"
+                    and result_item["cid"]["@value"] not in cid_list
+                ):
+                    result_list.append(
+                        {
+                            "commit": result_item["cid"]["@value"],
+                            "author": result_item["author"]["@value"],
+                            "message": result_item["message"]["@value"],
+                            "timstamp": datetime.fromtimestamp(
+                                int(result_item["timestamp"]["@value"])
+                            ),
+                        }
+                    )
+                    cid_list.append(result_item["cid"]["@value"])
+        return result_list
+
     def _get_current_commit(self):
         woql_query = (
             WOQLQuery()
             .using("_commits")
-            .triple("v:branch", "ref:branch_name", "main")
+            .triple("v:branch", "ref:branch_name", self.checkout())
             .triple("v:branch", "ref:ref_commit", "v:commit")
         )
         result = self.query(woql_query)
