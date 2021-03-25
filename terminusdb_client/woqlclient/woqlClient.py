@@ -166,23 +166,31 @@ class WOQLClient:
             )
             .triple("v:branch", "ref:branch_name", self.checkout())
             .triple("v:branch", "ref:ref_commit", "v:commit")
-            .path(
-                "v:commit",
-                "ref:commit_parent+",
-                "v:target_commit",
-                "v:path",
+            .woql_or(
+                WOQLQuery()
+                .path(
+                    "v:commit",
+                    "ref:commit_parent+",
+                    "v:target_commit",
+                    "v:path",
+                )
+                .triple("v:target_commit", "ref:commit_id", "v:cid")
+                .triple("v:target_commit", "ref:commit_author", "v:author")
+                .triple("v:target_commit", "ref:commit_message", "v:message")
+                .triple("v:target_commit", "ref:commit_timestamp", "v:timestamp")
+                .triple("v:commit", "ref:commit_id", "v:cur_cid")
+                .triple("v:commit", "ref:commit_author", "v:cur_author")
+                .triple("v:commit", "ref:commit_message", "v:cur_message")
+                .triple("v:commit", "ref:commit_timestamp", "v:cur_timestamp"),
+                WOQLQuery()
+                .triple("v:commit", "ref:commit_id", "v:cur_cid")
+                .triple("v:commit", "ref:commit_author", "v:cur_author")
+                .triple("v:commit", "ref:commit_message", "v:cur_message")
+                .triple("v:commit", "ref:commit_timestamp", "v:cur_timestamp"),
             )
-            .triple("v:target_commit", "ref:commit_id", "v:cid")
-            .triple("v:target_commit", "ref:commit_author", "v:author")
-            .triple("v:target_commit", "ref:commit_message", "v:message")
-            .triple("v:target_commit", "ref:commit_timestamp", "v:timestamp")
-            .triple("v:commit", "ref:commit_id", "v:cur_cid")
-            .triple("v:commit", "ref:commit_author", "v:cur_author")
-            .triple("v:commit", "ref:commit_message", "v:cur_message")
-            .triple("v:commit", "ref:commit_timestamp", "v:cur_timestamp")
         )
-        result = self.query(woql_query)
-        result_item = result.get("bindings")[0]
+        result = self.query(woql_query).get("bindings")
+        result_item = result[0]
         cid_list = [result_item["cur_cid"]["@value"]]
         result_list = [
             {
@@ -195,9 +203,11 @@ class WOQLClient:
             }
         ]
         if max_history > 1:
-            for result_item in result.get("bindings"):
-                cid = result_item["cid"]["@value"]
-                if cid not in cid_list:
+            for result_item in result:
+                if (
+                    result_item["cid"] != "system:unknown"
+                    and result_item["cid"]["@value"] not in cid_list
+                ):
                     result_list.append(
                         {
                             "commit": result_item["cid"]["@value"],
@@ -208,7 +218,7 @@ class WOQLClient:
                             ),
                         }
                     )
-                    cid_list.append(cid)
+                    cid_list.append(result_item["cid"]["@value"])
         return result_list
 
     def _get_current_commit(self):
