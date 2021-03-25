@@ -274,17 +274,13 @@ Commit history - Commit id, author of the commit, commit message and the commit 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.rollback">
 <code class="sig-name descname"><span class="pre">rollback</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.rollback" title="Permalink to this definition">¶</a></dt>
-<dd><p>Rollback number of update queries set in steps.</p>
-<p>Steps need to be smaller than the number of update queries made in the session. Number of update queries made in the session is counted from the last connection or commit() call.</p>
+<dd><p>Curently not implementated. Please check back later.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>steps</strong> (<em>int</em>) – Number of update queries to rollback.</p>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – Since TerminusDB currently does not support open transactions. This method is not applicable to it’s usage. To reset commit head, use WOQLClient.reset</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>None</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -904,21 +900,8 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.commit">
-<code class="sig-name descname"><span class="pre">commit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">woql_query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.commit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents and locking the commits so it cannot be rollback further than this point with the same client objcet.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>woql_query</strong> (<em>dict</em><em> or </em><em>WOQLQuery object</em>) – A woql query as an object or dict</p></li>
-<li><p><strong>commit_mg</strong> (<em>str</em>) – A message that will be written to the commit log to describe the change</p></li>
-<li><p><strong>file_dict</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]) – File dictionary to be associated with post name =&gt; filename, for multipart POST</p></li>
-</ul>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">WOQLClient</span><span class="p">(</span><span class="n">server</span><span class="o">=</span><span class="s2">&quot;http://localhost:6363&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">commit</span><span class="p">(</span><span class="n">woql</span><span class="p">,</span> <span class="s2">&quot;updating graph&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
+<code class="sig-name descname"><span class="pre">commit</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.commit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Not implementated: open transactions currently not suportted. Please check back later.</p>
 </dd></dl>
 
 <dl class="py method">
