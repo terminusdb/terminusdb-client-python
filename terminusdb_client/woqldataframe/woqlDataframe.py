@@ -1,17 +1,20 @@
 # woqlDataframe.py
 
 import warnings
+from importlib import import_module
 
-try:
-    import numpy as np
-    import pandas as pd
-except ImportError:
-    msg = (
-        "woqlDataframe requirements are not installed.\n\n"
-        "If you want to use woqlDataframe, please pip install as follows:\n\n"
-        "  python -m pip install -U terminus-client-python[dataframe]"
-    )
-    warnings.warn(msg)
+
+def _import_needed(package):
+    try:
+        module = import_module(package)
+        return module
+    except ImportError:
+        msg = (
+            "woqlDataframe requirements are not installed.\n\n"
+            "If you want to use woqlDataframe, please pip install as follows:\n\n"
+            "  python -m pip install -U terminus-client-python[dataframe]"
+        )
+        raise ImportError(msg)
 
 
 class EmptyException(Exception):
@@ -163,6 +166,7 @@ def type_map(ty_rdf):
     query_to_df : put the result of the query into a pandas DataFrame
     type_value_map : converts values of different WOQL rdf types to numpy data types values
     """
+    np = _import_needed("numpy")
     convert_mapping = {
         "http://www.w3.org/2001/XMLSchema#string": np.unicode_,
         "http://www.w3.org/2001/XMLSchema#integer": np.int,
@@ -203,6 +207,7 @@ def type_value_map(ty_rdf, value):
     query_to_df : put the result of the query into a pandas DataFrame
     type_map : mapping types from WOQL rdf to numpy data types
     """
+    np = _import_needed("numpy")
     if ty_rdf == "http://www.w3.org/2001/XMLSchema#string":
         return value
     elif ty_rdf == "http://www.w3.org/2001/XMLSchema#integer":
@@ -282,6 +287,7 @@ def result_to_df(query):
     WOQLQuery : create a WOQLQuery
     WOQLClient : create a WOQLClient
     """
+    pd = _import_needed("pandas")
     header = extract_header(query)
     dtypes = {}
     column_names = []
