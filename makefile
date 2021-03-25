@@ -36,9 +36,9 @@ publish_release:
 	git pull origin dev
 	git pull origin master
 	bumpversion minor
-	git push --no-verify origin dev
-	git push --no-verify origin dev:master
-	git push --no-verify origin --tags
+	git push origin dev
+	git push origin dev:master
+	git push origin --tags
 
 publish_release_major:
 	tox
@@ -47,6 +47,6 @@ publish_release_major:
 	git pull origin dev
 	git pull origin master
 	bumpversion major
-	git push --no-verify origin dev
-	git push --no-verify origin dev:master
-	git push --no-verify origin --tags
+	git push origin dev
+	git push origin dev:master
+	git push origin --tags
