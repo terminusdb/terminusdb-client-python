@@ -253,11 +253,11 @@ class WOQLClient:
         Raises
         ----------
         NotImplementedError
-            Since TerminusDB currently does not support open transessions. This method is not applicable to it's usage. To reset commit head, use WOQLClient.reset
+            Since TerminusDB currently does not support open transactions. This method is not applicable to it's usage. To reset commit head, use WOQLClient.reset
 
         """
         raise NotImplementedError(
-            "Open transections are currently not supported. To reset commit head, check WOQLClient.reset"
+            "Open transactions are currently not supported. To reset commit head, check WOQLClient.reset"
         )
 
     def copy(self) -> "WOQLClient":
@@ -1038,7 +1038,7 @@ class WOQLClient:
         )
 
     def commit(self):
-        """Not implementated: open transections currently not suportted. Please check back later."""
+        """Not implementated: open transactions currently not suportted. Please check back later."""
 
     def query(
         self,
