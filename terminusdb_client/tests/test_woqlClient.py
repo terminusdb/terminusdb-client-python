@@ -264,3 +264,10 @@ def test_rollback(mocked_requests):
     woql_client.connect(user="admin", account="admin", key="root")
     with pytest.raises(NotImplementedError):
         woql_client.rollback()
+
+
+# @mock.patch("requests.get", side_effect=mocked_requests_get)
+def test_copy_client():
+    woql_client = WOQLClient("http://localhost:6363")
+    copy_client = woql_client.copy()
+    assert id(woql_client) != copy_client
