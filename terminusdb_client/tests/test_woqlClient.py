@@ -304,3 +304,4 @@ def test_set_db(mocked_requests):
     woql_client.connect()
     woql_client.set_db("my_db")
     assert woql_client._db == "my_db"
+    assert woql_client.db() == "my_db"
