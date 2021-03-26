@@ -264,3 +264,47 @@ def test_rollback(mocked_requests):
     woql_client.connect(user="admin", account="admin", key="root")
     with pytest.raises(NotImplementedError):
         woql_client.rollback()
+
+
+def test_copy_client():
+    woql_client = WOQLClient("http://localhost:6363")
+    copy_client = woql_client.copy()
+    assert id(woql_client) != copy_client
+
+
+@mock.patch("requests.get", side_effect=mocked_requests_get)
+def test_basic_auth(mocked_requests):
+    woql_client = WOQLClient("http://localhost:6363")
+    result = woql_client.basic_auth()
+    assert result is None
+    woql_client.connect(user="admin", account="admin", key="root")
+    result = woql_client.basic_auth()
+    assert result == "admin:root"
+    assert woql_client.account() == "admin"
+    assert woql_client.user() == "admin"
+
+
+@mock.patch("requests.get", side_effect=mocked_requests_get)
+def test_remote_auth(mocked_requests):
+    woql_client = WOQLClient("http://localhost:6363")
+    result = woql_client.remote_auth()
+    assert result is None
+    woql_client.connect(user="admin", account="admin", key="root")
+    result = woql_client.remote_auth()
+    assert result is None
+    auth_setting = {"type": "jwt", "user": "admin", "key": "<token>"}
+    woql_client.remote_auth(auth_setting)
+    result = woql_client.remote_auth()
+    assert result == auth_setting
+
+
+@mock.patch("requests.get", side_effect=mocked_requests_get)
+def test_set_db(mocked_requests):
+    woql_client = WOQLClient("http://localhost:6363")
+    with pytest.raises(InterfaceError):
+        woql_client.set_db("my_db")
+    woql_client.connect()
+    woql_client.set_db("my_db")
+    assert woql_client._db == "my_db"
+    assert woql_client.db() == "my_db"
+    assert woql_client.repo() == "local"

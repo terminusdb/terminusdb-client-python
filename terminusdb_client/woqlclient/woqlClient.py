@@ -353,6 +353,8 @@ class WOQLClient:
         >>> client.remote_auth({"type": "jwt", "user": "admin", "key": "<token>"})
         {'type': 'jwt', 'user': 'admin', 'key': '<token>'}
         """
+        if not self._connected:
+            return None
         if auth_info is not None:
             self._remote_auth = auth_info
         return self._remote_auth
@@ -378,6 +380,7 @@ class WOQLClient:
         >>> client.set_db("database1")
         'database1'
         """
+        self._check_connection(check_db=False)
 
         if account is None:
             account = self._account
@@ -981,7 +984,7 @@ class WOQLClient:
         graph_type: Optional[str] = "instance",
         graph_id: Optional[str] = "main",
     ) -> None:
-        """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
+        """Updates the contents of the specified graph with the csv. Replaces the entire file contents
 
         Parameters
         ----------
@@ -1022,7 +1025,7 @@ class WOQLClient:
         graph_type: Optional[str] = "instance",
         graph_id: Optional[str] = "main",
     ) -> None:
-        """Inserts into the specified graph with the triples encoded in turtle format.
+        """Inserts into the specified graph with the csv.
 
         Parameters
         ----------
