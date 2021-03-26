@@ -23,7 +23,9 @@ def test_happy_path(docker_url):
     # test adding doctype
     WOQLQuery().doctype("Station").execute(client)
     first_commit = client._get_current_commit()
+    target_commit = client._get_target_commit(1)
     assert first_commit != init_commit
+    assert target_commit == init_commit.split("_")[-1]
     commit_history = client.get_commit_history()
     assert len(commit_history) == 2
     assert len(client.get_commit_history(2)) == 2
