@@ -380,6 +380,7 @@ class WOQLClient:
         >>> client.set_db("database1")
         'database1'
         """
+        self._check_connection(check_db=False)
 
         if account is None:
             account = self._account

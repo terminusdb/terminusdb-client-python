@@ -294,3 +294,13 @@ def test_remote_auth(mocked_requests):
     woql_client.remote_auth(auth_setting)
     result = woql_client.remote_auth()
     assert result == auth_setting
+
+
+@mock.patch("requests.get", side_effect=mocked_requests_get)
+def test_set_db(mocked_requests):
+    woql_client = WOQLClient("http://localhost:6363")
+    with pytest.raises(InterfaceError):
+        woql_client.set_db("my_db")
+    woql_client.connect()
+    woql_client.set_db("my_db")
+    assert woql_client._db == "my_db"
