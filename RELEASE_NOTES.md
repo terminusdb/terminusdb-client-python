@@ -8,7 +8,7 @@
 
 ### Changes
 
-- Remove functionality of WOQLClient.commit() and WOQLClient.rollback()
+- Remove functionality of WOQLClient.commit(), WOQLClient.rollback()
 - Make import of pandas and numpy of WOQLDataFrame dynamic
 
 ### Bug Fixes / Improvements
