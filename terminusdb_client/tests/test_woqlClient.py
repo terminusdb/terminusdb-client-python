@@ -266,8 +266,17 @@ def test_rollback(mocked_requests):
         woql_client.rollback()
 
 
-# @mock.patch("requests.get", side_effect=mocked_requests_get)
 def test_copy_client():
     woql_client = WOQLClient("http://localhost:6363")
     copy_client = woql_client.copy()
     assert id(woql_client) != copy_client
+
+
+@mock.patch("requests.get", side_effect=mocked_requests_get)
+def test_basic_auth(mocked_requests):
+    woql_client = WOQLClient("http://localhost:6363")
+    result = woql_client.basic_auth()
+    assert result is None
+    woql_client.connect(user="admin", account="admin", key="root")
+    result = woql_client.basic_auth()
+    assert result == "admin:root"
