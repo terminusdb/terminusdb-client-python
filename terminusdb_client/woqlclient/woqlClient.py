@@ -353,6 +353,8 @@ class WOQLClient:
         >>> client.remote_auth({"type": "jwt", "user": "admin", "key": "<token>"})
         {'type': 'jwt', 'user': 'admin', 'key': '<token>'}
         """
+        if not self._connected:
+            return None
         if auth_info is not None:
             self._remote_auth = auth_info
         return self._remote_auth

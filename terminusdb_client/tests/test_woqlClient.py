@@ -280,3 +280,17 @@ def test_basic_auth(mocked_requests):
     woql_client.connect(user="admin", account="admin", key="root")
     result = woql_client.basic_auth()
     assert result == "admin:root"
+
+
+@mock.patch("requests.get", side_effect=mocked_requests_get)
+def test_remote_auth(mocked_requests):
+    woql_client = WOQLClient("http://localhost:6363")
+    result = woql_client.remote_auth()
+    assert result is None
+    woql_client.connect(user="admin", account="admin", key="root")
+    result = woql_client.remote_auth()
+    assert result is None
+    auth_setting = {"type": "jwt", "user": "admin", "key": "<token>"}
+    woql_client.remote_auth(auth_setting)
+    result = woql_client.remote_auth()
+    assert result == auth_setting
