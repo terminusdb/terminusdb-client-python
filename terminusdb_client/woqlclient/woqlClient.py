@@ -984,7 +984,7 @@ class WOQLClient:
         graph_type: Optional[str] = "instance",
         graph_id: Optional[str] = "main",
     ) -> None:
-        """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
+        """Updates the contents of the specified graph with the csv. Replaces the entire file contents
 
         Parameters
         ----------
@@ -1025,7 +1025,7 @@ class WOQLClient:
         graph_type: Optional[str] = "instance",
         graph_id: Optional[str] = "main",
     ) -> None:
-        """Inserts into the specified graph with the triples encoded in turtle format.
+        """Inserts into the specified graph with the csv.
 
         Parameters
         ----------

@@ -38,15 +38,24 @@ def test_happy_path(docker_url):
     assert "test_happy_path" not in client.list_databases()
 
 
-def _generate_csv():
-    file_path = "employee_file.csv"
-    with open(file_path, mode="w") as employee_file:
-        employee_writer = csv.writer(
-            employee_file, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL
-        )
-        employee_writer.writerow(["John Smith", "Accounting", "November"])
-        employee_writer.writerow(["Erica Meyers", "IT", "March"])
-    return file_path
+def _generate_csv(option):
+    if option == 1:
+        file_path = "employee_file.csv"
+        with open(file_path, mode="w") as employee_file:
+            employee_writer = csv.writer(
+                employee_file, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL
+            )
+            employee_writer.writerow(["John Smith", "Accounting", "November"])
+            employee_writer.writerow(["Erica Meyers", "IT", "March"])
+        return file_path
+    else:
+        file_path = "employee_file.csv"
+        with open(file_path, mode="w") as employee_file:
+            employee_writer = csv.writer(
+                employee_file, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL
+            )
+            employee_writer.writerow(["Cow Duck", "Marketing", "April"])
+        return file_path
 
 
 def _file_clean_up(filename):
@@ -65,14 +74,19 @@ def test_csv_handeling(docker_url):
     client._get_current_commit()
     assert client._db == "test_csv"
     assert "test_csv" in client.list_databases()
-    csv_file_path = _generate_csv()  # create testing csv
+    csv_file_path = _generate_csv(1)  # create testing csv
     try:
         client.insert_csv(csv_file_path)
         client.get_csv(csv_file_path, csv_output_name="new_" + csv_file_path)
         assert filecmp.cmp(csv_file_path, "new_" + csv_file_path)
+        csv_file_path = _generate_csv(2)
+        client.update_csv(csv_file_path)
+        client.get_csv(csv_file_path, csv_output_name="update_" + csv_file_path)
+        assert not filecmp.cmp("new_" + csv_file_path, "update_" + csv_file_path)
     finally:
         _file_clean_up(csv_file_path)
         _file_clean_up("new_" + csv_file_path)
+        _file_clean_up("update_" + csv_file_path)
 
 
 def test_create_graph(docker_url):
