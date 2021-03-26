@@ -281,6 +281,7 @@ def test_basic_auth(mocked_requests):
     result = woql_client.basic_auth()
     assert result == "admin:root"
     assert woql_client.account() == "admin"
+    assert woql_client.user() == "admin"
 
 
 @mock.patch("requests.get", side_effect=mocked_requests_get)
