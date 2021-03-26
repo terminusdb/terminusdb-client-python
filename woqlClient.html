@@ -245,8 +245,8 @@
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.get_commit_history">
 <code class="sig-name descname"><span class="pre">get_commit_history</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_history</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_commit_history" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the whole commit history.
-Commit history - Commit id, author of the commit, commit message and the commit time, in the current branch from the current commit, ordered backwards in time, will be returned in a dictionary in the follow format:
+<dd><dl>
+<dt>Get the whole commit history.</dt><dd><p>Commit history - Commit id, author of the commit, commit message and the commit time, in the current branch from the current commit, ordered backwards in time, will be returned in a dictionary in the follow format:
 {“commit_id”:</p>
 <blockquote>
 <div><dl class="simple">
@@ -256,17 +256,39 @@ Commit history - Commit id, author of the commit, commit message and the commit 
 </dl>
 </div></blockquote>
 <p>}</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>max_history</strong> (<em>int</em><em>, </em><em>optional</em>) – maximum number of commit that would return, counting backwards from your current commit. Default is set to 500. It need to be nop-negitive, if input is 0 it will still give the last commit.</p></li>
-<li><p><strong>Result</strong> – </p></li>
-<li><p><strong>------</strong> – </p></li>
-<li><p><strong>list</strong> – </p></li>
-</ul>
+<dl class="simple">
+<dt>max_history: int, optional</dt><dd><p>maximum number of commit that would return, counting backwards from your current commit. Default is set to 500. It need to be nop-negitive, if input is 0 it will still give the last commit.</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">terminusdb_client</span> <span class="kn">import</span> <span class="n">WOQLClient</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;https://127.0.0.1:6363&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">db</span><span class="o">=</span><span class="s2">&quot;bank_balance_example&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">get_commit_history</span><span class="p">()</span>
+<span class="go">[{&#39;commit&#39;: &#39;s90wike9v5xibmrb661emxjs8k7ynwc&#39;, &#39;author&#39;: &#39;admin&#39;, &#39;message&#39;: &#39;Adding Jane&#39;, &#39;timstamp&#39;: datetime.da</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>tetime(2020, 9, 3, 15, 29, 34)}, {‘commit’: ‘1qhge8qlodajx93ovj67kvkrkxsw3pg’, ‘author’: <a class="reference external" href="mailto:'gavin&#37;&#52;&#48;terminusdb&#46;com">‘gavin<span>&#64;</span>terminusdb<span>&#46;</span>com</a>’, ‘m
+essage’: ‘Adding Jim’, ‘timstamp’: datetime.datetime(2020, 9, 3, 15, 29, 33)}, {‘commit’: ‘rciy1rfu5foj67ch00ow6f6n
+njjxe3i’, ‘author’: <a class="reference external" href="mailto:'gavin&#37;&#52;&#48;terminusdb&#46;com">‘gavin<span>&#64;</span>terminusdb<span>&#46;</span>com</a>’, ‘message’: ‘Update mike’, ‘timstamp’: datetime.datetime(2020, 9, 3, 15,</p>
+<blockquote>
+<div><p>29, 33)}, {‘commit’: ‘n4d86u8juzx852r2ekrega5hl838ovh’, ‘author’: <a class="reference external" href="mailto:'gavin&#37;&#52;&#48;terminusdb&#46;com">‘gavin<span>&#64;</span>terminusdb<span>&#46;</span>com</a>’, ‘message’: ‘Add mike’, ‘</p>
+</div></blockquote>
+<p>timstamp’: datetime.datetime(2020, 9, 3, 15, 29, 33)}, {‘commit’: ‘1vk2i8k8xce26p9jpi4zmq1h5vdqyuj’, ‘author’: ‘gav
+<a class="reference external" href="mailto:in&#37;&#52;&#48;terminusdb&#46;com">in<span>&#64;</span>terminusdb<span>&#46;</span>com</a>’, ‘message’: ‘Label for balance was wrong’, ‘timstamp’: datetime.datetime(2020, 9, 3, 15, 29, 33)
+}, {‘commit’: ‘9si4na9zv2qol9b189y92fia7ac3hbg’, ‘author’: <a class="reference external" href="mailto:'gavin&#37;&#52;&#48;terminusdb&#46;com">‘gavin<span>&#64;</span>terminusdb<span>&#46;</span>com</a>’, ‘message’: ‘Adding bank account
+object to schema’, ‘timstamp’: datetime.datetime(2020, 9, 3, 15, 29, 33)}, {‘commit’: ‘9egc4h0m36l5rbq1alr1fki6jbfu
+kuv’, ‘author’: ‘TerminusDB’, ‘message’: ‘internal system operation’, ‘timstamp’: datetime.datetime(2020, 9, 3, 15,</p>
+<blockquote>
+<div><p>29, 33)}]</p>
+<blockquote>
+<div><p>list</p>
+</div></blockquote>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
 </dd>
 </dl>
 </dd></dl>
