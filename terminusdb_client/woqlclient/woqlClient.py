@@ -126,20 +126,39 @@ class WOQLClient:
 
     def get_commit_history(self, max_history: int = 500) -> list:
         """Get the whole commit history.
-        Commit history - Commit id, author of the commit, commit message and the commit time, in the current branch from the current commit, ordered backwards in time, will be returned in a dictionary in the follow format:
-        {"commit_id":
-            {"author": "commit_author",
-             "message": "commit_message",
-             "timestamp: <datetime object of the timestamp>" }
-        }
+                Commit history - Commit id, author of the commit, commit message and the commit time, in the current branch from the current commit, ordered backwards in time, will be returned in a dictionary in the follow format:
+                {"commit_id":
+                    {"author": "commit_author",
+                     "message": "commit_message",
+                     "timestamp: <datetime object of the timestamp>" }
+                }
 
-        Parameters
-        ----------
-        max_history: int, optional
-            maximum number of commit that would return, counting backwards from your current commit. Default is set to 500. It need to be nop-negitive, if input is 0 it will still give the last commit.
-        Result
-        ------
-        list
+                Parameters
+                ----------
+                max_history: int, optional
+                    maximum number of commit that would return, counting backwards from your current commit. Default is set to 500. It need to be nop-negitive, if input is 0 it will still give the last commit.
+
+                Example
+                -------
+                >>> from terminusdb_client import WOQLClient
+                >>> client = WOQLClient("https://127.0.0.1:6363"
+                >>> client.connect(db="bank_balance_example")
+                >>> client.get_commit_history()
+                [{'commit': 's90wike9v5xibmrb661emxjs8k7ynwc', 'author': 'admin', 'message': 'Adding Jane', 'timstamp': datetime.da
+        tetime(2020, 9, 3, 15, 29, 34)}, {'commit': '1qhge8qlodajx93ovj67kvkrkxsw3pg', 'author': 'gavin@terminusdb.com', 'm
+        essage': 'Adding Jim', 'timstamp': datetime.datetime(2020, 9, 3, 15, 29, 33)}, {'commit': 'rciy1rfu5foj67ch00ow6f6n
+        njjxe3i', 'author': 'gavin@terminusdb.com', 'message': 'Update mike', 'timstamp': datetime.datetime(2020, 9, 3, 15,
+         29, 33)}, {'commit': 'n4d86u8juzx852r2ekrega5hl838ovh', 'author': 'gavin@terminusdb.com', 'message': 'Add mike', '
+        timstamp': datetime.datetime(2020, 9, 3, 15, 29, 33)}, {'commit': '1vk2i8k8xce26p9jpi4zmq1h5vdqyuj', 'author': 'gav
+        in@terminusdb.com', 'message': 'Label for balance was wrong', 'timstamp': datetime.datetime(2020, 9, 3, 15, 29, 33)
+        }, {'commit': '9si4na9zv2qol9b189y92fia7ac3hbg', 'author': 'gavin@terminusdb.com', 'message': 'Adding bank account
+        object to schema', 'timstamp': datetime.datetime(2020, 9, 3, 15, 29, 33)}, {'commit': '9egc4h0m36l5rbq1alr1fki6jbfu
+        kuv', 'author': 'TerminusDB', 'message': 'internal system operation', 'timstamp': datetime.datetime(2020, 9, 3, 15,
+         29, 33)}]
+
+                Result
+                ------
+                list
         """
         if max_history < 0:
             raise ValueError("max_history needs to be non-negative.")
@@ -1303,7 +1322,7 @@ class WOQLClient:
         return self._dispatch_json("post", self._rebase_url(), rc_args)
 
     def reset(self, commit_path: str) -> None:
-        """Reset the current branch HEAD to the specified commit path.
+        """Reset the current branch HEAD to the specified commit path. Doing it will reset the internal commit counter (self._commit_made) back to zero.
 
         Raises
         ------
@@ -1332,6 +1351,7 @@ class WOQLClient:
             self._reset_url(),
             {"commit_descriptor": commit_path},
         )
+        self._commit_made = 0
 
     def optimize(self, path: str) -> None:
         """Optimize the specified path.
