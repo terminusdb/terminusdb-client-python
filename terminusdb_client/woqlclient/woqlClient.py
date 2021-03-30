@@ -1324,7 +1324,7 @@ class WOQLClient:
         rc_args = {"rebase_from": rebase_source, "author": author, "message": message}
         return self._dispatch_json("post", self._rebase_url(), rc_args)
 
-    def reset(self, commit_path: str) -> None:
+    def reset(self, commit: str, use_path: bool = False) -> None:
         """Reset the current branch HEAD to the specified commit path. Doing it will reset the internal commit counter (self._commit_made) back to zero.
 
         Raises
@@ -1338,23 +1338,29 @@ class WOQLClient:
 
         Parameters
         ----------
-        commit_path : string
-            Path to the commit, for instance admin/database/local/commit/234980523ffaf93.
+        commit: string
+            Commit id or path to the commit (if use_path is True), for instance '234980523ffaf93' or 'admin/database/local/commit/234980523ffaf93'.
+        use_path : bool
+            Wheather or not the commit given is an id or path. Default using id and use_path is False.
 
         Examples
         --------
         >>> client = WOQLClient("https://127.0.0.1:6363/")
         >>> client.checkout("some_branch")
-        >>> client.reset('admin/database/local/commit/234980523ffaf93')
+        >>> client.reset('234980523ffaf93')
+        >>> client.reset('admin/database/local/commit/234980523ffaf93', use_path=True)
         """
 
         self._check_connection()
+        if use_path:
+            commit_path = commit
+        else:
+            commit_path = f"{self._account}/{self._db}/{self._repo}/commit/{commit}"
         self._dispatch(
             "post",
             self._reset_url(),
             {"commit_descriptor": commit_path},
         )
-        self._commit_made = 0
 
     def optimize(self, path: str) -> None:
         """Optimize the specified path.
