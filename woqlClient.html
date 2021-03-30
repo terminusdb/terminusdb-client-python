@@ -1087,7 +1087,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt id="terminusdb_client.WOQLClient.reset">
-<code class="sig-name descname"><span class="pre">reset</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commit_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.reset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">reset</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.reset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reset the current branch HEAD to the specified commit path. Doing it will reset the internal commit counter (self._commit_made) back to zero.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
@@ -1098,13 +1098,17 @@ and the new value will be used in future requests to the server.</p>
 <p>The “remote” repo can live in the local database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>commit_path</strong> (<em>string</em>) – Path to the commit, for instance admin/database/local/commit/234980523ffaf93.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>commit</strong> (<em>string</em>) – Commit id or path to the commit (if use_path is True), for instance ‘234980523ffaf93’ or ‘admin/database/local/commit/234980523ffaf93’.</p></li>
+<li><p><strong>use_path</strong> (<em>bool</em>) – Wheather or not the commit given is an id or path. Default using id and use_path is False.</p></li>
+</ul>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;https://127.0.0.1:6363/&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">checkout</span><span class="p">(</span><span class="s2">&quot;some_branch&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="s1">&#39;admin/database/local/commit/234980523ffaf93&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="s1">&#39;234980523ffaf93&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="s1">&#39;admin/database/local/commit/234980523ffaf93&#39;</span><span class="p">,</span> <span class="n">use_path</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
