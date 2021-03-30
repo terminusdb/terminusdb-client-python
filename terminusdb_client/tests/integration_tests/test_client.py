@@ -33,6 +33,10 @@ def test_happy_path(docker_url):
     assert len(client.get_commit_history(0)) == 1
     assert commit_history[0]["commit"] == first_commit.split("_")[-1]
     assert commit_history[1]["commit"] == init_commit.split("_")[-1]
+    # test resrt
+    client.reset(commit_history[1]["commit"])
+    assert client._get_current_commit() == init_commit
+
     client.delete_database("test_happy_path", "admin")
     assert client._db is None
     assert "test_happy_path" not in client.list_databases()
