@@ -1,6 +1,6 @@
 import pytest
 
-from terminusdb_client.woqlclient.errors import DatabaseError
+from terminusdb_client.errors import DatabaseError
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
