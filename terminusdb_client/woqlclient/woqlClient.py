@@ -12,8 +12,8 @@ import requests
 from urllib3.exceptions import InsecureRequestWarning
 
 from ..__version__ import __version__
+from ..errors import DatabaseError, InterfaceError
 from ..woqlquery.woql_query import WOQLQuery
-from .errors import DatabaseError, InterfaceError
 
 # WOQL client object
 # license Apache Version 2

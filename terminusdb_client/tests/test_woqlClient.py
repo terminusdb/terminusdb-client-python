@@ -7,7 +7,7 @@ import pytest
 import requests
 
 from terminusdb_client.__version__ import __version__
-from terminusdb_client.woqlclient.errors import InterfaceError
+from terminusdb_client.errors import InterfaceError
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 
 from .mockResponse import MOCK_CAPABILITIES
