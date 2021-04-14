@@ -20,9 +20,16 @@ class WOQLClass(type):
 class WOQLObject(metaclass=WOQLClass):
     properties = []
 
+    def __init__(self):
+        pass
+
 
 class Document(WOQLObject):
     pass
+
+
+class Enums(WOQLObject):
+    value_list = []
 
 
 class Property(metaclass=WOQLClass):
