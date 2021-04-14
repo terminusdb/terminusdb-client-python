@@ -72,24 +72,6 @@ class WOQLQuery:
         self._chain_ended = False
         self._contains_update = False
         self._triple_builder_context = {}
-        # operators which preserve global paging
-        # self._paging_transitive_properties = [
-        #     "select",
-        #     "from",
-        #     "start",
-        #     "when",
-        #     "opt",
-        #     "limit",
-        # ]
-        # self._update_operators = [
-        #     "woql:AddTriple",
-        #     "woql:DeleteTriple",
-        #     "woql:AddQuad",
-        #     "woql:DeleteQuad",
-        #     "woql:DeleteObject",
-        #     "woql:UpdateObject",
-        # ]
-
         self._vocab = SHORT_NAME_MAPPING
 
         # alias
@@ -830,11 +812,11 @@ class WOQLQuery:
         Parameters
         ----------
         sub : str
-            Subject
+            Subject, has to be a node (URI)
         pred : str
-            Predicate
+            Predicate, can be variable (prefix with "v:") or node
         obj : str
-            Object
+            Object, can be variable or node or value
         opt : bool
             weather or not this triple is optional, default to be False
 
