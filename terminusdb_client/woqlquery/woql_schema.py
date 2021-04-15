@@ -1,3 +1,6 @@
+from ..woqlclient.woqlClient import WOQLClient
+
+
 class WOQLClass(type):
     def __init__(cls, name, bases, nmspc):
         super().__init__(name, bases, nmspc)
@@ -6,6 +9,14 @@ class WOQLClass(type):
             cls.registry = set()
         cls.registry.add(cls)
         cls.registry -= set(bases)  # Remove base classes
+
+        if hasattr(cls, "domain"):
+            for item in cls.domain:
+                item.properties.add(cls)
+
+        if hasattr(cls, "properties"):
+            for item in cls.properties:
+                item.domain.add(cls)
 
     # Metamethods, called on class objects:
     def __iter__(cls):
@@ -18,7 +29,7 @@ class WOQLClass(type):
 
 
 class WOQLObject(metaclass=WOQLClass):
-    properties = []
+    properties = set()
 
     def __init__(self):
         pass
@@ -29,9 +40,21 @@ class Document(WOQLObject):
 
 
 class Enums(WOQLObject):
-    value_list = []
+    value_set = set()
 
 
 class Property(metaclass=WOQLClass):
-    domain = []
-    prop_range = []
+    domain = set()
+    prop_range = set()
+
+    def __init__(cls, name, bases, nmspc):
+        super().__init__(name, bases, nmspc)
+        for item in cls.domain:
+            item.properties.append(cls)
+            print("add domain:", cls.__name__)
+
+
+class WOQLSchema(list):
+    def commit(self, client: WOQLClient):
+        for item in self:
+            print(item)
