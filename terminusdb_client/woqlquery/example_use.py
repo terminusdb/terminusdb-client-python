@@ -20,13 +20,28 @@ class Address(WOQLObject):
 
 
 class Team(Enums):
+    """This is Team"""
+
     value_set = {"IT", "Marketing"}
 
 
 class AddressOf(Property):
     domain = [Employee]
+    prop_range = [Address]
 
 
-my_schema = WOQLSchema([WOQLObject, Property])
+print(Team.__name__)
+
+my_schema = WOQLSchema()
 
 my_schema.commit(None)
+
+
+class Title(Property):
+    domain = [Employee]
+    prop_range = ["xsd:string"]
+
+
+my_other_schema = WOQLSchema()
+
+my_other_schema.commit(None)

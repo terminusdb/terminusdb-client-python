@@ -54,7 +54,10 @@ class Property(metaclass=WOQLClass):
             print("add domain:", cls.__name__)
 
 
-class WOQLSchema(list):
+class WOQLSchema:
+    def __init__(self):
+        pass
+
     def commit(self, client: WOQLClient):
-        for item in self:
+        for item in [WOQLObject, Property]:
             print(item)
