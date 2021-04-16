@@ -121,6 +121,34 @@ class WOQLQuery:
         """
         return WOQLQuery().woql_and(self, other)
 
+    def __and__(self, other):
+        """Creates a logical AND with the argument passed, for WOQLQueries.
+
+        Parameters
+        ----------
+        other : WOQLQuery object
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        return WOQLQuery().woql_and(self, other)
+
+    def __or__(self, other):
+        """Creates a logical OR with the argument passed, for WOQLQueries.
+
+        Parameters
+        ----------
+        other : WOQLQuery object
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        return WOQLQuery().woql_or(self, other)
+
     # WOQLCore methods
     # def _parameter_error(self, message):
     #     """Basic Error handling"""

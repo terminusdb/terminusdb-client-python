@@ -123,15 +123,23 @@ class TestWoqlQueries:
         woql_object2 = WOQLQuery().triple("a", "b", "c") + WOQLQuery().triple(
             "1", "2", "3"
         )
+        woql_object3 = WOQLQuery().triple("a", "b", "c") & WOQLQuery().triple(
+            "1", "2", "3"
+        )
 
         assert woql_object.to_dict() == WOQL_AND_JSON
         assert woql_object2.to_dict() == WOQL_AND_JSON
+        assert woql_object3.to_dict() == WOQL_AND_JSON
 
     def test_woql_or_method(self):
         woql_object = WOQLQuery().woql_or(
             WOQLQuery().triple("a", "b", "c"), WOQLQuery().triple("1", "2", "3")
         )
+        woql_object2 = WOQLQuery().triple("a", "b", "c") | WOQLQuery().triple(
+            "1", "2", "3"
+        )
         assert woql_object.to_dict() == WOQL_OR_JSON
+        assert woql_object2.to_dict() == WOQL_OR_JSON
 
     def test_when_method(self):
 
