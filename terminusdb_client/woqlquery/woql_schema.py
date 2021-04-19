@@ -6,6 +6,14 @@ from ..woqlclient.woqlClient import WOQLClient
 class WOQLClass(type):
     def __init__(cls, name, bases, nmspc):
         super().__init__(name, bases, nmspc)
+<<<<<<< HEAD
+=======
+        # cls.registry holds all subclasses
+        # if not hasattr(cls, "registry"):
+        #     cls.registry = set()
+        # cls.registry.add(cls)
+        # cls.registry -= set(bases)  # Remove base classes
+>>>>>>> 967b6a0a09432d84cc54e6233d0205bd80d40654
 
         if cls.schema is not None:
             if hasattr(cls, "domain"):
@@ -28,6 +36,7 @@ class WOQLClass(type):
             for item in cls.properties:
                 item.domain.add(cls)
 
+<<<<<<< HEAD
     def __str__(cls):
         if hasattr(cls, "value_set"):
             return (
@@ -45,6 +54,20 @@ class WOQLClass(type):
                 + "has range: "
                 + ", ".join([rang for rang in cls.prop_range])
             )
+=======
+    # Metamethods, called on class objects:
+    # def __iter__(cls):
+    #     if cls.schema is not None and hasattr(cls.schema, "registry"):
+    #         return iter(cls.schema.registry)
+    #
+    def __str__(cls):
+        # if cls.schema is not None and hasattr(cls.schema, "registry"):
+        #     if cls in cls.schema.registry:
+        #         return cls.__name__
+        #     return cls.__name__ + ": " + ", ".join([sc.__name__ for sc in cls])
+        if hasattr(cls, "value_set"):
+            return cls.__name__ + ": " + ", ".join([val for val in cls.value_set])
+>>>>>>> 967b6a0a09432d84cc54e6233d0205bd80d40654
         return cls.__name__
 
 
