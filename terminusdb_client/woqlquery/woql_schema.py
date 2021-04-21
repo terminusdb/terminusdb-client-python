@@ -53,7 +53,7 @@ class WOQLObject(metaclass=WOQLClass):
 
 
 class Document(WOQLObject):
-    pass
+    is_doc = True
 
 
 class Enums(WOQLObject):
@@ -74,30 +74,42 @@ class WOQLSchema:
     def commit(self, client: WOQLClient):
         query = []
         parents = {}
-        for obj in self.object:
+        for obj in iter(self.object):
             for sub in obj.__subclasses__():
                 if sub in parents:
                     parents[sub].append(obj)
                 else:
                     parents[sub] = [obj]
-        for obj in self.object:
+
+        for obj in iter(self.object):
             comment = obj.__doc__ if obj.__doc__ else ""
             label = obj.__name__
             obj_iri = "scm:" + label
-            parent_list = parents[obj]
-            for parent in parent_list:
+            if obj in parents:
+                parent_list = parents[obj]
+                for parent in parent_list:
+                    query.append(
+                        WQ().add_quad(
+                            obj_iri,
+                            "rdfs:subClassOf",
+                            "scm:" + parent.__name__,
+                            "schema",
+                        )
+                    )
+            if hasattr(obj, "is_doc"):
                 query.append(
-                    WQ().add_triple(
-                        obj_iri, "rdfs:subClassOf", "scm:" + parent.__name__
+                    WQ().add_quad(
+                        obj_iri, "rdfs:subClassOf", "terminus:Document", "schema"
                     )
                 )
+
             query.append(
                 WQ()
-                .add_triple(obj_iri, "rdf:type", WQ().iri("owl:Class"))
-                .add_triple(obj_iri, "rdfs:comment", comment)
-                .add_triple(obj_iri, "rdfs:label", label)
+                .add_quad(obj_iri, "rdf:type", WQ().iri("owl:Class"), "schema")
+                .add_quad(obj_iri, "rdfs:comment", comment, "schema")
+                .add_quad(obj_iri, "rdfs:label", label, "schema")
             )
-        for prop in property:
+        for prop in iter(self.property):
             comment = prop.__doc__ if prop.__doc__ else ""
             label = prop.__name__
             prop_iri = "scm:" + label
@@ -110,16 +122,14 @@ class WOQLSchema:
                 prop_type = "owl:ObjectProperty"
             query.append(
                 WQ()
-                .add_triple(prop_iri, "rdf:type", WQ().iri(prop_type))
-                .add_triple(prop_iri, "rdfs:comment", comment)
-                .add_triple(prop_iri, "rdfs:label", label)
-                .add_tryple(prop_iri, "rdfs:domain", domain)
-                .add_tryple(prop_iri, "rdfs:range", prop_range)
+                .add_quad(prop_iri, "rdf:type", WQ().iri(prop_type), "schema")
+                .add_quad(prop_iri, "rdfs:comment", comment, "schema")
+                .add_quad(prop_iri, "rdfs:label", label, "schema")
+                .add_quad(prop_iri, "rdfs:domain", domain, "schema")
+                .add_quad(prop_iri, "rdfs:range", prop_range, "schema")
             )
 
-        WQ().using(client.db() + "/local/branch/main/schema/main").woql_and(
-            *query
-        ).execute(client)
+        WQ().woql_and(*query).execute(client)
 
     def all_obj(self):
         return self.object
