@@ -44,18 +44,6 @@ class PostCode(Property):
     schema = my_schema
 
 
-def test_schema_construct():
-    assert my_schema.all_obj() == {Employee, Address, Team}
-    assert my_schema.all_prop() == {AddressOf, Title, PostCode}
-    assert Employee.properties == {AddressOf, Title}
-
-
-def test_schema_copy():
-    copy_schema = my_schema.copy()
-    assert copy_schema.all_obj() == {Employee, Address, Team}
-    assert copy_schema.all_prop() == {AddressOf, Title, PostCode}
-
-
 def test_happy_schema(docker_url):
     # create client
     client = WOQLClient(docker_url)
