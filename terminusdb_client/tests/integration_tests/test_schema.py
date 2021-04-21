@@ -32,6 +32,30 @@ class AddressOf(Property):
     schema = my_schema
 
 
+class Title(Property):
+    domain = Employee
+    prop_range = "xsd:string"
+    schema = my_schema
+
+
+class PostCode(Property):
+    domain = Address
+    prop_range = "xsd:string"
+    schema = my_schema
+
+
+def test_schema_construct():
+    assert my_schema.all_obj() == {Employee, Address, Team}
+    assert my_schema.all_prop() == {AddressOf, Title, PostCode}
+    assert Employee.properties == {AddressOf, Title}
+
+
+def test_schema_copy():
+    copy_schema = my_schema.copy()
+    assert copy_schema.all_obj() == {Employee, Address, Team}
+    assert copy_schema.all_prop() == {AddressOf, Title, PostCode}
+
+
 def test_happy_schema(docker_url):
     # create client
     client = WOQLClient(docker_url)
@@ -45,4 +69,4 @@ def test_happy_schema(docker_url):
     properties = set()
     for item in WOQLLib().property().execute(client).get("bindings"):
         properties.add(item["Property Name"]["@value"])
-    assert properties == {"AddressOf"}
+    assert properties == {"AddressOf", "Title", "PostCode"}

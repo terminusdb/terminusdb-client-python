@@ -9,44 +9,51 @@ class WOQLClass(type):
         super().__init__(name, bases, nmspc)
 
         if cls.schema is not None:
-            if hasattr(cls, "domain"):
+            if hasattr(cls, "domain") and cls.domain is not None:
+                print(cls.domain)
                 if not hasattr(cls.schema, "property"):
                     cls.schema.property = set()
                 cls.schema.property.add(cls)
+                if cls.domain.properties is None:
+                    cls.domain.properties = set()
+                cls.domain.properties.add(cls)
                 # cls.schema.property -= set(bases)  # Remove base classes
 
             if hasattr(cls, "properties"):
                 if not hasattr(cls.schema, "object"):
                     cls.schema.object = set()
                 cls.schema.object.add(cls)
+                if cls.properties:
+                    for item in cls.properties:
+                        item.domain = cls
                 # cls.schema.object -= set(bases)  # Remove base classes
 
-        if hasattr(cls, "domain") and cls.domain is not None:
-            cls.domain.properties.add(cls)
+        # if hasattr(cls, "domain") and cls.domain is not None:
+        #     cls.domain.properties.add(cls)
 
-        if hasattr(cls, "properties"):
-            for item in cls.properties:
-                item.domain = cls
+        # if hasattr(cls, "properties"):
+        #     for item in cls.properties:
+        #         item.domain = cls
 
     def __str__(cls):
-        if hasattr(cls, "value_set"):
-            return (
-                cls.__name__ + ", values: " + ", ".join([val for val in cls.value_set])
-            )
-        if hasattr(cls, "properties"):
-            return (
-                cls.__name__
-                + "has properties: "
-                + ", ".join([prop for prop in cls.properties])
-            )
-        if hasattr(cls, "prop_range"):
-            return cls.__name__ + "has range: " + cls.prop_range
+        # if hasattr(cls, "value_set"):
+        #     return (
+        #         cls.__name__ + ", values: " + ", ".join([val for val in cls.value_set])
+        #     )
+        # if hasattr(cls, "properties"):
+        #     return (
+        #         cls.__name__
+        #         + "has properties: "
+        #         + ", ".join([prop for prop in cls.properties])
+        #     )
+        # if hasattr(cls, "prop_range"):
+        #     return cls.__name__ + "has range: " + cls.prop_range
         return cls.__name__
 
 
 class WOQLObject(metaclass=WOQLClass):
     schema = None
-    properties = set()
+    properties = None
 
     def __init__(self):
         pass
