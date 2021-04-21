@@ -25,9 +25,6 @@ from .woqljson.woqlOrJson import WOQL_OR_JSON
 from .woqljson.woqlTrimJson import WOQL_TRIM_JSON
 from .woqljson.woqlWhenJson import WOQL_WHEN_JSON
 
-# import pprint
-
-
 pp = pprint.PrettyPrinter(indent=4)
 
 

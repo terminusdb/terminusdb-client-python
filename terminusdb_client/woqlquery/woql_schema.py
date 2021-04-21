@@ -21,13 +21,12 @@ class WOQLClass(type):
                 cls.schema.object.add(cls)
                 # cls.schema.object -= set(bases)  # Remove base classes
 
-        if hasattr(cls, "domain"):
-            for item in cls.domain:
-                item.properties.add(cls)
+        if hasattr(cls, "domain") and cls.domain is not None:
+            cls.domain.properties.add(cls)
 
         if hasattr(cls, "properties"):
             for item in cls.properties:
-                item.domain.add(cls)
+                item.domain = cls
 
     def __str__(cls):
         if hasattr(cls, "value_set"):
@@ -41,11 +40,7 @@ class WOQLClass(type):
                 + ", ".join([prop for prop in cls.properties])
             )
         if hasattr(cls, "prop_range"):
-            return (
-                cls.__name__
-                + "has range: "
-                + ", ".join([rang for rang in cls.prop_range])
-            )
+            return cls.__name__ + "has range: " + cls.prop_range
         return cls.__name__
 
 
