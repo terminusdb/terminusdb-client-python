@@ -29,20 +29,20 @@ class Team(Enums):
 
 
 class AddressOf(Property):
-    domain = {Employee}
-    prop_range = {Address}
+    domain = Employee
+    prop_range = Address
     schema = my_schema
 
 
-print(my_schema)
+# print(my_schema)
 my_schema.commit(None)
 my_other_schema = my_schema.copy()
 # my_other_schema = WOQLSchema()
 
 
 class Title(Property):
-    domain = {Employee}
-    prop_range = {"xsd:string"}
+    domain = Employee
+    prop_range = "xsd:string"
     schema = my_other_schema
 
 
@@ -58,4 +58,4 @@ my_other_schema.commit(None)
 # for item in my_other_schema.all_prop():
 #     print(item)
 
-print(Team)
+# print(Team)

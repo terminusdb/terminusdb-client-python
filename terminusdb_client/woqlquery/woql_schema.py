@@ -1,6 +1,7 @@
 from copy import deepcopy
 
 from ..woqlclient.woqlClient import WOQLClient
+from .woql_query import WOQLQuery as WQ
 
 
 class WOQLClass(type):
@@ -66,8 +67,8 @@ class Enums(WOQLObject):
 
 class Property(metaclass=WOQLClass):
     schema = None
-    domain = set()
-    prop_range = set()
+    domain = None
+    prop_range = None
     cardinality = None
 
 
@@ -76,13 +77,60 @@ class WOQLSchema:
         pass
 
     def commit(self, client: WOQLClient):
-        pass
+        query = []
+        parents = {}
+        for obj in self.object:
+            for sub in obj.__subclasses__():
+                if sub in parents:
+                    parents[sub].append(obj)
+                else:
+                    parents[sub] = [obj]
+        for obj in self.object:
+            comment = obj.__doc__ if obj.__doc__ else ""
+            label = obj.__name__
+            obj_iri = "scm:" + label
+            parent_list = parents[obj]
+            for parent in parent_list:
+                query.append(
+                    WQ().add_triple(
+                        obj_iri, "rdfs:subClassOf", "scm:" + parent.__name__
+                    )
+                )
+            query.append(
+                WQ()
+                .add_triple(obj_iri, "rdf:type", WQ().iri("owl:Class"))
+                .add_triple(obj_iri, "rdfs:comment", comment)
+                .add_triple(obj_iri, "rdfs:label", label)
+            )
+        for prop in property:
+            comment = prop.__doc__ if prop.__doc__ else ""
+            label = prop.__name__
+            prop_iri = "scm:" + label
+            domain = "scm:" + prop.domain.__name__
+            if isinstance(prop.prop_range, str):
+                prop_range = prop.prop_range
+                prop_type = "owl:DatatypeProperty"
+            else:
+                prop_range = "scm:" + prop.prop_range.__name__
+                prop_type = "owl:ObjectProperty"
+            query.append(
+                WQ()
+                .add_triple(prop_iri, "rdf:type", WQ().iri(prop_type))
+                .add_triple(prop_iri, "rdfs:comment", comment)
+                .add_triple(prop_iri, "rdfs:label", label)
+                .add_tryple(prop_iri, "rdfs:domain", domain)
+                .add_tryple(prop_iri, "rdfs:range", prop_range)
+            )
+
+        WQ().using(client.db() + "/local/branch/main/schema/main").woql_and(
+            *query
+        ).execute(client)
 
     def all_obj(self):
-        return iter(self.object)
+        return self.object
 
     def all_prop(self):
-        return iter(self.property)
+        return self.property
 
     def copy(self):
         return deepcopy(self)
