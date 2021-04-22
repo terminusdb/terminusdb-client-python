@@ -3334,7 +3334,7 @@ class WOQLQuery:
         cls: str,
         clslabel="",
         clsdesc="",
-        choices=[],
+        choices=None,
         graph="schema",
         parent=None,
     ):
@@ -3352,6 +3352,8 @@ class WOQLQuery:
         if parent:
             wq.parent(parent)
         confs = [wq]
+        if choices is None:
+            choices = []
         for i, choice in enumerate(choices):
             if not choice:
                 continue

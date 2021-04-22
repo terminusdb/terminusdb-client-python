@@ -1098,7 +1098,9 @@ class WOQLClient:
             request_woql_query = woql_query.to_dict()
         else:
             request_woql_query = woql_query
-        if request_woql_query.get("@context") is not None:
+        if request_woql_query.get("@context") and isinstance(
+            request_woql_query.get("@context"), dict
+        ):
             request_woql_query["@context"].update(self._context)
         else:
             request_woql_query["@context"] = self._context

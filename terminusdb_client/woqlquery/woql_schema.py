@@ -20,15 +20,9 @@ class WOQLClass(type):
 
     def __str__(cls):
         if hasattr(cls, "value_set"):
-            return (
-                cls.__name__ + ", values: " + ", ".join([val for val in cls.value_set])
-            )
+            return cls.__name__ + ", values: " + ", ".join([cls.value_set])
         if cls.properties:
-            return (
-                cls.__name__
-                + "has properties: "
-                + ", ".join([prop for prop in cls.properties])
-            )
+            return cls.__name__ + "has properties: " + ", ".join([cls.properties])
         return cls.__name__
 
 
