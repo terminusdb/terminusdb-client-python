@@ -440,9 +440,13 @@ class WOQLQuery:
                 if native_context:
                     return native_context
 
-    def _context(self, current_context):
+    def _context(self, current_context=None):
         """Retrieves the value of the current json-ld context"""
-        self._cursor["@context"] = current_context
+        if self._cursor.get("@context") is None:
+            self._cursor["@context"] = {}
+        if current_context is not None:
+            self._cursor["@context"].update(current_context)
+        return self
 
     def execute(self, client, commit_msg=None, file_dict=None):
         """Executes the query using the passed client to connect to a server
@@ -3327,36 +3331,36 @@ class WOQLQuery:
 
     def generate_choice_list(
         self,
-        cls=None,
-        clslabel=None,
-        clsdesc=None,
-        choices=None,
-        graph=None,
+        cls: str,
+        clslabel="",
+        clsdesc="",
+        choices=[],
+        graph="schema",
         parent=None,
     ):
-        if not graph:
-            graph = self._graph
         clist = []
         if ":" not in cls:
             listid = "_:" + cls
         else:
             listid = "_:" + cls.split(":")[1]
         lastid = listid
+        if not clslabel:
+            clslabel = cls
         wq = WOQLQuery().add_class(cls, graph).label(clslabel)
         if clsdesc:
             wq.description(clsdesc)
         if parent:
             wq.parent(parent)
         confs = [wq]
-        for i in choices:
-            if not choices[i]:
+        for i, choice in enumerate(choices):
+            if not choice:
                 continue
-            if type(choices[i]) is list:
-                chid = choices[i][0]
-                clab = choices[i][1]
-                desc = choices[i][2] if len(choices[i]) >= 3 else False
+            if type(choice) is list:
+                chid = choice[0]
+                clab = choice[1]
+                desc = choice[2] if len(choice) >= 3 else False
             else:
-                chid = choices[i]
+                chid = choice
                 clab = utils.label_from_url(chid)
                 desc = False
             cq = WOQLQuery().insert(chid, cls, graph).label(clab)
@@ -3364,16 +3368,24 @@ class WOQLQuery:
                 cq.description(desc)
             confs.append(cq)
             if i < len(choices) - 1:
-                nextid = listid + "_" + i
+                nextid = listid + "_" + str(i)
             else:
                 nextid = "rdf:nil"
-            clist.append(WOQLQuery().add_quad(lastid, "rdf:first", chid, graph))
-            clist.append(WOQLQuery().add_quad(lastid, "rdf:rest", nextid, graph))
+            clist.append(
+                WOQLQuery().add_quad(lastid, "rdf:first", WOQLQuery().iri(chid), graph)
+            )
+            clist.append(
+                WOQLQuery().add_quad(lastid, "rdf:rest", WOQLQuery().iri(nextid), graph)
+            )
             lastid = nextid
         oneof = WOQLQuery().woql_and(
-            WOQLQuery().add_quad(cls, "owl:oneOf", listid, graph), *clist
+            WOQLQuery().add_quad(cls, "owl:oneOf", WOQLQuery().iri(listid), graph),
+            *clist,
         )
-        return WOQLQuery().woql_and(*confs, oneof)
+        result = WOQLQuery().woql_and(*confs, oneof)
+        if result._cursor.get("@context") is None:
+            result._context({"_": "_:"})
+        return result
 
     def libs(self, libs, parent, graph, prefix):
         bits = []

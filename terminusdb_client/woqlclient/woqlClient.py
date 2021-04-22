@@ -1098,7 +1098,10 @@ class WOQLClient:
             request_woql_query = woql_query.to_dict()
         else:
             request_woql_query = woql_query
-        request_woql_query["@context"] = self._context
+        if request_woql_query.get("@context") is not None:
+            request_woql_query["@context"].update(self._context)
+        else:
+            request_woql_query["@context"] = self._context
         query_obj["query"] = request_woql_query
         # request_file_dict: Optional[Dict[str, Tuple[str, Union[str, BinaryIO], str]]]
         if file_dict is not None and type(file_dict) is dict:

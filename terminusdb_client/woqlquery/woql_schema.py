@@ -109,9 +109,11 @@ class WOQLSchema:
                     )
                 )
             elif hasattr(obj, "value_set"):
-                choice_list = list(map(obj.value_set, lambda x: "doc:" + x))
+                choice_list = list(map(lambda x: "doc:" + x, obj.value_set))
                 query.append(
-                    WQ().generate_choice_list(obj, choices=choice_list, graph="schema")
+                    WQ().generate_choice_list(
+                        "scm:" + obj.__name__, choices=choice_list, graph="schema"
+                    )
                 )
 
             query.append(
@@ -140,7 +142,7 @@ class WOQLSchema:
                 .add_quad(prop_iri, "rdfs:range", prop_range, "schema")
             )
 
-        WQ().woql_and(*query).execute(client)
+        WQ().woql_and(*query)._context({"_": "_:"}).execute(client)
 
     def all_obj(self):
         return self.object
