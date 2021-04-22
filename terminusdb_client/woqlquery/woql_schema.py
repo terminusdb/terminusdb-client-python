@@ -15,6 +15,8 @@ class WOQLClass(type):
             if cls.properties:
                 for item in cls.properties:
                     item.domain = cls
+            if hasattr(cls, "value_set") and cls.value_set is None:
+                cls.value_set = set()
 
     def __str__(cls):
         if hasattr(cls, "value_set"):
@@ -61,7 +63,7 @@ class Document(WOQLObject):
 
 
 class Enums(WOQLObject):
-    value_set = set()
+    value_set = None
 
 
 class Property(metaclass=WOQLProperty):
@@ -105,6 +107,11 @@ class WOQLSchema:
                     WQ().add_quad(
                         obj_iri, "rdfs:subClassOf", "terminus:Document", "schema"
                     )
+                )
+            elif hasattr(obj, "value_set"):
+                choice_list = list(map(obj.value_set, lambda x: "doc:" + x))
+                query.append(
+                    WQ().generate_choice_list(obj, choices=choice_list, graph="schema")
                 )
 
             query.append(
