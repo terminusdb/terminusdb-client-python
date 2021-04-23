@@ -71,7 +71,7 @@ class WOQLSchema:
     def __init__(self):
         pass
 
-    def commit(self, client: WOQLClient):
+    def commit(self, client: WOQLClient, commit_msg: Optional[str] = None):
         query = []
         parents = {}
         for obj in iter(self.object):
@@ -136,7 +136,7 @@ class WOQLSchema:
                 .add_quad(prop_iri, "rdfs:range", prop_range, "schema")
             )
 
-        WQ().woql_and(*query)._context({"_": "_:"}).execute(client)
+        WQ().woql_and(*query)._context({"_": "_:"}).execute(client, commit_msg)
 
     def all_obj(self):
         return self.object
