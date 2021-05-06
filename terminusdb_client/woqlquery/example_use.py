@@ -1,8 +1,9 @@
+from typing import List, Set
+
 from terminusdb_client.woqlquery.woql_schema import (
-    Document,
-    Enums,
-    Property,
-    WOQLObject,
+    DocumentTemplate,
+    EnumTemplate,
+    ObjectTemplate,
     WOQLSchema,
 )
 
@@ -11,51 +12,45 @@ from terminusdb_client.woqlquery.woql_schema import (
 my_schema = WOQLSchema()
 
 
-class Employee(Document):
-    # properties = [AddressOf, ContactNum, ManagedBy, Title, TeamMemberOf]
-    schema = my_schema
+class MyObject(ObjectTemplate):
+    _schema = my_schema
 
 
-class Address(WOQLObject):
-    # properties = [Postcode, StreetName, StreetNum, TownCity]
-    schema = my_schema
+class MyDocument(DocumentTemplate):
+    _schema = my_schema
 
 
-class Team(Enums):
-    """This is Team"""
-
-    value_set = {"IT", "Marketing"}
-    schema = my_schema
+class Coordinate(MyObject):
+    x: float
+    y: float
 
 
-class AddressOf(Property):
-    domain = Employee
-    prop_range = Address
-    schema = my_schema
+class Country(MyDocument):
+    name: str
+    perimeter: List[Coordinate]
 
 
-# print(my_schema)
-my_schema.commit(None)
-my_other_schema = my_schema.copy()
-# my_other_schema = WOQLSchema()
+class Address(MyObject):
+    street: str
+    country: Country
 
 
-class Title(Property):
-    domain = Employee
-    prop_range = "xsd:string"
-    schema = my_other_schema
+class Person(MyDocument):
+    name: str
+    age: int
+    friend_of: Set["Person"]
 
 
-class Intern(Employee):
-    schema = my_other_schema
+class Employee(Person):
+    address_of: Address
+    contact_number: str
+    managed_by: "Employee"
 
 
-# print("Intern")
-# print(Intern.properties)
+class Team(EnumTemplate):
+    _schema = my_schema
+    IT = ()
+    Marketing = ()
 
-my_other_schema.commit(None)
 
-# for item in my_other_schema.all_prop():
-#     print(item)
-
-# print(Team)
+print(my_schema.all_obj())

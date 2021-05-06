@@ -1,70 +1,74 @@
 from copy import deepcopy
+from enum import Enum
 
 from ..woqlclient.woqlClient import WOQLClient
 from .woql_query import WOQLQuery as WQ
 
+from typing import Optional
 
-class WOQLClass(type):
+# from typeguard import check_type
+
+
+class TerminusClass(type):
     def __init__(cls, name, bases, nmspc):
+        if "__annotations__" in nmspc:
+            annotations = nmspc["__annotations__"]
+            cls.__init__
+
+            def init(obj, *args, **kwargs):
+                for key in annotations:
+                    if key in kwargs:
+                        value = kwargs[key]
+                        # ty = annotations[key]
+                        # if type(ty) == _GenericAlias:
+                        #     try:
+                        #         check_type('value',value,ty)
+                        #     except TypeError as e:
+                        #         message = f"Bad type for member: '{key}' with value '{value}' because " + e.__str__()
+                        #         raise TypeError(message)
+                        # elif isinstance(value,ty):
+                        #     pass
+                        # else:
+                        #     raise TypeError(f"Bad type for member: '{key}' with value '{value}' and type '{ty.__name__}'")
+                    else:
+                        value = None
+                    setattr(obj, key, value)
+                obj.annotations = annotations
+
+            cls.__init__ = init
+
+        if cls._schema is not None:
+            if not hasattr(cls._schema, "object"):
+                cls._schema.object = set()
+            cls._schema.object.add(cls)
         super().__init__(name, bases, nmspc)
 
-        if cls.schema is not None:
-            if not hasattr(cls.schema, "object"):
-                cls.schema.object = set()
-            cls.schema.object.add(cls)
-            if cls.properties:
-                for item in cls.properties:
-                    item.domain = cls
-            if hasattr(cls, "value_set") and cls.value_set is None:
-                cls.value_set = set()
-
-    def __str__(cls):
-        if hasattr(cls, "value_set"):
-            return cls.__name__ + ", values: " + ", ".join([cls.value_set])
-        if cls.properties:
-            return cls.__name__ + "has properties: " + ", ".join([cls.properties])
+    def __repr__(cls):
         return cls.__name__
 
 
-class WOQLProperty(type):
-    def __init__(cls, name, bases, nmspc):
-        super().__init__(name, bases, nmspc)
-
-        if cls.schema is not None and cls.domain is not None:
-            if not hasattr(cls.schema, "property"):
-                cls.schema.property = set()
-            cls.schema.property.add(cls)
-            if cls.domain.properties is None:
-                cls.domain.properties = set()
-            cls.domain.properties.add(cls)
-
-    def __str__(cls):
-        if cls.prop_range:
-            return cls.__name__ + "has range: " + cls.prop_range
-        return cls.__name__
-
-
-class WOQLObject(metaclass=WOQLClass):
-    schema = None
-    properties = None
+class ObjectTemplate(metaclass=TerminusClass):
+    _schema = None
 
     def __init__(self):
         pass
 
 
-class Document(WOQLObject):
-    is_doc = True
+class DocumentTemplate(ObjectTemplate):
+    _is_doc = True
 
 
-class Enums(WOQLObject):
-    value_set = None
+class EnumTemplate(Enum):
+    def __init__(self, value=None):
+        if self.name == "_schema":
+            if not hasattr(value, "object"):
+                value.object = set()
+            value.object.add(self.__class__)
+        elif not value:
+            self._value_ = self.name
 
-
-class Property(metaclass=WOQLProperty):
-    schema = None
-    domain = None
-    prop_range = None
-    cardinality = None
+    def __repr__(self):
+        return f"<{self.__class__.__name__}.{self.name}>"
 
 
 class WOQLSchema:
@@ -72,16 +76,20 @@ class WOQLSchema:
         pass
 
     def commit(self, client: WOQLClient, commit_msg: Optional[str] = None):
+        (
+            WQ().quad("v:x", "v:y", "v:z", "schema")
+            + WQ().delete_quad("v:x", "v:y", "v:z", "schema")
+        ).execute(client)
         query = []
         parents = {}
-        for obj in iter(self.object):
+        for obj in self.object:
             for sub in obj.__subclasses__():
                 if sub in parents:
                     parents[sub].append(obj)
                 else:
                     parents[sub] = [obj]
 
-        for obj in iter(self.object):
+        for obj in self.object:
             comment = obj.__doc__ if obj.__doc__ else ""
             label = obj.__name__
             obj_iri = "scm:" + label
@@ -116,7 +124,7 @@ class WOQLSchema:
                 .add_quad(obj_iri, "rdfs:comment", comment, "schema")
                 .add_quad(obj_iri, "rdfs:label", label, "schema")
             )
-        for prop in iter(self.property):
+        for prop in self.property:
             comment = prop.__doc__ if prop.__doc__ else ""
             label = prop.__name__
             prop_iri = "scm:" + label
@@ -135,14 +143,13 @@ class WOQLSchema:
                 .add_quad(prop_iri, "rdfs:domain", domain, "schema")
                 .add_quad(prop_iri, "rdfs:range", prop_range, "schema")
             )
-
         WQ().woql_and(*query)._context({"_": "_:"}).execute(client, commit_msg)
 
     def all_obj(self):
         return self.object
 
-    def all_prop(self):
-        return self.property
+    def to_dict(self):
+        
 
     def copy(self):
         return deepcopy(self)
