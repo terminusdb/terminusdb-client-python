@@ -53,4 +53,9 @@ class Team(EnumTemplate):
     Marketing = ()
 
 
-print(my_schema.all_obj())
+# print(dir(Person))
+# print(Person.to_dict())
+
+# print(my_schema.all_obj())
+# print(Team.__members__)
+print(my_schema.to_dict())

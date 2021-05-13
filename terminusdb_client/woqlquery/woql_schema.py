@@ -1,10 +1,9 @@
 from copy import deepcopy
 from enum import Enum
+from typing import Optional
 
 from ..woqlclient.woqlClient import WOQLClient
 from .woql_query import WOQLQuery as WQ
-
-from typing import Optional
 
 # from typeguard import check_type
 
@@ -41,10 +40,22 @@ class TerminusClass(type):
             if not hasattr(cls._schema, "object"):
                 cls._schema.object = set()
             cls._schema.object.add(cls)
+
         super().__init__(name, bases, nmspc)
 
     def __repr__(cls):
         return cls.__name__
+
+    def to_dict(cls):
+        result = {"@type": cls.__base__.__name__, "@id": cls.__name__}
+        if result["@type"] == "ObjectTemplate":
+            result["@type"] = "Object"
+        elif result["@type"] == "DocumentTemplate":
+            result["@type"] = "Document"
+        if hasattr(cls, "__annotations__"):
+            for attr, attr_type in cls.__annotations__.items():
+                result[attr] = str(attr_type)
+        return result
 
 
 class ObjectTemplate(metaclass=TerminusClass):
@@ -59,6 +70,16 @@ class DocumentTemplate(ObjectTemplate):
 
 
 class EnumTemplate(Enum):
+    # def __new__(cls, *args):
+    #     if args:
+    #         value = args[0]
+    #         if not hasattr(value, "object"):
+    #             value.object = set()
+    #         value.object.add(cls)
+    #         return None
+    #     obj = object.__new__(cls)
+    #     obj._value_ = obj.name
+    #     return obj
     def __init__(self, value=None):
         if self.name == "_schema":
             if not hasattr(value, "object"):
@@ -69,6 +90,14 @@ class EnumTemplate(Enum):
 
     def __repr__(self):
         return f"<{self.__class__.__name__}.{self.name}>"
+
+    @classmethod
+    def to_dict(cls):
+        result = {"@type": "Enum", "@id": cls.__name__}
+        # if hasattr(self, "__annotations__"):
+        #     for attr, attr_type in self.__annotations__.items():
+        #         result[attr] = str(attr_type)
+        return result
 
 
 class WOQLSchema:
@@ -149,7 +178,7 @@ class WOQLSchema:
         return self.object
 
     def to_dict(self):
-        
+        return list(map(lambda cls: cls.to_dict(), self.object))
 
     def copy(self):
         return deepcopy(self)
