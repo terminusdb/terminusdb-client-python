@@ -13,6 +13,8 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
 
   
@@ -32,6 +34,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
@@ -179,8 +182,8 @@
   <div class="section" id="woqldataframe">
 <h1>woqlDataframe<a class="headerlink" href="#woqldataframe" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="terminusdb_client.WOQLDataFrame.extract_column">
-<code class="sig-prename descclassname"><span class="pre">terminusdb_client.WOQLDataFrame.</span></code><code class="sig-name descname"><span class="pre">extract_column</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ty</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLDataFrame.extract_column" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terminusdb_client.WOQLDataFrame.extract_column">
+<span class="sig-prename descclassname"><span class="pre">terminusdb_client.WOQLDataFrame.</span></span><span class="sig-name descname"><span class="pre">extract_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ty</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLDataFrame.extract_column" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extracts the column of the returned result table</p>
 <p>Extrace one specific column from the result of the query binding.</p>
 <dl class="field-list simple">
@@ -221,8 +224,8 @@
 </dd></dl>
 
 <dl class="py function">
-<dt id="terminusdb_client.WOQLDataFrame.extract_header">
-<code class="sig-prename descclassname"><span class="pre">terminusdb_client.WOQLDataFrame.</span></code><code class="sig-name descname"><span class="pre">extract_header</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLDataFrame.extract_header" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terminusdb_client.WOQLDataFrame.extract_header">
+<span class="sig-prename descclassname"><span class="pre">terminusdb_client.WOQLDataFrame.</span></span><span class="sig-name descname"><span class="pre">extract_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLDataFrame.extract_header" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extracts the header of the returned result table</p>
 <p>Extrace the result of the query binding, including the header name and their WOQL rdf data type.</p>
 <dl class="field-list simple">
@@ -259,8 +262,8 @@
 </dd></dl>
 
 <dl class="py function">
-<dt id="terminusdb_client.WOQLDataFrame.query_to_df">
-<code class="sig-prename descclassname"><span class="pre">terminusdb_client.WOQLDataFrame.</span></code><code class="sig-name descname"><span class="pre">query_to_df</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLDataFrame.query_to_df" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terminusdb_client.WOQLDataFrame.query_to_df">
+<span class="sig-prename descclassname"><span class="pre">terminusdb_client.WOQLDataFrame.</span></span><span class="sig-name descname"><span class="pre">query_to_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLDataFrame.query_to_df" title="Permalink to this definition">¶</a></dt>
 <dd><p>DEPRECATED in 0.3.0: use result_to_df instead.</p>
 <p>Converts result query binding to a pandas DataFrame. This only works for homogeneous query results</p>
 <dl class="field-list simple">
@@ -296,8 +299,8 @@
 </dd></dl>
 
 <dl class="py function">
-<dt id="terminusdb_client.WOQLDataFrame.type_map">
-<code class="sig-prename descclassname"><span class="pre">terminusdb_client.WOQLDataFrame.</span></code><code class="sig-name descname"><span class="pre">type_map</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ty_rdf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLDataFrame.type_map" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terminusdb_client.WOQLDataFrame.type_map">
+<span class="sig-prename descclassname"><span class="pre">terminusdb_client.WOQLDataFrame.</span></span><span class="sig-name descname"><span class="pre">type_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ty_rdf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLDataFrame.type_map" title="Permalink to this definition">¶</a></dt>
 <dd><p>Mapping types from WOQL rdf to numpy data types</p>
 <p>Maps the WOQL rdf type in the result query binding to numpy data types so it can be used in constructed pandas DataFrame.</p>
 <dl class="field-list simple">
@@ -328,8 +331,8 @@
 </dd></dl>
 
 <dl class="py function">
-<dt id="terminusdb_client.WOQLDataFrame.type_value_map">
-<code class="sig-prename descclassname"><span class="pre">terminusdb_client.WOQLDataFrame.</span></code><code class="sig-name descname"><span class="pre">type_value_map</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ty_rdf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLDataFrame.type_value_map" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terminusdb_client.WOQLDataFrame.type_value_map">
+<span class="sig-prename descclassname"><span class="pre">terminusdb_client.WOQLDataFrame.</span></span><span class="sig-name descname"><span class="pre">type_value_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ty_rdf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLDataFrame.type_value_map" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts values of different WOQL rdf types to numpy data types values</p>
 <p>Converts the values in the result query binding to numpy data types according to their WOQL rdf type, so it can be used in constructed pandas DataFrame.</p>
 <dl class="field-list simple">
