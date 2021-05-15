@@ -22,3 +22,6 @@ shed = "*"
 
 [packages]
 requests = "*"
+
+[pipenv]
+allow_prereleases = true
