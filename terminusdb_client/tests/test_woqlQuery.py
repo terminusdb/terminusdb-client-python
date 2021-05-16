@@ -715,3 +715,33 @@ class TestTripleBuilderChainer:
                 "woql:variable_name": {"@type": "xsd:string", "@value": "z"},
             },
         ]
+
+    def test_woql_less_method(self):
+        woql_object = WOQLQuery().less("abc", "defg")
+        json_obj = {
+            "@type": "woql:Less",
+            "woql:left": {
+                "@type": "woql:Datatype",
+                "woql:datatype": {"@type": "xsd:string", "@value": "abc"},
+            },
+            "woql:right": {
+                "@type": "woql:Datatype",
+                "woql:datatype": {"@type": "xsd:string", "@value": "defg"},
+            },
+        }
+        assert woql_object.to_dict() == json_obj
+
+    def test_woql_greater_method(self):
+        woql_object = WOQLQuery().greater("abcd", "efg")
+        json_obj = {
+            "@type": "woql:Greater",
+            "woql:left": {
+                "@type": "woql:Datatype",
+                "woql:datatype": {"@type": "xsd:string", "@value": "abcd"},
+            },
+            "woql:right": {
+                "@type": "woql:Datatype",
+                "woql:datatype": {"@type": "xsd:string", "@value": "efg"},
+            },
+        }
+        assert woql_object.to_dict() == json_obj
