@@ -10,7 +10,7 @@ Make sure you have Python>=3.6 installed. We use [pipenv](https://pipenv-fork.re
 
 [Fork and clone](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) this repo, then in your local repo:
 
-`pipenv install --dev`
+`pipenv install --dev --pre` or `make init`
 
 To “editable” install the local Terminus Client Python:
 
