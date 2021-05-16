@@ -715,3 +715,63 @@ class TestTripleBuilderChainer:
                 "woql:variable_name": {"@type": "xsd:string", "@value": "z"},
             },
         ]
+
+    def test_woql_less_method(self):
+        woql_object = WOQLQuery().less("abc", "defg")
+        json_obj = {
+            "@type": "woql:Less",
+            "woql:left": {
+                "@type": "woql:Datatype",
+                "woql:datatype": {"@type": "xsd:string", "@value": "abc"},
+            },
+            "woql:right": {
+                "@type": "woql:Datatype",
+                "woql:datatype": {"@type": "xsd:string", "@value": "defg"},
+            },
+        }
+        assert woql_object.to_dict() == json_obj
+
+    def test_woql_greater_method(self):
+        woql_object = WOQLQuery().greater("abcd", "efg")
+        json_obj = {
+            "@type": "woql:Greater",
+            "woql:left": {
+                "@type": "woql:Datatype",
+                "woql:datatype": {"@type": "xsd:string", "@value": "abcd"},
+            },
+            "woql:right": {
+                "@type": "woql:Datatype",
+                "woql:datatype": {"@type": "xsd:string", "@value": "efg"},
+            },
+        }
+        assert woql_object.to_dict() == json_obj
+
+    def test_woql_upper_method(self):
+        woql_object = WOQLQuery().upper("abc", "ABC")
+        json_obj = {
+            "@type": "woql:Upper",
+            "woql:left": {
+                "@type": "woql:Datatype",
+                "woql:datatype": {"@type": "xsd:string", "@value": "abc"},
+            },
+            "woql:right": {
+                "@type": "woql:Datatype",
+                "woql:datatype": {"@type": "xsd:string", "@value": "ABC"},
+            },
+        }
+        assert woql_object.to_dict() == json_obj
+
+    def test_woql_lower_method(self):
+        woql_object = WOQLQuery().lower("ABC", "abc")
+        json_obj = {
+            "@type": "woql:Lower",
+            "woql:left": {
+                "@type": "woql:Datatype",
+                "woql:datatype": {"@type": "xsd:string", "@value": "ABC"},
+            },
+            "woql:right": {
+                "@type": "woql:Datatype",
+                "woql:datatype": {"@type": "xsd:string", "@value": "abc"},
+            },
+        }
+        assert woql_object.to_dict() == json_obj
