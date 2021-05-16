@@ -747,7 +747,7 @@ class TestTripleBuilderChainer:
         assert woql_object.to_dict() == json_obj
 
     def test_woql_upper_method(self):
-        woql_object = WOQLQuery().less("abc", "ABC")
+        woql_object = WOQLQuery().upper("abc", "ABC")
         json_obj = {
             "@type": "woql:Upper",
             "woql:left": {
@@ -762,7 +762,7 @@ class TestTripleBuilderChainer:
         assert woql_object.to_dict() == json_obj
 
     def test_woql_lower_method(self):
-        woql_object = WOQLQuery().greater("ABC", "abc")
+        woql_object = WOQLQuery().lower("ABC", "abc")
         json_obj = {
             "@type": "woql:Lower",
             "woql:left": {
