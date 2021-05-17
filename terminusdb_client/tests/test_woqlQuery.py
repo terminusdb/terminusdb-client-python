@@ -775,3 +775,57 @@ class TestTripleBuilderChainer:
             },
         }
         assert woql_object.to_dict() == json_obj
+
+    def test_woql_pad_method(self):
+        woql_object = WOQLQuery().pad("abc", "#", 8, "v:output")
+        json_obj = {
+            "@type": "woql:Pad",
+            "woql:pad_string": {
+                "@type": "woql:Datatype",
+                "woql:datatype": {"@type": "xsd:string", "@value": "abc"},
+            },
+            "woql:pad_char": {
+                "@type": "woql:Datatype",
+                "woql:datatype": {"@type": "xsd:string", "@value": "#"},
+            },
+            "woql:pad_times": {
+                "@type": "woql:Datatype",
+                "woql:datatype": {"@type": "xsd:integer", "@value": 8},
+            },
+            "woql:pad_result": {
+                "@type": "woql:Variable",
+                "woql:variable_name": {"@value": "output", "@type": "xsd:string"},
+            },
+        }
+        assert woql_object.to_dict() == json_obj
+
+    def test_woql_sum_method(self):
+        woql_object = WOQLQuery().sum([1, 2, 8], "v:output")
+        json_obj = {
+            "@type": "woql:Sum",
+            "woql:sum_list": {
+                "@type": "woql:Array",
+                "woql:array_element": [
+                    {
+                        "@type": "woql:ArrayElement",
+                        "woql:datatype": {"@type": "xsd:integer", "@value": 1},
+                        "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 0},
+                    },
+                    {
+                        "@type": "woql:ArrayElement",
+                        "woql:datatype": {"@type": "xsd:integer", "@value": 2},
+                        "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 1},
+                    },
+                    {
+                        "@type": "woql:ArrayElement",
+                        "woql:datatype": {"@type": "xsd:integer", "@value": 8},
+                        "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 2},
+                    },
+                ],
+            },
+            "woql:sum": {
+                "@type": "woql:Variable",
+                "woql:variable_name": {"@value": "output", "@type": "xsd:string"},
+            },
+        }
+        assert woql_object.to_dict() == json_obj
