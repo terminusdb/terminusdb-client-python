@@ -77,6 +77,12 @@
 #
 #     return MockResponse(args[0], 200, APIEndpointConst.CONNECT)
 
+HEADERS = {
+    "date": None,
+    "connection": "keep-alive",
+    "content-type": "application/json",
+    "content-length": "252",
+}
 
 MOCK_CAPABILITIES = {
     "@context": {

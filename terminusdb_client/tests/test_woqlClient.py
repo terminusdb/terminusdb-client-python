@@ -7,16 +7,17 @@ import pytest
 import requests
 
 from terminusdb_client.__version__ import __version__
-from terminusdb_client.errors import InterfaceError
+from terminusdb_client.errors import DatabaseError, InterfaceError
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 
-from .mockResponse import MOCK_CAPABILITIES
+from .mockResponse import HEADERS, MOCK_CAPABILITIES
 from .woqljson.woqlStarJson import WoqlStar
 
 
-def mocked_requests_get(*args, **kwargs):
+def mocked_request(response_code=200, *args, **kwargs):
     class MockResponse:
         def __init__(self, text, json_data, status_code):
+            self.headers = HEADERS
             self.json_data = json_data
             self.status_code = status_code
             self.text = text
@@ -24,10 +25,12 @@ def mocked_requests_get(*args, **kwargs):
         def json(self):
             return self.json_data
 
-    if "http://localhost:6363/" in args[0]:
-        return MockResponse(json.dumps(MOCK_CAPABILITIES), {"key1": "value1"}, 200)
+    def wrapper(*args, **kwargs):
+        return MockResponse(
+            json.dumps(MOCK_CAPABILITIES), {"key1": "value1"}, response_code
+        )
 
-    return MockResponse(None, 404)
+    return wrapper
 
 
 def mock_func_with_1arg(_):
@@ -42,7 +45,7 @@ def mock_func_no_arg():
     return True
 
 
-@mock.patch("requests.get", side_effect=mocked_requests_get)
+@mock.patch("requests.get", side_effect=mocked_request())
 def test_connection(mocked_requests):
     woql_client = WOQLClient("http://localhost:6363")
 
@@ -58,7 +61,7 @@ def test_connection(mocked_requests):
     )
 
 
-@mock.patch("requests.get", side_effect=mocked_requests_get)
+@mock.patch("requests.get", side_effect=mocked_request())
 def test_connected_flag(mocked_requests):
     woql_client = WOQLClient("http://localhost:6363")
     assert not woql_client._connected
@@ -68,8 +71,8 @@ def test_connected_flag(mocked_requests):
     assert not woql_client._connected
 
 
-@mock.patch("requests.post", side_effect=mocked_requests_get)
-@mock.patch("requests.get", side_effect=mocked_requests_get)
+@mock.patch("requests.post", side_effect=mocked_request())
+@mock.patch("requests.get", side_effect=mocked_request())
 def test_create_database(mocked_requests, mocked_requests2):
     woql_client = WOQLClient(
         "http://localhost:6363", user="admin", key="root", account="admin"
@@ -93,8 +96,30 @@ def test_create_database(mocked_requests, mocked_requests2):
     )
 
 
-@mock.patch("requests.post", side_effect=mocked_requests_get)
-@mock.patch("requests.get", side_effect=mocked_requests_get)
+@mock.patch("requests.get", side_effect=mocked_request())
+@mock.patch("requests.post", side_effect=mocked_request(response_code=400))
+def test_create_db_attempt_when_db_exists(mocked_requests, mocked_requests2):
+    woql_client = WOQLClient(
+        "http://localhost:6363", user="admin", key="root", account="admin"
+    )
+    woql_client.connect()
+    assert woql_client.basic_auth() == "admin:root"
+
+    with pytest.raises(DatabaseError):
+        woql_client.create_database(
+            "myFirstTerminusDB",
+            "admin",
+            label="my first db",
+            description="my first db comment",
+            include_schema=False,
+        )
+
+    assert woql_client._db is not None
+    assert woql_client._context
+
+
+@mock.patch("requests.post", side_effect=mocked_request())
+@mock.patch("requests.get", side_effect=mocked_request())
 @mock.patch("terminusdb_client.woqlclient.woqlClient.WOQLClient.create_graph")
 def test_create_database_with_schema(
     mocked_requests, mocked_requests2, create_schema_obj
@@ -121,8 +146,8 @@ def test_create_database_with_schema(
     )
 
 
-@mock.patch("requests.post", side_effect=mocked_requests_get)
-@mock.patch("requests.get", side_effect=mocked_requests_get)
+@mock.patch("requests.post", side_effect=mocked_request())
+@mock.patch("requests.get", side_effect=mocked_request())
 def test_create_database_and_change_account(mocked_requests, mocked_requests2):
     woql_client = WOQLClient(
         "http://localhost:6363", user="admin", account="admin", key="root"
@@ -146,8 +171,8 @@ def test_create_database_and_change_account(mocked_requests, mocked_requests2):
     assert woql_client.basic_auth() == "admin:root"
 
 
-@mock.patch("requests.get", side_effect=mocked_requests_get)
-@mock.patch("requests.post", side_effect=mocked_requests_get)
+@mock.patch("requests.get", side_effect=mocked_request())
+@mock.patch("requests.post", side_effect=mocked_request())
 def test_branch(mocked_requests, mocked_requests2):
     woql_client = WOQLClient("http://localhost:6363")
     woql_client.connect(user="admin", account="admin", key="root", db="myDBName")
@@ -161,8 +186,8 @@ def test_branch(mocked_requests, mocked_requests2):
     )
 
 
-@mock.patch("requests.get", side_effect=mocked_requests_get)
-@mock.patch("requests.post", side_effect=mocked_requests_get)
+@mock.patch("requests.get", side_effect=mocked_request())
+@mock.patch("requests.post", side_effect=mocked_request())
 def test_wrong_graph_type(mocked_requests, mocked_requests2):
     woql_client = WOQLClient("http://localhost:6363")
     woql_client.connect(user="admin", account="admin", key="root", db="myDBName")
@@ -171,7 +196,7 @@ def test_wrong_graph_type(mocked_requests, mocked_requests2):
         woql_client.create_graph("wrong_graph_name", "mygraph", "add a new graph")
 
 
-@mock.patch("requests.get", side_effect=mocked_requests_get)
+@mock.patch("requests.get", side_effect=mocked_request())
 def test_get_triples(mocked_requests):
     woql_client = WOQLClient("http://localhost:6363")
     woql_client.connect(user="admin", account="admin", key="root", db="myDBName")
@@ -186,8 +211,8 @@ def test_get_triples(mocked_requests):
     )
 
 
-@mock.patch("requests.post", side_effect=mocked_requests_get)
-@mock.patch("requests.get", side_effect=mocked_requests_get)
+@mock.patch("requests.post", side_effect=mocked_request())
+@mock.patch("requests.get", side_effect=mocked_request())
 def test_query(mocked_requests, mocked_requests2):
     woql_client = WOQLClient("http://localhost:6363")
     woql_client.connect(user="admin", account="admin", key="root", db="myDBName")
@@ -210,7 +235,7 @@ def test_query(mocked_requests, mocked_requests2):
     )
 
 
-@mock.patch("requests.get", side_effect=mocked_requests_get)
+@mock.patch("requests.get", side_effect=mocked_request())
 def test_query_nodb(mocked_requests):
     woql_client = WOQLClient("http://localhost:6363")
     woql_client.connect(user="admin", account="admin", key="root")
@@ -218,7 +243,7 @@ def test_query_nodb(mocked_requests):
         woql_client.query(WoqlStar)
 
 
-@mock.patch("requests.get", side_effect=mocked_requests_get)
+@mock.patch("requests.get", side_effect=mocked_request())
 @mock.patch.object(WOQLClient, "_dispatch_json")
 def test_query_commit_made(mocked_execute, mocked_requests):
     # mocked_execute.return_value = MOCK_CAPABILITIES
@@ -237,8 +262,8 @@ def test_query_commit_made(mocked_execute, mocked_requests):
     assert result == "Commit successfully made."
 
 
-@mock.patch("requests.post", side_effect=mocked_requests_get)
-@mock.patch("requests.get", side_effect=mocked_requests_get)
+@mock.patch("requests.post", side_effect=mocked_request())
+@mock.patch("requests.get", side_effect=mocked_request())
 def test_delete_database(mocked_requests, mocked_requests2):
     woql_client = WOQLClient(
         "http://localhost:6363", user="admin", key="root", account="admin"
@@ -258,7 +283,7 @@ def test_delete_database(mocked_requests, mocked_requests2):
         woql_client.delete_database()
 
 
-@mock.patch("requests.get", side_effect=mocked_requests_get)
+@mock.patch("requests.get", side_effect=mocked_request())
 def test_rollback(mocked_requests):
     woql_client = WOQLClient("http://localhost:6363")
     woql_client.connect(user="admin", account="admin", key="root")
@@ -272,7 +297,7 @@ def test_copy_client():
     assert id(woql_client) != copy_client
 
 
-@mock.patch("requests.get", side_effect=mocked_requests_get)
+@mock.patch("requests.get", side_effect=mocked_request())
 def test_basic_auth(mocked_requests):
     woql_client = WOQLClient("http://localhost:6363")
     result = woql_client.basic_auth()
@@ -284,7 +309,7 @@ def test_basic_auth(mocked_requests):
     assert woql_client.user() == "admin"
 
 
-@mock.patch("requests.get", side_effect=mocked_requests_get)
+@mock.patch("requests.get", side_effect=mocked_request())
 def test_remote_auth(mocked_requests):
     woql_client = WOQLClient("http://localhost:6363")
     result = woql_client.remote_auth()
@@ -298,7 +323,7 @@ def test_remote_auth(mocked_requests):
     assert result == auth_setting
 
 
-@mock.patch("requests.get", side_effect=mocked_requests_get)
+@mock.patch("requests.get", side_effect=mocked_request())
 def test_set_db(mocked_requests):
     woql_client = WOQLClient("http://localhost:6363")
     with pytest.raises(InterfaceError):
