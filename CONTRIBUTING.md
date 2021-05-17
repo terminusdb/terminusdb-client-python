@@ -1,6 +1,6 @@
 # Contributing to TerminusDB Client
 
-Thanks for interested to contribute to TerminusDB Client, to get started, fork this repo and follow the [instruction setting up dev environment](#setting-up-dev-environment). If you don't have idea where to start, you can look for [`good first issue`](https://github.com/terminusdb/terminusdb-client/contribute) or `help wanted` label at issues. All pull request should follow the [Pull Request Format Guideline](#pull-request-format-guideline) and pull request (PR) that involving coding should come with [tests](#writing-tests-and-testing) and [documentations](#writing-documentation). **All pull request should be made towards `dev` branch**
+Thanks for interested to contribute to TerminusDB Client, to get started, fork this repo and follow the [instruction setting up dev environment](#setting-up-dev-environment-). If you don't have idea where to start, you can look for [`good first issue`](https://github.com/terminusdb/terminusdb-client-python/contribute) or [`help wanted`](https://github.com/terminusdb/terminusdb-client-python/issues?q=is:open+is:issue+label:"help+wanted") label at issues. All pull request should follow the [Pull Request Format Guideline](#pull-request-format-guideline-) and pull request (PR) that involving coding should come with [tests](#writing-tests-and-testing-) and [documentations](#writing-documentation-). **All pull request should be made towards `dev` branch**
 
 ## Setting up dev environment 💻
 
@@ -28,7 +28,7 @@ To install the pre-commit hook:
 
 We are using [pytest](https://docs.pytest.org/en/latest/) for testing. All tests are stored in `/tests`
 
-We also use tox to run tests in a virtual enviroment, we recommend running `tox` for the frist time before you make any changes. This is to initialized the tox enviroments (or do it seperately by `tox -e deps`) and make sure all tests pass initially.
+We also use tox to run tests in a virtual environment, we recommend running `tox` for the first time before you make any changes. This is to initialize the tox environments (or do it separately by `tox -e deps`) and make sure all tests pass initially.
 
 To run the unittests without integration tests:
 
@@ -38,7 +38,7 @@ To run all tests including integration tests:
 
 `tox -e test`
 
-To run all checks and auto formating:
+To run all checks and auto formatting:
 
 `tox -e check`
 
@@ -61,7 +61,7 @@ make html
 
 The built documentation will be in `/build/html/` which you can open `index.html` in your browser to check.
 
-*now you are in docs directry, make sure you go back to the top directry of the repo if you want to commit and push*
+*now you are in docs directory, make sure you go back to the top directory of the repo if you want to commit and push*
 
 ## Pull Request Format Guideline 🏁
 
@@ -74,6 +74,6 @@ Please put the type of the pull request in the title:
 
 Also, if there is a related issues, please also put the issue numbers in blankets in the title, for example: (#10)
 
-It will be great to describe what you have done in the pull request (more detail the better). If there is a issue that can be closed by this PR, you can put `Close #XX` or `Fix #XX` (while XX is the issue number) to close that issue automatically when your PR is merged.
+It will be great to describe what you have done in the pull request (more detail the better). If there is an issue that can be closed by this PR, you can put `Close #XX` or `Fix #XX` (while XX is the issue number) to close that issue automatically when your PR is merged.
 
 Following the guideline makes the reviewing process of the PR much efficient.
