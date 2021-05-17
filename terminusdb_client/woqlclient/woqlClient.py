@@ -725,8 +725,8 @@ class WOQLClient:
         self._account = accountid
         self._connected = True
         self._db = dbid
-        self._dispatch("post", self._db_url(), details)
         self._context = self._get_prefixes()
+        self._dispatch("post", self._db_url(), details)
 
     def delete_database(
         self,
