@@ -2,6 +2,7 @@ from copy import deepcopy
 from enum import Enum
 from typing import Optional
 
+from .. import woql_type as wt
 from ..woqlclient.woqlClient import WOQLClient
 from .woql_query import WOQLQuery as WQ
 
@@ -54,7 +55,7 @@ class TerminusClass(type):
             result["@type"] = "Document"
         if hasattr(cls, "__annotations__"):
             for attr, attr_type in cls.__annotations__.items():
-                result[attr] = str(attr_type)
+                result[attr] = wt.convert_type(attr_type)
         return result
 
 

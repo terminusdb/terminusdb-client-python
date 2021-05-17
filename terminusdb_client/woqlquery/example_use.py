@@ -1,4 +1,4 @@
-from typing import List, Set
+from typing import List, Optional, Set
 
 from terminusdb_client.woqlquery.woql_schema import (
     DocumentTemplate,
@@ -43,7 +43,7 @@ class Person(MyDocument):
 
 class Employee(Person):
     address_of: Address
-    contact_number: str
+    contact_number: Optional[str]
     managed_by: "Employee"
 
 
