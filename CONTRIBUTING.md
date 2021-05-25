@@ -1,6 +1,6 @@
 # Contributing to TerminusDB Client
 
-Thanks for interested to contribute to TerminusDB Client, to get started, fork this repo and follow the [instruction setting up dev environment](#setting-up-dev-environment-). If you don't have idea where to start, you can look for [`good first issue`](https://github.com/terminusdb/terminusdb-client-python/contribute) or [`help wanted`](https://github.com/terminusdb/terminusdb-client-python/issues?q=is:open+is:issue+label:"help+wanted") label at issues. All pull request should follow the [Pull Request Format Guideline](#pull-request-format-guideline-) and pull request (PR) that involving coding should come with [tests](#writing-tests-and-testing-) and [documentations](#writing-documentation-). **All pull request should be made towards `dev` branch**
+Thanks for interested to contribute to TerminusDB Client, to get started, fork this repo and follow the [instruction setting up dev environment](#setting-up-dev-environment-). If you don't have idea where to start, you can look for [`good first issue`](https://github.com/terminusdb/terminusdb-client-python/contribute) or [`help wanted`](https://github.com/terminusdb/terminusdb-client-python/issues?q=is:open+is:issue+label:"help+wanted") label at issues. All pull request should follow the [Pull Request Format Guideline](#pull-request-format-guideline-) and pull request (PR) that involving coding should come with [tests](#writing-tests-and-testing-) and [documentations](#writing-documentation-).
 
 ## Setting up dev environment 💻
 
