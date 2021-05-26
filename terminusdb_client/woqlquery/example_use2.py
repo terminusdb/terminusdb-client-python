@@ -3,6 +3,7 @@ from typing import List, Optional, Set
 from terminusdb_client.woqlquery.woql_schema import (
     DocumentTemplate,
     EnumTemplate,
+    HashKey,
     ObjectTemplate,
     WOQLSchema,
 )
@@ -60,6 +61,16 @@ class Team(EnumTemplate):
     Marketing = ()
 
 
+class Address(MyDocument):
+    """This is address"""
+
+    _key = HashKey(["street", "region", "postal_code"])
+    _base = "Adddress_"
+    street: str
+    region: "Region"
+    postal_code: str
+
+
 # cheuk = Employee()
 # cheuk.contact_number = "13123238473897"
 # cheuk.commit(client)
@@ -72,5 +83,5 @@ class Team(EnumTemplate):
 # print(Team.__members__)
 # print(my_schema.to_dict())
 # my_schema.commit()
-
-print(Team.to_dict())
+# print(dir(Address))
+print(Address.to_dict())

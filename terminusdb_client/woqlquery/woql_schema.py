@@ -1,12 +1,34 @@
 from copy import deepcopy
 from enum import Enum
-from typing import Optional
+from typing import Optional, Union
 
 from .. import woql_type as wt
 from ..woqlclient.woqlClient import WOQLClient
 from .woql_query import WOQLQuery as WQ
 
 # from typeguard import check_type
+
+
+class HashKey:
+    at_type = "sys:Hash"
+
+    def __init__(self, keys: Union[str, list]):
+        self._keys = keys
+
+
+class LexicalKey:
+    at_type = "sys:Lexical"
+
+    def __init__(self, keys: Union[str, list]):
+        self._keys = keys
+
+
+class ValueHashKey:
+    at_type = "sys:ValueHash"
+
+
+class RandomKey:
+    at_type = "sys:Random"
 
 
 class TerminusClass(type):
@@ -49,13 +71,25 @@ class TerminusClass(type):
 
     def to_dict(cls):
         result = {"@type": cls.__base__.__name__, "@id": cls.__name__}
+        if cls.__doc__:
+            result["sys:comment"] = cls.__doc__
         if result["@type"] == "ObjectTemplate":
             result["@type"] = "Object"
         elif result["@type"] == "DocumentTemplate":
             result["@type"] = "Document"
+        if hasattr(cls, "_base"):
+            result["sys:base"] = cls._base
+        if hasattr(cls, "_key"):
+            if hasattr(cls._key, "_keys"):
+                result["sys:key"] = {
+                    "@type": cls._key.__class__.at_type,
+                    "sys:fields": cls._key._keys,
+                }
+            else:
+                result["sys:key"] = {"@type": cls._key.__class__.at_type}
         if hasattr(cls, "__annotations__"):
             for attr, attr_type in cls.__annotations__.items():
-                result[attr] = wt.convert_type(attr_type)
+                result[attr] = wt.to_woql_type(attr_type)
         return result
 
 
@@ -64,6 +98,12 @@ class ObjectTemplate(metaclass=TerminusClass):
 
     def __init__(self):
         pass
+
+    def commit(self, client: WOQLClient):
+        pass
+
+    # def to_dict(self):
+    #     pass
 
 
 class DocumentTemplate(ObjectTemplate):
@@ -94,7 +134,10 @@ class EnumTemplate(Enum):
 
     @classmethod
     def to_dict(cls):
-        result = {"@type": "Enum", "@id": cls.__name__}
+        result = {"@type": "Enum", "@id": cls.__name__, "sys:value": []}
+        for item in cls.__members__:
+            if item[0] != "_":
+                result["sys:value"].append(item)
         # if hasattr(self, "__annotations__"):
         #     for attr, attr_type in self.__annotations__.items():
         #         result[attr] = str(attr_type)
