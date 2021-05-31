@@ -77,6 +77,8 @@ class TerminusClass(type):
             result["@type"] = "Object"
         elif result["@type"] == "DocumentTemplate":
             result["@type"] = "Document"
+        elif result["@type"] == "TaggedUnion":
+            result["@type"] = "sys:TaggedUnion"
         if hasattr(cls, "_base"):
             result["sys:base"] = cls._base
         if hasattr(cls, "_key"):
@@ -143,6 +145,8 @@ class EnumTemplate(Enum):
         #         result[attr] = str(attr_type)
         return result
 
+class TaggedUnion(ObjectTemplate):
+    pass
 
 class WOQLSchema:
     def __init__(self):
