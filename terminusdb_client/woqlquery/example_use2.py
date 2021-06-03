@@ -75,6 +75,8 @@ class Contact(TaggedUnion):
     local_number : int
     international: str
 
+home = Address()
+home.street = "123 Abc Street"
 # cheuk = Employee()
 # cheuk.contact_number = "13123238473897"
 # cheuk.commit(client)
@@ -88,4 +90,5 @@ class Contact(TaggedUnion):
 # print(my_schema.to_dict())
 # my_schema.commit()
 # print(dir(Address))
-print(Contact.to_dict())
+# print(Contact._to_dict())
+print(home._obj_to_dict())

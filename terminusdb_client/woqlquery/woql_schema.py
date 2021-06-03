@@ -55,7 +55,7 @@ class TerminusClass(type):
                     else:
                         value = None
                     setattr(obj, key, value)
-                obj.annotations = annotations
+                obj._annotations = annotations
 
             cls.__init__ = init
 
@@ -69,7 +69,20 @@ class TerminusClass(type):
     def __repr__(cls):
         return cls.__name__
 
-    def to_dict(cls):
+
+
+
+class ObjectTemplate(metaclass=TerminusClass):
+    _schema = None
+
+    def __init__(self):
+        self._new = True
+
+    def _commit(self, client: WOQLClient):
+        pass
+
+    @classmethod
+    def _to_dict(cls):
         result = {"@type": cls.__base__.__name__, "@id": cls.__name__}
         if cls.__doc__:
             result["sys:comment"] = cls.__doc__
@@ -94,18 +107,14 @@ class TerminusClass(type):
                 result[attr] = wt.to_woql_type(attr_type)
         return result
 
-
-class ObjectTemplate(metaclass=TerminusClass):
-    _schema = None
-
-    def __init__(self):
-        pass
-
-    def commit(self, client: WOQLClient):
-        pass
-
-    # def to_dict(self):
-    #     pass
+    def _obj_to_dict(self):
+        result = {'@type' : self.__class__, '@id': ""}
+        for item in self._annotations.keys():
+            if hasattr(self, item):
+                result[item] = eval(f"self.{item}")
+            else:
+                result[item] = None
+        return result
 
 
 class DocumentTemplate(ObjectTemplate):
@@ -135,7 +144,7 @@ class EnumTemplate(Enum):
         return f"<{self.__class__.__name__}.{self.name}>"
 
     @classmethod
-    def to_dict(cls):
+    def _to_dict(cls):
         result = {"@type": "Enum", "@id": cls.__name__, "sys:value": []}
         for item in cls.__members__:
             if item[0] != "_":
@@ -226,7 +235,7 @@ class WOQLSchema:
         return self.object
 
     def to_dict(self):
-        return list(map(lambda cls: cls.to_dict(), self.object))
+        return list(map(lambda cls: cls._to_dict(), self.object))
 
     def copy(self):
         return deepcopy(self)
