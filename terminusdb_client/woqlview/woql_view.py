@@ -7,24 +7,20 @@ try:
 except ImportError:
     pass
 
+REQUIRE_CONFIG = """require.config({
+    paths: {
+        TerminusClient:'https://cdn.jsdelivr.net/npm/@terminusdb/terminusdb-client@4.3.1/dist/terminusdb-client.min',
+        TerminusDBGraph:'https://cdn.jsdelivr.net/npm/@terminusdb/terminusdb-react-components@4.3.1/dist/terminusdb-d3-graph.min'
+    }
+});"""
+
 
 class WOQLView:
     def __init__(self):
         self.config = ""
         self.obj = None
         try:
-            display(
-                Javascript(
-                    """
-            require.config({
-                paths: {
-                    TerminusClient:'https://unpkg.com/@terminusdb/terminusdb-client@3.0.3/dist/terminusdb-client.min',
-                    TerminusDBGraph:'https://dl.bintray.com/terminusdb/terminusdb/dev/terminusdb-d3-graph.min'
-                }
-            });
-            """
-                )
-            )
+            display(Javascript(REQUIRE_CONFIG))
         except NameError:
             pass
 
@@ -199,12 +195,7 @@ class WOQLView:
 
               <script>
 
-              require.config({
-                paths: {
-                    TerminusClient:'https://unpkg.com/@terminusdb/terminusdb-client@3.0.3/dist/terminusdb-client.min',
-                    TerminusDBGraph:'https://dl.bintray.com/terminusdb/terminusdb/dev/terminusdb-d3-graph.min'
-                }
-              });
+              %s
 
                 require(['TerminusClient','TerminusDBGraph'], function(TerminusClient,TerminusDBGraph){
 
@@ -228,7 +219,7 @@ class WOQLView:
 
 
             </html>"""
-                % (filename, result, self.config)
+                % (filename, REQUIRE_CONFIG, result, self.config)
             )
 
     def print_js_config(self):
