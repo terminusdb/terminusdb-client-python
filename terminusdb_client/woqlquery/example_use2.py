@@ -6,6 +6,7 @@ from terminusdb_client.woqlquery.woql_schema import (
     HashKey,
     ObjectTemplate,
     WOQLSchema,
+    TaggedUnion
 )
 
 # from woql_schema import WOQLSchema, Document, Property, WOQLObject
@@ -70,7 +71,12 @@ class Address(MyDocument):
     region: "Region"
     postal_code: str
 
+class Contact(TaggedUnion):
+    local_number : int
+    international: str
 
+home = Address()
+home.street = "123 Abc Street"
 # cheuk = Employee()
 # cheuk.contact_number = "13123238473897"
 # cheuk.commit(client)
@@ -84,4 +90,5 @@ class Address(MyDocument):
 # print(my_schema.to_dict())
 # my_schema.commit()
 # print(dir(Address))
-print(Address.to_dict())
+# print(Contact._to_dict())
+print(home._obj_to_dict())
