@@ -13,11 +13,23 @@ from urllib3.exceptions import InsecureRequestWarning
 
 from ..__version__ import __version__
 from ..errors import DatabaseError, InterfaceError
+from ..woql_utils import _finish_reponse, _result2stream
 from ..woqlquery.woql_query import WOQLQuery
 
 # WOQL client object
 # license Apache Version 2
 # summary Python module for accessing the Terminus DB API
+
+
+class NoRequestWarning:
+    def __init__(self, insecure):
+        self.insecure = insecure
+
+    def __enter__(self):
+        warnings.simplefilter("ignore", InsecureRequestWarning)
+
+    def __exit__(self):
+        warnings.resetwarnings()
 
 
 class WOQLClient:
@@ -931,6 +943,207 @@ class WOQLClient:
             commit,
         )
 
+    def get_document(self, iri_id: str, graph_type: str = "instance", **kwargs) -> dict:
+        """Retrieves the document of the iri_id
+
+        Parameters
+        ----------
+        iri_id : str
+            Iri id for the docuemnt that is retriving
+        graph_type : str, optional
+            Graph type, either "instance" or "schema".
+        kwargs:
+            Additional boolean flags for retriving. Currently avaliable: "prefixed", "minimized", "unfold"
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
+
+        Returns
+        -------
+        dict
+        """
+        add_args = ["prefixed", "minimized", "unfold"]
+        self._check_connection()
+        payload = {"id": iri_id}
+        for the_arg in add_args:
+            if the_arg in kwargs:
+                payload[the_arg] = kwargs[the_arg]
+
+        with NoRequestWarning(self.insecure):
+            result = request.get(
+                self._documents_url(graph_type),
+                verify=(not self.insecure),
+                params=payload,
+                auth=self._auth(),
+            )
+        return json.loads(_finish_reponse(result))
+
+    def get_documents_by_type(
+        self,
+        doc_type: str,
+        graph_type: str = "instance",
+        skip: int = 0,
+        count: Optional[int] = None,
+        **kwargs,
+    ) -> typing.iterable:
+        # TODO: make return iterable
+        """Retrieves the documents by type
+
+        Parameters
+        ----------
+        doc_type : str
+            Specific type for the docuemnts that is retriving
+        graph_type : str, optional
+            Graph type, either "instance" or "schema".
+        skip: int
+            The starting posiion of the returning results, default to be 0
+        count: int or None
+            The maximum number of returned result, if None (default) it will return all of the avalible result.
+        kwargs:
+            Additional boolean flags for retriving. Currently avaliable: "prefixed", "unfold"
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
+
+        Returns
+        -------
+        iterable
+            Stream of dictionaries
+        """
+        add_args = ["prefixed", "unfold"]
+        self._check_connection()
+        payload = {"type": doc_type}
+        if count is None:
+            count = "unlimited"
+        payload["skip"] = skip
+        payload["count"] = count
+        for the_arg in add_args:
+            if the_arg in kwargs:
+                payload[the_arg] = kwargs[the_arg]
+        with NoRequestWarning(self.insecure):
+            result = request.get(
+                self._documents_url(graph_type),
+                verify=(not self.insecure),
+                params=payload,
+                auth=self._auth(),
+            )
+        return _result2stream(_finish_reponse(result))
+
+    def get_all_documents(
+        self,
+        graph_type: str = "instance",
+        skip: int = 0,
+        count: Optional[int] = None,
+        **kwargs,
+    ) -> typing.iterable:
+        # TODO: make return iterable
+        """Retrieves all avalibale the documents
+
+        Parameters
+        ----------
+        graph_type : str, optional
+            Graph type, either "instance" or "schema".
+        skip: int
+            The starting posiion of the returning results, default to be 0
+        count: int or None
+            The maximum number of returned result, if None (default) it will return all of the avalible result.
+        kwargs:
+            Additional boolean flags for retriving. Currently avaliable: "prefixed", "unfold"
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
+
+        Returns
+        -------
+        iterable
+            Stream of dictionaries
+        """
+        add_args = ["prefixed", "unfold"]
+        self._check_connection()
+        payload = {}
+        if count is None:
+            count = "unlimited"
+        payload["skip"] = skip
+        payload["count"] = count
+        for the_arg in add_args:
+            if the_arg in kwargs:
+                payload[the_arg] = kwargs[the_arg]
+        with NoRequestWarning(self.insecure):
+            result = request.get(
+                self._documents_url(graph_type),
+                verify=(not self.insecure),
+                params=payload,
+                auth=self._auth(),
+            )
+        return _result2stream(_finish_reponse(result))
+
+    def replace_document(
+        self, document: Union[dict, List[dict]], graph_type: str, commit_msg: str
+    ) -> None:
+        """Updates the specified document(s)
+
+        Parameters
+        ----------
+        document: str
+            Document(s) to be updated.
+        graph_type : str
+            Graph type, either "inference", "instance" or "schema".
+        commit_msg : str
+            Commit message.
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
+        """
+        self._check_connection()
+        commit = self._generate_commit(commit_msg)["commit_info"]
+        with NoRequestWarning(self.insecure):
+            _finish_reponse(
+                request.put(
+                    self._documents_url(graph_type),
+                    params=commit,
+                    json=document,
+                    auth=self._auth(),
+                )
+            )
+
+    def insert_triples(
+        self, graph_type: str, graph_id: str, turtle, commit_msg: Optional[str] = None
+    ) -> None:
+        """Inserts into the specified graph with the triples encoded in turtle format.
+
+        Parameters
+        ----------
+        graph_type : str
+            Graph type, either "inference", "instance" or "schema".
+        graph_id : str
+            Graph identifier.
+        turtle
+            Valid set of triples in Turtle format.
+        commit_msg : str
+            Commit message.
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
+        """
+        self._check_connection()
+        commit = self._generate_commit(commit_msg)
+        commit["turtle"] = turtle
+        self._dispatch(
+            "put",
+            self._triples_url(graph_type, graph_id),
+            commit,
+        )
+
     def get_csv(
         self,
         csv_name: str,
@@ -1522,12 +1735,18 @@ class WOQLClient:
         result = self._dispatch(action, url, payload, file_list)
         return json.loads(result)
 
+    def _auth(self):
+        if self._connected and self._key and self._user:
+            return (self._user, self._key)
+        # TODO: remote_auth
+
     def _dispatch(
         self,
         action: str,  # get, post, put, delete
         url: str,
         payload: Optional[dict] = None,
         file_list: Optional[list] = None,
+        data: Optional[list] = None,
     ) -> str:
         """Directly dispatch to a TerminusDB database.
 
@@ -1823,6 +2042,13 @@ class WOQLClient:
         else:
             base_url = self._branch_base("csv")
         return f"{base_url}/{graph_type}/{graph_id}"
+
+    def _documents_url(self, graph_type="instance"):
+        if self._db == "_system":
+            base_url = self._db_base("document")
+        else:
+            base_url = self._branch_base("document")
+        return base_url
 
     def _triples_url(self, graph_type="instance", graph_id="main"):
         if self._db == "_system":

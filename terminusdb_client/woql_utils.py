@@ -1,5 +1,7 @@
 import urllib.parse
 
+from .errors import DatabaseError
+
 STANDARD_URLS = {
     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
@@ -118,3 +120,23 @@ def label_from_url(url):
         nurl = nurl[last_char + 1 :]
     nurl = nurl.replace("_", " ")
     return nurl[0].upper() + nurl[1:]
+
+
+def _result2stream(result):
+    """turning JSON string into a interable that give you a stream of dictionary"""
+    decoder = json.JSONDecoder()
+
+    idx = 0
+    while True:
+        if idx >= len(result):
+            raise StopIteration
+        data, offset = decoder.raw_decode(result[idx:])
+        idx += offset
+        yield data
+
+
+def _finish_reponse(request_response):
+    if request_response.status_code == 200:
+        return request_response.text  # if not a json not it raises an error
+    elif request_response.status_code > 399 and request_response.status_code < 599:
+        raise DatabaseError(request_response)
