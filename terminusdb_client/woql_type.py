@@ -30,15 +30,15 @@ def to_woql_type(input_type: type):
         return str(input_type)
 
 
-def from_woql_type(input_type: Union[str, list]):
+def from_woql_type(input_type: Union[str, dict]):
     invert_type = {v: k for k, v in COVERT_TYPE.items()}
-    if isinstance(input_type, "list"):  ## NEED UPDATE
-        if input_type[0] == "list":
-            return List[input_type[1]]
-        elif input_type[0] == "set":
-            return Set[input_type[1]]
-        elif input_type[0] == "optional":
-            return Optional[input_type[1]]
+    if isinstance(input_type, "dict"):
+        if input_type["@type"] == "List":
+            return List[input_type["@class"]]
+        elif input_type["@type"] == "Set":
+            return Set[input_type["@class"]]
+        elif input_type["@type"] == "Optional":
+            return Optional[input_type["@class"]]
     elif input_type in invert_type:
         return invert_type[input_type]
     else:
