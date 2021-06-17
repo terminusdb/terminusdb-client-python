@@ -1081,10 +1081,9 @@ class WOQLClient:
         add_args = ["prefixed", "unfold"]
         self._check_connection()
         payload = {"graph_type": graph_type}
-        if count is None:
-            count = "unlimited"
         payload["skip"] = skip
-        payload["count"] = count
+        if count is not None:
+            payload["count"] = count
         for the_arg in add_args:
             if the_arg in kwargs:
                 payload[the_arg] = kwargs[the_arg]
