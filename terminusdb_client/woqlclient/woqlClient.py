@@ -752,7 +752,7 @@ class WOQLClient:
         self._connected = True
         self._db = dbid
         self._dispatch("post", self._db_url(), details)
-        self._context = self._get_prefixes()
+        # self._context = self._get_prefixes()
 
     def delete_database(
         self,
@@ -980,7 +980,7 @@ class WOQLClient:
         """
         add_args = ["prefixed", "minimized", "unfold"]
         self._check_connection()
-        payload = {"id": iri_id}
+        payload = {"id": iri_id, "graph_type": graph_type}
         for the_arg in add_args:
             if the_arg in kwargs:
                 payload[the_arg] = kwargs[the_arg]
@@ -1030,7 +1030,7 @@ class WOQLClient:
         """
         add_args = ["prefixed", "unfold"]
         self._check_connection()
-        payload = {"type": doc_type}
+        payload = {"type": doc_type, "graph_type": graph_type}
         if count is None:
             count = "unlimited"
         payload["skip"] = skip
@@ -1080,7 +1080,7 @@ class WOQLClient:
         """
         add_args = ["prefixed", "unfold"]
         self._check_connection()
-        payload = {}
+        payload = {"graph_type": graph_type}
         if count is None:
             count = "unlimited"
         payload["skip"] = skip
@@ -1090,7 +1090,7 @@ class WOQLClient:
                 payload[the_arg] = kwargs[the_arg]
         with NoRequestWarning(self.insecure):
             result = requests.get(
-                self._documents_url(graph_type),
+                self._documents_url(),
                 verify=(not self.insecure),
                 params=payload,
                 auth=self._auth(),
@@ -1122,11 +1122,12 @@ class WOQLClient:
             list of ids of the inseted docuemnts
         """
         self._check_connection()
-        commit = self._generate_commit(commit_msg)["commit_info"]
+        params = self._generate_commit(commit_msg)["commit_info"]
+        params["graph_type"] = graph_type
         with NoRequestWarning(self.insecure):
             result = requests.post(
-                self._documents_url(graph_type),
-                params=commit,
+                self._documents_url(),
+                params=params,
                 json=document,
                 auth=self._auth(),
                 verify=(not self.insecure),
@@ -1153,12 +1154,13 @@ class WOQLClient:
             if the client does not connect to a database
         """
         self._check_connection()
-        commit = self._generate_commit(commit_msg)["commit_info"]
+        params = self._generate_commit(commit_msg)["commit_info"]
+        params["graph_type"] = graph_type
         with NoRequestWarning(self.insecure):
             _finish_reponse(
                 requests.put(
                     self._documents_url(graph_type),
-                    params=commit,
+                    params=params,
                     json=document,
                     auth=self._auth(),
                     verify=(not self.insecure),
@@ -1185,12 +1187,13 @@ class WOQLClient:
             if the client does not connect to a database
         """
         self._check_connection()
-        commit = self._generate_commit(commit_msg)["commit_info"]
+        params = self._generate_commit(commit_msg)["commit_info"]
+        params["graph_type"] = graph_type
         with NoRequestWarning(self.insecure):
             _finish_reponse(
                 requests.delete(
-                    self._documents_url(graph_type),
-                    params=commit,
+                    self._documents_url(),
+                    params=params,
                     json=doc_id,
                     auth=self._auth(),
                     verify=(not self.insecure),
@@ -2096,7 +2099,7 @@ class WOQLClient:
             base_url = self._branch_base("csv")
         return f"{base_url}/{graph_type}/{graph_id}"
 
-    def _documents_url(self, graph_type="instance"):
+    def _documents_url(self):
         if self._db == "_system":
             base_url = self._db_base("document")
         else:
