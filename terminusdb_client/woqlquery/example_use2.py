@@ -97,8 +97,6 @@ home.street = "123 Abc Street"
 # pp.pprint(my_schema.to_dict())
 import terminusdb_client.woql_utils as utils
 
-print(list(utils._result2stream("{} {} []")))
-exit(1)
 client = WOQLClient("https://127.0.0.1:6363/", insecure=True)
 client.connect(db="test_docapi")
 #client.create_database("test_docapi")

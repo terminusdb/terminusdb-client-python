@@ -128,12 +128,13 @@ def _result2stream(result):
     decoder = json.JSONDecoder()
 
     idx = 0
+    result_length = len(result)
     while True:
-        if idx >= len(result):
-            raise StopIteration
+        if idx >= result_length:
+            return
         data, offset = decoder.raw_decode(result[idx:])
         idx += offset
-        while result[idx].isspace():
+        while idx < result_length and result[idx].isspace():
             idx += 1
         yield data
 
