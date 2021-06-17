@@ -1097,7 +1097,10 @@ class WOQLClient:
         return _result2stream(_finish_reponse(result))
 
     def insert_document(
-        self, document: Union[dict, List[dict]], graph_type: str, commit_msg: str
+        self,
+        document: Union[dict, List[dict]],
+        graph_type: str,
+        commit_msg: Optional[str] = None,
     ) -> None:
         """Inserts the specified document(s)
 
@@ -1134,7 +1137,10 @@ class WOQLClient:
         return json.loads(_finish_reponse(result))
 
     def replace_document(
-        self, document: Union[dict, List[dict]], graph_type: str, commit_msg: str
+        self,
+        document: Union[dict, List[dict]],
+        graph_type: str,
+        commit_msg: Optional[str] = None,
     ) -> None:
         """Updates the specified document(s)
 
@@ -1167,7 +1173,10 @@ class WOQLClient:
             )
 
     def delete_document(
-        self, doc_id: Union[str, List[str]], graph_type: str, commit_msg: str
+        self,
+        doc_id: Union[str, List[str]],
+        graph_type: str,
+        commit_msg: Optional[str] = None,
     ) -> None:
         """Delete the specified document(s)
 
