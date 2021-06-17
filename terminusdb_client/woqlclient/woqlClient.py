@@ -986,7 +986,7 @@ class WOQLClient:
                 payload[the_arg] = kwargs[the_arg]
 
         with NoRequestWarning(self.insecure):
-            result = request.get(
+            result = requests.get(
                 self._documents_url(graph_type),
                 verify=(not self.insecure),
                 params=payload,
@@ -1039,7 +1039,7 @@ class WOQLClient:
             if the_arg in kwargs:
                 payload[the_arg] = kwargs[the_arg]
         with NoRequestWarning(self.insecure):
-            result = request.get(
+            result = requests.get(
                 self._documents_url(graph_type),
                 verify=(not self.insecure),
                 params=payload,
@@ -1089,7 +1089,7 @@ class WOQLClient:
             if the_arg in kwargs:
                 payload[the_arg] = kwargs[the_arg]
         with NoRequestWarning(self.insecure):
-            result = request.get(
+            result = requests.get(
                 self._documents_url(graph_type),
                 verify=(not self.insecure),
                 params=payload,
@@ -1124,7 +1124,7 @@ class WOQLClient:
         self._check_connection()
         commit = self._generate_commit(commit_msg)["commit_info"]
         with NoRequestWarning(self.insecure):
-            result = request.post(
+            result = requests.post(
                 self._documents_url(graph_type),
                 params=commit,
                 json=document,
@@ -1156,7 +1156,7 @@ class WOQLClient:
         commit = self._generate_commit(commit_msg)["commit_info"]
         with NoRequestWarning(self.insecure):
             _finish_reponse(
-                request.put(
+                requests.put(
                     self._documents_url(graph_type),
                     params=commit,
                     json=document,
@@ -1188,7 +1188,7 @@ class WOQLClient:
         commit = self._generate_commit(commit_msg)["commit_info"]
         with NoRequestWarning(self.insecure):
             _finish_reponse(
-                request.delete(
+                requests.delete(
                     self._documents_url(graph_type),
                     params=commit,
                     json=doc_id,

@@ -97,7 +97,7 @@ home.street = "123 Abc Street"
 # pp.pprint(my_schema.to_dict())
 
 client = WOQLClient("https://127.0.0.1:6363/", insecure=True)
-client.connect("test_docapi")
+client.connect(db="test_docapi")
 # client.create_database("test_docapi")
 print(client._auth())
 # client.insert_document(my_schema.to_dict(), graph_type="schema")
