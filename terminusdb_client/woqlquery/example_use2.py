@@ -70,7 +70,6 @@ class Address(MyDocument):
     _key = HashKey(["street", "region", "postal_code"])
     _base = "Adddress_"
     street: str
-    region: "Region"
     postal_code: str
 
 
@@ -101,9 +100,10 @@ client = WOQLClient("https://127.0.0.1:6363/", insecure=True)
 client.connect(db="test_docapi")
 #client.create_database("test_docapi")
 #print(client._auth())
-stuff = my_schema.to_dict()
-pp.pprint(stuff)
-client.insert_document(my_schema.to_dict(),
-                       commit_msg="I am checking in the schema",
-                       graph_type="schema")
-
+# stuff = my_schema.to_dict()
+# pp.pprint(stuff)
+# client.insert_document(my_schema.to_dict(),
+#                        commit_msg="I am checking in the schema",
+#                        graph_type="schema")
+results = client.get_all_documents(graph_type="schema")
+print(list(results))
