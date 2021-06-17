@@ -10,6 +10,7 @@ from terminusdb_client.woqlquery.woql_schema import (
     WOQLSchema,
 )
 
+import pprint as pp
 # from woql_schema import WOQLSchema, Document, Property, WOQLObject
 
 my_schema = WOQLSchema()
@@ -98,6 +99,11 @@ home.street = "123 Abc Street"
 
 client = WOQLClient("https://127.0.0.1:6363/", insecure=True)
 client.connect(db="test_docapi")
-# client.create_database("test_docapi")
-print(client._auth())
-# client.insert_document(my_schema.to_dict(), graph_type="schema")
+#client.create_database("test_docapi")
+#print(client._auth())
+stuff = my_schema.to_dict()
+pp.pprint(stuff)
+client.insert_document(my_schema.to_dict(),
+                       commit_msg="I am checking in the schema",
+                       graph_type="schema")
+
