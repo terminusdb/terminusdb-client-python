@@ -20,16 +20,19 @@ def to_woql_type(input_type: type):
         if isinstance(input_type, ForwardRef):
             return input_type.__forward_arg__
         elif input_type._name:
-            return [input_type._name.lower(), *map(to_woql_type, input_type.__args__)]
+            return {
+                "@type": input_type._name,
+                "@class": to_woql_type(input_type.__args__[0]),
+            }
         else:
-            return ["optional", *map(to_woql_type, input_type.__args__[:-1])]
+            return {"@type": "Optional", "@class": to_woql_type(input_type.__args__[0])}
     else:
         return str(input_type)
 
 
 def from_woql_type(input_type: Union[str, list]):
     invert_type = {v: k for k, v in COVERT_TYPE.items()}
-    if isinstance(input_type, "list"):
+    if isinstance(input_type, "list"):  ## NEED UPDATE
         if input_type[0] == "list":
             return List[input_type[1]]
         elif input_type[0] == "set":

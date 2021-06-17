@@ -5,6 +5,7 @@ import json
 import os
 import warnings
 from base64 import b64encode
+from collections.abc import Iterable
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
 
@@ -26,10 +27,12 @@ class NoRequestWarning:
         self.insecure = insecure
 
     def __enter__(self):
-        warnings.simplefilter("ignore", InsecureRequestWarning)
+        if self.insecure:
+            warnings.simplefilter("ignore", InsecureRequestWarning)
 
-    def __exit__(self):
-        warnings.resetwarnings()
+    def __exit__(self, type, value, traceback):
+        if self.insecure:
+            warnings.resetwarnings()
 
 
 class WOQLClient:
@@ -107,18 +110,29 @@ class WOQLClient:
 
         self._connected = True
 
-        capabilities = self._dispatch_json("get", self._api)
-        self._uid = capabilities["@id"]
+        # capabilities = self._dispatch_json("get", self._api)
+        # self._uid = capabilities["@id"]
+        print(self._auth())
+        with NoRequestWarning(self.insecure):
+            self._all_avaliable_db = json.loads(
+                _finish_reponse(
+                    requests.get(
+                        self._api, auth=self._auth(), verify=(not self.insecure)
+                    )
+                )
+            )
 
         #
         # Get the current user's identifier, if logged in to Hub, it will be their email otherwise it will be the user provided
-        if capabilities.get("system:user_identifier"):
-            self._author = capabilities["system:user_identifier"]["@value"]
-        else:
-            self._author = self._user
+        # if capabilities.get("system:user_identifier"):
+        #     self._author = capabilities["system:user_identifier"]["@value"]
+        # else:
+        #     self._author = self._user
 
-        if self._db is not None:
-            self._context = self._get_prefixes()
+        self._author = self._user
+
+        # if self._db is not None:
+        #     self._context = self._get_prefixes()
 
     def close(self) -> None:
         """Undo connect and close the connection.
@@ -987,7 +1001,7 @@ class WOQLClient:
         skip: int = 0,
         count: Optional[int] = None,
         **kwargs,
-    ) -> typing.iterable:
+    ) -> Iterable:
         # TODO: make return iterable
         """Retrieves the documents by type
 
@@ -1039,7 +1053,7 @@ class WOQLClient:
         skip: int = 0,
         count: Optional[int] = None,
         **kwargs,
-    ) -> typing.iterable:
+    ) -> Iterable:
         # TODO: make return iterable
         """Retrieves all avalibale the documents
 
@@ -1083,6 +1097,42 @@ class WOQLClient:
             )
         return _result2stream(_finish_reponse(result))
 
+    def insert_document(
+        self, document: Union[dict, List[dict]], graph_type: str, commit_msg: str
+    ) -> None:
+        """Inserts the specified document(s)
+
+        Parameters
+        ----------
+        document: dict or list of dict
+            Document(s) to be inserted.
+        graph_type : str
+            Graph type, either "inference", "instance" or "schema".
+        commit_msg : str
+            Commit message.
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
+
+        Returns
+        -------
+        list
+            list of ids of the inseted docuemnts
+        """
+        self._check_connection()
+        commit = self._generate_commit(commit_msg)["commit_info"]
+        with NoRequestWarning(self.insecure):
+            result = request.post(
+                self._documents_url(graph_type),
+                params=commit,
+                json=document,
+                auth=self._auth(),
+                verify=(not self.insecure),
+            )
+        return json.loads(_finish_reponse(result))
+
     def replace_document(
         self, document: Union[dict, List[dict]], graph_type: str, commit_msg: str
     ) -> None:
@@ -1090,7 +1140,7 @@ class WOQLClient:
 
         Parameters
         ----------
-        document: str
+        document: dict or list of dict
             Document(s) to be updated.
         graph_type : str
             Graph type, either "inference", "instance" or "schema".
@@ -1111,22 +1161,21 @@ class WOQLClient:
                     params=commit,
                     json=document,
                     auth=self._auth(),
+                    verify=(not self.insecure),
                 )
             )
 
-    def insert_triples(
-        self, graph_type: str, graph_id: str, turtle, commit_msg: Optional[str] = None
+    def delete_document(
+        self, doc_id: Union[str, List[str]], graph_type: str, commit_msg: str
     ) -> None:
-        """Inserts into the specified graph with the triples encoded in turtle format.
+        """Delete the specified document(s)
 
         Parameters
         ----------
+        doc_id: str or list of str
+            Id(s) of document(s) to be updated.
         graph_type : str
             Graph type, either "inference", "instance" or "schema".
-        graph_id : str
-            Graph identifier.
-        turtle
-            Valid set of triples in Turtle format.
         commit_msg : str
             Commit message.
 
@@ -1136,13 +1185,17 @@ class WOQLClient:
             if the client does not connect to a database
         """
         self._check_connection()
-        commit = self._generate_commit(commit_msg)
-        commit["turtle"] = turtle
-        self._dispatch(
-            "put",
-            self._triples_url(graph_type, graph_id),
-            commit,
-        )
+        commit = self._generate_commit(commit_msg)["commit_info"]
+        with NoRequestWarning(self.insecure):
+            _finish_reponse(
+                request.delete(
+                    self._documents_url(graph_type),
+                    params=commit,
+                    json=doc_id,
+                    auth=self._auth(),
+                    verify=(not self.insecure),
+                )
+            )
 
     def get_csv(
         self,

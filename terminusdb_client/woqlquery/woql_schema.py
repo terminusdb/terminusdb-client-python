@@ -10,25 +10,25 @@ from .woql_query import WOQLQuery as WQ
 
 
 class HashKey:
-    at_type = "sys:Hash"
+    at_type = "Hash"
 
     def __init__(self, keys: Union[str, list]):
         self._keys = keys
 
 
 class LexicalKey:
-    at_type = "sys:Lexical"
+    at_type = "Lexical"
 
     def __init__(self, keys: Union[str, list]):
         self._keys = keys
 
 
 class ValueHashKey:
-    at_type = "sys:ValueHash"
+    at_type = "ValueHash"
 
 
 class RandomKey:
-    at_type = "sys:Random"
+    at_type = "Random"
 
 
 class TerminusClass(type):
@@ -70,8 +70,6 @@ class TerminusClass(type):
         return cls.__name__
 
 
-
-
 class ObjectTemplate(metaclass=TerminusClass):
     _schema = None
 
@@ -83,32 +81,39 @@ class ObjectTemplate(metaclass=TerminusClass):
 
     @classmethod
     def _to_dict(cls):
-        result = {"@type": cls.__base__.__name__, "@id": cls.__name__}
-        if cls.__doc__:
-            result["sys:comment"] = cls.__doc__
-        if result["@type"] == "ObjectTemplate":
-            result["@type"] = "Object"
-        elif result["@type"] == "DocumentTemplate":
-            result["@type"] = "Document"
-        elif result["@type"] == "TaggedUnion":
-            result["@type"] = "sys:TaggedUnion"
+        result = {"@type": "Class", "@id": cls.__name__}
+        if (
+            cls.__base__.__name__ != "ObjectTemplate"
+            and cls.__base__.__name__ != "DocumentTemplate"
+        ):
+            result["@inherits"] = cls.__base__.__name__
+        elif cls.__base__.__name__ == "TaggedUnion":
+            result["@type"] = "TaggedUnion"
+
+        # if cls.__doc__:
+        #     result["sys:comment"] = cls.__doc__
+
         if hasattr(cls, "_base"):
-            result["sys:base"] = cls._base
+            result["@base"] = cls._base
+        if hasattr(cls, "_subdocument"):
+            result["@subdocument"] = cls._subdocument
+        if hasattr(cls, "_abstract"):
+            result["@abstract"] = cls._abstract
         if hasattr(cls, "_key"):
             if hasattr(cls._key, "_keys"):
-                result["sys:key"] = {
+                result["@key"] = {
                     "@type": cls._key.__class__.at_type,
-                    "sys:fields": cls._key._keys,
+                    "@fields": cls._key._keys,
                 }
             else:
-                result["sys:key"] = {"@type": cls._key.__class__.at_type}
+                result["@key"] = {"@type": cls._key.__class__.at_type}
         if hasattr(cls, "__annotations__"):
             for attr, attr_type in cls.__annotations__.items():
                 result[attr] = wt.to_woql_type(attr_type)
         return result
 
     def _obj_to_dict(self):
-        result = {'@type' : self.__class__, '@id': ""}
+        result = {"@type": self.__class__, "@id": ""}
         for item in self._annotations.keys():
             if hasattr(self, item):
                 result[item] = eval(f"self.{item}")
@@ -145,17 +150,19 @@ class EnumTemplate(Enum):
 
     @classmethod
     def _to_dict(cls):
-        result = {"@type": "Enum", "@id": cls.__name__, "sys:value": []}
+        result = {"@type": "Enum", "@id": cls.__name__, "@value": []}
         for item in cls.__members__:
             if item[0] != "_":
-                result["sys:value"].append(item)
+                result["@value"].append(item)
         # if hasattr(self, "__annotations__"):
         #     for attr, attr_type in self.__annotations__.items():
         #         result[attr] = str(attr_type)
         return result
 
+
 class TaggedUnion(ObjectTemplate):
     pass
+
 
 class WOQLSchema:
     def __init__(self):

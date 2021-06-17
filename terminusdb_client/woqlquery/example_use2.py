@@ -1,12 +1,13 @@
 from typing import List, Optional, Set
 
+from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from terminusdb_client.woqlquery.woql_schema import (
     DocumentTemplate,
     EnumTemplate,
     HashKey,
     ObjectTemplate,
+    TaggedUnion,
     WOQLSchema,
-    TaggedUnion
 )
 
 # from woql_schema import WOQLSchema, Document, Property, WOQLObject
@@ -71,9 +72,11 @@ class Address(MyDocument):
     region: "Region"
     postal_code: str
 
+
 class Contact(TaggedUnion):
-    local_number : int
+    local_number: int
     international: str
+
 
 home = Address()
 home.street = "123 Abc Street"
@@ -91,4 +94,10 @@ home.street = "123 Abc Street"
 # my_schema.commit()
 # print(dir(Address))
 # print(Contact._to_dict())
-print(home._obj_to_dict())
+# pp.pprint(my_schema.to_dict())
+
+client = WOQLClient("https://127.0.0.1:6363/", insecure=True)
+client.connect("test_docapi")
+# client.create_database("test_docapi")
+print(client._auth())
+# client.insert_document(my_schema.to_dict(), graph_type="schema")
