@@ -133,7 +133,7 @@ def _result2stream(result):
             raise StopIteration
         data, offset = decoder.raw_decode(result[idx:])
         idx += offset
-        if result[idx] == " ":
+        while result[idx].isspace():
             idx += 1
         yield data
 
