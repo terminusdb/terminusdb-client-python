@@ -1,7 +1,7 @@
 import datetime as dt
 from typing import ForwardRef, List, Optional, Set, Union
 
-COVERT_TYPE = {
+CONVERT_TYPE = {
     str: "xsd:string",
     bool: "xsd:boolean",
     float: "xsd:decimal",
@@ -14,8 +14,8 @@ COVERT_TYPE = {
 
 
 def to_woql_type(input_type: type):
-    if input_type in COVERT_TYPE:
-        return COVERT_TYPE[input_type]
+    if input_type in CONVERT_TYPE:
+        return CONVERT_TYPE[input_type]
     elif hasattr(input_type, "__module__") and input_type.__module__ == "typing":
         if isinstance(input_type, ForwardRef):
             return input_type.__forward_arg__
@@ -31,7 +31,7 @@ def to_woql_type(input_type: type):
 
 
 def from_woql_type(input_type: Union[str, dict]):
-    invert_type = {v: k for k, v in COVERT_TYPE.items()}
+    invert_type = {v: k for k, v in CONVERT_TYPE.items()}
     if isinstance(input_type, "dict"):
         if input_type["@type"] == "List":
             return List[input_type["@class"]]
