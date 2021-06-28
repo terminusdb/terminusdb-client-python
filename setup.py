@@ -23,7 +23,7 @@ for old_str, new_str in replace_pairs.items():
 
 # ---
 
-requires = ["requests"]
+requires = ["requests", "numpydoc"]
 
 test_requirements = [
     "pytest>=3",

@@ -1,6 +1,5 @@
 from typing import List, Optional, Set
 
-from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from terminusdb_client.woqlquery.woql_schema import (
     DocumentTemplate,
     EnumTemplate,
@@ -10,7 +9,6 @@ from terminusdb_client.woqlquery.woql_schema import (
     WOQLSchema,
 )
 
-import pprint as pp
 # from woql_schema import WOQLSchema, Document, Property, WOQLObject
 
 my_schema = WOQLSchema()
@@ -41,11 +39,18 @@ class Address(MyObject):
 
 class Person(MyDocument):
     """This is a person
-    attribute
-    =========
-    name: this is the name of that Person
-    age: age of that person, integer
-    friend_of: who is this person friend's with"""
+    I hate human
+
+    This is extended summary and there will be more things here.
+    This is the next line.
+
+    Attributes
+    ----------
+    x : float
+        The X coordinate.
+    y : float
+        The Y coordinate.
+    """
 
     name: str
     age: int
@@ -69,6 +74,7 @@ class Address(MyDocument):
 
     _key = HashKey(["street", "region", "postal_code"])
     _base = "Adddress_"
+    _subdocument = []
     street: str
     postal_code: str
 
@@ -80,7 +86,10 @@ class Contact(TaggedUnion):
 
 home = Address()
 home.street = "123 Abc Street"
-# cheuk = Employee()
+home._id = "dnkasnklslkd"
+
+cheuk = Employee()
+cheuk.address_of = home
 # cheuk.contact_number = "13123238473897"
 # cheuk.commit(client)
 # client.commit_objects(cheuk, gavin, matthijs)
@@ -95,18 +104,19 @@ home.street = "123 Abc Street"
 # print(dir(Address))
 # print(Contact._to_dict())
 # pp.pprint(my_schema.to_dict())
-import terminusdb_client.woql_utils as utils
 
-client = WOQLClient("https://127.0.0.1:6363/", insecure=True)
-client.connect(db="test_docapi")
-#client.create_database("test_docapi")
-#print(client._auth())
-# stuff = my_schema.to_dict()
-# pp.pprint(stuff)
-# client.insert_document(my_schema.to_dict(),
-#                        commit_msg="I am checking in the schema",
-#                        graph_type="schema")
-results = client.get_all_documents(graph_type="schema")
-print(list(results))
+# client = WOQLClient("https://127.0.0.1:6363/", insecure=True)
+# client.connect(db="test_docapi")
+# #client.create_database("test_docapi")
+# #print(client._auth())
+# # stuff = my_schema.to_dict()
+# # pp.pprint(stuff)
+# # client.insert_document(my_schema.to_dict(),
+# #                        commit_msg="I am checking in the schema",
+# #                        graph_type="schema")
+# results = client.get_all_documents(graph_type="schema")
+# print(list(results))
 
 
+# print(cheuk._obj_to_dict())
+print(Person._to_dict())

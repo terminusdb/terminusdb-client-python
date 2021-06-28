@@ -2,6 +2,8 @@ from copy import deepcopy
 from enum import Enum
 from typing import Optional, Union
 
+from numpydoc.docscrape import ClassDoc
+
 from .. import woql_type as wt
 from ..woqlclient.woqlClient import WOQLClient
 from .woql_query import WOQLQuery as WQ
@@ -90,8 +92,14 @@ class ObjectTemplate(metaclass=TerminusClass):
         elif cls.__base__.__name__ == "TaggedUnion":
             result["@type"] = "TaggedUnion"
 
-        # if cls.__doc__:
-        #     result["sys:comment"] = cls.__doc__
+        if cls.__doc__:
+            doc_obj = ClassDoc(cls)
+            result["@documentation"] = {
+                "@comment": "\n".join(doc_obj["Summary"] + doc_obj["Extended Summary"]),
+                "@properties": {
+                    thing.name: "\n".join(thing.desc) for thing in doc_obj["Attributes"]
+                },
+            }
 
         if hasattr(cls, "_base"):
             result["@base"] = cls._base
@@ -113,12 +121,17 @@ class ObjectTemplate(metaclass=TerminusClass):
         return result
 
     def _obj_to_dict(self):
-        result = {"@type": self.__class__, "@id": ""}
+        result = {"@type": self.__class__}
+        if hasattr(self, "_id"):
+            result["@id"] = self._id
         for item in self._annotations.keys():
             if hasattr(self, item):
-                result[item] = eval(f"self.{item}")
-            else:
-                result[item] = None
+                the_item = eval(f"self.{item}")
+                if the_item is not None:
+                    if hasattr(the_item.__class__, "_subdocument"):
+                        result[item] = the_item._obj_to_dict()
+                    else:
+                        result[item] = the_item
         return result
 
 
