@@ -56,5 +56,5 @@ setuptools.setup(
     setup_requires=["pytest-runner"],
     tests_require=test_requirements,
     extras_require=extras_require,
-    python_requires=">=3.6",
+    python_requires=">=3.7",
 )
