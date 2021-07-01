@@ -1,4 +1,4 @@
-from typing import Set
+from typing import List, Set
 
 from terminusdb_client.woqlquery.woql_schema import (
     DocumentTemplate,
@@ -9,17 +9,35 @@ from terminusdb_client.woqlquery.woql_schema import (
 
 my_schema = WOQLSchema()
 
-# class MyObject(ObjectTemplate):
-#     _schema = my_schema
-#
-# class MyDocument(DocumentTemplate):
-#     _schema = my_schema
+
+class Coordinate(ObjectTemplate):
+    """Coordinate of location.
+
+    Coordinate to identify the location of a place on earth, it could be found from Google map.
+
+    Attributes
+    ----------
+    x : float
+        The X coordinate.
+    y : float
+        The Y coordinate.
+    """
+
+    _schema = my_schema
+    x: float
+    y: float
+
+
+class Country(DocumentTemplate):
+    _schema = my_schema
+    name: str
+    perimeter: List[Coordinate]
 
 
 class Address(ObjectTemplate):
     _schema = my_schema
     street: str
-    # country : Country
+    country: Country
 
 
 class Person(DocumentTemplate):
@@ -30,36 +48,34 @@ class Person(DocumentTemplate):
 
 
 class Employee(Person):
+    _schema = my_schema
     address_of: Address
     contact_number: str
     managed_by: "Employee"
 
 
 class Team(EnumTemplate):
-    """This is Team"""
-
     _schema = my_schema
     IT = ()
     Marketing = ()
 
 
-# other_schema = my_schema.copy()
-
-# class Country(Property):
-#     domain = Address
-#     prop_range = "xsd:string"
-#     schema = other_schema
-
-
 def test_schema_construct():
-    assert my_schema.all_obj() == {Employee, Person, Address, Team}
+    assert my_schema.all_obj() == {Employee, Person, Address, Team, Country, Coordinate}
     # assert my_schema.all_prop() == {AddressOf, Title, PostCode}
     # assert Employee.properties == {AddressOf, Title}
 
 
 def test_schema_copy():
     copy_schema = my_schema.copy()
-    assert copy_schema.all_obj() == {Employee, Person, Address, Team}
+    assert copy_schema.all_obj() == {
+        Employee,
+        Person,
+        Address,
+        Team,
+        Country,
+        Coordinate,
+    }
     # assert copy_schema.all_prop() == {AddressOf, Title, PostCode}
 
 

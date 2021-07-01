@@ -30,6 +30,31 @@ def mocked_requests_get(*args, **kwargs):
     return MockResponse(None, 404)
 
 
+def mocked_requests_post(*args, **kwargs):
+    class MockResponse:
+        def __init__(self, text, json_data, status_code):
+            self.json_data = json_data
+            self.status_code = status_code
+            self.text = text
+
+        def json(self):
+            return self.json_data
+
+    if "http://localhost:6363/" in args[0]:
+        mock_result = {
+            "@type": "api:WoqlResponse",
+            "api:status": "api:success",
+            "api:variable_names": [],
+            "bindings": [{}],
+            "deletes": 0,
+            "inserts": 1,
+            "transaction_retry_count": 0,
+        }
+        return MockResponse(json.dumps(mock_result), {"key1": "value1"}, 200)
+
+    return MockResponse(None, 404)
+
+
 def mock_func_with_1arg(_):
     return True
 
@@ -52,9 +77,8 @@ def test_connection(mocked_requests):
 
     requests.get.assert_called_once_with(
         "http://localhost:6363/api",
-        headers={"Authorization": "Basic YWRtaW46cm9vdA=="},
-        params={},
-        verify=False,
+        auth=("admin", "root"),
+        verify=True,
     )
 
 
@@ -87,8 +111,8 @@ def test_create_database(mocked_requests, mocked_requests2):
 
     requests.post.assert_called_once_with(
         "http://localhost:6363/api/db/admin/myFirstTerminusDB",
-        headers={"Authorization": "Basic YWRtaW46cm9vdA=="},
-        verify=False,
+        auth=("admin", "root"),
+        verify=True,
         json={"label": "my first db", "comment": "my first db comment"},
     )
 
@@ -115,8 +139,8 @@ def test_create_database_with_schema(
 
     requests.post.assert_called_once_with(
         "http://localhost:6363/api/db/admin/myFirstTerminusDB",
-        headers={"Authorization": "Basic YWRtaW46cm9vdA=="},
-        verify=False,
+        auth=("admin", "root"),
+        verify=True,
         json={"label": "my first db", "comment": "my first db comment", "schema": True},
     )
 
@@ -138,8 +162,8 @@ def test_create_database_and_change_account(mocked_requests, mocked_requests2):
 
     requests.post.assert_called_once_with(
         "http://localhost:6363/api/db/my_new_account/myFirstTerminusDB",
-        headers={"Authorization": "Basic YWRtaW46cm9vdA=="},
-        verify=False,
+        auth=("admin", "root"),
+        verify=True,
         json={"label": "my first db", "comment": "my first db comment"},
     )
 
@@ -155,8 +179,8 @@ def test_branch(mocked_requests, mocked_requests2):
 
     requests.post.assert_called_once_with(
         "http://localhost:6363/api/branch/admin/myDBName/local/branch/my_new_branch",
-        headers={"Authorization": "Basic YWRtaW46cm9vdA=="},
-        verify=False,
+        auth=("admin", "root"),
+        verify=True,
         json={"origin": "admin/myDBName/local/branch/main"},
     )
 
@@ -198,8 +222,8 @@ def test_query(mocked_requests, mocked_requests2):
 
     requests.post.assert_called_once_with(
         "http://localhost:6363/api/woql/admin/myDBName/local/branch/main",
-        headers={"Authorization": "Basic YWRtaW46cm9vdA=="},
-        verify=False,
+        auth=("admin", "root"),
+        verify=True,
         json={
             "commit_info": {
                 "author": "admin",
@@ -219,20 +243,10 @@ def test_query_nodb(mocked_requests):
 
 
 @mock.patch("requests.get", side_effect=mocked_requests_get)
-@mock.patch.object(WOQLClient, "_dispatch_json")
+@mock.patch("requests.post", side_effect=mocked_requests_post)
 def test_query_commit_made(mocked_execute, mocked_requests):
-    # mocked_execute.return_value = MOCK_CAPABILITIES
     woql_client = WOQLClient("http://localhost:6363")
     woql_client.connect(user="admin", account="admin", key="root", db="myDBName")
-    mocked_execute.return_value = {
-        "@type": "api:WoqlResponse",
-        "api:status": "api:success",
-        "api:variable_names": [],
-        "bindings": [{}],
-        "deletes": 0,
-        "inserts": 1,
-        "transaction_retry_count": 0,
-    }
     result = woql_client.query(WoqlStar)
     assert result == "Commit successfully made."
 

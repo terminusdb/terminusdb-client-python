@@ -4,6 +4,10 @@ init:
 	pipenv install --dev
 	python -m pip install -e .
 
+#test without integration test
+unittest:
+	pytest terminusdb_client/tests --ignore=terminusdb_client/tests/integration_tests
+
 # Command to run test and generate a coverage report on terminal
 coverage:
 	pytest --cov=terminusdb_client terminusdb_client/tests/
