@@ -4,9 +4,9 @@ from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from terminusdb_client.woqlquery.woql_schema import (
     DocumentTemplate,
     EnumTemplate,
-    HashKey,
     ObjectTemplate,
     TaggedUnion,
+    ValueHashKey,
     WOQLSchema,
 )
 
@@ -30,8 +30,10 @@ class Country(DocumentTemplate):
 class Address(DocumentTemplate):
     """This is address"""
 
-    _key = HashKey(["street", "postal_code", "country"])
-    _base = "Adddress_"
+    # _key = HashKey(["street", "postal_code"])
+    # _key = LexicalKey(["street", "postal_code"])
+    _key = ValueHashKey()
+    # _base = "Adddress_"
     _subdocument = []
     _schema = my_schema
     street: str

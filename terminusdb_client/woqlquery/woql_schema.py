@@ -1,6 +1,9 @@
 from copy import deepcopy
 from enum import Enum
+from hashlib import sha256
 from typing import Optional, Union
+from urllib.parse import quote
+from uuid import uuid4
 
 from numpydoc.docscrape import ClassDoc
 
@@ -11,25 +14,67 @@ from ..woqlclient.woqlClient import WOQLClient
 
 
 class HashKey:
+    """Generating ID with SHA256 using provided keys"""
+
     at_type = "Hash"
 
     def __init__(self, keys: Union[str, list]):
         self._keys = keys
 
+    def idgen(self, obj: "ObjectTemplate"):
+        key_list = []
+        for item in self._keys:
+            key_list.append(eval(f"obj.{item}"))
+        if hasattr(obj.__class__, "_base"):
+            prefix = obj.__class__._base
+        else:
+            prefix = obj.__class__.__name__ + "_"
+        return prefix + sha256((quote("_".join(key_list))).encode("utf-8")).hexdigest()
+
 
 class LexicalKey:
+    """Generating ID with urllib.parse.quote using provided keys"""
+
     at_type = "Lexical"
 
     def __init__(self, keys: Union[str, list]):
         self._keys = keys
 
+    def idgen(self, obj: "ObjectTemplate"):
+        key_list = []
+        for item in self._keys:
+            key_list.append(eval(f"obj.{item}"))
+        if hasattr(obj.__class__, "_base"):
+            prefix = obj.__class__._base
+        else:
+            prefix = obj.__class__.__name__ + "_"
+        return prefix + quote("_".join(key_list))
+
 
 class ValueHashKey:
+    """Generating ID with SHA256"""
+
     at_type = "ValueHash"
+
+    def idgen(self, obj: "ObjectTemplate"):
+        if hasattr(obj.__class__, "_base"):
+            prefix = obj.__class__._base
+        else:
+            prefix = obj.__class__.__name__ + "_"
+        return prefix + sha256((quote(str(obj))).encode("utf-8")).hexdigest()
 
 
 class RandomKey:
+    """Generating ID with UUID4"""
+
     at_type = "Random"
+
+    def idgen(self, obj: "ObjectTemplate"):
+        if hasattr(obj.__class__, "_base"):
+            prefix = obj.__class__._base
+        else:
+            prefix = obj.__class__.__name__ + "_"
+        return prefix + uuid4().hex
 
 
 class TerminusClass(type):
@@ -73,6 +118,7 @@ class TerminusClass(type):
 
 class ObjectTemplate(metaclass=TerminusClass):
     _schema = None
+    _key = ValueHashKey()  # default key
 
     def __init__(self):
         self._new = True
@@ -120,7 +166,7 @@ class ObjectTemplate(metaclass=TerminusClass):
         return result
 
     def _obj_to_dict(self):
-        result = {"@type": self.__class__}
+        result = {"@type": str(self.__class__)}
         if hasattr(self, "_id"):
             result["@id"] = self._id
         for item in self._annotations.keys():
@@ -129,6 +175,8 @@ class ObjectTemplate(metaclass=TerminusClass):
                 if the_item is not None:
                     if hasattr(the_item.__class__, "_subdocument"):
                         result[item] = the_item._obj_to_dict()
+                    elif hasattr(the_item, "_id"):
+                        result[item] = {"@id": the_item._id}
                     else:
                         result[item] = the_item
         return result

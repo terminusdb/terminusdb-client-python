@@ -3,6 +3,7 @@ WOQLClient is the Python public API for TerminusDB"""
 import copy
 import json
 import os
+import pprint as pp
 import warnings
 from base64 import b64encode
 from collections.abc import Iterable
@@ -1143,6 +1144,8 @@ class WOQLClient:
             elif hasattr(object, "to_dict"):
                 return object.to_dict()
             elif hasattr(object, "_obj_to_dict"):
+                if not hasattr(object, "_id") and hasattr(object.__class__, "_key"):
+                    object._id = object.__class__._key.idgen(object)
                 return object._obj_to_dict()
             else:
                 raise ValueError("Object cannot convert to dictionary")
@@ -1150,11 +1153,15 @@ class WOQLClient:
         if isinstance(document, list):
             new_doc = []
             for item in document:
-                new_doc.append(conv_to_dict(item))
+                # while document:
+                #     item = document.pop()
+                item_dict = conv_to_dict(item)
+                new_doc.append(item_dict)
+                # id_list.append(item_dict['@id'])
             document = new_doc
         else:
             document = conv_to_dict(document)
-        print(document)
+        pp.pprint(document)
         with NoRequestWarning(self.insecure):
             result = requests.post(
                 self._documents_url(),
