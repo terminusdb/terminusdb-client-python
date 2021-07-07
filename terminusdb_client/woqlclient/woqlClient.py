@@ -1144,7 +1144,11 @@ class WOQLClient:
             elif hasattr(object, "to_dict"):
                 return object.to_dict()
             elif hasattr(object, "_obj_to_dict"):
-                if not hasattr(object, "_id") and hasattr(object.__class__, "_key"):
+                if (
+                    not hasattr(object, "_id")
+                    and not hasattr(object.__class__, "_subdocument")
+                    and hasattr(object.__class__._key, "idgen")
+                ):
                     object._id = object.__class__._key.idgen(object)
                 return object._obj_to_dict()
             else:

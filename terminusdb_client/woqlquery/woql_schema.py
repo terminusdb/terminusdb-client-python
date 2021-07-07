@@ -8,6 +8,7 @@ from uuid import uuid4
 from numpydoc.docscrape import ClassDoc
 
 from .. import woql_type as wt
+from ..woql_type import CONVERT_TYPE
 from ..woqlclient.woqlClient import WOQLClient
 
 # from typeguard import check_type
@@ -24,7 +25,11 @@ class HashKey:
     def idgen(self, obj: "ObjectTemplate"):
         key_list = []
         for item in self._keys:
-            key_list.append(eval(f"obj.{item}"))
+            key_item = eval(f"obj.{item}")
+            if isinstance(key_item, tuple(CONVERT_TYPE.keys())):
+                key_list.append(str(key_item))
+            else:
+                raise ValueError("Keys need to be datatype object")
         if hasattr(obj.__class__, "_base"):
             prefix = obj.__class__._base
         else:
@@ -43,7 +48,11 @@ class LexicalKey:
     def idgen(self, obj: "ObjectTemplate"):
         key_list = []
         for item in self._keys:
-            key_list.append(eval(f"obj.{item}"))
+            key_item = eval(f"obj.{item}")
+            if isinstance(key_item, tuple(CONVERT_TYPE.keys())):
+                key_list.append(str(key_item))
+            else:
+                raise ValueError("Keys need to be datatype object")
         if hasattr(obj.__class__, "_base"):
             prefix = obj.__class__._base
         else:
@@ -56,12 +65,12 @@ class ValueHashKey:
 
     at_type = "ValueHash"
 
-    def idgen(self, obj: "ObjectTemplate"):
-        if hasattr(obj.__class__, "_base"):
-            prefix = obj.__class__._base
-        else:
-            prefix = obj.__class__.__name__ + "_"
-        return prefix + sha256((quote(str(obj))).encode("utf-8")).hexdigest()
+    # def idgen(self, obj: "ObjectTemplate"):
+    #     if hasattr(obj.__class__, "_base"):
+    #         prefix = obj.__class__._base
+    #     else:
+    #         prefix = obj.__class__.__name__ + "_"
+    #     return prefix + sha256((quote(str(obj))).encode("utf-8")).hexdigest()
 
 
 class RandomKey:
@@ -118,7 +127,7 @@ class TerminusClass(type):
 
 class ObjectTemplate(metaclass=TerminusClass):
     _schema = None
-    _key = ValueHashKey()  # default key
+    _key = RandomKey()  # default key
 
     def __init__(self):
         self._new = True
@@ -150,9 +159,10 @@ class ObjectTemplate(metaclass=TerminusClass):
             result["@base"] = cls._base
         if hasattr(cls, "_subdocument"):
             result["@subdocument"] = cls._subdocument
+            result["@key"] = {"@type": "Random"}
         if hasattr(cls, "_abstract"):
             result["@abstract"] = cls._abstract
-        if hasattr(cls, "_key"):
+        if hasattr(cls, "_key") and not hasattr(cls, "_subdocument"):
             if hasattr(cls._key, "_keys"):
                 result["@key"] = {
                     "@type": cls._key.__class__.at_type,
@@ -173,10 +183,13 @@ class ObjectTemplate(metaclass=TerminusClass):
             if hasattr(self, item):
                 the_item = eval(f"self.{item}")
                 if the_item is not None:
-                    if hasattr(the_item.__class__, "_subdocument"):
+                    if hasattr(the_item.__class__, "_subdocument") or (
+                        hasattr(the_item.__class__, "_key")
+                        and not hasattr(the_item.__class__._key, "idgen")
+                    ):
                         result[item] = the_item._obj_to_dict()
                     elif hasattr(the_item, "_id"):
-                        result[item] = {"@id": the_item._id}
+                        result[item] = {"@id": the_item._id, "@type": "@id"}
                     else:
                         result[item] = the_item
         return result

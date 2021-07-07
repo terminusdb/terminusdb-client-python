@@ -4,6 +4,7 @@ from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from terminusdb_client.woqlquery.woql_schema import (
     DocumentTemplate,
     EnumTemplate,
+    HashKey,
     ObjectTemplate,
     TaggedUnion,
     ValueHashKey,
@@ -23,6 +24,7 @@ class Coordinate(ObjectTemplate):
 
 class Country(DocumentTemplate):
     _schema = my_schema
+    _key = ValueHashKey()
     name: str
     perimeter: List[Coordinate]
 
@@ -30,9 +32,8 @@ class Country(DocumentTemplate):
 class Address(DocumentTemplate):
     """This is address"""
 
-    # _key = HashKey(["street", "postal_code"])
+    _key = HashKey(["street", "postal_code"])
     # _key = LexicalKey(["street", "postal_code"])
-    _key = ValueHashKey()
     # _base = "Adddress_"
     _subdocument = []
     _schema = my_schema
@@ -102,6 +103,8 @@ def test_create_schema(docker_url):
     client.insert_document(
         my_schema, commit_msg="I am checking in the schema", graph_type="schema"
     )
+    # print(my_schema.to_dict)
+    # assert False
     result = client.get_all_documents(graph_type="schema")
     for item in result:
         if "@id" in item:
@@ -155,7 +158,7 @@ def test_insert_cheuk(docker_url):
     cheuk.contact_number = "07777123456"
     cheuk.age = 21
     cheuk.name = "Cheuk"
-    # cheuk.managed_by = cheuk
+    cheuk.managed_by = cheuk
 
     client = WOQLClient(docker_url, insecure=True)
     client.connect(db="test_docapi")
