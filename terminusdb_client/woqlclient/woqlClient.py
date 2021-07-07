@@ -729,6 +729,9 @@ class WOQLClient:
         >>> client = WOQLClient("https://127.0.0.1:6363/")
         >>> client.create_database("someDB", "admin", "Database Label", "My Description")
         """
+
+        self._check_connection(check_db=False)
+
         details: Dict[str, Any] = {}
         if label:
             details["label"] = label
@@ -744,8 +747,6 @@ class WOQLClient:
             details["prefixes"] = prefixes
         if accountid is None:
             accountid = self._account
-
-        self._check_connection(check_db=False)
 
         self._account = accountid
         self._connected = True
@@ -1105,8 +1106,10 @@ class WOQLClient:
 
     def insert_document(
         self,
-        document: Union[dict, List[dict]],
-        graph_type: str,
+        document: Union[
+            dict, List[dict], "WOQLSchema", "ObjectTemplate", List["ObjectTemplate"]
+        ],
+        graph_type: str = "instance",
         commit_msg: Optional[str] = None,
     ) -> None:
         """Inserts the specified document(s)
@@ -1133,6 +1136,25 @@ class WOQLClient:
         self._check_connection()
         params = self._generate_commit(commit_msg)["commit_info"]
         params["graph_type"] = graph_type
+
+        def conv_to_dict(object):
+            if isinstance(object, dict):
+                return object
+            elif hasattr(object, "to_dict"):
+                return object.to_dict()
+            elif hasattr(object, "_obj_to_dict"):
+                return object._obj_to_dict()
+            else:
+                raise ValueError("Object cannot convert to dictionary")
+
+        if isinstance(document, list):
+            new_doc = []
+            for item in document:
+                new_doc.append(conv_to_dict(item))
+            document = new_doc
+        else:
+            document = conv_to_dict(document)
+        print(document)
         with NoRequestWarning(self.insecure):
             result = requests.post(
                 self._documents_url(),

@@ -6,7 +6,6 @@ from numpydoc.docscrape import ClassDoc
 
 from .. import woql_type as wt
 from ..woqlclient.woqlClient import WOQLClient
-from .woql_query import WOQLQuery as WQ
 
 # from typeguard import check_type
 
@@ -78,8 +77,8 @@ class ObjectTemplate(metaclass=TerminusClass):
     def __init__(self):
         self._new = True
 
-    def _commit(self, client: WOQLClient):
-        pass
+    # def _commit(self, client: WOQLClient):
+    #     pass
 
     @classmethod
     def _to_dict(cls):
@@ -182,74 +181,9 @@ class WOQLSchema:
         pass
 
     def commit(self, client: WOQLClient, commit_msg: Optional[str] = None):
-        (
-            WQ().quad("v:x", "v:y", "v:z", "schema")
-            + WQ().delete_quad("v:x", "v:y", "v:z", "schema")
-        ).execute(client)
-        query = []
-        parents = {}
-        for obj in self.object:
-            for sub in obj.__subclasses__():
-                if sub in parents:
-                    parents[sub].append(obj)
-                else:
-                    parents[sub] = [obj]
-
-        for obj in self.object:
-            comment = obj.__doc__ if obj.__doc__ else ""
-            label = obj.__name__
-            obj_iri = "scm:" + label
-            if obj in parents:
-                parent_list = parents[obj]
-                for parent in parent_list:
-                    query.append(
-                        WQ().add_quad(
-                            obj_iri,
-                            "rdfs:subClassOf",
-                            "scm:" + parent.__name__,
-                            "schema",
-                        )
-                    )
-            if hasattr(obj, "is_doc"):
-                query.append(
-                    WQ().add_quad(
-                        obj_iri, "rdfs:subClassOf", "terminus:Document", "schema"
-                    )
-                )
-            elif hasattr(obj, "value_set"):
-                choice_list = list(map(lambda x: "doc:" + x, obj.value_set))
-                query.append(
-                    WQ().generate_choice_list(
-                        "scm:" + obj.__name__, choices=choice_list, graph="schema"
-                    )
-                )
-
-            query.append(
-                WQ()
-                .add_quad(obj_iri, "rdf:type", WQ().iri("owl:Class"), "schema")
-                .add_quad(obj_iri, "rdfs:comment", comment, "schema")
-                .add_quad(obj_iri, "rdfs:label", label, "schema")
-            )
-        for prop in self.property:
-            comment = prop.__doc__ if prop.__doc__ else ""
-            label = prop.__name__
-            prop_iri = "scm:" + label
-            domain = "scm:" + prop.domain.__name__
-            if isinstance(prop.prop_range, str):
-                prop_range = prop.prop_range
-                prop_type = "owl:DatatypeProperty"
-            else:
-                prop_range = "scm:" + prop.prop_range.__name__
-                prop_type = "owl:ObjectProperty"
-            query.append(
-                WQ()
-                .add_quad(prop_iri, "rdf:type", WQ().iri(prop_type), "schema")
-                .add_quad(prop_iri, "rdfs:comment", comment, "schema")
-                .add_quad(prop_iri, "rdfs:label", label, "schema")
-                .add_quad(prop_iri, "rdfs:domain", domain, "schema")
-                .add_quad(prop_iri, "rdfs:range", prop_range, "schema")
-            )
-        WQ().woql_and(*query)._context({"_": "_:"}).execute(client, commit_msg)
+        client.insert_document(
+            self.to_dict(), commit_msg=commit_msg, graph_type="schema"
+        )
 
     def all_obj(self):
         return self.object

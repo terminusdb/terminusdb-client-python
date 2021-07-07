@@ -14,30 +14,33 @@ from terminusdb_client.woqlquery.woql_schema import (
 my_schema = WOQLSchema()
 
 
-class MyObject(ObjectTemplate):
+# class MyObject(ObjectTemplate):
+#     _schema = my_schema
+#
+#
+# class MyDocument(DocumentTemplate):
+#     _schema = my_schema
+
+
+class Coordinate(ObjectTemplate):
     _schema = my_schema
-
-
-class MyDocument(DocumentTemplate):
-    _schema = my_schema
-
-
-class Coordinate(MyObject):
     x: float
     y: float
 
 
-class Country(MyDocument):
+class Country(DocumentTemplate):
+    _schema = my_schema
     name: str
     perimeter: List[Coordinate]
 
 
-class Address(MyObject):
+class Address(ObjectTemplate):
+    _schema = my_schema
     street: str
     country: Country
 
 
-class Person(MyDocument):
+class Person(DocumentTemplate):
     """This is a person
     I hate human
 
@@ -52,6 +55,7 @@ class Person(MyDocument):
         The Y coordinate.
     """
 
+    _schema = my_schema
     name: str
     age: int
     friend_of: Set["Person"]
@@ -69,12 +73,13 @@ class Team(EnumTemplate):
     Marketing = ()
 
 
-class Address(MyDocument):
+class Address(DocumentTemplate):
     """This is address"""
 
     _key = HashKey(["street", "region", "postal_code"])
     _base = "Adddress_"
     _subdocument = []
+    _schema = my_schema
     street: str
     postal_code: str
 
@@ -90,7 +95,7 @@ home._id = "dnkasnklslkd"
 
 cheuk = Employee()
 cheuk.address_of = home
-# cheuk.contact_number = "13123238473897"
+cheuk.contact_number = "13123238473897"
 # cheuk.commit(client)
 # client.commit_objects(cheuk, gavin, matthijs)
 
@@ -118,5 +123,5 @@ cheuk.address_of = home
 # print(list(results))
 
 
-# print(cheuk._obj_to_dict())
-print(Person._to_dict())
+print(cheuk._obj_to_dict())
+# print(Person._to_dict())
