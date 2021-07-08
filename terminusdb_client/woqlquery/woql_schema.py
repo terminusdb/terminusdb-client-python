@@ -91,6 +91,12 @@ class TerminusClass(type):
         if "__annotations__" in nmspc:
             annotations = nmspc["__annotations__"]
             cls.__init__
+            base_annotations = (
+                cls.__base__.__annotations__
+                if hasattr(cls.__base__, "__annotations__")
+                else {}
+            )
+            annotations.update(base_annotations)
 
             def init(obj, *args, **kwargs):
                 for key in annotations:

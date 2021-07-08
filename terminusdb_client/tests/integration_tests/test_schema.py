@@ -76,26 +76,6 @@ class Contact(TaggedUnion):
     international: str
 
 
-# home = Address()
-# home.street = "123 Abc Street"
-# home._id = "dnkasnklslkd"
-#
-# cheuk = Employee()
-# cheuk.address_of = home
-# cheuk.contact_number = "13123238473897"
-# cheuk.commit(client)
-# client.commit_objects(cheuk, gavin, matthijs)
-
-# print(dir(Person))
-# print(Person.to_dict())
-
-# print(my_schema.all_obj())
-# print(Team.__members__)
-# print(my_schema.to_dict())
-# my_schema.commit()
-# print(dir(Address))
-# print(Contact._to_dict())
-# pp.pprint(my_schema.to_dict())
 def test_create_schema(docker_url):
     client = WOQLClient(docker_url, insecure=True)
     client.connect()
@@ -103,8 +83,6 @@ def test_create_schema(docker_url):
     client.insert_document(
         my_schema, commit_msg="I am checking in the schema", graph_type="schema"
     )
-    # print(my_schema.to_dict)
-    # assert False
     result = client.get_all_documents(graph_type="schema")
     for item in result:
         if "@id" in item:
@@ -164,7 +142,16 @@ def test_insert_cheuk(docker_url):
     client.connect(db="test_docapi")
     # client.create_database("test_docapi")
     client.insert_document([uk, home, cheuk], commit_msg="Adding cheuk")
-
-
-# print(cheuk._obj_to_dict())
-# print(Person._to_dict())
+    result = client.get_all_documents()
+    for item in result:
+        if item.get("@type") == "Country":
+            assert item["name"] == "United Kingdom"
+        elif item.get("@type") == "Employee":
+            assert item["address_of"]["postal_code"] == "A12 345"
+            assert item["address_of"]["street"] == "123 Abc Street"
+            assert item["name"] == "Cheuk"
+            assert item["age"] == 21
+            assert item["contact_number"] == "07777123456"
+            assert item["managed_by"] == item["@id"]
+        else:
+            assert False

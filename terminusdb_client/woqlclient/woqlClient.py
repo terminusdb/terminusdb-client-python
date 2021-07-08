@@ -3,7 +3,6 @@ WOQLClient is the Python public API for TerminusDB"""
 import copy
 import json
 import os
-import pprint as pp
 import warnings
 from base64 import b64encode
 from collections.abc import Iterable
@@ -1165,7 +1164,6 @@ class WOQLClient:
             document = new_doc
         else:
             document = conv_to_dict(document)
-        pp.pprint(document)
         with NoRequestWarning(self.insecure):
             result = requests.post(
                 self._documents_url(),
