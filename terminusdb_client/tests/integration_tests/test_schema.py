@@ -1,7 +1,7 @@
 from typing import List, Optional, Set
 
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
-from terminusdb_client.woqlquery.woql_schema import (
+from terminusdb_client.woqlschema.woql_schema import (
     DocumentTemplate,
     EnumTemplate,
     HashKey,
