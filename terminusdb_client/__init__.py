@@ -5,4 +5,5 @@ from .woqlquery import WOQLClass  # noqa
 from .woqlquery import WOQLLib  # noqa
 from .woqlquery import WOQLObj  # noqa
 from .woqlquery import WOQLQuery  # noqa
+from .woqlschema import *  # noqa
 from .woqlview import WOQLView  # noqa
