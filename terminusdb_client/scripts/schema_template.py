@@ -1,6 +1,6 @@
 from typing import List, Optional, Set
 
-from terminusdb_client.woqlquery.woql_schema import (
+from terminusdb_client.woqlschema.woql_schema import (
     DocumentTemplate,
     EnumTemplate,
     HashKey,
@@ -9,17 +9,7 @@ from terminusdb_client.woqlquery.woql_schema import (
     WOQLSchema,
 )
 
-# from woql_schema import WOQLSchema, Document, Property, WOQLObject
-
 my_schema = WOQLSchema()
-
-
-# class MyObject(ObjectTemplate):
-#     _schema = my_schema
-#
-#
-# class MyDocument(DocumentTemplate):
-#     _schema = my_schema
 
 
 class Coordinate(ObjectTemplate):

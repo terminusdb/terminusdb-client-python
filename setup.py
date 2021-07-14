@@ -23,7 +23,7 @@ for old_str, new_str in replace_pairs.items():
 
 # ---
 
-requires = ["requests", "numpydoc"]
+requires = ["requests", "numpydoc", "click"]
 
 test_requirements = [
     "pytest>=3",
@@ -57,4 +57,9 @@ setuptools.setup(
     tests_require=test_requirements,
     extras_require=extras_require,
     python_requires=">=3.7",
+    entry_points={
+        "console_scripts": [
+            "terminusdb = terminusdb_client.scripts.scripts:terminusdb",
+        ],
+    },
 )
