@@ -1,5 +1,6 @@
 import os
 import shutil
+import sys
 
 import click
 
@@ -24,7 +25,16 @@ def startproject():
 
 @click.command()
 def connect():
-    pass
+    sys.path.append(os.getcwd())
+
+    try:
+        _temp = __import__("settings", globals(), locals(), ["SERVER", "DATABASE"], 0)
+        SERVER = _temp.SERVER
+        DATABASE = _temp.DATABASE
+    except ImportError:
+        msg = "Cannot find settings.py"
+        raise ImportError(msg)
 
 
 terminusdb.add_command(startproject)
+terminusdb.add_command(connect)
