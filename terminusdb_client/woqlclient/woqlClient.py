@@ -1183,7 +1183,9 @@ class WOQLClient:
 
     def replace_document(
         self,
-        document: Union[dict, List[dict]],
+        document: Union[
+            dict, List[dict], "WOQLSchema", "ObjectTemplate", List["ObjectTemplate"]
+        ],
         graph_type: str,
         commit_msg: Optional[str] = None,
     ) -> None:
@@ -1206,10 +1208,38 @@ class WOQLClient:
         self._check_connection()
         params = self._generate_commit(commit_msg)["commit_info"]
         params["graph_type"] = graph_type
+
+        def conv_to_dict(object):
+            if isinstance(object, dict):
+                return object
+            elif hasattr(object, "to_dict"):
+                return object.to_dict()
+            elif hasattr(object, "_obj_to_dict"):
+                if (
+                    not hasattr(object, "_id")
+                    and not hasattr(object.__class__, "_subdocument")
+                    and hasattr(object.__class__._key, "idgen")
+                ):
+                    object._id = object.__class__._key.idgen(object)
+                return object._obj_to_dict()
+            else:
+                raise ValueError("Object cannot convert to dictionary")
+
+        if isinstance(document, list):
+            new_doc = []
+            for item in document:
+                # while document:
+                #     item = document.pop()
+                item_dict = conv_to_dict(item)
+                new_doc.append(item_dict)
+                # id_list.append(item_dict['@id'])
+            document = new_doc
+        else:
+            document = conv_to_dict(document)
         with NoRequestWarning(self.insecure):
             _finish_reponse(
                 requests.put(
-                    self._documents_url(graph_type),
+                    self._documents_url(),
                     params=params,
                     json=document,
                     auth=self._auth(),

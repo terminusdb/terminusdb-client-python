@@ -123,7 +123,8 @@ class TerminusClass(type):
         if cls._schema is not None:
             if not hasattr(cls._schema, "object"):
                 cls._schema.object = set()
-            cls._schema.object.add(cls)
+            # cls._schema.object.add(cls)
+            cls._schema.add_obj(cls)
 
         super().__init__(name, bases, nmspc)
 
@@ -245,12 +246,15 @@ class TaggedUnion(ObjectTemplate):
 
 class WOQLSchema:
     def __init__(self):
-        pass
+        self.object = set()
 
     def commit(self, client: WOQLClient, commit_msg: Optional[str] = None):
         client.insert_document(
             self.to_dict(), commit_msg=commit_msg, graph_type="schema"
         )
+
+    def add_obj(self, obj):
+        self.object.add(obj)
 
     def all_obj(self):
         return self.object
