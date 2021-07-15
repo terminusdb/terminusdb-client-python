@@ -4,6 +4,9 @@ import sys
 
 import click
 
+from terminusdb_client.woqlclient.woqlClient import WOQLClient
+from terminusdb_client.errors import DatabaseError, InterfaceError
+from requests.exceptions import ConnectionError
 
 @click.group()
 def terminusdb():
@@ -34,6 +37,20 @@ def connect():
     except ImportError:
         msg = "Cannot find settings.py"
         raise ImportError(msg)
+
+    global client = WOQLClient(SERVER)
+    # client = WOQLClient("http://123123:6363/")
+    # client.connect()
+    client.connect()
+    try:
+        client.create_database(DATABASE)
+        print(f"{DATABASE} created.")
+    except DatabaseError as error:
+        if "Database already exists." in error.message:
+            client.connect(db=DATABASE)
+            print(f"Connected to {DATABASE}.")
+        else:
+            raise InterfaceError(f"Cannot connect to {DATABASE}.")
 
 
 terminusdb.add_command(startproject)

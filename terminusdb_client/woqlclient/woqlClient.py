@@ -113,13 +113,18 @@ class WOQLClient:
         # capabilities = self._dispatch_json("get", self._api)
         # self._uid = capabilities["@id"]
         with NoRequestWarning(self.insecure):
-            self._all_avaliable_db = json.loads(
-                _finish_reponse(
-                    requests.get(
-                        self._api, auth=self._auth(), verify=(not self.insecure)
+            try:
+                self._all_avaliable_db = json.loads(
+                    _finish_reponse(
+                        requests.get(
+                            self._api, auth=self._auth(), verify=(not self.insecure)
+                        )
                     )
                 )
-            )
+            except Exception:
+                raise InterfaceError(
+                    f"Cannot connect to server, please make sure TerminusDB is running at {self._server_url} and the authetication details are correct."
+                ) from None
 
         #
         # Get the current user's identifier, if logged in to Hub, it will be their email otherwise it will be the user provided
@@ -755,11 +760,13 @@ class WOQLClient:
         # self._context = self._get_prefixes()
 
         with NoRequestWarning(self.insecure):
-            result = requests.post(
-                self._db_url(),
-                json=details,
-                auth=self._auth(),
-                verify=(not self.insecure),
+            _finish_reponse(
+                requests.post(
+                    self._db_url(),
+                    json=details,
+                    auth=self._auth(),
+                    verify=(not self.insecure),
+                )
             )
 
     def delete_database(
