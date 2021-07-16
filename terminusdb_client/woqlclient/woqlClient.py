@@ -816,7 +816,15 @@ class WOQLClient:
         else:
             self._account = accountid
         payload = {"force": force}
-        self._dispatch("delete", self._db_url(), payload)
+        with NoRequestWarning(self.insecure):
+            _finish_reponse(
+                requests.delete(
+                    self._db_url(),
+                    auth=self._auth(),
+                    verify=(not self.insecure),
+                )
+            )
+        # self._dispatch("delete", self._db_url(), payload)
         self._db = None
 
     def create_graph(

@@ -29,20 +29,25 @@ def startproject():
             )
 
 
-def _connect():
+def _load_settings():
     sys.path.append(os.getcwd())
 
     try:
         _temp = __import__("settings", globals(), locals(), ["SERVER", "DATABASE"], 0)
         SERVER = _temp.SERVER
         DATABASE = _temp.DATABASE
+        return {"SERVER": SERVER, "DATABASE": DATABASE}
     except ImportError:
         msg = "Cannot find settings.py"
         raise ImportError(msg)
 
+
+def _connect():
+    SETTINGS = _load_settings()
+    SERVER = SETTINGS["SERVER"]
+    DATABASE = SETTINGS["DATABASE"]
+
     client = WOQLClient(SERVER)
-    # client = WOQLClient("http://123123:6363/")
-    # client.connect()
     client.connect()
     try:
         client.create_database(DATABASE)
@@ -56,14 +61,15 @@ def _connect():
 
 
 @click.command()
-def sync_schema():
+def sync():
     _, msg = _connect()
     print(msg)
 
 
 @click.command()
-def commit_schema():
-    client, _ = _connect()
+def commit():
+    client, msg = _connect()
+    print(msg)
     schema_plan = __import__("schema", globals(), locals(), [], 0)
     all_existing_obj = client.get_all_documents(graph_type="schema")
     all_existing_id = list(map(lambda x: x.get("@id"), all_existing_obj))
@@ -89,8 +95,27 @@ def commit_schema():
         commit_msg="Schema object insert by Python client.",
         graph_type="schema",
     )
+    print("Schema updated.")
+
+
+@click.command()
+@click.argument("database")
+def deletedb(database):
+    SETTINGS = _load_settings()
+    SERVER = SETTINGS["SERVER"]
+    DATABASE = SETTINGS["DATABASE"]
+    if database != DATABASE:
+        raise ValueError(
+            "Name provided does not match project database name. You can only delete the database in this project."
+        )
+    else:
+        client = WOQLClient(SERVER)
+        client.connect()
+        client.delete_database(database, client._account)
+        print(f"{database} deleted.")
 
 
 terminusdb.add_command(startproject)
-terminusdb.add_command(sync_schema)
-terminusdb.add_command(commit_schema)
+terminusdb.add_command(sync)
+terminusdb.add_command(commit)
+terminusdb.add_command(deletedb)
