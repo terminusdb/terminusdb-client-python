@@ -7,7 +7,7 @@ WOQL_AND_JSON = {
             "predicate": {"@type": "NodeValue", "node": "b"},
             "object": {
                 "@type": "Value",
-                "data": {"@type": "xsd:string", "@value": "c"},
+                "node": "c",
             },
         },
         {
@@ -16,7 +16,7 @@ WOQL_AND_JSON = {
             "predicate": {"@type": "NodeValue", "node": "2"},
             "object": {
                 "@type": "Value",
-                "data": {"@type": "xsd:string", "@value": "3"},
+                "node": "3",
             },
         },
     ],

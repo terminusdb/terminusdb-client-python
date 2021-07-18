@@ -776,7 +776,7 @@ class WOQLQuery:
         if "or" not in self._cursor:
             self._cursor["or"] = []
         for item in queries:
-            onevar = self._corce_to_dict(item)
+            onevar = self._coerce_to_dict(item)
             self._cursor["or"].append(onevar)
         return self
 

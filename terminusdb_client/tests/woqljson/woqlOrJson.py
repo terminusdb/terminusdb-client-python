@@ -3,20 +3,20 @@ WOQL_OR_JSON = {
     "or": [
         {
             "@type": "Triple",
-            "subject": {"@type": "NodeValue", "node": "doc:a"},
-            "predicate": {"@type": "NodeValue", "node": "scm:b"},
+            "subject": {"@type": "NodeValue", "node": "a"},
+            "predicate": {"@type": "NodeValue", "node": "b"},
             "object": {
                 "@type": "Value",
-                "data": {"@type": "xsd:string", "@value": "c"},
+                "node": "c",
             },
         },
         {
             "@type": "Triple",
-            "subject": {"@type": "NodeValue", "node": "doc:1"},
-            "predicate": {"@type": "NodeValue", "node": "scm:2"},
+            "subject": {"@type": "NodeValue", "node": "1"},
+            "predicate": {"@type": "NodeValue", "node": "2"},
             "object": {
                 "@type": "Value",
-                "data": {"@type": "xsd:string", "@value": "3"},
+                "node": "3",
             },
         },
     ],

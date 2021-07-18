@@ -100,7 +100,7 @@ class TestWoqlQueries:
                 "predicate": {"@type": "NodeValue", "node": "b"},
                 "object": {
                     "@type": "Value",
-                    "data": {"@type": "xsd:string", "@value": "c"},
+                    "node": "c",
                 },
             },
         }

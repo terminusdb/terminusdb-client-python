@@ -26,7 +26,7 @@ WOQL_MATH_JSON = {
         "expression": "1+2",
         "result": {
             "@type": "ArithmeticValue",
-            "data": {"@type": "xsd:string", "@value": "b"},
+            "variable": "x",
         },
     },
     "plusJson": {
