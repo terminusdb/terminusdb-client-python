@@ -1,7 +1,10 @@
-WOQL_STAR = { "@type": "Triple", "object": { "@type": "NodeValue",
-                                             "variable": "Object", }, "predicate": { "@type": "NodeValue",
-                                                                                     "variable": "Predicate" }, "subject": { "@type": "Value",
-                                                                                                                             "variable": "Subject" }, }
+WOQL_STAR = { "@type": "Triple",
+              "object": { "@type": "Value",
+                          "variable": "Object", },
+              "predicate": { "@type": "NodeValue",
+                             "variable": "Predicate" },
+              "subject": { "@type": "NodeValue",
+                           "variable": "Subject" },}
 
 WOQL_JSON = {
     "quadJson": {
