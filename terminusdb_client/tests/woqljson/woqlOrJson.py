@@ -1,30 +1,22 @@
 WOQL_OR_JSON = {
-    "@type": "woql:Or",
-    "woql:query_list": [
+    "@type": "Or",
+    "or": [
         {
-            "@type": "woql:QueryListElement",
-            "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 0},
-            "woql:query": {
-                "@type": "woql:Triple",
-                "woql:subject": {"@type": "woql:Node", "woql:node": "doc:a"},
-                "woql:predicate": {"@type": "woql:Node", "woql:node": "scm:b"},
-                "woql:object": {
-                    "@type": "woql:Datatype",
-                    "woql:datatype": {"@type": "xsd:string", "@value": "c"},
-                },
+            "@type": "Triple",
+            "subject": {"@type": "NodeValue", "node": "doc:a"},
+            "predicate": {"@type": "NodeValue", "node": "scm:b"},
+            "object": {
+                "@type": "Value",
+                "data": {"@type": "xsd:string", "@value": "c"},
             },
         },
         {
-            "@type": "woql:QueryListElement",
-            "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 1},
-            "woql:query": {
-                "@type": "woql:Triple",
-                "woql:subject": {"@type": "woql:Node", "woql:node": "doc:1"},
-                "woql:predicate": {"@type": "woql:Node", "woql:node": "scm:2"},
-                "woql:object": {
-                    "@type": "woql:Datatype",
-                    "woql:datatype": {"@type": "xsd:string", "@value": "3"},
-                },
+            "@type": "Triple",
+            "subject": {"@type": "NodeValue", "node": "doc:1"},
+            "predicate": {"@type": "NodeValue", "node": "scm:2"},
+            "object": {
+                "@type": "Value",
+                "data": {"@type": "xsd:string", "@value": "3"},
             },
         },
     ],

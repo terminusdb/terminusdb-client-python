@@ -1,22 +1,19 @@
 WoqlStar = {
-    "@type": "woql:Limit",
-    "woql:limit": {
-        "@type": "woql:Datatype",
-        "woql:datatype": {"@type": "xsd:nonNegativeInteger", "@value": 10},
-    },
-    "woql:query": {
-        "@type": "woql:Triple",
-        "woql:subject": {
-            "@type": "woql:Variable",
-            "woql:variable_name": {"@value": "Subject", "@type": "xsd:string"},
+    "@type": "Limit",
+    "limit": 10,
+    "query": {
+        "@type": "Triple",
+        "subject": {
+            "@type": "NodeValue",
+            "variable": "Subject",
         },
-        "woql:predicate": {
-            "@type": "woql:Variable",
-            "woql:variable_name": {"@value": "Predicate", "@type": "xsd:string"},
+        "predicate": {
+            "@type": "NodeValue",
+            "variable_name": "Predicate",
         },
-        "woql:object": {
-            "@type": "woql:Variable",
-            "woql:variable_name": {"@value": "Object", "@type": "xsd:string"},
+        "object": {
+            "@type": "Value",
+            "variable_name": "Object",
         },
     },
 }

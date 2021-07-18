@@ -2685,12 +2685,11 @@ class WOQLQuery:
                     gpart = (
                         part["graph_filter"]
                         if part.get("graph_filter")
-                        else part["graph"]
+                        else part["graph"] if part.get("graph")
+                        else "instance"
                     )
                 else:
                     gpart = None
-                if gpart:
-                    gpart["@value"]
                 nprop = (
                     WOQLQuery()
                     .add_property(pro_id, property_type)
