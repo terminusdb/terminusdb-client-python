@@ -2148,7 +2148,7 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         if concat_list and concat_list == "args":
-            return ["concat_list", "concatenated"]
+            return ["list", "concatenated"]
         if type(concat_list) is str:
             slist = re.split("(v:)", concat_list)
             nlist = []
@@ -2167,8 +2167,8 @@ class WOQLQuery:
             if self._cursor.get("@type"):
                 self._wrap_cursor_with_and()
             self._cursor["@type"] = "Concatenate"
-            self._cursor["concat_list"] = self._data_list(concat_list)
-            self._cursor["concatenated"] = self._clean_data_value(result)
+            self._cursor["list"] = self._data_list(concat_list)
+            self._cursor["result"] = self._clean_data_value(result)
         return self
 
     def join(self, user_input, glue, output):
@@ -2221,7 +2221,7 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Sum"
-        self._cursor["sum_list"] = self._data_list(user_input)
+        self._cursor["list"] = self._data_list(user_input)
         self._cursor["sum"] = self._clean_data_value(output)
         return self
 

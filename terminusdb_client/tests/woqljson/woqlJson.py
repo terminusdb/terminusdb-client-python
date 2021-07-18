@@ -54,7 +54,7 @@ WOQL_JSON = {
         "group_by": ["A","B"],
         "template": ["C"],
         "grouped": {
-            "@type": "DataValue",
+            "@type": "Value",
             "variable": "New"
         },
         "query": {

@@ -463,7 +463,7 @@ class TestWoqlQueries:
         json_object = {
             "@type": "Path",
             "subject": {
-                "@type": "Variable",
+                "@type": "NodeValue",
                 "variable": "X",
             },
             "pattern": {
