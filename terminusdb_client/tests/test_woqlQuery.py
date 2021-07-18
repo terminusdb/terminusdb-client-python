@@ -151,7 +151,7 @@ class TestWoqlQueries:
         woql_object_chain = WOQLQuery().woql_from("schema").star()
         json_obj = {
             "@type": "From",
-            "graph_filter": {"@type": "xsd:string", "@value": "schema"},
+            "graph_filter": "schema",
             "query": WOQL_STAR,
         }
         assert woql_object.to_dict() == woql_object_chain.to_dict()

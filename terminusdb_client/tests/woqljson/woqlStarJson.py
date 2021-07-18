@@ -9,11 +9,11 @@ WoqlStar = {
         },
         "predicate": {
             "@type": "NodeValue",
-            "variable_name": "Predicate",
+            "variable": "Predicate",
         },
         "object": {
             "@type": "Value",
-            "variable_name": "Object",
+            "variable": "Object",
         },
     },
 }
