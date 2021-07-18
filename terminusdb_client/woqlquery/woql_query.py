@@ -685,7 +685,7 @@ class WOQLQuery:
             embedquery = queries.pop()
         else:
             embedquery = False
-        self._cursor["variables"] = self.raw_var_list(queries)
+        self._cursor["variables"] = self._raw_var_list(queries)
         return self._add_sub_query(embedquery)
 
     def distinct(self, *args):
@@ -704,7 +704,7 @@ class WOQLQuery:
         """Select the set of variables that the result will return"""
         queries = list(args)
         if queries and queries[0] == "args":
-            return ["variable_list", "query"]
+            return ["variables", "query"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Distinct"
@@ -716,7 +716,7 @@ class WOQLQuery:
             embedquery = queries.pop()
         else:
             embedquery = False
-        self._cursor["variable_list"] = self.raw_var_list(queries)
+        self._cursor["variables"] = self._raw_var_list(queries)
         return self._add_sub_query(embedquery)
 
     def woql_and(self, *args):
