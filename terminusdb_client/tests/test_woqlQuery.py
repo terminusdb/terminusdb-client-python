@@ -176,12 +176,12 @@ class TestWoqlQueries:
         json_obj = {
             "@type": "Equals",
             "left": {
-                "@type": "Datatype",
-                "datatype": {"@type": "xsd:string", "@value": "a"},
+                "@type": "Value",
+                "node": "a",
             },
             "right": {
-                "@type": "Datatype",
-                "datatype": {"@type": "xsd:string", "@value": "b"},
+                "@type": "Value",
+                "node": "b"
             },
         }
         assert woql_object.to_dict() == json_obj
@@ -191,70 +191,68 @@ class TestWoqlQueries:
         assert woql_object.to_dict() == WOQL_TRIM_JSON
 
     def test_eval_method(self):
-        woql_object = WOQLQuery().eval("1+2", "b")
+        woql_object = WOQLQuery().eval(WOQLQuery().plus(1,2), "v:x")
         assert woql_object.to_dict() == WOQL_MATH_JSON["evalJson"]
 
     def test_minus_method(self):
 
-        woql_object = WOQLQuery().minus("2", "1")
+        woql_object = WOQLQuery().minus(1, 1)
         assert woql_object.to_dict() == WOQL_MATH_JSON["minusJson"]
 
     def test_plus_method(self):
-        woql_object = WOQLQuery().plus("2", "1")
+        woql_object = WOQLQuery().plus(2, 1)
         assert woql_object.to_dict() == WOQL_MATH_JSON["plusJson"]
 
     def test_times_method(self):
-        woql_object = WOQLQuery().times("2", "1")
+        woql_object = WOQLQuery().times(2, 1)
         assert woql_object.to_dict() == WOQL_MATH_JSON["timesJson"]
 
     def test_divide_method(self):
-        woql_object = WOQLQuery().divide("2", "1")
+        woql_object = WOQLQuery().divide(2, 1)
         assert woql_object.to_dict() == WOQL_MATH_JSON["divideJson"]
 
     def test_exp_method(self):
-        woql_object = WOQLQuery().exp("2", "1")
+        woql_object = WOQLQuery().exp(2, 1)
         assert woql_object.to_dict() == WOQL_MATH_JSON["expJson"]
 
     def test_div_method(self):
-        woql_object = WOQLQuery().div("2", "1")
+        woql_object = WOQLQuery().div(2, 1)
         assert woql_object.to_dict() == WOQL_MATH_JSON["divJson"]
 
     def test_floor_method(self):
-        woql_object = WOQLQuery().floor("2.5")
+        woql_object = WOQLQuery().floor(2.5)
         assert woql_object.to_dict() == WOQL_MATH_JSON["floorJson"]
 
     def test_get_method(self):
         woql_object = WOQLQuery().get(WOQLQuery().woql_as("a", "b"), "Target")
         json_obj = {
             "@type": "Get",
-            "as_vars": [
+            "columns": [
                 {
-                    "@type": "NamedAsVar",
-                    "identifier": {"@type": "xsd:string", "@value": "a"},
-                    "variable": {"@type": "xsd:string", "@value": "b"},
+                    "@type": "Column",
+                    "indicator": {"@type": "Indicator", "name": "a"},
+                    "variable": "b",
                 }
             ],
-            "query_resource": "Target",
+            "resource": "Target",
         }
         assert woql_object.to_dict() == json_obj
 
     def test_remote_method(self):
         woql_object = WOQLQuery().remote({"url": "http://url"})
         json_obj = {
-            "@type": "RemoteResource",
-            "remote_uri": {"@type": "xsd:anyURI", "@value": {"url": "http://url"}},
+            "@type": "QueryResource",
+            "format" : "csv",
+            "source": {"@type": "Source", "url": "http://url"},
         }
         assert woql_object.to_dict() == json_obj
 
     def test_post_method(self):
         woql_object = WOQLQuery().post("my_json_file", {"format": "panda_json"})
         json_obj = {
-            "@type": "PostResource",
-            "file": {"@type": "xsd:string", "@value": "my_json_file"},
-            "format": {
-                "@type": "Format",
-                "format_type": {"@value": "panda_json", "@type": "xsd:string"},
-            },
+            "@type": "QueryResource",
+            "file": {"@type": "Source", "file": "my_json_file"},
+            "format": "panda_json",
         }
         assert woql_object.to_dict() == json_obj
 
@@ -328,16 +326,16 @@ class TestWoqlQueries:
         json_obj = {
             "@type": "Regexp",
             "pattern": {
-                "@type": "Datatype",
-                "datatype": {"@type": "xsd:string", "@value": "!\\w+(.*)test$"},
+                "@type": "DataValue",
+                "data": {"@type": "xsd:string", "@value": "!\\w+(.*)test$"},
             },
             "regexp_list": {
-                "@type": "Variable",
-                "variable": {"@type": "xsd:string", "@value": "formated"},
+                "@type": "DataValue",
+                "variable": "formated",
             },
             "regexp_string": {
-                "@type": "Variable",
-                "variable": {"@type": "xsd:string", "@value": "string"},
+                "@type": "DataValue",
+                "variable": "string",
             },
         }
         assert woql_object.to_dict() == json_obj
@@ -355,12 +353,12 @@ class TestWoqlQueries:
         json_obj = {
             "@type": "Member",
             "member": {
-                "@type": "Variable",
-                "variable": {"@value": "member", "@type": "xsd:string"},
+                "@type": "Value",
+                "variable": "member",
             },
-            "member_list": {
-                "@type": "Variable",
-                "variable": {"@value": "list_obj", "@type": "xsd:string"},
+            "list": {
+                "@type": "Value",
+                "variable": "list_obj",
             },
         }
         assert woql_object.to_dict() == json_obj
@@ -439,30 +437,32 @@ class TestWoqlQueries:
         json_object = {
             "@type": "Path",
             "subject": {
-                "@type": "Variable",
-                "variable": {"@value": "X", "@type": "xsd:string"},
+                "@type": "NodeValue",
+                "variable": "X",
             },
-            "path_pattern": {
+            "pattern": {
                 "@type": "PathPlus",
-                "path_pattern": {
+                "pattern": {
                     "@type": "PathSequence",
-                    "path_first": {
-                        "@type": "InvertedPathPredicate",
-                        "path_predicate": "hop",
-                    },
-                    "path_second": {
-                        "@type": "PathPredicate",
-                        "path_predicate": "hop",
-                    },
+                    "sequence" : [
+                        {
+                            "@type": "InversePathPredicate",
+                            "predicate": "hop",
+                        },
+                        {
+                            "@type": "PathPredicate",
+                            "predicate": "hop",
+                        },
+                    ]
                 },
             },
             "object": {
-                "@type": "Variable",
-                "variable": {"@value": "Y", "@type": "xsd:string"},
+                "@type": "Value",
+                "variable": "Y",
             },
             "path": {
-                "@type": "Variable",
-                "variable": {"@value": "Path", "@type": "xsd:string"},
+                "@type": "Value",
+                "variable": "Path",
             },
         }
         assert woql_object.to_dict() == json_object
