@@ -265,7 +265,7 @@ class WOQLQuery:
                 return arg.to_dict()
             else:
                 return arg
-        var = self._clean_object(arg, "xsd:decimal")
+        var = self._clean_arithmetic_value(arg, "xsd:decimal")
         return var
 
     def _vlist(self, target_list):
