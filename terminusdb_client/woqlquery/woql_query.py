@@ -294,7 +294,7 @@ class WOQLQuery:
             elif self._vocab and (obj in self._vocab):
                 subj = self._vocab[obj]
             else:
-                subj = "doc:" + obj
+                subj = obj
             return self._expand_node_variable(subj)
         raise ValueError("Subject must be a URI string")
 
@@ -322,7 +322,7 @@ class WOQLQuery:
             elif self._vocab and (predicate in self._vocab):
                 pred = self._vocab[predicate]
             else:
-                pred = "scm:" + predicate
+                pred = predicate
         return pred
 
     def _clean_object(self, user_obj, target=None):
