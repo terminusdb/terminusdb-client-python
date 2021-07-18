@@ -34,8 +34,8 @@
 #
 #     # Fix bug in schema
 #     WOQLQuery().woql_and(
-#         WOQLQuery().delete_quad("scm:balance", "label", "owner", "schema/main"),
-#         WOQLQuery().add_quad("scm:balance", "label", "balance", "schema/main"),
+#         WOQLQuery().delete_quad("scm:balance", "label", "owner", "schema"),
+#         WOQLQuery().add_quad("scm:balance", "label", "balance", "schema"),
 #     ).execute(client, "Label for balance was wrong")
 #
 #     # Add the data from csv to the main branch (again idempotent as widget ids are chosen from sku)
