@@ -147,11 +147,11 @@ class TestWoqlQueries:
         assert woql_object_chain.to_dict() == json_obj
 
     def test_woql_from_method(self):
-        woql_object = WOQLQuery().woql_from("schema/main", WOQLQuery().star())
-        woql_object_chain = WOQLQuery().woql_from("schema/main").star()
+        woql_object = WOQLQuery().woql_from("schema", WOQLQuery().star())
+        woql_object_chain = WOQLQuery().woql_from("schema").star()
         json_obj = {
             "@type": "From",
-            "graph_filter": {"@type": "xsd:string", "@value": "schema/main"},
+            "graph_filter": {"@type": "xsd:string", "@value": "schema"},
             "query": WOQL_STAR,
         }
         assert woql_object.to_dict() == woql_object_chain.to_dict()
@@ -586,11 +586,11 @@ class TestTripleBuilderChainer:
         assert woql_object.to_dict() == {}
 
     def test_graph_method(self):
-        woql_object = WOQLQuery().node("a", "AddQuad").graph("schema/main")
+        woql_object = WOQLQuery().node("a", "AddQuad").graph("schema")
         woql_object2 = (
             WOQLQuery()
             .node("x", "add_quad")
-            .graph("schema/main")
+            .graph("schema")
             .label("my label", "en")
         )
 
@@ -609,14 +609,6 @@ class TestTripleBuilderChainer:
             WOQLQuery().add_class("NewClass").description("A new class object.")
         )
         assert woql_object.to_dict() == WOQL_JSON["addClassDescJson"]
-
-    def test_comment_method(self):
-        woql_object = WOQLQuery().comment("my comment")
-        json_obj = {
-            "@type": "Comment",
-            "comment": {"@type": "xsd:string", "@value": "my comment"},
-        }
-        assert woql_object.to_dict() == json_obj
 
     def test_abstract_method(self):
         woql_object = WOQLQuery().node("x", "add_quad").abstract()
@@ -695,18 +687,18 @@ class TestTripleBuilderChainer:
         query = WOQLQuery().woql_as(x).woql_as(y).woql_as(z)
         assert query.to_dict() == [
             {
-                "@type": "IndexedAsVar",
-                "index": {"@type": "xsd:nonNegativeInteger", "@value": 0},
-                "variable": {"@type": "xsd:string", "@value": "x"},
+                "@type": "Column",
+                "indicator": {"@type": "Indicator", "index": 0},
+                "variable": "x",
             },
             {
-                "@type": "IndexedAsVar",
-                "index": {"@type": "xsd:nonNegativeInteger", "@value": 1},
-                "variable": {"@type": "xsd:string", "@value": "y"},
+                "@type": "Column",
+                "indicator": {"@type": "Indicator", "index": 1},
+                "variable": "y",
             },
             {
-                "@type": "IndexedAsVar",
-                "index": {"@type": "xsd:nonNegativeInteger", "@value": 2},
-                "variable": {"@type": "xsd:string", "@value": "z"},
+                "@type": "Column",
+                "indicator": {"@type": "Indicator", "index": 2},
+                "variable": "z",
             },
         ]
