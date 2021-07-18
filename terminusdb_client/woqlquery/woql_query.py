@@ -2188,13 +2188,13 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         if user_input and user_input == "args":
-            return ["join_list", "join_separator", "join"]
+            return ["list", "separator", "join"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Join"
-        self._cursor["join_list"] = self._data_list(user_input)
-        self._cursor["join_separator"] = self._clean_data_value(glue)
-        self._cursor["join"] = self._clean_data_value(output)
+        self._cursor["list"] = self._data_list(user_input)
+        self._cursor["separator"] = self._clean_data_value(glue)
+        self._cursor["result"] = self._clean_data_value(output)
         return self
 
     def sum(self, user_input, output):
@@ -2220,7 +2220,7 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Sum"
         self._cursor["sum_list"] = self._data_list(user_input)
-        self._cursor["sum"] = self._clean_object(output)
+        self._cursor["sum"] = self._clean_data_value(output)
         return self
 
     def start(self, start, query=None):
@@ -2367,7 +2367,7 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Count"
-        self._cursor["count"] = self._clean_object(countvar)
+        self._cursor["count"] = self._clean_data_value(countvar)
         return self._add_sub_query(query)
 
     def cast(self, val, user_type, result, literal_type=None):

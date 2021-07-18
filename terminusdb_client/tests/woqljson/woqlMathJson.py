@@ -23,7 +23,15 @@ WOQL_MATH_JSON = {
     },
     "evalJson": {
         "@type": "Eval",
-        "expression": "1+2",
+        "expression": {
+            "@type": "Plus",
+            "left": {
+                "@type": "ArithmeticValue",
+                "data": {"@type": "xsd:decimal", "@value": 1}},
+            "right": {
+                "@type": "ArithmeticValue",
+                "data": {"@type": "xsd:decimal", "@value": 2}}
+        },
         "result": {
             "@type": "ArithmeticValue",
             "variable": "x",
