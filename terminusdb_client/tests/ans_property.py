@@ -114,8 +114,8 @@ def property_with_des():
                     "subject": {"@type": "NodeValue", "node": "Duration"},
                     "predicate": {"@type": "NodeValue", "node": "rdfs:label"},
                     "object": {
-                        "@type": "Datatype",
-                        "datatype": {
+                        "@type": "Value",
+                        "data": {
                             "@value": "Journey Duration",
                             "@type": "xsd:string",
                             "@language": "en",
@@ -131,8 +131,8 @@ def property_with_des():
                         "node": "rdfs:comment",
                     },
                     "object": {
-                        "@type": "Datatype",
-                        "datatype": {
+                        "@type": "Value",
+                        "data": {
                             "@value": "Journey duration in minutes.",
                             "@type": "xsd:string",
                             "@language": "en",

@@ -99,8 +99,8 @@ class TestWoqlQueries:
                 "subject": {"@type": "NodeValue", "node": "a"},
                 "predicate": {"@type": "NodeValue", "node": "b"},
                 "object": {
-                    "@type": "Datatype",
-                    "datatype": {"@type": "xsd:string", "@value": "c"},
+                    "@type": "Value",
+                    "data": {"@type": "xsd:string", "@value": "c"},
                 },
             },
         }

@@ -60,8 +60,8 @@ def doctype_with_label():
                 "subject": {"@type": "NodeValue", "node": "Station"},
                 "predicate": {"@type": "NodeValue", "node": "rdfs:label"},
                 "object": {
-                    "@type": "Datatype",
-                    "datatype": {
+                    "@type": "Value",
+                    "data": {
                         "@value": "Station Object",
                         "@type": "xsd:string",
                         "@language": "en",
@@ -103,8 +103,8 @@ def doctype_with_des():
                 "subject": {"@type": "NodeValue", "node": "Station"},
                 "predicate": {"@type": "NodeValue", "node": "rdfs:label"},
                 "object": {
-                    "@type": "Datatype",
-                    "datatype": {
+                    "@type": "Value",
+                    "data": {
                         "@value": "Station Object",
                         "@type": "xsd:string",
                         "@language": "en",
@@ -120,8 +120,8 @@ def doctype_with_des():
                     "node": "rdfs:comment",
                 },
                 "object": {
-                    "@type": "Datatype",
-                    "datatype": {
+                    "@type": "Value",
+                    "data": {
                         "@value": "A bike station object.",
                         "@type": "xsd:string",
                         "@language": "en",
