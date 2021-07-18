@@ -1930,7 +1930,7 @@ class WOQLQuery:
         self._cursor["@type"] = "Unique"
         self._cursor["base"] = self._clean_object(prefix)
         self._cursor["key_list"] = self._data_list(key_list)
-        self._cursor["uri"] = self._clean_class(uri)
+        self._cursor["uri"] = self._clean_nod_value(uri)
         return self
 
     def idgen(self, prefix, input_var_list, output_var):
@@ -1994,7 +1994,7 @@ class WOQLQuery:
         self._cursor["@type"] = "RandomIDGenerator"
         self._cursor["base"] = self._clean_object(prefix)
         self._cursor["key_list"] = self._vlist(key_list)
-        self._cursor["uri"] = self._clean_class(uri)
+        self._cursor["uri"] = self._clean_node_value(uri)
         return self
 
     def upper(self, left, right):
@@ -2813,7 +2813,6 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        d = self._clean_class(d)
         return self._add_partial(None, "rdfs:domain", d)
 
     def label(self, lab, lang="en"):
@@ -2869,8 +2868,7 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         for ipl in args:
-            pn = self._clean_class(ipl)
-            self._add_partial(None, "rdfs:subClassOf", pn)
+            self._add_partial(None, "rdfs:subClassOf", ipl)
         return self
 
     def max(self, m):
@@ -3107,7 +3105,6 @@ class WOQLQuery:
         if not graph:
             graph = self._graph
         if c:
-            c = self._clean_class(c, True)
             self.add_quad(c, "rdf:type", "owl:Class", graph)
             self._set_adding_class(c)
         return self
@@ -3188,7 +3185,6 @@ class WOQLQuery:
             graph = self._graph
         ap = WOQLQuery()
         if classid:
-            classid = ap._clean_class(classid, True)
             ap.woql_and(
                 WOQLQuery().delete_quad(classid, "v:Outgoing", "v:Value", graph),
                 WOQLQuery().opt().delete_quad("v:Other", "v:Incoming", classid, graph),
@@ -3215,7 +3211,7 @@ class WOQLQuery:
         """
         if not graph:
             graph = self._graph
-        t = self._clean_type(t, True) if t else "xsd:string"
+        t = t if t else "xsd:string"
         if p:
             p = self._clean_path_predicate(p)
             # TODO: cleaning
