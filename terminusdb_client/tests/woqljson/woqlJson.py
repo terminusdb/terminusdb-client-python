@@ -33,7 +33,7 @@ WOQL_JSON = {
                 "@type": "Column",
                 "indicator": {"@type": "Indicator", "name": "M"},
                 "variable": "a",
-                "var_type": "p",
+                "type": "p",
             }
         ],
         "resource": "Target",
@@ -44,7 +44,7 @@ WOQL_JSON = {
             "@type": "Value",
             "variable": "member"
         },
-        "member_list": {
+        "list": {
             "@type": "Value",
             "variable": "list_obj"
         },
@@ -117,7 +117,7 @@ WOQL_JSON = {
         "predicate": {"@type": "NodeValue", "node": "b"},
         "object": {
             "@type": "Value",
-            "data": {"@type": "xsd:string", "@value": "c"},
+            "node": "c",
         },
     },
     "deleteQuadJson": {
@@ -126,9 +126,9 @@ WOQL_JSON = {
         "predicate": {"@type": "NodeValue", "node": "b"},
         "object": {
             "@type": "Value",
-            "data": {"@type": "xsd:string", "@value": "c"},
+            "node": "c",
         },
-        "graph": {"@type": "xsd:string", "@value": "d"},
+        "graph": "d",
     },
     "addTripleJson": {
         "@type": "AddTriple",
@@ -136,7 +136,7 @@ WOQL_JSON = {
         "predicate": {"@type": "NodeValue", "node": "b"},
         "object": {
             "@type": "Value",
-            "data": {"@type": "xsd:string", "@value": "c"},
+            "node": "c",
         },
     },
     "addQuadJson": {
@@ -145,9 +145,9 @@ WOQL_JSON = {
         "predicate": {"@type": "NodeValue", "node": "b"},
         "object": {
             "@type": "Value",
-            "data": {"@type": "xsd:string", "@value": "c"},
+            "node": "c",
         },
-        "graph": {"@type": "xsd:string", "@value": "d"},
+        "graph": "d",
     },
     "addPropertyJson": {
         "@type": "And",
