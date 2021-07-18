@@ -204,12 +204,12 @@ class WOQLQuery:
             return {"@type": "True"}
         return qobj
 
-    def _raw_var(varb):
+    def _raw_var(self,varb):
         if varb[:2] == "v:":
             return varb[2:]
         return varb
 
-    def _raw_var_list(vl):
+    def _raw_var_list(self,vl):
         ret = []
         for v in vl:
             ret.append(self._raw_var(v))
