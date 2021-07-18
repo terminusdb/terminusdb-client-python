@@ -3,22 +3,22 @@ WOQL_MATH_JSON = {
         "@type": "Div",
         "left": {
             "@type": "ArithmeticValue",
-            "data": {"@type": "xsd:decimal", "@value": "2"},
+            "data": {"@type": "xsd:decimal", "@value": 2},
         },
         "right": {
             "@type": "ArithmeticValue",
-            "data": {"@type": "xsd:decimal", "@value": "1"},
+            "data": {"@type": "xsd:decimal", "@value": 1},
         },
     },
     "minusJson": {
         "@type": "Minus",
         "left": {
             "@type": "ArithmeticValue",
-            "data": {"@type": "xsd:decimal", "@value": "2"},
+            "data": {"@type": "xsd:decimal", "@value": 1},
         },
         "right": {
             "@type": "ArithmeticValue",
-            "data": {"@type": "xsd:decimal", "@value": "1"},
+            "data": {"@type": "xsd:decimal", "@value": 1},
         },
     },
     "evalJson": {
@@ -33,51 +33,51 @@ WOQL_MATH_JSON = {
         "@type": "Plus",
         "left": {
             "@type": "ArithmeticValue",
-            "data": {"@type": "xsd:decimal", "@value": "2"},
+            "data": {"@type": "xsd:decimal", "@value": 2},
         },
         "right": {
             "@type": "ArithmeticValue",
-            "data": {"@type": "xsd:decimal", "@value": "1"},
+            "data": {"@type": "xsd:decimal", "@value": 1},
         },
     },
     "timesJson": {
         "@type": "Times",
         "left": {
             "@type": "ArithmeticValue",
-            "data": {"@type": "xsd:decimal", "@value": "2"},
+            "data": {"@type": "xsd:decimal", "@value": 2},
         },
         "right": {
             "@type": "ArithmeticValue",
-            "data": {"@type": "xsd:decimal", "@value": "1"},
+            "data": {"@type": "xsd:decimal", "@value": 1},
         },
     },
     "divideJson": {
         "@type": "Divide",
         "left": {
             "@type": "ArithmeticValue",
-            "data": {"@type": "xsd:decimal", "@value": "2"},
+            "data": {"@type": "xsd:decimal", "@value": 2},
         },
         "right": {
             "@type": "ArithmeticValue",
-            "data": {"@type": "xsd:decimal", "@value": "1"},
+            "data": {"@type": "xsd:decimal", "@value": 1},
         },
     },
     "expJson": {
         "@type": "Exp",
         "left": {
             "@type": "ArithmeticValue",
-            "data": {"@type": "xsd:decimal", "@value": "2"},
+            "data": {"@type": "xsd:decimal", "@value": 2},
         },
         "right": {
             "@type": "ArithmeticValue",
-            "data": {"@type": "xsd:decimal", "@value": "1"},
+            "data": {"@type": "xsd:decimal", "@value": 1},
         },
     },
     "floorJson": {
         "@type": "Floor",
         "argument": {
             "@type": "ArithmeticValue",
-            "data": {"@type": "xsd:decimal", "@value": "2.5"},
+            "data": {"@type": "xsd:decimal", "@value": 2.5},
         },
     },
 }
