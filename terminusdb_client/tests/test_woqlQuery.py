@@ -353,7 +353,7 @@ class TestWoqlQueries:
         assert woql_object.to_dict() == json_obj
 
     def test_concat_method(self):
-        woql_object = WOQLQuery().concat("v:Duration yo v:Duration_Cast", "v:x")
+        woql_object = WOQLQuery().concat(["v:Duration","yo","v:Duration_Cast"], "v:x")
         assert woql_object.to_dict() == WOQL_CONCAT_JSON
 
     def test_group_by_method(self):
@@ -464,7 +464,7 @@ class TestWoqlQueries:
             "@type": "Path",
             "subject": {
                 "@type": "Variable",
-                "variable": {"@value": "X", "@type": "xsd:string"},
+                "variable": "X",
             },
             "pattern": {
                 "@type": "PathPlus",

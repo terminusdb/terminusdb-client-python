@@ -4,7 +4,7 @@ WOQL_CAST_JSON = {
         "@type": "Value",
         "variable": "Duration"
     },
-    "type": {"@type": "Node", "node": "xsd:integer"},
+    "type": {"@type": "NodeValue", "node": "xsd:integer"},
     "result": {
         "@type": "Value",
         "variable": "Duration_Cast"

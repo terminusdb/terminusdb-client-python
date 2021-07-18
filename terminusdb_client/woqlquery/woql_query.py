@@ -378,6 +378,8 @@ class WOQLQuery:
             if user_obj[:2] == "v:":
                 return self._expand_data_variable(user_obj)
             else:
+                if not target:
+                    target = "xsd:string"
                 obj["data"] = self._jlt(user_obj, target)
         elif type(user_obj) is float:
             if not target:
@@ -1815,12 +1817,12 @@ class WOQLQuery:
         bool
         """
         if element and element == "args":
-            return ["element", "of_type"]
+            return ["element", "type"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "IsA"
         self._cursor["element"] = self._clean_node_value(element)
-        self._cursor["of_type"] = self._clean_node_value(of_type)
+        self._cursor["type"] = self._clean_node_value(of_type)
         return self
 
     def like(self, left, right, dist):
@@ -1940,7 +1942,7 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "HashKey"
-        self._cursor["base"] = self._clean_object(prefix)
+        self._cursor["base"] = self._clean_data_value(prefix)
         self._cursor["key_list"] = self._data_list(key_list)
         self._cursor["uri"] = self._clean_node_value(uri)
         return self

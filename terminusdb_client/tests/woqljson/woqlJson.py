@@ -13,7 +13,7 @@ WOQL_JSON = {
         "predicate": {"@type": "NodeValue", "node": "b"},
         "object": {
             "@type": "Value",
-            "data": {"@type": "xsd:string", "@value": "c"},
+            "node": "c",
         },
         "graph_filter": "d",
     },
@@ -23,7 +23,7 @@ WOQL_JSON = {
         "predicate": {"@type": "NodeValue", "node": "b"},
         "object": {
             "@type": "Value",
-            "data": {"@type": "xsd:string", "@value": "c"},
+            "node": "c",
         },
     },
     "getJson": {
@@ -52,7 +52,7 @@ WOQL_JSON = {
     "groupbyJson": {
         "@type": "GroupBy",
         "group_by": ["A","B"],
-        "group_template": ["C"],
+        "template": ["C"],
         "grouped": {
             "@type": "DataValue",
             "variable": "New"
@@ -109,7 +109,7 @@ WOQL_JSON = {
     "isAJson": {
         "@type": "IsA",
         "element": {"@type": "NodeValue", "node": "instance"},
-        "of_type": {"@type": "NodeValue", "node": "owl:Class"},
+        "type": {"@type": "NodeValue", "node": "owl:Class"},
     },
     "deleteTripleJson": {
         "@type": "DeleteTriple",
