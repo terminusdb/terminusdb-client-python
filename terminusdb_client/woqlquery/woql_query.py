@@ -228,6 +228,19 @@ class WOQLQuery:
                 ret.append(co_item)
             return ret
 
+    def _value_list(self, wvar):
+        # TODO: orig is Nonetype
+        """takes input that can be either a string (variable name)
+        or an array - each element of the array is a member of the list"""
+        if type(wvar) is str:
+            return self._expand_value_variable(wvar, True)
+        if type(wvar) is list:
+            ret = []
+            for item in wvar:
+                co_item = self._clean_object(item)
+                ret.append(co_item)
+            return ret
+
     def _asv(self, colname_or_index, vname, obj_type=None):
         """Wraps the elements of an AS variable in the appropriate json-ld"""
         asvar = {}
@@ -1926,7 +1939,7 @@ class WOQLQuery:
             return ["base", "key_list", "uri"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
-        self._cursor["@type"] = "Unique"
+        self._cursor["@type"] = "HashKey"
         self._cursor["base"] = self._clean_object(prefix)
         self._cursor["key_list"] = self._data_list(key_list)
         self._cursor["uri"] = self._clean_node_value(uri)
@@ -1959,7 +1972,7 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "LexicalKey"
-        self._cursor["base"] = self._clean_data_value(self.iri(prefix))
+        self._cursor["base"] = self._clean_data_value(prefix)
         self._cursor["key_list"] = self._data_list(input_var_list)
         self._cursor["uri"] = self._clean_node_value(output_var)
         return self
@@ -1990,8 +2003,8 @@ class WOQLQuery:
             return ["base", "key_list", "uri"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
-        self._cursor["@type"] = "RandomIDGenerator"
-        self._cursor["base"] = self._clean_object(prefix)
+        self._cursor["@type"] = "RandomKey"
+        self._cursor["base"] = self._clean_data_value(prefix)
         self._cursor["key_list"] = self._vlist(key_list)
         self._cursor["uri"] = self._clean_node_value(uri)
         return self
@@ -2002,8 +2015,8 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Upper"
-        self._cursor["left"] = self._clean_object(left)
-        self._cursor["right"] = self._clean_object(right)
+        self._cursor["left"] = self._clean_data_value(left, "xsd:string")
+        self._cursor["right"] = self._clean_data_value(right, "xsd:string")
         return self
 
     def lower(self, left, right):
@@ -2026,8 +2039,8 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Lower"
-        self._cursor["left"] = self._clean_object(left)
-        self._cursor["right"] = self._clean_object(right)
+        self._cursor["left"] = self._clean_data_value(left, "xsd:string")
+        self._cursor["right"] = self._clean_data_value(right, "xsd:string")
         return self
 
     def pad(self, user_input, pad, length, output):
@@ -2052,18 +2065,18 @@ class WOQLQuery:
         """
         if user_input and user_input == "args":
             return [
-                "pad_string",
-                "pad_char",
-                "pad_times",
-                "pad_result",
+                "string",
+                "char",
+                "times",
+                "result",
             ]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Pad"
-        self._cursor["pad_string"] = self._clean_object(user_input)
-        self._cursor["pad_char"] = self._clean_object(pad)
-        self._cursor["pad_times"] = self._clean_object(length, "xsd:integer")
-        self._cursor["pad_result"] = self._clean_object(output)
+        self._cursor["string"] = self._clean_data_value(user_input)
+        self._cursor["char"] = self._clean_data_value(pad)
+        self._cursor["times"] = self._clean_data_value(length, "xsd:integer")
+        self._cursor["result"] = self._clean_data_value(output)
         return self
 
     def split(self, user_input, glue, output):
@@ -2084,13 +2097,13 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         if user_input and user_input == "args":
-            return ["split_string", "split_pattern", "split_list"]
+            return ["string", "pattern", "list"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Split"
-        self._cursor["split_string"] = self._clean_object(user_input)
-        self._cursor["split_pattern"] = self._clean_object(glue)
-        self._cursor["split_list"] = self._data_list(output)
+        self._cursor["string"] = self._clean_data_value(user_input)
+        self._cursor["pattern"] = self._clean_data_value(glue)
+        self._cursor["list"] = self._data_list(output)
         return self
 
     def member(self, member, mem_list):
@@ -2109,12 +2122,12 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         if member and member == "args":
-            return ["member", "member_list"]
+            return ["member", "list"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Member"
         self._cursor["member"] = self._clean_object(member)
-        self._cursor["member_list"] = self._data_list(mem_list)
+        self._cursor["list"] = self._value_list(mem_list)
         return self
 
     def concat(self, concat_list, result):
@@ -2153,7 +2166,7 @@ class WOQLQuery:
                 self._wrap_cursor_with_and()
             self._cursor["@type"] = "Concatenate"
             self._cursor["concat_list"] = self._data_list(concat_list)
-            self._cursor["concatenated"] = self._clean_object(result)
+            self._cursor["concatenated"] = self._clean_data_value(result)
         return self
 
     def join(self, user_input, glue, output):
@@ -2180,8 +2193,8 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Join"
         self._cursor["join_list"] = self._data_list(user_input)
-        self._cursor["join_separator"] = self._clean_object(glue)
-        self._cursor["join"] = self._clean_object(output)
+        self._cursor["join_separator"] = self._clean_data_value(glue)
+        self._cursor["join"] = self._clean_data_value(output)
         return self
 
     def sum(self, user_input, output):

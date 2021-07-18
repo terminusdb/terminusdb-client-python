@@ -281,7 +281,7 @@ class TestWoqlQueries:
         json_obj = {
             "@type": "Typecast",
             "value": {
-                "@type": "DataValue",
+                "@type": "Value",
                 "variable": "Duration",
             },
             "type": {"@type": "NodeValue", "node": "xsd:integer"},
@@ -326,7 +326,7 @@ class TestWoqlQueries:
                 "@type": "DataValue",
                 "data": {"@type": "xsd:string", "@value": "!\\w+(.*)test$"},
             },
-            "list": {
+            "result": {
                 "@type": "DataValue",
                 "variable": "formated",
             },
