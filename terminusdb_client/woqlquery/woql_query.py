@@ -2005,7 +2005,7 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "RandomKey"
         self._cursor["base"] = self._clean_data_value(prefix)
-        self._cursor["key_list"] = self._vlist(key_list)
+        self._cursor["key_list"] = self._data_list(key_list)
         self._cursor["uri"] = self._clean_node_value(uri)
         return self
 
@@ -2522,7 +2522,7 @@ class WOQLQuery:
         if type(groupedvar) is str:
             groupedvar = [groupedvar]
         self._cursor["template"] = self._raw_var_list(groupedvar)
-        self._cursor["grouped"] = self._varj(output)
+        self._cursor["grouped"] = self._clean_object(output)
         return self._add_sub_query(groupquery)
 
     def true(self):
@@ -2555,7 +2555,7 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         if subject and subject == "args":
-            return ["subject", "path_pattern", "object", "path"]
+            return ["subject", "pattern", "object", "path"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Path"

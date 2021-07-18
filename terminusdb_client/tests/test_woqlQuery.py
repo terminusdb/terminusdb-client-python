@@ -23,7 +23,6 @@ from .woqljson.woqlJson import WOQL_JSON, WOQL_STAR
 from .woqljson.woqlMathJson import WOQL_MATH_JSON
 from .woqljson.woqlOrJson import WOQL_OR_JSON
 from .woqljson.woqlTrimJson import WOQL_TRIM_JSON
-from .woqljson.woqlWhenJson import WOQL_WHEN_JSON
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -131,13 +130,6 @@ class TestWoqlQueries:
         )
         assert woql_object.to_dict() == WOQL_OR_JSON
         assert woql_object2.to_dict() == WOQL_OR_JSON
-
-    def test_when_method(self):
-
-        woql_object = WOQLQuery().when(True, WOQLQuery().add_class("id"))
-        woql_object_chain = WOQLQuery().when(True).add_class("id")
-        assert woql_object.to_dict() == WOQL_WHEN_JSON
-        assert woql_object_chain.to_dict() == WOQL_WHEN_JSON
 
     def test_opt_method(self):
         woql_object = WOQLQuery().opt(WOQLQuery().star())
@@ -252,7 +244,7 @@ class TestWoqlQueries:
         json_obj = {
             "@type": "QueryResource",
             "file": {"@type": "Source", "file": "my_json_file"},
-            "format": "panda_json",
+            "format": "csv",
         }
         assert woql_object.to_dict() == json_obj
 
@@ -313,7 +305,7 @@ class TestWoqlQueries:
             "my_int", "xsd:integer", "v:Duration_Cast", literal_type="node"
         )
         woql_object3 = WOQLQuery().cast(
-            WOQLQuery().iri("my_int"), "xsd:integer", "v:Duration_Cast"
+            "my_int", "xsd:integer", "v:Duration_Cast"
         )
         assert woql_object1.to_dict() == woql_object3.to_dict()
         assert woql_object2.to_dict() == woql_object3.to_dict()
@@ -413,7 +405,7 @@ class TestWoqlQueries:
             },
             "pattern": {
                 "@type": "PathPlus",
-                "path_pattern": {
+                "pattern": {
                     "@type": "InversePathPredicate",
                     "predicate": "hop",
                 },
@@ -474,9 +466,9 @@ class TestWoqlQueries:
                 "@type": "Variable",
                 "variable": {"@value": "X", "@type": "xsd:string"},
             },
-            "path_pattern": {
+            "pattern": {
                 "@type": "PathPlus",
-                "path_pattern": {
+                "pattern": {
                     "@type": "PathOr",
                     "or":[
                         { "@type": "PathSequence",
