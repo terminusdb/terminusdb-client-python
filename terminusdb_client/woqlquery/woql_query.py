@@ -233,10 +233,10 @@ class WOQLQuery:
         asvar = {}
         if type(colname_or_index) is int:
             asvar["@type"] = "Column"
-            asvar["indicator"] = {"@type" : "Indicator", "index" : column_or_index}
+            asvar["indicator"] = {"@type" : "Indicator", "index" : colname_or_index}
         elif type(colname_or_index) is str:
             asvar["@type"] = "Column"
-            asvar["indicator"] = {"@type" : "Indicator", "name" : column_or_index}
+            asvar["indicator"] = {"@type" : "Indicator", "name" : colname_or_index}
         if vname[:2] == "v:":
             vname = vname[2:]
         asvar["variable"] = vname
@@ -330,7 +330,7 @@ class WOQLQuery:
         obj = {"@type": "Value"}
         if type(user_obj) is str:
             if user_obj[:2] == "v:":
-                return self._expand_value_variable(o)
+                return self._expand_value_variable(user_obj)
             else:
                 obj["node"] = user_obj
         elif type(user_obj) is float:
