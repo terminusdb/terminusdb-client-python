@@ -43,18 +43,12 @@ class TestWoqlQueries:
     def test_start_method(self):
         woql_object = WOQLQuery().limit(10).start(0).star()
         json_obj = {
-            "@type": "woql:Limit",
-            "woql:limit": {
-                "@type": "woql:Datatype",
-                "woql:datatype": {"@type": "xsd:nonNegativeInteger", "@value": 10},
-            },
-            "woql:query": {
-                "@type": "woql:Start",
-                "woql:query": WOQL_STAR,
-                "woql:start": {
-                    "@type": "woql:Datatype",
-                    "woql:datatype": {"@type": "xsd:nonNegativeInteger", "@value": 0},
-                },
+            "@type": "Limit",
+            "limit": 10,
+            "query": {
+                "@type": "Start",
+                "query": WOQL_STAR,
+                "start": 0
             },
         }
         assert woql_object.to_dict() == json_obj
@@ -99,14 +93,14 @@ class TestWoqlQueries:
         woql_object_chain = WOQLQuery().woql_not()
         woql_object_chain.triple("a", "b", "c")
         json_obj = {
-            "@type": "woql:Not",
-            "woql:query": {
-                "@type": "woql:Triple",
-                "woql:subject": {"@type": "woql:Node", "woql:node": "doc:a"},
-                "woql:predicate": {"@type": "woql:Node", "woql:node": "scm:b"},
-                "woql:object": {
-                    "@type": "woql:Datatype",
-                    "woql:datatype": {"@type": "xsd:string", "@value": "c"},
+            "@type": "Not",
+            "query": {
+                "@type": "Triple",
+                "subject": {"@type": "NodeValue", "node": "a"},
+                "predicate": {"@type": "NodeValue", "node": "b"},
+                "object": {
+                    "@type": "Datatype",
+                    "datatype": {"@type": "xsd:string", "@value": "c"},
                 },
             },
         }
@@ -148,7 +142,7 @@ class TestWoqlQueries:
     def test_opt_method(self):
         woql_object = WOQLQuery().opt(WOQLQuery().star())
         woql_object_chain = WOQLQuery().opt().star()
-        json_obj = {"@type": "woql:Optional", "woql:query": WOQL_STAR}
+        json_obj = {"@type": "Optional", "query": WOQL_STAR}
         assert woql_object.to_dict() == json_obj
         assert woql_object_chain.to_dict() == json_obj
 
@@ -156,9 +150,9 @@ class TestWoqlQueries:
         woql_object = WOQLQuery().woql_from("schema/main", WOQLQuery().star())
         woql_object_chain = WOQLQuery().woql_from("schema/main").star()
         json_obj = {
-            "@type": "woql:From",
-            "woql:graph_filter": {"@type": "xsd:string", "@value": "schema/main"},
-            "woql:query": WOQL_STAR,
+            "@type": "From",
+            "graph_filter": {"@type": "xsd:string", "@value": "schema/main"},
+            "query": WOQL_STAR,
         }
         assert woql_object.to_dict() == woql_object_chain.to_dict()
         assert woql_object_chain.to_dict() == json_obj
@@ -180,14 +174,14 @@ class TestWoqlQueries:
     def test_eq_method(self):
         woql_object = WOQLQuery().eq("a", "b")
         json_obj = {
-            "@type": "woql:Equals",
-            "woql:left": {
-                "@type": "woql:Datatype",
-                "woql:datatype": {"@type": "xsd:string", "@value": "a"},
+            "@type": "Equals",
+            "left": {
+                "@type": "Datatype",
+                "datatype": {"@type": "xsd:string", "@value": "a"},
             },
-            "woql:right": {
-                "@type": "woql:Datatype",
-                "woql:datatype": {"@type": "xsd:string", "@value": "b"},
+            "right": {
+                "@type": "Datatype",
+                "datatype": {"@type": "xsd:string", "@value": "b"},
             },
         }
         assert woql_object.to_dict() == json_obj
@@ -232,53 +226,53 @@ class TestWoqlQueries:
     def test_get_method(self):
         woql_object = WOQLQuery().get(WOQLQuery().woql_as("a", "b"), "Target")
         json_obj = {
-            "@type": "woql:Get",
-            "woql:as_vars": [
+            "@type": "Get",
+            "as_vars": [
                 {
-                    "@type": "woql:NamedAsVar",
-                    "woql:identifier": {"@type": "xsd:string", "@value": "a"},
-                    "woql:variable_name": {"@type": "xsd:string", "@value": "b"},
+                    "@type": "NamedAsVar",
+                    "identifier": {"@type": "xsd:string", "@value": "a"},
+                    "variable": {"@type": "xsd:string", "@value": "b"},
                 }
             ],
-            "woql:query_resource": "Target",
+            "query_resource": "Target",
         }
         assert woql_object.to_dict() == json_obj
 
     def test_remote_method(self):
         woql_object = WOQLQuery().remote({"url": "http://url"})
         json_obj = {
-            "@type": "woql:RemoteResource",
-            "woql:remote_uri": {"@type": "xsd:anyURI", "@value": {"url": "http://url"}},
+            "@type": "RemoteResource",
+            "remote_uri": {"@type": "xsd:anyURI", "@value": {"url": "http://url"}},
         }
         assert woql_object.to_dict() == json_obj
 
     def test_post_method(self):
         woql_object = WOQLQuery().post("my_json_file", {"format": "panda_json"})
         json_obj = {
-            "@type": "woql:PostResource",
-            "woql:file": {"@type": "xsd:string", "@value": "my_json_file"},
-            "woql:format": {
-                "@type": "woql:Format",
-                "woql:format_type": {"@value": "panda_json", "@type": "xsd:string"},
+            "@type": "PostResource",
+            "file": {"@type": "xsd:string", "@value": "my_json_file"},
+            "format": {
+                "@type": "Format",
+                "format_type": {"@value": "panda_json", "@type": "xsd:string"},
             },
         }
         assert woql_object.to_dict() == json_obj
 
     def test_unique_method(self):
         woql_object = WOQLQuery().unique(
-            "doc:Station", "v:Start_ID", "v:Start_Station_URL"
+            "Station", "v:Start_ID", "v:Start_Station_URL"
         )
         assert woql_object.to_dict() == WOQL_UNIQUE_JSON
 
     def test_idgen_method(self):
         woql_object = WOQLQuery().idgen(
-            "doc:Station", "v:Start_ID", "v:Start_Station_URL"
+            "Station", "v:Start_ID", "v:Start_Station_URL"
         )
         assert woql_object.to_dict() == WOQL_IDGEN_JSON
 
     def test_random_idgen_method(self):
         woql_object = WOQLQuery().random_idgen(
-            "doc:Station", "v:Start_ID", "v:Start_Station_URL"
+            "Station", "v:Start_ID", "v:Start_Station_URL"
         )
         assert woql_object.to_dict() == WOQL_RANDOM_IDGEN_JSON
 
@@ -287,15 +281,15 @@ class TestWoqlQueries:
             "v:Duration", "xsd:integer", "v:Duration_Cast"
         )
         json_obj = {
-            "@type": "woql:Typecast",
-            "woql:typecast_value": {
-                "@type": "woql:Variable",
-                "woql:variable_name": {"@value": "Duration", "@type": "xsd:string"},
+            "@type": "Typecast",
+            "typecast_value": {
+                "@type": "Variable",
+                "variable": {"@value": "Duration", "@type": "xsd:string"},
             },
-            "woql:typecast_type": {"@type": "woql:Node", "woql:node": "xsd:integer"},
-            "woql:typecast_result": {
-                "@type": "woql:Variable",
-                "woql:variable_name": {
+            "typecast_type": {"@type": "NodeValue", "node": "xsd:integer"},
+            "typecast_result": {
+                "@type": "Variable",
+                "variable": {
                     "@value": "Duration_Cast",
                     "@type": "xsd:string",
                 },
@@ -321,7 +315,7 @@ class TestWoqlQueries:
             "my_int", "xsd:integer", "v:Duration_Cast", literal_type="owl:Thing"
         )
         woql_object2 = WOQLQuery().cast(
-            "my_int", "xsd:integer", "v:Duration_Cast", literal_type="woql:node"
+            "my_int", "xsd:integer", "v:Duration_Cast", literal_type="node"
         )
         woql_object3 = WOQLQuery().cast(
             WOQLQuery().iri("my_int"), "xsd:integer", "v:Duration_Cast"
@@ -332,18 +326,18 @@ class TestWoqlQueries:
     def test_re_method(self):
         woql_object = WOQLQuery().re("!\\w+(.*)test$", "v:string", "v:formated")
         json_obj = {
-            "@type": "woql:Regexp",
-            "woql:pattern": {
-                "@type": "woql:Datatype",
-                "woql:datatype": {"@type": "xsd:string", "@value": "!\\w+(.*)test$"},
+            "@type": "Regexp",
+            "pattern": {
+                "@type": "Datatype",
+                "datatype": {"@type": "xsd:string", "@value": "!\\w+(.*)test$"},
             },
-            "woql:regexp_list": {
-                "@type": "woql:Variable",
-                "woql:variable_name": {"@type": "xsd:string", "@value": "formated"},
+            "regexp_list": {
+                "@type": "Variable",
+                "variable": {"@type": "xsd:string", "@value": "formated"},
             },
-            "woql:regexp_string": {
-                "@type": "woql:Variable",
-                "woql:variable_name": {"@type": "xsd:string", "@value": "string"},
+            "regexp_string": {
+                "@type": "Variable",
+                "variable": {"@type": "xsd:string", "@value": "string"},
             },
         }
         assert woql_object.to_dict() == json_obj
@@ -359,14 +353,14 @@ class TestWoqlQueries:
     def test_member_method(self):
         woql_object = WOQLQuery().member("v:member", "v:list_obj")
         json_obj = {
-            "@type": "woql:Member",
-            "woql:member": {
-                "@type": "woql:Variable",
-                "woql:variable_name": {"@value": "member", "@type": "xsd:string"},
+            "@type": "Member",
+            "member": {
+                "@type": "Variable",
+                "variable": {"@value": "member", "@type": "xsd:string"},
             },
-            "woql:member_list": {
-                "@type": "woql:Variable",
-                "woql:variable_name": {"@value": "list_obj", "@type": "xsd:string"},
+            "member_list": {
+                "@type": "Variable",
+                "variable": {"@value": "list_obj", "@type": "xsd:string"},
             },
         }
         assert woql_object.to_dict() == json_obj
@@ -392,132 +386,136 @@ class TestWoqlQueries:
         assert woql_object.to_dict() == WOQL_JSON["orderbyJson"]
 
     def test_simple_path_query(self):
-        woql_object = WOQLQuery().path("v:X", "scm:hop", "v:Y", "v:Path")
+        woql_object = WOQLQuery().path("v:X", "hop", "v:Y", "v:Path")
         json_object = {
-            "@type": "woql:Path",
-            "woql:subject": {
-                "@type": "woql:Variable",
-                "woql:variable_name": {"@value": "X", "@type": "xsd:string"},
+            "@type": "Path",
+            "subject": {
+                "@type": "Variable",
+                "variable": {"@value": "X", "@type": "xsd:string"},
             },
-            "woql:path_pattern": {
-                "@type": "woql:PathPredicate",
-                "woql:path_predicate": {"@id": "scm:hop"},
+            "path_pattern": {
+                "@type": "PathPredicate",
+                "path_predicate": "hop",
             },
-            "woql:object": {
-                "@type": "woql:Variable",
-                "woql:variable_name": {"@value": "Y", "@type": "xsd:string"},
+            "object": {
+                "@type": "Variable",
+                "variable": {"@value": "Y", "@type": "xsd:string"},
             },
-            "woql:path": {
-                "@type": "woql:Variable",
-                "woql:variable_name": {"@value": "Path", "@type": "xsd:string"},
+            "path": {
+                "@type": "Variable",
+                "variable": {"@value": "Path", "@type": "xsd:string"},
             },
         }
         assert woql_object.to_dict() == json_object
 
     def test_plus_directed_path_query(self):
-        woql_object = WOQLQuery().path("v:X", "<scm:hop+", "v:Y", "v:Path")
+        woql_object = WOQLQuery().path("v:X", "<hop+", "v:Y", "v:Path")
         json_object = {
-            "@type": "woql:Path",
-            "woql:subject": {
-                "@type": "woql:Variable",
-                "woql:variable_name": {"@value": "X", "@type": "xsd:string"},
+            "@type": "Path",
+            "subject": {
+                "@type": "Variable",
+                "variable": {"@value": "X", "@type": "xsd:string"},
             },
-            "woql:path_pattern": {
-                "@type": "woql:PathPlus",
-                "woql:path_pattern": {
-                    "@type": "woql:InvertedPathPredicate",
-                    "woql:path_predicate": {"@id": "scm:hop"},
+            "path_pattern": {
+                "@type": "PathPlus",
+                "path_pattern": {
+                    "@type": "InvertedPathPredicate",
+                    "path_predicate": "hop",
                 },
             },
-            "woql:object": {
-                "@type": "woql:Variable",
-                "woql:variable_name": {"@value": "Y", "@type": "xsd:string"},
+            "object": {
+                "@type": "Variable",
+                "variable": {"@value": "Y", "@type": "xsd:string"},
             },
-            "woql:path": {
-                "@type": "woql:Variable",
-                "woql:variable_name": {"@value": "Path", "@type": "xsd:string"},
+            "path": {
+                "@type": "Variable",
+                "variable": {"@value": "Path", "@type": "xsd:string"},
             },
         }
         assert woql_object.to_dict() == json_object
 
     def test_grouped_path_query(self):
-        woql_object = WOQLQuery().path("v:X", "(<scm:hop,scm:hop>)+", "v:Y", "v:Path")
+        woql_object = WOQLQuery().path("v:X", "(<hop,hop>)+", "v:Y", "v:Path")
         json_object = {
-            "@type": "woql:Path",
-            "woql:subject": {
-                "@type": "woql:Variable",
-                "woql:variable_name": {"@value": "X", "@type": "xsd:string"},
+            "@type": "Path",
+            "subject": {
+                "@type": "Variable",
+                "variable": {"@value": "X", "@type": "xsd:string"},
             },
-            "woql:path_pattern": {
-                "@type": "woql:PathPlus",
-                "woql:path_pattern": {
-                    "@type": "woql:PathSequence",
-                    "woql:path_first": {
-                        "@type": "woql:InvertedPathPredicate",
-                        "woql:path_predicate": {"@id": "scm:hop"},
+            "path_pattern": {
+                "@type": "PathPlus",
+                "path_pattern": {
+                    "@type": "PathSequence",
+                    "path_first": {
+                        "@type": "InvertedPathPredicate",
+                        "path_predicate": "hop",
                     },
-                    "woql:path_second": {
-                        "@type": "woql:PathPredicate",
-                        "woql:path_predicate": {"@id": "scm:hop"},
+                    "path_second": {
+                        "@type": "PathPredicate",
+                        "path_predicate": "hop",
                     },
                 },
             },
-            "woql:object": {
-                "@type": "woql:Variable",
-                "woql:variable_name": {"@value": "Y", "@type": "xsd:string"},
+            "object": {
+                "@type": "Variable",
+                "variable": {"@value": "Y", "@type": "xsd:string"},
             },
-            "woql:path": {
-                "@type": "woql:Variable",
-                "woql:variable_name": {"@value": "Path", "@type": "xsd:string"},
+            "path": {
+                "@type": "Variable",
+                "variable": {"@value": "Path", "@type": "xsd:string"},
             },
         }
         assert woql_object.to_dict() == json_object
 
     def test_double_grouped_path_query(self):
         woql_object = WOQLQuery().path(
-            "v:X", "((<scm:hop,scm:hop>)|(<scm:hop2,scm:hop2>))+", "v:Y", "v:Path"
+            "v:X", "((<hop,hop>)|(<hop2,hop2>))+", "v:Y", "v:Path"
         )
         json_object = {
-            "@type": "woql:Path",
-            "woql:subject": {
-                "@type": "woql:Variable",
-                "woql:variable_name": {"@value": "X", "@type": "xsd:string"},
+            "@type": "Path",
+            "subject": {
+                "@type": "Variable",
+                "variable": {"@value": "X", "@type": "xsd:string"},
             },
-            "woql:path_pattern": {
-                "@type": "woql:PathPlus",
-                "woql:path_pattern": {
-                    "@type": "woql:PathOr",
-                    "woql:path_left": {
-                        "@type": "woql:PathSequence",
-                        "woql:path_first": {
-                            "@type": "woql:InvertedPathPredicate",
-                            "woql:path_predicate": {"@id": "scm:hop"},
-                        },
-                        "woql:path_second": {
-                            "@type": "woql:PathPredicate",
-                            "woql:path_predicate": {"@id": "scm:hop"},
-                        },
-                    },
-                    "woql:path_right": {
-                        "@type": "woql:PathSequence",
-                        "woql:path_first": {
-                            "@type": "woql:InvertedPathPredicate",
-                            "woql:path_predicate": {"@id": "scm:hop2"},
-                        },
-                        "woql:path_second": {
-                            "@type": "woql:PathPredicate",
-                            "woql:path_predicate": {"@id": "scm:hop2"},
-                        },
-                    },
+            "path_pattern": {
+                "@type": "PathPlus",
+                "path_pattern": {
+                    "@type": "PathOr",
+                    "or":[
+                        { "@type": "PathSequence",
+                          "sequence" : [
+                              {
+                                  "@type": "InversePathPredicate",
+                                  "predicate": "hop"
+                              },
+                              {
+                                  "@type": "PathPredicate",
+                                  "predicate": "hop",
+                              }
+                              ]
+                         },
+                        {  "@type": "PathSequence",
+                           "sequence" : [
+                               {
+                                   "@type": "InversePathPredicate",
+                                   "predicate": "hop2",
+                               },
+                               {
+                                   "@type": "PathPredicate",
+                                   "predicate": "hop2",
+                               }
+                           ]
+                         },
+                    ],
                 },
             },
-            "woql:object": {
-                "@type": "woql:Variable",
-                "woql:variable_name": {"@value": "Y", "@type": "xsd:string"},
+            "object": {
+                "@type": "Value",
+                "variable": "Y",
             },
-            "woql:path": {
-                "@type": "woql:Variable",
-                "woql:variable_name": {"@value": "Path", "@type": "xsd:string"},
+            "path": {
+                "@type": "Value",
+                "variable": "Path"
             },
         }
         assert woql_object.to_dict() == json_object
@@ -553,8 +551,8 @@ class TestTripleBuilder:
         assert woql_object.to_dict() == WOQL_JSON["isAJson"]
 
     def test_delete_method(self):
-        woql_object = WOQLQuery().delete_object("doc:x")
-        json_obj = {"@type": "woql:DeleteObject", "woql:document_uri": "doc:x"}
+        woql_object = WOQLQuery().delete_object("x")
+        json_obj = {"@type": "DeleteObject", "document_uri": "x"}
         assert woql_object.to_dict() == json_obj
 
     def test_delete_triple_method(self):
@@ -591,7 +589,7 @@ class TestTripleBuilderChainer:
         woql_object = WOQLQuery().node("a", "AddQuad").graph("schema/main")
         woql_object2 = (
             WOQLQuery()
-            .node("doc:x", "add_quad")
+            .node("x", "add_quad")
             .graph("schema/main")
             .label("my label", "en")
         )
@@ -600,8 +598,8 @@ class TestTripleBuilderChainer:
         assert woql_object2.to_dict() == WOQL_JSON["graphMethodJson"]
 
     def test_node_and_label_method(self):
-        woql_object = WOQLQuery().node("doc:x", "add_quad").label("my label", "en")
-        woql_object2 = WOQLQuery().node("doc:x", "add_quad").label("v:label")
+        woql_object = WOQLQuery().node("x", "add_quad").label("my label", "en")
+        woql_object2 = WOQLQuery().node("x", "add_quad").label("v:label")
         pp.pprint(woql_object.to_dict())
         assert woql_object.to_dict() == WOQL_JSON["labelMethodJson"]
         assert woql_object2.to_dict() == WOQL_JSON["labelMethodJson2"]
@@ -615,23 +613,23 @@ class TestTripleBuilderChainer:
     def test_comment_method(self):
         woql_object = WOQLQuery().comment("my comment")
         json_obj = {
-            "@type": "woql:Comment",
-            "woql:comment": {"@type": "xsd:string", "@value": "my comment"},
+            "@type": "Comment",
+            "comment": {"@type": "xsd:string", "@value": "my comment"},
         }
         assert woql_object.to_dict() == json_obj
 
     def test_abstract_method(self):
-        woql_object = WOQLQuery().node("doc:x", "add_quad").abstract()
+        woql_object = WOQLQuery().node("x", "add_quad").abstract()
         assert woql_object.to_dict() == WOQL_JSON["nodeAbstractJson"]
 
     def test_node_property_method(self):
         woql_object = (
-            WOQLQuery().node("doc:x", "add_triple").property("myprop", "value")
+            WOQLQuery().node("x", "add_triple").property("myprop", "value")
         )
         assert woql_object.to_dict() == WOQL_JSON["addNodePropJson"]
 
     def test_node_parent_method(self):
-        woql_object = WOQLQuery().node("doc:x", "add_quad").parent("classParentName")
+        woql_object = WOQLQuery().node("x", "add_quad").parent("classParentName")
         assert woql_object.to_dict() == WOQL_JSON["nodeParentJson"]
 
     def test_class_description_method(self):
@@ -697,18 +695,18 @@ class TestTripleBuilderChainer:
         query = WOQLQuery().woql_as(x).woql_as(y).woql_as(z)
         assert query.to_dict() == [
             {
-                "@type": "woql:IndexedAsVar",
-                "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 0},
-                "woql:variable_name": {"@type": "xsd:string", "@value": "x"},
+                "@type": "IndexedAsVar",
+                "index": {"@type": "xsd:nonNegativeInteger", "@value": 0},
+                "variable": {"@type": "xsd:string", "@value": "x"},
             },
             {
-                "@type": "woql:IndexedAsVar",
-                "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 1},
-                "woql:variable_name": {"@type": "xsd:string", "@value": "y"},
+                "@type": "IndexedAsVar",
+                "index": {"@type": "xsd:nonNegativeInteger", "@value": 1},
+                "variable": {"@type": "xsd:string", "@value": "y"},
             },
             {
-                "@type": "woql:IndexedAsVar",
-                "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 2},
-                "woql:variable_name": {"@type": "xsd:string", "@value": "z"},
+                "@type": "IndexedAsVar",
+                "index": {"@type": "xsd:nonNegativeInteger", "@value": 2},
+                "variable": {"@type": "xsd:string", "@value": "z"},
             },
         ]
