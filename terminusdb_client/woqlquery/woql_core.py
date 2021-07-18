@@ -69,35 +69,35 @@ def _tokens_to_json(seq, query):
         left = seq[: seq.index("|")]
         right = seq[seq.index("|") + 1 :]
         return {
-            "@type": "woql:PathOr",
-            "woql:path_left": _tokens_to_json(left, query),
-            "woql:path_right": _tokens_to_json(right, query),
+            "@type": "PathOr",
+            "or" : [_tokens_to_json(left, query),
+                    _tokens_to_json(right, query)],
         }
     elif "," in seq:  # binds tighter
         first = seq[: seq.index(",")]
         second = seq[seq.index(",") + 1 :]
         return {
-            "@type": "woql:PathSequence",
-            "woql:path_first": _tokens_to_json(first, query),
-            "woql:path_second": _tokens_to_json(second, query),
+            "@type": "PathSequence",
+            "sequence": [_tokens_to_json(first, query),
+                         _tokens_to_json(second, query)],
         }
     elif seq[1] == "+":  # binds tightest of all
         return {
-            "@type": "woql:PathPlus",
-            "woql:path_pattern": _tokens_to_json([seq[0]], query),
+            "@type": "PathPlus",
+            "pattern": _tokens_to_json([seq[0]], query),
         }
     elif seq[1][0] == "{":  # binds tightest of all
         meat = seq[1][1:-1].split(",")
         return {
-            "@type": "woql:PathTimes",
-            "woql:path_minimum": {"@type": "xsd:positiveInteger", "@value": meat[0]},
-            "woql:path_maximum": {"@type": "xsd:positiveInteger", "@value": meat[1]},
-            "woql:path_pattern": _tokens_to_json([seq[0]], query),
+            "@type": "PathTimes",
+            "minimum": meat[0],
+            "maximum": meat[1],
+            "pattern": _tokens_to_json([seq[0]], query),
         }
     else:
         query._parameter_error("Pattern error - could not be parsed " + seq[0])
         return {
-            "@type": "woql:PathPredicate",
+            "@type": "PathPredicate",
             "rdfs:label": "failed to parse query " + seq[0],
         }
 
@@ -111,15 +111,17 @@ def _compile_predicate(pp, query):
             else query._clean_path_predicate(pred)
         )
         return {
-            "@type": "woql:PathOr",
-            "woql:path_left": {
-                "@type": "woql:InvertedPathPredicate",
-                "woql:path_predicate": {"@id": cleaned},
-            },
-            "woql:path_right": {
-                "@type": "woql:PathPredicate",
-                "woql:path_predicate": {"@id": cleaned},
-            },
+            "@type": "PathOr",
+            "or": [
+                {
+                    "@type": "InversePathPredicate",
+                    "predicate": cleaned,
+                },
+                {
+                    "@type": "PathPredicate",
+                    "predicate": cleaned,
+                },
+            ]
         }
     elif "<" in pp:
         pred = pp[1:]
@@ -129,8 +131,8 @@ def _compile_predicate(pp, query):
             else query._clean_path_predicate(pred)
         )
         return {
-            "@type": "woql:InvertedPathPredicate",
-            "woql:path_predicate": {"@id": cleaned},
+            "@type": "InversePathPredicate",
+            "predicate": cleaned,
         }
     elif ">" in pp:
         pred = pp[:-1]
@@ -139,28 +141,33 @@ def _compile_predicate(pp, query):
             if pred == "*"
             else query._clean_path_predicate(pred)
         )
-        return {"@type": "woql:PathPredicate", "woql:path_predicate": {"@id": cleaned}}
+        return {"@type": "PathPredicate", "predicate": cleaned}
     else:
         pred = "owl:topObjectProperty" if pp == "*" else query._clean_path_predicate(pp)
-        return {"@type": "woql:PathPredicate", "woql:path_predicate": {"@id": pred}}
+        return {"@type": "PathPredicate", "predicate": pred}
 
 
 def _copy_dict(orig, rollup=None):
     if type(orig) is list:
         return orig
     if rollup:
-        if orig.get("@type") in ["woql:And", "woql:Or"]:
-            if not orig.get("woql:query_list") or not len(orig["woql:query_list"]):
+        if orig.get("@type") == "And"
+            if not orig.get("and") or not len(orig["and"]):
                 return {}
-            if len(orig["woql:query_list"]) == 1:
-                return _copy_dict(orig["woql:query_list"][0]["woql:query"], rollup)
-        if "woql:query" in orig and orig["@type"] != "woql:Comment":
-            if type(orig["woql:query"]) is tuple:
-                orig["woql:query"] = orig["woql:query"][0].to_dict()
-            if not orig["woql:query"].get("@type"):
+            if len(orig["and"]) == 1:
+                return _copy_dict(orig["and"][0], rollup)
+        if orig.get("@type") == "Or":
+            if not orig.get("or") or not len(orig["or"]):
                 return {}
-        if "woql:consequent" in orig:
-            if not orig["woql:consequent"].get("@type"):
+            if len(orig["or"]) == 1:
+                return _copy_dict(orig["or"][0], rollup)
+        if "query" in orig and orig["@type"] != "Comment":
+            if type(orig["query"]) is tuple:
+                orig["query"] = orig["query"][0].to_dict()
+            if not orig["query"].get("@type"):
+                return {}
+        if "consequent" in orig:
+            if not orig["consequent"].get("@type"):
                 return {}
     nuj = {}
     for key, part in orig.items():
