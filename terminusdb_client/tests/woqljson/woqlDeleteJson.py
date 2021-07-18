@@ -21,7 +21,7 @@ WOQL_DELETE_JSON = {
                 "subject": {
                     "@type": "NodeValue",
                     "variable": "Other"
-                }.
+                },
                 "predicate": {
                     "@type": "NodeValue",
                     "variable": "Incoming"
