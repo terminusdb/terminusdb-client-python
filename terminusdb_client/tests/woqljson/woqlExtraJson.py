@@ -92,7 +92,7 @@ WoqlExtra = {
                         },
                         "object": {
                             "@type": "Value",
-                            "variable_name": "C"
+                            "variable": "C"
                         },
                     },
                 },

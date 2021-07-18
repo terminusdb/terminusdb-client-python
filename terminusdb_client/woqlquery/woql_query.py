@@ -192,7 +192,7 @@ class WOQLQuery:
         if type(varb) is str:
             return {
                 "@type": "Value",
-                "variable_name": varb
+                "variable": varb
             }
         return varb
 
@@ -3029,7 +3029,7 @@ class WOQLQuery:
         v = obj.get("@value")
         if v is not None:
             return s == v
-        vn = obj.get("variable_name")
+        vn = obj.get("variable")
         if vn is not None:
             return s == "v:" + vn
         return False
