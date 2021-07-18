@@ -363,7 +363,7 @@ class WOQLQuery:
         obj = {"@type": "DataValue"}
         if type(user_obj) is str:
             if user_obj[:2] == "v:":
-                return self._expand_data_variable(o)
+                return self._expand_data_variable(user_obj)
             else:
                 obj["data"] = self._jlt(user_obj, target)
         elif type(user_obj) is float:
@@ -396,7 +396,7 @@ class WOQLQuery:
         obj = {"@type": "ArithmeticValue"}
         if type(user_obj) is str:
             if user_obj[:2] == "v:":
-                return self._expand_arithmetic_variable(o)
+                return self._expand_arithmetic_variable(user_obj)
             else:
                 obj["data"] = self._jlt(user_obj, target)
         elif type(user_obj) is float:
@@ -429,7 +429,7 @@ class WOQLQuery:
         obj = {"@type": "NodeValue"}
         if type(user_obj) is str:
             if user_obj[:2] == "v:":
-                return self._expand_node_variable(o)
+                return self._expand_node_variable(user_obj)
             else:
                 obj["node"] = user_obj
         elif type(user_obj) is dict:
