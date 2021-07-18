@@ -151,7 +151,7 @@ def _copy_dict(orig, rollup=None):
     if type(orig) is list:
         return orig
     if rollup:
-        if orig.get("@type") == "And"
+        if orig.get("@type") == "And":
             if not orig.get("and") or not len(orig["and"]):
                 return {}
             if len(orig["and"]) == 1:
