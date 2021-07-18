@@ -1929,7 +1929,7 @@ class WOQLQuery:
         self._cursor["@type"] = "Unique"
         self._cursor["base"] = self._clean_object(prefix)
         self._cursor["key_list"] = self._data_list(key_list)
-        self._cursor["uri"] = self._clean_nod_value(uri)
+        self._cursor["uri"] = self._clean_node_value(uri)
         return self
 
     def idgen(self, prefix, input_var_list, output_var):
@@ -1960,8 +1960,8 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "LexicalKey"
         self._cursor["base"] = self._clean_data_value(self.iri(prefix))
-        self._cursor["key_list"] = self._clean_object(input_var_list)
-        self._cursor["uri"] = self._clean_data_value(output_var)
+        self._cursor["key_list"] = self._data_list(input_var_list)
+        self._cursor["uri"] = self._clean_node_value(output_var)
         return self
 
     def random_idgen(self, prefix, key_list, uri):
@@ -2383,7 +2383,7 @@ class WOQLQuery:
             else:
                 return self.cast(self.literal(val, literal_type), user_type, result)
         if val and val == "args":
-            return ["typecast_value", "typecast_type", "typecast_result"]
+            return ["value", "type", "result"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Typecast"

@@ -280,17 +280,14 @@ class TestWoqlQueries:
         )
         json_obj = {
             "@type": "Typecast",
-            "typecast_value": {
-                "@type": "Variable",
-                "variable": {"@value": "Duration", "@type": "xsd:string"},
+            "value": {
+                "@type": "DataValue",
+                "variable": "Duration",
             },
-            "typecast_type": {"@type": "NodeValue", "node": "xsd:integer"},
-            "typecast_result": {
-                "@type": "Variable",
-                "variable": {
-                    "@value": "Duration_Cast",
-                    "@type": "xsd:string",
-                },
+            "type": {"@type": "NodeValue", "node": "xsd:integer"},
+            "result": {
+                "@type": "Value",
+                "variable": "Duration_Cast"
             },
         }
         assert woql_object.to_dict() == json_obj
@@ -329,11 +326,11 @@ class TestWoqlQueries:
                 "@type": "DataValue",
                 "data": {"@type": "xsd:string", "@value": "!\\w+(.*)test$"},
             },
-            "regexp_list": {
+            "list": {
                 "@type": "DataValue",
                 "variable": "formated",
             },
-            "regexp_string": {
+            "string": {
                 "@type": "DataValue",
                 "variable": "string",
             },
@@ -388,20 +385,20 @@ class TestWoqlQueries:
         json_object = {
             "@type": "Path",
             "subject": {
-                "@type": "Variable",
-                "variable": {"@value": "X", "@type": "xsd:string"},
+                "@type": "NodeValue",
+                "variable": "X",
             },
-            "path_pattern": {
+            "pattern": {
                 "@type": "PathPredicate",
-                "path_predicate": "hop",
+                "predicate": "hop",
             },
             "object": {
-                "@type": "Variable",
-                "variable": {"@value": "Y", "@type": "xsd:string"},
+                "@type": "Value",
+                "variable": "Y",
             },
             "path": {
-                "@type": "Variable",
-                "variable": {"@value": "Path", "@type": "xsd:string"},
+                "@type": "Value",
+                "variable": "Path",
             },
         }
         assert woql_object.to_dict() == json_object
@@ -411,23 +408,23 @@ class TestWoqlQueries:
         json_object = {
             "@type": "Path",
             "subject": {
-                "@type": "Variable",
-                "variable": {"@value": "X", "@type": "xsd:string"},
+                "@type": "NodeValue",
+                "variable": "X",
             },
-            "path_pattern": {
+            "pattern": {
                 "@type": "PathPlus",
                 "path_pattern": {
-                    "@type": "InvertedPathPredicate",
-                    "path_predicate": "hop",
+                    "@type": "InversePathPredicate",
+                    "predicate": "hop",
                 },
             },
             "object": {
-                "@type": "Variable",
-                "variable": {"@value": "Y", "@type": "xsd:string"},
+                "@type": "Value",
+                "variable": "Y",
             },
             "path": {
-                "@type": "Variable",
-                "variable": {"@value": "Path", "@type": "xsd:string"},
+                "@type": "Value",
+                "variable": "Path",
             },
         }
         assert woql_object.to_dict() == json_object
