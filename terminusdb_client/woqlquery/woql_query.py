@@ -2229,7 +2229,7 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Start"
-        self._cursor["start"] = self._clean_object(start, "xsd:nonNegativeInteger")
+        self._cursor["start"] = start
         return self._add_sub_query(query)
 
     def limit(self, limit, query=None):
@@ -2251,7 +2251,7 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Limit"
-        self._cursor["limit"] = self._clean_object(limit, "xsd:nonNegativeInteger")
+        self._cursor["limit"] = limit
         return self._add_sub_query(query)
 
     def re(self, pattern, reg_str, reg_list):
