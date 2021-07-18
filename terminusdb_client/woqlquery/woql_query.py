@@ -295,7 +295,7 @@ class WOQLQuery:
                 subj = self._vocab[obj]
             else:
                 subj = "doc:" + obj
-            return self._expand_variable(subj)
+            return self._expand_node_variable(subj)
         raise ValueError("Subject must be a URI string")
 
     def _clean_predicate(self, predicate):
@@ -311,8 +311,8 @@ class WOQLQuery:
         elif self._vocab and (predicate in self._vocab):
             pred = self._vocab[predicate]
         else:
-            pred = "scm:" + predicate
-        return self._expand_variable(pred)
+            pred = predicate
+        return self._expand_node_variable(pred)
 
     def _clean_path_predicate(self, predicate=None):
         pred = False
@@ -1175,7 +1175,7 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "UpdateObject"
         if isinstance(input_obj, str):
-            doc = self.expand_value(input_obj)
+            doc = self.expand_data_value(input_obj)
         else:
             doc = input_obj
         self._cursor["document"] = doc
@@ -1197,7 +1197,7 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "ReadObject"
         self._cursor["document_uri"] = iri
-        self._cursor["document"] = self._expand_variable(output_var)
+        self._cursor["document"] = self._expand_data_variable(output_var)
         return self
 
     def get(self, as_vars, query_resource=None):
