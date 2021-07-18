@@ -7,7 +7,7 @@ def property_max():
         "@type": "And",
         "and": [
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:P"},
                 "predicate": {"@type": "NodeValue", "node": "rdf:type"},
                 "object": {
@@ -17,7 +17,7 @@ def property_max():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:P"},
                 "predicate": {
                     "@type": "NodeValue",
@@ -27,7 +27,7 @@ def property_max():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:P"},
                 "predicate": {
                     "@type": "NodeValue",
@@ -37,7 +37,7 @@ def property_max():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:P_max"},
                 "predicate": {"@type": "NodeValue", "node": "rdf:type"},
                 "object": {
@@ -47,7 +47,7 @@ def property_max():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:P_max"},
                 "predicate": {
                     "@type": "NodeValue",
@@ -57,7 +57,7 @@ def property_max():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:P_max"},
                 "predicate": {
                     "@type": "NodeValue",
@@ -73,7 +73,7 @@ def property_max():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:A"},
                 "predicate": {
                     "@type": "NodeValue",
@@ -92,7 +92,7 @@ def property_min():
         "@type": "And",
         "and": [
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:P"},
                 "predicate": {"@type": "NodeValue", "node": "rdf:type"},
                 "object": {
@@ -102,7 +102,7 @@ def property_min():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:P"},
                 "predicate": {
                     "@type": "NodeValue",
@@ -112,7 +112,7 @@ def property_min():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:P"},
                 "predicate": {
                     "@type": "NodeValue",
@@ -122,7 +122,7 @@ def property_min():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:P_min"},
                 "predicate": {"@type": "NodeValue", "node": "rdf:type"},
                 "object": {
@@ -132,7 +132,7 @@ def property_min():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:P_min"},
                 "predicate": {
                     "@type": "NodeValue",
@@ -142,7 +142,7 @@ def property_min():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:P_min"},
                 "predicate": {
                     "@type": "NodeValue",
@@ -158,7 +158,7 @@ def property_min():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:A"},
                 "predicate": {
                     "@type": "NodeValue",
@@ -177,7 +177,7 @@ def property_cardinalty():
         "@type": "And",
         "and": [
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:P"},
                 "predicate": {"@type": "NodeValue", "node": "rdf:type"},
                 "object": {
@@ -187,7 +187,7 @@ def property_cardinalty():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:P"},
                 "predicate": {
                     "@type": "NodeValue",
@@ -197,7 +197,7 @@ def property_cardinalty():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:P"},
                 "predicate": {
                     "@type": "NodeValue",
@@ -207,7 +207,7 @@ def property_cardinalty():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {
                     "@type": "NodeValue",
                     "node": "scm:P_cardinality",
@@ -220,7 +220,7 @@ def property_cardinalty():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {
                     "@type": "NodeValue",
                     "node": "scm:P_cardinality",
@@ -233,7 +233,7 @@ def property_cardinalty():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {
                     "@type": "NodeValue",
                     "node": "scm:P_cardinality",
@@ -252,7 +252,7 @@ def property_cardinalty():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:A"},
                 "predicate": {
                     "@type": "NodeValue",
@@ -361,14 +361,14 @@ def chain_doctype():
         "@type": "And",
         "and": [
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:MyDoc"},
                 "predicate": {"@type": "NodeValue", "node": "rdf:type"},
                 "object": {"@type": "Value", "node": "owl:Class"},
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:MyDoc"},
                 "predicate": {
                     "@type": "NodeValue",
@@ -381,7 +381,7 @@ def chain_doctype():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:MyDoc"},
                 "predicate": {"@type": "NodeValue", "node": "rdfs:label"},
                 "object": {
@@ -395,7 +395,7 @@ def chain_doctype():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:MyDoc"},
                 "predicate": {
                     "@type": "NodeValue",
@@ -412,7 +412,7 @@ def chain_doctype():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:prop"},
                 "predicate": {"@type": "NodeValue", "node": "rdf:type"},
                 "object": {
@@ -422,14 +422,14 @@ def chain_doctype():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:prop"},
                 "predicate": {"@type": "NodeValue", "node": "rdfs:range"},
                 "object": {"@type": "Value", "node": "xsd:dateTime"},
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:prop"},
                 "predicate": {
                     "@type": "NodeValue",
@@ -439,7 +439,7 @@ def chain_doctype():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:prop"},
                 "predicate": {"@type": "NodeValue", "node": "rdfs:label"},
                 "object": {
@@ -453,7 +453,7 @@ def chain_doctype():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:prop2"},
                 "predicate": {"@type": "NodeValue", "node": "rdf:type"},
                 "object": {
@@ -463,14 +463,14 @@ def chain_doctype():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:prop2"},
                 "predicate": {"@type": "NodeValue", "node": "rdfs:range"},
                 "object": {"@type": "Value", "node": "xsd:integer"},
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:prop2"},
                 "predicate": {
                     "@type": "NodeValue",
@@ -480,7 +480,7 @@ def chain_doctype():
                 "graph": "schema",
             },
             {
-                "@type": "AddQuad",
+                "@type": "AddTriple",
                 "subject": {"@type": "NodeValue", "node": "scm:prop2"},
                 "predicate": {"@type": "NodeValue", "node": "rdfs:label"},
                 "object": {
