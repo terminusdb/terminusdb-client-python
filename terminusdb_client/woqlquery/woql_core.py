@@ -179,7 +179,7 @@ def _copy_dict(orig, rollup=None):
                     if sub:
                         nupart.append(sub)
                 else:
-                    nupart = nupart.append(item)
+                    nupart.append(item)
             nuj[key] = nupart
         elif type(part) is dict:
             query = _copy_dict(part, rollup)
