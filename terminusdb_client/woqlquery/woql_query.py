@@ -2467,7 +2467,7 @@ class WOQLQuery:
             if type(item) is str:
                 obj = {
                     "@type": "OrderTemplate",
-                    "variable" : self._raw_var(item)
+                    "variable" : self._raw_var(item),
                     "order": "asc"
                 }
                 self._cursor["ordering"].append(obj)

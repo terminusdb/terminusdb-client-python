@@ -27,13 +27,13 @@ WOQL_JSON = {
         "@type": "Get",
         "columns": [
             {
-                "@type": "column",
+                "@type": "Column",
                 "indicator": {"@type": "Indicator", "name": "M"},
                 "variable": "a",
                 "var_type": "p",
             }
         ],
-        "query_resource": "Target",
+        "resource": "Target",
     },
     "memberJson": {
         "@type": "Member",
