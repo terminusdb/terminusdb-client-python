@@ -2,34 +2,36 @@ WoqlExtra = {
     "chainAndJson": {
         "@type": "And",
         "and": [
-            { "@type": "Triple",
-              "subject": {
-                  "@type": "NodeValue",
-                  "variableA"
+            {
+                "@type": "Triple",
+                "subject": {
+                    "@type": "NodeValue",
+                    "variable" : "A"
+                },
+                "predicate": {
+                    "@type" : "NodeValue",
+                    "variable": "B"
               },
-              "predicate": {
-                  "@type" : "NodeValue",
-                  "variable": "B"
-              },
-              "object": {
-                  "@type": "Value",
-                "variable": "C"
-              },
-             },
-            { "@type": "Triple",
-              "subject": {
-                  "@type": "NodeValue",
-                  "variable": "D"
-              },
-              "predicate": {
-                  "@type": "NodeValue",
-                  "variable": "E"
-              },
-              "object": {
-                  "@type": "Value",
-                  "variable": "F"
-              },
-             },
+                "object": {
+                    "@type": "Value",
+                    "variable": "C"
+                },
+            },
+            {
+                "@type": "Triple",
+                "subject": {
+                    "@type": "NodeValue",
+                    "variable": "D"
+                },
+                "predicate": {
+                    "@type": "NodeValue",
+                    "variable": "E"
+                },
+                "object": {
+                    "@type": "Value",
+                    "variable": "F"
+                },
+            },
         ],
     },
     "usingJson": {
