@@ -743,6 +743,8 @@ class WOQLQuery:
             self._cursor["and"] = []
         for item in queries:
             onevar = self._coerce_to_dict(item)
+            print(f"item: {item}")
+            print(f"onevar: {onevar}")
             if (
                 onevar["@type"] == "And"
                 and onevar['and']
