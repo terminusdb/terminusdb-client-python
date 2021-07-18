@@ -330,7 +330,7 @@ class WOQLQuery:
         obj = {"@type": "Value"}
         if type(user_obj) is str:
             if user_obj[:2] == "v:":
-                return self.expand_value_variable(o)
+                return self._expand_value_variable(o)
             else:
                 obj["node"] = user_obj
         elif type(user_obj) is float:
@@ -737,12 +737,11 @@ class WOQLQuery:
             self._cursor.clear()
             queries = [new_json] + queries
         if queries and queries[0] == "args":
-            return ["query_list"]
+            return ["and"]
         self._cursor["@type"] = "And"
-        if "query_list" not in self._cursor:
-            self._cursor["query_list"] = []
+        if "and" not in self._cursor:
+            self._cursor["and"] = []
         for item in queries:
-            index = len(self._cursor["and"])
             onevar = self._coerce_to_dict(item)
             if (
                 onevar["@type"] == "And"
@@ -2749,7 +2748,6 @@ class WOQLQuery:
         add_quad
         """
         if label is None and description is None:
-            insert_type = self._clean_type(insert_type, True)
             if ref_graph:
                 self.add_quad(insert_id, "type", insert_type, ref_graph)
             else:
@@ -2778,7 +2776,7 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         if data.get("type") and data.get("id"):
-            data_type = self._clean_type(data["type"], True)
+            data_type = data["type"]
             self.insert(data["id"], data_type, ref_graph)
             if data.get("label"):
                 self.label(data["label"])
@@ -3054,19 +3052,19 @@ class WOQLQuery:
             if gobj is None:
                 gobj = lastsubj.get("graph")
             if gobj is not None:
-                g = gobj.get("@value")
+                g = gobj
         if g is None:
-            g = "schema/main"
+            g = "schema"
 
         if t == "AddTriple":
             self.woql_and(WOQLQuery().add_triple(s, p, o))
         elif t == "DeleteTriple":
             self.woql_and(WOQLQuery().delete_triple(s, p, o))
-        elif t == "AddQuad":
+        elif t == "AddTriple":
             self.woql_and(WOQLQuery().add_quad(s, p, o, g))
-        elif t == "DeleteQuad":
+        elif t == "DeleteTriple":
             self.woql_and(WOQLQuery().delete_quad(s, p, o, g))
-        elif t == "Quad":
+        elif t == "Triple":
             self.woql_and(WOQLQuery().quad(s, p, o, g))
         else:
             self.woql_and(WOQLQuery().triple(s, p, o))
