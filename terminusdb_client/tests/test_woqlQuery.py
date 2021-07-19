@@ -334,7 +334,7 @@ class TestWoqlQueries:
         assert woql_object.to_dict() == WOQL_JOIN_SPLIT_JSON["joinJson"]
 
     def test_split_method(self):
-        woql_object = WOQLQuery().split("A, B, C", ", ", "v:list_obj")
+        woql_object = WOQLQuery().split(["A", "B", "C"], ", ", "v:list_obj")
         assert woql_object.to_dict() == WOQL_JOIN_SPLIT_JSON["splitJson"]
 
     def test_member_method(self):
@@ -573,88 +573,6 @@ class TestTripleBuilderChainer:
     def test_node_method(self):
         woql_object = WOQLQuery().node("some_node", "add_quad")
         assert woql_object.to_dict() == {}
-
-    def test_graph_method(self):
-        woql_object = WOQLQuery().node("a", "AddQuad").graph("schema")
-        woql_object2 = (
-            WOQLQuery()
-            .node("x", "add_quad")
-            .graph("schema")
-            .label("my label", "en")
-        )
-
-        assert woql_object.to_dict() == {}
-        assert woql_object2.to_dict() == WOQL_JSON["graphMethodJson"]
-
-    def test_node_and_label_method(self):
-        woql_object = WOQLQuery().node("x", "add_quad").label("my label", "en")
-        woql_object2 = WOQLQuery().node("x", "add_quad").label("v:label")
-        pp.pprint(woql_object.to_dict())
-        assert woql_object.to_dict() == WOQL_JSON["labelMethodJson"]
-        assert woql_object2.to_dict() == WOQL_JSON["labelMethodJson2"]
-
-    def test_add_class_and_description_method(self):
-        woql_object = (
-            WOQLQuery().add_class("NewClass").description("A new class object.")
-        )
-        assert woql_object.to_dict() == WOQL_JSON["addClassDescJson"]
-
-    def test_abstract_method(self):
-        woql_object = WOQLQuery().node("x", "add_quad").abstract()
-        assert woql_object.to_dict() == WOQL_JSON["nodeAbstractJson"]
-
-    def test_node_property_method(self):
-        woql_object = (
-            WOQLQuery().node("x", "add_triple").property("myprop", "value")
-        )
-        assert woql_object.to_dict() == WOQL_JSON["addNodePropJson"]
-
-    def test_node_parent_method(self):
-        woql_object = WOQLQuery().node("x", "add_quad").parent("classParentName")
-        assert woql_object.to_dict() == WOQL_JSON["nodeParentJson"]
-
-    def test_class_description_method(self):
-        woql_object = (
-            WOQLQuery().add_class("NewClass").description("A new class object.")
-        )
-        assert woql_object.to_dict() == WOQL_JSON["addClassDescJson"]
-
-    def test_max(self, property_max):
-        woql_object = WOQLQuery().add_property("P", "string").domain("A").max(4)
-        assert woql_object.to_dict() == property_max
-
-    def test_min(self, property_min):
-        woql_object = WOQLQuery().add_property("P", "string").domain("A").min(2)
-        assert woql_object.to_dict() == property_min
-
-    def test_card(self, property_cardinalty):
-        woql_object = WOQLQuery().add_property("P", "string").domain("A").cardinality(3)
-        assert woql_object.to_dict() == property_cardinalty
-
-    def test_chain1(self, chain_insert):
-        woql_object = (
-            WOQLQuery()
-            .insert("v:Node_ID", "v:Type")
-            .label("v:Label")
-            .description("v:Description")
-            .property("prop", "v:Prop")
-            .property("prop", "v:Prop2")
-            .parent("myParentClass")
-        )
-        assert woql_object.to_dict() == chain_insert
-
-    def test_chain2(self, chain_doctype):
-        woql_object = (
-            WOQLQuery()
-            .doctype("MyDoc")
-            .label("abc")
-            .description("abcd")
-            .property("prop", "dateTime")
-            .label("aaa")
-            .property("prop2", "integer")
-            .label("abe")
-        )
-        assert woql_object.to_dict() == chain_doctype
 
     def test_dot_chain(self):
         woql_object = WOQLQuery().triple("A", "B", "C").triple("D", "E", "F")
