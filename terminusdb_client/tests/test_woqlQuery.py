@@ -205,10 +205,10 @@ class TestWoqlQueries:
         assert woql_object.to_dict() == json_obj
 
     def test_post_method(self):
-        woql_object = WOQLQuery().post({"file" : "my_json_file", "format" : "csv"})
+        woql_object = WOQLQuery().post({"file" : "my_json_file"})
         json_obj = {
             "@type": "QueryResource",
-            "file": {"@type": "Source", "file": "my_json_file"},
+            "source": {"@type": "Source", "file": "my_json_file"},
             "format": "csv",
         }
         assert woql_object.to_dict() == json_obj
@@ -484,7 +484,7 @@ class TestTripleBuilder:
 
     def test_quad_method(self, quad_opt):
         woql_object = WOQLQuery().quad("a", "b", "c", "d")
-        woql_object_opt = WOQLQuery().quad("a", "b", "c", WOQLQuery().string("d"), opt=True)
+        woql_object_opt = WOQLQuery().quad("a", "b", WOQLQuery().string("c"), "d", opt=True)
         assert woql_object.to_dict() == WOQL_JSON["quadJson"]
         assert woql_object_opt.to_dict() == quad_opt
 
