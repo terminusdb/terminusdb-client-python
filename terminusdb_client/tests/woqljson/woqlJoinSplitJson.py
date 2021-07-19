@@ -11,11 +11,11 @@ WOQL_JOIN_SPLIT_JSON = {
                 "variable": "B_obj"
             },
         ],
-        "join_separator": {
+        "separator": {
             "@type": "DataValue",
             "data": {"@type": "xsd:string", "@value": ", "},
         },
-        "join": {
+        "result": {
             "@type": "DataValue",
             "variable": "output",
         },
