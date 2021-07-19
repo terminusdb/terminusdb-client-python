@@ -1190,7 +1190,7 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "UpdateObject"
         if isinstance(input_obj, str):
-            doc = self.expand_data_value(input_obj)
+            doc = self._expand_data_value(input_obj)
         else:
             doc = input_obj
         self._cursor["document"] = doc
@@ -1202,7 +1202,7 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "DeleteObject"
-        self._cursor["document_uri"] = this.clean_node_value(json_or_iri)
+        self._cursor["document_uri"] = self._clean_node_value(json_or_iri)
         return self._updated()
 
     def read_object(self, iri, output_var):
@@ -2218,7 +2218,7 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         if user_input and user_input == "args":
-            return ["sum_list", "sum"]
+            return ["list", "sum"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Sum"
@@ -2629,42 +2629,6 @@ class WOQLQuery:
     def lib(self):
         # return WOQLLibrary()
         pass
-
-    def node(self, node, node_type=None):
-        """
-        Selects nodes with the ID NodeID as the subject of subsequent sub-queries. The second argument PatternType specifies what type of sub-queries are being constructed, options are: triple, quad, update_triple, update_quad, delete_triple, delete_quad
-
-        Parameters
-        ----------
-        node : str
-            node to be selected
-        node_type : str
-            pattern type, optional (default is triple)
-
-        Returns
-        -------
-        WOQLQuery object
-            query object that can be chained and/or execute
-        """
-        if node_type == "add_quad":
-            node_type = "AddQuad"
-        elif node_type == "delete_quad":
-            node_type = "DeleteQuad"
-        elif node_type == "add_triple":
-            node_type = "AddTriple"
-        elif node_type == "delete_triple":
-            node_type = "DeleteTriple"
-        elif node_type == "quad":
-            node_type = "Quad"
-        elif node_type == "triple":
-            node_type = "Triple"
-        if ":" not in node_type:
-            node_type = "" + node_type
-        ctxt = {"subject": node}
-        if node_type is not None:
-            ctxt["action"] = node_type
-        self._set_context(ctxt)
-        return self
 
     def insert(
         self, insert_id, insert_type, ref_graph=None, label=None, description=None
