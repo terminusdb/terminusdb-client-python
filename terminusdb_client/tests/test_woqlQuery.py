@@ -205,7 +205,7 @@ class TestWoqlQueries:
         assert woql_object.to_dict() == json_obj
 
     def test_post_method(self):
-        woql_object = WOQLQuery().post({"file" : "my_json_file"}, {"format": "panda_json"})
+        woql_object = WOQLQuery().post({"file" : "my_json_file", "format" : "csv"})
         json_obj = {
             "@type": "QueryResource",
             "file": {"@type": "Source", "file": "my_json_file"},
