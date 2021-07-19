@@ -478,7 +478,7 @@ class TestWoqlQueries:
 class TestTripleBuilder:
     def test_triple_method(self, triple_opt):
         woql_object = WOQLQuery().triple("a", "b", "c")
-        woql_object_opt = WOQLQuery().triple("a", "b", "c", opt=True)
+        woql_object_opt = WOQLQuery().triple("a", "b", WOQLQuery().string("c"), opt=True)
         assert woql_object.to_dict() == WOQL_JSON["tripleJson"]
         assert woql_object_opt.to_dict() == triple_opt
 
@@ -499,7 +499,7 @@ class TestTripleBuilder:
     def test_delete_method(self):
         woql_object = WOQLQuery().delete_object("x")
         json_obj = {"@type": "DeleteObject",
-                    "document_uri": {'document_uri': {'@type': 'NodeValue', 'node': 'x'}}}
+                    "document_uri": {'@type': 'NodeValue', 'node': 'x'}}
         assert woql_object.to_dict() == json_obj
 
     def test_delete_triple_method(self):
