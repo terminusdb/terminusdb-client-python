@@ -484,7 +484,7 @@ class TestTripleBuilder:
 
     def test_quad_method(self, quad_opt):
         woql_object = WOQLQuery().quad("a", "b", "c", "d")
-        woql_object_opt = WOQLQuery().quad("a", "b", "c", "d", opt=True)
+        woql_object_opt = WOQLQuery().quad("a", "b", "c", WOQLQuery().string("d"), opt=True)
         assert woql_object.to_dict() == WOQL_JSON["quadJson"]
         assert woql_object_opt.to_dict() == quad_opt
 
