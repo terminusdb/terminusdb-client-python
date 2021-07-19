@@ -299,7 +299,7 @@ class TestWoqlQueries:
         assert woql_object.to_dict() == WOQL_JOIN_SPLIT_JSON["joinJson"]
 
     def test_split_method(self):
-        woql_object = WOQLQuery().split(["A", "B", "C"], ", ", "v:list_obj")
+        woql_object = WOQLQuery().split('A, B, C', ", ", "v:list_obj")
         assert woql_object.to_dict() == WOQL_JOIN_SPLIT_JSON["splitJson"]
 
     def test_member_method(self):
@@ -318,7 +318,7 @@ class TestWoqlQueries:
         assert woql_object.to_dict() == json_obj
 
     def test_concat_method(self):
-        woql_object = WOQLQuery().concat(["v:Duration","yo","v:Duration_Cast"], "v:x")
+        woql_object = WOQLQuery().concat(["v:Duration"," yo ","v:Duration_Cast"], "v:x")
         assert woql_object.to_dict() == WOQL_CONCAT_JSON
 
     def test_group_by_method(self):
@@ -498,7 +498,8 @@ class TestTripleBuilder:
 
     def test_delete_method(self):
         woql_object = WOQLQuery().delete_object("x")
-        json_obj = {"@type": "DeleteObject", "document_uri": "x"}
+        json_obj = {"@type": "DeleteObject",
+                    "document_uri": {'document_uri': {'@type': 'NodeValue', 'node': 'x'}}}
         assert woql_object.to_dict() == json_obj
 
     def test_delete_triple_method(self):

@@ -2394,8 +2394,8 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         if literal_type is not None:
-            if literal_type == "owl:Thing" or literal_type == "node":
-                return self.cast(self.iri(val), user_type, result)
+            if (literal_type == "owl:Thing" or literal_type == "node") and isinstance(val, str) :
+                return self.cast({"@type": "Value", "node": val}, user_type, result)
             else:
                 return self.cast(self.literal(val, literal_type), user_type, result)
         if val and val == "args":

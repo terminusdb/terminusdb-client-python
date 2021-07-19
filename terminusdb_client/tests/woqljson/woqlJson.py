@@ -109,7 +109,7 @@ WOQL_JSON = {
     "isAJson": {
         "@type": "IsA",
         "element": {"@type": "NodeValue", "node": "instance"},
-        "type": {"@type": "NodeValue", "node": "owl:Class"},
+        "type": {"@type": "NodeValue", "node": "Class"},
     },
     "deleteTripleJson": {
         "@type": "DeleteTriple",
