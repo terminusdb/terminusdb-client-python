@@ -52,41 +52,6 @@ class TestWoqlQueries:
         }
         assert woql_object.to_dict() == json_obj
 
-    def test_insert_method(self, insert_without, insert_with_des):
-        woql_object = WOQLQuery().insert("v:Bike_URL", "Bicycle")
-        woql_object_des = WOQLQuery().insert(
-            "v:Bike_URL", "Bicycle", label="v:Bike_Label", description="v:Bike_Des"
-        )
-        assert woql_object.to_dict() == insert_without
-        assert woql_object_des.to_dict() == insert_with_des
-
-    def test_doctype_method(
-        self, doctype_without, doctype_with_label, doctype_with_des
-    ):
-        woql_object = WOQLQuery().doctype("Station")
-        woql_object_label = WOQLQuery().doctype("Station", label="Station Object")
-        woql_object_des = WOQLQuery().doctype(
-            "Station", label="Station Object", description="A bike station object."
-        )
-        assert woql_object.to_dict() == doctype_without
-        assert woql_object_label.to_dict() == doctype_with_label
-        assert woql_object_des.to_dict() == doctype_with_des
-
-    def test_doctype_property_method(self, property_without, property_with_des):
-        woql_object = WOQLQuery().doctype("Journey").property("Duration", "dateTime")
-        woql_object_des = (
-            WOQLQuery()
-            .doctype("Journey")
-            .property(
-                "Duration",
-                "dateTime",
-                label="Journey Duration",
-                description="Journey duration in minutes.",
-            )
-        )
-        assert woql_object.to_dict() == property_without
-        assert woql_object_des.to_dict() == property_with_des
-
     def test_woql_not_method(self):
         woql_object = WOQLQuery().woql_not(WOQLQuery().triple("a", "b", "c"))
         woql_object_chain = WOQLQuery().woql_not()
