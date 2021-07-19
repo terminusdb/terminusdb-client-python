@@ -759,7 +759,8 @@ class WOQLQuery:
         for item in queries:
             onevar = self._coerce_to_dict(item)
             if (
-                onevar["@type"] == "And"
+                "@type" in onevar
+                and onevar["@type"] == "And"
                 and onevar['and']
             ):
                 for each in onevar["and"]:
@@ -1373,7 +1374,7 @@ class WOQLQuery:
             If your csv file is local then use :meth:`.file` instead of `.remote`.
         """
         if uri and uri == "args":
-            return ["remote_uri", "format"]
+            return ["source", "format", "options"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "QueryResource"
@@ -1386,7 +1387,7 @@ class WOQLQuery:
 
     def post(self, fpath, opts=None):
         if fpath and fpath == "args":
-            return ["file", "format"]
+            return ["source", "format", "options"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "QueryResource"
