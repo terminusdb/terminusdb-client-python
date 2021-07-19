@@ -1,11 +1,11 @@
 WOQL_WHEN_JSON = {
-    "@type": "woql:When",
-    "woql:query": {"@type": "woql:True"},
-    "woql:consequent": {
-        "@type": "woql:AddQuad",
-        "woql:subject": {"@type": "woql:Node", "woql:node": "scm:id"},
-        "woql:predicate": {"@type": "woql:Node", "woql:node": "rdf:type"},
-        "woql:object": {"@type": "woql:Node", "woql:node": "owl:Class"},
-        "woql:graph": {"@type": "xsd:string", "@value": "schema/main"},
+    "@type": "When",
+    "query": {"@type": "True"},
+    "consequent": {
+        "@type": "AddTriple",
+        "subject": {"@type": "NodeValue", "node": "id"},
+        "predicate": {"@type": "NodeValue", "node": "rdf:type"},
+        "object": {"@type": "Value", "node": "owl:Class"},
+        "graph": "schema",
     },
 }

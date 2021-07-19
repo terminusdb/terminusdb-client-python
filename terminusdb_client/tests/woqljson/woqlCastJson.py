@@ -1,12 +1,12 @@
 WOQL_CAST_JSON = {
-    "@type": "woql:Typecast",
-    "woql:typecast_value": {
-        "@type": "woql:Variable",
-        "woql:variable_name": {"@value": "Duration", "@type": "xsd:string"},
+    "@type": "Typecast",
+    "value": {
+        "@type": "Value",
+        "variable": "Duration"
     },
-    "woql:typecast_type": {"@type": "woql:Node", "woql:node": "xsd:integer"},
-    "woql:typecast_result": {
-        "@type": "woql:Variable",
-        "woql:variable_name": {"@value": "Duration_Cast", "@type": "xsd:string"},
+    "type": {"@type": "NodeValue", "node": "xsd:integer"},
+    "result": {
+        "@type": "Value",
+        "variable": "Duration_Cast"
     },
 }

@@ -1,30 +1,22 @@
 WoqlDoctype = {
-    "@type": "woql:And",
-    "woql:query_list": [
+    "@type": "And",
+    "and": [
         {
-            "@type": "woql:QueryListElement",
-            "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 0},
-            "woql:query": {
-                "@type": "woql:AddQuad",
-                "woql:subject": {"@type": "woql:Node", "woql:node": "scm:Station"},
-                "woql:predicate": {"@type": "woql:Node", "woql:node": "rdf:type"},
-                "woql:object": {"@type": "woql:Node", "woql:node": "owl:Class"},
-                "woql:graph": {"@type": "xsd:string", "@value": "schema/main"},
-            },
+            "@type": "AddTriple",
+            "subject": {"@type": "NodeValue", "node": "Station"},
+            "predicate": {"@type": "NodeValue", "node": "rdf:type"},
+            "object": {"@type": "Value", "node": "owl:Class"},
+            "graph": "schema"
         },
         {
-            "@type": "woql:QueryListElement",
-            "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 1},
-            "woql:query": {
-                "@type": "woql:AddQuad",
-                "woql:subject": {"@type": "woql:Node", "woql:node": "scm:Station"},
-                "woql:predicate": {
-                    "@type": "woql:Node",
-                    "woql:node": "rdfs:subClassOf",
-                },
-                "woql:object": {"@type": "woql:Node", "woql:node": "terminus:Document"},
-                "woql:graph": {"@type": "xsd:string", "@value": "schema/main"},
+            "@type": "AddTriple",
+            "subject": {"@type": "NodeValue", "node": "Station"},
+            "predicate": {
+                "@type": "NodeValue",
+                "node": "rdfs:subClassOf",
             },
+            "object": {"@type": "Value", "node": "terminus:Document"},
+            "graph": "schema"
         },
     ],
 }
