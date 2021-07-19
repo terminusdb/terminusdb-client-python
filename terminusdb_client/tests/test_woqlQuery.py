@@ -523,14 +523,6 @@ class TestTripleBuilder:
         assert woql_object.to_dict() == WOQL_JSON["quadJson"]
         assert woql_object_opt.to_dict() == quad_opt
 
-    def test_add_class_method(self):
-        woql_object = WOQLQuery().add_class("id")
-        assert woql_object.to_dict() == WOQL_JSON["addClassJson"]
-
-    def test_delete_class_method(self):
-        woql_object = WOQLQuery().delete_class("id")
-        assert woql_object.to_dict() == WOQL_DELETE_JSON
-
     def test_sub_method(self):
         woql_object = WOQLQuery().sub("ClassA", "ClassB")
         assert woql_object.to_dict() == WOQL_JSON["subsumptionJson"]
@@ -560,20 +552,7 @@ class TestTripleBuilder:
         woql_object = WOQLQuery().add_quad("a", "b", "c", "d")
         assert woql_object.to_dict() == WOQL_JSON["addQuadJson"]
 
-    def test_add_property_method(self):
-        woql_object = WOQLQuery().add_property("some_property", "string")
-        assert woql_object.to_dict() == WOQL_JSON["addPropertyJson"]
-
-    def test_delete_property_method(self):
-        woql_object = WOQLQuery().delete_property("some_property", "string")
-        assert woql_object.to_dict() == WOQL_JSON["deletePropertyJson"]
-
-
 class TestTripleBuilderChainer:
-    def test_node_method(self):
-        woql_object = WOQLQuery().node("some_node", "add_quad")
-        assert woql_object.to_dict() == {}
-
     def test_dot_chain(self):
         woql_object = WOQLQuery().triple("A", "B", "C").triple("D", "E", "F")
         v2 = WOQLQuery().woql_and(
