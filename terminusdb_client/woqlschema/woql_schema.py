@@ -102,7 +102,14 @@ class TerminusClass(type):
             )
             annotations.update(base_annotations)
 
+            if hasattr(cls, "_abstract"):
+                abstract = cls._abstract
+            else:
+                abstract = False
+
             def init(obj, *args, **kwargs):
+                if abstract:
+                    raise TypeError(f"{name} is an abstract class.")
                 for key in annotations:
                     if key in kwargs:
                         value = kwargs[key]
