@@ -69,6 +69,8 @@ class Employee(Person):
 
 class Team(EnumTemplate):
     _schema = my_schema
+    # IT = "Information Technology"
+    # Marketing = "Amazing Marketing"
     IT = ()
     Marketing = ()
 
@@ -98,6 +100,7 @@ cheuk.address_of = home
 cheuk.contact_number = "13123238473897"
 # cheuk.commit(client)
 # client.commit_objects(cheuk, gavin, matthijs)
+print(Team._to_dict())
 
 
 class AgricultureDiversity(DocumentTemplate):
@@ -111,7 +114,8 @@ class Polity(DocumentTemplate):
     agriculture_diversity: AgricultureDiversity
 
 
-print(dani_schema.to_dict())
+#
+# print(dani_schema.to_dict())
 # print(dir(Person))
 # print(Person.to_dict())
 
