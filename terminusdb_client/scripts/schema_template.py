@@ -7,10 +7,7 @@ from terminusdb_client.woqlschema.woql_schema import (
     ObjectTemplate,
     TaggedUnion,
     ValueHashKey,
-    WOQLSchema,
 )
-
-my_schema = WOQLSchema()
 
 
 class Coordinate(ObjectTemplate):

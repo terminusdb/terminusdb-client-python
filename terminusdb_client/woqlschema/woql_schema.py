@@ -14,7 +14,11 @@ from ..woqlclient.woqlClient import WOQLClient
 # from typeguard import check_type
 
 
-class HashKey:
+class TerminusKey(type):
+    pass
+
+
+class HashKey(metaclass=TerminusKey):
     """Generating ID with SHA256 using provided keys"""
 
     at_type = "Hash"
@@ -22,7 +26,7 @@ class HashKey:
     def __init__(self, keys: Union[str, list]):
         self._keys = keys
 
-    def idgen(self, obj: "ObjectTemplate"):
+    def idgen(self, obj: "DocumentTemplate"):
         key_list = []
         for item in self._keys:
             key_item = eval(f"obj.{item}")
@@ -37,7 +41,7 @@ class HashKey:
         return prefix + sha256((quote("_".join(key_list))).encode("utf-8")).hexdigest()
 
 
-class LexicalKey:
+class LexicalKey(metaclass=TerminusKey):
     """Generating ID with urllib.parse.quote using provided keys"""
 
     at_type = "Lexical"
@@ -45,7 +49,7 @@ class LexicalKey:
     def __init__(self, keys: Union[str, list]):
         self._keys = keys
 
-    def idgen(self, obj: "ObjectTemplate"):
+    def idgen(self, obj: "DocumentTemplate"):
         key_list = []
         for item in self._keys:
             key_item = eval(f"obj.{item}")
@@ -60,12 +64,12 @@ class LexicalKey:
         return prefix + quote("_".join(key_list))
 
 
-class ValueHashKey:
+class ValueHashKey(metaclass=TerminusKey):
     """Generating ID with SHA256"""
 
     at_type = "ValueHash"
 
-    # def idgen(self, obj: "ObjectTemplate"):
+    # def idgen(self, obj: "DocumentTemplate"):
     #     if hasattr(obj.__class__, "_base"):
     #         prefix = obj.__class__._base
     #     else:
@@ -73,12 +77,12 @@ class ValueHashKey:
     #     return prefix + sha256((quote(str(obj))).encode("utf-8")).hexdigest()
 
 
-class RandomKey:
+class RandomKey(metaclass=TerminusKey):
     """Generating ID with UUID4"""
 
     at_type = "Random"
 
-    def idgen(self, obj: "ObjectTemplate"):
+    def idgen(self, obj: "DocumentTemplate"):
         if hasattr(obj.__class__, "_base"):
             prefix = obj.__class__._base
         else:
@@ -132,7 +136,7 @@ class TerminusClass(type):
         return cls.__name__
 
 
-class ObjectTemplate(metaclass=TerminusClass):
+class DocumentTemplate(metaclass=TerminusClass):
     _schema = None
     _key = RandomKey()  # default key
 
@@ -145,10 +149,7 @@ class ObjectTemplate(metaclass=TerminusClass):
     @classmethod
     def _to_dict(cls):
         result = {"@type": "Class", "@id": cls.__name__}
-        if (
-            cls.__base__.__name__ != "ObjectTemplate"
-            and cls.__base__.__name__ != "DocumentTemplate"
-        ):
+        if cls.__base__.__name__ != "DocumentTemplate":
             result["@inherits"] = cls.__base__.__name__
         elif cls.__base__.__name__ == "TaggedUnion":
             result["@type"] = "TaggedUnion"
@@ -202,10 +203,6 @@ class ObjectTemplate(metaclass=TerminusClass):
         return result
 
 
-class DocumentTemplate(ObjectTemplate):
-    _is_doc = True
-
-
 class EnumTemplate(Enum):
     # def __new__(cls, *args):
     #     if args:
@@ -240,7 +237,7 @@ class EnumTemplate(Enum):
         return result
 
 
-class TaggedUnion(ObjectTemplate):
+class TaggedUnion(DocumentTemplate):
     pass
 
 

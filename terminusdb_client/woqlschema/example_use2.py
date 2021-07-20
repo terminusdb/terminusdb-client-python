@@ -4,7 +4,6 @@ from terminusdb_client.woqlschema.woql_schema import (
     DocumentTemplate,
     EnumTemplate,
     HashKey,
-    ObjectTemplate,
     TaggedUnion,
     WOQLSchema,
 )
@@ -12,9 +11,10 @@ from terminusdb_client.woqlschema.woql_schema import (
 # from woql_schema import WOQLSchema, Document, Property, WOQLObject
 
 my_schema = WOQLSchema()
+dani_schema = WOQLSchema()
 
 
-# class MyObject(ObjectTemplate):
+# class MyObject(DocumentTemplate):
 #     _schema = my_schema
 #
 #
@@ -22,7 +22,7 @@ my_schema = WOQLSchema()
 #     _schema = my_schema
 
 
-class Coordinate(ObjectTemplate):
+class Coordinate(DocumentTemplate):
     _schema = my_schema
     x: float
     y: float
@@ -34,7 +34,7 @@ class Country(DocumentTemplate):
     perimeter: List[Coordinate]
 
 
-class Address(ObjectTemplate):
+class Address(DocumentTemplate):
     _schema = my_schema
     street: str
     country: Country
@@ -99,6 +99,19 @@ cheuk.contact_number = "13123238473897"
 # cheuk.commit(client)
 # client.commit_objects(cheuk, gavin, matthijs)
 
+
+class AgricultureDiversity(DocumentTemplate):
+    """IV.4.2 Agriculture Diversity []"""
+
+    _schema = dani_schema
+
+
+class Polity(DocumentTemplate):
+    _schema = dani_schema
+    agriculture_diversity: AgricultureDiversity
+
+
+print(dani_schema.to_dict())
 # print(dir(Person))
 # print(Person.to_dict())
 
@@ -123,5 +136,5 @@ cheuk.contact_number = "13123238473897"
 # print(list(results))
 
 
-print(cheuk._obj_to_dict())
+# print(cheuk._obj_to_dict())
 # print(Person._to_dict())

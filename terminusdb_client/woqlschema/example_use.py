@@ -3,17 +3,12 @@ from typing import List, Optional, Set
 from terminusdb_client.woqlschema.woql_schema import (
     DocumentTemplate,
     EnumTemplate,
-    ObjectTemplate,
     WOQLSchema,
 )
 
 # from woql_schema import WOQLSchema, Document, Property, WOQLObject
 
 my_schema = WOQLSchema()
-
-
-class MyObject(ObjectTemplate):
-    _schema = my_schema
 
 
 class MyDocument(DocumentTemplate):
