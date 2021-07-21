@@ -2116,7 +2116,7 @@ class WOQLClient:
         elif request_response.status_code > 399 and request_response.status_code < 599:
             raise DatabaseError(request_response)
 
-    def get_database(self, dbid: str, account: str) -> Optional[dict]:
+    def get_database(self, dbid: str) -> Optional[dict]:
         """
         Returns metadata (id, organization, label, comment) about the requested database
         Parameters
@@ -2141,7 +2141,7 @@ class WOQLClient:
                 return this_db
         return None
 
-    def get_databases(self) -> Iterable:
+    def get_databases(self) -> List[dict]:
         """
         Returns a list of database metadata records for all databases the user has access to
 
@@ -2162,7 +2162,7 @@ class WOQLClient:
                 verify=(not self.insecure),
                 auth=self._auth(),
             )
-        return _result2stream(_finish_reponse(result))
+        return json.loads(_finish_reponse(result))
 
     def list_databases(self) -> List[Dict]:
         """

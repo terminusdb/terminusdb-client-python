@@ -208,7 +208,10 @@ class DocumentTemplate(metaclass=TerminusClass):
                     elif hasattr(the_item, "_id"):
                         result[item] = {"@id": the_item._id, "@type": "@id"}
                     else:
-                        result[item] = the_item
+                        if isinstance(the_item, Enum):
+                            result[item] = str(the_item)
+                        else:
+                            result[item] = the_item
         return result
 
 
