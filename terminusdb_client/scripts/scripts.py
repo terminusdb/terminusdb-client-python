@@ -42,10 +42,10 @@ def _load_settings():
         raise ImportError(msg)
 
 
-def _connect():
-    SETTINGS = _load_settings()
-    SERVER = SETTINGS["SERVER"]
-    DATABASE = SETTINGS["DATABASE"]
+def _connect(settings):
+    # SETTINGS = _load_settings()
+    SERVER = settings["SERVER"]
+    DATABASE = settings["DATABASE"]
 
     client = WOQLClient(SERVER)
     client.connect()
@@ -60,15 +60,73 @@ def _connect():
             raise InterfaceError(f"Cannot connect to {DATABASE}.")
 
 
+def _create_script(obj_list):
+    class ResultObj:
+        def __init__(self, name, parent, script=None):
+            self.name = name
+            if parent in dir(woqlschema):
+                self.parent = None
+            else:
+                self.parent = parent
+            if script is None:
+                if type(parent) == str or len(parent) == 1:
+                    self.script = f"class {name}({parent}):"
+                elif len(parent) > 1:
+                    parent = ", ".join(parent)
+                    self.script = f"class {name}({parent}):"
+                else:
+                    self.script = f"class {name}:"
+            else:
+                self.script = script
+
+    for obj_str in dir(woqlschema):
+        obj = eval(f"woqlschema.{obj_str}")
+        if (
+            isinstance(obj, woqlschema.TerminusClass)
+            or isinstance(obj, enum.EnumMeta)
+            or isinstance(obj, woqlschema.TerminusKey)
+        ):
+            # print(obj_str)
+            pass
+
+    result_list = []
+    for obj in obj_list:
+        if obj.get("@id"):
+            if obj.get("@inherits"):
+                result_obj = ResultObj(obj["@id"], obj["@inherits"])
+            elif obj["@type"] == "Class":
+                result_obj = ResultObj(obj["@id"], "DocumentTemplate")
+            elif obj["@type"] == "Enum":
+                result_obj = ResultObj(obj["@id"], "EnumTemplate")
+            result_list.append(result_obj)
+
+    for obj in result_list:
+        print(obj.script)
+        print(obj.parent)
+
+
 @click.command()
 def sync():
-    _, msg = _connect()
+    settings = _load_settings()
+    DATABASE = settings["DATABASE"]
+    client, msg = _connect(settings)
     print(msg)
+    all_existing_obj = client.get_all_documents(graph_type="schema")
+    all_obj_list = []
+    for obj in all_existing_obj:
+        all_obj_list.append(obj)
+    if len(all_obj_list) > 1:
+        _create_script(all_obj_list)
+        print(f"schema.py is updated with {DATABASE} schema.")
+    else:
+        print(f"{DATABASE} schema is empty so schema.py has not be changed.")
 
 
 @click.command()
 def commit():
-    client, msg = _connect()
+    settings = _load_settings()
+    DATABASE = settings["DATABASE"]
+    client, msg = _connect(settings)
     print(msg)
     schema_plan = __import__("schema", globals(), locals(), [], 0)
     all_existing_obj = client.get_all_documents(graph_type="schema")
@@ -95,7 +153,7 @@ def commit():
         commit_msg="Schema object insert by Python client.",
         graph_type="schema",
     )
-    print("Schema updated.")
+    print(f"{DATABASE} schema updated.")
 
 
 @click.command()
