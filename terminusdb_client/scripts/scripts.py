@@ -70,15 +70,27 @@ def _create_script(obj_list):
                 self.parent = parent
             if script is None:
                 if type(parent) == str or len(parent) == 1:
-                    self.script = f"class {name}({parent}):"
+                    self.script = f"class {name}({parent}):\n"
                 elif len(parent) > 1:
-                    parent = ", ".join(parent)
-                    self.script = f"class {name}({parent}):"
+                    self.script = f"class {name}({', '.join(parent)}):\n"
                 else:
-                    self.script = f"class {name}:"
+                    self.script = f"class {name}:\n"
             else:
                 self.script = script
 
+        def add_key(self, key: str, fields: list = None):
+            if fields is None:
+                self.script += f"    _key = {key}Key()\n"
+            else:
+                self.script += f"    _key = {key}Key({fields})\n"
+
+        def add_subdoc(self):
+            self.script += "    _subdocument = []\n"
+
+        def add_abstract(self):
+            self.script += "    _abstract = []\n"
+
+    import_objs = []
     for obj_str in dir(woqlschema):
         obj = eval(f"woqlschema.{obj_str}")
         if (
@@ -86,11 +98,13 @@ def _create_script(obj_list):
             or isinstance(obj, enum.EnumMeta)
             or isinstance(obj, woqlschema.TerminusKey)
         ):
-            # print(obj_str)
-            pass
+            import_objs.append(obj_str)
+
+    print(f"from terminusdb_client.woqlschema import {', '.join(import_objs)}")
 
     result_list = []
     for obj in obj_list:
+        print(obj)
         if obj.get("@id"):
             if obj.get("@inherits"):
                 result_obj = ResultObj(obj["@id"], obj["@inherits"])
@@ -98,11 +112,37 @@ def _create_script(obj_list):
                 result_obj = ResultObj(obj["@id"], "DocumentTemplate")
             elif obj["@type"] == "Enum":
                 result_obj = ResultObj(obj["@id"], "EnumTemplate")
+
+            if obj.get("@subdocument") is not None:
+                result_obj.add_subdoc()
+            elif obj.get("@key"):
+                result_obj.add_key(obj["@key"]["@type"], obj["@key"].get("@fields"))
+
+            if obj.get("@abstract") is not None:
+                result_obj.add_abtract()
             result_list.append(result_obj)
 
-    for obj in result_list:
-        print(obj.script)
-        print(obj.parent)
+    print("=============")
+    # sorts depends on the object inherits order
+    printed = []
+    while len(result_list) > 0:
+        obj = result_list.pop(0)
+        if obj.parent is None:
+            print(obj.script)
+            printed.append(obj.name)
+        elif type(obj.parent) == str and obj.parent in printed:
+            print(obj.script)
+            printed.append(obj.name)
+        else:
+            parent_is_in = False
+            for mama in obj.parent:
+                if mama in printed:
+                    parent_is_in = True
+            if parent_is_in:
+                print(obj.script)
+                printed.append(obj.name)
+            else:
+                result_list.append(obj)
 
 
 @click.command()
