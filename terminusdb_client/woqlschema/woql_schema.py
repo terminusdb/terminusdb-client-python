@@ -157,7 +157,9 @@ class DocumentTemplate(metaclass=TerminusClass):
     def _to_dict(cls):
         result = {"@type": "Class", "@id": cls.__name__}
         if cls.__base__.__name__ != "DocumentTemplate":
-            result["@inherits"] = cls.__base__.__name__
+            # result["@inherits"] = cls.__base__.__name__
+            parents = list(map(lambda x: x.__name__, cls.__mro__))
+            result["@inherits"] = parents[1 : parents.index("DocumentTemplate")]
         elif cls.__base__.__name__ == "TaggedUnion":
             result["@type"] = "TaggedUnion"
 
@@ -227,20 +229,19 @@ class EnumTemplate(Enum):
                 value.object = set()
             value.object.add(self.__class__)
         elif not value:
-            self._value_ = self.name
+            self._value_ = str(self.name)
         else:
             self._value_ = value
 
-    def __repr__(self):
+    def __str__(self):
         return self._value_
-        # return f"<{self.__class__.__name__}.{self.name}>"
 
     @classmethod
     def _to_dict(cls):
         result = {"@type": "Enum", "@id": cls.__name__, "@value": []}
         for item in cls.__members__:
             if item[0] != "_":
-                result["@value"].append(eval(f"cls.{item}"))
+                result["@value"].append(str(eval(f"cls.{item}")))
         # if hasattr(self, "__annotations__"):
         #     for attr, attr_type in self.__annotations__.items():
         #         result[attr] = str(attr_type)

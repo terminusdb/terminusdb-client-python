@@ -40,6 +40,10 @@ class Address(DocumentTemplate):
     country: Country
 
 
+class Location(Address, Coordinate):
+    pass
+
+
 class Person(DocumentTemplate):
     """This is a person
     I hate human
@@ -100,6 +104,12 @@ cheuk.address_of = home
 cheuk.contact_number = "13123238473897"
 # cheuk.commit(client)
 # client.commit_objects(cheuk, gavin, matthijs)
+# print(Location.__mro__.index(DocumentTemplate))
+# print(Address.__mro__)
+# print(Employee.__mro__)
+# print(Contact.__mro__)
+# print(Team.__mro__)
+print(Location._to_dict())
 print(Team._to_dict())
 
 
