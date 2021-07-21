@@ -123,7 +123,7 @@ class WOQLClient:
                 )
             except Exception:
                 raise InterfaceError(
-                    f"Cannot connect to server, please make sure TerminusDB is running at {self._server_url} and the authetication details are correct."
+                    f"Cannot connect to server, please make sure TerminusDB is running at {self._server_url} and the authentication details are correct."
                 ) from None
 
         #
