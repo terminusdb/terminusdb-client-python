@@ -2136,34 +2136,12 @@ class WOQLClient:
         dict or None if not found
         """
         self._check_connection(check_db=False)
-        db_ids = []
-        all_dbs = []
         for this_db in self.get_databases():
-            if this_db["system:resource_name"]["@value"] == dbid:
-                db_ids.append(this_db["@id"])
-                all_dbs.append(this_db)
-
-        resources_ids = []
-        for scope in self._dispatch_json("get", self._api)["system:role"][
-            "system:capability"
-        ]["system:capability_scope"]:
-            if (
-                scope["@type"] == "system:Organization"
-                and scope["system:organization_name"]["@value"] == account
-            ):
-                if type(scope["system:resource_includes"]) is list:
-                    for resource in scope["system:resource_includes"]:
-                        resources_ids.append(resource["@id"])
-
-        target_db = None
-        for target in set(db_ids).intersection(set(resources_ids)):
-            target_db = target
-
-        for this_db in all_dbs:
-            if this_db["@id"] == target_db:
+            if this_db["name"] == dbid:
                 return this_db
+        return None
 
-    def get_databases(self) -> List[Dict]:
+    def get_databases(self) -> Iterable:
         """
         Returns a list of database metadata records for all databases the user has access to
 
@@ -2177,13 +2155,14 @@ class WOQLClient:
         list of dicts
         """
         self._check_connection(check_db=False)
-        all_dbs = []
-        for scope in self._dispatch_json("get", self._api)["system:role"][
-            "system:capability"
-        ]["system:capability_scope"]:
-            if scope["@type"] == "system:Database":
-                all_dbs.append(scope)
-        return all_dbs
+
+        with NoRequestWarning(self.insecure):
+            result = requests.get(
+                self._api,
+                verify=(not self.insecure),
+                auth=self._auth(),
+            )
+        return _result2stream(_finish_reponse(result))
 
     def list_databases(self) -> List[Dict]:
         """
@@ -2199,10 +2178,9 @@ class WOQLClient:
         list of dicts
         """
         self._check_connection(check_db=False)
-        all_data = self.get_databases()
         all_dbs = []
-        for data in all_data:
-            all_dbs.append(data["system:resource_name"]["@value"])
+        for data in self.get_databases():
+            all_dbs.append(data["name"])
         return all_dbs
 
     def get_metadata(self, dbid: str, account):
