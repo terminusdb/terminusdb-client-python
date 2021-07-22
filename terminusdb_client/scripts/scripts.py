@@ -106,7 +106,13 @@ def _create_script(obj_list):
             self.script += '"""\n'
 
     import_objs = []
-    print_script = ""
+    print_script = """####
+# This is the script for storing the schema of your TerminusDB
+# database for your project.
+# Use 'terminusdb commit' to commit changes to the database and
+# use 'terminusdb sync' to change this file according to
+# the exsisting database schema
+####\n\n"""
     for obj_str in dir(woqlschema):
         obj = eval(f"woqlschema.{obj_str}")
         if (
