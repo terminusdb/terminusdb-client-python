@@ -5,6 +5,7 @@ import json
 import os
 import warnings
 from base64 import b64encode
+from collections.abc import Iterable
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
 
@@ -13,11 +14,25 @@ from urllib3.exceptions import InsecureRequestWarning
 
 from ..__version__ import __version__
 from ..errors import DatabaseError, InterfaceError
+from ..woql_utils import _finish_reponse, _result2stream
 from ..woqlquery.woql_query import WOQLQuery
 
 # WOQL client object
 # license Apache Version 2
 # summary Python module for accessing the Terminus DB API
+
+
+class NoRequestWarning:
+    def __init__(self, insecure):
+        self.insecure = insecure
+
+    def __enter__(self):
+        if self.insecure:
+            warnings.simplefilter("ignore", InsecureRequestWarning)
+
+    def __exit__(self, type, value, traceback):
+        if self.insecure:
+            warnings.resetwarnings()
 
 
 class WOQLClient:
@@ -95,18 +110,33 @@ class WOQLClient:
 
         self._connected = True
 
-        capabilities = self._dispatch_json("get", self._api)
-        self._uid = capabilities["@id"]
+        # capabilities = self._dispatch_json("get", self._api)
+        # self._uid = capabilities["@id"]
+        with NoRequestWarning(self.insecure):
+            try:
+                self._all_avaliable_db = json.loads(
+                    _finish_reponse(
+                        requests.get(
+                            self._api, auth=self._auth(), verify=(not self.insecure)
+                        )
+                    )
+                )
+            except Exception:
+                raise InterfaceError(
+                    f"Cannot connect to server, please make sure TerminusDB is running at {self._server_url} and the authentication details are correct."
+                ) from None
 
         #
         # Get the current user's identifier, if logged in to Hub, it will be their email otherwise it will be the user provided
-        if capabilities.get("system:user_identifier"):
-            self._author = capabilities["system:user_identifier"]["@value"]
-        else:
-            self._author = self._user
+        # if capabilities.get("system:user_identifier"):
+        #     self._author = capabilities["system:user_identifier"]["@value"]
+        # else:
+        #     self._author = self._user
 
-        if self._db is not None:
-            self._context = self._get_prefixes()
+        self._author = self._user
+
+        # if self._db is not None:
+        #     self._context = self._get_prefixes()
 
     def close(self) -> None:
         """Undo connect and close the connection.
@@ -704,6 +734,9 @@ class WOQLClient:
         >>> client = WOQLClient("https://127.0.0.1:6363/")
         >>> client.create_database("someDB", "admin", "Database Label", "My Description")
         """
+
+        self._check_connection(check_db=False)
+
         details: Dict[str, Any] = {}
         if label:
             details["label"] = label
@@ -720,13 +753,21 @@ class WOQLClient:
         if accountid is None:
             accountid = self._account
 
-        self._check_connection(check_db=False)
-
         self._account = accountid
         self._connected = True
         self._db = dbid
-        self._dispatch("post", self._db_url(), details)
-        self._context = self._get_prefixes()
+        # self._dispatch("post", self._db_url(), details)
+        # self._context = self._get_prefixes()
+
+        with NoRequestWarning(self.insecure):
+            _finish_reponse(
+                requests.post(
+                    self._db_url(),
+                    json=details,
+                    auth=self._auth(),
+                    verify=(not self.insecure),
+                )
+            )
 
     def delete_database(
         self,
@@ -775,7 +816,15 @@ class WOQLClient:
         else:
             self._account = accountid
         payload = {"force": force}
-        self._dispatch("delete", self._db_url(), payload)
+        with NoRequestWarning(self.insecure):
+            _finish_reponse(
+                requests.delete(
+                    self._db_url(),
+                    auth=self._auth(),
+                    verify=(not self.insecure),
+                )
+            )
+        # self._dispatch("delete", self._db_url(), payload)
         self._db = None
 
     def create_graph(
@@ -931,112 +980,233 @@ class WOQLClient:
             commit,
         )
 
-    def get_csv(
-        self,
-        csv_name: str,
-        csv_directory: Optional[str] = None,
-        csv_output_name: Optional[str] = None,
-        graph_type: Optional[str] = "instance",
-        graph_id: Optional[str] = "main",
-    ):
-        """Retrieves the contents of the specified graph as a CSV
+    def get_document(self, iri_id: str, graph_type: str = "instance", **kwargs) -> dict:
+        """Retrieves the document of the iri_id
 
         Parameters
         ----------
-        csv_name : str
-            Name of csv to dump from the specified database to extract.
-        csv_directory : str, optional
-            CSV output directory path. (defaults to current directory).
-        csv_output_name: str, optional
-            CSV output file name. (defaults to same csv name).
-        graph_type : str
-            Graph type, either "inference", "instance" or "schema". Default to be "instance"
-        graph_id : str, optional
-            Graph identifier. Default to be "main"
+        iri_id : str
+            Iri id for the docuemnt that is retriving
+        graph_type : str, optional
+            Graph type, either "instance" or "schema".
+        kwargs:
+            Additional boolean flags for retriving. Currently avaliable: "prefixed", "minimized", "unfold"
 
         Raises
         ------
         InterfaceError
             if the client does not connect to a database
+
+        Returns
+        -------
+        dict
         """
+        add_args = ["prefixed", "minimized", "unfold"]
         self._check_connection()
-        options = {}
-        if csv_directory is None:
-            csv_directory = os.getcwd()
-        if csv_output_name is None:
-            csv_output_name = csv_name
-        options["name"] = csv_name
+        payload = {"id": iri_id, "graph_type": graph_type}
+        for the_arg in add_args:
+            if the_arg in kwargs:
+                payload[the_arg] = kwargs[the_arg]
 
-        result = self._dispatch(
-            "get",
-            self._csv_url(graph_type, graph_id),
-            options,
-        )
+        with NoRequestWarning(self.insecure):
+            result = requests.get(
+                self._documents_url(graph_type),
+                verify=(not self.insecure),
+                params=payload,
+                auth=self._auth(),
+            )
+        return json.loads(_finish_reponse(result))
 
-        stream = open(f"{csv_directory}/{csv_output_name}", "w")
-        stream.write(result)
-        stream.close()
-
-    def update_csv(
+    def get_documents_by_type(
         self,
-        csv_paths: Union[str, List[str]],
-        commit_msg: Optional[str] = None,
-        graph_type: Optional[str] = "instance",
-        graph_id: Optional[str] = "main",
-    ) -> None:
-        """Updates the contents of the specified graph with the csv. Replaces the entire file contents
+        doc_type: str,
+        graph_type: str = "instance",
+        skip: int = 0,
+        count: Optional[int] = None,
+        **kwargs,
+    ) -> Iterable:
+        # TODO: make return iterable
+        """Retrieves the documents by type
 
         Parameters
         ----------
-        csv_paths : str or list of str
-            csv path or list of csv paths to load. (required)
+        doc_type : str
+            Specific type for the docuemnts that is retriving
+        graph_type : str, optional
+            Graph type, either "instance" or "schema".
+        skip: int
+            The starting posiion of the returning results, default to be 0
+        count: int or None
+            The maximum number of returned result, if None (default) it will return all of the avalible result.
+        kwargs:
+            Additional boolean flags for retriving. Currently avaliable: "prefixed", "unfold"
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
+
+        Returns
+        -------
+        iterable
+            Stream of dictionaries
+        """
+        add_args = ["prefixed", "unfold"]
+        self._check_connection()
+        payload = {"type": doc_type, "graph_type": graph_type}
+        if count is None:
+            count = "unlimited"
+        payload["skip"] = skip
+        payload["count"] = count
+        for the_arg in add_args:
+            if the_arg in kwargs:
+                payload[the_arg] = kwargs[the_arg]
+        with NoRequestWarning(self.insecure):
+            result = requests.get(
+                self._documents_url(graph_type),
+                verify=(not self.insecure),
+                params=payload,
+                auth=self._auth(),
+            )
+        return _result2stream(_finish_reponse(result))
+
+    def get_all_documents(
+        self,
+        graph_type: str = "instance",
+        skip: int = 0,
+        count: Optional[int] = None,
+        **kwargs,
+    ) -> Iterable:
+        # TODO: make return iterable
+        """Retrieves all avalibale the documents
+
+        Parameters
+        ----------
+        graph_type : str, optional
+            Graph type, either "instance" or "schema".
+        skip: int
+            The starting posiion of the returning results, default to be 0
+        count: int or None
+            The maximum number of returned result, if None (default) it will return all of the avalible result.
+        kwargs:
+            Additional boolean flags for retriving. Currently avaliable: "prefixed", "unfold"
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
+
+        Returns
+        -------
+        iterable
+            Stream of dictionaries
+        """
+        add_args = ["prefixed", "unfold"]
+        self._check_connection()
+        payload = {"graph_type": graph_type}
+        payload["skip"] = skip
+        if count is not None:
+            payload["count"] = count
+        for the_arg in add_args:
+            if the_arg in kwargs:
+                payload[the_arg] = kwargs[the_arg]
+        with NoRequestWarning(self.insecure):
+            result = requests.get(
+                self._documents_url(),
+                verify=(not self.insecure),
+                params=payload,
+                auth=self._auth(),
+            )
+        return _result2stream(_finish_reponse(result))
+
+    def insert_document(
+        self,
+        document: Union[
+            dict, List[dict], "WOQLSchema", "ObjectTemplate", List["ObjectTemplate"]
+        ],
+        graph_type: str = "instance",
+        commit_msg: Optional[str] = None,
+    ) -> None:
+        """Inserts the specified document(s)
+
+        Parameters
+        ----------
+        document: dict or list of dict
+            Document(s) to be inserted.
+        graph_type : str
+            Graph type, either "inference", "instance" or "schema".
         commit_msg : str
             Commit message.
-        graph_type : str
-            Graph type, either "inference", "instance" or "schema". Default to be "instance"
-        graph_id : str, optional
-            Graph identifier. Default to be "main"
 
         Raises
         ------
         InterfaceError
             if the client does not connect to a database
+
+        Returns
+        -------
+        list
+            list of ids of the inseted docuemnts
         """
         self._check_connection()
-        if commit_msg is None:
-            commit_msg = f"Update csv from {csv_paths} by python client {__version__}"
-        commit = self._generate_commit(commit_msg)
-        if isinstance(csv_paths, str):
-            csv_paths_list = [csv_paths]
+        params = self._generate_commit(commit_msg)["commit_info"]
+        params["graph_type"] = graph_type
+
+        def conv_to_dict(object):
+            if isinstance(object, dict):
+                return object
+            elif hasattr(object, "to_dict"):
+                return object.to_dict()
+            elif hasattr(object, "_obj_to_dict"):
+                if (
+                    not hasattr(object, "_id")
+                    and not hasattr(object.__class__, "_subdocument")
+                    and hasattr(object.__class__._key, "idgen")
+                ):
+                    object._id = object.__class__._key.idgen(object)
+                return object._obj_to_dict()
+            else:
+                raise ValueError("Object cannot convert to dictionary")
+
+        if isinstance(document, list):
+            new_doc = []
+            for item in document:
+                # while document:
+                #     item = document.pop()
+                item_dict = conv_to_dict(item)
+                new_doc.append(item_dict)
+                # id_list.append(item_dict['@id'])
+            document = new_doc
         else:
-            csv_paths_list = csv_paths
+            document = conv_to_dict(document)
+        with NoRequestWarning(self.insecure):
+            result = requests.post(
+                self._documents_url(),
+                params=params,
+                json=document,
+                auth=self._auth(),
+                verify=(not self.insecure),
+            )
+        return json.loads(_finish_reponse(result))
 
-        self._dispatch(
-            "post",
-            self._csv_url(graph_type, graph_id),
-            commit,
-            file_list=csv_paths_list,
-        )
-
-    def insert_csv(
+    def replace_document(
         self,
-        csv_paths: Union[str, List[str]],
+        document: Union[
+            dict, List[dict], "WOQLSchema", "ObjectTemplate", List["ObjectTemplate"]
+        ],
+        graph_type: str,
         commit_msg: Optional[str] = None,
-        graph_type: Optional[str] = "instance",
-        graph_id: Optional[str] = "main",
     ) -> None:
-        """Inserts into the specified graph with the csv.
+        """Updates the specified document(s)
 
         Parameters
         ----------
-        csv_paths : str or list
-            CSV or list of csvs to upload
+        document: dict or list of dict
+            Document(s) to be updated.
+        graph_type : str
+            Graph type, either "inference", "instance" or "schema".
         commit_msg : str
             Commit message.
-        graph_type : str
-            Graph type, either "inference", "instance" or "schema". Default to be "instance"
-        graph_id : str, optional
-            Graph identifier. Default to be "main"
 
         Raises
         ------
@@ -1044,20 +1214,210 @@ class WOQLClient:
             if the client does not connect to a database
         """
         self._check_connection()
-        if commit_msg is None:
-            commit_msg = f"Insert csv from {csv_paths} by python client {__version__}"
-        commit = self._generate_commit(commit_msg)
-        if isinstance(csv_paths, str):
-            csv_paths_list = [csv_paths]
-        else:
-            csv_paths_list = csv_paths
+        params = self._generate_commit(commit_msg)["commit_info"]
+        params["graph_type"] = graph_type
 
-        self._dispatch(
-            "put",
-            self._csv_url(graph_type, graph_id),
-            commit,
-            file_list=csv_paths_list,
-        )
+        def conv_to_dict(object):
+            if isinstance(object, dict):
+                return object
+            elif hasattr(object, "to_dict"):
+                return object.to_dict()
+            elif hasattr(object, "_obj_to_dict"):
+                if (
+                    not hasattr(object, "_id")
+                    and not hasattr(object.__class__, "_subdocument")
+                    and hasattr(object.__class__._key, "idgen")
+                ):
+                    object._id = object.__class__._key.idgen(object)
+                return object._obj_to_dict()
+            else:
+                raise ValueError("Object cannot convert to dictionary")
+
+        if isinstance(document, list):
+            new_doc = []
+            for item in document:
+                # while document:
+                #     item = document.pop()
+                item_dict = conv_to_dict(item)
+                new_doc.append(item_dict)
+                # id_list.append(item_dict['@id'])
+            document = new_doc
+        else:
+            document = conv_to_dict(document)
+        with NoRequestWarning(self.insecure):
+            _finish_reponse(
+                requests.put(
+                    self._documents_url(),
+                    params=params,
+                    json=document,
+                    auth=self._auth(),
+                    verify=(not self.insecure),
+                )
+            )
+
+    def delete_document(
+        self,
+        doc_id: Union[str, List[str]],
+        graph_type: str,
+        commit_msg: Optional[str] = None,
+    ) -> None:
+        """Delete the specified document(s)
+
+        Parameters
+        ----------
+        doc_id: str or list of str
+            Id(s) of document(s) to be updated.
+        graph_type : str
+            Graph type, either "inference", "instance" or "schema".
+        commit_msg : str
+            Commit message.
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
+        """
+        self._check_connection()
+        params = self._generate_commit(commit_msg)["commit_info"]
+        params["graph_type"] = graph_type
+        with NoRequestWarning(self.insecure):
+            _finish_reponse(
+                requests.delete(
+                    self._documents_url(),
+                    params=params,
+                    json=doc_id,
+                    auth=self._auth(),
+                    verify=(not self.insecure),
+                )
+            )
+
+    # def get_csv(
+    #     self,
+    #     csv_name: str,
+    #     csv_directory: Optional[str] = None,
+    #     csv_output_name: Optional[str] = None,
+    #     graph_type: Optional[str] = "instance",
+    #     graph_id: Optional[str] = "main",
+    # ):
+    #     """Retrieves the contents of the specified graph as a CSV
+    #
+    #     Parameters
+    #     ----------
+    #     csv_name : str
+    #         Name of csv to dump from the specified database to extract.
+    #     csv_directory : str, optional
+    #         CSV output directory path. (defaults to current directory).
+    #     csv_output_name: str, optional
+    #         CSV output file name. (defaults to same csv name).
+    #     graph_type : str
+    #         Graph type, either "inference", "instance" or "schema". Default to be "instance"
+    #     graph_id : str, optional
+    #         Graph identifier. Default to be "main"
+    #
+    #     Raises
+    #     ------
+    #     InterfaceError
+    #         if the client does not connect to a database
+    #     """
+    #     self._check_connection()
+    #     options = {}
+    #     if csv_directory is None:
+    #         csv_directory = os.getcwd()
+    #     if csv_output_name is None:
+    #         csv_output_name = csv_name
+    #     options["name"] = csv_name
+    #
+    #     result = self._dispatch(
+    #         "get",
+    #         self._csv_url(graph_type, graph_id),
+    #         options,
+    #     )
+    #
+    #     stream = open(f"{csv_directory}/{csv_output_name}", "w")
+    #     stream.write(result)
+    #     stream.close()
+    #
+    # def update_csv(
+    #     self,
+    #     csv_paths: Union[str, List[str]],
+    #     commit_msg: Optional[str] = None,
+    #     graph_type: Optional[str] = "instance",
+    #     graph_id: Optional[str] = "main",
+    # ) -> None:
+    #     """Updates the contents of the specified graph with the csv. Replaces the entire file contents
+    #
+    #     Parameters
+    #     ----------
+    #     csv_paths : str or list of str
+    #         csv path or list of csv paths to load. (required)
+    #     commit_msg : str
+    #         Commit message.
+    #     graph_type : str
+    #         Graph type, either "inference", "instance" or "schema". Default to be "instance"
+    #     graph_id : str, optional
+    #         Graph identifier. Default to be "main"
+    #
+    #     Raises
+    #     ------
+    #     InterfaceError
+    #         if the client does not connect to a database
+    #     """
+    #     self._check_connection()
+    #     if commit_msg is None:
+    #         commit_msg = f"Update csv from {csv_paths} by python client {__version__}"
+    #     commit = self._generate_commit(commit_msg)
+    #     if isinstance(csv_paths, str):
+    #         csv_paths_list = [csv_paths]
+    #     else:
+    #         csv_paths_list = csv_paths
+    #
+    #     self._dispatch(
+    #         "post",
+    #         self._csv_url(graph_type, graph_id),
+    #         commit,
+    #         file_list=csv_paths_list,
+    #     )
+    #
+    # def insert_csv(
+    #     self,
+    #     csv_paths: Union[str, List[str]],
+    #     commit_msg: Optional[str] = None,
+    #     graph_type: Optional[str] = "instance",
+    #     graph_id: Optional[str] = "main",
+    # ) -> None:
+    #     """Inserts into the specified graph with the csv.
+    #
+    #     Parameters
+    #     ----------
+    #     csv_paths : str or list
+    #         CSV or list of csvs to upload
+    #     commit_msg : str
+    #         Commit message.
+    #     graph_type : str
+    #         Graph type, either "inference", "instance" or "schema". Default to be "instance"
+    #     graph_id : str, optional
+    #         Graph identifier. Default to be "main"
+    #
+    #     Raises
+    #     ------
+    #     InterfaceError
+    #         if the client does not connect to a database
+    #     """
+    #     self._check_connection()
+    #     if commit_msg is None:
+    #         commit_msg = f"Insert csv from {csv_paths} by python client {__version__}"
+    #     commit = self._generate_commit(commit_msg)
+    #     if isinstance(csv_paths, str):
+    #         csv_paths_list = [csv_paths]
+    #     else:
+    #         csv_paths_list = csv_paths
+    #
+    #     self._dispatch(
+    #         "put",
+    #         self._csv_url(graph_type, graph_id),
+    #         commit,
+    #         file_list=csv_paths_list,
+    #     )
 
     def commit(self):
         """Not implementated: open transactions currently not suportted. Please check back later."""
@@ -1066,7 +1426,7 @@ class WOQLClient:
         self,
         woql_query: Union[dict, WOQLQuery],
         commit_msg: Optional[str] = None,
-        file_dict: Optional[dict] = None,
+        # file_dict: Optional[dict] = None,
     ) -> Union[dict, str]:
         """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
 
@@ -1076,7 +1436,7 @@ class WOQLClient:
             A woql query as an object or dict
         commit_mg : str
             A message that will be written to the commit log to describe the change
-        file_dict:
+        file_dict: **deprecated**
             File dictionary to be associated with post name => filename, for multipart POST
 
         Raises
@@ -1098,37 +1458,55 @@ class WOQLClient:
             request_woql_query = woql_query.to_dict()
         else:
             request_woql_query = woql_query
-        request_woql_query["@context"] = self._context
+        # if request_woql_query.get("@context") and isinstance(
+        #     request_woql_query.get("@context"), dict
+        # ):
+        #     request_woql_query["@context"].update(self._context)
+        # else:
+        #     request_woql_query["@context"] = self._context
         query_obj["query"] = request_woql_query
         # request_file_dict: Optional[Dict[str, Tuple[str, Union[str, BinaryIO], str]]]
-        if file_dict is not None and type(file_dict) is dict:
-            request_file_dict = {}
-            for name in query_obj:
-                query_obj_value = query_obj[name]
-                request_file_dict[name] = (
-                    name,
-                    json.dumps(query_obj_value),
-                    "application/json",
-                )
-            file_list = []
-            for name in file_dict:
-                file_list.append(os.path.join(file_dict[name], name))
-                # path = file_dict[name]
-                # request_file_dict[name] = (name, open(path, "rb"), "application/binary")
-            payload = None
-        else:
-            file_list = None
-            payload = query_obj
+        # if file_dict is not None and type(file_dict) is dict:
+        #     request_file_dict = {}
+        #     for name in query_obj:
+        #         query_obj_value = query_obj[name]
+        #         request_file_dict[name] = (
+        #             name,
+        #             json.dumps(query_obj_value),
+        #             "application/json",
+        #         )
+        #     file_list = []
+        #     for name in file_dict:
+        #         file_list.append(os.path.join(file_dict[name], name))
+        #         # path = file_dict[name]
+        #         # request_file_dict[name] = (name, open(path, "rb"), "application/binary")
+        #     payload = None
+        # else:
+        #     file_list = None
+        #     payload = query_obj
 
-        result = self._dispatch_json(
-            "post",
-            self._query_url(),
-            payload,
-            file_list,
-        )
-        if result.get("inserts") or result.get("deletes"):
+        # result = self._dispatch_json(
+        #     "post",
+        #     self._query_url(),
+        #     payload,
+        #     file_list,
+        # )
+        # if result.get("inserts") or result.get("deletes"):
+        #     return "Commit successfully made."
+        # return result
+
+        with NoRequestWarning(self.insecure):
+            result = requests.post(
+                self._query_url(),
+                json=query_obj,
+                auth=self._auth(),
+                verify=(not self.insecure),
+            )
+        fin_reqult = json.loads(_finish_reponse(result))
+
+        if fin_reqult.get("inserts") or fin_reqult.get("deletes"):
             return "Commit successfully made."
-        return result
+        return fin_reqult
 
     def branch(self, new_branch_id: str, empty: bool = False) -> None:
         """Create a branch starting from the current branch.
@@ -1157,7 +1535,15 @@ class WOQLClient:
                 "origin": f"{self._account}/{self._db}/{self._repo}/branch/{self._branch}"
             }
 
-        self._dispatch("post", self._branch_url(new_branch_id), source)
+        # self._dispatch("post", self._branch_url(new_branch_id), source)
+
+        with NoRequestWarning(self.insecure):
+            result = requests.post(
+                self._branch_url(new_branch_id),
+                json=source,
+                auth=self._auth(),
+                verify=(not self.insecure),
+            )
 
     def pull(
         self,
@@ -1209,11 +1595,21 @@ class WOQLClient:
             "message": message,
         }
 
-        return self._dispatch_json(
-            "post",
-            self._pull_url(),
-            rc_args,
-        )
+        # return self._dispatch_json(
+        #     "post",
+        #     self._pull_url(),
+        #     rc_args,
+        # )
+
+        with NoRequestWarning(self.insecure):
+            result = requests.post(
+                self._pull_url(),
+                json=rc_args,
+                auth=self._auth(),
+                verify=(not self.insecure),
+            )
+
+        return json.loads(_finish_reponse(result))
 
     def fetch(self, remote_id: str) -> dict:
         """Fatch the brach from a remote
@@ -1228,7 +1624,16 @@ class WOQLClient:
         InterfaceError
             if the client does not connect to a database"""
         self._check_connection()
-        return self._dispatch_json("post", self._fetch_url(remote_id))
+        # return self._dispatch_json("post", self._fetch_url(remote_id))
+
+        with NoRequestWarning(self.insecure):
+            result = requests.post(
+                self._fetch_url(remote_id),
+                auth=self._auth(),
+                verify=(not self.insecure),
+            )
+
+        return json.loads(_finish_reponse(result))
 
     def push(
         self,
@@ -1278,7 +1683,17 @@ class WOQLClient:
             "author": author,
             "message": message,
         }
-        return self._dispatch_json("post", self._push_url(), rc_args)
+        # return self._dispatch_json("post", self._push_url(), rc_args)
+
+        with NoRequestWarning(self.insecure):
+            result = requests.post(
+                self._push_url(),
+                json=rc_args,
+                auth=self._auth(),
+                verify=(not self.insecure),
+            )
+
+        return json.loads(_finish_reponse(result))
 
     def rebase(
         self,
@@ -1322,7 +1737,17 @@ class WOQLClient:
         if message is None:
             message = f"Rebase from {rebase_source} by Python client {__version__}"
         rc_args = {"rebase_from": rebase_source, "author": author, "message": message}
-        return self._dispatch_json("post", self._rebase_url(), rc_args)
+        # return self._dispatch_json("post", self._rebase_url(), rc_args)
+
+        with NoRequestWarning(self.insecure):
+            result = requests.post(
+                self._rebase_url(),
+                json=rc_args,
+                auth=self._auth(),
+                verify=(not self.insecure),
+            )
+
+        return json.loads(_finish_reponse(result))
 
     def reset(self, commit: str, use_path: bool = False) -> None:
         """Reset the current branch HEAD to the specified commit path. Doing it will reset the internal commit counter (self._commit_made) back to zero.
@@ -1356,11 +1781,19 @@ class WOQLClient:
             commit_path = commit
         else:
             commit_path = f"{self._account}/{self._db}/{self._repo}/commit/{commit}"
-        self._dispatch(
-            "post",
-            self._reset_url(),
-            {"commit_descriptor": commit_path},
-        )
+        # self._dispatch(
+        #     "post",
+        #     self._reset_url(),
+        #     {"commit_descriptor": commit_path},
+        # )
+
+        with NoRequestWarning(self.insecure):
+            result = requests.post(
+                self._reset_url(),
+                json={"commit_descriptor": commit_path},
+                auth=self._auth(),
+                verify=(not self.insecure),
+            )
 
     def optimize(self, path: str) -> None:
         """Optimize the specified path.
@@ -1385,7 +1818,14 @@ class WOQLClient:
         >>> client.optimize('admin/database/_meta')
         """
         self._check_connection()
-        self._dispatch("post", self._optimize_url(path))
+        # self._dispatch("post", self._optimize_url(path))
+
+        with NoRequestWarning(self.insecure):
+            result = requests.post(
+                self._optimize_url(path),
+                auth=self._auth(),
+                verify=(not self.insecure),
+            )
 
     def squash(
         self, message: Optional[str] = None, author: Optional[str] = None
@@ -1424,8 +1864,18 @@ class WOQLClient:
         >>> client.squash('This is a squash commit message!')
         """
         self._check_connection()
-        commit_object = self._generate_commit(message, author)
-        return self._dispatch_json("post", self._squash_url(), commit_object)
+        # commit_object = self._generate_commit(message, author)
+        # return self._dispatch_json("post", self._squash_url(), commit_object)
+
+        with NoRequestWarning(self.insecure):
+            result = requests.post(
+                self._squash_url(),
+                json=self._generate_commit(message, author),
+                auth=self._auth(),
+                verify=(not self.insecure),
+            )
+
+        return json.loads(_finish_reponse(result))
 
     def clonedb(
         self, clone_source: str, newid: str, description: Optional[str] = None
@@ -1455,7 +1905,15 @@ class WOQLClient:
         if description is None:
             description = f"New database {newid}"
         rc_args = {"remote_url": clone_source, "label": newid, "comment": description}
-        self._dispatch("post", self._clone_url(newid), rc_args)
+        # self._dispatch("post", self._clone_url(newid), rc_args)
+
+        with NoRequestWarning(self.insecure):
+            result = requests.post(
+                self._clone_url(newid),
+                json=rc_args,
+                auth=self._auth(),
+                verify=(not self.insecure),
+            )
 
     def _generate_commit(
         self, msg: Optional[str] = None, author: Optional[str] = None
@@ -1517,12 +1975,18 @@ class WOQLClient:
         result = self._dispatch(action, url, payload, file_list)
         return json.loads(result)
 
+    def _auth(self):
+        if self._connected and self._key and self._user:
+            return (self._user, self._key)
+        # TODO: remote_auth
+
     def _dispatch(
         self,
         action: str,  # get, post, put, delete
         url: str,
         payload: Optional[dict] = None,
         file_list: Optional[list] = None,
+        data: Optional[list] = None,
     ) -> str:
         """Directly dispatch to a TerminusDB database.
 
@@ -1652,7 +2116,7 @@ class WOQLClient:
         elif request_response.status_code > 399 and request_response.status_code < 599:
             raise DatabaseError(request_response)
 
-    def get_database(self, dbid: str, account: str) -> Optional[dict]:
+    def get_database(self, dbid: str) -> Optional[dict]:
         """
         Returns metadata (id, organization, label, comment) about the requested database
         Parameters
@@ -1672,34 +2136,12 @@ class WOQLClient:
         dict or None if not found
         """
         self._check_connection(check_db=False)
-        db_ids = []
-        all_dbs = []
         for this_db in self.get_databases():
-            if this_db["system:resource_name"]["@value"] == dbid:
-                db_ids.append(this_db["@id"])
-                all_dbs.append(this_db)
-
-        resources_ids = []
-        for scope in self._dispatch_json("get", self._api)["system:role"][
-            "system:capability"
-        ]["system:capability_scope"]:
-            if (
-                scope["@type"] == "system:Organization"
-                and scope["system:organization_name"]["@value"] == account
-            ):
-                if type(scope["system:resource_includes"]) is list:
-                    for resource in scope["system:resource_includes"]:
-                        resources_ids.append(resource["@id"])
-
-        target_db = None
-        for target in set(db_ids).intersection(set(resources_ids)):
-            target_db = target
-
-        for this_db in all_dbs:
-            if this_db["@id"] == target_db:
+            if this_db["name"] == dbid:
                 return this_db
+        return None
 
-    def get_databases(self) -> List[Dict]:
+    def get_databases(self) -> List[dict]:
         """
         Returns a list of database metadata records for all databases the user has access to
 
@@ -1713,13 +2155,14 @@ class WOQLClient:
         list of dicts
         """
         self._check_connection(check_db=False)
-        all_dbs = []
-        for scope in self._dispatch_json("get", self._api)["system:role"][
-            "system:capability"
-        ]["system:capability_scope"]:
-            if scope["@type"] == "system:Database":
-                all_dbs.append(scope)
-        return all_dbs
+
+        with NoRequestWarning(self.insecure):
+            result = requests.get(
+                self._api,
+                verify=(not self.insecure),
+                auth=self._auth(),
+            )
+        return json.loads(_finish_reponse(result))
 
     def list_databases(self) -> List[Dict]:
         """
@@ -1735,10 +2178,9 @@ class WOQLClient:
         list of dicts
         """
         self._check_connection(check_db=False)
-        all_data = self.get_databases()
         all_dbs = []
-        for data in all_data:
-            all_dbs.append(data["system:resource_name"]["@value"])
+        for data in self.get_databases():
+            all_dbs.append(data["name"])
         return all_dbs
 
     def get_metadata(self, dbid: str, account):
@@ -1818,6 +2260,13 @@ class WOQLClient:
         else:
             base_url = self._branch_base("csv")
         return f"{base_url}/{graph_type}/{graph_id}"
+
+    def _documents_url(self):
+        if self._db == "_system":
+            base_url = self._db_base("document")
+        else:
+            base_url = self._branch_base("document")
+        return base_url
 
     def _triples_url(self, graph_type="instance", graph_id="main"):
         if self._db == "_system":

@@ -14,7 +14,7 @@ class WOQLLib:
         self._user_values = []
         self._default_variables = []
         self._parameters = []
-        self._default_schema_resource = "schema/main"
+        self._default_schema_resource = "schema"
         self._default_commit_resource = "_commits"
         self._default_meta_resource = "_meta"
         self._masterdb_resource = "terminus"
