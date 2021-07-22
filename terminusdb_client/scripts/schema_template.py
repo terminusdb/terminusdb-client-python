@@ -76,6 +76,8 @@ class Location(Address, Coordinate):
     Class can have multiple inheritance. It will inherits both the attibutes fromAddress and Coordinate.
     """
 
+    name: str
+
 
 class Team(EnumTemplate):
     """This is an example for Enum, if a value is not provided, the name of the Enum (e.g. Marketing) will be used as the value."""
