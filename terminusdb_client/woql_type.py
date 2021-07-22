@@ -30,19 +30,46 @@ def to_woql_type(input_type: type):
         return str(input_type)
 
 
-def from_woql_type(input_type: Union[str, dict]):
+def from_woql_type(
+    input_type: Union[str, dict], skip_convert_error=False, as_str=False
+):
     invert_type = {v: k for k, v in CONVERT_TYPE.items()}
-    if isinstance(input_type, "dict"):
+    if isinstance(input_type, dict):
         if input_type["@type"] == "List":
-            return List[input_type["@class"]]
+            if as_str:
+                return f'List[{from_woql_type(input_type["@class"], skip_convert_error=True, as_str=True)}]'
+            else:
+                return List[
+                    from_woql_type(input_type["@class"], skip_convert_error=True)
+                ]
         elif input_type["@type"] == "Set":
-            return Set[input_type["@class"]]
+            if as_str:
+                return f'Set[{from_woql_type(input_type["@class"], skip_convert_error=True, as_str=True)}]'
+            else:
+                return Set[
+                    from_woql_type(input_type["@class"], skip_convert_error=True)
+                ]
         elif input_type["@type"] == "Optional":
-            return Optional[input_type["@class"]]
+            if as_str:
+                return f'Optional[{from_woql_type(input_type["@class"], skip_convert_error=True, as_str=True)}]'
+            else:
+                return Optional[
+                    from_woql_type(input_type["@class"], skip_convert_error=True)
+                ]
+        else:
+            raise TypeError(
+                f"Input type {input_type} cannot be converted to Python type"
+            )
     elif input_type in invert_type:
+        if as_str:
+            return invert_type[input_type].__name__
         return invert_type[input_type]
+    elif skip_convert_error:
+        if as_str:
+            return f"'{input_type}'"
+        return input_type
     else:
-        raise ValueError("Input type cannot be converted to Python type")
+        raise TypeError(f"Input type {input_type} cannot be converted to Python type")
 
 
 def convert_array(input_array: Union[list, set]):

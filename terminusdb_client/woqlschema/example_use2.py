@@ -73,10 +73,10 @@ class Employee(Person):
 
 class Team(EnumTemplate):
     _schema = my_schema
-    # IT = "Information Technology"
-    # Marketing = "Amazing Marketing"
-    IT = ()
-    Marketing = ()
+    IT = "Information Technology"
+    Marketing = "Amazing Marketing"
+    # IT = ()
+    # Marketing = ()
 
 
 class Address(DocumentTemplate):
@@ -109,8 +109,9 @@ cheuk.contact_number = "13123238473897"
 # print(Employee.__mro__)
 # print(Contact.__mro__)
 # print(Team.__mro__)
-print(Location._to_dict())
-print(Team._to_dict())
+# print(Location._to_dict())
+# print(Team._to_dict())
+print(my_schema.to_dict())
 
 
 class AgricultureDiversity(DocumentTemplate):

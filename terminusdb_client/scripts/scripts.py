@@ -4,10 +4,12 @@ import shutil
 import sys
 
 import click
+from shed import shed
 
 # from terminusdb_client.woqlschema.woql_schema import TerminusClass
 import terminusdb_client.woqlschema.woql_schema as woqlschema
 from terminusdb_client.errors import DatabaseError, InterfaceError
+from terminusdb_client.woql_type import from_woql_type
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 
 
@@ -91,6 +93,7 @@ def _create_script(obj_list):
             self.script += "    _abstract = []\n"
 
     import_objs = []
+    print_script = ""
     for obj_str in dir(woqlschema):
         obj = eval(f"woqlschema.{obj_str}")
         if (
@@ -99,12 +102,15 @@ def _create_script(obj_list):
             or isinstance(obj, woqlschema.TerminusKey)
         ):
             import_objs.append(obj_str)
-
-    print(f"from terminusdb_client.woqlschema import {', '.join(import_objs)}")
+    print_script += "from typing import List, Optional, Set\n"
+    print_script += (
+        f"from terminusdb_client.woqlschema import {', '.join(import_objs)}\n"
+    )
+    # print("from typing import List, Optional, Set\n")
+    # print(f"from terminusdb_client.woqlschema import {', '.join(import_objs)}\n")
 
     result_list = []
     for obj in obj_list:
-        print(obj)
         if obj.get("@id"):
             if obj.get("@inherits"):
                 result_obj = ResultObj(obj["@id"], obj["@inherits"])
@@ -112,6 +118,13 @@ def _create_script(obj_list):
                 result_obj = ResultObj(obj["@id"], "DocumentTemplate")
             elif obj["@type"] == "Enum":
                 result_obj = ResultObj(obj["@id"], "EnumTemplate")
+                for value in obj["@value"]:
+                    if " " not in value:
+                        result_obj.script += f"    {value} = ()\n"
+                    else:
+                        result_obj.script += (
+                            f"    {value.replace(' ','_')} = '{value}'\n"
+                        )
 
             if obj.get("@subdocument") is not None:
                 result_obj.add_subdoc()
@@ -122,16 +135,21 @@ def _create_script(obj_list):
                 result_obj.add_abtract()
             result_list.append(result_obj)
 
-    print("=============")
+            for key, value in obj.items():
+                if key[0] != "@":
+                    result_obj.script += f"    {key}:{from_woql_type(value, skip_convert_error=True, as_str=True)}\n"
+
     # sorts depends on the object inherits order
     printed = []
     while len(result_list) > 0:
         obj = result_list.pop(0)
         if obj.parent is None:
-            print(obj.script)
+            # print(obj.script)
+            print_script += obj.script
             printed.append(obj.name)
         elif type(obj.parent) == str and obj.parent in printed:
-            print(obj.script)
+            # print(obj.script)
+            print_script += obj.script
             printed.append(obj.name)
         else:
             parent_is_in = False
@@ -139,10 +157,15 @@ def _create_script(obj_list):
                 if mama in printed:
                     parent_is_in = True
             if parent_is_in:
-                print(obj.script)
+                # print(obj.script)
+                print_script += obj.script
                 printed.append(obj.name)
             else:
                 result_list.append(obj)
+
+    file = open("schema.py", "w")
+    file.write(shed(source_code=print_script))
+    file.close()
 
 
 @click.command()
@@ -183,6 +206,10 @@ def commit():
                 else:
                     obj._schema = insert_schema
                     insert_schema.add_obj(obj)
+    # print("Update")
+    # print(update_schema.to_dict())
+    # print("Insert")
+    # print(insert_schema.to_dict())
     client.replace_document(
         update_schema,
         commit_msg="Schema updated by Python client.",
