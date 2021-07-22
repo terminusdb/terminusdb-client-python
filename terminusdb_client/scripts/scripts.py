@@ -92,6 +92,19 @@ def _create_script(obj_list):
         def add_abstract(self):
             self.script += "    _abstract = []\n"
 
+        def add_docstring(self, obj_dict):
+            self.script += '    """'
+            if obj_dict["@documentation"].get("@comment"):
+                self.script += f'{obj_dict["@documentation"]["@comment"]}'
+            if obj_dict["@documentation"].get("@properties"):
+                self.script += "\n\n    Attributes\n    ----------\n"
+                for prop, discription in obj_dict["@documentation"][
+                    "@properties"
+                ].items():
+                    self.script += f"    {prop} : {from_woql_type(obj_dict[prop], skip_convert_error=True, as_str=True)}\n        {discription}\n"
+                self.script += "    "
+            self.script += '"""\n'
+
     import_objs = []
     print_script = ""
     for obj_str in dir(woqlschema):
@@ -111,6 +124,7 @@ def _create_script(obj_list):
 
     result_list = []
     for obj in obj_list:
+        # print(obj)
         if obj.get("@id"):
             if obj.get("@inherits"):
                 result_obj = ResultObj(obj["@id"], obj["@inherits"])
@@ -125,7 +139,8 @@ def _create_script(obj_list):
                         result_obj.script += (
                             f"    {value.replace(' ','_')} = '{value}'\n"
                         )
-
+            if obj.get("@documentation"):
+                result_obj.add_docstring(obj)
             if obj.get("@subdocument") is not None:
                 result_obj.add_subdoc()
             elif obj.get("@key"):
@@ -162,10 +177,7 @@ def _create_script(obj_list):
                 printed.append(obj.name)
             else:
                 result_list.append(obj)
-
-    file = open("schema.py", "w")
-    file.write(shed(source_code=print_script))
-    file.close()
+    return print_script
 
 
 @click.command()
@@ -179,7 +191,11 @@ def sync():
     for obj in all_existing_obj:
         all_obj_list.append(obj)
     if len(all_obj_list) > 1:
-        _create_script(all_obj_list)
+        print_script = _create_script(all_obj_list)
+        # print(print_script)
+        file = open("schema.py", "w")
+        file.write(shed(source_code=print_script))
+        file.close()
         print(f"schema.py is updated with {DATABASE} schema.")
     else:
         print(f"{DATABASE} schema is empty so schema.py has not be changed.")

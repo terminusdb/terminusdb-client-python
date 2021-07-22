@@ -4,13 +4,12 @@ from terminusdb_client.woqlschema.woql_schema import (
     DocumentTemplate,
     EnumTemplate,
     HashKey,
-    ObjectTemplate,
     TaggedUnion,
     ValueHashKey,
 )
 
 
-class Coordinate(ObjectTemplate):
+class Coordinate(DocumentTemplate):
     x: float
     y: float
 
