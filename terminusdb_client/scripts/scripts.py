@@ -153,7 +153,7 @@ def _create_script(obj_list):
                 result_obj.add_key(obj["@key"]["@type"], obj["@key"].get("@fields"))
 
             if obj.get("@abstract") is not None:
-                result_obj.add_abtract()
+                result_obj.add_abstract()
             result_list.append(result_obj)
 
             for key, value in obj.items():
