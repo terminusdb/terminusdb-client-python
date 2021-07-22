@@ -92,49 +92,51 @@ class RandomKey(metaclass=TerminusKey):
 
 class TerminusClass(type):
     def __init__(cls, name, bases, nmspc):
+
         if "__annotations__" in nmspc:
             annotations = nmspc["__annotations__"]
-            cls.__init__
+        else:
+            nmspc["__annotations__"] = {}
+            annotations = nmspc["__annotations__"]
+
+        for parent in bases:
             base_annotations = (
-                cls.__base__.__annotations__
-                if hasattr(cls.__base__, "__annotations__")
-                else {}
+                parent.__annotations__ if hasattr(parent, "__annotations__") else {}
             )
             annotations.update(base_annotations)
 
-            if hasattr(cls, "_abstract"):
-                abstract = cls._abstract
-            else:
-                abstract = False
+        if hasattr(cls, "_abstract"):
+            abstract = cls._abstract
+        else:
+            abstract = False
 
-            def init(obj, *args, **kwargs):
-                if abstract:
-                    raise TypeError(f"{name} is an abstract class.")
-                for key in annotations:
-                    if key in kwargs:
-                        value = kwargs[key]
-                        # ty = annotations[key]
-                        # if type(ty) == _GenericAlias:
-                        #     try:
-                        #         check_type('value',value,ty)
-                        #     except TypeError as e:
-                        #         message = f"Bad type for member: '{key}' with value '{value}' because " + e.__str__()
-                        #         raise TypeError(message)
-                        # elif isinstance(value,ty):
-                        #     pass
-                        # else:
-                        #     raise TypeError(f"Bad type for member: '{key}' with value '{value}' and type '{ty.__name__}'")
-                    else:
-                        value = None
-                    setattr(obj, key, value)
-                obj._annotations = annotations
+        def init(obj, *args, **kwargs):
+            if abstract:
+                raise TypeError(f"{name} is an abstract class.")
+            for key in annotations:
+                if key in kwargs:
+                    value = kwargs[key]
+                    # ty = annotations[key]
+                    # if type(ty) == _GenericAlias:
+                    #     try:
+                    #         check_type('value',value,ty)
+                    #     except TypeError as e:
+                    #         message = f"Bad type for member: '{key}' with value '{value}' because " + e.__str__()
+                    #         raise TypeError(message)
+                    # elif isinstance(value,ty):
+                    #     pass
+                    # else:
+                    #     raise TypeError(f"Bad type for member: '{key}' with value '{value}' and type '{ty.__name__}'")
+                else:
+                    value = None
+                setattr(obj, key, value)
+            obj._annotations = annotations
 
-            cls.__init__ = init
+        cls.__init__ = init
 
         if cls._schema is not None:
             if not hasattr(cls._schema, "object"):
                 cls._schema.object = set()
-            # cls._schema.object.add(cls)
             cls._schema.add_obj(cls)
 
         super().__init__(name, bases, nmspc)

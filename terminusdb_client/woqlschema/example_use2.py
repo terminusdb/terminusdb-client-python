@@ -1,12 +1,6 @@
-from typing import List, Optional, Set
+from typing import List
 
-from terminusdb_client.woqlschema.woql_schema import (
-    DocumentTemplate,
-    EnumTemplate,
-    HashKey,
-    TaggedUnion,
-    WOQLSchema,
-)
+from terminusdb_client.woqlschema.woql_schema import DocumentTemplate, WOQLSchema
 
 # from woql_schema import WOQLSchema, Document, Property, WOQLObject
 
@@ -41,67 +35,73 @@ class Address(DocumentTemplate):
 
 
 class Location(Address, Coordinate):
+    # name: str
     pass
 
 
-class Person(DocumentTemplate):
-    """This is a person
-    I hate human
-
-    This is extended summary and there will be more things here.
-    This is the next line.
-
-    Attributes
-    ----------
-    x : float
-        The X coordinate.
-    y : float
-        The Y coordinate.
-    """
-
-    _schema = my_schema
+class Location2(Address, Coordinate):
     name: str
-    age: int
-    friend_of: Set["Person"]
 
 
-class Employee(Person):
-    address_of: Address
-    contact_number: Optional[str]
-    managed_by: "Employee"
+#
+# class Person(DocumentTemplate):
+#     """This is a person
+#     I hate human
+#
+#     This is extended summary and there will be more things here.
+#     This is the next line.
+#
+#     Attributes
+#     ----------
+#     x : float
+#         The X coordinate.
+#     y : float
+#         The Y coordinate.
+#     """
+#
+#     _schema = my_schema
+#     name: str
+#     age: int
+#     friend_of: Set["Person"]
+#
+#
+# class Employee(Person):
+#     address_of: Address
+#     contact_number: Optional[str]
+#     managed_by: "Employee"
+# #
+#
+# class Team(EnumTemplate):
+#     _schema = my_schema
+#     IT = "Information Technology"
+#     Marketing = "Amazing Marketing"
+#     # IT = ()
+#     # Marketing = ()
+#
+#
+# class Address(DocumentTemplate):
+#     """This is address"""
+#
+#     _key = HashKey(["street", "region", "postal_code"])
+#     _base = "Adddress_"
+#     _subdocument = []
+#     _schema = my_schema
+#     street: str
+#     postal_code: str
+#
+#
+# class Contact(TaggedUnion):
+#     local_number: int
+#     international: str
 
 
-class Team(EnumTemplate):
-    _schema = my_schema
-    IT = "Information Technology"
-    Marketing = "Amazing Marketing"
-    # IT = ()
-    # Marketing = ()
-
-
-class Address(DocumentTemplate):
-    """This is address"""
-
-    _key = HashKey(["street", "region", "postal_code"])
-    _base = "Adddress_"
-    _subdocument = []
-    _schema = my_schema
-    street: str
-    postal_code: str
-
-
-class Contact(TaggedUnion):
-    local_number: int
-    international: str
-
-
-home = Address()
-home.street = "123 Abc Street"
-home._id = "dnkasnklslkd"
-
-cheuk = Employee()
-cheuk.address_of = home
-cheuk.contact_number = "13123238473897"
+# home = Address()
+# home.street = "123 Abc Street"
+# home._id = "dnkasnklslkd"
+#
+# cheuk = Employee()
+# cheuk.address_of = home
+# cheuk.contact_number = "13123238473897"
 # cheuk.commit(client)
 # client.commit_objects(cheuk, gavin, matthijs)
 # print(Location.__mro__.index(DocumentTemplate))
@@ -111,18 +111,9 @@ cheuk.contact_number = "13123238473897"
 # print(Team.__mro__)
 # print(Location._to_dict())
 # print(Team._to_dict())
-print(my_schema.to_dict())
-
-
-class AgricultureDiversity(DocumentTemplate):
-    """IV.4.2 Agriculture Diversity []"""
-
-    _schema = dani_schema
-
-
-class Polity(DocumentTemplate):
-    _schema = dani_schema
-    agriculture_diversity: AgricultureDiversity
+# print(Employee.__annotations__)
+print(Location.__annotations__)
+print(Location2.__annotations__)
 
 
 #
