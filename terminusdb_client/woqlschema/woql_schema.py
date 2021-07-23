@@ -1,4 +1,4 @@
-from copy import deepcopy
+from copy import copy, deepcopy
 from enum import Enum
 from hashlib import sha256
 from typing import Optional, Union
@@ -94,16 +94,15 @@ class TerminusClass(type):
     def __init__(cls, name, bases, nmspc):
 
         if "__annotations__" in nmspc:
-            annotations = nmspc["__annotations__"]
+            cls._annotations = copy(nmspc["__annotations__"])
         else:
-            nmspc["__annotations__"] = {}
-            annotations = nmspc["__annotations__"]
+            cls._annotations = {}
 
         for parent in bases:
             base_annotations = (
-                parent.__annotations__ if hasattr(parent, "__annotations__") else {}
+                parent._annotations if hasattr(parent, "_annotations") else {}
             )
-            annotations.update(base_annotations)
+            cls._annotations.update(base_annotations)
 
         if hasattr(cls, "_abstract"):
             abstract = cls._abstract
@@ -113,7 +112,7 @@ class TerminusClass(type):
         def init(obj, *args, **kwargs):
             if abstract:
                 raise TypeError(f"{name} is an abstract class.")
-            for key in annotations:
+            for key in cls._annotations:
                 if key in kwargs:
                     value = kwargs[key]
                     # ty = annotations[key]
@@ -130,7 +129,7 @@ class TerminusClass(type):
                 else:
                     value = None
                 setattr(obj, key, value)
-            obj._annotations = annotations
+            obj._annotations = cls._annotations
 
         cls.__init__ = init
 
@@ -139,7 +138,7 @@ class TerminusClass(type):
                 cls._schema.object = set()
             cls._schema.add_obj(cls)
 
-        super().__init__(name, bases, nmspc)
+        # super().__init__(name, bases, nmspc)
 
     def __repr__(cls):
         return cls.__name__
@@ -189,8 +188,8 @@ class DocumentTemplate(metaclass=TerminusClass):
                 }
             else:
                 result["@key"] = {"@type": cls._key.__class__.at_type}
-        if hasattr(cls, "__annotations__"):
-            for attr, attr_type in cls.__annotations__.items():
+        if hasattr(cls, "_annotations"):
+            for attr, attr_type in cls._annotations.items():
                 result[attr] = wt.to_woql_type(attr_type)
         return result
 
