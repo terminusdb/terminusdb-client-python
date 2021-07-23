@@ -3,14 +3,13 @@ from typing import List, Set
 from terminusdb_client.woqlschema.woql_schema import (
     DocumentTemplate,
     EnumTemplate,
-    ObjectTemplate,
     WOQLSchema,
 )
 
 my_schema = WOQLSchema()
 
 
-class Coordinate(ObjectTemplate):
+class Coordinate(DocumentTemplate):
     """Coordinate of location.
 
     Coordinate to identify the location of a place on earth, it could be found from Google map.
@@ -34,7 +33,7 @@ class Country(DocumentTemplate):
     perimeter: List[Coordinate]
 
 
-class Address(ObjectTemplate):
+class Address(DocumentTemplate):
     _schema = my_schema
     street: str
     country: Country
