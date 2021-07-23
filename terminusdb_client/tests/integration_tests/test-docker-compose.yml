@@ -5,7 +5,7 @@ volumes:
 
 services:
   terminusdb-server:
-    image: terminusdb/terminusdb-server:canary
+    image: terminusdb/terminusdb-server:dev
     container_name: terminusdb-server
     hostname: terminusdb-server
     tty: true
