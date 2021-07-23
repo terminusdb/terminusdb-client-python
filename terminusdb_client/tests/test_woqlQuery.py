@@ -12,7 +12,6 @@ from .ans_triple_quad import *  # noqa
 from .woqljson.woqlAndJson import WOQL_AND_JSON
 from .woqljson.woqlCastJson import WOQL_CAST_JSON
 from .woqljson.woqlConcatJson import WOQL_CONCAT_JSON
-from .woqljson.woqlDeleteJson import WOQL_DELETE_JSON
 from .woqljson.woqlIdgenJson import (
     WOQL_IDGEN_JSON,
     WOQL_RANDOM_IDGEN_JSON,
@@ -44,11 +43,7 @@ class TestWoqlQueries:
         json_obj = {
             "@type": "Limit",
             "limit": 10,
-            "query": {
-                "@type": "Start",
-                "query": WOQL_STAR,
-                "start": 0
-            },
+            "query": {"@type": "Start", "query": WOQL_STAR, "start": 0},
         }
         assert woql_object.to_dict() == json_obj
 
@@ -136,10 +131,7 @@ class TestWoqlQueries:
                 "@type": "Value",
                 "node": "a",
             },
-            "right": {
-                "@type": "Value",
-                "node": "b"
-            },
+            "right": {"@type": "Value", "node": "b"},
         }
         assert woql_object.to_dict() == json_obj
 
@@ -148,7 +140,7 @@ class TestWoqlQueries:
         assert woql_object.to_dict() == WOQL_TRIM_JSON
 
     def test_eval_method(self):
-        woql_object = WOQLQuery().eval(WOQLQuery().plus(1,2), "v:x")
+        woql_object = WOQLQuery().eval(WOQLQuery().plus(1, 2), "v:x")
         assert woql_object.to_dict() == WOQL_MATH_JSON["evalJson"]
 
     def test_minus_method(self):
@@ -199,13 +191,13 @@ class TestWoqlQueries:
         woql_object = WOQLQuery().remote({"url": "http://url"})
         json_obj = {
             "@type": "QueryResource",
-            "format" : "csv",
+            "format": "csv",
             "source": {"@type": "Source", "url": "http://url"},
         }
         assert woql_object.to_dict() == json_obj
 
     def test_post_method(self):
-        woql_object = WOQLQuery().post({"file" : "my_json_file"})
+        woql_object = WOQLQuery().post({"file": "my_json_file"})
         json_obj = {
             "@type": "QueryResource",
             "source": {"@type": "Source", "file": "my_json_file"},
@@ -214,15 +206,11 @@ class TestWoqlQueries:
         assert woql_object.to_dict() == json_obj
 
     def test_unique_method(self):
-        woql_object = WOQLQuery().unique(
-            "Station", "v:Start_ID", "v:Start_Station_URL"
-        )
+        woql_object = WOQLQuery().unique("Station", "v:Start_ID", "v:Start_Station_URL")
         assert woql_object.to_dict() == WOQL_UNIQUE_JSON
 
     def test_idgen_method(self):
-        woql_object = WOQLQuery().idgen(
-            "Station", "v:Start_ID", "v:Start_Station_URL"
-        )
+        woql_object = WOQLQuery().idgen("Station", "v:Start_ID", "v:Start_Station_URL")
         assert woql_object.to_dict() == WOQL_IDGEN_JSON
 
     def test_random_idgen_method(self):
@@ -242,10 +230,7 @@ class TestWoqlQueries:
                 "variable": "Duration",
             },
             "type": {"@type": "NodeValue", "node": "xsd:integer"},
-            "result": {
-                "@type": "Value",
-                "variable": "Duration_Cast"
-            },
+            "result": {"@type": "Value", "variable": "Duration_Cast"},
         }
         assert woql_object.to_dict() == json_obj
 
@@ -269,9 +254,7 @@ class TestWoqlQueries:
         woql_object2 = WOQLQuery().cast(
             "my_int", "xsd:integer", "v:Duration_Cast", literal_type="node"
         )
-        woql_object3 = WOQLQuery().cast(
-            "my_int", "xsd:integer", "v:Duration_Cast"
-        )
+        woql_object3 = WOQLQuery().cast("my_int", "xsd:integer", "v:Duration_Cast")
         assert woql_object1.to_dict() == woql_object3.to_dict()
         assert woql_object2.to_dict() == woql_object3.to_dict()
 
@@ -299,7 +282,7 @@ class TestWoqlQueries:
         assert woql_object.to_dict() == WOQL_JOIN_SPLIT_JSON["joinJson"]
 
     def test_split_method(self):
-        woql_object = WOQLQuery().split('A, B, C', ", ", "v:list_obj")
+        woql_object = WOQLQuery().split("A, B, C", ", ", "v:list_obj")
         assert woql_object.to_dict() == WOQL_JOIN_SPLIT_JSON["splitJson"]
 
     def test_member_method(self):
@@ -318,7 +301,9 @@ class TestWoqlQueries:
         assert woql_object.to_dict() == json_obj
 
     def test_concat_method(self):
-        woql_object = WOQLQuery().concat(["v:Duration"," yo ","v:Duration_Cast"], "v:x")
+        woql_object = WOQLQuery().concat(
+            ["v:Duration", " yo ", "v:Duration_Cast"], "v:x"
+        )
         assert woql_object.to_dict() == WOQL_CONCAT_JSON
 
     def test_group_by_method(self):
@@ -398,7 +383,7 @@ class TestWoqlQueries:
                 "@type": "PathPlus",
                 "pattern": {
                     "@type": "PathSequence",
-                    "sequence" : [
+                    "sequence": [
                         {
                             "@type": "InversePathPredicate",
                             "predicate": "hop",
@@ -407,7 +392,7 @@ class TestWoqlQueries:
                             "@type": "PathPredicate",
                             "predicate": "hop",
                         },
-                    ]
+                    ],
                 },
             },
             "object": {
@@ -435,31 +420,30 @@ class TestWoqlQueries:
                 "@type": "PathPlus",
                 "pattern": {
                     "@type": "PathOr",
-                    "or":[
-                        { "@type": "PathSequence",
-                          "sequence" : [
-                              {
-                                  "@type": "InversePathPredicate",
-                                  "predicate": "hop"
-                              },
-                              {
-                                  "@type": "PathPredicate",
-                                  "predicate": "hop",
-                              }
-                              ]
-                         },
-                        {  "@type": "PathSequence",
-                           "sequence" : [
-                               {
-                                   "@type": "InversePathPredicate",
-                                   "predicate": "hop2",
-                               },
-                               {
-                                   "@type": "PathPredicate",
-                                   "predicate": "hop2",
-                               }
-                           ]
-                         },
+                    "or": [
+                        {
+                            "@type": "PathSequence",
+                            "sequence": [
+                                {"@type": "InversePathPredicate", "predicate": "hop"},
+                                {
+                                    "@type": "PathPredicate",
+                                    "predicate": "hop",
+                                },
+                            ],
+                        },
+                        {
+                            "@type": "PathSequence",
+                            "sequence": [
+                                {
+                                    "@type": "InversePathPredicate",
+                                    "predicate": "hop2",
+                                },
+                                {
+                                    "@type": "PathPredicate",
+                                    "predicate": "hop2",
+                                },
+                            ],
+                        },
                     ],
                 },
             },
@@ -467,10 +451,7 @@ class TestWoqlQueries:
                 "@type": "Value",
                 "variable": "Y",
             },
-            "path": {
-                "@type": "Value",
-                "variable": "Path"
-            },
+            "path": {"@type": "Value", "variable": "Path"},
         }
         assert woql_object.to_dict() == json_object
 
@@ -478,13 +459,17 @@ class TestWoqlQueries:
 class TestTripleBuilder:
     def test_triple_method(self, triple_opt):
         woql_object = WOQLQuery().triple("a", "b", "c")
-        woql_object_opt = WOQLQuery().triple("a", "b", WOQLQuery().string("c"), opt=True)
+        woql_object_opt = WOQLQuery().triple(
+            "a", "b", WOQLQuery().string("c"), opt=True
+        )
         assert woql_object.to_dict() == WOQL_JSON["tripleJson"]
         assert woql_object_opt.to_dict() == triple_opt
 
     def test_quad_method(self, quad_opt):
         woql_object = WOQLQuery().quad("a", "b", "c", "d")
-        woql_object_opt = WOQLQuery().quad("a", "b", WOQLQuery().string("c"), "d", opt=True)
+        woql_object_opt = WOQLQuery().quad(
+            "a", "b", WOQLQuery().string("c"), "d", opt=True
+        )
         assert woql_object.to_dict() == WOQL_JSON["quadJson"]
         assert woql_object_opt.to_dict() == quad_opt
 
@@ -498,8 +483,10 @@ class TestTripleBuilder:
 
     def test_delete_method(self):
         woql_object = WOQLQuery().delete_object("x")
-        json_obj = {"@type": "DeleteObject",
-                    "document_uri": {'@type': 'NodeValue', 'node': 'x'}}
+        json_obj = {
+            "@type": "DeleteObject",
+            "document_uri": {"@type": "NodeValue", "node": "x"},
+        }
         assert woql_object.to_dict() == json_obj
 
     def test_delete_triple_method(self):
@@ -517,6 +504,7 @@ class TestTripleBuilder:
     def test_add_quad_method(self):
         woql_object = WOQLQuery().add_quad("a", "b", "c", "d")
         assert woql_object.to_dict() == WOQL_JSON["addQuadJson"]
+
 
 class TestTripleBuilderChainer:
     def test_dot_chain(self):

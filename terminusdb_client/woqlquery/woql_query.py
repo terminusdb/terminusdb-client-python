@@ -1,11 +1,8 @@
-import copy
 import datetime as dt
 import json
 
 # import pprint
 import re
-
-import terminusdb_client.woql_utils as utils
 
 from .woql_core import _copy_dict, _tokenize, _tokens_to_json
 
@@ -154,9 +151,7 @@ class WOQLQuery:
             return False
         if json["@type"] in self._update_operators:
             return True
-        if json.get("consequent") and self._contains_update_check(
-            json["consequent"]
-        ):
+        if json.get("consequent") and self._contains_update_check(json["consequent"]):
             return True
         if json.get("query"):
             return self._contains_update_check(json["query"])
@@ -190,10 +185,7 @@ class WOQLQuery:
         if varb[:2] == "v:":
             varb = varb[2:]
         if type(varb) is str:
-            return {
-                "@type": "Value",
-                "variable": varb
-            }
+            return {"@type": "Value", "variable": varb}
         return varb
 
     def _coerce_to_dict(self, qobj):
@@ -204,12 +196,12 @@ class WOQLQuery:
             return {"@type": "True"}
         return qobj
 
-    def _raw_var(self,varb):
+    def _raw_var(self, varb):
         if varb[:2] == "v:":
             return varb[2:]
         return varb
 
-    def _raw_var_list(self,vl):
+    def _raw_var_list(self, vl):
         ret = []
         for v in vl:
             ret.append(self._raw_var(v))
@@ -246,10 +238,10 @@ class WOQLQuery:
         asvar = {}
         if type(colname_or_index) is int:
             asvar["@type"] = "Column"
-            asvar["indicator"] = {"@type" : "Indicator", "index" : colname_or_index}
+            asvar["indicator"] = {"@type": "Indicator", "index": colname_or_index}
         elif type(colname_or_index) is str:
             asvar["@type"] = "Column"
-            asvar["indicator"] = {"@type" : "Indicator", "name" : colname_or_index}
+            asvar["indicator"] = {"@type": "Indicator", "name": colname_or_index}
         if vname[:2] == "v:":
             vname = vname[2:]
         asvar["variable"] = vname
@@ -470,24 +462,21 @@ class WOQLQuery:
         if varname[:2] == "v:" or always:
             if varname[:2] == "v:":
                 varname = varname[2:]
-            return {
-                "@type": target_type,
-                "variable": varname
-            }
+            return {"@type": target_type, "variable": varname}
         else:
             return {"@type": target_type, "node": varname}
 
-    def _expand_value_variable(self,varname,always=False):
-        return self._expand_variable(varname,'Value',always)
+    def _expand_value_variable(self, varname, always=False):
+        return self._expand_variable(varname, "Value", always)
 
-    def _expand_node_variable(self,varname,always=False):
-        return self._expand_variable(varname,'NodeValue',always)
+    def _expand_node_variable(self, varname, always=False):
+        return self._expand_variable(varname, "NodeValue", always)
 
-    def _expand_data_variable(self,varname,always=False):
-        return self._expand_variable(varname,'DataValue',always)
+    def _expand_data_variable(self, varname, always=False):
+        return self._expand_variable(varname, "DataValue", always)
 
-    def _expand_arithmetic_variable(self,varname,always=False):
-        return self._expand_variable(varname,'ArithmeticValue',always)
+    def _expand_arithmetic_variable(self, varname, always=False):
+        return self._expand_variable(varname, "ArithmeticValue", always)
 
     def execute(self, client, commit_msg=None, file_dict=None):
         """Executes the query using the passed client to connect to a server
@@ -627,9 +616,7 @@ class WOQLQuery:
                         self._vocab[spl[0]] = spl[1]
 
     def _wrap_cursor_with_and(self):
-        if self._cursor.get("@type") == "And" and self._cursor.get(
-            "and"
-        ):
+        if self._cursor.get("@type") == "And" and self._cursor.get("and"):
             next_item = len(self._cursor.get("and"))
             self.woql_and({})
             self._cursor = self._cursor["and"][next_item]
@@ -758,11 +745,7 @@ class WOQLQuery:
             self._cursor["and"] = []
         for item in queries:
             onevar = self._coerce_to_dict(item)
-            if (
-                "@type" in onevar
-                and onevar["@type"] == "And"
-                and onevar['and']
-            ):
+            if "@type" in onevar and onevar["@type"] == "And" and onevar["and"]:
                 for each in onevar["and"]:
                     if each:
                         subvar = self._coerce_to_dict(each)
@@ -1315,7 +1298,7 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "QueryResource"
-        fpath['@type'] = 'Source'
+        fpath["@type"] = "Source"
         self._cursor["source"] = fpath
         self._cursor["format"] = "csv"
         if opts:
@@ -1380,11 +1363,11 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "QueryResource"
-        uri['@type'] = 'Source'
-        self._cursor['source'] = uri
-        self._cursor['format'] = "csv"
+        uri["@type"] = "Source"
+        self._cursor["source"] = uri
+        self._cursor["format"] = "csv"
         if opts:
-            self._cursor['options'] = opts
+            self._cursor["options"] = opts
         return self
 
     def post(self, fpath, fmt="csv", opts=None):
@@ -1393,11 +1376,11 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "QueryResource"
-        fpath['@type'] = 'Source'
-        self._cursor['source'] = fpath
-        self._cursor['format'] = fmt
+        fpath["@type"] = "Source"
+        self._cursor["source"] = fpath
+        self._cursor["format"] = fmt
         if opts:
-            self._cursor['options'] = opts
+            self._cursor["options"] = opts
         return self
 
     def delete_triple(self, subject, predicate, object_or_literal):
@@ -1669,9 +1652,7 @@ class WOQLQuery:
         self._cursor["@type"] = "Minus"
         self._cursor["left"] = self._arop(new_args.pop(0))
         if len(new_args) > 1:
-            self._cursor["right"] = self._coerce_to_dict(
-                WOQLQuery().minus(*new_args)
-            )
+            self._cursor["right"] = self._coerce_to_dict(WOQLQuery().minus(*new_args))
         else:
             self._cursor["right"] = self._arop(new_args[0])
         return self
@@ -1697,9 +1678,7 @@ class WOQLQuery:
         self._cursor["@type"] = "Times"
         self._cursor["left"] = self._arop(new_args.pop(0))
         if len(new_args) > 1:
-            self._cursor["right"] = self._coerce_to_dict(
-                WOQLQuery().times(*new_args)
-            )
+            self._cursor["right"] = self._coerce_to_dict(WOQLQuery().times(*new_args))
         else:
             self._cursor["right"] = self._arop(new_args[0])
         return self
@@ -1725,9 +1704,7 @@ class WOQLQuery:
         self._cursor["@type"] = "Divide"
         self._cursor["left"] = self._arop(new_args.pop(0))
         if len(new_args) > 1:
-            self._cursor["right"] = self._coerce_to_dict(
-                WOQLQuery().divide(*new_args)
-            )
+            self._cursor["right"] = self._coerce_to_dict(WOQLQuery().divide(*new_args))
         else:
             self._cursor["right"] = self._arop(new_args[0])
         return self
@@ -1753,9 +1730,7 @@ class WOQLQuery:
         self._cursor["@type"] = "Div"
         self._cursor["left"] = self._arop(new_args.pop(0))
         if len(new_args) > 1:
-            self._cursor["right"] = self._coerce_to_dict(
-                WOQLQuery().div(*new_args)
-            )
+            self._cursor["right"] = self._coerce_to_dict(WOQLQuery().div(*new_args))
         else:
             self._cursor["right"] = self._arop(new_args[0])
         return self
@@ -1834,12 +1809,10 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Like"
-        self._cursor["left"] = self._clean_data_value(left, 'xsd:string')
-        self._cursor["right"] = self._clean_data_value(right, 'xsd:string')
+        self._cursor["left"] = self._clean_data_value(left, "xsd:string")
+        self._cursor["right"] = self._clean_data_value(right, "xsd:string")
         if dist:
-            self._cursor["like_similarity"] = self._clean_object(
-                dist, "xsd:decimal"
-            )
+            self._cursor["like_similarity"] = self._clean_object(dist, "xsd:decimal")
         return self
 
     def less(self, left, right):
@@ -2296,8 +2269,8 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Regexp"
-        self._cursor["pattern"] = self._clean_data_value(pattern, 'xsd:string')
-        self._cursor["string"] = self._clean_data_value(reg_str, 'xsd:string')
+        self._cursor["pattern"] = self._clean_data_value(pattern, "xsd:string")
+        self._cursor["string"] = self._clean_data_value(reg_str, "xsd:string")
         self._cursor["result"] = self._data_list(reg_list)
         return self
 
@@ -2396,7 +2369,9 @@ class WOQLQuery:
             query object that can be chained and/or execute
         """
         if literal_type is not None:
-            if (literal_type == "owl:Thing" or literal_type == "node") and isinstance(val, str) :
+            if (literal_type == "owl:Thing" or literal_type == "node") and isinstance(
+                val, str
+            ):
                 return self.cast({"@type": "Value", "node": val}, user_type, result)
             else:
                 return self.cast(self.literal(val, literal_type), user_type, result)
@@ -2484,8 +2459,8 @@ class WOQLQuery:
             if type(item) is str:
                 obj = {
                     "@type": "OrderTemplate",
-                    "variable" : self._raw_var(item),
-                    "order": "asc"
+                    "variable": self._raw_var(item),
+                    "order": "asc",
                 }
                 self._cursor["ordering"].append(obj)
             else:
