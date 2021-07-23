@@ -197,10 +197,10 @@ class TestWoqlQueries:
         assert woql_object.to_dict() == json_obj
 
     def test_post_method(self):
-        woql_object = WOQLQuery().post({"file": "my_json_file"})
+        woql_object = WOQLQuery().post({"file": "my_json_file", "format": "csv"})
         json_obj = {
             "@type": "QueryResource",
-            "source": {"@type": "Source", "file": "my_json_file"},
+            "source": {"file": "my_json_file", "format": "csv", "@type": "Source"},
             "format": "csv",
         }
         assert woql_object.to_dict() == json_obj
@@ -542,117 +542,3 @@ class TestTripleBuilderChainer:
                 "variable": "z",
             },
         ]
-
-    def test_woql_less_method(self):
-        woql_object = WOQLQuery().less("abc", "defg")
-        json_obj = {
-            "@type": "woql:Less",
-            "woql:left": {
-                "@type": "woql:Datatype",
-                "woql:datatype": {"@type": "xsd:string", "@value": "abc"},
-            },
-            "woql:right": {
-                "@type": "woql:Datatype",
-                "woql:datatype": {"@type": "xsd:string", "@value": "defg"},
-            },
-        }
-        assert woql_object.to_dict() == json_obj
-
-    def test_woql_greater_method(self):
-        woql_object = WOQLQuery().greater("abcd", "efg")
-        json_obj = {
-            "@type": "woql:Greater",
-            "woql:left": {
-                "@type": "woql:Datatype",
-                "woql:datatype": {"@type": "xsd:string", "@value": "abcd"},
-            },
-            "woql:right": {
-                "@type": "woql:Datatype",
-                "woql:datatype": {"@type": "xsd:string", "@value": "efg"},
-            },
-        }
-        assert woql_object.to_dict() == json_obj
-
-    def test_woql_upper_method(self):
-        woql_object = WOQLQuery().upper("abc", "ABC")
-        json_obj = {
-            "@type": "woql:Upper",
-            "woql:left": {
-                "@type": "woql:Datatype",
-                "woql:datatype": {"@type": "xsd:string", "@value": "abc"},
-            },
-            "woql:right": {
-                "@type": "woql:Datatype",
-                "woql:datatype": {"@type": "xsd:string", "@value": "ABC"},
-            },
-        }
-        assert woql_object.to_dict() == json_obj
-
-    def test_woql_lower_method(self):
-        woql_object = WOQLQuery().lower("ABC", "abc")
-        json_obj = {
-            "@type": "woql:Lower",
-            "woql:left": {
-                "@type": "woql:Datatype",
-                "woql:datatype": {"@type": "xsd:string", "@value": "ABC"},
-            },
-            "woql:right": {
-                "@type": "woql:Datatype",
-                "woql:datatype": {"@type": "xsd:string", "@value": "abc"},
-            },
-        }
-        assert woql_object.to_dict() == json_obj
-
-    def test_woql_pad_method(self):
-        woql_object = WOQLQuery().pad("abc", "#", 8, "v:output")
-        json_obj = {
-            "@type": "woql:Pad",
-            "woql:pad_string": {
-                "@type": "woql:Datatype",
-                "woql:datatype": {"@type": "xsd:string", "@value": "abc"},
-            },
-            "woql:pad_char": {
-                "@type": "woql:Datatype",
-                "woql:datatype": {"@type": "xsd:string", "@value": "#"},
-            },
-            "woql:pad_times": {
-                "@type": "woql:Datatype",
-                "woql:datatype": {"@type": "xsd:integer", "@value": 8},
-            },
-            "woql:pad_result": {
-                "@type": "woql:Variable",
-                "woql:variable_name": {"@value": "output", "@type": "xsd:string"},
-            },
-        }
-        assert woql_object.to_dict() == json_obj
-
-    def test_woql_sum_method(self):
-        woql_object = WOQLQuery().sum([1, 2, 8], "v:output")
-        json_obj = {
-            "@type": "woql:Sum",
-            "woql:sum_list": {
-                "@type": "woql:Array",
-                "woql:array_element": [
-                    {
-                        "@type": "woql:ArrayElement",
-                        "woql:datatype": {"@type": "xsd:integer", "@value": 1},
-                        "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 0},
-                    },
-                    {
-                        "@type": "woql:ArrayElement",
-                        "woql:datatype": {"@type": "xsd:integer", "@value": 2},
-                        "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 1},
-                    },
-                    {
-                        "@type": "woql:ArrayElement",
-                        "woql:datatype": {"@type": "xsd:integer", "@value": 8},
-                        "woql:index": {"@type": "xsd:nonNegativeInteger", "@value": 2},
-                    },
-                ],
-            },
-            "woql:sum": {
-                "@type": "woql:Variable",
-                "woql:variable_name": {"@value": "output", "@type": "xsd:string"},
-            },
-        }
-        assert woql_object.to_dict() == json_obj

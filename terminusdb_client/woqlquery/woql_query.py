@@ -1324,15 +1324,13 @@ class WOQLQuery:
         self._cursor["@type"] = "Once"
         return self._add_sub_query(query)
 
-    def remote(self, uri, fmt="csv", opts=None):
+    def remote(self, uri, opts=None):
         """Provides details of a remote data source in a JSON format that includes a URL property
 
         Parameters
         ----------
         uri : str
             remote data source
-        fmt : str
-            file format, one of ["csv"]
         opts : input options
             optional
 
@@ -1370,7 +1368,7 @@ class WOQLQuery:
             self._cursor["options"] = opts
         return self
 
-    def post(self, fpath, fmt="csv", opts=None):
+    def post(self, fpath, opts=None):
         if fpath and fpath == "args":
             return ["source", "format", "options"]
         if self._cursor.get("@type"):
@@ -1378,7 +1376,7 @@ class WOQLQuery:
         self._cursor["@type"] = "QueryResource"
         fpath["@type"] = "Source"
         self._cursor["source"] = fpath
-        self._cursor["format"] = fmt
+        self._cursor["format"] = "csv"
         if opts:
             self._cursor["options"] = opts
         return self

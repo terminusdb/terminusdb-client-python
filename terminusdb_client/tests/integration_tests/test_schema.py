@@ -5,7 +5,6 @@ from terminusdb_client.woqlschema.woql_schema import (
     DocumentTemplate,
     EnumTemplate,
     HashKey,
-    ObjectTemplate,
     TaggedUnion,
     ValueHashKey,
     WOQLSchema,
@@ -16,7 +15,7 @@ from terminusdb_client.woqlschema.woql_schema import (
 my_schema = WOQLSchema()
 
 
-class Coordinate(ObjectTemplate):
+class Coordinate(DocumentTemplate):
     _schema = my_schema
     x: float
     y: float
