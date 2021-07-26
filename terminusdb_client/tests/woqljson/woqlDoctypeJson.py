@@ -6,7 +6,7 @@ WoqlDoctype = {
             "subject": {"@type": "NodeValue", "node": "Station"},
             "predicate": {"@type": "NodeValue", "node": "rdf:type"},
             "object": {"@type": "Value", "node": "owl:Class"},
-            "graph": "schema"
+            "graph": "schema",
         },
         {
             "@type": "AddTriple",
@@ -16,7 +16,7 @@ WoqlDoctype = {
                 "node": "rdfs:subClassOf",
             },
             "object": {"@type": "Value", "node": "terminus:Document"},
-            "graph": "schema"
+            "graph": "schema",
         },
     ],
 }

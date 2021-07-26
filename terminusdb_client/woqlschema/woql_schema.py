@@ -1,3 +1,4 @@
+import ast
 from copy import copy, deepcopy
 from enum import Enum
 from hashlib import sha256
@@ -29,7 +30,7 @@ class HashKey(metaclass=TerminusKey):
     def idgen(self, obj: "DocumentTemplate"):
         key_list = []
         for item in self._keys:
-            key_item = eval(f"obj.{item}")
+            key_item = ast.literal_eval(f"obj.{item}")
             if isinstance(key_item, tuple(CONVERT_TYPE.keys())):
                 key_list.append(str(key_item))
             else:
@@ -52,7 +53,7 @@ class LexicalKey(metaclass=TerminusKey):
     def idgen(self, obj: "DocumentTemplate"):
         key_list = []
         for item in self._keys:
-            key_item = eval(f"obj.{item}")
+            key_item = ast.literal_eval(f"obj.{item}")
             if isinstance(key_item, tuple(CONVERT_TYPE.keys())):
                 key_list.append(str(key_item))
             else:
@@ -199,7 +200,7 @@ class DocumentTemplate(metaclass=TerminusClass):
             result["@id"] = self._id
         for item in self._annotations.keys():
             if hasattr(self, item):
-                the_item = eval(f"self.{item}")
+                the_item = eval(f"self.{item}")  # noqa: S307
                 if the_item is not None:
                     if hasattr(the_item.__class__, "_subdocument") or (
                         hasattr(the_item.__class__, "_key")
@@ -245,7 +246,7 @@ class EnumTemplate(Enum):
         result = {"@type": "Enum", "@id": cls.__name__, "@value": []}
         for item in cls.__members__:
             if item[0] != "_":
-                result["@value"].append(str(eval(f"cls.{item}")))
+                result["@value"].append(str(eval(f"cls.{item}")))  # noqa: S307
         # if hasattr(self, "__annotations__"):
         #     for attr, attr_type in self.__annotations__.items():
         #         result[attr] = str(attr_type)

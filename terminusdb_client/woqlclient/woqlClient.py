@@ -30,7 +30,7 @@ class NoRequestWarning:
         if self.insecure:
             warnings.simplefilter("ignore", InsecureRequestWarning)
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, the_type, value, traceback):
         if self.insecure:
             warnings.resetwarnings()
 
@@ -821,6 +821,7 @@ class WOQLClient:
                 requests.delete(
                     self._db_url(),
                     auth=self._auth(),
+                    params=payload,
                     verify=(not self.insecure),
                 )
             )
@@ -1122,7 +1123,11 @@ class WOQLClient:
     def insert_document(
         self,
         document: Union[
-            dict, List[dict], "WOQLSchema", "ObjectTemplate", List["ObjectTemplate"]
+            dict,
+            List[dict],
+            "WOQLSchema",  # noqa:F821
+            "DocumentTemplate",  # noqa:F821
+            List["DocumentTemplate"],  # noqa:F821
         ],
         graph_type: str = "instance",
         commit_msg: Optional[str] = None,
@@ -1152,19 +1157,19 @@ class WOQLClient:
         params = self._generate_commit(commit_msg)["commit_info"]
         params["graph_type"] = graph_type
 
-        def conv_to_dict(object):
-            if isinstance(object, dict):
-                return object
-            elif hasattr(object, "to_dict"):
-                return object.to_dict()
-            elif hasattr(object, "_obj_to_dict"):
+        def conv_to_dict(obj):
+            if isinstance(obj, dict):
+                return obj
+            elif hasattr(obj, "to_dict"):
+                return obj.to_dict()
+            elif hasattr(obj, "_obj_to_dict"):
                 if (
-                    not hasattr(object, "_id")
-                    and not hasattr(object.__class__, "_subdocument")
-                    and hasattr(object.__class__._key, "idgen")
+                    not hasattr(obj, "_id")
+                    and not hasattr(obj.__class__, "_subdocument")
+                    and hasattr(obj.__class__._key, "idgen")
                 ):
-                    object._id = object.__class__._key.idgen(object)
-                return object._obj_to_dict()
+                    obj._id = obj.__class__._key.idgen(obj)
+                return obj._obj_to_dict()
             else:
                 raise ValueError("Object cannot convert to dictionary")
 
@@ -1192,7 +1197,11 @@ class WOQLClient:
     def replace_document(
         self,
         document: Union[
-            dict, List[dict], "WOQLSchema", "ObjectTemplate", List["ObjectTemplate"]
+            dict,
+            List[dict],
+            "WOQLSchema",  # noqa:F821
+            "DocumentTemplate",  # noqa:F821
+            List["DocumentTemplate"],  # noqa:F821
         ],
         graph_type: str,
         commit_msg: Optional[str] = None,
@@ -1217,19 +1226,19 @@ class WOQLClient:
         params = self._generate_commit(commit_msg)["commit_info"]
         params["graph_type"] = graph_type
 
-        def conv_to_dict(object):
-            if isinstance(object, dict):
-                return object
-            elif hasattr(object, "to_dict"):
-                return object.to_dict()
-            elif hasattr(object, "_obj_to_dict"):
+        def conv_to_dict(obj):
+            if isinstance(obj, dict):
+                return obj
+            elif hasattr(obj, "to_dict"):
+                return obj.to_dict()
+            elif hasattr(obj, "_obj_to_dict"):
                 if (
-                    not hasattr(object, "_id")
-                    and not hasattr(object.__class__, "_subdocument")
-                    and hasattr(object.__class__._key, "idgen")
+                    not hasattr(obj, "_id")
+                    and not hasattr(obj.__class__, "_subdocument")
+                    and hasattr(obj.__class__._key, "idgen")
                 ):
-                    object._id = object.__class__._key.idgen(object)
-                return object._obj_to_dict()
+                    obj._id = obj.__class__._key.idgen(obj)
+                return obj._obj_to_dict()
             else:
                 raise ValueError("Object cannot convert to dictionary")
 
@@ -1538,7 +1547,7 @@ class WOQLClient:
         # self._dispatch("post", self._branch_url(new_branch_id), source)
 
         with NoRequestWarning(self.insecure):
-            result = requests.post(
+            requests.post(
                 self._branch_url(new_branch_id),
                 json=source,
                 auth=self._auth(),
@@ -1788,7 +1797,7 @@ class WOQLClient:
         # )
 
         with NoRequestWarning(self.insecure):
-            result = requests.post(
+            requests.post(
                 self._reset_url(),
                 json={"commit_descriptor": commit_path},
                 auth=self._auth(),
@@ -1821,7 +1830,7 @@ class WOQLClient:
         # self._dispatch("post", self._optimize_url(path))
 
         with NoRequestWarning(self.insecure):
-            result = requests.post(
+            requests.post(
                 self._optimize_url(path),
                 auth=self._auth(),
                 verify=(not self.insecure),
@@ -1908,7 +1917,7 @@ class WOQLClient:
         # self._dispatch("post", self._clone_url(newid), rc_args)
 
         with NoRequestWarning(self.insecure):
-            result = requests.post(
+            requests.post(
                 self._clone_url(newid),
                 json=rc_args,
                 auth=self._auth(),

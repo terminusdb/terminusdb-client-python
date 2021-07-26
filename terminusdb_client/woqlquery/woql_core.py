@@ -70,16 +70,14 @@ def _tokens_to_json(seq, query):
         right = seq[seq.index("|") + 1 :]
         return {
             "@type": "PathOr",
-            "or" : [_tokens_to_json(left, query),
-                    _tokens_to_json(right, query)],
+            "or": [_tokens_to_json(left, query), _tokens_to_json(right, query)],
         }
     elif "," in seq:  # binds tighter
         first = seq[: seq.index(",")]
         second = seq[seq.index(",") + 1 :]
         return {
             "@type": "PathSequence",
-            "sequence": [_tokens_to_json(first, query),
-                         _tokens_to_json(second, query)],
+            "sequence": [_tokens_to_json(first, query), _tokens_to_json(second, query)],
         }
     elif seq[1] == "+":  # binds tightest of all
         return {
@@ -121,7 +119,7 @@ def _compile_predicate(pp, query):
                     "@type": "PathPredicate",
                     "predicate": cleaned,
                 },
-            ]
+            ],
         }
     elif "<" in pp:
         pred = pp[1:]

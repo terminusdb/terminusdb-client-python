@@ -27,10 +27,12 @@ WOQL_MATH_JSON = {
             "@type": "Plus",
             "left": {
                 "@type": "ArithmeticValue",
-                "data": {"@type": "xsd:decimal", "@value": 1}},
+                "data": {"@type": "xsd:decimal", "@value": 1},
+            },
             "right": {
                 "@type": "ArithmeticValue",
-                "data": {"@type": "xsd:decimal", "@value": 2}}
+                "data": {"@type": "xsd:decimal", "@value": 2},
+            },
         },
         "result": {
             "@type": "ArithmeticValue",

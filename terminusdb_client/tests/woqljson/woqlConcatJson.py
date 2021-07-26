@@ -1,21 +1,12 @@
 WOQL_CONCAT_JSON = {
     "@type": "Concatenate",
     "list": [
-        {
-            "@type": "DataValue",
-            "variable": "Duration"
-        },
+        {"@type": "DataValue", "variable": "Duration"},
         {
             "@type": "DataValue",
             "data": {"@type": "xsd:string", "@value": " yo "},
         },
-        {
-            "@type": "DataValue",
-            "variable": "Duration_Cast"
-        }
+        {"@type": "DataValue", "variable": "Duration_Cast"},
     ],
-    "result": {
-        "@type": "DataValue",
-        "variable": "x"
-    },
+    "result": {"@type": "DataValue", "variable": "x"},
 }

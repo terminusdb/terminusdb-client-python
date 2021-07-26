@@ -62,11 +62,12 @@ class Employee(Person):
     address_of: Address
     contact_number: Optional[str]
     managed_by: "Employee"
+    member_of: "Team"
 
 
 class Team(EnumTemplate):
     _schema = my_schema
-    IT = ()
+    IT = "Information Technology"
     Marketing = ()
 
 
@@ -96,7 +97,7 @@ def test_create_schema(docker_url):
         elif "@type" in item:
             assert item["@type"] == "@context"
         else:
-            assert False
+            raise AssertionError()
 
 
 def test_create_schema2(docker_url):
@@ -118,7 +119,7 @@ def test_create_schema2(docker_url):
         elif "@type" in item:
             assert item["@type"] == "@context"
         else:
-            assert False
+            raise AssertionError()
 
 
 def test_insert_cheuk(docker_url):
@@ -136,6 +137,7 @@ def test_insert_cheuk(docker_url):
     cheuk.age = 21
     cheuk.name = "Cheuk"
     cheuk.managed_by = cheuk
+    cheuk.member_of = Team.IT
 
     client = WOQLClient(docker_url, insecure=True)
     client.connect(db="test_docapi")
@@ -153,4 +155,4 @@ def test_insert_cheuk(docker_url):
             assert item["contact_number"] == "07777123456"
             assert item["managed_by"] == item["@id"]
         else:
-            assert False
+            raise AssertionError()

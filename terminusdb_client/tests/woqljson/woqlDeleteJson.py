@@ -4,30 +4,18 @@ WOQL_DELETE_JSON = {
         {
             "@type": "DeleteTriple",
             "subject": {"@type": "NodeValue", "node": "id"},
-            "predicate": {
-                "@type": "NodeValue",
-                "variable": "Outgoing"
-            },
-            "object": {
-                "@type": "Value",
-                "variable": "Value"
-            },
-            "graph": "schema"
+            "predicate": {"@type": "NodeValue", "variable": "Outgoing"},
+            "object": {"@type": "Value", "variable": "Value"},
+            "graph": "schema",
         },
         {
             "@type": "Optional",
             "query": {
                 "@type": "DeleteTriple",
-                "subject": {
-                    "@type": "NodeValue",
-                    "variable": "Other"
-                },
-                "predicate": {
-                    "@type": "NodeValue",
-                    "variable": "Incoming"
-                },
+                "subject": {"@type": "NodeValue", "variable": "Other"},
+                "predicate": {"@type": "NodeValue", "variable": "Incoming"},
                 "object": {"@type": "Value", "node": "id"},
-                "graph": "schema"
+                "graph": "schema",
             },
         },
     ],

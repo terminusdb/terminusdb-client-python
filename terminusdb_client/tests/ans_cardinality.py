@@ -280,43 +280,28 @@ def chain_insert():
                     "variable": "Node_ID",
                 },
                 "predicate": {"@type": "NodeValue", "node": "rdf:type"},
-                "object": {
-                    "@type": "Value",
-                    "variable": "Type"
-                },
+                "object": {"@type": "Value", "variable": "Type"},
             },
             {
                 "@type": "AddTriple",
-                "subject": {
-                    "@type": "NodeValue",
-                    "variable": "Node_ID"
-                },
+                "subject": {"@type": "NodeValue", "variable": "Node_ID"},
                 "predicate": {"@type": "NodeValue", "node": "rdfs:label"},
-                "object": {
-                    "@type": "Value",
-                    "variable": "Label"
-                },
+                "object": {"@type": "Value", "variable": "Label"},
             },
             {
                 "@type": "AddTriple",
-                "subject": {
-                    "@type": "NodeValue",
-                    "variable": "Node_ID"
-                },
+                "subject": {"@type": "NodeValue", "variable": "Node_ID"},
                 "predicate": {
                     "@type": "NodeValue",
                     "node": "rdfs:comment",
                 },
-                "object": {
-                    "@type": "Value",
-                    "variable":  "Description"
-                },
+                "object": {"@type": "Value", "variable": "Description"},
             },
             {
                 "@type": "AddTriple",
                 "subject": {
                     "@type": "NodeValue",
-                    "variable":  "Node_ID",
+                    "variable": "Node_ID",
                 },
                 "predicate": {"@type": "NodeValue", "node": "scm:prop"},
                 "object": {
@@ -338,10 +323,7 @@ def chain_insert():
             },
             {
                 "@type": "AddTriple",
-                "subject": {
-                    "@type": "NodeValue",
-                    "variable": "Node_ID"
-                },
+                "subject": {"@type": "NodeValue", "variable": "Node_ID"},
                 "predicate": {
                     "@type": "NodeValue",
                     "node": "rdfs:subClassOf",
@@ -350,7 +332,7 @@ def chain_insert():
                     "@type": "Value",
                     "node": "scm:myParentClass",
                 },
-            }
+            },
         ],
     }
 

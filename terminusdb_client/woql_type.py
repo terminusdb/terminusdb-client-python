@@ -33,28 +33,41 @@ def to_woql_type(input_type: type):
 def from_woql_type(
     input_type: Union[str, dict], skip_convert_error=False, as_str=False
 ):
+    """Converting the TerminusDB datatypes into Python types
+
+    Parameters
+    ----------
+    input_type : str or dict
+        TerminusDB datatypes to be converted.
+    skip_convert_error : bool
+        Will an error be raised if the datatype given cannot be convert to Python types. If set to True (and as_type set to False) and type cannot be converted, the type will be returned back without convertion.
+    as_str : bool
+        Will convert the type and present it as string (e.g. used in constructing scripts). It will always skip convert error if set to True.
+    """
+    if as_str:
+        skip_convert_error = True
     invert_type = {v: k for k, v in CONVERT_TYPE.items()}
     if isinstance(input_type, dict):
         if input_type["@type"] == "List":
             if as_str:
-                return f'List[{from_woql_type(input_type["@class"], skip_convert_error=True, as_str=True)}]'
+                return f'List[{from_woql_type(input_type["@class"], as_str=True)}]'
             else:
                 return List[
-                    from_woql_type(input_type["@class"], skip_convert_error=True)
+                    from_woql_type(input_type["@class"], as_str=True)  # noqa: F722
                 ]
         elif input_type["@type"] == "Set":
             if as_str:
-                return f'Set[{from_woql_type(input_type["@class"], skip_convert_error=True, as_str=True)}]'
+                return f'Set[{from_woql_type(input_type["@class"], as_str=True)}]'
             else:
                 return Set[
-                    from_woql_type(input_type["@class"], skip_convert_error=True)
+                    from_woql_type(input_type["@class"], as_str=True)  # noqa: F722
                 ]
         elif input_type["@type"] == "Optional":
             if as_str:
-                return f'Optional[{from_woql_type(input_type["@class"], skip_convert_error=True, as_str=True)}]'
+                return f'Optional[{from_woql_type(input_type["@class"], as_str=True)}]'
             else:
                 return Optional[
-                    from_woql_type(input_type["@class"], skip_convert_error=True)
+                    from_woql_type(input_type["@class"], as_str=True)  # noqa: F722
                 ]
         else:
             raise TypeError(

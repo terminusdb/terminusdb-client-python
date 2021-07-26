@@ -1,3 +1,4 @@
+import ast
 import enum
 import os
 import shutil
@@ -29,6 +30,9 @@ def startproject():
             shutil.copyfile(
                 this_file_dir + "/" + file, os.getcwd() + "/" + names[0] + ".py"
             )
+    print(  # noqa: T001
+        "settings.py and schema.py created, please customize them to start your project."
+    )
 
 
 def _load_settings():
@@ -36,30 +40,29 @@ def _load_settings():
 
     try:
         _temp = __import__("settings", globals(), locals(), ["SERVER", "DATABASE"], 0)
-        SERVER = _temp.SERVER
-        DATABASE = _temp.DATABASE
-        return {"SERVER": SERVER, "DATABASE": DATABASE}
+        server = _temp.SERVER
+        database = _temp.DATABASE
+        return {"SERVER": server, "DATABASE": database}
     except ImportError:
         msg = "Cannot find settings.py"
         raise ImportError(msg)
 
 
 def _connect(settings):
-    # SETTINGS = _load_settings()
-    SERVER = settings["SERVER"]
-    DATABASE = settings["DATABASE"]
+    server = settings["SERVER"]
+    database = settings["DATABASE"]
 
-    client = WOQLClient(SERVER)
+    client = WOQLClient(server)
     client.connect()
     try:
-        client.create_database(DATABASE)
-        return client, f"{DATABASE} created."
+        client.create_database(database)
+        return client, f"{database} created."
     except DatabaseError as error:
-        if "Database already exists." in error.message:
-            client.connect(db=DATABASE)
-            return client, f"Connected to {DATABASE}."
+        if "Database already exists." in str(error):
+            client.connect(db=database)
+            return client, f"Connected to {database}."
         else:
-            raise InterfaceError(f"Cannot connect to {DATABASE}.")
+            raise InterfaceError(f"Cannot connect to {database}.")
 
 
 def _create_script(obj_list):
@@ -114,7 +117,7 @@ def _create_script(obj_list):
 # the exsisting database schema
 ####\n\n"""
     for obj_str in dir(woqlschema):
-        obj = eval(f"woqlschema.{obj_str}")
+        obj = ast.literal_eval(f"woqlschema.{obj_str}")
         if (
             isinstance(obj, woqlschema.TerminusClass)
             or isinstance(obj, enum.EnumMeta)
@@ -125,12 +128,9 @@ def _create_script(obj_list):
     print_script += (
         f"from terminusdb_client.woqlschema import {', '.join(import_objs)}\n"
     )
-    # print("from typing import List, Optional, Set\n")
-    # print(f"from terminusdb_client.woqlschema import {', '.join(import_objs)}\n")
 
     result_list = []
     for obj in obj_list:
-        # print(obj)
         if obj.get("@id"):
             if obj.get("@inherits"):
                 result_obj = ResultObj(obj["@id"], obj["@inherits"])
@@ -165,11 +165,9 @@ def _create_script(obj_list):
     while len(result_list) > 0:
         obj = result_list.pop(0)
         if obj.parent is None:
-            # print(obj.script)
             print_script += obj.script
             printed.append(obj.name)
         elif type(obj.parent) == str and obj.parent in printed:
-            # print(obj.script)
             print_script += obj.script
             printed.append(obj.name)
         else:
@@ -178,7 +176,6 @@ def _create_script(obj_list):
                 if mama in printed:
                     parent_is_in = True
             if parent_is_in:
-                # print(obj.script)
                 print_script += obj.script
                 printed.append(obj.name)
             else:
@@ -189,37 +186,38 @@ def _create_script(obj_list):
 @click.command()
 def sync():
     settings = _load_settings()
-    DATABASE = settings["DATABASE"]
+    database = settings["DATABASE"]
     client, msg = _connect(settings)
-    print(msg)
+    print(msg)  # noqa: T001
     all_existing_obj = client.get_all_documents(graph_type="schema")
     all_obj_list = []
     for obj in all_existing_obj:
         all_obj_list.append(obj)
     if len(all_obj_list) > 1:
         print_script = _create_script(all_obj_list)
-        # print(print_script)
         file = open("schema.py", "w")
         file.write(shed(source_code=print_script))
         file.close()
-        print(f"schema.py is updated with {DATABASE} schema.")
+        print(f"schema.py is updated with {database} schema.")  # noqa: T001
     else:
-        print(f"{DATABASE} schema is empty so schema.py has not be changed.")
+        print(  # noqa: T001
+            f"{database} schema is empty so schema.py has not be changed."
+        )
 
 
 @click.command()
 def commit():
     settings = _load_settings()
-    DATABASE = settings["DATABASE"]
+    database = settings["DATABASE"]
     client, msg = _connect(settings)
-    print(msg)
+    print(msg)  # noqa: T001
     schema_plan = __import__("schema", globals(), locals(), [], 0)
     all_existing_obj = client.get_all_documents(graph_type="schema")
     all_existing_id = list(map(lambda x: x.get("@id"), all_existing_obj))
     insert_schema = woqlschema.WOQLSchema()
     update_schema = woqlschema.WOQLSchema()
     for obj_str in dir(schema_plan):
-        obj = eval(f"schema_plan.{obj_str}")
+        obj = ast.literal_eval(f"schema_plan.{obj_str}")
         if isinstance(obj, woqlschema.TerminusClass) or isinstance(obj, enum.EnumMeta):
             if obj_str not in dir(woqlschema):
                 if obj_str in all_existing_id:
@@ -228,10 +226,6 @@ def commit():
                 else:
                     obj._schema = insert_schema
                     insert_schema.add_obj(obj)
-    # print("Update")
-    # print(update_schema.to_dict())
-    # print("Insert")
-    # print(insert_schema.to_dict())
     client.replace_document(
         update_schema,
         commit_msg="Schema updated by Python client.",
@@ -242,24 +236,24 @@ def commit():
         commit_msg="Schema object insert by Python client.",
         graph_type="schema",
     )
-    print(f"{DATABASE} schema updated.")
+    print(f"{database} schema updated.")  # noqa: T001
 
 
 @click.command()
 @click.argument("database")
 def deletedb(database):
-    SETTINGS = _load_settings()
-    SERVER = SETTINGS["SERVER"]
-    DATABASE = SETTINGS["DATABASE"]
-    if database != DATABASE:
+    settings = _load_settings()
+    server = settings["SERVER"]
+    setting_database = settings["DATABASE"]
+    if database != setting_database:
         raise ValueError(
             "Name provided does not match project database name. You can only delete the database in this project."
         )
     else:
-        client = WOQLClient(SERVER)
+        client = WOQLClient(server)
         client.connect()
         client.delete_database(database, client._account)
-        print(f"{database} deleted.")
+        print(f"{database} deleted.")  # noqa: T001
 
 
 terminusdb.add_command(startproject)

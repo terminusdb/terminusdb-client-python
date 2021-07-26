@@ -21,31 +21,19 @@ def insert_with_des():
         "and": [
             {
                 "@type": "AddTriple",
-                "subject": {
-                    "@type": "NodeValue",
-                    "variable": "Bike_URL"
-                },
+                "subject": {"@type": "NodeValue", "variable": "Bike_URL"},
                 "predicate": {"@type": "NodeValue", "node": "rdf:type"},
                 "object": {"@type": "Value", "node": "Bicycle"},
             },
             {
                 "@type": "AddTriple",
-                "subject": {
-                    "@type": "NodeValue",
-                    "variable": "Bike_URL"
-                },
+                "subject": {"@type": "NodeValue", "variable": "Bike_URL"},
                 "predicate": {"@type": "NodeValue", "node": "rdfs:label"},
-                "object": {
-                    "@type": "Value",
-                    "variable": "Bike_Label"
-                },
+                "object": {"@type": "Value", "variable": "Bike_Label"},
             },
             {
                 "@type": "AddTriple",
-                "subject": {
-                    "@type": "NodeValue",
-                    "variable": "Bike_URL"
-                },
+                "subject": {"@type": "NodeValue", "variable": "Bike_URL"},
                 "predicate": {
                     "@type": "NodeValue",
                     "node": "rdfs:comment",

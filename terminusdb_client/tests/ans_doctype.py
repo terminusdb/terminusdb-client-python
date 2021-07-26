@@ -65,7 +65,7 @@ def doctype_with_label():
                         "@value": "Station Object",
                         "@type": "xsd:string",
                         "@language": "en",
-                        },
+                    },
                 },
                 "graph": "schema",
             },
