@@ -1,4 +1,5 @@
 import datetime as dt
+from enum import Enum
 from typing import ForwardRef, List, Optional, Set, Union
 
 CONVERT_TYPE = {
@@ -26,6 +27,8 @@ def to_woql_type(input_type: type):
             }
         else:
             return {"@type": "Optional", "@class": to_woql_type(input_type.__args__[0])}
+    elif isinstance(input_type, type(Enum)):
+        return input_type.__name__
     else:
         return str(input_type)
 
