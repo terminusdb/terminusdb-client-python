@@ -1,4 +1,3 @@
-import ast
 import enum
 import os
 import shutil
@@ -117,7 +116,7 @@ def _create_script(obj_list):
 # the exsisting database schema
 ####\n\n"""
     for obj_str in dir(woqlschema):
-        obj = ast.literal_eval(f"woqlschema.{obj_str}")
+        obj = eval(f"woqlschema.{obj_str}")
         if (
             isinstance(obj, woqlschema.TerminusClass)
             or isinstance(obj, enum.EnumMeta)
@@ -217,7 +216,7 @@ def commit():
     insert_schema = woqlschema.WOQLSchema()
     update_schema = woqlschema.WOQLSchema()
     for obj_str in dir(schema_plan):
-        obj = ast.literal_eval(f"schema_plan.{obj_str}")
+        obj = eval(f"schema_plan.{obj_str}")
         if isinstance(obj, woqlschema.TerminusClass) or isinstance(obj, enum.EnumMeta):
             if obj_str not in dir(woqlschema):
                 if obj_str in all_existing_id:
