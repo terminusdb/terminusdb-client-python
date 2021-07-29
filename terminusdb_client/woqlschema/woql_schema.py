@@ -209,6 +209,11 @@ class DocumentTemplate(metaclass=TerminusClass):
                         result[item] = the_item._obj_to_dict()
                     elif hasattr(the_item, "_id"):
                         result[item] = {"@id": the_item._id, "@type": "@id"}
+                    elif isinstance(the_item, list):
+                        new_item = []
+                        for sub_item in the_item:
+                            new_item.append(sub_item._obj_to_dict())
+                        result[item] = new_item
                     else:
                         if isinstance(the_item, Enum):
                             result[item] = str(the_item)
