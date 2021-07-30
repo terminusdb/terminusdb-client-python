@@ -212,7 +212,10 @@ class DocumentTemplate(metaclass=TerminusClass):
                     elif isinstance(the_item, list):
                         new_item = []
                         for sub_item in the_item:
-                            new_item.append(sub_item._obj_to_dict())
+                            if hasattr(sub_item, "_obj_to_dict"):
+                                new_item.append(sub_item._obj_to_dict())
+                            else:
+                                new_item.append(sub_item)
                         result[item] = new_item
                     else:
                         if isinstance(the_item, Enum):
