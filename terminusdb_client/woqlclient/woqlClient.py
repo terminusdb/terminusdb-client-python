@@ -325,6 +325,22 @@ class WOQLClient:
         """
         return copy.deepcopy(self)
 
+    def jwt_auth(self, token: str):
+        """Authenticate using a JWT token.
+
+        Parameters
+        ----------
+        token : str
+            Bearer token to use when authenticating to the server.
+
+
+        Examples
+        --------
+        >>> client = WOQLClient("http://localhost:6363")
+        >>> client.jwt_auth("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.POstGetfAytaZS82wHcjoTyoqhMyxXiWdR7Nn7A29DNSl0EiXLdwJ6xC6AfgZWF1bOsS_TuYI3OG85AmiExREkrS6tDfTQ2B3WXlrr-wp5AokiRbz3_oB4OxG-W9KcEEbDRcZc0nH3L7LzYptiy1PtAylQGxHTWZXtGz4ht0bAecBgmpdgXMguEIcoqPJ1n3pIWk_dUZegpqx0Lka21H6XxUTxiy8OcaarA8zdnPUnV6AmNP3ecFawIFYdvJB_cm-GvpCSbr8G8y_Mllj8f4x9nBH8pQux89_6gUY618iYv7tuPWBFfEbLxtF2pZS6YC1aSfLQxeNe8djT9YjpvRZA")
+        """
+        self._jwt_auth = token
+
     def basic_auth(self, key: Optional[str] = None, user: Optional[str] = None):
         """Set or get the ``user:password`` for basic HTTP authentication to the server.
 
@@ -2044,6 +2060,9 @@ class WOQLClient:
             headers["Authorization"] = "Basic %s" % b64encode(
                 (basic_auth).encode("utf-8")
             ).decode("utf-8")
+        elif self._jwt_auth:
+            headers["Authorization"] = "Bearer %s" % self._jwt_auth
+
         if remote_auth and remote_auth["type"] == "jwt":
             headers["Authorization-Remote"] = "Bearer %s" % remote_auth["key"]
         elif remote_auth and remote_auth["type"] == "basic":
