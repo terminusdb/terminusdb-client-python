@@ -7,6 +7,7 @@ from urllib.parse import quote
 from uuid import uuid4
 
 from numpydoc.docscrape import ClassDoc
+from typeguard import check_type
 
 from .. import woql_type as wt
 from ..woql_type import CONVERT_TYPE
@@ -118,17 +119,6 @@ class TerminusClass(type):
             for key in cls._annotations:
                 if key in kwargs:
                     value = kwargs[key]
-                    # ty = annotations[key]
-                    # if type(ty) == _GenericAlias:
-                    #     try:
-                    #         check_type('value',value,ty)
-                    #     except TypeError as e:
-                    #         message = f"Bad type for member: '{key}' with value '{value}' because " + e.__str__()
-                    #         raise TypeError(message)
-                    # elif isinstance(value,ty):
-                    #     pass
-                    # else:
-                    #     raise TypeError(f"Bad type for member: '{key}' with value '{value}' and type '{ty.__name__}'")
                 else:
                     value = None
                 setattr(obj, key, value)
@@ -154,8 +144,14 @@ class DocumentTemplate(metaclass=TerminusClass):
     def __init__(self):
         self._new = True
 
-    # def _commit(self, client: WOQLClient):
-    #     pass
+    def __setattr__(self, name, value):
+        if name[0] != "_" and value is not None:
+            correct_type = self._annotations.get(name)
+            check_type(str(value), value, correct_type)
+            # import pdb; pdb.set_trace()
+            # if not correct_type or not check_type(str(value), value, correct_type):
+            #     raise AttributeError(f"{value} is not type {correct_type}")
+        super().__setattr__(name, value)
 
     @classmethod
     def _to_dict(cls):
@@ -281,9 +277,6 @@ class WOQLSchema:
         self.object = set()
 
     def commit(self, client: WOQLClient, commit_msg: Optional[str] = None):
-        # client.insert_document(
-        #     self.to_dict(), commit_msg=commit_msg, graph_type="schema"
-        # )
         all_existing_obj = client.get_all_documents(graph_type="schema")
         all_existing_id = list(map(lambda x: x.get("@id"), all_existing_obj))
         insert_schema = WOQLSchema()
