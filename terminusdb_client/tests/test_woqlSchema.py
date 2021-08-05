@@ -1,5 +1,7 @@
 from typing import List, Set
 
+import pytest
+
 from terminusdb_client.woqlschema.woql_schema import (
     DocumentTemplate,
     EnumTemplate,
@@ -7,6 +9,22 @@ from terminusdb_client.woqlschema.woql_schema import (
 )
 
 my_schema = WOQLSchema()
+
+
+class Abstract(DocumentTemplate):
+    """This is abstract class"""
+
+    _schema = WOQLSchema()
+    _abstract = []
+    name: str
+
+
+class TypeCheck(DocumentTemplate):
+    """For checking instance types"""
+
+    _schema = WOQLSchema()
+    name: str
+    age: int
 
 
 class Coordinate(DocumentTemplate):
@@ -76,6 +94,19 @@ def test_schema_copy():
         Coordinate,
     }
     # assert copy_schema.all_prop() == {AddressOf, Title, PostCode}
+
+
+def test_abstract_class():
+    with pytest.raises(TypeError):
+        Abstract()
+
+
+def test_type_check():
+    test_obj = TypeCheck()
+    with pytest.raises(TypeError):
+        test_obj.name = 123
+    with pytest.raises(TypeError):
+        test_obj.age = "not a number"
 
 
 # def test_schema_delete():

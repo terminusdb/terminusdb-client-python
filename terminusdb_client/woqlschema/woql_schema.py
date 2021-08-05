@@ -105,10 +105,12 @@ class TerminusClass(type):
             )
             cls._annotations.update(base_annotations)
 
+        abstract = False
         if hasattr(cls, "_abstract"):
-            abstract = cls._abstract
-        else:
-            abstract = False
+            if isinstance(cls._abstract, bool):
+                abstract = cls._abstract
+            else:
+                abstract = True
 
         def init(obj, *args, **kwargs):
             if abstract:
