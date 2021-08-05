@@ -1,6 +1,6 @@
 import ast
 from copy import copy, deepcopy
-from enum import Enum
+from enum import Enum, EnumMeta
 from hashlib import sha256
 from typing import Optional, Union
 from urllib.parse import quote
@@ -225,23 +225,32 @@ class DocumentTemplate(metaclass=TerminusClass):
         return result
 
 
-class EnumTemplate(Enum):
-    # def __new__(cls, *args):
-    #     if args:
-    #         value = args[0]
-    #         if not hasattr(value, "object"):
-    #             value.object = set()
-    #         value.object.add(cls)
-    #         return None
-    #     obj = object.__new__(cls)
-    #     obj._value_ = obj.name
-    #     return obj
+class EnumMetaTemplate(EnumMeta):
+    def __new__(
+        metacls,
+        cls,
+        bases,
+        classdict,
+        *,
+        boundary=None,
+        _simple=False,
+        **kwds,
+    ):
+        if "_schema" in classdict:
+            schema = classdict.pop("_schema")
+            classdict._member_names.remove("_schema")
+            new_cls = super().__new__(metacls, cls, bases, classdict)
+            new_cls._schema = schema
+            if not hasattr(schema, "object"):
+                schema.object = set()
+            schema.object.add(new_cls)
+            return new_cls
+        return super().__new__(metacls, cls, bases, classdict)
+
+
+class EnumTemplate(Enum, metaclass=EnumMetaTemplate):
     def __init__(self, value=None):
-        if self.name == "_schema":
-            if not hasattr(value, "object"):
-                value.object = set()
-            value.object.add(self.__class__)
-        elif not value:
+        if not value:
             self._value_ = str(self.name)
         else:
             self._value_ = value
@@ -270,8 +279,34 @@ class WOQLSchema:
         self.object = set()
 
     def commit(self, client: WOQLClient, commit_msg: Optional[str] = None):
+        # client.insert_document(
+        #     self.to_dict(), commit_msg=commit_msg, graph_type="schema"
+        # )
+        all_existing_obj = client.get_all_documents(graph_type="schema")
+        all_existing_id = list(map(lambda x: x.get("@id"), all_existing_obj))
+        insert_schema = WOQLSchema()
+        update_schema = WOQLSchema()
+        for obj in self.all_obj():
+            obj_str = obj.__name__
+            # obj = eval(f"schema_plan.{obj_str}")  # noqa: S307
+            # if isinstance(obj, woqlschema.TerminusClass) or isinstance(obj, enum.EnumMeta):
+            #     if obj_str not in dir(woqlschema):
+            if obj_str in all_existing_id:
+                obj._schema = update_schema
+                update_schema.add_obj(obj)
+            else:
+                obj._schema = insert_schema
+                insert_schema.add_obj(obj)
+
         client.insert_document(
-            self.to_dict(), commit_msg=commit_msg, graph_type="schema"
+            insert_schema,
+            commit_msg="Schema object insert by Python client.",
+            graph_type="schema",
+        )
+        client.replace_document(
+            update_schema,
+            commit_msg="Schema updated by Python client.",
+            graph_type="schema",
         )
 
     def add_obj(self, obj):
