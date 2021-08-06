@@ -20,7 +20,28 @@ def terminusdb():
 
 @click.command()
 def startproject():
-    """Copy the template files into current working directory"""
+    """Create the template files into current working directory"""
+    # prompt to get info for settings.py
+    project_name = click.prompt(
+        "Please enter a project name (this will also be the database name)", type=str
+    )
+    server_location = click.prompt(
+        "Please enter a server location (press enter to use default)",
+        type=str,
+        default="http://127.0.0.1:6363/",
+    )
+    # create settings.py
+    setting_file = open("settings.py", "w")
+    setting_file.write(
+        """####
+# This is the script for storing the settings to connect to TerminusDB
+# database for your project.
+####"""
+    )
+    setting_file.write(f'\nSERVER = "{server_location}"\nDATABASE = "{project_name}"')
+    setting_file.close()
+
+    # copy all the other template files
     this_file_dir = os.path.dirname(os.path.abspath(__file__))
     files = os.listdir(this_file_dir)
     for file in files:
