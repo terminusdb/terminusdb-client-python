@@ -1203,7 +1203,7 @@ class WOQLClient:
             "DocumentTemplate",  # noqa:F821
             List["DocumentTemplate"],  # noqa:F821
         ],
-        graph_type: str,
+        graph_type: str = "instance",
         commit_msg: Optional[str] = None,
     ) -> None:
         """Updates the specified document(s)
@@ -1213,7 +1213,7 @@ class WOQLClient:
         document: dict or list of dict
             Document(s) to be updated.
         graph_type : str
-            Graph type, either "inference", "instance" or "schema".
+            Graph type, either "instance" or "schema".
         commit_msg : str
             Commit message.
 
@@ -1267,7 +1267,7 @@ class WOQLClient:
     def delete_document(
         self,
         doc_id: Union[str, List[str]],
-        graph_type: str,
+        graph_type: str = "instance",
         commit_msg: Optional[str] = None,
     ) -> None:
         """Delete the specified document(s)
@@ -1277,7 +1277,7 @@ class WOQLClient:
         doc_id: str or list of str
             Id(s) of document(s) to be updated.
         graph_type : str
-            Graph type, either "inference", "instance" or "schema".
+            Graph type, either "instance" or "schema".
         commit_msg : str
             Commit message.
 
@@ -1299,6 +1299,25 @@ class WOQLClient:
                     verify=(not self.insecure),
                 )
             )
+
+    def has_doc(self, doc_id: str, graph_type: str = "instance") -> bool:
+        """Check if a certain document exist in a database
+
+        Parameters
+        ----------
+        doc_id: str
+            Id of document to be checked.
+        graph_type : str
+            Graph type, either "instance" or "schema".
+
+        returns
+        -------
+        Bool
+            if the document exist
+        """
+        all_existing_obj = self.get_all_documents(graph_type=graph_type)
+        all_existing_id = list(map(lambda x: x.get("@id"), all_existing_obj))
+        return doc_id in all_existing_id
 
     # def get_csv(
     #     self,

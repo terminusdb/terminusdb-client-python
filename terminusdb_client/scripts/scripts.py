@@ -1,16 +1,22 @@
+import builtins
+import datetime as dt
 import enum
 import os
 import shutil
 import sys
+from importlib import import_module
 
 import click
 from shed import shed
 
 # from terminusdb_client.woqlschema.woql_schema import TerminusClass
 import terminusdb_client.woqlschema.woql_schema as woqlschema
-from terminusdb_client.errors import DatabaseError, InterfaceError
-from terminusdb_client.woql_type import from_woql_type
-from terminusdb_client.woqlclient.woqlClient import WOQLClient
+
+from .. import woql_type as wt
+from ..errors import DatabaseError, InterfaceError
+
+# from ..woql_type import from_woql_type
+from ..woqlclient.woqlClient import WOQLClient
 
 
 @click.group()
@@ -124,7 +130,7 @@ def _create_script(obj_list):
                 for prop, discription in obj_dict["@documentation"][
                     "@properties"
                 ].items():
-                    self.script += f"    {prop} : {from_woql_type(obj_dict[prop], skip_convert_error=True, as_str=True)}\n        {discription}\n"
+                    self.script += f"    {prop} : {wt.from_woql_type(obj_dict[prop], skip_convert_error=True, as_str=True)}\n        {discription}\n"
                 self.script += "    "
             self.script += '"""\n'
 
@@ -178,7 +184,7 @@ def _create_script(obj_list):
 
             for key, value in obj.items():
                 if key[0] != "@":
-                    result_obj.script += f"    {key}:{from_woql_type(value, skip_convert_error=True, as_str=True)}\n"
+                    result_obj.script += f"    {key}:{wt.from_woql_type(value, skip_convert_error=True, as_str=True)}\n"
 
     # sorts depends on the object inherits order
     printed = []
@@ -203,20 +209,16 @@ def _create_script(obj_list):
     return print_script
 
 
-@click.command()
-def sync():
-    settings = _load_settings()
-    database = settings["DATABASE"]
-    client, msg = _connect(settings)
-    print(msg)  # noqa: T001
+def _sync(client, database):
     all_existing_obj = client.get_all_documents(graph_type="schema")
     all_obj_list = []
     for obj in all_existing_obj:
         all_obj_list.append(obj)
     if len(all_obj_list) > 1:
         print_script = _create_script(all_obj_list)
+        print_script = shed(source_code=print_script)
         file = open("schema.py", "w")
-        file.write(shed(source_code=print_script))
+        file.write(print_script)
         file.close()
         print(f"schema.py is updated with {database} schema.")  # noqa: T001
     else:
@@ -226,7 +228,18 @@ def sync():
 
 
 @click.command()
+def sync():
+    """Pull the current schema plan in database to schema.py"""
+    settings = _load_settings()
+    database = settings["DATABASE"]
+    client, msg = _connect(settings)
+    print(msg)  # noqa: T001
+    _sync(client, database)
+
+
+@click.command()
 def commit():
+    """Push the current schema plan in schema.py to database."""
     settings = _load_settings()
     database = settings["DATABASE"]
     client, msg = _connect(settings)
@@ -247,6 +260,9 @@ def commit():
                     obj._schema = insert_schema
                     insert_schema.add_obj(obj)
 
+    print(insert_schema.to_dict())
+    print(update_schema.to_dict())
+
     client.insert_document(
         insert_schema,
         commit_msg="Schema object insert by Python client.",
@@ -264,6 +280,7 @@ def commit():
 @click.command()
 @click.argument("database")
 def deletedb(database):
+    """Delete the database in this project."""
     settings = _load_settings()
     server = settings["SERVER"]
     setting_database = settings["DATABASE"]
@@ -278,7 +295,92 @@ def deletedb(database):
         print(f"{database} deleted.")  # noqa: T001
 
 
+@click.command()
+@click.argument("csv_file")
+@click.option("--sep", default=",", show_default=True)
+# @click.option('--header ', default=',', show_default=True)
+def importcsv(csv_file, sep):
+    """Import CSV file into pandas DataFrame then into TerminusDB, options are read_csv() options."""
+    settings = _load_settings()
+    settings["SERVER"]
+    database = settings["DATABASE"]
+    try:
+        pd = import_module("pandas")
+        np = import_module("numpy")
+    except ImportError:
+        raise ImportError(
+            "Library 'pandas' is required to import csv, either install 'pandas' or install woqlDataframe requirements as follows: python -m pip install -U terminus-client-python[dataframe]"
+        )
+    df = pd.read_csv(csv_file, sep=sep)
+    # df = pd.DataFrame({'float': [1.0],
+    #                'int': [1],
+    #                'datetime': [pd.Timestamp('20180310')],
+    #                'string': ['foo']})
+    class_name = csv_file.split(".")[0].capitalize()
+    class_dict = {"@type": "Class", "@id": class_name, "@key": {"@type": "Random"}}
+    np_to_buildin = {
+        v: getattr(builtins, k) for k, v in np.typeDict.items() if k in vars(builtins)
+    }
+    np_to_buildin[np.datetime64] = dt.datetime
+    for col, dtype in dict(df.dtypes).items():
+        converted_type = np_to_buildin[dtype.type]
+        if converted_type == object:
+            converted_type = str  # pandas treats all string as objects
+        converted_type = wt.to_woql_type(converted_type)
+        converted_col = col.lower().replace(" ", "_")
+        df.rename(columns={col: converted_col}, inplace=True)
+        class_dict[converted_col] = converted_type
+    # print(class_dict)
+    # print(df)
+    client, msg = _connect(settings)
+    if client.has_doc(class_name, graph_type="schema"):
+        client.replace_document(
+            class_dict,
+            commit_msg=f"Schema object update with {csv_file} insert by Python client.",
+            graph_type="schema",
+        )
+    else:
+        client.insert_document(
+            class_dict,
+            commit_msg=f"Schema object created with {csv_file} insert by Python client.",
+            graph_type="schema",
+        )
+    print(
+        f"Schema object created with {csv_file} inserted into database."
+    )  # noqa: T001
+    _sync(client, database)
+    # schema_plan = __import__('schema')
+    # class_obj = eval(f'schema_plan.{class_name}')
+    # print(list(map(lambda item: item.update({'@type': class_name}), df.to_dict(orient='records'))))
+    obj_list = df.to_dict(orient="records")
+    for item in obj_list:
+        item.update({"@type": class_name})
+    client.insert_document(
+        obj_list,
+        commit_msg=f"Documents created with {csv_file} insert by Python client.",
+    )
+    # print(obj_list)
+    # print(dir(obj_dict['Last name']))
+    # print(obj_dict[' "Test3"'].type)
+    # _create_script(obj_list)
+
+
+@click.command()
+@click.option("--schema", is_flag=True)
+def alldocs(schema):
+    """Get all documents in the database"""
+    settings = _load_settings()
+    settings["DATABASE"]
+    client, msg = _connect(settings)
+    if schema:
+        print(list(client.get_all_documents(graph_type="schema")))
+    else:
+        print(list(client.get_all_documents()))
+
+
 terminusdb.add_command(startproject)
 terminusdb.add_command(sync)
 terminusdb.add_command(commit)
 terminusdb.add_command(deletedb)
+terminusdb.add_command(importcsv)
+terminusdb.add_command(alldocs)

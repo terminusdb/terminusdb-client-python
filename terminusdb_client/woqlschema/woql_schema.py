@@ -283,9 +283,6 @@ class WOQLSchema:
         update_schema = WOQLSchema()
         for obj in self.all_obj():
             obj_str = obj.__name__
-            # obj = eval(f"schema_plan.{obj_str}")  # noqa: S307
-            # if isinstance(obj, woqlschema.TerminusClass) or isinstance(obj, enum.EnumMeta):
-            #     if obj_str not in dir(woqlschema):
             if obj_str in all_existing_id:
                 obj._schema = update_schema
                 update_schema.add_obj(obj)
