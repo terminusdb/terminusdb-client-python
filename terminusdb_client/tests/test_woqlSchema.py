@@ -109,6 +109,12 @@ def test_type_check():
         test_obj.age = "not a number"
 
 
+def test_inheritance():
+    for item in Person._annotations:
+        if item not in Employee._annotations:
+            raise AssertionError(f"{item} not inherted")
+
+
 # def test_schema_delete():
 #     other_schema.delete_property(Title)
 #     assert other_schema.all_obj() == {Employee, Address, Team}
