@@ -349,9 +349,6 @@ def importcsv(csv_file, sep):
         f"Schema object created with {csv_file} inserted into database."
     )  # noqa: T001
     _sync(client, database)
-    # schema_plan = __import__('schema')
-    # class_obj = eval(f'schema_plan.{class_name}')
-    # print(list(map(lambda item: item.update({'@type': class_name}), df.to_dict(orient='records'))))
     obj_list = df.to_dict(orient="records")
     for item in obj_list:
         item.update({"@type": class_name})
@@ -359,10 +356,9 @@ def importcsv(csv_file, sep):
         obj_list,
         commit_msg=f"Documents created with {csv_file} insert by Python client.",
     )
-    # print(obj_list)
-    # print(dir(obj_dict['Last name']))
-    # print(obj_dict[' "Test3"'].type)
-    # _create_script(obj_list)
+    print(
+        f"Records in {csv_file} inserted into database with random ids."
+    )  # noqa: T001
 
 
 @click.command()
@@ -373,9 +369,9 @@ def alldocs(schema):
     settings["DATABASE"]
     client, msg = _connect(settings)
     if schema:
-        print(list(client.get_all_documents(graph_type="schema")))
+        print(list(client.get_all_documents(graph_type="schema")))  # noqa: T001
     else:
-        print(list(client.get_all_documents()))
+        print(list(client.get_all_documents()))  # noqa: T001
 
 
 terminusdb.add_command(startproject)
