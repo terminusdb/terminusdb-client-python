@@ -22,6 +22,16 @@ from ..woqlquery.woql_query import WOQLQuery
 # summary Python module for accessing the Terminus DB API
 
 
+class JWTAuth(requests.auth.AuthBase):
+    """Class for JWT Authentication in requests"""
+    def __init__(self, token):
+        self._token = token
+
+    def __call__(self, r):
+        r.headers['Authorization'] = 'Bearer {}'.format(self._token)
+        return r
+
+
 class NoRequestWarning:
     def __init__(self, insecure):
         self.insecure = insecure
@@ -61,6 +71,7 @@ class WOQLClient:
         account: str = "admin",
         db: Optional[str] = None,
         remote_auth: str = None,
+        jwt_token: str = None,
         key: str = "root",
         user: str = "admin",
         branch: str = "main",
@@ -104,6 +115,7 @@ class WOQLClient:
         self._remote_auth = remote_auth
         self._key = key
         self._user = user
+        self._jwt_token = jwt_token
         self._branch = branch
         self._ref = ref
         self._repo = repo
@@ -2004,8 +2016,10 @@ class WOQLClient:
         return json.loads(result)
 
     def _auth(self):
-        if self._connected and self._key and self._user:
+        # if https basic
+        if not self._jwt_token and self._connected and self._key and self._user:
             return (self._user, self._key)
+        return JWTAuth(self._jwt_token)
         # TODO: remote_auth
 
     def _dispatch(
@@ -2063,6 +2077,9 @@ class WOQLClient:
             headers["Authorization"] = "Basic %s" % b64encode(
                 (basic_auth).encode("utf-8")
             ).decode("utf-8")
+        elif self._jwt_token:
+            headers["Authorization"] = "Bearer %s" % self._jwt_token
+
         if remote_auth and remote_auth["type"] == "jwt":
             headers["Authorization-Remote"] = "Bearer %s" % remote_auth["key"]
         elif remote_auth and remote_auth["type"] == "basic":
