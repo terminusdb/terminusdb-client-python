@@ -981,6 +981,10 @@ class WOQLClient:
             commit,
         )
 
+    def _validate_graph_type(self, graph_type):
+        if graph_type not in ["instance", "schema"]:
+            raise ValueError("graph_type can only be 'instance' or 'schema'")
+
     def get_document(self, iri_id: str, graph_type: str = "instance", **kwargs) -> dict:
         """Retrieves the document of the iri_id
 
@@ -1002,6 +1006,8 @@ class WOQLClient:
         -------
         dict
         """
+        self._validate_graph_type(graph_type)
+
         add_args = ["prefixed", "minimized", "unfold"]
         self._check_connection()
         payload = {"id": iri_id, "graph_type": graph_type}
@@ -1052,6 +1058,8 @@ class WOQLClient:
         iterable
             Stream of dictionaries
         """
+        self._validate_graph_type(graph_type)
+
         add_args = ["prefixed", "unfold"]
         self._check_connection()
         payload = {"type": doc_type, "graph_type": graph_type}
@@ -1102,6 +1110,8 @@ class WOQLClient:
         iterable
             Stream of dictionaries
         """
+        self._validate_graph_type(graph_type)
+
         add_args = ["prefixed", "unfold"]
         self._check_connection()
         payload = {"graph_type": graph_type}
@@ -1119,6 +1129,25 @@ class WOQLClient:
                 auth=self._auth(),
             )
         return _result2stream(_finish_reponse(result))
+
+    def _conv_to_dict(self, obj):
+        if isinstance(obj, dict):
+            return obj
+        elif hasattr(obj, "to_dict"):
+            return obj.to_dict()
+        elif hasattr(obj, "_to_dict"):
+            return obj._to_dict()
+        elif hasattr(obj, "_obj_to_dict"):
+            if (
+                not hasattr(obj, "_id")
+                and not hasattr(obj.__class__, "_subdocument")
+                and hasattr(obj.__class__, "_key")
+                and hasattr(obj.__class__._key, "idgen")
+            ):
+                obj._id = obj.__class__._key.idgen(obj)
+            return obj._obj_to_dict()
+        else:
+            raise ValueError("Object cannot convert to dictionary")
 
     def insert_document(
         self,
@@ -1153,37 +1182,38 @@ class WOQLClient:
         list
             list of ids of the inseted docuemnts
         """
+        self._validate_graph_type(graph_type)
         self._check_connection()
         params = self._generate_commit(commit_msg)["commit_info"]
         params["graph_type"] = graph_type
 
-        def conv_to_dict(obj):
-            if isinstance(obj, dict):
-                return obj
-            elif hasattr(obj, "to_dict"):
-                return obj.to_dict()
-            elif hasattr(obj, "_obj_to_dict"):
-                if (
-                    not hasattr(obj, "_id")
-                    and not hasattr(obj.__class__, "_subdocument")
-                    and hasattr(obj.__class__._key, "idgen")
-                ):
-                    obj._id = obj.__class__._key.idgen(obj)
-                return obj._obj_to_dict()
-            else:
-                raise ValueError("Object cannot convert to dictionary")
+        # def conv_to_dict(obj):
+        #     if isinstance(obj, dict):
+        #         return obj
+        #     elif hasattr(obj, "to_dict"):
+        #         return obj.to_dict()
+        #     elif hasattr(obj, "_obj_to_dict"):
+        #         if (
+        #             not hasattr(obj, "_id")
+        #             and not hasattr(obj.__class__, "_subdocument")
+        #             and hasattr(obj.__class__._key, "idgen")
+        #         ):
+        #             obj._id = obj.__class__._key.idgen(obj)
+        #         return obj._obj_to_dict()
+        #     else:
+        #         raise ValueError("Object cannot convert to dictionary")
 
         if isinstance(document, list):
             new_doc = []
             for item in document:
                 # while document:
                 #     item = document.pop()
-                item_dict = conv_to_dict(item)
+                item_dict = self._conv_to_dict(item)
                 new_doc.append(item_dict)
                 # id_list.append(item_dict['@id'])
             document = new_doc
         else:
-            document = conv_to_dict(document)
+            document = self._conv_to_dict(document)
         with NoRequestWarning(self.insecure):
             result = requests.post(
                 self._documents_url(),
@@ -1222,37 +1252,41 @@ class WOQLClient:
         InterfaceError
             if the client does not connect to a database
         """
+        self._validate_graph_type(graph_type)
         self._check_connection()
         params = self._generate_commit(commit_msg)["commit_info"]
         params["graph_type"] = graph_type
 
-        def conv_to_dict(obj):
-            if isinstance(obj, dict):
-                return obj
-            elif hasattr(obj, "to_dict"):
-                return obj.to_dict()
-            elif hasattr(obj, "_obj_to_dict"):
-                if (
-                    not hasattr(obj, "_id")
-                    and not hasattr(obj.__class__, "_subdocument")
-                    and hasattr(obj.__class__._key, "idgen")
-                ):
-                    obj._id = obj.__class__._key.idgen(obj)
-                return obj._obj_to_dict()
-            else:
-                raise ValueError("Object cannot convert to dictionary")
+        # def conv_to_dict(obj):
+        #     if isinstance(obj, dict):
+        #         return obj
+        #     elif hasattr(obj, "to_dict"):
+        #         return obj.to_dict()
+        #     elif hasattr(obj, "_to_dict"):
+        #         return obj._to_dict()
+        #     elif hasattr(obj, "_obj_to_dict"):
+        #         if (
+        #             not hasattr(obj, "_id")
+        #             and not hasattr(obj.__class__, "_subdocument")
+        #             and hasattr(obj.__class__, "_key")
+        #             and hasattr(obj.__class__._key, "idgen")
+        #         ):
+        #             obj._id = obj.__class__._key.idgen(obj)
+        #         return obj._obj_to_dict()
+        #     else:
+        #         raise ValueError("Object cannot convert to dictionary")
 
         if isinstance(document, list):
             new_doc = []
             for item in document:
                 # while document:
                 #     item = document.pop()
-                item_dict = conv_to_dict(item)
+                item_dict = self._conv_to_dict(item)
                 new_doc.append(item_dict)
                 # id_list.append(item_dict['@id'])
             document = new_doc
         else:
-            document = conv_to_dict(document)
+            document = self._conv_to_dict(document)
         with NoRequestWarning(self.insecure):
             _finish_reponse(
                 requests.put(
@@ -1263,6 +1297,61 @@ class WOQLClient:
                     verify=(not self.insecure),
                 )
             )
+
+    def update_document(
+        self,
+        document: Union[
+            dict,
+            List[dict],
+            "WOQLSchema",  # noqa:F821
+            "DocumentTemplate",  # noqa:F821
+            List["DocumentTemplate"],  # noqa:F821
+        ],
+        graph_type: str = "instance",
+        commit_msg: Optional[str] = None,
+    ) -> None:
+
+        self._validate_graph_type(graph_type)
+        self._check_connection()
+
+        all_existing_obj = self.get_all_documents(graph_type=graph_type)
+        all_existing_id = list(map(lambda x: x.get("@id"), all_existing_obj))
+        insert_docs = []
+        update_docs = []
+        update_list = None
+        if isinstance(document, list):
+            update_list = document
+        elif hasattr(document, "all_obj"):
+            update_list = self.all_obj()
+        else:
+            update_list = [document]
+
+        for obj in update_list:
+            if hasattr(obj, "_to_dict"):
+                obj_id = obj._to_dict().get("@id")
+            else:
+                obj_id = obj.get("@id")
+
+            if obj_id is not None and obj_id in all_existing_id:
+                update_docs.append(obj)
+            else:
+                insert_docs.append(obj)
+
+        if graph_type == "schema":
+            stuff = "Schema object"
+        elif graph_type == "instance":
+            stuff = "Document object"
+
+        self.insert_document(
+            insert_docs,
+            commit_msg=f"{stuff} inserted by Python client.",
+            graph_type=graph_type,
+        )
+        self.replace_document(
+            update_docs,
+            commit_msg=f"{stuff} updated by Python client.",
+            graph_type=graph_type,
+        )
 
     def delete_document(
         self,
@@ -1286,6 +1375,7 @@ class WOQLClient:
         InterfaceError
             if the client does not connect to a database
         """
+        self._validate_graph_type(graph_type)
         self._check_connection()
         params = self._generate_commit(commit_msg)["commit_info"]
         params["graph_type"] = graph_type
@@ -1315,6 +1405,8 @@ class WOQLClient:
         Bool
             if the document exist
         """
+        self._validate_graph_type(graph_type)
+        self._check_connection()
         all_existing_obj = self.get_all_documents(graph_type=graph_type)
         all_existing_id = list(map(lambda x: x.get("@id"), all_existing_obj))
         return doc_id in all_existing_id

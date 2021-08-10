@@ -28,18 +28,28 @@ class HashKey(metaclass=TerminusKey):
     def __init__(self, keys: Union[str, list]):
         self._keys = keys
 
-    def idgen(self, obj: "DocumentTemplate"):
+    def idgen(self, obj: Union["DocumentTemplate", dict]):
         key_list = []
         for item in self._keys:
-            key_item = ast.literal_eval(f"obj.{item}")
+            if hasattr(obj, item):
+                key_item = ast.literal_eval(f"obj.{item}")
+            elif isinstance(obj, dict) and obj.get(item) is not None:
+                key_item = obj.get(item)
+            else:
+                raise ValueError(f"Cannot get {item} from {obj}")
+
             if isinstance(key_item, tuple(CONVERT_TYPE.keys())):
                 key_list.append(str(key_item))
             else:
                 raise ValueError("Keys need to be datatype object")
-        if hasattr(obj.__class__, "_base"):
-            prefix = obj.__class__._base
-        else:
+        if isinstance(obj, dict) and obj.get("@type") is not None:
+            prefix = obj.get("@type") + "_"
+        elif hasattr(obj.__class__, "_base"):
+            prefix = obj.__class__._base + "_"
+        elif hasattr(obj.__class__, "__name__"):
             prefix = obj.__class__.__name__ + "_"
+        else:
+            raise ValueError(f"Cannot determin prefix from {obj}")
         return prefix + sha256((quote("_".join(key_list))).encode("utf-8")).hexdigest()
 
 
@@ -51,18 +61,28 @@ class LexicalKey(metaclass=TerminusKey):
     def __init__(self, keys: Union[str, list]):
         self._keys = keys
 
-    def idgen(self, obj: "DocumentTemplate"):
+    def idgen(self, obj: Union["DocumentTemplate", dict]):
         key_list = []
         for item in self._keys:
-            key_item = ast.literal_eval(f"obj.{item}")
+            if hasattr(obj, item):
+                key_item = ast.literal_eval(f"obj.{item}")
+            elif isinstance(obj, dict) and obj.get(item) is not None:
+                key_item = obj.get(item)
+            else:
+                raise ValueError(f"Cannot get {item} from {obj}")
+
             if isinstance(key_item, tuple(CONVERT_TYPE.keys())):
                 key_list.append(str(key_item))
             else:
                 raise ValueError("Keys need to be datatype object")
-        if hasattr(obj.__class__, "_base"):
-            prefix = obj.__class__._base
-        else:
+        if isinstance(obj, dict) and obj.get("@type") is not None:
+            prefix = obj.get("@type") + "_"
+        elif hasattr(obj.__class__, "_base"):
+            prefix = obj.__class__._base + "_"
+        elif hasattr(obj.__class__, "__name__"):
             prefix = obj.__class__.__name__ + "_"
+        else:
+            raise ValueError(f"Cannot determin prefix from {obj}")
         return prefix + quote("_".join(key_list))
 
 
@@ -84,11 +104,15 @@ class RandomKey(metaclass=TerminusKey):
 
     at_type = "Random"
 
-    def idgen(self, obj: "DocumentTemplate"):
-        if hasattr(obj.__class__, "_base"):
-            prefix = obj.__class__._base
-        else:
+    def idgen(self, obj: Union["DocumentTemplate", dict]):
+        if isinstance(obj, dict) and obj.get("@type") is not None:
+            prefix = obj.get("@type") + "_"
+        elif hasattr(obj.__class__, "_base"):
+            prefix = obj.__class__._base + "_"
+        elif hasattr(obj.__class__, "__name__"):
             prefix = obj.__class__.__name__ + "_"
+        else:
+            raise ValueError(f"Cannot determin prefix from {obj}")
         return prefix + uuid4().hex
 
 
@@ -277,29 +301,36 @@ class WOQLSchema:
         self.object = set()
 
     def commit(self, client: WOQLClient, commit_msg: Optional[str] = None):
-        all_existing_obj = client.get_all_documents(graph_type="schema")
-        all_existing_id = list(map(lambda x: x.get("@id"), all_existing_obj))
-        insert_schema = WOQLSchema()
-        update_schema = WOQLSchema()
-        for obj in self.all_obj():
-            obj_str = obj.__name__
-            if obj_str in all_existing_id:
-                obj._schema = update_schema
-                update_schema.add_obj(obj)
-            else:
-                obj._schema = insert_schema
-                insert_schema.add_obj(obj)
-
-        client.insert_document(
-            insert_schema,
-            commit_msg="Schema object insert by Python client.",
+        if commit_msg is None:
+            commit_msg = "Schema object insert/ update by Python client."
+        client.update_document(
+            self,
+            commit_msg=commit_msg,
             graph_type="schema",
         )
-        client.replace_document(
-            update_schema,
-            commit_msg="Schema updated by Python client.",
-            graph_type="schema",
-        )
+        # all_existing_obj = client.get_all_documents(graph_type="schema")
+        # all_existing_id = list(map(lambda x: x.get("@id"), all_existing_obj))
+        # insert_schema = WOQLSchema()
+        # update_schema = WOQLSchema()
+        # for obj in self.all_obj():
+        #     obj_str = obj.__name__
+        #     if obj_str in all_existing_id:
+        #         obj._schema = update_schema
+        #         update_schema.add_obj(obj)
+        #     else:
+        #         obj._schema = insert_schema
+        #         insert_schema.add_obj(obj)
+        #
+        # client.insert_document(
+        #     insert_schema,
+        #     commit_msg="Schema object insert by Python client.",
+        #     graph_type="schema",
+        # )
+        # client.replace_document(
+        #     update_schema,
+        #     commit_msg="Schema updated by Python client.",
+        #     graph_type="schema",
+        # )
 
     def add_obj(self, obj):
         self.object.add(obj)

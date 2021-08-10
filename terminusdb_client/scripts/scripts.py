@@ -17,6 +17,7 @@ from ..errors import DatabaseError, InterfaceError
 
 # from ..woql_type import from_woql_type
 from ..woqlclient.woqlClient import WOQLClient
+from ..woqlschema.woql_schema import HashKey
 
 
 @click.group()
@@ -245,34 +246,46 @@ def commit():
     client, msg = _connect(settings)
     print(msg)  # noqa: T001
     schema_plan = __import__("schema", globals(), locals(), [], 0)
-    all_existing_obj = client.get_all_documents(graph_type="schema")
-    all_existing_id = list(map(lambda x: x.get("@id"), all_existing_obj))
-    insert_schema = woqlschema.WOQLSchema()
-    update_schema = woqlschema.WOQLSchema()
+    all_obj = []
     for obj_str in dir(schema_plan):
         obj = eval(f"schema_plan.{obj_str}")  # noqa: S307
         if isinstance(obj, woqlschema.TerminusClass) or isinstance(obj, enum.EnumMeta):
             if obj_str not in dir(woqlschema):
-                if obj_str in all_existing_id:
-                    obj._schema = update_schema
-                    update_schema.add_obj(obj)
-                else:
-                    obj._schema = insert_schema
-                    insert_schema.add_obj(obj)
-
-    print(insert_schema.to_dict())
-    print(update_schema.to_dict())
-
-    client.insert_document(
-        insert_schema,
-        commit_msg="Schema object insert by Python client.",
-        graph_type="schema",
-    )
-    client.replace_document(
-        update_schema,
+                all_obj.append(obj)
+    client.update_document(
+        all_obj,
         commit_msg="Schema updated by Python client.",
         graph_type="schema",
     )
+    #
+    # all_existing_obj = client.get_all_documents(graph_type="schema")
+    # all_existing_id = list(map(lambda x: x.get("@id"), all_existing_obj))
+    # insert_schema = woqlschema.WOQLSchema()
+    # update_schema = woqlschema.WOQLSchema()
+    # for obj_str in dir(schema_plan):
+    #     obj = eval(f"schema_plan.{obj_str}")  # noqa: S307
+    #     if isinstance(obj, woqlschema.TerminusClass) or isinstance(obj, enum.EnumMeta):
+    #         if obj_str not in dir(woqlschema):
+    #             if obj_str in all_existing_id:
+    #                 obj._schema = update_schema
+    #                 update_schema.add_obj(obj)
+    #             else:
+    #                 obj._schema = insert_schema
+    #                 insert_schema.add_obj(obj)
+    #
+    # print(insert_schema.to_dict())
+    # print(update_schema.to_dict())
+    #
+    # client.insert_document(
+    #     insert_schema,
+    #     commit_msg="Schema object insert by Python client.",
+    #     graph_type="schema",
+    # )
+    # client.replace_document(
+    #     update_schema,
+    #     commit_msg="Schema updated by Python client.",
+    #     graph_type="schema",
+    # )
 
     print(f"{database} schema updated.")  # noqa: T001
 
@@ -317,7 +330,7 @@ def importcsv(csv_file, sep):
     #                'datetime': [pd.Timestamp('20180310')],
     #                'string': ['foo']})
     class_name = csv_file.split(".")[0].capitalize()
-    class_dict = {"@type": "Class", "@id": class_name, "@key": {"@type": "Random"}}
+    class_dict = {"@type": "Class", "@id": class_name}
     np_to_buildin = {
         v: getattr(builtins, k) for k, v in np.typeDict.items() if k in vars(builtins)
     }
@@ -330,28 +343,34 @@ def importcsv(csv_file, sep):
         converted_col = col.lower().replace(" ", "_")
         df.rename(columns={col: converted_col}, inplace=True)
         class_dict[converted_col] = converted_type
-    # print(class_dict)
-    # print(df)
+    class_dict["@key"] = {"@type": "Hash", "@field": list(df.columns)}
     client, msg = _connect(settings)
-    if client.has_doc(class_name, graph_type="schema"):
-        client.replace_document(
-            class_dict,
-            commit_msg=f"Schema object update with {csv_file} insert by Python client.",
-            graph_type="schema",
-        )
-    else:
-        client.insert_document(
-            class_dict,
-            commit_msg=f"Schema object created with {csv_file} insert by Python client.",
-            graph_type="schema",
-        )
+    client.update_document(
+        class_dict,
+        commit_msg=f"Schema object insert/ update with {csv_file} insert by Python client.",
+        graph_type="schema",
+    )
+    # if client.has_doc(class_name, graph_type="schema"):
+    #     client.replace_document(
+    #         class_dict,
+    #         commit_msg=f"Schema object update with {csv_file} insert by Python client.",
+    #         graph_type="schema",
+    #     )
+    # else:
+    #     client.insert_document(
+    #         class_dict,
+    #         commit_msg=f"Schema object created with {csv_file} insert by Python client.",
+    #         graph_type="schema",
+    #     )
     print(
         f"Schema object created with {csv_file} inserted into database."
     )  # noqa: T001
     _sync(client, database)
     obj_list = df.to_dict(orient="records")
     for item in obj_list:
-        item.update({"@type": class_name})
+        item["@type"] = class_name
+        item_id = HashKey(list(df.columns)).idgen(item)
+        item["@id"] = item_id
     client.insert_document(
         obj_list,
         commit_msg=f"Documents created with {csv_file} insert by Python client.",
