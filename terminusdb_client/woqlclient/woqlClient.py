@@ -22,6 +22,16 @@ from ..woqlquery.woql_query import WOQLQuery
 # summary Python module for accessing the Terminus DB API
 
 
+class JWTAuth(requests.auth.AuthBase):
+    """Class for JWT Authentication in requests"""
+    def __init__(self, token):
+        self._token = token
+
+    def __call__(self, r):
+        r.headers['Authorization'] = 'Bearer {}'.format(self._token)
+        return r
+
+
 class NoRequestWarning:
     def __init__(self, insecure):
         self.insecure = insecure
@@ -61,6 +71,7 @@ class WOQLClient:
         account: str = "admin",
         db: Optional[str] = None,
         remote_auth: str = None,
+        jwt_token: str = None,
         key: str = "root",
         user: str = "admin",
         branch: str = "main",
@@ -104,6 +115,7 @@ class WOQLClient:
         self._remote_auth = remote_auth
         self._key = key
         self._user = user
+        self._jwt_token = jwt_token
         self._branch = branch
         self._ref = ref
         self._repo = repo
@@ -324,22 +336,6 @@ class WOQLClient:
         >>> assert client is not clone
         """
         return copy.deepcopy(self)
-
-    def jwt_auth(self, token: str):
-        """Authenticate using a JWT token.
-
-        Parameters
-        ----------
-        token : str
-            Bearer token to use when authenticating to the server.
-
-
-        Examples
-        --------
-        >>> client = WOQLClient("http://localhost:6363")
-        >>> client.jwt_auth("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.POstGetfAytaZS82wHcjoTyoqhMyxXiWdR7Nn7A29DNSl0EiXLdwJ6xC6AfgZWF1bOsS_TuYI3OG85AmiExREkrS6tDfTQ2B3WXlrr-wp5AokiRbz3_oB4OxG-W9KcEEbDRcZc0nH3L7LzYptiy1PtAylQGxHTWZXtGz4ht0bAecBgmpdgXMguEIcoqPJ1n3pIWk_dUZegpqx0Lka21H6XxUTxiy8OcaarA8zdnPUnV6AmNP3ecFawIFYdvJB_cm-GvpCSbr8G8y_Mllj8f4x9nBH8pQux89_6gUY618iYv7tuPWBFfEbLxtF2pZS6YC1aSfLQxeNe8djT9YjpvRZA")
-        """
-        self._jwt_auth = token
 
     def basic_auth(self, key: Optional[str] = None, user: Optional[str] = None):
         """Set or get the ``user:password`` for basic HTTP authentication to the server.
@@ -2001,8 +1997,10 @@ class WOQLClient:
         return json.loads(result)
 
     def _auth(self):
-        if self._connected and self._key and self._user:
+        # if https basic
+        if not self._jwt_token and self._connected and self._key and self._user:
             return (self._user, self._key)
+        return JWTAuth(self._jwt_token)
         # TODO: remote_auth
 
     def _dispatch(
@@ -2060,8 +2058,8 @@ class WOQLClient:
             headers["Authorization"] = "Basic %s" % b64encode(
                 (basic_auth).encode("utf-8")
             ).decode("utf-8")
-        elif self._jwt_auth:
-            headers["Authorization"] = "Bearer %s" % self._jwt_auth
+        elif self._jwt_token:
+            headers["Authorization"] = "Bearer %s" % self._jwt_token
 
         if remote_auth and remote_auth["type"] == "jwt":
             headers["Authorization-Remote"] = "Bearer %s" % remote_auth["key"]
