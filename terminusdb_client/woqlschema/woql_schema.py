@@ -161,6 +161,14 @@ class TerminusClass(type):
         return cls.__name__
 
 
+def _check_cycling(class_obj: TerminusClass):
+    if hasattr(class_obj, "_subdocument"):
+        mro_names = list(map(lambda obj: obj.__name__, class_obj.__mro__))
+        for prop_type in class_obj._annotations.values():
+            if str(prop_type) in mro_names:
+                raise RecursionError(f"Embbding {prop_type} cause recursions.")
+
+
 class DocumentTemplate(metaclass=TerminusClass):
     _schema = None
     _key = RandomKey()  # default key
@@ -179,6 +187,7 @@ class DocumentTemplate(metaclass=TerminusClass):
 
     @classmethod
     def _to_dict(cls):
+        _check_cycling(cls)
         result = {"@type": "Class", "@id": cls.__name__}
         if cls.__base__.__name__ != "DocumentTemplate":
             # result["@inherits"] = cls.__base__.__name__

@@ -6,9 +6,11 @@ from terminusdb_client.woqlschema.woql_schema import (
     DocumentTemplate,
     EnumTemplate,
     WOQLSchema,
+    _check_cycling,
 )
 
 my_schema = WOQLSchema()
+cycling_schema = WOQLSchema()
 
 
 class Abstract(DocumentTemplate):
@@ -25,6 +27,27 @@ class TypeCheck(DocumentTemplate):
     _schema = WOQLSchema()
     name: str
     age: int
+
+
+class CheckCyclingGrandPa(DocumentTemplate):
+    """GrandPa For checking cycling"""
+
+    _schema = cycling_schema
+    child: "CheckCyclingPaPa"
+
+
+class CheckCyclingPaPa(CheckCyclingGrandPa):
+    """GrandPa For checking cycling"""
+
+    papa: CheckCyclingGrandPa
+
+
+class CheckCycling(CheckCyclingPaPa):
+    """GrandPa For checking cycling"""
+
+    papa: CheckCyclingPaPa
+    grand_pa: CheckCyclingGrandPa
+    me: "CheckCycling"  # not allow
 
 
 class Coordinate(DocumentTemplate):
@@ -113,6 +136,22 @@ def test_inheritance():
     for item in Person._annotations:
         if item not in Employee._annotations:
             raise AssertionError(f"{item} not inherted")
+
+
+def test_cycling():
+    # no self embedding if subdocument
+    _check_cycling(CheckCycling)
+    CheckCycling._subdocument = []
+    with pytest.raises(RecursionError):
+        _check_cycling(CheckCycling)
+    CheckCyclingGrandPa
+    # no cycling embedding if subdocument
+    _check_cycling(CheckCyclingPaPa)
+    CheckCyclingPaPa._subdocument = []
+    with pytest.raises(RecursionError):
+        _check_cycling(CheckCyclingPaPa)
+    with pytest.raises(RecursionError):
+        cycling_schema.to_dict()
 
 
 # def test_schema_delete():
