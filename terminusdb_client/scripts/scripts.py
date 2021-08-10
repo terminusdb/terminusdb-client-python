@@ -362,9 +362,9 @@ def importcsv(csv_file, sep):
     #         commit_msg=f"Schema object created with {csv_file} insert by Python client.",
     #         graph_type="schema",
     #     )
-    print(
+    print(  # noqa: T001
         f"Schema object created with {csv_file} inserted into database."
-    )  # noqa: T001
+    )
     _sync(client, database)
     obj_list = df.to_dict(orient="records")
     for item in obj_list:
@@ -375,9 +375,9 @@ def importcsv(csv_file, sep):
         obj_list,
         commit_msg=f"Documents created with {csv_file} insert by Python client.",
     )
-    print(
+    print(  # noqa: T001
         f"Records in {csv_file} inserted into database with random ids."
-    )  # noqa: T001
+    )
 
 
 @click.command()

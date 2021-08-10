@@ -77,7 +77,7 @@ class ValueHashKey(TerminusKey):
     def __init__(self):
         raise RuntimeError("ValueHashKey is not avaliable yet.")
 
-    ### TODO: idgen
+    # TODO: idgen
 
 
 class RandomKey(TerminusKey):
