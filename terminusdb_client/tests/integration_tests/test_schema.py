@@ -1,4 +1,4 @@
-from typing import List, Optional, Set
+from typing import List, Optional
 
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from terminusdb_client.woqlschema.woql_schema import (
@@ -6,7 +6,6 @@ from terminusdb_client.woqlschema.woql_schema import (
     EnumTemplate,
     HashKey,
     TaggedUnion,
-    ValueHashKey,
     WOQLSchema,
 )
 
@@ -23,7 +22,6 @@ class Coordinate(DocumentTemplate):
 
 class Country(DocumentTemplate):
     _schema = my_schema
-    _key = ValueHashKey()
     name: str
     perimeter: List[Coordinate]
 
@@ -55,7 +53,7 @@ class Person(DocumentTemplate):
     _schema = my_schema
     name: str
     age: int
-    friend_of: Set["Person"]
+    # friend_of: Set["Person"]
 
 
 class Employee(Person):
@@ -125,6 +123,7 @@ def test_create_schema2(docker_url):
 def test_insert_cheuk(docker_url):
     uk = Country()
     uk.name = "United Kingdom"
+    uk.perimeter = []
 
     home = Address()
     home.street = "123 Abc Street"
@@ -142,6 +141,7 @@ def test_insert_cheuk(docker_url):
     client = WOQLClient(docker_url, insecure=True)
     client.connect(db="test_docapi")
     # client.create_database("test_docapi")
+    # print(cheuk._obj_to_dict())
     client.insert_document([uk, home, cheuk], commit_msg="Adding cheuk")
     result = client.get_all_documents()
     for item in result:

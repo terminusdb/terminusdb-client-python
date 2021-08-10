@@ -16,104 +16,102 @@ from ..woqlclient.woqlClient import WOQLClient
 # from typeguard import check_type
 
 
-class TerminusKey(type):
-    pass
+class TerminusKey:
+    def __init__(self, keys: Union[str, list, None] = None):
+        if keys is not None:
+            self._keys = keys
+
+    def _idgen_prep(self, obj: Union["DocumentTemplate", dict]):
+        """Helper function to prepare prefix and key_list for idgen to use."""
+        key_list = []
+        if hasattr(self, "_keys"):
+            for item in self._keys:
+                if hasattr(obj, item):
+                    key_item = ast.literal_eval(f"obj.{item}")
+                elif isinstance(obj, dict) and obj.get(item) is not None:
+                    key_item = obj.get(item)
+                else:
+                    raise ValueError(f"Cannot get {item} from {obj}")
+
+                if isinstance(key_item, tuple(CONVERT_TYPE.keys())):
+                    key_list.append(str(key_item))
+                else:
+                    raise ValueError("Keys need to be datatype object")
+
+        if isinstance(obj, dict) and obj.get("@type") is not None:
+            prefix = obj.get("@type") + "_"
+        elif hasattr(obj.__class__, "_base"):
+            prefix = obj.__class__._base + "_"
+        elif hasattr(obj.__class__, "__name__"):
+            prefix = obj.__class__.__name__ + "_"
+        else:
+            raise ValueError(f"Cannot determine prefix from {obj}")
+        return prefix, key_list
 
 
-class HashKey(metaclass=TerminusKey):
+class HashKey(TerminusKey):
     """Generating ID with SHA256 using provided keys"""
 
     at_type = "Hash"
 
-    def __init__(self, keys: Union[str, list]):
-        self._keys = keys
-
     def idgen(self, obj: Union["DocumentTemplate", dict]):
-        key_list = []
-        for item in self._keys:
-            if hasattr(obj, item):
-                key_item = ast.literal_eval(f"obj.{item}")
-            elif isinstance(obj, dict) and obj.get(item) is not None:
-                key_item = obj.get(item)
-            else:
-                raise ValueError(f"Cannot get {item} from {obj}")
-
-            if isinstance(key_item, tuple(CONVERT_TYPE.keys())):
-                key_list.append(str(key_item))
-            else:
-                raise ValueError("Keys need to be datatype object")
-        if isinstance(obj, dict) and obj.get("@type") is not None:
-            prefix = obj.get("@type") + "_"
-        elif hasattr(obj.__class__, "_base"):
-            prefix = obj.__class__._base + "_"
-        elif hasattr(obj.__class__, "__name__"):
-            prefix = obj.__class__.__name__ + "_"
-        else:
-            raise ValueError(f"Cannot determin prefix from {obj}")
+        prefix, key_list = self._idgen_prep(obj)
         return prefix + sha256((quote("_".join(key_list))).encode("utf-8")).hexdigest()
 
 
-class LexicalKey(metaclass=TerminusKey):
+class LexicalKey(TerminusKey):
     """Generating ID with urllib.parse.quote using provided keys"""
 
     at_type = "Lexical"
 
-    def __init__(self, keys: Union[str, list]):
-        self._keys = keys
-
     def idgen(self, obj: Union["DocumentTemplate", dict]):
-        key_list = []
-        for item in self._keys:
-            if hasattr(obj, item):
-                key_item = ast.literal_eval(f"obj.{item}")
-            elif isinstance(obj, dict) and obj.get(item) is not None:
-                key_item = obj.get(item)
-            else:
-                raise ValueError(f"Cannot get {item} from {obj}")
-
-            if isinstance(key_item, tuple(CONVERT_TYPE.keys())):
-                key_list.append(str(key_item))
-            else:
-                raise ValueError("Keys need to be datatype object")
-        if isinstance(obj, dict) and obj.get("@type") is not None:
-            prefix = obj.get("@type") + "_"
-        elif hasattr(obj.__class__, "_base"):
-            prefix = obj.__class__._base + "_"
-        elif hasattr(obj.__class__, "__name__"):
-            prefix = obj.__class__.__name__ + "_"
-        else:
-            raise ValueError(f"Cannot determin prefix from {obj}")
+        prefix, key_list = self._idgen_prep(obj)
         return prefix + quote("_".join(key_list))
 
 
-class ValueHashKey(metaclass=TerminusKey):
+class ValueHashKey(TerminusKey):
     """Generating ID with SHA256"""
 
     at_type = "ValueHash"
 
-    # def idgen(self, obj: "DocumentTemplate"):
-    #     if hasattr(obj.__class__, "_base"):
-    #         prefix = obj.__class__._base
-    #     else:
-    #         prefix = obj.__class__.__name__ + "_"
-    #     return prefix + sha256((quote(str(obj))).encode("utf-8")).hexdigest()
+    def __init__(self):
+        raise RuntimeError("ValueHashKey is not avaliable yet.")
+
+    ### TODO: idgen
 
 
-class RandomKey(metaclass=TerminusKey):
+class RandomKey(TerminusKey):
     """Generating ID with UUID4"""
 
     at_type = "Random"
 
     def idgen(self, obj: Union["DocumentTemplate", dict]):
-        if isinstance(obj, dict) and obj.get("@type") is not None:
-            prefix = obj.get("@type") + "_"
-        elif hasattr(obj.__class__, "_base"):
-            prefix = obj.__class__._base + "_"
-        elif hasattr(obj.__class__, "__name__"):
-            prefix = obj.__class__.__name__ + "_"
-        else:
-            raise ValueError(f"Cannot determin prefix from {obj}")
+        prefix, _ = self._idgen_prep(obj)
         return prefix + uuid4().hex
+
+
+def _check_cycling(class_obj: "TerminusClass"):
+    """Helper function to check if the embedded subdocument is cycling"""
+    if hasattr(class_obj, "_subdocument"):
+        mro_names = list(map(lambda obj: obj.__name__, class_obj.__mro__))
+        for prop_type in class_obj._annotations.values():
+            if str(prop_type) in mro_names:
+                raise RecursionError(f"Embbding {prop_type} cause recursions.")
+
+
+def _check_missing_prop(doc_obj: "DocumentTemplate"):
+    """Helper function to check if the the document is missing properties (and if they are right types)"""
+    class_obj = doc_obj.__class__
+    for prop, prop_type in class_obj._annotations.items():
+        try:
+            check_type(str(None), None, prop_type)
+        except TypeError:
+            if not hasattr(doc_obj, prop):
+                raise ValueError(f"{doc_obj} missing property: {prop}")
+            else:
+                prop_value = eval(f"doc_obj.{prop}")  # noqa: S307
+                check_type(prop, prop_value, prop_type)
+                # raise TypeError(f"Property of {doc_obj} missing should be type {prop_type} but got {prop_value} which is {type(prop_value)}")
 
 
 class TerminusClass(type):
@@ -146,6 +144,13 @@ class TerminusClass(type):
                 else:
                     value = None
                 setattr(obj, key, value)
+            if (
+                not hasattr(obj, "_subdocument")
+                and hasattr(obj, "_key")
+                and hasattr(obj._key, "idgen")
+            ):
+                obj._id = obj._key.idgen(obj)
+            obj._isinstance = True
             obj._annotations = cls._annotations
 
         cls.__init__ = init
@@ -161,33 +166,22 @@ class TerminusClass(type):
         return cls.__name__
 
 
-def _check_cycling(class_obj: TerminusClass):
-    if hasattr(class_obj, "_subdocument"):
-        mro_names = list(map(lambda obj: obj.__name__, class_obj.__mro__))
-        for prop_type in class_obj._annotations.values():
-            if str(prop_type) in mro_names:
-                raise RecursionError(f"Embbding {prop_type} cause recursions.")
-
-
 class DocumentTemplate(metaclass=TerminusClass):
     _schema = None
     _key = RandomKey()  # default key
-
-    def __init__(self):
-        self._new = True
 
     def __setattr__(self, name, value):
         if name[0] != "_" and value is not None:
             correct_type = self._annotations.get(name)
             check_type(str(value), value, correct_type)
-            # import pdb; pdb.set_trace()
             # if not correct_type or not check_type(str(value), value, correct_type):
             #     raise AttributeError(f"{value} is not type {correct_type}")
         super().__setattr__(name, value)
 
     @classmethod
-    def _to_dict(cls):
-        _check_cycling(cls)
+    def _to_dict(cls, skip_checking=False):
+        if not skip_checking:
+            _check_cycling(cls)
         result = {"@type": "Class", "@id": cls.__name__}
         if cls.__base__.__name__ != "DocumentTemplate":
             # result["@inherits"] = cls.__base__.__name__
@@ -225,21 +219,26 @@ class DocumentTemplate(metaclass=TerminusClass):
                 result[attr] = wt.to_woql_type(attr_type)
         return result
 
-    def _obj_to_dict(self):
+    def _obj_to_dict(self, skip_checking=False):
+        if not skip_checking:
+            _check_missing_prop(self)
         result = {"@type": str(self.__class__)}
         if hasattr(self, "_id"):
             result["@id"] = self._id
+        # elif hasattr(self.__class__, "_key") and hasattr(self.__class__._key, "idgen"):
+        #     result["@id"] = self.__class__._key.idgen(self)
+
         for item in self._annotations.keys():
             if hasattr(self, item):
                 the_item = eval(f"self.{item}")  # noqa: S307
                 if the_item is not None:
-                    if hasattr(the_item.__class__, "_subdocument") or (
-                        hasattr(the_item.__class__, "_key")
-                        and not hasattr(the_item.__class__._key, "idgen")
-                    ):
+                    # subdocuments
+                    if hasattr(the_item.__class__, "_subdocument"):
                         result[item] = the_item._obj_to_dict()
+                    # embbed id if there's id
                     elif hasattr(the_item, "_id"):
                         result[item] = {"@id": the_item._id, "@type": "@id"}
+                    # handle list
                     elif isinstance(the_item, list):
                         new_item = []
                         for sub_item in the_item:
@@ -248,6 +247,7 @@ class DocumentTemplate(metaclass=TerminusClass):
                             else:
                                 new_item.append(sub_item)
                         result[item] = new_item
+                    # TODO: handle set
                     else:
                         if isinstance(the_item, Enum):
                             result[item] = str(the_item)

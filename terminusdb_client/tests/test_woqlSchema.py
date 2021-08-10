@@ -154,6 +154,11 @@ def test_cycling():
         cycling_schema.to_dict()
 
 
+def test_idgen():
+    cheuk = Country()
+    assert cheuk._id[: len("Country_")] == "Country_"
+
+
 # def test_schema_delete():
 #     other_schema.delete_property(Title)
 #     assert other_schema.all_obj() == {Employee, Address, Team}

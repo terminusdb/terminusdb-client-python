@@ -1149,16 +1149,10 @@ class WOQLClient:
         elif hasattr(obj, "to_dict"):
             return obj.to_dict()
         elif hasattr(obj, "_to_dict"):
-            return obj._to_dict()
-        elif hasattr(obj, "_obj_to_dict"):
-            if (
-                not hasattr(obj, "_id")
-                and not hasattr(obj.__class__, "_subdocument")
-                and hasattr(obj.__class__, "_key")
-                and hasattr(obj.__class__._key, "idgen")
-            ):
-                obj._id = obj.__class__._key.idgen(obj)
-            return obj._obj_to_dict()
+            if hasattr(obj, "_isinstance") and obj._isinstance:
+                return obj._obj_to_dict()
+            else:
+                return obj._to_dict()
         else:
             raise ValueError("Object cannot convert to dictionary")
 
@@ -1219,11 +1213,8 @@ class WOQLClient:
         if isinstance(document, list):
             new_doc = []
             for item in document:
-                # while document:
-                #     item = document.pop()
                 item_dict = self._conv_to_dict(item)
                 new_doc.append(item_dict)
-                # id_list.append(item_dict['@id'])
             document = new_doc
         else:
             document = self._conv_to_dict(document)

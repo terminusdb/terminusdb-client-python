@@ -148,7 +148,7 @@ def _create_script(obj_list):
         if (
             isinstance(obj, woqlschema.TerminusClass)
             or isinstance(obj, enum.EnumMeta)
-            or isinstance(obj, woqlschema.TerminusKey)
+            or isinstance(obj, type(woqlschema.TerminusKey))
         ):
             import_objs.append(obj_str)
     print_script += "from typing import List, Optional, Set\n"
