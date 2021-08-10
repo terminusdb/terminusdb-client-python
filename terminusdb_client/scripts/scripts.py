@@ -371,7 +371,7 @@ def importcsv(csv_file, sep):
         item["@type"] = class_name
         item_id = HashKey(list(df.columns)).idgen(item)
         item["@id"] = item_id
-    client.insert_document(
+    client.update_document(
         obj_list,
         commit_msg=f"Documents created with {csv_file} insert by Python client.",
     )
