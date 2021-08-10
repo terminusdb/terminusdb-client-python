@@ -373,24 +373,17 @@ class WOQLClient:
         '<team>/<db>/<repo>/branch/<branch>'
         """
         base = self.team + "/" + self.db + "/"
-        if ttype == "db":
-            return base
-        elif ttype == "meta":
-            return base + "_meta"
-        base = base + self.repo
-        if ttype == "repo":
-            return base + "/_meta"
-        elif ttype == "commits":
-            return base + "/_commits"
-        if val is None:
-            if ttype == "ref":
-                val = self.ref
-            else:
-                val = self.branch
-        if ttype == "branch":
-            return base + "/branch/" + val
-        if ttype == "ref":
-            return base + "/commit/" + val
+        ref_value = val if val else self.ref
+        branch_value = val if val else self.branch
+        urls = {
+            'db': base,
+            'meta': f"{base}_meta",
+            'repo': f"{base}{self.repo}/_meta",
+            'commits': f"{base}{self.repo}/_commits",
+            'ref': f"{base}{self.repo}/commit/{ref_value}",
+            'branch': f"{base}{self.repo}/{branch_value}",
+        }
+        return urls[ttype]
 
     def _get_prefixes(self):
         """Get the prefixes for a given database"""
