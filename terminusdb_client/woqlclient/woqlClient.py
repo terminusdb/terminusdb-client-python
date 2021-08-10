@@ -10,7 +10,6 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
 
 import requests
-from urllib3.exceptions import InsecureRequestWarning
 
 from ..__version__ import __version__
 from ..errors import DatabaseError, InterfaceError
@@ -33,31 +32,16 @@ class JWTAuth(requests.auth.AuthBase):
         return r
 
 
-class NoRequestWarning:
-    def __init__(self, insecure):
-        self.insecure = insecure
-
-    def __enter__(self):
-        if self.insecure:
-            warnings.simplefilter("ignore", InsecureRequestWarning)
-
-    def __exit__(self, the_type, value, traceback):
-        if self.insecure:
-            warnings.resetwarnings()
-
-
 class WOQLClient:
     """Client for querying a TerminusDB server using WOQL queries."""
 
-    def __init__(self, server_url: str, insecure=False, **kwargs) -> None:
+    def __init__(self, server_url: str, **kwargs) -> None:
         r"""The WOQLClient constructor.
 
         Parameters
         ----------
         server_url : str
             URL of the server that this client will connect to.
-        insecure : bool
-            weather or not the connection is insecure. Passing insecure=True will skip HTTPS certificate checking.
         \**kwargs
             Extra configuration options
 
@@ -65,7 +49,6 @@ class WOQLClient:
         self._server_url = server_url.strip("/")
         self._api = f"{self._server_url}/api"
         self._connected = False
-        self.insecure = insecure
 
     def connect(
         self,
@@ -107,7 +90,7 @@ class WOQLClient:
 
         Examples
         -------
-        >>> client = WOQLClient("https://127.0.0.1:6363", insecure=True)
+        >>> client = WOQLClient("https://127.0.0.1:6363")
         >>> client.connect(key="root", account="admin", user="admin", db="example_db")
         """
 
@@ -125,19 +108,18 @@ class WOQLClient:
 
         # capabilities = self._dispatch_json("get", self._api)
         # self._uid = capabilities["@id"]
-        with NoRequestWarning(self.insecure):
-            try:
-                self._all_avaliable_db = json.loads(
-                    _finish_reponse(
-                        requests.get(
-                            self._api, auth=self._auth(), verify=(not self.insecure)
-                        )
+        try:
+            self._all_avaliable_db = json.loads(
+                _finish_reponse(
+                    requests.get(
+                        self._api, auth=self._auth()
                     )
                 )
-            except Exception:
-                raise InterfaceError(
-                    f"Cannot connect to server, please make sure TerminusDB is running at {self._server_url} and the authentication details are correct."
-                ) from None
+            )
+        except Exception:
+            raise InterfaceError(
+                f"Cannot connect to server, please make sure TerminusDB is running at {self._server_url} and the authentication details are correct."
+            ) from None
 
         #
         # Get the current user's identifier, if logged in to Hub, it will be their email otherwise it will be the user provided
@@ -772,15 +754,13 @@ class WOQLClient:
         # self._dispatch("post", self._db_url(), details)
         # self._context = self._get_prefixes()
 
-        with NoRequestWarning(self.insecure):
-            _finish_reponse(
-                requests.post(
-                    self._db_url(),
-                    json=details,
-                    auth=self._auth(),
-                    verify=(not self.insecure),
-                )
+        _finish_reponse(
+            requests.post(
+                self._db_url(),
+                json=details,
+                auth=self._auth(),
             )
+        )
 
     def delete_database(
         self,
@@ -829,15 +809,13 @@ class WOQLClient:
         else:
             self._account = accountid
         payload = {"force": force}
-        with NoRequestWarning(self.insecure):
-            _finish_reponse(
-                requests.delete(
-                    self._db_url(),
-                    auth=self._auth(),
-                    params=payload,
-                    verify=(not self.insecure),
-                )
+        _finish_reponse(
+            requests.delete(
+                self._db_url(),
+                auth=self._auth(),
+                params=payload,
             )
+        )
         # self._dispatch("delete", self._db_url(), payload)
         self._db = None
 
@@ -1028,13 +1006,11 @@ class WOQLClient:
             if the_arg in kwargs:
                 payload[the_arg] = kwargs[the_arg]
 
-        with NoRequestWarning(self.insecure):
-            result = requests.get(
-                self._documents_url(graph_type),
-                verify=(not self.insecure),
-                params=payload,
-                auth=self._auth(),
-            )
+        result = requests.get(
+            self._documents_url(graph_type),
+            params=payload,
+            auth=self._auth(),
+        )
         return json.loads(_finish_reponse(result))
 
     def get_documents_by_type(
@@ -1083,13 +1059,11 @@ class WOQLClient:
         for the_arg in add_args:
             if the_arg in kwargs:
                 payload[the_arg] = kwargs[the_arg]
-        with NoRequestWarning(self.insecure):
-            result = requests.get(
-                self._documents_url(graph_type),
-                verify=(not self.insecure),
-                params=payload,
-                auth=self._auth(),
-            )
+        result = requests.get(
+            self._documents_url(graph_type),
+            params=payload,
+            auth=self._auth(),
+        )
         return _result2stream(_finish_reponse(result))
 
     def get_all_documents(
@@ -1134,13 +1108,11 @@ class WOQLClient:
         for the_arg in add_args:
             if the_arg in kwargs:
                 payload[the_arg] = kwargs[the_arg]
-        with NoRequestWarning(self.insecure):
-            result = requests.get(
-                self._documents_url(),
-                verify=(not self.insecure),
-                params=payload,
-                auth=self._auth(),
-            )
+        result = requests.get(
+            self._documents_url(),
+            params=payload,
+            auth=self._auth(),
+        )
         return _result2stream(_finish_reponse(result))
 
     def _conv_to_dict(self, obj):
@@ -1218,14 +1190,12 @@ class WOQLClient:
             document = new_doc
         else:
             document = self._conv_to_dict(document)
-        with NoRequestWarning(self.insecure):
-            result = requests.post(
-                self._documents_url(),
-                params=params,
-                json=document,
-                auth=self._auth(),
-                verify=(not self.insecure),
-            )
+        result = requests.post(
+            self._documents_url(),
+            params=params,
+            json=document,
+            auth=self._auth(),
+        )
         return json.loads(_finish_reponse(result))
 
     def replace_document(
@@ -1291,16 +1261,14 @@ class WOQLClient:
             document = new_doc
         else:
             document = self._conv_to_dict(document)
-        with NoRequestWarning(self.insecure):
-            _finish_reponse(
-                requests.put(
-                    self._documents_url(),
-                    params=params,
-                    json=document,
-                    auth=self._auth(),
-                    verify=(not self.insecure),
-                )
+        _finish_reponse(
+            requests.put(
+                self._documents_url(),
+                params=params,
+                json=document,
+                auth=self._auth(),
             )
+        )
 
     def update_document(
         self,
@@ -1383,16 +1351,14 @@ class WOQLClient:
         self._check_connection()
         params = self._generate_commit(commit_msg)["commit_info"]
         params["graph_type"] = graph_type
-        with NoRequestWarning(self.insecure):
-            _finish_reponse(
-                requests.delete(
-                    self._documents_url(),
-                    params=params,
-                    json=doc_id,
-                    auth=self._auth(),
-                    verify=(not self.insecure),
-                )
+        _finish_reponse(
+            requests.delete(
+                self._documents_url(),
+                params=params,
+                json=doc_id,
+                auth=self._auth(),
             )
+        )
 
     def has_doc(self, doc_id: str, graph_type: str = "instance") -> bool:
         """Check if a certain document exist in a database
@@ -1619,13 +1585,11 @@ class WOQLClient:
         #     return "Commit successfully made."
         # return result
 
-        with NoRequestWarning(self.insecure):
-            result = requests.post(
-                self._query_url(),
-                json=query_obj,
-                auth=self._auth(),
-                verify=(not self.insecure),
-            )
+        result = requests.post(
+            self._query_url(),
+            json=query_obj,
+            auth=self._auth(),
+        )
         fin_reqult = json.loads(_finish_reponse(result))
 
         if fin_reqult.get("inserts") or fin_reqult.get("deletes"):
@@ -1661,13 +1625,11 @@ class WOQLClient:
 
         # self._dispatch("post", self._branch_url(new_branch_id), source)
 
-        with NoRequestWarning(self.insecure):
-            requests.post(
-                self._branch_url(new_branch_id),
-                json=source,
-                auth=self._auth(),
-                verify=(not self.insecure),
-            )
+        requests.post(
+            self._branch_url(new_branch_id),
+            json=source,
+            auth=self._auth(),
+        )
 
     def pull(
         self,
@@ -1725,13 +1687,11 @@ class WOQLClient:
         #     rc_args,
         # )
 
-        with NoRequestWarning(self.insecure):
-            result = requests.post(
-                self._pull_url(),
-                json=rc_args,
-                auth=self._auth(),
-                verify=(not self.insecure),
-            )
+        result = requests.post(
+            self._pull_url(),
+            json=rc_args,
+            auth=self._auth(),
+        )
 
         return json.loads(_finish_reponse(result))
 
@@ -1750,12 +1710,10 @@ class WOQLClient:
         self._check_connection()
         # return self._dispatch_json("post", self._fetch_url(remote_id))
 
-        with NoRequestWarning(self.insecure):
-            result = requests.post(
-                self._fetch_url(remote_id),
-                auth=self._auth(),
-                verify=(not self.insecure),
-            )
+        result = requests.post(
+            self._fetch_url(remote_id),
+            auth=self._auth(),
+        )
 
         return json.loads(_finish_reponse(result))
 
@@ -1809,13 +1767,11 @@ class WOQLClient:
         }
         # return self._dispatch_json("post", self._push_url(), rc_args)
 
-        with NoRequestWarning(self.insecure):
-            result = requests.post(
-                self._push_url(),
-                json=rc_args,
-                auth=self._auth(),
-                verify=(not self.insecure),
-            )
+        result = requests.post(
+            self._push_url(),
+            json=rc_args,
+            auth=self._auth(),
+        )
 
         return json.loads(_finish_reponse(result))
 
@@ -1863,13 +1819,11 @@ class WOQLClient:
         rc_args = {"rebase_from": rebase_source, "author": author, "message": message}
         # return self._dispatch_json("post", self._rebase_url(), rc_args)
 
-        with NoRequestWarning(self.insecure):
-            result = requests.post(
-                self._rebase_url(),
-                json=rc_args,
-                auth=self._auth(),
-                verify=(not self.insecure),
-            )
+        result = requests.post(
+            self._rebase_url(),
+            json=rc_args,
+            auth=self._auth(),
+        )
 
         return json.loads(_finish_reponse(result))
 
@@ -1911,13 +1865,11 @@ class WOQLClient:
         #     {"commit_descriptor": commit_path},
         # )
 
-        with NoRequestWarning(self.insecure):
-            requests.post(
-                self._reset_url(),
-                json={"commit_descriptor": commit_path},
-                auth=self._auth(),
-                verify=(not self.insecure),
-            )
+        requests.post(
+            self._reset_url(),
+            json={"commit_descriptor": commit_path},
+            auth=self._auth(),
+        )
 
     def optimize(self, path: str) -> None:
         """Optimize the specified path.
@@ -1944,12 +1896,10 @@ class WOQLClient:
         self._check_connection()
         # self._dispatch("post", self._optimize_url(path))
 
-        with NoRequestWarning(self.insecure):
-            requests.post(
-                self._optimize_url(path),
-                auth=self._auth(),
-                verify=(not self.insecure),
-            )
+        requests.post(
+            self._optimize_url(path),
+            auth=self._auth(),
+        )
 
     def squash(
         self, message: Optional[str] = None, author: Optional[str] = None
@@ -1991,13 +1941,11 @@ class WOQLClient:
         # commit_object = self._generate_commit(message, author)
         # return self._dispatch_json("post", self._squash_url(), commit_object)
 
-        with NoRequestWarning(self.insecure):
-            result = requests.post(
-                self._squash_url(),
-                json=self._generate_commit(message, author),
-                auth=self._auth(),
-                verify=(not self.insecure),
-            )
+        result = requests.post(
+            self._squash_url(),
+            json=self._generate_commit(message, author),
+            auth=self._auth(),
+        )
 
         return json.loads(_finish_reponse(result))
 
@@ -2031,13 +1979,11 @@ class WOQLClient:
         rc_args = {"remote_url": clone_source, "label": newid, "comment": description}
         # self._dispatch("post", self._clone_url(newid), rc_args)
 
-        with NoRequestWarning(self.insecure):
-            requests.post(
-                self._clone_url(newid),
-                json=rc_args,
-                auth=self._auth(),
-                verify=(not self.insecure),
-            )
+        requests.post(
+            self._clone_url(newid),
+            json=rc_args,
+            auth=self._auth(),
+        )
 
     def _generate_commit(
         self, msg: Optional[str] = None, author: Optional[str] = None
@@ -2144,14 +2090,6 @@ class WOQLClient:
             file_list = []
         request_response = None
         headers = {}
-        # url = utils.add_params_to_url(url, payload)
-        if url[:17] == "https://127.0.0.1" or url[:7] == "http://" or self.insecure:
-            verify = False
-        else:
-            verify = True
-
-        if not verify:
-            warnings.simplefilter("ignore", InsecureRequestWarning)
 
         # if (payload and ('terminus:user_key' in  payload)):
         # utils.encodeURIComponent(payload['terminus:user_key'])}
@@ -2174,12 +2112,12 @@ class WOQLClient:
 
         if action == "get":
             request_response = requests.get(
-                url, headers=headers, verify=verify, params=payload
+                url, headers=headers, params=payload
             )
 
         elif action == "delete":
             request_response = requests.delete(
-                url, headers=headers, verify=verify, json=payload
+                url, headers=headers, json=payload
             )
 
         elif action in ["post", "put"]:
@@ -2203,7 +2141,6 @@ class WOQLClient:
                             url,
                             headers=headers,
                             files=file_dict,
-                            verify=verify,
                             params=payload,
                         )
                     else:
@@ -2211,7 +2148,6 @@ class WOQLClient:
                             url,
                             headers=headers,
                             files=file_dict,
-                            verify=verify,
                             params=payload,
                         )
                 finally:
@@ -2225,7 +2161,6 @@ class WOQLClient:
                         url,
                         json=payload,
                         headers=headers,
-                        verify=verify,
                         # params=payload,
                     )
                 else:
@@ -2233,7 +2168,6 @@ class WOQLClient:
                         url,
                         json=payload,
                         headers=headers,
-                        verify=verify,
                         # params=payload,
                     )
         else:
@@ -2285,12 +2219,10 @@ class WOQLClient:
         """
         self._check_connection(check_db=False)
 
-        with NoRequestWarning(self.insecure):
-            result = requests.get(
-                self._api,
-                verify=(not self.insecure),
-                auth=self._auth(),
-            )
+        result = requests.get(
+            self._api,
+            auth=self._auth(),
+        )
         return json.loads(_finish_reponse(result))
 
     def list_databases(self) -> List[Dict]:
