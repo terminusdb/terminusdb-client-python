@@ -1,0 +1,17 @@
+version: "3"
+
+volumes:
+  terminusdb_storage:
+
+services:
+  terminusdb-server:
+    image: terminusdb/terminusdb-server:dev
+    container_name: terminusdb-server
+    hostname: terminusdb-server
+    tty: true
+    ports:
+      - 6367:6367
+    environment:
+      - TERMINUSDB_SERVER_PORT=6367
+      - TERMINUSDB_JWT_ENABLED=true
+      - TERMINUSDB_SERVER_JWKS_ENDPOINT=https://cdn.terminusdb.com/jwks.json
