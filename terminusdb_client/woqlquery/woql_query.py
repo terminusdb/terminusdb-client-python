@@ -218,7 +218,7 @@ class WOQLQuery:
             for item in wvar:
                 co_item = self._clean_data_value(item)
                 ret.append(co_item)
-            return ret
+            return { "@type" : "DataValue", "list" : ret }
 
     def _value_list(self, wvar):
         # TODO: orig is Nonetype
@@ -2278,7 +2278,7 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Length"
-        self._cursor["list"] = self._clean_data_list(var_list)
+        self._cursor["list"] = self._data_list(var_list)
         if type(var_len) is float:
             self._cursor["length"] = self._clean_object(
                 var_len, "xsd:nonNegativeInteger"
