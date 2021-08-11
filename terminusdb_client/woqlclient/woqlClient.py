@@ -145,6 +145,9 @@ class WOQLClient:
         #     self._author = capabilities["system:user_identifier"]["@value"]
         # else:
         #     self._author = self._user
+        all_db_name = list(map(lambda x: x.get("name"), self._all_avaliable_db))
+        if self._db is not None and self._db not in all_db_name:
+            raise InterfaceError(f"Connection fail, {self._db} does not exist.")
 
         self._author = self._user
 
