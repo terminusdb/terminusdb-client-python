@@ -10,35 +10,52 @@ from terminusdb_client.__version__ import __version__
 from terminusdb_client.errors import InterfaceError
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 
-from .mockResponse import MOCK_CAPABILITIES
 from .woqljson.woqlStarJson import WoqlStar
 
 
-def mocked_requests_get(*args, **kwargs):
-    class MockResponse:
-        def __init__(self, text, json_data, status_code):
-            self.json_data = json_data
-            self.status_code = status_code
-            self.text = text
+class MockResponse:
+    def __init__(self, text, json_data, status_code):
+        self.json_data = json_data
+        self.status_code = status_code
+        self.text = text
 
-        def json(self):
-            return self.json_data
+    def json(self):
+        return self.json_data
+
+
+def mocked_requests_get(*args, **kwargs):
 
     if "http://localhost:6363/" in args[0]:
-        return MockResponse(json.dumps(MOCK_CAPABILITIES), {"key1": "value1"}, 200)
+        return MockResponse(
+            json.dumps(
+                [
+                    {
+                        "@id": "UserDatabase_48965a1628f9748db159df4ebacf3eca",
+                        "@type": "UserDatabase",
+                        "comment": "",
+                        "creation_date": "2021-08-10T12:30:44.565Z",
+                        "label": "myDBName",
+                        "name": "myDBName",
+                        "state": "finalized",
+                    }
+                ]
+            ),
+            {"key1": "value1"},
+            200,
+        )
 
-    return MockResponse(None, 404)
+    return MockResponse(None, {}, 404)
 
 
 def mocked_requests_post(*args, **kwargs):
-    class MockResponse:
-        def __init__(self, text, json_data, status_code):
-            self.json_data = json_data
-            self.status_code = status_code
-            self.text = text
-
-        def json(self):
-            return self.json_data
+    # class MockResponse:
+    #     def __init__(self, text, json_data, status_code):
+    #         self.json_data = json_data
+    #         self.status_code = status_code
+    #         self.text = text
+    #
+    #     def json(self):
+    #         return self.json_data
 
     if "http://localhost:6363/" in args[0]:
         mock_result = {
@@ -52,7 +69,7 @@ def mocked_requests_post(*args, **kwargs):
         }
         return MockResponse(json.dumps(mock_result), {"key1": "value1"}, 200)
 
-    return MockResponse(None, 404)
+    return MockResponse(None, {}, 404)
 
 
 def mock_func_with_1arg(_):
@@ -204,7 +221,7 @@ def test_get_triples(mocked_requests):
     )
 
 
-@mock.patch("requests.post", side_effect=mocked_requests_get)
+@mock.patch("requests.post", side_effect=mocked_requests_post)
 @mock.patch("requests.get", side_effect=mocked_requests_get)
 def test_query(mocked_requests, mocked_requests2):
     woql_client = WOQLClient("http://localhost:6363")
@@ -309,9 +326,9 @@ def test_remote_auth(mocked_requests):
 def test_set_db(mocked_requests):
     woql_client = WOQLClient("http://localhost:6363")
     with pytest.raises(InterfaceError):
-        woql_client.set_db("my_db")
+        woql_client.set_db("myDBName")
     woql_client.connect()
-    woql_client.set_db("my_db")
-    assert woql_client._db == "my_db"
-    assert woql_client.db() == "my_db"
+    woql_client.set_db("myDBName")
+    assert woql_client._db == "myDBName"
+    assert woql_client.db() == "myDBName"
     assert woql_client.repo() == "local"
