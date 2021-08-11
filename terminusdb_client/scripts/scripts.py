@@ -13,7 +13,7 @@ from shed import shed
 import terminusdb_client.woqlschema.woql_schema as woqlschema
 
 from .. import woql_type as wt
-from ..errors import DatabaseError, InterfaceError
+from ..errors import InterfaceError
 
 # from ..woql_type import from_woql_type
 from ..woqlclient.woqlClient import WOQLClient
@@ -75,19 +75,19 @@ def _load_settings():
         raise ImportError(msg)
 
 
-def _connect(settings):
+def _connect(settings, new_db=True):
     server = settings["SERVER"]
     database = settings["DATABASE"]
 
     client = WOQLClient(server)
-    client.connect()
     try:
-        client.create_database(database)
-        return client, f"{database} created."
-    except DatabaseError as error:
-        if "Database already exists." in str(error):
-            client.connect(db=database)
-            return client, f"Connected to {database}."
+        client.connect(db=database)
+        return client, f"Connected to {database}."
+    except InterfaceError as error:
+        if "does not exist" in str(error) and new_db:
+            client.connect()
+            client.create_database(database)
+            return client, f"{database} created."
         else:
             raise InterfaceError(f"Cannot connect to {database}.")
 
@@ -233,7 +233,7 @@ def sync():
     """Pull the current schema plan in database to schema.py"""
     settings = _load_settings()
     database = settings["DATABASE"]
-    client, msg = _connect(settings)
+    client, msg = _connect(settings, new_db=False)
     print(msg)  # noqa: T001
     _sync(client, database)
 
@@ -381,6 +381,73 @@ def importcsv(csv_file, sep):
 
 
 @click.command()
+@click.argument("class_obj")
+@click.option("--filename")
+# @click.option('--header ', default=',', show_default=True)
+def exportcsv(class_obj, filename=None):
+    """Export all documents in a TerminusDB class into a flatten CSV file."""
+    settings = _load_settings()
+    settings["SERVER"]
+    database = settings["DATABASE"]
+    client, msg = _connect(settings, new_db=False)
+    all_existing_obj = client.get_all_documents(graph_type="schema")
+    class_dict = {}
+    for obj in all_existing_obj:
+        if class_obj == obj.get("@id"):
+            class_dict = obj
+    if not class_dict:
+        raise InterfaceError(f"{class_obj} not found in database ({database}) schema.'")
+
+    try:
+        pd = import_module("pandas")
+        # np = import_module("numpy")
+    except ImportError:
+        raise ImportError(
+            "Library 'pandas' is required to export csv, either install 'pandas' or install woqlDataframe requirements as follows: python -m pip install -U terminus-client-python[dataframe]"
+        )
+
+    # def flatten(in_key, in_item, header, prefix = ""):
+    #     if isinstance(in_item, (str, list)):
+    #         if in_item[:4] == "xsd:":
+    #             if prefix:
+    #                 header.append(prefix + '.' + in_key)
+    #             else:
+    #                 header.append(in_key)
+    #     elif isinstance(in_item, dict):
+    #         for key, item in in_item.items():
+    #             if key[0] != '@':
+    #                 header.append(flatten(key, item, header, prefix + '.' + in_key))
+    #     else:
+    #         raise ValueError(f"Cannot flatten with {in_item}")
+    #
+    # master_header = []
+    # for key, item in class_dict.items():
+    #     if key[0] != '@':
+    #         flatten(key, item, master_header)
+
+    # df = pd.DataFrame(columns=master_header)
+    # print(df)
+
+    all_records = client.get_documents_by_type(class_obj)
+    # all_records_flatten = []
+    # for records in all_records:
+    df = pd.DataFrame().from_records(list(all_records))
+    df.drop(columns=list(filter(lambda x: x[0] == "@", df.columns)), inplace=True)
+    if filename is None:
+        filename = class_obj + ".csv"
+    df.to_csv(filename, index=False)
+    print(  # noqa: T001
+        f"CSV file {filename} created with {class_obj} from database {database}."
+    )
+
+    # if isinstance(item, (str, list)):
+    #     if item[:4] == "xsd:"
+    #     header.append(key)
+    # elif isinstance(item, dict):
+    #     header.gen_nested_name(key
+
+
+@click.command()
 @click.option("--schema", is_flag=True)
 def alldocs(schema):
     """Get all documents in the database"""
@@ -398,4 +465,5 @@ terminusdb.add_command(sync)
 terminusdb.add_command(commit)
 terminusdb.add_command(deletedb)
 terminusdb.add_command(importcsv)
+terminusdb.add_command(exportcsv)
 terminusdb.add_command(alldocs)
