@@ -54,7 +54,8 @@ class DatabaseError(Error):
                 self.message = self.error_obj["api:error"]["vio:message"]
             else:
                 self.message = (
-                    "Unknown Error: check DatabaseError.error_obj for details"
+                    # "Unknown Error: check DatabaseError.error_obj for details"
+                    f"Unknown Error:{response.json()}"
                 )
         else:
             self.error_obj = None
