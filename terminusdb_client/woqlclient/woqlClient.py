@@ -1079,16 +1079,15 @@ class WOQLClient:
         add_args = ["prefixed", "unfold"]
         self._check_connection()
         payload = {"type": doc_type, "graph_type": graph_type}
-        if count is None:
-            count = "unlimited"
         payload["skip"] = skip
-        payload["count"] = count
+        if count is not None:
+            payload["count"] = count
         for the_arg in add_args:
             if the_arg in kwargs:
                 payload[the_arg] = kwargs[the_arg]
         with NoRequestWarning(self.insecure):
             result = requests.get(
-                self._documents_url(graph_type),
+                self._documents_url(),
                 verify=(not self.insecure),
                 params=payload,
                 auth=self._auth(),
