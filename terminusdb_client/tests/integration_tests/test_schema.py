@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Set
 
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from terminusdb_client.woqlschema.woql_schema import (
@@ -53,7 +53,7 @@ class Person(DocumentTemplate):
     _schema = my_schema
     name: str
     age: int
-    # friend_of: Set["Person"]
+    friend_of: Set["Person"]
 
 
 class Employee(Person):
@@ -61,12 +61,21 @@ class Employee(Person):
     contact_number: Optional[str]
     managed_by: "Employee"
     member_of: "Team"
+    permisstion: Set["Role"]
 
 
 class Team(EnumTemplate):
     _schema = my_schema
     IT = "Information Technology"
     Marketing = ()
+
+
+class Role(EnumTemplate):
+    "Test Enum in a set"
+    _schema = my_schema
+    Admin = ()
+    Read = ()
+    Write = ()
 
 
 class Contact(TaggedUnion):
@@ -91,6 +100,7 @@ def test_create_schema(docker_url):
                 "Team",
                 "Country",
                 "Coordinate",
+                "Role",
             ]
         elif "@type" in item:
             assert item["@type"] == "@context"
@@ -113,6 +123,7 @@ def test_create_schema2(docker_url):
                 "Team",
                 "Country",
                 "Coordinate",
+                "Role",
             ]
         elif "@type" in item:
             assert item["@type"] == "@context"
@@ -131,11 +142,13 @@ def test_insert_cheuk(docker_url):
     home.postal_code = "A12 345"
 
     cheuk = Employee()
+    cheuk.permisstion = {Role.Admin, Role.Read}
     cheuk.address_of = home
     cheuk.contact_number = "07777123456"
     cheuk.age = 21
     cheuk.name = "Cheuk"
     cheuk.managed_by = cheuk
+    cheuk.friend_of = {cheuk}
     cheuk.member_of = Team.IT
 
     client = WOQLClient(docker_url, insecure=True)

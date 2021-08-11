@@ -161,6 +161,7 @@ class TerminusClass(type):
             cls._schema.add_obj(cls)
 
         # super().__init__(name, bases, nmspc)
+        globals()[name] = cls
 
     def __repr__(cls):
         return cls.__name__
@@ -219,6 +220,13 @@ class DocumentTemplate(metaclass=TerminusClass):
                 result[attr] = wt.to_woql_type(attr_type)
         return result
 
+    def _embeded_rep(self):
+        """get representation for embedding as object property"""
+        if hasattr(self.__class__, "_subdocument"):
+            return self._obj_to_dict()
+        elif hasattr(self, "_id"):
+            return {"@id": self._id, "@type": "@id"}
+
     def _obj_to_dict(self, skip_checking=False):
         if not skip_checking:
             _check_missing_prop(self)
@@ -232,22 +240,24 @@ class DocumentTemplate(metaclass=TerminusClass):
             if hasattr(self, item):
                 the_item = eval(f"self.{item}")  # noqa: S307
                 if the_item is not None:
-                    # subdocuments
-                    if hasattr(the_item.__class__, "_subdocument"):
-                        result[item] = the_item._obj_to_dict()
-                    # embbed id if there's id
-                    elif hasattr(the_item, "_id"):
-                        result[item] = {"@id": the_item._id, "@type": "@id"}
-                    # handle list
-                    elif isinstance(the_item, list):
+                    # object properties
+                    if hasattr(the_item, "_embeded_rep"):
+                        result[item] = the_item._embeded_rep()
+                    # handle list and set (set end up passing as list for jsonlize)
+                    elif isinstance(the_item, (list, set)):
                         new_item = []
                         for sub_item in the_item:
-                            if hasattr(sub_item, "_obj_to_dict"):
-                                new_item.append(sub_item._obj_to_dict())
+                            # inner is object properties
+                            if hasattr(sub_item, "_embeded_rep"):
+                                new_item.append(sub_item._embeded_rep())
+                            # inner is Enum
+                            elif isinstance(sub_item, Enum):
+                                new_item.append(str(sub_item))
+                            # inner is datatypes
                             else:
                                 new_item.append(sub_item)
                         result[item] = new_item
-                    # TODO: handle set
+                    # Enum and datatypes
                     else:
                         if isinstance(the_item, Enum):
                             result[item] = str(the_item)
@@ -275,8 +285,10 @@ class EnumMetaTemplate(EnumMeta):
             if not hasattr(schema, "object"):
                 schema.object = set()
             schema.object.add(new_cls)
-            return new_cls
-        return super().__new__(metacls, cls, bases, classdict)
+        else:
+            new_cls = super().__new__(metacls, cls, bases, classdict)
+        globals()[cls] = new_cls
+        return new_cls
 
 
 class EnumTemplate(Enum, metaclass=EnumMetaTemplate):
