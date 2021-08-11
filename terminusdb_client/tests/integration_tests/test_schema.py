@@ -84,7 +84,7 @@ class Contact(TaggedUnion):
 
 
 def test_create_schema(docker_url):
-    client = WOQLClient(docker_url, insecure=True)
+    client = WOQLClient(docker_url)
     client.connect()
     client.create_database("test_docapi")
     client.insert_document(
@@ -109,7 +109,7 @@ def test_create_schema(docker_url):
 
 
 def test_create_schema2(docker_url):
-    client = WOQLClient(docker_url, insecure=True)
+    client = WOQLClient(docker_url)
     client.connect()
     client.create_database("test_docapi2")
     my_schema.commit(client, "I am checking in the schema")
@@ -151,7 +151,7 @@ def test_insert_cheuk(docker_url):
     cheuk.friend_of = {cheuk}
     cheuk.member_of = Team.IT
 
-    client = WOQLClient(docker_url, insecure=True)
+    client = WOQLClient(docker_url)
     client.connect(db="test_docapi")
     # client.create_database("test_docapi")
     # print(cheuk._obj_to_dict())
