@@ -1288,7 +1288,6 @@ class WOQLClient:
         all_existing_id = list(map(lambda x: x.get("@id"), all_existing_obj))
         insert_docs = []
         update_docs = []
-        update_list = None
         if isinstance(document, list):
             update_list = document
         elif hasattr(document, "all_obj"):
@@ -1297,7 +1296,9 @@ class WOQLClient:
             update_list = [document]
 
         for obj in update_list:
-            if hasattr(obj, "_to_dict"):
+            if hasattr(obj, "_id"):
+                obj_id = obj._id
+            elif hasattr(obj, "_to_dict"):
                 obj_id = obj._to_dict().get("@id")
             else:
                 obj_id = obj.get("@id")
