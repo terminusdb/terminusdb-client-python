@@ -250,7 +250,11 @@ def commit():
     for obj_str in dir(schema_plan):
         obj = eval(f"schema_plan.{obj_str}")  # noqa: S307
         if isinstance(obj, woqlschema.TerminusClass) or isinstance(obj, enum.EnumMeta):
-            if obj_str not in dir(woqlschema):
+            if obj_str not in [
+                "DocumentTemplate",
+                "EnumTemplate",
+                "TaggedUnion",
+            ]:  # TODO, check what shold be included
                 all_obj.append(obj)
     client.update_document(
         all_obj,
