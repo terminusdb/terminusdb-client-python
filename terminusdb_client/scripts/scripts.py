@@ -250,11 +250,7 @@ def commit():
     for obj_str in dir(schema_plan):
         obj = eval(f"schema_plan.{obj_str}")  # noqa: S307
         if isinstance(obj, woqlschema.TerminusClass) or isinstance(obj, enum.EnumMeta):
-            if obj_str not in [
-                "DocumentTemplate",
-                "EnumTemplate",
-                "TaggedUnion",
-            ]:  # TODO, check what shold be included
+            if obj_str not in ["DocumentTemplate", "EnumTemplate", "TaggedUnion"]:
                 all_obj.append(obj)
     client.update_document(
         all_obj,
@@ -436,7 +432,16 @@ def exportcsv(class_obj, filename=None):
     # all_records_flatten = []
     # for records in all_records:
     df = pd.DataFrame().from_records(list(all_records))
-    df.drop(columns=list(filter(lambda x: x[0] == "@", df.columns)), inplace=True)
+    # df.drop(columns=list(filter(lambda x: x[0] == "@", df.columns)), inplace=True)
+    for col in df.columns:
+        expanded = None
+        try:
+            expanded = pd.io.json.json_normalize(df[col])
+        except:
+            pass
+        if expanded is not None:
+            df.drop(columns=col, inplace=True)
+            df = df.join(expanded, rsuffix="." + col)
     if filename is None:
         filename = class_obj + ".csv"
     df.to_csv(filename, index=False)
