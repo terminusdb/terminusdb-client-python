@@ -1,4 +1,3 @@
-import ast
 from copy import copy, deepcopy
 from enum import Enum, EnumMeta
 from hashlib import sha256
@@ -27,7 +26,7 @@ class TerminusKey:
         if hasattr(self, "_keys"):
             for item in self._keys:
                 if hasattr(obj, item):
-                    key_item = ast.literal_eval(f"obj.{item}")
+                    key_item = eval(f"obj.{item}")  # noqa: S307
                 elif isinstance(obj, dict) and obj.get(item) is not None:
                     key_item = obj.get(item)
                 else:
