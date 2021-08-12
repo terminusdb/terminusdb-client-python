@@ -382,9 +382,10 @@ def importcsv(csv_file, sep):
 
 @click.command()
 @click.argument("class_obj")
+@click.option("--keepid", is_flag=True)
 @click.option("--filename")
 # @click.option('--header ', default=',', show_default=True)
-def exportcsv(class_obj, filename=None):
+def exportcsv(class_obj, keepid, filename=None):
     """Export all documents in a TerminusDB class into a flatten CSV file."""
     settings = _load_settings()
     settings["SERVER"]
@@ -432,7 +433,6 @@ def exportcsv(class_obj, filename=None):
     # all_records_flatten = []
     # for records in all_records:
     df = pd.DataFrame().from_records(list(all_records))
-    # df.drop(columns=list(filter(lambda x: x[0] == "@", df.columns)), inplace=True)
     for col in df.columns:
         expanded = None
         try:
@@ -442,6 +442,8 @@ def exportcsv(class_obj, filename=None):
         if expanded is not None:
             df.drop(columns=col, inplace=True)
             df = df.join(expanded, rsuffix="." + col)
+    if not keepid:
+        df.drop(columns=list(filter(lambda x: x[0] == "@", df.columns)), inplace=True)
     if filename is None:
         filename = class_obj + ".csv"
     df.to_csv(filename, index=False)
