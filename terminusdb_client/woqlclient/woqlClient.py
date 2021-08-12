@@ -1006,7 +1006,7 @@ class WOQLClient:
                 payload[the_arg] = kwargs[the_arg]
 
         result = requests.get(
-            self._documents_url(graph_type),
+            self._documents_url(),
             params=payload,
             auth=self._auth(),
         )
@@ -1058,7 +1058,7 @@ class WOQLClient:
             if the_arg in kwargs:
                 payload[the_arg] = kwargs[the_arg]
         result = requests.get(
-            self._documents_url(graph_type),
+            self._documents_url(),
             params=payload,
             auth=self._auth(),
         )
