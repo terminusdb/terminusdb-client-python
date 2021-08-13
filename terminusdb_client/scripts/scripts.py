@@ -284,9 +284,6 @@ def deletedb(database):
 # @click.option('--header ', default=',', show_default=True)
 def importcsv(csv_file, sep):
     """Import CSV file into pandas DataFrame then into TerminusDB, options are read_csv() options."""
-    settings = _load_settings()
-    settings["SERVER"]
-    database = settings["DATABASE"]
     try:
         pd = import_module("pandas")
         np = import_module("numpy")
@@ -294,11 +291,10 @@ def importcsv(csv_file, sep):
         raise ImportError(
             "Library 'pandas' is required to import csv, either install 'pandas' or install woqlDataframe requirements as follows: python -m pip install -U terminus-client-python[dataframe]"
         )
+    settings = _load_settings()
+    settings["SERVER"]
+    database = settings["DATABASE"]
     df = pd.read_csv(csv_file, sep=sep)
-    # df = pd.DataFrame({'float': [1.0],
-    #                'int': [1],
-    #                'datetime': [pd.Timestamp('20180310')],
-    #                'string': ['foo']})
     class_name = csv_file.split(".")[0].capitalize()
     class_dict = {"@type": "Class", "@id": class_name}
     np_to_buildin = {
@@ -353,79 +349,90 @@ def importcsv(csv_file, sep):
 @click.command()
 @click.argument("class_obj")
 @click.option("--keepid", is_flag=True)
+@click.option("--maxdep", default=2, show_default=True)
 @click.option("--filename")
 # @click.option('--header ', default=',', show_default=True)
-def exportcsv(class_obj, keepid, filename=None):
+def exportcsv(class_obj, keepid, maxdep, filename=None):
     """Export all documents in a TerminusDB class into a flatten CSV file."""
+    try:
+        pd = import_module("pandas")
+    except ImportError:
+        raise ImportError(
+            "Library 'pandas' is required to export csv, either install 'pandas' or install woqlDataframe requirements as follows: python -m pip install -U terminus-client-python[dataframe]"
+        )
     settings = _load_settings()
     settings["SERVER"]
     database = settings["DATABASE"]
     client, msg = _connect(settings, new_db=False)
     all_existing_obj = client.get_all_documents(graph_type="schema")
-    class_dict = {}
-    for obj in all_existing_obj:
-        if class_obj == obj.get("@id"):
-            class_dict = obj
-    if not class_dict:
+    all_existing_class = {}
+    for item in all_existing_obj:
+        if item.get("@id"):
+            all_existing_class[item["@id"]] = item
+    if class_obj not in all_existing_class:
         raise InterfaceError(f"{class_obj} not found in database ({database}) schema.'")
 
-    try:
-        pd = import_module("pandas")
-        # np = import_module("numpy")
-    except ImportError:
-        raise ImportError(
-            "Library 'pandas' is required to export csv, either install 'pandas' or install woqlDataframe requirements as follows: python -m pip install -U terminus-client-python[dataframe]"
-        )
+    all_existing_class[class_obj]
 
-    # def flatten(in_key, in_item, header, prefix = ""):
-    #     if isinstance(in_item, (str, list)):
-    #         if in_item[:4] == "xsd:":
-    #             if prefix:
-    #                 header.append(prefix + '.' + in_key)
-    #             else:
-    #                 header.append(in_key)
-    #     elif isinstance(in_item, dict):
-    #         for key, item in in_item.items():
-    #             if key[0] != '@':
-    #                 header.append(flatten(key, item, header, prefix + '.' + in_key))
-    #     else:
-    #         raise ValueError(f"Cannot flatten with {in_item}")
-    #
-    # master_header = []
-    # for key, item in class_dict.items():
-    #     if key[0] != '@':
-    #         flatten(key, item, master_header)
+    def expand_df(df):
+        for col in df.columns:
+            expanded = None
+            try:
+                expanded = pd.json_normalize(df[col])
+            except:
+                pass
+            if expanded is not None and "@id" in expanded.columns:
+                # if len(expanded.columns) == 1:
+                #     import pdb; pdb.set_trace()
+                if not keepid:
+                    expanded.drop(
+                        columns=list(filter(lambda x: x[0] == "@", expanded.columns)),
+                        inplace=True,
+                    )
+                expanded.columns = list(map(lambda x: col + "." + x, expanded))
+                df.drop(columns=col, inplace=True)
+                df = df.join(expanded)
+        return df
 
-    # df = pd.DataFrame(columns=master_header)
-    # print(df)
+    def embed_obj(df, maxdep):
+        if maxdep == 0:
+            return df
+        for col in df.columns:
+            if "@" not in col:
+                col_comp = col.split(".")
+                if len(col_comp) == 1:
+                    prop_type = all_existing_class[class_obj][col]
+                else:
+                    prop_type = class_obj
+                    for comp in col_comp:
+                        prop_type = all_existing_class[prop_type][comp]
+                if (
+                    isinstance(prop_type, str)
+                    and prop_type[:4] != "xsd:"
+                    and prop_type != class_obj
+                ):
+                    df[col] = df[col].apply(client.get_document)
+        finish_df = expand_df(df)
+        if (
+            len(finish_df.columns) == len(df.columns)
+            and (finish_df.columns == df.columns).all()
+        ):
+            return finish_df
+        else:
+            return embed_obj(finish_df, maxdep - 1)
 
     all_records = client.get_documents_by_type(class_obj)
-    # all_records_flatten = []
-    # for records in all_records:
     df = pd.DataFrame().from_records(list(all_records))
-    for col in df.columns:
-        expanded = None
-        try:
-            expanded = pd.io.json.json_normalize(df[col])
-        except:
-            pass
-        if expanded is not None:
-            df.drop(columns=col, inplace=True)
-            df = df.join(expanded, rsuffix="." + col)
     if not keepid:
         df.drop(columns=list(filter(lambda x: x[0] == "@", df.columns)), inplace=True)
+    df = expand_df(df)
+    df = embed_obj(df, maxdep=maxdep)
     if filename is None:
         filename = class_obj + ".csv"
     df.to_csv(filename, index=False)
     print(  # noqa: T001
         f"CSV file {filename} created with {class_obj} from database {database}."
     )
-
-    # if isinstance(item, (str, list)):
-    #     if item[:4] == "xsd:"
-    #     header.append(key)
-    # elif isinstance(item, dict):
-    #     header.gen_nested_name(key
 
 
 @click.command()
