@@ -1,7 +1,7 @@
 from copy import copy, deepcopy
-from enum import Enum, EnumMeta
+from enum import Enum, EnumMeta, _EnumDict
 from hashlib import sha256
-from typing import Optional, Union
+from typing import List, Optional, Set, Union
 from urllib.parse import quote
 from uuid import uuid4
 
@@ -11,8 +11,6 @@ from typeguard import check_type
 from .. import woql_type as wt
 from ..woql_type import CONVERT_TYPE
 from ..woqlclient.woqlClient import WOQLClient
-
-# from typeguard import check_type
 
 
 class TerminusKey:
@@ -156,8 +154,8 @@ class TerminusClass(type):
 
         if cls._schema is not None:
             if not hasattr(cls._schema, "object"):
-                cls._schema.object = set()
-            cls._schema.add_obj(cls)
+                cls._schema.object = {}
+            cls._schema.add_obj(name, cls)
 
         # super().__init__(name, bases, nmspc)
         globals()[name] = cls
@@ -282,8 +280,8 @@ class EnumMetaTemplate(EnumMeta):
             new_cls = super().__new__(metacls, cls, bases, classdict)
             new_cls._schema = schema
             if not hasattr(schema, "object"):
-                schema.object = set()
-            schema.object.add(new_cls)
+                schema.object = {}
+            schema.object[cls] = new_cls
         else:
             new_cls = super().__new__(metacls, cls, bases, classdict)
         globals()[cls] = new_cls
@@ -318,7 +316,7 @@ class TaggedUnion(DocumentTemplate):
 
 class WOQLSchema:
     def __init__(self):
-        self.object = set()
+        self.object = {}
 
     def commit(self, client: WOQLClient, commit_msg: Optional[str] = None):
         if commit_msg is None:
@@ -328,38 +326,135 @@ class WOQLSchema:
             commit_msg=commit_msg,
             graph_type="schema",
         )
-        # all_existing_obj = client.get_all_documents(graph_type="schema")
-        # all_existing_id = list(map(lambda x: x.get("@id"), all_existing_obj))
-        # insert_schema = WOQLSchema()
-        # update_schema = WOQLSchema()
-        # for obj in self.all_obj():
-        #     obj_str = obj.__name__
-        #     if obj_str in all_existing_id:
-        #         obj._schema = update_schema
-        #         update_schema.add_obj(obj)
-        #     else:
-        #         obj._schema = insert_schema
-        #         insert_schema.add_obj(obj)
-        #
-        # client.insert_document(
-        #     insert_schema,
-        #     commit_msg="Schema object insert by Python client.",
-        #     graph_type="schema",
-        # )
-        # client.replace_document(
-        #     update_schema,
-        #     commit_msg="Schema updated by Python client.",
-        #     graph_type="schema",
-        # )
 
-    def add_obj(self, obj):
-        self.object.add(obj)
+    def sync_wth_db(self, client: WOQLClient):
+        """Add all the classes in the database shcema in the global namespace"""
+        all_existing_class_raw = client.get_all_documents(graph_type="schema")
+        # clean up and make a dict
+        all_existing_class = {}
+        for item in all_existing_class_raw:
+            if item.get("@id"):
+                all_existing_class[item["@id"]] = item
+
+        def contruct_class(class_obj_dict):
+            # if the class is already in sechema obj
+            if class_obj_dict.get("@id") and class_obj_dict["@id"] in self.object:
+                return self.object[class_obj_dict["@id"]]
+            # if the class is Enum
+            if class_obj_dict.get("@type") == "Enum":
+                attributedict = _EnumDict()
+            else:
+                attributedict = {}
+            annotations = {}
+            superclasses = []
+            inherits = class_obj_dict.get("@inherits")
+            if inherits:
+                if isinstance(inherits, str):
+                    inherits = [inherits]
+                for parent in inherits:
+                    if parent == "TaggedUnion":
+                        superclasses.append(TaggedUnion)
+                    elif parent not in all_existing_class:
+                        raise RuntimeError(f"{parent} not exist in database schema")
+                    else:
+                        contruct_class(all_existing_class[parent])
+                        superclasses.append(self.object[parent])
+            else:
+                inherits = []
+            if class_obj_dict.get("@type") == "Class":
+                superclasses.append(DocumentTemplate)
+            elif class_obj_dict.get("@type") == "Enum":
+                superclasses.append(EnumTemplate)
+                if class_obj_dict.get("@value"):
+                    for members in class_obj_dict.get("@value"):
+                        attributedict[members.lower().replace(" ", "_")] = members
+                else:
+                    raise RuntimeError(f"{value} not exist in database schema")
+            for key, value in class_obj_dict.items():
+                if key[0] != "@":
+                    attributedict[key] = None
+                    if isinstance(value, str):
+                        if value[:4] == "xsd:":
+                            annotations[key] = wt.from_woql_type(value)
+                        else:
+                            if value not in all_existing_class:
+                                raise RuntimeError(
+                                    f"{value} not exist in database schema"
+                                )
+                            elif value == class_obj_dict["@id"] or value in inherits:
+                                new_dict = copy(all_existing_class[value])
+                                new_dict.pop(key)
+                                annotations[key] = contruct_class(new_dict)
+                            else:
+                                annotations[key] = contruct_class(
+                                    all_existing_class[value]
+                                )
+                    elif isinstance(value, dict):
+                        if value.get("@type") and value.get("@type") == "Set":
+                            annotations[key] = Set[
+                                wt.from_woql_type(
+                                    value.get("@class"), skip_convert_error=True
+                                )
+                            ]
+                        elif value.get("@type") and value.get("@type") == "List":
+                            annotations[key] = List[
+                                wt.from_woql_type(
+                                    value.get("@class"), skip_convert_error=True
+                                )
+                            ]
+                        elif value.get("@type") and value.get("@type") == "Optional":
+                            annotations[key] = Optional[
+                                wt.from_woql_type(
+                                    value.get("@class"), skip_convert_error=True
+                                )
+                            ]
+                        else:
+                            raise RuntimeError(
+                                f"{value} is not in the right format for TerminusDB type"
+                            )
+                # when key stars with @
+                elif key == "@subdocument":
+                    attributedict["_subdocument"] = value
+                elif key == "@abstract":
+                    attributedict["_abstract"] = value
+                elif key == "@key":
+                    key_type = value.get("@type")
+                    if key_type and key_type == "Random":
+                        attributedict["_key"] = RandomKey()
+                    elif key_type and key_type == "ValueHash":
+                        attributedict["_key"] = ValueHashKey()
+                    elif key_type and key_type == "Lexical":
+                        attributedict["_key"] = LexicalKey(value.get("@fields"))
+                    elif key_type and key_type == "Hash":
+                        attributedict["_key"] = HashKey(value.get("@fields"))
+                    else:
+                        raise RuntimeError(
+                            f"{value} is not in the right format for TerminusDB key"
+                        )
+                elif key == "@documentation":
+                    docstring = f'{value["@comment"]}'
+                    if value.get("@properties"):
+                        docstring += "\n\n    Attributes\n    ----------\n"
+                        for prop, discription in value["@properties"].items():
+                            docstring += f"    {prop} : {wt.from_woql_type(class_obj_dict[prop], skip_convert_error=True, as_str=True)}\n        {discription}\n"
+                    attributedict["__doc__"] = docstring
+
+            attributedict["__annotations__"] = annotations
+            new_class = type(class_obj_dict["@id"], tuple(superclasses), attributedict)
+            self.add_obj(class_obj_dict["@id"], new_class)
+            return new_class
+
+        for class_obj_dict in all_existing_class.values():
+            contruct_class(class_obj_dict)
+
+    def add_obj(self, name, obj):
+        self.object[name] = obj
 
     def all_obj(self):
-        return self.object
+        return set(self.object.values())
 
     def to_dict(self):
-        return list(map(lambda cls: cls._to_dict(), self.object))
+        return list(map(lambda cls: cls._to_dict(), self.all_obj()))
 
     def copy(self):
         return deepcopy(self)
