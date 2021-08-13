@@ -337,8 +337,12 @@ class WOQLSchema:
                 all_existing_class[item["@id"]] = item
 
         def contruct_class(class_obj_dict):
-            # if the class is already in sechema obj
-            if class_obj_dict.get("@id") and class_obj_dict["@id"] in self.object:
+            # if the class is already constructed properly
+            if (
+                class_obj_dict.get("@id")
+                and class_obj_dict["@id"] in self.object
+                and not isinstance(self.object[class_obj_dict["@id"]], str)
+            ):
                 return self.object[class_obj_dict["@id"]]
             # if the class is Enum
             if class_obj_dict.get("@type") == "Enum":
@@ -381,14 +385,9 @@ class WOQLSchema:
                                 raise RuntimeError(
                                     f"{value} not exist in database schema"
                                 )
-                            elif value == class_obj_dict["@id"] or value in inherits:
-                                new_dict = copy(all_existing_class[value])
-                                new_dict.pop(key)
-                                annotations[key] = contruct_class(new_dict)
-                            else:
-                                annotations[key] = contruct_class(
-                                    all_existing_class[value]
-                                )
+                            elif value not in self.object:
+                                self.object[value] = value
+                            annotations[key] = self.object[value]
                     elif isinstance(value, dict):
                         if value.get("@type") and value.get("@type") == "Set":
                             annotations[key] = Set[
@@ -444,7 +443,7 @@ class WOQLSchema:
             self.add_obj(class_obj_dict["@id"], new_class)
             return new_class
 
-        for class_obj_dict in all_existing_class.values():
+        for _, class_obj_dict in all_existing_class.items():
             contruct_class(class_obj_dict)
 
     def add_obj(self, name, obj):
