@@ -82,15 +82,20 @@ def _tokens_to_json(seq, query):
     elif seq[1] == "+":  # binds tightest of all
         return {
             "@type": "PathPlus",
-            "pattern": _tokens_to_json([seq[0]], query),
+            "plus": _tokens_to_json([seq[0]], query),
+        }
+    elif seq[1] == "*":  # binds tightest of all
+        return {
+            "@type": "PathStar",
+            "star": _tokens_to_json([seq[0]], query),
         }
     elif seq[1][0] == "{":  # binds tightest of all
         meat = seq[1][1:-1].split(",")
         return {
             "@type": "PathTimes",
-            "minimum": meat[0],
-            "maximum": meat[1],
-            "pattern": _tokens_to_json([seq[0]], query),
+            "from": meat[0],
+            "to": meat[1],
+            "times": _tokens_to_json([seq[0]], query),
         }
     else:
         query._parameter_error("Pattern error - could not be parsed " + seq[0])
@@ -103,11 +108,7 @@ def _tokens_to_json(seq, query):
 def _compile_predicate(pp, query):
     if "<" in pp and ">" in pp:
         pred = pp[1:-1]
-        cleaned = (
-            "owl:topObjectProperty"
-            if pred == "*"
-            else query._clean_path_predicate(pred)
-        )
+        cleaned = query._clean_path_predicate(pred)
         return {
             "@type": "PathOr",
             "or": [
@@ -123,25 +124,17 @@ def _compile_predicate(pp, query):
         }
     elif "<" in pp:
         pred = pp[1:]
-        cleaned = (
-            "owl:topObjectProperty"
-            if pred == "*"
-            else query._clean_path_predicate(pred)
-        )
+        cleaned = query._clean_path_predicate(pred)
         return {
             "@type": "InversePathPredicate",
             "predicate": cleaned,
         }
     elif ">" in pp:
         pred = pp[:-1]
-        cleaned = (
-            "owl:topObjectProperty"
-            if pred == "*"
-            else query._clean_path_predicate(pred)
-        )
+        cleaned = query._clean_path_predicate(pred)
         return {"@type": "PathPredicate", "predicate": cleaned}
     else:
-        pred = "owl:topObjectProperty" if pp == "*" else query._clean_path_predicate(pp)
+        pred = query._clean_path_predicate(pp)
         return {"@type": "PathPredicate", "predicate": pred}
 
 
