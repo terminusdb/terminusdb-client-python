@@ -309,7 +309,7 @@ def importcsv(csv_file, sep):
         converted_col = col.lower().replace(" ", "_")
         df.rename(columns={col: converted_col}, inplace=True)
         class_dict[converted_col] = converted_type
-    class_dict["@key"] = {"@type": "Hash", "@field": list(df.columns)}
+    class_dict["@key"] = {"@type": "Hash", "@fields": list(df.columns)}
     client, msg = _connect(settings)
     client.update_document(
         class_dict,
