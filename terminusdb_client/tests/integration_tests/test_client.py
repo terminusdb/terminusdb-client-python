@@ -3,6 +3,7 @@
 # import os
 
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
+from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 # from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
@@ -16,30 +17,25 @@ def test_happy_path(docker_url):
     assert client._connected
     # test create db
     client.create_database("test_happy_path", prefixes={"doc": "foo://"})
-    # init_commit = client._get_current_commit()
-    assert client._db == "test_happy_path"
+    init_commit = client._get_current_commit()
+    assert client.db == "test_happy_path"
     assert "test_happy_path" in client.list_databases()
     # assert client._context.get("doc") == "foo://"
-    # assert len(client.get_commit_history()) == 1
-    # test adding doctype
-    # WOQLQuery().doctype("Station").execute(client)
-    # first_commit = client._get_current_commit()
-    # target_commit = client._get_target_commit(1)
-    # assert first_commit != init_commit
-    # assert target_commit == init_commit.split("_")[-1]
-    # commit_history = client.get_commit_history()
-    # assert len(commit_history) == 2
-    # assert len(client.get_commit_history(2)) == 2
-    # assert len(client.get_commit_history(1)) == 1
-    # assert len(client.get_commit_history(0)) == 1
-    # assert commit_history[0]["commit"] == first_commit.split("_")[-1]
-    # assert commit_history[1]["commit"] == init_commit.split("_")[-1]
-    # test resrt
-    # client.reset(commit_history[1]["commit"])
-    # assert client._get_current_commit() == init_commit
-
+    assert len(client.get_commit_history()) == 1
+    # test adding something
+    client.query(WOQLQuery().add_quad("a", "rdf:type", "sys:Class", "schema"))
+    first_commit = client._get_current_commit()
+    assert first_commit != init_commit
+    assert len(client.get_commit_history()) == 1
+    client.query(WOQLQuery().add_quad("b", "rdf:type", "sys:Class", "schema"))
+    commit_history = client.get_commit_history()
+    assert client._get_target_commit(1) == first_commit
+    assert len(client.get_commit_history()) == 2
+    # test reset
+    client.reset(commit_history[-1]["commit"])
+    assert client._get_current_commit() == first_commit
     client.delete_database("test_happy_path", "admin")
-    assert client._db is None
+    assert client.db is None
     assert "test_happy_path" not in client.list_databases()
 
 
@@ -54,30 +50,10 @@ def test_jwt(docker_url_jwt):
     assert client._connected
     # test create db
     client.create_database("test_happy_path", prefixes={"doc": "foo://"})
-    # init_commit = client._get_current_commit()
-    assert client._db == "test_happy_path"
+    assert client.db == "test_happy_path"
     assert "test_happy_path" in client.list_databases()
-    # assert client._context.get("doc") == "foo://"
-    # assert len(client.get_commit_history()) == 1
-    # test adding doctype
-    # WOQLQuery().doctype("Station").execute(client)
-    # first_commit = client._get_current_commit()
-    # target_commit = client._get_target_commit(1)
-    # assert first_commit != init_commit
-    # assert target_commit == init_commit.split("_")[-1]
-    # commit_history = client.get_commit_history()
-    # assert len(commit_history) == 2
-    # assert len(client.get_commit_history(2)) == 2
-    # assert len(client.get_commit_history(1)) == 1
-    # assert len(client.get_commit_history(0)) == 1
-    # assert commit_history[0]["commit"] == first_commit.split("_")[-1]
-    # assert commit_history[1]["commit"] == init_commit.split("_")[-1]
-    # test resrt
-    # client.reset(commit_history[1]["commit"])
-    # assert client._get_current_commit() == init_commit
-
     client.delete_database("test_happy_path", "admin")
-    assert client._db is None
+    assert client.db is None
     assert "test_happy_path" not in client.list_databases()
 
 
