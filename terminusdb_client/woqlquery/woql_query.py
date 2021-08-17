@@ -129,11 +129,6 @@ class WOQLQuery:
         """
         return WOQLQuery().woql_or(self, other)
 
-    # WOQLCore methods
-    # def _parameter_error(self, message):
-    #     """Basic Error handling"""
-    #     raise ValueError(message)
-
     def _add_sub_query(self, sub_query=None):
         """Internal library function which adds a subquery and sets the cursor"""
         if sub_query:
