@@ -222,8 +222,10 @@ def test_query(mocked_requests, mocked_requests2):
         "http://localhost:6363/api/woql/admin/myDBName/local/branch/main",
         auth=("admin", "root"),
         json={
-            "author": "admin",
-            "message": "commit msg",
+            "commit_info": {
+                "author": "admin",
+                "message": "commit msg",
+            },
             "query": WoqlStar,
         },
     )

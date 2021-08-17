@@ -572,7 +572,7 @@ class WOQLClient:
         """
         self._check_connection()
         self._validate_graph_type(graph_type)
-        params = self._generate_commit(commit_msg)
+        params = {"commit_info": self._generate_commit(commit_msg)}
         params["turtle"] = turtle
         result = requests.post(
             self._triples_url(graph_type),
@@ -602,7 +602,7 @@ class WOQLClient:
         """
         self._check_connection()
         self._validate_graph_type(graph_type)
-        params = self._generate_commit(commit_msg)
+        params = {"commit_info": self._generate_commit(commit_msg)}
         params["turtle"] = turtle
         result = requests.put(
             self._triples_url(graph_type),
@@ -1035,7 +1035,7 @@ class WOQLClient:
         dict
         """
         self._check_connection()
-        query_obj = self._generate_commit(commit_msg)
+        query_obj = {"commit_info": self._generate_commit(commit_msg)}
         if isinstance(woql_query, WOQLQuery):
             request_woql_query = woql_query.to_dict()
         else:
@@ -1387,7 +1387,7 @@ class WOQLClient:
 
         result = requests.post(
             self._squash_url(),
-            json=self._generate_commit(message, author),
+            json={"commit_info": self._generate_commit(message, author)},
             auth=self._auth(),
         )
 
