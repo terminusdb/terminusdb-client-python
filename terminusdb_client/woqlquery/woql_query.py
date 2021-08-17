@@ -2598,10 +2598,6 @@ class WOQLQuery:
     def all(self, subj=None, pred=None, obj=None, graph=None):
         return self.star(subj=subj, pred=pred, obj=obj, graph=graph)
 
-    def lib(self):
-        # return WOQLLibrary()
-        pass
-
     def graph(self, g):
         """Used to specify that the rest of the query should use the graph g in calls to add_quad, quad, etc
         Parameters
