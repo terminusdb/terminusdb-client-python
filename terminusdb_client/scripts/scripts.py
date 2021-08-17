@@ -1,6 +1,7 @@
 import builtins
 import datetime as dt
 import enum
+import json
 import os
 import shutil
 import sys
@@ -38,15 +39,24 @@ def startproject():
         default="http://127.0.0.1:6363/",
     )
     # create settings.py
-    setting_file = open("settings.py", "w")
-    setting_file.write(
-        """####
-# This is the script for storing the settings to connect to TerminusDB
-# database for your project.
-####"""
-    )
-    setting_file.write(f'\nSERVER = "{server_location}"\nDATABASE = "{project_name}"')
-    setting_file.close()
+    #     setting_file = open("settings.py", "w")
+    #     setting_file.write(
+    #         """####
+    # # This is the script for storing the settings to connect to TerminusDB
+    # # database for your project.
+    # ####"""
+    #     )
+    #     setting_file.write(f'\nSERVER = "{server_location}"\nDATABASE = "{project_name}"')
+    #     setting_file.close()
+
+    # create config.json
+    with open("config.json", "w") as outfile:
+        json.dump(
+            {"server": server_location, "database": project_name},
+            outfile,
+            sort_keys=True,
+            indent=4,
+        )
 
     # copy all the other template files
     this_file_dir = os.path.dirname(os.path.abspath(__file__))
@@ -58,27 +68,32 @@ def startproject():
                 this_file_dir + "/" + file, os.getcwd() + "/" + names[0] + ".py"
             )
     print(  # noqa: T001
-        "settings.py and schema.py created, please customize them to start your project."
+        "config.json and schema.py created, please customize them to start your project."
     )
 
 
-def _load_settings():
-    sys.path.append(os.getcwd())
-
-    try:
-        _temp = __import__("settings", globals(), locals(), ["SERVER", "DATABASE"], 0)
-        server = _temp.SERVER
-        database = _temp.DATABASE
-        return {"SERVER": server, "DATABASE": database}
-    except ImportError:
-        msg = "Cannot find settings.py"
-        raise ImportError(msg)
+def _load_settings(filename="config.json", check=["server", "database"]):
+    with open(filename) as input:
+        config = json.load(input)
+    for item in check:
+        if config.get(item) is None:
+            raise InterfaceError(f"'{item}' setting cannot be found.")
+    return config
+    # sys.path.append(os.getcwd())
+    #
+    # try:
+    #     _temp = __import__("settings", globals(), locals(), ["SERVER", "DATABASE"], 0)
+    #     server = _temp.SERVER
+    #     database = _temp.DATABASE
+    #     return {"server": server, "database": database}
+    # except ImportError:
+    #     msg = "Cannot find settings.py"
+    #     raise ImportError(msg)
 
 
 def _connect(settings, new_db=True):
-    server = settings["SERVER"]
-    database = settings["DATABASE"]
-
+    server = settings.get("server")
+    database = settings.get("database")
     client = WOQLClient(server)
     try:
         client.connect(db=database)
@@ -232,7 +247,7 @@ def _sync(client, database):
 def sync():
     """Pull the current schema plan in database to schema.py"""
     settings = _load_settings()
-    database = settings["DATABASE"]
+    database = settings["database"]
     client, msg = _connect(settings, new_db=False)
     print(msg)  # noqa: T001
     _sync(client, database)
@@ -242,9 +257,10 @@ def sync():
 def commit():
     """Push the current schema plan in schema.py to database."""
     settings = _load_settings()
-    database = settings["DATABASE"]
+    database = settings["database"]
     client, msg = _connect(settings)
     print(msg)  # noqa: T001
+    sys.path.append(os.getcwd())
     schema_plan = __import__("schema", globals(), locals(), [], 0)
     all_obj = []
     for obj_str in dir(schema_plan):
@@ -265,8 +281,8 @@ def commit():
 def deletedb(database):
     """Delete the database in this project."""
     settings = _load_settings()
-    server = settings["SERVER"]
-    setting_database = settings["DATABASE"]
+    server = settings["server"]
+    setting_database = settings["database"]
     if database != setting_database:
         raise ValueError(
             "Name provided does not match project database name. You can only delete the database in this project."
@@ -292,8 +308,8 @@ def importcsv(csv_file, sep):
             "Library 'pandas' is required to import csv, either install 'pandas' or install woqlDataframe requirements as follows: python -m pip install -U terminus-client-python[dataframe]"
         )
     settings = _load_settings()
-    settings["SERVER"]
-    database = settings["DATABASE"]
+    settings["server"]
+    database = settings["database"]
     df = pd.read_csv(csv_file, sep=sep)
     class_name = csv_file.split(".")[0].capitalize()
     class_dict = {"@type": "Class", "@id": class_name}
@@ -316,18 +332,6 @@ def importcsv(csv_file, sep):
         commit_msg=f"Schema object insert/ update with {csv_file} insert by Python client.",
         graph_type="schema",
     )
-    # if client.has_doc(class_name, graph_type="schema"):
-    #     client.replace_document(
-    #         class_dict,
-    #         commit_msg=f"Schema object update with {csv_file} insert by Python client.",
-    #         graph_type="schema",
-    #     )
-    # else:
-    #     client.insert_document(
-    #         class_dict,
-    #         commit_msg=f"Schema object created with {csv_file} insert by Python client.",
-    #         graph_type="schema",
-    #     )
     print(  # noqa: T001
         f"Schema object created with {csv_file} inserted into database."
     )
@@ -361,8 +365,8 @@ def exportcsv(class_obj, keepid, maxdep, filename=None):
             "Library 'pandas' is required to export csv, either install 'pandas' or install woqlDataframe requirements as follows: python -m pip install -U terminus-client-python[dataframe]"
         )
     settings = _load_settings()
-    settings["SERVER"]
-    database = settings["DATABASE"]
+    settings["server"]
+    database = settings["database"]
     client, msg = _connect(settings, new_db=False)
     all_existing_obj = client.get_all_documents(graph_type="schema")
     all_existing_class = {}
@@ -440,7 +444,7 @@ def exportcsv(class_obj, keepid, maxdep, filename=None):
 def alldocs(schema):
     """Get all documents in the database"""
     settings = _load_settings()
-    settings["DATABASE"]
+    settings["database"]
     client, msg = _connect(settings)
     if schema:
         print(list(client.get_all_documents(graph_type="schema")))  # noqa: T001
