@@ -8,14 +8,14 @@ from .woql_core import _copy_dict, _tokenize, _tokens_to_json
 
 # pp = pprint.PrettyPrinter(indent=4)
 
-BLOCK_SCOPE = [
-    "select",
-    "from",
-    "start",
-    "when",
-    "opt",
-    "limit",
-]
+# BLOCK_SCOPE = [
+#     "select",
+#     "from",
+#     "start",
+#     "when",
+#     "opt",
+#     "limit",
+# ]
 UPDATE_OPERATORS = [
     "AddTriple",
     "DeleteTriple",
@@ -70,6 +70,7 @@ class WOQLQuery:
         self._contains_update = False
         self._triple_builder_context = {}
         self._vocab = SHORT_NAME_MAPPING
+        self._update_operators = UPDATE_OPERATORS
 
         # alias
         self.subsumption = self.sub
@@ -149,7 +150,7 @@ class WOQLQuery:
             json = self._query
         if not isinstance(json, dict):
             return False
-        if json["@type"] in self._update_operators:
+        if json["@type"] in self._update_operators:  # won't work
             return True
         if json.get("consequent") and self._contains_update_check(json["consequent"]):
             return True
@@ -218,7 +219,7 @@ class WOQLQuery:
             for item in wvar:
                 co_item = self._clean_data_value(item)
                 ret.append(co_item)
-            return { "@type" : "DataValue", "list" : ret }
+            return {"@type": "DataValue", "list": ret}
 
     def _value_list(self, wvar):
         # TODO: orig is Nonetype
@@ -2507,7 +2508,7 @@ class WOQLQuery:
         self._cursor["@type"] = "True"
         return self
 
-    def path(self, subject, pattern, obj, path):
+    def path(self, subject, pattern, obj, path=None):
         """
         Create a path object constructed by the rules specified with pattern.
 
@@ -2542,7 +2543,8 @@ class WOQLQuery:
             pattern = self._compile_path_pattern(pattern)
         self._cursor["pattern"] = pattern
         self._cursor["object"] = self._clean_object(obj)
-        self._cursor["path"] = self._varj(path)
+        if path is not None:
+            self._cursor["path"] = self._varj(path)
         return self
 
     def size(self, graph, size):

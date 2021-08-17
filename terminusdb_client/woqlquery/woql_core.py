@@ -24,7 +24,7 @@ def _get_clause_and_remainder(pat):
                 return _get_clause_and_remainder(pat[1:idx])
                 # whole thing surrounded by parentheses, strip them out and reparse
         return []
-    if pat[0] == "+" or pat[0] == "," or pat[0] == "|":
+    if pat[0] == "+" or pat[0] == "*" or pat[0] == "," or pat[0] == "|":
         ret = [pat[0]]
         if pat[1:]:
             ret.append(pat[1:])
@@ -36,7 +36,7 @@ def _get_clause_and_remainder(pat):
             ret.append(pat[close_idx:])
         return ret
     for idx, char in enumerate(pat[1:]):
-        if char in [",", "|", "+", "{"]:
+        if char in [",", "|", "+", "*", "{"]:
             return [pat[: idx + 1], pat[idx + 1 :]]
     return [pat]
 
@@ -93,8 +93,8 @@ def _tokens_to_json(seq, query):
         meat = seq[1][1:-1].split(",")
         return {
             "@type": "PathTimes",
-            "from": meat[0],
-            "to": meat[1],
+            "from": int(meat[0]),
+            "to": int(meat[1]),
             "times": _tokens_to_json([seq[0]], query),
         }
     else:
