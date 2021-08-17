@@ -1,5 +1,31 @@
 # TerminusDB Python Client Release Notes
 
+## v2.0.0
+
+### New
+
+- WOQLClient:
+  - works with new document interface api
+- woql_schema:
+  - sub-module to create schema in document interface
+- scrpits:
+  - sub-module to provide CLI for setting up project and working with document interface
+
+### Changes
+
+- WOQLQuery:
+  - deprecate `doctype` - use document interface instead
+- WOQLLib:
+  - deprecated - use document interface instead
+
+### Bug Fixes / Improvements
+
+- WOQLQuery:
+  - fix path queries
+  - update to work with new version of TerminusDB
+
+---
+
 ## v1.1.0
 
 ### New
