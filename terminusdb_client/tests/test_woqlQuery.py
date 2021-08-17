@@ -355,7 +355,7 @@ class TestWoqlQueries:
             },
             "pattern": {
                 "@type": "PathPlus",
-                "pattern": {
+                "plus": {
                     "@type": "InversePathPredicate",
                     "predicate": "hop",
                 },
@@ -381,7 +381,7 @@ class TestWoqlQueries:
             },
             "pattern": {
                 "@type": "PathPlus",
-                "pattern": {
+                "plus": {
                     "@type": "PathSequence",
                     "sequence": [
                         {
@@ -418,7 +418,7 @@ class TestWoqlQueries:
             },
             "pattern": {
                 "@type": "PathPlus",
-                "pattern": {
+                "plus": {
                     "@type": "PathOr",
                     "or": [
                         {
