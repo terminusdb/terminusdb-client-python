@@ -317,6 +317,112 @@ class TaggedUnion(DocumentTemplate):
 class WOQLSchema:
     def __init__(self):
         self.object = {}
+        self._all_existing_classes = {}
+
+    def _contruct_class(self, class_obj_dict):
+        # if the class is already constructed properly
+        if (
+            class_obj_dict.get("@id")
+            and class_obj_dict["@id"] in self.object
+            and not isinstance(self.object[class_obj_dict["@id"]], str)
+        ):
+            return self.object[class_obj_dict["@id"]]
+        # if the class is Enum
+        if class_obj_dict.get("@type") == "Enum":
+            attributedict = _EnumDict()
+        else:
+            attributedict = {}
+        annotations = {}
+        superclasses = []
+        inherits = class_obj_dict.get("@inherits")
+        if inherits:
+            if isinstance(inherits, str):
+                inherits = [inherits]
+            for parent in inherits:
+                if parent == "TaggedUnion":
+                    superclasses.append(TaggedUnion)
+                elif parent not in self._all_existing_classes:
+                    raise RuntimeError(f"{parent} not exist in database schema")
+                else:
+                    self._contruct_class(self._all_existing_classes[parent])
+                    superclasses.append(self.object[parent])
+        else:
+            inherits = []
+        if class_obj_dict.get("@type") == "Class":
+            superclasses.append(DocumentTemplate)
+        elif class_obj_dict.get("@type") == "Enum":
+            superclasses.append(EnumTemplate)
+            if class_obj_dict.get("@value"):
+                for members in class_obj_dict.get("@value"):
+                    attributedict[members.lower().replace(" ", "_")] = members
+            else:
+                raise RuntimeError(f"{value} not exist in database schema")
+        for key, value in class_obj_dict.items():
+            if key[0] != "@":
+                attributedict[key] = None
+                if isinstance(value, str):
+                    if value[:4] == "xsd:":
+                        annotations[key] = wt.from_woql_type(value)
+                    else:
+                        if value not in self._all_existing_classes:
+                            raise RuntimeError(f"{value} not exist in database schema")
+                        elif value not in self.object:
+                            self.object[value] = value
+                        annotations[key] = self.object[value]
+                elif isinstance(value, dict):
+                    if value.get("@type") and value.get("@type") == "Set":
+                        annotations[key] = Set[
+                            wt.from_woql_type(
+                                value.get("@class"), skip_convert_error=True
+                            )
+                        ]
+                    elif value.get("@type") and value.get("@type") == "List":
+                        annotations[key] = List[
+                            wt.from_woql_type(
+                                value.get("@class"), skip_convert_error=True
+                            )
+                        ]
+                    elif value.get("@type") and value.get("@type") == "Optional":
+                        annotations[key] = Optional[
+                            wt.from_woql_type(
+                                value.get("@class"), skip_convert_error=True
+                            )
+                        ]
+                    else:
+                        raise RuntimeError(
+                            f"{value} is not in the right format for TerminusDB type"
+                        )
+            # when key stars with @
+            elif key == "@subdocument":
+                attributedict["_subdocument"] = value
+            elif key == "@abstract":
+                attributedict["_abstract"] = value
+            elif key == "@key":
+                key_type = value.get("@type")
+                if key_type and key_type == "Random":
+                    attributedict["_key"] = RandomKey()
+                elif key_type and key_type == "ValueHash":
+                    attributedict["_key"] = ValueHashKey()
+                elif key_type and key_type == "Lexical":
+                    attributedict["_key"] = LexicalKey(value.get("@fields"))
+                elif key_type and key_type == "Hash":
+                    attributedict["_key"] = HashKey(value.get("@fields"))
+                else:
+                    raise RuntimeError(
+                        f"{value} is not in the right format for TerminusDB key"
+                    )
+            elif key == "@documentation":
+                docstring = f'{value["@comment"]}'
+                if value.get("@properties"):
+                    docstring += "\n\n    Attributes\n    ----------\n"
+                    for prop, discription in value["@properties"].items():
+                        docstring += f"    {prop} : {wt.from_woql_type(class_obj_dict[prop], skip_convert_error=True, as_str=True)}\n        {discription}\n"
+                attributedict["__doc__"] = docstring
+
+        attributedict["__annotations__"] = annotations
+        new_class = type(class_obj_dict["@id"], tuple(superclasses), attributedict)
+        self.add_obj(class_obj_dict["@id"], new_class)
+        return new_class
 
     def commit(self, client: WOQLClient, commit_msg: Optional[str] = None):
         if commit_msg is None:
@@ -327,124 +433,29 @@ class WOQLSchema:
             graph_type="schema",
         )
 
-    def sync_wth_db(self, client: WOQLClient):
-        """Add all the classes in the database shcema in the global namespace"""
+    def from_db(self, client: WOQLClient, select: Optional[List[str]] = None):
+        """Load classes in the database shcema into schema
+
+        Parameters
+        ----------
+        client: WOQLClient
+            Client that is connected to the database
+        select: list of str, optional
+            The classes (and depended classes) that will be imported, default to None which will import all classes
+        """
         all_existing_class_raw = client.get_all_documents(graph_type="schema")
-        # clean up and make a dict
-        all_existing_class = {}
+        # clean up and update all_existing_classes
         for item in all_existing_class_raw:
-            if item.get("@id"):
-                all_existing_class[item["@id"]] = item
+            item_id = item.get("@id")
+            if item_id:
+                self._all_existing_classes[item_id] = item
 
-        def contruct_class(class_obj_dict):
-            # if the class is already constructed properly
-            if (
-                class_obj_dict.get("@id")
-                and class_obj_dict["@id"] in self.object
-                and not isinstance(self.object[class_obj_dict["@id"]], str)
-            ):
-                return self.object[class_obj_dict["@id"]]
-            # if the class is Enum
-            if class_obj_dict.get("@type") == "Enum":
-                attributedict = _EnumDict()
-            else:
-                attributedict = {}
-            annotations = {}
-            superclasses = []
-            inherits = class_obj_dict.get("@inherits")
-            if inherits:
-                if isinstance(inherits, str):
-                    inherits = [inherits]
-                for parent in inherits:
-                    if parent == "TaggedUnion":
-                        superclasses.append(TaggedUnion)
-                    elif parent not in all_existing_class:
-                        raise RuntimeError(f"{parent} not exist in database schema")
-                    else:
-                        contruct_class(all_existing_class[parent])
-                        superclasses.append(self.object[parent])
-            else:
-                inherits = []
-            if class_obj_dict.get("@type") == "Class":
-                superclasses.append(DocumentTemplate)
-            elif class_obj_dict.get("@type") == "Enum":
-                superclasses.append(EnumTemplate)
-                if class_obj_dict.get("@value"):
-                    for members in class_obj_dict.get("@value"):
-                        attributedict[members.lower().replace(" ", "_")] = members
-                else:
-                    raise RuntimeError(f"{value} not exist in database schema")
-            for key, value in class_obj_dict.items():
-                if key[0] != "@":
-                    attributedict[key] = None
-                    if isinstance(value, str):
-                        if value[:4] == "xsd:":
-                            annotations[key] = wt.from_woql_type(value)
-                        else:
-                            if value not in all_existing_class:
-                                raise RuntimeError(
-                                    f"{value} not exist in database schema"
-                                )
-                            elif value not in self.object:
-                                self.object[value] = value
-                            annotations[key] = self.object[value]
-                    elif isinstance(value, dict):
-                        if value.get("@type") and value.get("@type") == "Set":
-                            annotations[key] = Set[
-                                wt.from_woql_type(
-                                    value.get("@class"), skip_convert_error=True
-                                )
-                            ]
-                        elif value.get("@type") and value.get("@type") == "List":
-                            annotations[key] = List[
-                                wt.from_woql_type(
-                                    value.get("@class"), skip_convert_error=True
-                                )
-                            ]
-                        elif value.get("@type") and value.get("@type") == "Optional":
-                            annotations[key] = Optional[
-                                wt.from_woql_type(
-                                    value.get("@class"), skip_convert_error=True
-                                )
-                            ]
-                        else:
-                            raise RuntimeError(
-                                f"{value} is not in the right format for TerminusDB type"
-                            )
-                # when key stars with @
-                elif key == "@subdocument":
-                    attributedict["_subdocument"] = value
-                elif key == "@abstract":
-                    attributedict["_abstract"] = value
-                elif key == "@key":
-                    key_type = value.get("@type")
-                    if key_type and key_type == "Random":
-                        attributedict["_key"] = RandomKey()
-                    elif key_type and key_type == "ValueHash":
-                        attributedict["_key"] = ValueHashKey()
-                    elif key_type and key_type == "Lexical":
-                        attributedict["_key"] = LexicalKey(value.get("@fields"))
-                    elif key_type and key_type == "Hash":
-                        attributedict["_key"] = HashKey(value.get("@fields"))
-                    else:
-                        raise RuntimeError(
-                            f"{value} is not in the right format for TerminusDB key"
-                        )
-                elif key == "@documentation":
-                    docstring = f'{value["@comment"]}'
-                    if value.get("@properties"):
-                        docstring += "\n\n    Attributes\n    ----------\n"
-                        for prop, discription in value["@properties"].items():
-                            docstring += f"    {prop} : {wt.from_woql_type(class_obj_dict[prop], skip_convert_error=True, as_str=True)}\n        {discription}\n"
-                    attributedict["__doc__"] = docstring
+        for item_id, class_obj_dict in self._all_existing_classes.items():
+            if select is None or (select is not None and item_id in select):
+                self._contruct_class(class_obj_dict)
 
-            attributedict["__annotations__"] = annotations
-            new_class = type(class_obj_dict["@id"], tuple(superclasses), attributedict)
-            self.add_obj(class_obj_dict["@id"], new_class)
-            return new_class
-
-        for _, class_obj_dict in all_existing_class.items():
-            contruct_class(class_obj_dict)
+    def from_json_schema(self, client: WOQLClient, select: Optional[List[str]] = None):
+        pass
 
     def add_obj(self, name, obj):
         self.object[name] = obj

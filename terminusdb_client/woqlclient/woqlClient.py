@@ -157,25 +157,25 @@ class WOQLClient:
 
     def get_commit_history(self, max_history: int = 500) -> list:
         """Get the whole commit history.
-                Commit history - Commit id, author of the commit, commit message and the commit time, in the current branch from the current commit, ordered backwards in time, will be returned in a dictionary in the follow format:
-                {"commit_id":
-                    {"author": "commit_author",
-                     "message": "commit_message",
-                     "timestamp: <datetime object of the timestamp>" }
-                }
+        Commit history - Commit id, author of the commit, commit message and the commit time, in the current branch from the current commit, ordered backwards in time, will be returned in a dictionary in the follow format:
+        {"commit_id":
+            {"author": "commit_author",
+             "message": "commit_message",
+             "timestamp: <datetime object of the timestamp>" }
+        }
 
-                Parameters
-                ----------
-                max_history: int, optional
-                    maximum number of commit that would return, counting backwards from your current commit. Default is set to 500. It need to be nop-negitive, if input is 0 it will still give the last commit.
+        Parameters
+        ----------
+        max_history: int, optional
+            maximum number of commit that would return, counting backwards from your current commit. Default is set to 500. It need to be nop-negitive, if input is 0 it will still give the last commit.
 
-                Example
-                -------
-                >>> from terminusdb_client import WOQLClient
-                >>> client = WOQLClient("https://127.0.0.1:6363"
-                >>> client.connect(db="bank_balance_example")
-                >>> client.get_commit_history()
-                [{'commit': 's90wike9v5xibmrb661emxjs8k7ynwc', 'author': 'admin', 'message': 'Adding Jane', 'timstamp': datetime.da
+        Example
+        -------
+        >>> from terminusdb_client import WOQLClient
+        >>> client = WOQLClient("https://127.0.0.1:6363"
+        >>> client.connect(db="bank_balance_example")
+        >>> client.get_commit_history()
+        [{'commit': 's90wike9v5xibmrb661emxjs8k7ynwc', 'author': 'admin', 'message': 'Adding Jane', 'timstamp': datetime.da
         tetime(2020, 9, 3, 15, 29, 34)}, {'commit': '1qhge8qlodajx93ovj67kvkrkxsw3pg', 'author': 'gavin@terminusdb.com', 'm
         essage': 'Adding Jim', 'timstamp': datetime.datetime(2020, 9, 3, 15, 29, 33)}, {'commit': 'rciy1rfu5foj67ch00ow6f6n
         njjxe3i', 'author': 'gavin@terminusdb.com', 'message': 'Update mike', 'timstamp': datetime.datetime(2020, 9, 3, 15,
