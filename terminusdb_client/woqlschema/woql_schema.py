@@ -1,6 +1,8 @@
+import json
 from copy import copy, deepcopy
 from enum import Enum, EnumMeta, _EnumDict
 from hashlib import sha256
+from io import StringIO, TextIOWrapper
 from typing import List, Optional, Set, Union
 from urllib.parse import quote
 from uuid import uuid4
@@ -9,7 +11,7 @@ from numpydoc.docscrape import ClassDoc
 from typeguard import check_type
 
 from .. import woql_type as wt
-from ..woql_type import CONVERT_TYPE
+from ..woql_type import CONVERT_TYPE, to_woql_type
 from ..woqlclient.woqlClient import WOQLClient
 
 
@@ -454,8 +456,68 @@ class WOQLSchema:
             if select is None or (select is not None and item_id in select):
                 self._contruct_class(class_obj_dict)
 
-    def from_json_schema(self, client: WOQLClient, select: Optional[List[str]] = None):
-        pass
+    def from_json_schema(
+        self, name: str, json_schema: Union[dict, str, StringIO], pipe=False
+    ):
+        """Load classe object from json schema (http://json-schema.org/) and, if pipe mode is off, add into schema.
+
+        Parameters
+        ----------
+        name: str
+            Name of the class object.
+        json_schema: dict or str or StringIO
+            Json Schema in dictionary or jsonisable string format or json file stream.
+        pipe: bool
+            Pipe mode, if True will return the schema in TerminusDB dictionary format (just like calling to_dict) WITHOUT loading the schema into the schema object. Default to False.
+        """
+        if isinstance(json_schema, str):
+            json_schema = json.loads(json_schema)
+        elif isinstance(json_schema, TextIOWrapper):
+            json_schema = json.load(json_schema)
+
+        properties = json_schema.get("properties")
+        if properties is None:
+            raise InterfaceError(
+                f"json_schema not in proper format: 'properties' is missing"
+            )
+
+        class_dict = {"@id": name, "@type": "Class"}
+        convert_dict = {
+            "string": str,
+            "integer": int,
+            "boolean": bool,
+            "number": int,
+            "decimal": float,
+        }
+        for prop_name, prop in properties.items():
+            if "format" in prop and prop["format"] == "date-time":
+                prop_type = "xsd:dataTime"
+            elif prop["type"] == "array":
+                prop_type = list(prop["items"].values())
+                prop_type = to_woql_type(
+                    List.__getitem__(*map(lambda x: convert_dict[x], prop_type))
+                )
+            else:
+                prop_type = prop["type"]
+                if "null" in prop_type:
+                    prop_type.remove("null")
+                    prop_type = to_woql_type(
+                        Optional.__getitem__(*map(lambda x: convert_dict[x], prop_type))
+                    )
+                elif len(prop_type) > 1:
+                    prop_type = to_woql_type(
+                        Union.__getitem__(*map(lambda x: convert_dict[x], prop_type))
+                    )
+                elif isinstance(prop_type, list):
+                    prop_type = to_woql_type(prop_type[0])
+                else:
+                    prop_type = to_woql_type(prop_type)
+            class_dict[prop_name] = prop_type
+
+        if pipe:  # end of journey for pipemode
+            return class_dict
+
+        self._contruct_class(class_dict)
 
     def add_obj(self, name, obj):
         self.object[name] = obj
@@ -464,7 +526,11 @@ class WOQLSchema:
         return set(self.object.values())
 
     def to_dict(self):
+        """Return the schema in the TerminusDB dictionary format"""
         return list(map(lambda cls: cls._to_dict(), self.all_obj()))
+
+    def to_json_schema(self):
+        """Return the schema in the json schema (http://json-schema.org/) format as a dictionary."""
 
     def copy(self):
         return deepcopy(self)
