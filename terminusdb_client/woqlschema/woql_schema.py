@@ -457,9 +457,13 @@ class WOQLSchema:
                 self._contruct_class(class_obj_dict)
 
     def from_json_schema(
-        self, name: str, json_schema: Union[dict, str, StringIO], pipe=False
+        self,
+        name: str,
+        json_schema: Union[dict, str, StringIO],
+        pipe=False,
+        subdoc=False,
     ):
-        """Load classe object from json schema (http://json-schema.org/) and, if pipe mode is off, add into schema.
+        """Load classe object from json schema (http://json-schema.org/) and, if pipe mode is off, add into schema. All referenced object will be treated as subdocuments.
 
         Parameters
         ----------
@@ -469,6 +473,8 @@ class WOQLSchema:
             Json Schema in dictionary or jsonisable string format or json file stream.
         pipe: bool
             Pipe mode, if True will return the schema in TerminusDB dictionary format (just like calling to_dict) WITHOUT loading the schema into the schema object. Default to False.
+        subdoc: bool
+            If not in pipe mode, the class object will be added as a subdocument class.
         """
         if isinstance(json_schema, str):
             json_schema = json.loads(json_schema)
@@ -476,12 +482,15 @@ class WOQLSchema:
             json_schema = json.load(json_schema)
 
         properties = json_schema.get("properties")
+        defs = json_schema.get("$defs")
         if properties is None:
-            raise InterfaceError(
+            raise RuntimeError(
                 f"json_schema not in proper format: 'properties' is missing"
             )
 
         class_dict = {"@id": name, "@type": "Class"}
+        if subdoc:
+            class_dict["@subdocument"] = []
         convert_dict = {
             "string": str,
             "integer": int,
@@ -489,30 +498,56 @@ class WOQLSchema:
             "number": int,
             "decimal": float,
         }
-        for prop_name, prop in properties.items():
+
+        def convert_property(prop_name, prop):
+            # it's datetime
             if "format" in prop and prop["format"] == "date-time":
-                prop_type = "xsd:dataTime"
+                return "xsd:dataTime"
+            # it's another object
+            elif prop.get("type") is None and prop.get("$ref") is not None:
+                prop_type = prop["$ref"].split("/")[-1]
+                if defs is None or prop_type not in defs:
+                    raise RuntimeError(f"{prop_type} not found in defs.")
+                if pipe:
+                    return self.from_json_schema(prop_type, defs[prop_type], pipe=True)
+                else:
+                    self.from_json_schema(prop_type, defs[prop_type], subdoc=True)
+                    return self.object[prop_type]._to_dict()
+            # it's enum
+            elif prop.get("type") is None and prop.get("enum") is not None:
+                # create enum name from snake case to camal case
+                enum_name = prop_name.replace("_", " ").capitalize().replace(" ", "")
+                enum_dict = {"@id": enum_name, "@type": "Enum", "@value": prop["enum"]}
+                if pipe:
+                    return enum_dict
+                else:
+                    self._contruct_class(enum_dict)
+                    return self.object[enum_name]._to_dict()
+            # it's a List
             elif prop["type"] == "array":
-                prop_type = list(prop["items"].values())
-                prop_type = to_woql_type(
-                    List.__getitem__(*map(lambda x: convert_dict[x], prop_type))
-                )
-            else:
+                prop_type = convert_property(prop["items"])
+                return {"@type": "List", "@class": prop_type}
+            elif isinstance(prop["type"], list):
                 prop_type = prop["type"]
+                # it's Optional
                 if "null" in prop_type:
                     prop_type.remove("null")
-                    prop_type = to_woql_type(
-                        Optional.__getitem__(*map(lambda x: convert_dict[x], prop_type))
-                    )
-                elif len(prop_type) > 1:
-                    prop_type = to_woql_type(
-                        Union.__getitem__(*map(lambda x: convert_dict[x], prop_type))
-                    )
-                elif isinstance(prop_type, list):
-                    prop_type = to_woql_type(prop_type[0])
+                    prop_type = prop_type[0]  # can only have one type
+                    # it's list in a 'type' so assume no ref
+                    return to_woql_type(Optional.__getitem__(convert_dict[prop_type]))
+                # THIS SHOULD BE TaggedUnion
+                # elif len(prop_type) > 1:
+                #     prop_type = to_woql_type(
+                #         Union.__getitem__(*map(lambda x: convert_dict[x], prop_type))
+                #     )
+                # type is wrapped in a list
                 else:
-                    prop_type = to_woql_type(prop_type)
-            class_dict[prop_name] = prop_type
+                    return to_woql_type(convert_dict[prop_type[0]])
+            else:
+                return to_woql_type(convert_dict[prop["type"]])
+
+        for prop_name, prop in properties.items():
+            class_dict[prop_name] = convert_property(prop_name, prop)
 
         if pipe:  # end of journey for pipemode
             return class_dict
@@ -529,8 +564,65 @@ class WOQLSchema:
         """Return the schema in the TerminusDB dictionary format"""
         return list(map(lambda cls: cls._to_dict(), self.all_obj()))
 
-    def to_json_schema(self):
-        """Return the schema in the json schema (http://json-schema.org/) format as a dictionary."""
+    def to_json_schema(self, class_object):
+        """Return the schema in the json schema (http://json-schema.org/) format as a dictionary for the class object.
+
+        Parameters
+        ----------
+        class object: str
+            Name of the class object.
+        """
+        if class_object not in self.object.keys():
+            raise RuntimeError(f"{class_object} not found in schema.")
+        class_dict = self.object[class_object]._to_dict()
+        class_dict.get("@documentation")
+        json_properties = {}
+        defs = {}
+        for key, item in class_dict.items():
+            if key[0] != "@":
+                if isinstance(item, str):
+                    # datatype properties
+                    if item[:4] == "xsd:":
+                        json_properties[key] = {"type": item[4:]}
+                    # object properties
+                    else:
+                        if item == class_object:
+                            raise RuntimeError(
+                                f"{class_object} depends on itself and created a loop. Cannot be created as json schema."
+                            )
+                        json_properties[key] = {"type": "#/$defs/" + item}
+                        defs[item] = self.to_json_schema(item)
+                elif isinstance(item, dict):
+                    prop_type = item["@type"]
+                    # if prop_type is None:
+                    #     raise RuntimeError(f"Format of property {key} is not valid.")
+                    # obejct properties, subdocument
+                    if prop_type == "Class":
+                        item_id = item["@id"]
+                        # if item_id is None:
+                        #     raise RuntimeError(f"Format of property {key} is not valid.")
+                        json_properties[key] = {"$ref": "#/$defs/" + item_id}
+                        defs[item_id] = self.to_json_schema(item_id)
+                    elif prop_type == "Enum":
+                        item_id = item["@id"]
+                        json_properties[key] = {"enum": item["@value"]}
+                    elif prop_type in ["List", "Set", "Optional"]:
+                        item = item["@class"]
+                        # datatype properties
+                        if item[:4] == "xsd:":
+                            json_properties[key] = {"type": item[4:]}
+                        # object properties
+                        else:
+                            if item == class_object:
+                                raise RuntimeError(
+                                    f"{class_object} depends on itself and created a loop. Cannot be created as json schema."
+                                )
+                            json_properties[key] = {"type": "#/$defs/" + item}
+                            defs[item] = self.to_json_schema(item)
+        json_schema = {"type": ["null", "object"], "additionalProperties": False}
+        json_schema["properties"] = json_properties
+        json_schema["$defs"] = defs
+        return json_schema
 
     def copy(self):
         return deepcopy(self)
