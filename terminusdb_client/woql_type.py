@@ -36,7 +36,7 @@ def to_woql_type(input_type: type):
 def from_woql_type(
     input_type: Union[str, dict], skip_convert_error=False, as_str=False
 ):
-    """Converting the TerminusDB datatypes into Python types
+    """Converting the TerminusDB datatypes into Python types, it will not detect self define types (i.e. object properties) so if converting object properties, skip_convert_error need to be True.
 
     Parameters
     ----------

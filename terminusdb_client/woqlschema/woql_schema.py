@@ -571,7 +571,7 @@ class WOQLSchema:
 
         Parameters
         ----------
-        class object: str ro dict
+        class object: str or dict
             Name of the class object or the class object represented as dictionary.
         """
         if isinstance(class_object, dict):
