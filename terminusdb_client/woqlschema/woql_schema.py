@@ -566,17 +566,20 @@ class WOQLSchema:
         """Return the schema in the TerminusDB dictionary format"""
         return list(map(lambda cls: cls._to_dict(), self.all_obj()))
 
-    def to_json_schema(self, class_object):
+    def to_json_schema(self, class_object: Union[str, dict]):
         """Return the schema in the json schema (http://json-schema.org/) format as a dictionary for the class object.
 
         Parameters
         ----------
-        class object: str
-            Name of the class object.
+        class object: str ro dict
+            Name of the class object or the class object represented as dictionary.
         """
-        if class_object not in self.object.keys():
+        if isinstance(class_object, dict):
+            class_dict = class_object
+        elif class_object not in self.object.keys():
             raise RuntimeError(f"{class_object} not found in schema.")
-        class_dict = self.object[class_object]._to_dict()
+        else:
+            class_dict = self.object[class_object]._to_dict()
         class_doc = class_dict.get("@documentation")
         if class_doc is not None:
             doc_dict = class_doc.get("@properties")
@@ -625,7 +628,7 @@ class WOQLSchema:
                                 )
                             json_properties[key] = {"type": "#/$defs/" + item}
                             defs[item] = self.to_json_schema(item)
-            if key in doc_dict:
+            if doc_dict and key in doc_dict:
                 json_properties[key]["description"] = doc_dict[key]
         json_schema = {"type": ["null", "object"], "additionalProperties": False}
         json_schema["properties"] = json_properties
