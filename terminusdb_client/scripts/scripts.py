@@ -290,7 +290,7 @@ def deletedb(database):
     else:
         client = WOQLClient(server)
         client.connect()
-        client.delete_database(database, client._account)
+        client.delete_database(database, client.account)
         print(f"{database} deleted.")  # noqa: T001
 
 

@@ -73,7 +73,7 @@ class Coordinate(DocumentTemplate):
 class Location(Address, Coordinate):
     """Location is inherits from Address and Coordinate
 
-    Class can have multiple inheritance. It will inherits both the attibutes fromAddress and Coordinate.
+    Class can have multiple inheritance. It will inherits both the attibutes from Address and Coordinate.
     """
 
     name: str

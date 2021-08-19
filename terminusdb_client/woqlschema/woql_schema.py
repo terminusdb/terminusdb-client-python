@@ -192,11 +192,13 @@ class DocumentTemplate(metaclass=TerminusClass):
 
         if cls.__doc__:
             doc_obj = ClassDoc(cls)
+            prop_doc = {}
+            for thing in doc_obj["Attributes"]:
+                if thing.desc:
+                    prop_doc[thing.name] = "\n".join(thing.desc)
             result["@documentation"] = {
                 "@comment": "\n".join(doc_obj["Summary"] + doc_obj["Extended Summary"]),
-                "@properties": {
-                    thing.name: "\n".join(thing.desc) for thing in doc_obj["Attributes"]
-                },
+                "@properties": prop_doc,
             }
 
         if hasattr(cls, "_base"):
@@ -575,7 +577,11 @@ class WOQLSchema:
         if class_object not in self.object.keys():
             raise RuntimeError(f"{class_object} not found in schema.")
         class_dict = self.object[class_object]._to_dict()
-        class_dict.get("@documentation")
+        class_doc = class_dict.get("@documentation")
+        if class_doc is not None:
+            doc_dict = class_doc.get("@properties")
+        else:
+            doc_dict = {}
         json_properties = {}
         defs = {}
         for key, item in class_dict.items():
@@ -619,9 +625,14 @@ class WOQLSchema:
                                 )
                             json_properties[key] = {"type": "#/$defs/" + item}
                             defs[item] = self.to_json_schema(item)
+            if key in doc_dict:
+                json_properties[key]["description"] = doc_dict[key]
         json_schema = {"type": ["null", "object"], "additionalProperties": False}
         json_schema["properties"] = json_properties
         json_schema["$defs"] = defs
+        if class_doc is not None:
+            if class_doc.get("@comment"):
+                json_schema["description"] = class_doc.get("@comment")
         return json_schema
 
     def copy(self):
