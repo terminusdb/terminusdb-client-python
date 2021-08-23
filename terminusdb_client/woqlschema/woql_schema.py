@@ -595,11 +595,15 @@ class WOQLSchema:
                         json_properties[key] = {"type": item[4:]}
                     # object properties
                     else:
+                        if isinstance(class_object, dict):
+                            raise RuntimeError(
+                                f"{item} not embedded in input. Cannot be created as json schema."
+                            )
                         if item == class_object:
                             raise RuntimeError(
                                 f"{class_object} depends on itself and created a loop. Cannot be created as json schema."
                             )
-                        json_properties[key] = {"type": "#/$defs/" + item}
+                        json_properties[key] = {"$ref": "#/$defs/" + item}
                         defs[item] = self.to_json_schema(item)
                 elif isinstance(item, dict):
                     prop_type = item["@type"]
@@ -619,17 +623,31 @@ class WOQLSchema:
                         item = item["@class"]
                         # datatype properties
                         if item[:4] == "xsd:":
-                            json_properties[key] = {"type": item[4:]}
+                            if prop_type == "Optional":
+                                json_properties[key] = {"type": ["null", item[4:]]}
+                            else:
+                                json_properties[key] = {
+                                    "type": "array",
+                                    "items": {"type": item[4:]},
+                                }
                         # object properties
                         else:
+                            if isinstance(class_object, dict):
+                                raise RuntimeError(
+                                    f"{item} not embedded in input. Cannot be created as json schema."
+                                )
                             if item == class_object:
                                 raise RuntimeError(
                                     f"{class_object} depends on itself and created a loop. Cannot be created as json schema."
                                 )
-                            json_properties[key] = {"type": "#/$defs/" + item}
+                            json_properties[key] = {
+                                "type": "array",
+                                "items": {"$ref": "#/$defs/" + item},
+                            }
                             defs[item] = self.to_json_schema(item)
             if doc_dict and key in doc_dict:
                 json_properties[key]["description"] = doc_dict[key]
+        json_properties["id"] = {"type": "string"}
         json_schema = {"type": ["null", "object"], "additionalProperties": False}
         json_schema["properties"] = json_properties
         json_schema["$defs"] = defs
