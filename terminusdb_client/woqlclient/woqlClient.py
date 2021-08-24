@@ -1303,9 +1303,9 @@ class WOQLClient:
         self._check_connection()
 
         if branch is not None and commit is None:
-            rebase_source = "/".join([self.account, self.db, "branch", branch])
+            rebase_source = "/".join([self.account, self.db, self.repo, "branch", branch])
         elif branch is None and commit is not None:
-            rebase_source = "/".join([self.account, self.db, "commit", commit])
+            rebase_source = "/".join([self.account, self.db, self.repo, "commit", commit])
         elif branch is not None or commit is not None:
             raise RuntimeError("Cannot specify both branch and commit.")
         elif rebase_source is None:
