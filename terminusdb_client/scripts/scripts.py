@@ -104,6 +104,10 @@ def _connect(settings, new_db=True):
     jwt_token = settings.get("JWT token")
     account = settings.get("account")
     branch = settings.get("branch")
+    if not account:
+        account = "admin"
+    if not branch:
+        branch = "main"
     client = WOQLClient(server)
     try:
         client.connect(db=database, jwt_token=jwt_token, account=account, branch=branch)
