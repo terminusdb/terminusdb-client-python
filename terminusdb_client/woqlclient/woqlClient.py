@@ -210,7 +210,6 @@ class WOQLClient:
             .triple("v:target_commit", "message", "v:message")
             .triple("v:target_commit", "timestamp", "v:timestamp")
         )
-        # print(woql_query.to_dict())
         result = self.query(woql_query).get("bindings")
         if not result:
             return result
@@ -237,7 +236,6 @@ class WOQLClient:
             .triple("v:branch", "head", "v:commit")
             .triple("v:commit", "identifier", "v:cid")
         )
-        print(woql_query.to_dict())
         result = self.query(woql_query)
         if not result:
             return None
@@ -257,7 +255,6 @@ class WOQLClient:
             .triple("v:branch", "head", "v:commit")
             .triple("v:target_commit", "identifier", "v:cid")
         )
-        print(woql_query.to_dict())
         result = self.query(woql_query)
         target_commit = result.get("bindings")[0].get("cid").get("@value")
         return target_commit
