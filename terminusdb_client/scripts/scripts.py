@@ -9,6 +9,7 @@ from importlib import import_module
 
 import click
 from shed import shed
+from tqdm import tqdm
 
 # from terminusdb_client.woqlschema.woql_schema import TerminusClass
 import terminusdb_client.woqlschema.woql_schema as woqlschema
@@ -54,8 +55,8 @@ def startproject():
                 {
                     "server": server_location,
                     "database": project_name,
-                    "JWT Token": jwt_token,
-                    "Account": account,
+                    "JWT token": jwt_token,
+                    "account": account,
                 },
                 outfile,
                 sort_keys=True,
@@ -80,6 +81,9 @@ def startproject():
             shutil.copyfile(
                 this_file_dir + "/" + file, os.getcwd() + "/" + names[0] + ".py"
             )
+    # create operational file for TerminiusDB
+    with open(".TDB", "w") as outfile:
+        json.dump({"branch": "main"}, outfile)
     print(  # noqa: T001
         "config.json and schema.py created, please customize them to start your project."
     )
@@ -92,30 +96,21 @@ def _load_settings(filename="config.json", check=["server", "database"]):
         if config.get(item) is None:
             raise InterfaceError(f"'{item}' setting cannot be found.")
     return config
-    # sys.path.append(os.getcwd())
-    #
-    # try:
-    #     _temp = __import__("settings", globals(), locals(), ["SERVER", "DATABASE"], 0)
-    #     server = _temp.SERVER
-    #     database = _temp.DATABASE
-    #     return {"server": server, "database": database}
-    # except ImportError:
-    #     msg = "Cannot find settings.py"
-    #     raise ImportError(msg)
 
 
 def _connect(settings, new_db=True):
     server = settings.get("server")
     database = settings.get("database")
-    jwt_token = settings.get("JWT Token")
-    account = settings.get("Account")
+    jwt_token = settings.get("JWT token")
+    account = settings.get("account")
+    branch = settings.get("branch")
     client = WOQLClient(server)
     try:
-        client.connect(db=database, jwt_token=jwt_token, account=account)
+        client.connect(db=database, jwt_token=jwt_token, account=account, branch=branch)
         return client, f"Connected to {database}."
     except InterfaceError as error:
         if "does not exist" in str(error) and new_db:
-            client.connect(jwt_token=jwt_token, account=account)
+            client.connect(jwt_token=jwt_token, account=account, branch=branch)
             client.create_database(database)
             return client, f"{database} created."
         else:
@@ -262,6 +257,8 @@ def _sync(client, database):
 def sync():
     """Pull the current schema plan in database to schema.py"""
     settings = _load_settings()
+    status = _load_settings(".TDB", check=[])
+    settings.update(status)
     database = settings["database"]
     client, msg = _connect(settings, new_db=False)
     print(msg)  # noqa: T001
@@ -272,6 +269,8 @@ def sync():
 def commit():
     """Push the current schema plan in schema.py to database."""
     settings = _load_settings()
+    status = _load_settings(".TDB", check=[])
+    settings.update(status)
     database = settings["database"]
     client, msg = _connect(settings)
     print(msg)  # noqa: T001
@@ -296,6 +295,8 @@ def commit():
 def deletedb(database):
     """Delete the database in this project."""
     settings = _load_settings()
+    status = _load_settings(".TDB", check=[])
+    settings.update(status)
     server = settings["server"]
     setting_database = settings["database"]
     if database != setting_database:
@@ -311,9 +312,11 @@ def deletedb(database):
 
 @click.command()
 @click.argument("csv_file")
+@click.option("--chunksize", default=1000, show_default=True)
 @click.option("--sep", default=",", show_default=True)
+@click.option("--skipna", is_flag=True)
 # @click.option('--header ', default=',', show_default=True)
-def importcsv(csv_file, sep):
+def importcsv(csv_file, chunksize, sep, skipna):
     """Import CSV file into pandas DataFrame then into TerminusDB, options are read_csv() options."""
     try:
         pd = import_module("pandas")
@@ -323,43 +326,63 @@ def importcsv(csv_file, sep):
             "Library 'pandas' is required to import csv, either install 'pandas' or install woqlDataframe requirements as follows: python -m pip install -U terminus-client-python[dataframe]"
         )
     settings = _load_settings()
-    settings["server"]
+    status = _load_settings(".TDB", check=[])
+    settings.update(status)
     database = settings["database"]
-    df = pd.read_csv(csv_file, sep=sep)
     class_name = csv_file.split(".")[0].capitalize()
-    class_dict = {"@type": "Class", "@id": class_name}
-    np_to_buildin = {
-        v: getattr(builtins, k) for k, v in np.typeDict.items() if k in vars(builtins)
-    }
-    np_to_buildin[np.datetime64] = dt.datetime
-    for col, dtype in dict(df.dtypes).items():
-        converted_type = np_to_buildin[dtype.type]
-        if converted_type == object:
-            converted_type = str  # pandas treats all string as objects
-        converted_type = wt.to_woql_type(converted_type)
-        converted_col = col.lower().replace(" ", "_")
-        df.rename(columns={col: converted_col}, inplace=True)
-        class_dict[converted_col] = converted_type
-    class_dict["@key"] = {"@type": "Hash", "@fields": list(df.columns)}
-    client, msg = _connect(settings)
-    client.update_document(
-        class_dict,
-        commit_msg=f"Schema object insert/ update with {csv_file} insert by Python client.",
-        graph_type="schema",
-    )
-    print(  # noqa: T001
-        f"Schema object created with {csv_file} inserted into database."
-    )
-    _sync(client, database)
-    obj_list = df.to_dict(orient="records")
-    for item in obj_list:
-        item["@type"] = class_name
-        item_id = HashKey(list(df.columns)).idgen(item)
-        item["@id"] = item_id
-    client.update_document(
-        obj_list,
-        commit_msg=f"Documents created with {csv_file} insert by Python client.",
-    )
+    has_schema = False
+
+    def _df_to_schema(class_name, df):
+        class_dict = {"@type": "Class", "@id": class_name}
+        np_to_buildin = {
+            v: getattr(builtins, k)
+            for k, v in np.typeDict.items()
+            if k in vars(builtins)
+        }
+        np_to_buildin[np.datetime64] = dt.datetime
+        for col, dtype in dict(df.dtypes).items():
+            converted_type = np_to_buildin[dtype.type]
+            if converted_type == object:
+                converted_type = str  # pandas treats all string as objects
+            converted_type = wt.to_woql_type(converted_type)
+            class_dict[col] = converted_type
+        class_dict["@key"] = {"@type": "Hash", "@fields": list(df.columns)}
+        return class_dict
+
+    with pd.read_csv(csv_file, sep=sep, chunksize=chunksize) as reader:
+        for df in tqdm(reader):
+            if any(df.isna().any()) and not skipna:
+                raise RuntimeError(
+                    f"{df}\nThere is NA in the data and cannot be automatically load in. Use --skipna to remove all records with NA or use the Python client to handle data beform loading to TerminusDB."
+                )
+            elif skipna:
+                df.dropna(inplace=True)
+            for col in df.columns:
+                converted_col = col.lower().replace(" ", "_")
+                df.rename(columns={col: converted_col}, inplace=True)
+            if not has_schema:
+                class_dict = _df_to_schema(class_name, df)
+                client, msg = _connect(settings)
+                client.update_document(
+                    class_dict,
+                    commit_msg=f"Schema object insert/ update with {csv_file} insert by Python client.",
+                    graph_type="schema",
+                )
+                print(  # noqa: T001
+                    f"\nSchema object created with {csv_file} inserted into database."
+                )
+                _sync(client, database)
+                has_schema = True
+
+            obj_list = df.to_dict(orient="records")
+            for item in obj_list:
+                item["@type"] = class_name
+                item_id = HashKey(list(df.columns)).idgen(item)
+                item["@id"] = item_id
+            client.update_document(
+                obj_list,
+                commit_msg=f"Documents created with {csv_file} insert by Python client.",
+            )
     print(  # noqa: T001
         f"Records in {csv_file} inserted into database with random ids."
     )
@@ -380,7 +403,8 @@ def exportcsv(class_obj, keepid, maxdep, filename=None):
             "Library 'pandas' is required to export csv, either install 'pandas' or install woqlDataframe requirements as follows: python -m pip install -U terminus-client-python[dataframe]"
         )
     settings = _load_settings()
-    settings["server"]
+    status = _load_settings(".TDB", check=[])
+    settings.update(status)
     database = settings["database"]
     client, msg = _connect(settings, new_db=False)
     all_existing_obj = client.get_all_documents(graph_type="schema")
@@ -456,15 +480,106 @@ def exportcsv(class_obj, keepid, maxdep, filename=None):
 
 @click.command()
 @click.option("--schema", is_flag=True)
-def alldocs(schema):
+@click.option("--type")
+@click.option("-q", "--query", multiple=True)
+def alldocs(schema, type, query):
     """Get all documents in the database"""
     settings = _load_settings()
-    settings["database"]
+    status = _load_settings(".TDB", check=[])
+    settings.update(status)
     client, msg = _connect(settings)
     if schema:
-        print(list(client.get_all_documents(graph_type="schema")))  # noqa: T001
+        if type:
+            print(client.get_document(type, graph_type="schema"))  # noqa: T001
+        else:
+            print(list(client.get_all_documents(graph_type="schema")))  # noqa: T001
+    elif type:
+        if not query:
+            print(list(client.get_documents_by_type(type)))  # noqa: T001
+        else:
+            schema_dict = client.get_document(type, graph_type="schema")
+            query_dict = {"@type": type}
+            for item in query:
+                pair = item.split("=")
+                if schema_dict.get(pair[0]) is None:
+                    raise InterfaceError(f"{pair[0]} is not a proerty in {type}")
+                elif schema_dict.get(pair[0]) == "xsd:integer":
+                    pair[1] = int(pair[1].strip('"'))
+                elif schema_dict.get(pair[0]) == "xsd:decimal":
+                    pair[1] = float(pair[1].strip('"'))
+                elif schema_dict.get(pair[0]) == "xsd:boolean":
+                    pair[1] = pair[1].strip('"')
+                    if pair[1].lower() == "false":
+                        pair[1] = False
+                    elif pair[1].lower() == "true":
+                        pair[1] = True
+                    else:
+                        raise InterfaceError(f"{pair[1]} cannot be parse as boolean")
+                else:
+                    pair[1] = pair[1].strip('"')
+                query_dict[pair[0]] = pair[1]
+            print(list(client.query_document(query_dict)))  # noqa: T001
     else:
         print(list(client.get_all_documents()))  # noqa: T001
+
+
+@click.command()
+@click.argument("branch_name")
+def branch(branch_name):
+    settings = _load_settings()
+    status = _load_settings(".TDB", check=[])
+    settings.update(status)
+    client, _ = _connect(settings)
+    client.create_branch(branch_name)
+    status["branch"] = branch_name
+    with open(".TDB", "w") as outfile:
+        json.dump(status, outfile)
+    print(
+        f"Branch {branch_name} created, checked out {branch_name} branch."
+    )  # noqa: T001
+
+
+@click.command()
+@click.argument("branch_name")
+@click.option("-b", "--branch", "new_branch", is_flag=True)
+def checkout(branch_name, new_branch):
+    settings = _load_settings()
+    status = _load_settings(".TDB", check=[])
+    settings.update(status)
+    client, _ = _connect(settings)
+    if new_branch:
+        client.create_branch(branch_name)
+    status["branch"] = branch_name
+    with open(".TDB", "w") as outfile:
+        json.dump(status, outfile)
+    if new_branch:
+        print(
+            f"Branch {branch_name} created, checked out {branch_name} branch."
+        )  # noqa: T001
+    else:
+        print(f"Checked out {branch_name} branch.")  # noqa: T001
+
+
+@click.command()
+def status():
+    settings = _load_settings()
+    status = _load_settings(".TDB", check=[])
+    settings.update(status)
+    message = f"Connecting to '{settings['database']}' at '{settings['server']}'\non branch '{settings['branch']}'"
+    if settings.get("account"):
+        message += f"\nas account '{settings['account']}'"
+    print(message)  # noqa: T001
+
+
+@click.command()
+@click.argument("branch_name")
+def rebase(branch_name):
+    settings = _load_settings()
+    status = _load_settings(".TDB", check=[])
+    settings.update(status)
+    client, _ = _connect(settings)
+    client.rebase(branch=branch_name)
+    print(f"Rebased {branch_name} branch.")  # noqa: T001
 
 
 terminusdb.add_command(startproject)
@@ -474,3 +589,7 @@ terminusdb.add_command(deletedb)
 terminusdb.add_command(importcsv)
 terminusdb.add_command(exportcsv)
 terminusdb.add_command(alldocs)
+terminusdb.add_command(branch)
+terminusdb.add_command(checkout)
+terminusdb.add_command(status)
+terminusdb.add_command(rebase)
