@@ -642,11 +642,11 @@ class WOQLClient:
 
         result = requests.post(
             self._documents_url(),
-            params=payload,
+            json=payload,
             auth=self._auth(),
             headers = {'X-HTTP-Method-Override': 'GET'}
         )
-        return _result2stream(_finish_reponse(result))
+        return _result2stream(_finish_response(result))
 
     def get_document(self, iri_id: str, graph_type: str = "instance", **kwargs) -> dict:
         """Retrieves the document of the iri_id
