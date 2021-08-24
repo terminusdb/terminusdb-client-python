@@ -360,7 +360,7 @@ class WOQLSchema:
                 for members in class_obj_dict.get("@value"):
                     attributedict[members.lower().replace(" ", "_")] = members
             else:
-                raise RuntimeError(f"{value} not exist in database schema")
+                raise RuntimeError(f"{class_obj_dict} not exist in database schema")
         for key, value in class_obj_dict.items():
             if key[0] != "@":
                 attributedict[key] = None
@@ -487,7 +487,7 @@ class WOQLSchema:
         defs = json_schema.get("$defs")
         if properties is None:
             raise RuntimeError(
-                f"json_schema not in proper format: 'properties' is missing"
+                "json_schema not in proper format: 'properties' is missing"
             )
 
         class_dict = {"@id": name, "@type": "Class"}

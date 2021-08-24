@@ -16,9 +16,9 @@ def test_startproject():
             assert setting.get("server") == "http://127.0.0.1:6363/"
 
 
-def test_no_server():
-    runner = CliRunner()
-    with runner.isolated_filesystem():
-        runner.invoke(scripts.startproject, input="mydb\n\n")
-        result = runner.invoke(scripts.commit)
-        assert result.exit_code == 1
+# def test_no_server():
+#     runner = CliRunner()
+#     with runner.isolated_filesystem():
+#         runner.invoke(scripts.startproject, input="mydb\n\n")
+#         result = runner.invoke(scripts.commit)
+#         assert result.exit_code == 1

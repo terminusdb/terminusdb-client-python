@@ -89,9 +89,9 @@ def startproject():
     )
 
 
-def _load_settings(filename="config.json", check=["server", "database"]):
-    with open(filename) as input:
-        config = json.load(input)
+def _load_settings(filename="config.json", check=("server", "database")):
+    with open(filename) as input_file:
+        config = json.load(input_file)
     for item in check:
         if config.get(item) is None:
             raise InterfaceError(f"'{item}' setting cannot be found.")
@@ -423,14 +423,11 @@ def exportcsv(class_obj, keepid, maxdep, filename=None):
 
     def expand_df(df):
         for col in df.columns:
-            expanded = None
             try:
                 expanded = pd.json_normalize(df[col])
-            except:
-                pass
+            except Exception:
+                expanded = None
             if expanded is not None and "@id" in expanded.columns:
-                # if len(expanded.columns) == 1:
-                #     import pdb; pdb.set_trace()
                 if not keepid:
                     expanded.drop(
                         columns=list(filter(lambda x: x[0] == "@", expanded.columns)),
@@ -484,29 +481,29 @@ def exportcsv(class_obj, keepid, maxdep, filename=None):
 
 @click.command()
 @click.option("--schema", is_flag=True)
-@click.option("--type")
+@click.option("--type", "type_")
 @click.option("-q", "--query", multiple=True)
-def alldocs(schema, type, query):
+def alldocs(schema, type_, query):
     """Get all documents in the database"""
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
     settings.update(status)
     client, msg = _connect(settings)
     if schema:
-        if type:
-            print(client.get_document(type, graph_type="schema"))  # noqa: T001
+        if type_:
+            print(client.get_document(type_, graph_type="schema"))  # noqa: T001
         else:
             print(list(client.get_all_documents(graph_type="schema")))  # noqa: T001
-    elif type:
+    elif type_:
         if not query:
-            print(list(client.get_documents_by_type(type)))  # noqa: T001
+            print(list(client.get_documents_by_type(type_)))  # noqa: T001
         else:
-            schema_dict = client.get_document(type, graph_type="schema")
-            query_dict = {"@type": type}
+            schema_dict = client.get_document(type_, graph_type="schema")
+            query_dict = {"@type": type_}
             for item in query:
                 pair = item.split("=")
                 if schema_dict.get(pair[0]) is None:
-                    raise InterfaceError(f"{pair[0]} is not a proerty in {type}")
+                    raise InterfaceError(f"{pair[0]} is not a proerty in {type_}")
                 elif schema_dict.get(pair[0]) == "xsd:integer":
                     pair[1] = int(pair[1].strip('"'))
                 elif schema_dict.get(pair[0]) == "xsd:decimal":
@@ -538,9 +535,9 @@ def branch(branch_name):
     status["branch"] = branch_name
     with open(".TDB", "w") as outfile:
         json.dump(status, outfile)
-    print(
+    print(  # noqa: T001
         f"Branch {branch_name} created, checked out {branch_name} branch."
-    )  # noqa: T001
+    )
 
 
 @click.command()
@@ -557,9 +554,9 @@ def checkout(branch_name, new_branch):
     with open(".TDB", "w") as outfile:
         json.dump(status, outfile)
     if new_branch:
-        print(
+        print(  # noqa: T001
             f"Branch {branch_name} created, checked out {branch_name} branch."
-        )  # noqa: T001
+        )
     else:
         print(f"Checked out {branch_name} branch.")  # noqa: T001
 

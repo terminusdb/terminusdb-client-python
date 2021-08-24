@@ -55,23 +55,17 @@ def from_woql_type(
             if as_str:
                 return f'List[{from_woql_type(input_type["@class"], as_str=True)}]'
             else:
-                return List[
-                    from_woql_type(input_type["@class"], as_str=True)  # noqa: F722
-                ]
+                return List[from_woql_type(input_type["@class"], as_str=True)]
         elif input_type["@type"] == "Set":
             if as_str:
                 return f'Set[{from_woql_type(input_type["@class"], as_str=True)}]'
             else:
-                return Set[
-                    from_woql_type(input_type["@class"], as_str=True)  # noqa: F722
-                ]
+                return Set[from_woql_type(input_type["@class"], as_str=True)]
         elif input_type["@type"] == "Optional":
             if as_str:
                 return f'Optional[{from_woql_type(input_type["@class"], as_str=True)}]'
             else:
-                return Optional[
-                    from_woql_type(input_type["@class"], as_str=True)  # noqa: F722
-                ]
+                return Optional[from_woql_type(input_type["@class"], as_str=True)]
         else:
             raise TypeError(
                 f"Input type {input_type} cannot be converted to Python type"

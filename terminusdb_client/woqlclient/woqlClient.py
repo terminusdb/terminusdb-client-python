@@ -130,8 +130,7 @@ class WOQLClient:
             )
         except Exception as error:
             raise InterfaceError(
-                f"Cannot connect to server, please make sure TerminusDB is running at {self.server_url} and the authentication details are correct. Details: {error.message}",
-                details=error.message,
+                f"Cannot connect to server, please make sure TerminusDB is running at {self.server_url} and the authentication details are correct. Details: {str(error)}"
             ) from None
 
         all_db_name = list(map(lambda x: x.get("name"), self._all_avaliable_db))

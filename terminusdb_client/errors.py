@@ -15,9 +15,8 @@ class InterfaceError(Error):
 
     """
 
-    def __init__(self, message, details=None):
+    def __init__(self, message):
         self.message = message
-        self.details = details
 
 
 class DatabaseError(Error):
