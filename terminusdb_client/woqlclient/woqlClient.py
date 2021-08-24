@@ -11,7 +11,7 @@ import requests
 
 from ..__version__ import __version__
 from ..errors import InterfaceError
-from ..woql_utils import _finish_reponse, _result2stream
+from ..woql_utils import _finish_response, _result2stream
 from ..woqlquery.woql_query import WOQLQuery
 
 # WOQL client object
@@ -126,7 +126,7 @@ class WOQLClient:
 
         try:
             self._all_avaliable_db = json.loads(
-                _finish_reponse(requests.get(self.api + "/", auth=self._auth()))
+                _finish_response(requests.get(self.api + "/", auth=self._auth()))
             )
         except Exception as error:
             raise InterfaceError(
@@ -392,7 +392,7 @@ class WOQLClient:
             self._db_base("prefixes"),
             auth=self._auth(),
         )
-        return json.loads(_finish_reponse(result))
+        return json.loads(_finish_response(result))
         # return self._dispatch_json("get", self._db_base("prefixes")).get("@context")
 
     def create_database(
@@ -460,7 +460,7 @@ class WOQLClient:
         self._connected = True
         self.db = dbid
 
-        _finish_reponse(
+        _finish_response(
             requests.post(
                 self._db_url(),
                 json=details,
@@ -515,7 +515,7 @@ class WOQLClient:
         else:
             self.account = accountid
         payload = {"force": force}
-        _finish_reponse(
+        _finish_response(
             requests.delete(
                 self._db_url(),
                 auth=self._auth(),
@@ -552,7 +552,7 @@ class WOQLClient:
             self._triples_url(graph_type),
             auth=self._auth(),
         )
-        return json.loads(_finish_reponse(result))
+        return json.loads(_finish_response(result))
 
     def update_triples(self, graph_type: str, turtle, commit_msg: str) -> None:
         """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
@@ -580,7 +580,7 @@ class WOQLClient:
             params=params,
             auth=self._auth(),
         )
-        return json.loads(_finish_reponse(result))
+        return json.loads(_finish_response(result))
 
     def insert_triples(
         self, graph_type: str, turtle, commit_msg: Optional[str] = None
@@ -610,7 +610,7 @@ class WOQLClient:
             params=params,
             auth=self._auth(),
         )
-        return json.loads(_finish_reponse(result))
+        return json.loads(_finish_response(result))
 
     def get_document(self, iri_id: str, graph_type: str = "instance", **kwargs) -> dict:
         """Retrieves the document of the iri_id
@@ -647,7 +647,7 @@ class WOQLClient:
             params=payload,
             auth=self._auth(),
         )
-        return json.loads(_finish_reponse(result))
+        return json.loads(_finish_response(result))
 
     def get_documents_by_type(
         self,
@@ -698,7 +698,7 @@ class WOQLClient:
             params=payload,
             auth=self._auth(),
         )
-        return _result2stream(_finish_reponse(result))
+        return _result2stream(_finish_response(result))
 
     def get_all_documents(
         self,
@@ -746,7 +746,7 @@ class WOQLClient:
             params=payload,
             auth=self._auth(),
         )
-        return _result2stream(_finish_reponse(result))
+        return _result2stream(_finish_response(result))
 
     def _conv_to_dict(self, obj):
         if isinstance(obj, dict):
@@ -813,7 +813,7 @@ class WOQLClient:
             json=document,
             auth=self._auth(),
         )
-        return json.loads(_finish_reponse(result))
+        return json.loads(_finish_response(result))
 
     def replace_document(
         self,
@@ -859,7 +859,7 @@ class WOQLClient:
             document = new_doc
         else:
             document = self._conv_to_dict(document)
-        _finish_reponse(
+        _finish_response(
             requests.put(
                 self._documents_url(),
                 params=params,
@@ -950,7 +950,7 @@ class WOQLClient:
         self._check_connection()
         params = self._generate_commit(commit_msg)
         params["graph_type"] = graph_type
-        _finish_reponse(
+        _finish_response(
             requests.delete(
                 self._documents_url(),
                 params=params,
@@ -1000,7 +1000,7 @@ class WOQLClient:
             params=opts,
             auth=self._auth(),
         )
-        return json.loads(_finish_reponse(result))
+        return json.loads(_finish_response(result))
 
     def commit(self):
         """Not implementated: open transactions currently not suportted. Please check back later."""
@@ -1048,7 +1048,7 @@ class WOQLClient:
             json=query_obj,
             auth=self._auth(),
         )
-        fin_reqult = json.loads(_finish_reponse(result))
+        fin_reqult = json.loads(_finish_response(result))
 
         if fin_reqult.get("inserts") or fin_reqult.get("deletes"):
             return "Commit successfully made."
@@ -1081,7 +1081,7 @@ class WOQLClient:
                 "origin": f"{self.account}/{self.db}/{self.repo}/branch/{self.branch}"
             }
 
-        _finish_reponse(
+        _finish_response(
             requests.post(
                 self._branch_url(new_branch_id),
                 json=source,
@@ -1145,7 +1145,7 @@ class WOQLClient:
             auth=self._auth(),
         )
 
-        return json.loads(_finish_reponse(result))
+        return json.loads(_finish_response(result))
 
     def fetch(self, remote_id: str) -> dict:
         """Fatch the brach from a remote
@@ -1166,7 +1166,7 @@ class WOQLClient:
             auth=self._auth(),
         )
 
-        return json.loads(_finish_reponse(result))
+        return json.loads(_finish_response(result))
 
     def push(
         self,
@@ -1223,7 +1223,7 @@ class WOQLClient:
             auth=self._auth(),
         )
 
-        return json.loads(_finish_reponse(result))
+        return json.loads(_finish_response(result))
 
     def rebase(
         self,
@@ -1274,7 +1274,7 @@ class WOQLClient:
             auth=self._auth(),
         )
 
-        return json.loads(_finish_reponse(result))
+        return json.loads(_finish_response(result))
 
     def reset(self, commit: str, use_path: bool = False) -> None:
         """Reset the current branch HEAD to the specified commit path. Doing it will reset the internal commit counter (self._commit_made) back to zero.
@@ -1309,7 +1309,7 @@ class WOQLClient:
         else:
             commit_path = f"{self.account}/{self.db}/{self.repo}/commit/{commit}"
 
-        _finish_reponse(
+        _finish_response(
             requests.post(
                 self._reset_url(),
                 json={"commit_descriptor": commit_path},
@@ -1341,7 +1341,7 @@ class WOQLClient:
         """
         self._check_connection()
 
-        _finish_reponse(
+        _finish_response(
             requests.post(
                 self._optimize_url(path),
                 auth=self._auth(),
@@ -1392,7 +1392,7 @@ class WOQLClient:
             auth=self._auth(),
         )
 
-        return json.loads(_finish_reponse(result))
+        return json.loads(_finish_response(result))
 
     def clonedb(
         self, clone_source: str, newid: str, description: Optional[str] = None
@@ -1423,7 +1423,7 @@ class WOQLClient:
             description = f"New database {newid}"
         rc_args = {"remote_url": clone_source, "label": newid, "comment": description}
 
-        _finish_reponse(
+        _finish_response(
             requests.post(
                 self._clone_url(newid),
                 json=rc_args,
@@ -1513,7 +1513,7 @@ class WOQLClient:
             self.api + "/",
             auth=self._auth(),
         )
-        return json.loads(_finish_reponse(result))
+        return json.loads(_finish_response(result))
 
     def list_databases(self) -> List[Dict]:
         """
