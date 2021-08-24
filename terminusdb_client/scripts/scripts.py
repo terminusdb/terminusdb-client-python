@@ -333,7 +333,7 @@ def importcsv(csv_file, chunksize, sep, skipna):
     status = _load_settings(".TDB", check=[])
     settings.update(status)
     database = settings["database"]
-    class_name = csv_file.split(".")[0].capitalize()
+    class_name = csv_file.split(".")[0].replace("_", " ").title().replace(" ", "")
     has_schema = False
 
     def _df_to_schema(class_name, df):
@@ -373,7 +373,7 @@ def importcsv(csv_file, chunksize, sep, skipna):
                     graph_type="schema",
                 )
                 print(  # noqa: T001
-                    f"\nSchema object created with {csv_file} inserted into database."
+                    f"\nSchema object {class_name} created with {csv_file} inserted into database."
                 )
                 _sync(client, database)
                 has_schema = True
@@ -388,7 +388,7 @@ def importcsv(csv_file, chunksize, sep, skipna):
                 commit_msg=f"Documents created with {csv_file} insert by Python client.",
             )
     print(  # noqa: T001
-        f"Records in {csv_file} inserted into database with random ids."
+        f"Records in {csv_file} inserted as type {class_name} into database with random ids."
     )
 
 
