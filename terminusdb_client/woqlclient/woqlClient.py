@@ -126,11 +126,12 @@ class WOQLClient:
 
         try:
             self._all_avaliable_db = json.loads(
-                _finish_reponse(requests.get(self.api, auth=self._auth()))
+                _finish_reponse(requests.get(self.api + "/", auth=self._auth()))
             )
-        except Exception:
+        except Exception as error:
             raise InterfaceError(
-                f"Cannot connect to server, please make sure TerminusDB is running at {self.server_url} and the authentication details are correct."
+                f"Cannot connect to server, please make sure TerminusDB is running at {self.server_url} and the authentication details are correct.",
+                details=error,
             ) from None
 
         all_db_name = list(map(lambda x: x.get("name"), self._all_avaliable_db))
@@ -1509,7 +1510,7 @@ class WOQLClient:
         self._check_connection(check_db=False)
 
         result = requests.get(
-            self.api,
+            self.api + "/",
             auth=self._auth(),
         )
         return json.loads(_finish_reponse(result))
