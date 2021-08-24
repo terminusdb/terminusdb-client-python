@@ -92,7 +92,7 @@ def test_connection(mocked_requests):
     woql_client.connect(key="root", account="admin", user="admin")
 
     requests.get.assert_called_once_with(
-        "http://localhost:6363/api",
+        "http://localhost:6363/api/",
         auth=("admin", "root"),
     )
 
