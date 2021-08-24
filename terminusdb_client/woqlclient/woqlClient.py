@@ -415,11 +415,11 @@ class WOQLClient:
         description : str, optional
             Database description.
         prefixes : dict, optional
-            Optional dict containing ``"doc"`` and ``"scm"`` keys.
+            Optional dict containing ``"@base"`` and ``"@schema"`` keys.
 
-            doc (str)
+            @base (str)
                 IRI to use when ``doc:`` prefixes are expanded. Defaults to ``terminusdb:///data``.
-            scm (str)
+            @schema (str)
                 IRI to use when ``scm:`` prefixes are expanded. Defaults to ``terminusdb:///schema``.
         include_schema : bool
             If ``True``, a main schema graph will be created, otherwise only a main instance graph will be created.
