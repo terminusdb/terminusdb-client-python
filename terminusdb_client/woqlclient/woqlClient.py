@@ -1224,11 +1224,13 @@ class WOQLClient:
 
     def rebase(
         self,
-        rebase_source: str,
+        branch: Optional[str] = None,
+        commit: Optional[str] = None,
+        rebase_source: Optional[str] = None,
         message: Optional[str] = None,
         author: Optional[str] = None,
     ) -> dict:
-        """Rebase the current branch onto the specified remote branch.
+        """Rebase the current branch onto the specified remote branch. Need to specify one of 'branch','commit' or the 'rebase_source'.
 
         Notes
         -----
@@ -1236,7 +1238,9 @@ class WOQLClient:
 
         Parameters
         ----------
-        rebase_source : str
+        branch : str, optional
+            the branch for the rebase
+        rebase_source : str, optional
             the source branch for the rebase
         message : str, optional
             the commit message
@@ -1258,6 +1262,17 @@ class WOQLClient:
         >>> client.rebase("the_branch")
         """
         self._check_connection()
+
+        if branch is not None and commit is None:
+            rebase_source = "/".join([self.account, self.db, "branch", branch])
+        elif branch is None and commit is not None:
+            rebase_source = "/".join([self.account, self.db, "commit", commit])
+        elif branch is not None or commit is not None:
+            raise RuntimeError("Cannot specify both branch and commit.")
+        elif rebase_source is None:
+            raise RuntimeError(
+                "Need to specify one of 'branch', 'commit' or the 'rebase_source'"
+            )
 
         if author is None:
             author = self._author
