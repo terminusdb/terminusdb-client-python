@@ -39,14 +39,37 @@ def startproject():
         default="http://127.0.0.1:6363/",
     )
 
-    # create config.json
-    with open("config.json", "w") as outfile:
-        json.dump(
-            {"server": server_location, "database": project_name},
-            outfile,
-            sort_keys=True,
-            indent=4,
+    if "http://127.0.0.1" not in server_location:
+        account = click.prompt(
+            "Please enter the account for login",
+            type=str,
         )
+        jwt_token = click.prompt(
+            "Please put in the JWT token",
+            type=str,
+        )
+        # create config.json
+        with open("config.json", "w") as outfile:
+            json.dump(
+                {
+                    "server": server_location,
+                    "database": project_name,
+                    "JWT Token": jwt_token,
+                    "Account": account,
+                },
+                outfile,
+                sort_keys=True,
+                indent=4,
+            )
+    else:
+        # create config.json
+        with open("config.json", "w") as outfile:
+            json.dump(
+                {"server": server_location, "database": project_name},
+                outfile,
+                sort_keys=True,
+                indent=4,
+            )
 
     # copy all the other template files
     this_file_dir = os.path.dirname(os.path.abspath(__file__))
@@ -84,13 +107,15 @@ def _load_settings(filename="config.json", check=["server", "database"]):
 def _connect(settings, new_db=True):
     server = settings.get("server")
     database = settings.get("database")
+    jwt_token = settings.get("JWT Token")
+    account = settings.get("Account")
     client = WOQLClient(server)
     try:
-        client.connect(db=database)
+        client.connect(db=database, jwt_token=jwt_token, account=account)
         return client, f"Connected to {database}."
     except InterfaceError as error:
         if "does not exist" in str(error) and new_db:
-            client.connect()
+            client.connect(jwt_token=jwt_token, account=account)
             client.create_database(database)
             return client, f"{database} created."
         else:

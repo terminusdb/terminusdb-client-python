@@ -57,6 +57,14 @@ def test_jwt(docker_url_jwt):
     assert "test_happy_path" not in client.list_databases()
 
 
+def test_terminusx():
+    key = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkpXUjBIOXYyeTFORUdaZXlodUM0aCJ9.eyJodHRwOi8vdGVybWludXNkYi5jb20vc2NoZW1hL3N5c3RlbSNhZ2VudF9uYW1lIjoiYXV0aDB8NjEyM2MwODYwZTI0NWEwMDZhMjg0YTM3IiwiaXNzIjoiaHR0cHM6Ly90ZXJtaW51cy1jbG91ZC1kZXYuZXUuYXV0aDAuY29tLyIsInN1YiI6Iko0NWpKNmVYTDM4M3NXVU1ueFJNelJJMktsUFRnRnlKQGNsaWVudHMiLCJhdWQiOiJodHRwczovL3Rlcm1pbnVzY2xvdWQvYXBpX3Rva2VucyIsImlhdCI6MTYyOTczMzE3OCwiZXhwIjoxNjMyMzI1MTc4LCJhenAiOiJKNDVqSjZlWEwzODNzV1VNbnhSTXpSSTJLbFBUZ0Z5SiIsImd0eSI6ImNsaWVudC1jcmVkZW50aWFscyJ9.d7BvjSOxZz5yysdm8cUD6TQFqgp86ZJqoPQze_ODodHeZDfHB38y3l0w_AkK2pdewcNOiygRidyO5WKYtoSQrbUPmpQEplXh1GbGCP1IMK3D1YuRN6EfRwVGa0gPQZoNsmlTCI8XeUGiSBX9lap23aOIhwZ0UzggDZFsoyHbul1F_gMV8d5WL49NjEq_I_FyRdLIFeTSlf-zWACNIVrOBXlR5Ea0mmDqaOUbHT9c5zWmuWB8RXCWj-H6IvZYUB_9O27DXgWTS40RbI_rY8su_DRb10sfsB9VMF6YcpUzWQWl8Cjjm0_O-tqzAxIpP981ilGko3WsHbnsARMxM65CmA"
+    endpoint = "https://cloud-dev.dcm.ist/ubf40420team/"
+
+    client = WOQLClient(endpoint)
+    client.connect(jwt_token=key)
+
+
 #
 # def _generate_csv(option):
 #     if option == 1:
