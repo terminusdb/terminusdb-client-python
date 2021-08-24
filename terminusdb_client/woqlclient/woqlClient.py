@@ -652,7 +652,7 @@ class WOQLClient:
 
         result = requests.post(
             self._documents_url(),
-            params=payload,
+            json=payload,
             auth=self._auth(),
             headers = {'X-HTTP-Method-Override': 'GET'}
         )
