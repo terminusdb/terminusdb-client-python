@@ -609,6 +609,45 @@ class WOQLClient:
         )
         return json.loads(_finish_response(result))
 
+    def query_document(self, document_template: dict, graph_type: str = "instance", **kwargs) -> Iterable:
+        """Retrieves all documents that match a given document template
+
+        Parameters
+        ----------
+        document_template : dict
+            Template for the document that is being retrived
+        graph_type : str, optional
+            Graph type, either "instance" or "schema".
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
+
+        Returns
+        -------
+        Iterable
+        """
+        self._validate_graph_type(graph_type)
+
+
+        self._check_connection()
+
+        payload = {"query": document_template, "graph_type": graph_type}
+
+        add_args = ["prefixed", "minimized", "unfold", "skip", "count"]
+        for the_arg in add_args:
+            if the_arg in kwargs:
+                payload[the_arg] = kwargs[the_arg]
+
+        result = requests.post(
+            self._documents_url(),
+            json=payload,
+            auth=self._auth(),
+            headers = {'X-HTTP-Method-Override': 'GET'}
+        )
+        return _result2stream(_finish_response(result))
+
     def get_document(self, iri_id: str, graph_type: str = "instance", **kwargs) -> dict:
         """Retrieves the document of the iri_id
 
