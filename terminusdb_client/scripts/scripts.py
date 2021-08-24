@@ -38,16 +38,6 @@ def startproject():
         type=str,
         default="http://127.0.0.1:6363/",
     )
-    # create settings.py
-    #     setting_file = open("settings.py", "w")
-    #     setting_file.write(
-    #         """####
-    # # This is the script for storing the settings to connect to TerminusDB
-    # # database for your project.
-    # ####"""
-    #     )
-    #     setting_file.write(f'\nSERVER = "{server_location}"\nDATABASE = "{project_name}"')
-    #     setting_file.close()
 
     # create config.json
     with open("config.json", "w") as outfile:
