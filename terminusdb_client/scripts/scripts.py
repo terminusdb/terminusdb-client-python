@@ -536,7 +536,7 @@ def branch(branch_name):
     if branch_name is None:
         all_branches = client.get_all_branches()
         all_branches = list(map(lambda item: item["name"], all_branches))
-        print("\n".join(all_branches))
+        print("\n".join(all_branches))  # noqa: T001
     else:
         client.create_branch(branch_name)
         # status["branch"] = branch_name

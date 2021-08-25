@@ -39,8 +39,8 @@ class WOQLClient:
         URL of the server that this client connected.
     api: str
         API endpoint for this client.
-    account: str
-        TerminiusDB account that this client is using. "admin" for local dbs.
+    team: str
+        Team that this client is using. "admin" for local dbs.
     db: str
         Database that this client is connected to.
     user: str
@@ -70,7 +70,7 @@ class WOQLClient:
 
     def connect(
         self,
-        account: str = "admin",
+        team: str = "admin",
         db: Optional[str] = None,
         remote_auth: str = None,
         jwt_token: str = None,
@@ -87,8 +87,8 @@ class WOQLClient:
 
         Parameters
         ----------
-        account: str
-            Name of the organization account, default to be "admin"
+        team: str
+            Name of the team, default to be "admin"
         db: optional, str
             Name of the database connected
         remote_auth: optional, str
@@ -109,10 +109,10 @@ class WOQLClient:
         Examples
         -------
         >>> client = WOQLClient("https://127.0.0.1:6363")
-        >>> client.connect(key="root", account="admin", user="admin", db="example_db")
+        >>> client.connect(key="root", team="admin", user="admin", db="example_db")
         """
 
-        self.account = account
+        self.team = team
         self.db = db
         self._remote_auth = remote_auth
         self._key = key
@@ -300,15 +300,15 @@ class WOQLClient:
         """
         return copy.deepcopy(self)
 
-    def set_db(self, dbid: str, account: Optional[str] = None) -> str:
+    def set_db(self, dbid: str, team: Optional[str] = None) -> str:
         """Set the connection to another database. This will reset the connection.
 
         Parameters
         ----------
         dbid : str
             Database identifer to set in the config.
-        account : str
-            User identifer to set in the config. If not passed in, it will use the current one.
+        team : str
+            Team identifer to set in the config. If not passed in, it will use the current one.
 
         Returns
         -------
@@ -323,11 +323,11 @@ class WOQLClient:
         """
         self._check_connection(check_db=False)
 
-        if account is None:
-            account = self.account
+        if team is None:
+            team = self.team
 
         return self.connect(
-            account=account,
+            team=team,
             db=dbid,
             remote_auth=self._remote_auth,
             key=self._key,
@@ -355,26 +355,20 @@ class WOQLClient:
         Examples
         --------
         >>> client = WOQLClient("https://127.0.0.1:6363")
-        >>> client.account("<account>")
-        '<account>'
-        >>> client.db("<db>")
-        '<db>'
-        >>> client.repo("<repo>")
-        '<repo>'
         >>> client.resource("db")
-        '<account>/<db>/'
+        '<team>/<db>/'
         >>> client.resource("meta")
-        '<account>/<db>/_meta'
+        '<team>/<db>/_meta'
         >>> client.resource("commits")
-        '<account>/<db>/<repo>/_commits'
+        '<team>/<db>/<repo>/_commits'
         >>> client.resource("repo")
-        '<account>/<db>/<repo>/_meta'
+        '<team>/<db>/<repo>/_meta'
         >>> client.resource("ref", "<reference>")
-        '<account>/<db>/<repo>/commit/<reference>'
+        '<team>/<db>/<repo>/commit/<reference>'
         >>> client.resource("branch", "<branch>")
-        '<account>/<db>/<repo>/branch/<branch>'
+        '<team>/<db>/<repo>/branch/<branch>'
         """
-        base = self.account + "/" + self.db + "/"
+        base = self.team + "/" + self.db + "/"
         if ttype == "db":
             return base
         elif ttype == "meta":
@@ -407,7 +401,7 @@ class WOQLClient:
     def create_database(
         self,
         dbid: str,
-        accountid: Optional[str] = None,
+        team: Optional[str] = None,
         label: Optional[str] = None,
         description: Optional[str] = None,
         prefixes: Optional[dict] = None,
@@ -420,8 +414,8 @@ class WOQLClient:
         ----------
         dbid : str
             Unique identifier of the database.
-        accountid : str, optional
-            ID of the organization in which to create the DB (defaults to 'admin')
+        team : str, optional
+            ID of the Team in which to create the DB (defaults to 'admin')
         label : str, optional
             Database name.
         description : str, optional
@@ -462,10 +456,10 @@ class WOQLClient:
             details["schema"] = True
         if prefixes:
             details["prefixes"] = prefixes
-        if accountid is None:
-            accountid = self.account
+        if team is None:
+            team = self.team
 
-        self.account = accountid
+        self.team = team
         self._connected = True
         self.db = dbid
 
@@ -480,20 +474,20 @@ class WOQLClient:
     def delete_database(
         self,
         dbid: Optional[str] = None,
-        accountid: Optional[str] = None,
+        team: Optional[str] = None,
         force: bool = False,
     ) -> None:
         """Delete a TerminusDB database.
 
-        If ``accountid`` is provided, then the account in the config will be updated
+        If ``team`` is provided, then the team in the config will be updated
         and the new value will be used in future requests to the server.
 
         Parameters
         ----------
         dbid : str
             ID of the database to delete
-        accountid : str, optional
-            the account id in which the database resides (defaults to "admin")
+        team : str, optional
+            the team in which the database resides (defaults to "admin")
         force: bool
 
         Raises
@@ -506,23 +500,23 @@ class WOQLClient:
         Examples
         -------
         >>> client = WOQLClient("https://127.0.0.1:6363/")
-        >>> client.delete_database("<database>", "<account>")
+        >>> client.delete_database("<database>", "<team>")
         """
 
         self._check_connection(check_db=False)
 
         if dbid is None:
             raise UserWarning(
-                f"You are currently using the database: {self.account}/{self.db}. If you want to delete it, please do 'delete_database({self.db},{self.account})' instead."
+                f"You are currently using the database: {self.team}/{self.db}. If you want to delete it, please do 'delete_database({self.db},{self.team})' instead."
             )
 
         self.db = dbid
-        if accountid is None:
+        if team is None:
             warnings.warn(
-                f"Delete Database Warning: You have not specify the accountid, assuming {self.account}/{self.db}"
+                f"Delete Database Warning: You have not specify the team, assuming {self.team}/{self.db}"
             )
         else:
-            self.account = accountid
+            self.team = team
         payload = {"force": force}
         _finish_response(
             requests.delete(
@@ -653,7 +647,7 @@ class WOQLClient:
         self._check_connection()
 
         if optimize:
-            self.optimize(f"{self.account}/{self.db}")
+            self.optimize(f"{self.team}/{self.db}")
 
         payload = {"query": document_template, "graph_type": graph_type}
 
@@ -1131,12 +1125,10 @@ class WOQLClient:
         if empty:
             source = {}
         elif self.ref:
-            source = {
-                "origin": f"{self.account}/{self.db}/{self.repo}/commit/{self.ref}"
-            }
+            source = {"origin": f"{self.team}/{self.db}/{self.repo}/commit/{self.ref}"}
         else:
             source = {
-                "origin": f"{self.account}/{self.db}/{self.repo}/branch/{self.branch}"
+                "origin": f"{self.team}/{self.db}/{self.repo}/branch/{self.branch}"
             }
 
         _finish_response(
@@ -1325,13 +1317,9 @@ class WOQLClient:
         self._check_connection()
 
         if branch is not None and commit is None:
-            rebase_source = "/".join(
-                [self.account, self.db, self.repo, "branch", branch]
-            )
+            rebase_source = "/".join([self.team, self.db, self.repo, "branch", branch])
         elif branch is None and commit is not None:
-            rebase_source = "/".join(
-                [self.account, self.db, self.repo, "commit", commit]
-            )
+            rebase_source = "/".join([self.team, self.db, self.repo, "commit", commit])
         elif branch is not None or commit is not None:
             raise RuntimeError("Cannot specify both branch and commit.")
         elif rebase_source is None:
@@ -1384,7 +1372,7 @@ class WOQLClient:
         if use_path:
             commit_path = commit
         else:
-            commit_path = f"{self.account}/{self.db}/{self.repo}/commit/{commit}"
+            commit_path = f"{self.team}/{self.db}/{self.repo}/commit/{commit}"
 
         _finish_response(
             requests.post(
@@ -1458,7 +1446,7 @@ class WOQLClient:
         Examples
         --------
         >>> client = WOQLClient("https://127.0.0.1:6363/")
-        >>> client.connect(user="admin", key="root", account="admin", db="some_db")
+        >>> client.connect(user="admin", key="root", team="admin", db="some_db")
         >>> client.squash('This is a squash commit message!')
         """
         self._check_connection()
@@ -1553,8 +1541,6 @@ class WOQLClient:
         ----------
         dbid : str
             The id of the database
-        account : str
-            The account / organization id that the user is acting through
 
         Raises
         ------
@@ -1614,7 +1600,7 @@ class WOQLClient:
     def _db_url_fragment(self):
         if self.db == "_system":
             return self.db
-        return f"{self.account}/{self.db}"
+        return f"{self.team}/{self.db}"
 
     def _db_base(self, action: str):
         return f"{self.api}/{action}/{self._db_url_fragment()}"
@@ -1663,10 +1649,10 @@ class WOQLClient:
         return f"{base_url}/{graph_type}"
 
     def _clone_url(self, new_repo_id: str):
-        return f"{self.api}/clone/{self.account}/{new_repo_id}"
+        return f"{self.api}/clone/{self.team}/{new_repo_id}"
 
     def _cloneable_url(self):
-        crl = f"{self.server_url}/{self.account}/{self.db}"
+        crl = f"{self.server_url}/{self.team}/{self.db}"
         return crl
 
     def _pull_url(self):
