@@ -66,7 +66,7 @@ def startproject():
         # create config.json
         with open("config.json", "w") as outfile:
             json.dump(
-                {"server": server_location, "database": project_name},
+                {"server": server_location, "database": project_name, "team": "admin"},
                 outfile,
                 sort_keys=True,
                 indent=4,
