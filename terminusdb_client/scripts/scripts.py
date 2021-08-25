@@ -526,20 +526,25 @@ def alldocs(schema, type_, query):
 
 
 @click.command()
-@click.argument("branch_name")
+@click.argument("branch_name", required=False)
 def branch(branch_name):
     """Create branch."""
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
     settings.update(status)
     client, _ = _connect(settings)
-    client.create_branch(branch_name)
-    # status["branch"] = branch_name
-    # with open(".TDB", "w") as outfile:
-    #     json.dump(status, outfile)
-    print(  # noqa: T001
-        f"Branch '{branch_name}' created. Remain on '{status['branch']}' branch."
-    )
+    if branch_name is None:
+        all_branches = client.get_all_branches()
+        all_branches = list(map(lambda item: item["name"], all_branches))
+        print("\n".join(all_branches))
+    else:
+        client.create_branch(branch_name)
+        # status["branch"] = branch_name
+        # with open(".TDB", "w") as outfile:
+        #     json.dump(status, outfile)
+        print(  # noqa: T001
+            f"Branch '{branch_name}' created. Remain on '{status['branch']}' branch."
+        )
 
 
 @click.command()

@@ -258,6 +258,19 @@ class WOQLClient:
         target_commit = result.get("bindings")[0].get("cid").get("@value")
         return target_commit
 
+    def get_all_branches(self):
+        """Get all the branches available in the database."""
+        self._check_connection()
+        api_url = self._documents_url().split("/")
+        api_url = api_url[:-2]
+        api_url = "/".join(api_url) + "/_commits"
+        result = requests.get(
+            api_url,
+            params={"type": "Branch"},
+            auth=self._auth(),
+        )
+        return list(_result2stream(_finish_response(result)))
+
     def rollback(self, steps=1) -> None:
         """Curently not implementated. Please check back later.
 
