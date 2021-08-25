@@ -558,6 +558,10 @@ def checkout(branch_name, new_branch):
     client, _ = _connect(settings)
     if new_branch:
         client.create_branch(branch_name)
+    all_branches = client.get_all_branches()
+    all_branches = list(map(lambda item: item["name"], all_branches))
+    if branch_name not in all_branches:
+        raise InterfaceError(f"{branch_name} does not exist.")
     status["branch"] = branch_name
     with open(".TDB", "w") as outfile:
         json.dump(status, outfile)
