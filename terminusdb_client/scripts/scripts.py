@@ -239,7 +239,7 @@ def _create_script(obj_list):
     return print_script
 
 
-def _sync(client, database):
+def _sync(client):
     all_existing_obj = client.get_all_documents(graph_type="schema")
     all_obj_list = []
     for obj in all_existing_obj:
@@ -250,10 +250,10 @@ def _sync(client, database):
         file = open("schema.py", "w")
         file.write(print_script)
         file.close()
-        print(f"schema.py is updated with {database} schema.")  # noqa: T001
+        print(f"schema.py is updated with {client.db} schema.")  # noqa: T001
     else:
         print(  # noqa: T001
-            f"{database} schema is empty so schema.py has not be changed."
+            f"{client.db} schema is empty so schema.py has not be changed."
         )
 
 
@@ -263,10 +263,10 @@ def sync():
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
     settings.update(status)
-    database = settings["database"]
+    settings["database"]
     client, msg = _connect(settings, new_db=False)
     print(msg)  # noqa: T001
-    _sync(client, database)
+    _sync(client)
 
 
 @click.command()
@@ -310,7 +310,20 @@ def deletedb(database):
     else:
         client, _ = _connect(settings, new_db=False)
         client.delete_database(database, client.team)
+        # reset to main branch
+        status["branch"] = "main"
+        with open(".TDB", "w") as outfile:
+            json.dump(status, outfile)
         print(f"{database} deleted.")  # noqa: T001
+
+
+def _get_existing_class(client):
+    all_existing_obj = client.get_all_documents(graph_type="schema")
+    all_existing_class = {}
+    for item in all_existing_obj:
+        if item.get("@id"):
+            all_existing_class[item["@id"]] = item
+    return all_existing_class
 
 
 @click.command()
@@ -332,10 +345,10 @@ def importcsv(csv_file, class_name, chunksize, sep, skipna):
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
     settings.update(status)
-    database = settings["database"]
+    client, msg = _connect(settings)
     if not class_name:
         class_name = csv_file.split(".")[0].replace("_", " ").title().replace(" ", "")
-    has_schema = False
+    has_schema = class_name in _get_existing_class(client)
 
     def _df_to_schema(class_name, df):
         class_dict = {"@type": "Class", "@id": class_name}
@@ -367,7 +380,6 @@ def importcsv(csv_file, class_name, chunksize, sep, skipna):
                 df.rename(columns={col: converted_col}, inplace=True)
             if not has_schema:
                 class_dict = _df_to_schema(class_name, df)
-                client, msg = _connect(settings)
                 client.update_document(
                     class_dict,
                     commit_msg=f"Schema object insert/ update with {csv_file} insert by Python client.",
@@ -376,7 +388,7 @@ def importcsv(csv_file, class_name, chunksize, sep, skipna):
                 print(  # noqa: T001
                     f"\nSchema object {class_name} created with {csv_file} inserted into database."
                 )
-                _sync(client, database)
+                _sync(client)
                 has_schema = True
 
             obj_list = df.to_dict(orient="records")
@@ -389,21 +401,8 @@ def importcsv(csv_file, class_name, chunksize, sep, skipna):
                 commit_msg=f"Documents created with {csv_file} insert by Python client.",
             )
     print(  # noqa: T001
-        f"Records in {csv_file} inserted as type {class_name} into database with random ids."
+        f"Records in {csv_file} inserted as type {class_name} into database with Hash ids."
     )
-
-
-def _check_existing_class(class_obj, client):
-    all_existing_obj = client.get_all_documents(graph_type="schema")
-    all_existing_class = {}
-    for item in all_existing_obj:
-        if item.get("@id"):
-            all_existing_class[item["@id"]] = item
-    if class_obj not in all_existing_class:
-        raise InterfaceError(
-            f"{class_obj} not found in database ({client.db}) schema.'"
-        )
-    return all_existing_class
 
 
 def _exportcsv(
@@ -487,7 +486,11 @@ def exportcsv(class_obj, keepid, maxdep, filename=None):
     settings.update(status)
     settings["database"]
     client, msg = _connect(settings, new_db=False)
-    all_existing_class = _check_existing_class(class_obj, client)
+    all_existing_class = _get_existing_class(client)
+    if class_obj not in all_existing_class:
+        raise InterfaceError(
+            f"{class_obj} not found in database ({client.db}) schema.'"
+        )
     all_records = client.get_documents_by_type(class_obj)
     _exportcsv(
         class_obj,
@@ -522,7 +525,11 @@ def alldocs(schema, type_, query, export, keepid, maxdep, filename=None):
         else:
             print(list(client.get_all_documents(graph_type="schema")))  # noqa: T001
     elif type_:
-        all_existing_class = _check_existing_class(type_, client)
+        all_existing_class = _get_existing_class(client)
+        if type_ not in all_existing_class:
+            raise InterfaceError(
+                f"{type_} not found in database ({client.db}) schema.'"
+            )
         if not query:
             result = list(client.get_documents_by_type(type_))
         else:
@@ -547,7 +554,7 @@ def alldocs(schema, type_, query, export, keepid, maxdep, filename=None):
                 else:
                     pair[1] = pair[1].strip('"')
                 query_dict[pair[0]] = pair[1]
-            result = list(client.query_document(query_dict))
+            result = list(client.query_document(query_dict, optimize=True))
         if export:
             _exportcsv(
                 type_, client, result, all_existing_class, keepid, maxdep, filename
