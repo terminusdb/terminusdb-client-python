@@ -528,7 +528,7 @@ def alldocs(schema, type_, query):
 @click.command()
 @click.argument("branch_name", required=False)
 def branch(branch_name):
-    """Create branch."""
+    """Create or list branch."""
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
     settings.update(status)
