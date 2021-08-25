@@ -393,34 +393,29 @@ def importcsv(csv_file, class_name, chunksize, sep, skipna):
     )
 
 
-@click.command()
-@click.argument("class_obj")
-@click.option("--keepid", is_flag=True)
-@click.option("--maxdep", default=2, show_default=True)
-@click.option("--filename")
-# @click.option('--header ', default=',', show_default=True)
-def exportcsv(class_obj, keepid, maxdep, filename=None):
-    """Export all documents in a TerminusDB class into a flatten CSV file."""
-    try:
-        pd = import_module("pandas")
-    except ImportError:
-        raise ImportError(
-            "Library 'pandas' is required to export csv, either install 'pandas' or install woqlDataframe requirements as follows: python -m pip install -U terminus-client-python[dataframe]"
-        )
-    settings = _load_settings()
-    status = _load_settings(".TDB", check=[])
-    settings.update(status)
-    database = settings["database"]
-    client, msg = _connect(settings, new_db=False)
+def _check_existing_class(class_obj, client):
     all_existing_obj = client.get_all_documents(graph_type="schema")
     all_existing_class = {}
     for item in all_existing_obj:
         if item.get("@id"):
             all_existing_class[item["@id"]] = item
     if class_obj not in all_existing_class:
-        raise InterfaceError(f"{class_obj} not found in database ({database}) schema.'")
+        raise InterfaceError(
+            f"{class_obj} not found in database ({client.db}) schema.'"
+        )
+    return all_existing_class
 
-    all_existing_class[class_obj]
+
+def _exportcsv(
+    class_obj, client, all_records, all_existing_class, keepid, maxdep, filename=None
+):
+    """Export into a flatten CSV file."""
+    try:
+        pd = import_module("pandas")
+    except ImportError:
+        raise ImportError(
+            "Library 'pandas' is required to export csv, either install 'pandas' or install woqlDataframe requirements as follows: python -m pip install -U terminus-client-python[dataframe]"
+        )
 
     def expand_df(df):
         for col in df.columns:
@@ -466,7 +461,6 @@ def exportcsv(class_obj, keepid, maxdep, filename=None):
         else:
             return embed_obj(finish_df, maxdep - 1)
 
-    all_records = client.get_documents_by_type(class_obj)
     df = pd.DataFrame().from_records(list(all_records))
     if not keepid:
         df.drop(columns=list(filter(lambda x: x[0] == "@", df.columns)), inplace=True)
@@ -476,7 +470,33 @@ def exportcsv(class_obj, keepid, maxdep, filename=None):
         filename = class_obj + ".csv"
     df.to_csv(filename, index=False)
     print(  # noqa: T001
-        f"CSV file {filename} created with {class_obj} from database {database}."
+        f"CSV file {filename} created with {class_obj} from database {client.db}."
+    )
+
+
+@click.command()
+@click.argument("class_obj")
+@click.option("--keepid", is_flag=True)
+@click.option("--maxdep", default=2, show_default=True)
+@click.option("--filename")
+# @click.option('--header ', default=',', show_default=True)
+def exportcsv(class_obj, keepid, maxdep, filename=None):
+    """Export all documents in a TerminusDB class into a flatten CSV file."""
+    settings = _load_settings()
+    status = _load_settings(".TDB", check=[])
+    settings.update(status)
+    settings["database"]
+    client, msg = _connect(settings, new_db=False)
+    all_existing_class = _check_existing_class(class_obj, client)
+    all_records = client.get_documents_by_type(class_obj)
+    _exportcsv(
+        class_obj,
+        client,
+        all_records,
+        all_existing_class,
+        keepid,
+        maxdep,
+        filename=None,
     )
 
 
@@ -484,8 +504,14 @@ def exportcsv(class_obj, keepid, maxdep, filename=None):
 @click.option("--schema", is_flag=True)
 @click.option("--type", "type_")
 @click.option("-q", "--query", multiple=True)
-def alldocs(schema, type_, query):
-    """Get all documents in the database, use --schema to specify schema, --type to select type and -q to make queries (e.g. -q date=2021-07-01)"""
+@click.option("-e", "--export", is_flag=True)
+@click.option("--keepid", is_flag=True)
+@click.option("--maxdep", default=2, show_default=True)
+@click.option("--filename")
+def alldocs(schema, type_, query, export, keepid, maxdep, filename=None):
+    """Get all documents in the database, use --schema to specify schema, --type to select type and -q to make queries (e.g. -q date=2021-07-01)
+
+    If using --type and not --schema, can export using -e with options: --keepid, --maxdep and --filename"""
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
     settings.update(status)
@@ -496,8 +522,9 @@ def alldocs(schema, type_, query):
         else:
             print(list(client.get_all_documents(graph_type="schema")))  # noqa: T001
     elif type_:
+        all_existing_class = _check_existing_class(type_, client)
         if not query:
-            print(list(client.get_documents_by_type(type_)))  # noqa: T001
+            result = list(client.get_documents_by_type(type_))
         else:
             schema_dict = client.get_document(type_, graph_type="schema")
             query_dict = {"@type": type_}
@@ -520,7 +547,13 @@ def alldocs(schema, type_, query):
                 else:
                     pair[1] = pair[1].strip('"')
                 query_dict[pair[0]] = pair[1]
-            print(list(client.query_document(query_dict)))  # noqa: T001
+            result = list(client.query_document(query_dict))
+        if export:
+            _exportcsv(
+                type_, client, result, all_existing_class, keepid, maxdep, filename
+            )
+        else:
+            print(result)  # noqa: T001
     else:
         print(list(client.get_all_documents()))  # noqa: T001
 
