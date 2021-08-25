@@ -301,26 +301,26 @@ def deletedb(database):
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
     settings.update(status)
-    server = settings["server"]
+    settings["server"]
     setting_database = settings["database"]
     if database != setting_database:
         raise ValueError(
             "Name provided does not match project database name. You can only delete the database in this project."
         )
     else:
-        client = WOQLClient(server)
-        client.connect()
+        client, _ = _connect(settings, new_db=False)
         client.delete_database(database, client.account)
         print(f"{database} deleted.")  # noqa: T001
 
 
 @click.command()
 @click.argument("csv_file")
+@click.option("--classname", "class_name")
 @click.option("--chunksize", default=1000, show_default=True)
 @click.option("--sep", default=",", show_default=True)
 @click.option("--skipna", is_flag=True)
 # @click.option('--header ', default=',', show_default=True)
-def importcsv(csv_file, chunksize, sep, skipna):
+def importcsv(csv_file, class_name, chunksize, sep, skipna):
     """Import CSV file into pandas DataFrame then into TerminusDB, options are read_csv() options."""
     try:
         pd = import_module("pandas")
@@ -333,7 +333,8 @@ def importcsv(csv_file, chunksize, sep, skipna):
     status = _load_settings(".TDB", check=[])
     settings.update(status)
     database = settings["database"]
-    class_name = csv_file.split(".")[0].replace("_", " ").title().replace(" ", "")
+    if not class_name:
+        class_name = csv_file.split(".")[0].replace("_", " ").title().replace(" ", "")
     has_schema = False
 
     def _df_to_schema(class_name, df):
