@@ -484,7 +484,7 @@ def exportcsv(class_obj, keepid, maxdep, filename=None):
 @click.option("--type", "type_")
 @click.option("-q", "--query", multiple=True)
 def alldocs(schema, type_, query):
-    """Get all documents in the database"""
+    """Get all documents in the database, use --schema to specify schema, --type to select type and -q to make queries (e.g. -q date=2021-07-01)"""
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
     settings.update(status)
@@ -527,16 +527,17 @@ def alldocs(schema, type_, query):
 @click.command()
 @click.argument("branch_name")
 def branch(branch_name):
+    """Create branch."""
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
     settings.update(status)
     client, _ = _connect(settings)
     client.create_branch(branch_name)
-    status["branch"] = branch_name
-    with open(".TDB", "w") as outfile:
-        json.dump(status, outfile)
+    # status["branch"] = branch_name
+    # with open(".TDB", "w") as outfile:
+    #     json.dump(status, outfile)
     print(  # noqa: T001
-        f"Branch {branch_name} created, checked out {branch_name} branch."
+        f"Branch '{branch_name}' created. Remain on '{status['branch']}' branch."
     )
 
 
@@ -544,6 +545,7 @@ def branch(branch_name):
 @click.argument("branch_name")
 @click.option("-b", "--branch", "new_branch", is_flag=True)
 def checkout(branch_name, new_branch):
+    """Switch branches. Use -b to create and switch to new branch."""
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
     settings.update(status)
@@ -555,14 +557,15 @@ def checkout(branch_name, new_branch):
         json.dump(status, outfile)
     if new_branch:
         print(  # noqa: T001
-            f"Branch {branch_name} created, checked out {branch_name} branch."
+            f"Branch '{branch_name}' created, checked out '{branch_name}' branch."
         )
     else:
-        print(f"Checked out {branch_name} branch.")  # noqa: T001
+        print(f"Checked out '{branch_name}' branch.")  # noqa: T001
 
 
 @click.command()
 def status():
+    """Show the working status of the project."""
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
     settings.update(status)
@@ -575,6 +578,7 @@ def status():
 @click.command()
 @click.argument("branch_name")
 def rebase(branch_name):
+    """Reapply commits on top of another base tip on another branch."""
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
     settings.update(status)
