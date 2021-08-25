@@ -41,8 +41,8 @@ def startproject():
     )
 
     if "http://127.0.0.1" not in server_location:
-        account = click.prompt(
-            "Please enter the account for login",
+        team = click.prompt(
+            "Please enter the team for login",
             type=str,
         )
         jwt_token = click.prompt(
@@ -56,7 +56,7 @@ def startproject():
                     "server": server_location,
                     "database": project_name,
                     "JWT token": jwt_token,
-                    "account": account,
+                    "team": team,
                 },
                 outfile,
                 sort_keys=True,
@@ -102,19 +102,19 @@ def _connect(settings, new_db=True):
     server = settings.get("server")
     database = settings.get("database")
     jwt_token = settings.get("JWT token")
-    account = settings.get("account")
+    team = settings.get("team")
     branch = settings.get("branch")
-    if not account:
-        account = "admin"
+    if not team:
+        team = "admin"
     if not branch:
         branch = "main"
     client = WOQLClient(server)
     try:
-        client.connect(db=database, jwt_token=jwt_token, account=account, branch=branch)
+        client.connect(db=database, jwt_token=jwt_token, team=team, branch=branch)
         return client, f"Connected to {database}."
     except InterfaceError as error:
         if "does not exist" in str(error) and new_db:
-            client.connect(jwt_token=jwt_token, account=account, branch=branch)
+            client.connect(jwt_token=jwt_token, team=team, branch=branch)
             client.create_database(database)
             return client, f"{database} created."
         else:
@@ -309,7 +309,7 @@ def deletedb(database):
         )
     else:
         client, _ = _connect(settings, new_db=False)
-        client.delete_database(database, client.account)
+        client.delete_database(database, client.team)
         print(f"{database} deleted.")  # noqa: T001
 
 
@@ -580,8 +580,8 @@ def status():
     status = _load_settings(".TDB", check=[])
     settings.update(status)
     message = f"Connecting to '{settings['database']}' at '{settings['server']}'\non branch '{settings['branch']}'"
-    if settings.get("account"):
-        message += f"\nas account '{settings['account']}'"
+    if settings.get("team"):
+        message += f"\nwith team '{settings['team']}'"
     print(message)  # noqa: T001
 
 
