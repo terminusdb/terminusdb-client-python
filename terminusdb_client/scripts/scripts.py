@@ -19,7 +19,7 @@ from ..errors import InterfaceError
 
 # from ..woql_type import from_woql_type
 from ..woqlclient.woqlClient import WOQLClient
-from ..woqlschema.woql_schema import HashKey
+from ..woqlschema.woql_schema import HashKey, RandomKey
 
 
 @click.group()
@@ -328,13 +328,25 @@ def _get_existing_class(client):
 
 @click.command()
 @click.argument("csv_file")
+@click.argument("keys", nargs=-1)
 @click.option("--classname", "class_name")
 @click.option("--chunksize", default=1000, show_default=True)
+@click.option("--schema", is_flag=True)
+@click.option(
+    "--na",
+    default="optional",
+    type=click.Choice(["skip", "optional", "error"], case_sensitive=False),
+)
 @click.option("--sep", default=",", show_default=True)
-@click.option("--skipna", is_flag=True)
 # @click.option('--header ', default=',', show_default=True)
-def importcsv(csv_file, class_name, chunksize, sep, skipna):
-    """Import CSV file into pandas DataFrame then into TerminusDB, options are read_csv() options."""
+def importcsv(csv_file, keys, class_name, chunksize, schema, na, sep):
+    """Import CSV file into pandas DataFrame then into TerminusDB, with read_csv() options.
+    Options:
+    --classname - Customize the class name that the data from the CSV will be import as
+    --chunksize - Large files will be load into database in chunks, size of the chunks
+    --na - skip, optional or error: skip will skip entries with NAs, optional will make all properties optional in the database, error will just thow an error if there's NAs"""
+    # If chunksize is too small, pandas may decide certain column to be integer if all values in the 1st chunk are 0.0. This can be problmetic for some cases.
+    na = na.lower()
     try:
         pd = import_module("pandas")
         np = import_module("numpy")
@@ -348,7 +360,8 @@ def importcsv(csv_file, class_name, chunksize, sep, skipna):
     client, msg = _connect(settings)
     if not class_name:
         class_name = csv_file.split(".")[0].replace("_", " ").title().replace(" ", "")
-    has_schema = class_name in _get_existing_class(client)
+    # "not schema" make it always False if adding the schema option
+    has_schema = not schema and class_name in _get_existing_class(client)
 
     def _df_to_schema(class_name, df):
         class_dict = {"@type": "Class", "@id": class_name}
@@ -363,17 +376,25 @@ def importcsv(csv_file, class_name, chunksize, sep, skipna):
             if converted_type == object:
                 converted_type = str  # pandas treats all string as objects
             converted_type = wt.to_woql_type(converted_type)
-            class_dict[col] = converted_type
-        class_dict["@key"] = {"@type": "Hash", "@fields": list(df.columns)}
+            if na == "optional":
+                class_dict[col] = {"@type": "Optional", "@class": converted_type}
+            else:
+                class_dict[col] = converted_type
+        if keys:
+            class_dict["@key"] = {"@type": "Hash", "@fields": list(keys)}
+        elif na == "optional":
+            class_dict["@key"] = {"@type": "Random"}
+        else:
+            class_dict["@key"] = {"@type": "Hash", "@fields": list(df.columns)}
         return class_dict
 
     with pd.read_csv(csv_file, sep=sep, chunksize=chunksize) as reader:
         for df in tqdm(reader):
-            if any(df.isna().any()) and not skipna:
+            if any(df.isna().any()) and na == "error":
                 raise RuntimeError(
-                    f"{df}\nThere is NA in the data and cannot be automatically load in. Use --skipna to remove all records with NA or use the Python client to handle data beform loading to TerminusDB."
+                    f"{df}\nThere is NA in the data and cannot be automatically load in. Use --na options to remove all records with NA or make properties optional to accept missing data."
                 )
-            elif skipna:
+            elif na == "skip":
                 df.dropna(inplace=True)
             for col in df.columns:
                 converted_col = col.lower().replace(" ", "_")
@@ -393,15 +414,29 @@ def importcsv(csv_file, class_name, chunksize, sep, skipna):
 
             obj_list = df.to_dict(orient="records")
             for item in obj_list:
+                if na == "optional":
+                    bad_key = []
+                    for key, value in item.items():
+                        if pd.isna(value):
+                            # item.pop(key)
+                            bad_key.append(key)
+                    for key in bad_key:
+                        item.pop(key)
                 item["@type"] = class_name
-                item_id = HashKey(list(df.columns)).idgen(item)
+                if keys:
+                    item_id = HashKey(list(keys)).idgen(item)
+                elif na == "optional":
+                    item_id = RandomKey().idgen(item)
+                else:
+                    item_id = HashKey(list(df.columns)).idgen(item)
                 item["@id"] = item_id
             client.update_document(
                 obj_list,
                 commit_msg=f"Documents created with {csv_file} insert by Python client.",
             )
+    key_type = "Random" if (na == "optional" and not keys) else "Hash"
     print(  # noqa: T001
-        f"Records in {csv_file} inserted as type {class_name} into database with Hash ids."
+        f"Records in {csv_file} inserted as type {class_name} into database with {key_type} ids."
     )
 
 
