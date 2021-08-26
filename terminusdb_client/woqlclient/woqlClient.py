@@ -1535,7 +1535,6 @@ class WOQLClient:
         # if https basic
         if not self._use_token and self._connected and self._key and self.user:
             return (self.user, self._key)
-        # TODO: Should throw a nice error when the env variable is not defined
         return JWTAuth(os.environ["TERMINUSDB_ACCESS_TOKEN"])
         # TODO: remote_auth
 
