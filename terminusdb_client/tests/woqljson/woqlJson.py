@@ -17,7 +17,7 @@ WOQL_JSON = {
             "@type": "Value",
             "node": "c",
         },
-        "graph_filter": "d",
+        "graph": "d",
     },
     "tripleJson": {
         "@type": "Triple",
