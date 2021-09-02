@@ -1,8 +1,10 @@
 """woqlClient.py
 WOQLClient is the Python public API for TerminusDB"""
 import copy
+import os
 import json
 import warnings
+
 from collections.abc import Iterable
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
@@ -73,7 +75,7 @@ class WOQLClient:
         team: str = "admin",
         db: Optional[str] = None,
         remote_auth: str = None,
-        jwt_token: str = None,
+        use_token: bool = False,
         key: str = "root",
         user: str = "admin",
         branch: str = "main",
@@ -97,6 +99,8 @@ class WOQLClient:
             API key for connecting, default to be "root"
         user: optional, str
             Name of the user, default to be "admin"
+        use_token: optional, bool
+            Use the ENV variable TERMINUSDB_ACCESS_TOKEN to connect with a Bearer JWT token
         branch: optional, str
             Branch to be connected, default to be "main"
         ref: optional, str
@@ -117,7 +121,7 @@ class WOQLClient:
         self._remote_auth = remote_auth
         self._key = key
         self.user = user
-        self._jwt_token = jwt_token
+        self._use_token = use_token
         self.branch = branch
         self.ref = ref
         self.repo = repo
@@ -1529,9 +1533,9 @@ class WOQLClient:
 
     def _auth(self):
         # if https basic
-        if not self._jwt_token and self._connected and self._key and self.user:
+        if not self._use_token and self._connected and self._key and self.user:
             return (self.user, self._key)
-        return JWTAuth(self._jwt_token)
+        return JWTAuth(os.environ["TERMINUSDB_ACCESS_TOKEN"])
         # TODO: remote_auth
 
     def get_database(self, dbid: str) -> Optional[dict]:
