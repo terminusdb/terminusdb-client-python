@@ -619,13 +619,7 @@ class WOQLClient:
         )
         return json.loads(_finish_response(result))
 
-    def query_document(
-        self,
-        document_template: dict,
-        graph_type: str = "instance",
-        optimize: bool = False,
-        **kwargs,
-    ) -> Iterable:
+    def query_document(self, document_template: dict, graph_type: str = "instance", **kwargs) -> Iterable:
         """Retrieves all documents that match a given document template
 
         Parameters
@@ -634,8 +628,6 @@ class WOQLClient:
             Template for the document that is being retrived
         graph_type : str, optional
             Graph type, either "instance" or "schema".
-        optimize : bool, optional
-            Optimize before query.
 
         Raises
         ------
@@ -648,10 +640,8 @@ class WOQLClient:
         """
         self._validate_graph_type(graph_type)
 
-        self._check_connection()
 
-        if optimize:
-            self.optimize(f"{self.team}/{self.db}")
+        self._check_connection()
 
         payload = {"query": document_template, "graph_type": graph_type}
 
@@ -662,9 +652,9 @@ class WOQLClient:
 
         result = requests.post(
             self._documents_url(),
-            json=payload,
+            params=payload,
             auth=self._auth(),
-            headers={"X-HTTP-Method-Override": "GET"},
+            headers = {'X-HTTP-Method-Override': 'GET'}
         )
         return _result2stream(_finish_response(result))
 
