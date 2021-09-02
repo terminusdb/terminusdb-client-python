@@ -29,6 +29,6 @@ def quad_opt():
                 "@type": "Value",
                 "data": {"@type": "xsd:string", "@value": "c"},
             },
-            "graph_filter": "d",
+            "graph": "d",
         },
     }
