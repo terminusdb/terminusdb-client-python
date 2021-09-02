@@ -7,6 +7,7 @@ import warnings
 
 from collections.abc import Iterable
 from datetime import datetime
+from enum import Enum
 from typing import Any, Dict, List, Optional, Union
 
 import requests
@@ -30,6 +31,15 @@ class JWTAuth(requests.auth.AuthBase):
     def __call__(self, r):
         r.headers["Authorization"] = f"Bearer {self._token}"
         return r
+
+class ResourceType(Enum):
+    """Enum for the different TerminusDB resources"""
+    DB = 1
+    META = 2
+    REPO = 3
+    COMMITS = 4
+    REF = 5
+    BRANCH = 6
 
 
 class WOQLClient:
@@ -341,13 +351,13 @@ class WOQLClient:
             repo=self.repo,
         )
 
-    def resource(self, ttype: str, val: Optional[str] = None) -> str:
+    def resource(self, ttype: ResourceType, val: Optional[str] = None) -> str:
         """Create a resource identifier string based on the current config.
 
         Parameters
         ----------
-        ttype : str
-            Type of resource. One of ["db", "meta", "repo", "commits", "ref", "branch"].
+        ttype : ResourceType
+            Type of resource.
         val : str, optional
             Branch or commit identifier.
 
@@ -359,38 +369,31 @@ class WOQLClient:
         Examples
         --------
         >>> client = WOQLClient("https://127.0.0.1:6363")
-        >>> client.resource("db")
+        >>> client.resource(ResourceType.DB)
         '<team>/<db>/'
-        >>> client.resource("meta")
+        >>> client.resource(ResourceType.META)
         '<team>/<db>/_meta'
-        >>> client.resource("commits")
+        >>> client.resource(ResourceType.COMMITS)
         '<team>/<db>/<repo>/_commits'
-        >>> client.resource("repo")
+        >>> client.resource(ResourceType.META)
         '<team>/<db>/<repo>/_meta'
-        >>> client.resource("ref", "<reference>")
+        >>> client.resource(ResourceType.REF, "<reference>")
         '<team>/<db>/<repo>/commit/<reference>'
-        >>> client.resource("branch", "<branch>")
+        >>> client.resource(ResourceType.BRANCH, "<branch>")
         '<team>/<db>/<repo>/branch/<branch>'
         """
         base = self.team + "/" + self.db + "/"
-        if ttype == "db":
-            return base
-        elif ttype == "meta":
-            return base + "_meta"
-        base = base + self.repo
-        if ttype == "repo":
-            return base + "/_meta"
-        elif ttype == "commits":
-            return base + "/_commits"
-        if val is None:
-            if ttype == "ref":
-                val = self.ref
-            else:
-                val = self.branch
-        if ttype == "branch":
-            return base + "/branch/" + val
-        if ttype == "ref":
-            return base + "/commit/" + val
+        ref_value = val if val else self.ref
+        branch_value = val if val else self.branch
+        urls = {
+            ResourceType.DB: base,
+            ResourceType.META: f"{base}_meta",
+            ResourceType.REPO: f"{base}{self.repo}/_meta",
+            ResourceType.COMMITS: f"{base}{self.repo}/_commits",
+            ResourceType.REF: f"{base}{self.repo}/commit/{ref_value}",
+            ResourceType.BRANCH: f"{base}{self.repo}/{branch_value}",
+        }
+        return urls[ttype]
 
     def _get_prefixes(self):
         """Get the prefixes for a given database"""
