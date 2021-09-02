@@ -375,7 +375,7 @@ class WOQLClient:
         '<team>/<db>/_meta'
         >>> client.resource(ResourceType.COMMITS)
         '<team>/<db>/<repo>/_commits'
-        >>> client.resource(ResourceType.META)
+        >>> client.resource(ResourceType.REPO)
         '<team>/<db>/<repo>/_meta'
         >>> client.resource(ResourceType.REF, "<reference>")
         '<team>/<db>/<repo>/commit/<reference>'
