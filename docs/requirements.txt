@@ -3,3 +3,6 @@ sphinx_rtd_theme
 sphinxcontrib-napoleon
 sphinx_autodoc_typehints
 numpydoc
+typeguard
+requests
+tqdm
