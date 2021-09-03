@@ -41,7 +41,7 @@ jobs:
         target-folder: ${{ steps.extract_branch.outputs.branch }}
     - name: Deploy to root 🚀
       uses: JamesIves/github-pages-deploy-action@4.0.0
-      if: ${{ steps.extract_branch.outputs.branch == "master" }}
+      if: ${{ steps.extract_branch.outputs.branch == 'master' }}
       with:
         branch: gh-pages
         folder: docs/build/html
