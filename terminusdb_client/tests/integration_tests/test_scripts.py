@@ -8,7 +8,6 @@ from ...scripts import scripts
 
 def test_script_happy_path(terminusx_token):
     testdb = "test" + str(dt.datetime.now()).replace(" ", "")
-    testdb = "testdb"
     runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(
@@ -20,7 +19,7 @@ def test_script_happy_path(terminusx_token):
             setting = json.load(file)
             assert setting.get("database") == "testdb"
             assert setting.get("server") == "https://cloud-dev.dcm.ist/ubf40420team/"
-            assert setting.get("use JWT token") == True
+            assert setting.get("use JWT token")
             assert setting.get("team") == "ubf40420team"
         result = runner.invoke(scripts.commit)
         assert result.exit_code == 0
