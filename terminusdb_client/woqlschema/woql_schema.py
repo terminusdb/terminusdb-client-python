@@ -38,11 +38,11 @@ class TerminusKey:
                     raise ValueError("Keys need to be datatype object")
 
         if isinstance(obj, dict) and obj.get("@type") is not None:
-            prefix = obj.get("@type") + "_"
+            prefix = obj.get("@type") + "/"
         elif hasattr(obj.__class__, "_base"):
-            prefix = obj.__class__._base + "_"
+            prefix = obj.__class__._base + "/"
         elif hasattr(obj.__class__, "__name__"):
-            prefix = obj.__class__.__name__ + "_"
+            prefix = obj.__class__.__name__ + "/"
         else:
             raise ValueError(f"Cannot determine prefix from {obj}")
         return prefix, key_list
