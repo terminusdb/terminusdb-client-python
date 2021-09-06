@@ -775,12 +775,12 @@ class WOQLQuery:
             self._cursor["or"].append(onevar)
         return self
 
-    def woql_from(self, graph_filter, query=None):
+    def woql_from(self, graph, query=None):
         """Specifies the database URL that will be the default database for the enclosed query
 
         Parameters
         ----------
-        graph_filter : str
+        graph : str
             url of the database
         query : WOQLQuery object, optional
 
@@ -789,16 +789,16 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        if graph_filter and graph_filter == "args":
-            return ["graph_filter", "query"]
+        if graph and graph == "args":
+            return ["graph", "query"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "From"
-        if not graph_filter or type(graph_filter) != str:
+        if not graph or type(graph) != str:
             raise ValueError(
                 "The first parameter to from must be a Graph Filter Expression (string)"
             )
-        self._cursor["graph_filter"] = graph_filter
+        self._cursor["graph"] = graph
         return self._add_sub_query(query)
 
     def into(self, graph_descriptor, query):
@@ -941,13 +941,13 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         arguments = self.triple(sub, pred, obj)
         if sub and sub == "args":
-            return arguments.append("graph_filter")
+            return arguments.append("graph")
         if not graph:
             raise ValueError(
                 "Quad takes four parameters, the last should be a graph filter"
             )
         self._cursor["@type"] = "Triple"
-        self._cursor["graph_filter"] = self._clean_graph(graph)
+        self._cursor["graph"] = self._clean_graph(graph)
         return self
 
     def added_quad(self, sub, pred, obj, graph, opt=False):
@@ -977,13 +977,13 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         arguments = self.triple(sub, pred, obj)
         if sub and sub == "args":
-            return arguments.append("graph_filter")
+            return arguments.append("graph")
         if not graph:
             raise ValueError(
                 "Quad takes four parameters, the last should be a graph filter"
             )
         self._cursor["@type"] = "AddedTriple"
-        self._cursor["graph_filter"] = self._clean_graph(graph)
+        self._cursor["graph"] = self._clean_graph(graph)
         return self
 
     def removed_quad(self, sub, pred, obj, graph, opt=False):
@@ -1013,13 +1013,13 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         arguments = self.triple(sub, pred, obj)
         if sub and sub == "args":
-            return arguments.append("graph_filter")
+            return arguments.append("graph")
         if not graph:
             raise ValueError(
                 "Quad takes four parameters, the last should be a graph filter"
             )
         self._cursor["@type"] = "DeletedTriple"
-        self._cursor["graph_filter"] = self._clean_graph(graph)
+        self._cursor["graph"] = self._clean_graph(graph)
         return self
 
     def string(self, input_str):
@@ -2687,9 +2687,7 @@ class WOQLQuery:
         if t is None:
             t = lastsubj.get("@type")
         if g is None and lastsubj:
-            gobj = lastsubj.get("graph_filter")
-            if gobj is None:
-                gobj = lastsubj.get("graph")
+            gobj = lastsubj.get("graph")
             if gobj is not None:
                 g = gobj
         if g is None:
