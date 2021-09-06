@@ -22,7 +22,6 @@ def test_script_happy_path(terminusx_token):
             assert setting.get("server") == "https://cloud-dev.dcm.ist/ubf40420team/"
             assert setting.get("use JWT token") == True
             assert setting.get("team") == "ubf40420team"
-            scripts._connect(setting)
         result = runner.invoke(scripts.commit)
         assert result.exit_code == 0
         result = runner.invoke(scripts.sync)
