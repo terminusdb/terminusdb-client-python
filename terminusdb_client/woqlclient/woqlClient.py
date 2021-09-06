@@ -1,10 +1,9 @@
 """woqlClient.py
 WOQLClient is the Python public API for TerminusDB"""
 import copy
-import os
 import json
+import os
 import warnings
-
 from collections.abc import Iterable
 from datetime import datetime
 from enum import Enum
@@ -32,8 +31,10 @@ class JWTAuth(requests.auth.AuthBase):
         r.headers["Authorization"] = f"Bearer {self._token}"
         return r
 
+
 class ResourceType(Enum):
     """Enum for the different TerminusDB resources"""
+
     DB = 1
     META = 2
     REPO = 3
@@ -622,7 +623,9 @@ class WOQLClient:
         )
         return json.loads(_finish_response(result))
 
-    def query_document(self, document_template: dict, graph_type: str = "instance", **kwargs) -> Iterable:
+    def query_document(
+        self, document_template: dict, graph_type: str = "instance", **kwargs
+    ) -> Iterable:
         """Retrieves all documents that match a given document template
 
         Parameters
@@ -642,8 +645,6 @@ class WOQLClient:
         Iterable
         """
         self._validate_graph_type(graph_type)
-
-
         self._check_connection()
 
         payload = {"query": document_template, "graph_type": graph_type}
@@ -657,7 +658,7 @@ class WOQLClient:
             self._documents_url(),
             json=payload,
             auth=self._auth(),
-            headers = {'X-HTTP-Method-Override': 'GET'}
+            headers={"X-HTTP-Method-Override": "GET"},
         )
         return _result2stream(_finish_response(result))
 
