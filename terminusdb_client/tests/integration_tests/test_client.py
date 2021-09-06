@@ -1,6 +1,5 @@
 # import csv
 # import filecmp
-import os
 
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
@@ -42,9 +41,6 @@ def test_happy_path(docker_url):
 def test_jwt(docker_url_jwt):
     # create client
     client = WOQLClient(docker_url_jwt)
-    os.environ[
-        "TERMINUSDB_ACCESS_TOKEN"
-    ] = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InRlc3RrZXkifQ.eyJodHRwOi8vdGVybWludXNkYi5jb20vc2NoZW1hL3N5c3RlbSNhZ2VudF9uYW1lIjoiYWRtaW4iLCJodHRwOi8vdGVybWludXNkYi5jb20vc2NoZW1hL3N5c3RlbSN1c2VyX2lkZW50aWZpZXIiOiJhZG1pbkB1c2VyLmNvbSIsImlzcyI6Imh0dHBzOi8vdGVybWludXNodWIuZXUuYXV0aDAuY29tLyIsInN1YiI6ImFkbWluIiwiYXVkIjpbImh0dHBzOi8vdGVybWludXNodWIvcmVnaXN0ZXJVc2VyIiwiaHR0cHM6Ly90ZXJtaW51c2h1Yi5ldS5hdXRoMC5jb20vdXNlcmluZm8iXSwiaWF0IjoxNTkzNzY5MTgzLCJhenAiOiJNSkpuZEdwMHpVZE03bzNQT1RRUG1SSkltWTJobzBhaSIsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwifQ.Ru03Bi6vSIQ57bC41n6fClSdxlb61m0xX6Q34Yh91gql0_CyfYRWTuqzqPMFoCefe53hPC5E-eoSFdID_u6w1ih_pH-lTTqus9OWgi07Qou3QNs8UZBLiM4pgLqcBKs0N058jfg4y6h9GjIBGVhX9Ni2ez3JGNcz1_U45BhnreE"
     assert not client._connected
     # test connect
     client.connect(use_token=True)
@@ -58,14 +54,18 @@ def test_jwt(docker_url_jwt):
     assert "test_happy_path" not in client.list_databases()
 
 
-def test_terminusx():
-    os.environ[
-        "TERMINUSDB_ACCESS_TOKEN"
-    ] = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkpXUjBIOXYyeTFORUdaZXlodUM0aCJ9.eyJodHRwOi8vdGVybWludXNkYi5jb20vc2NoZW1hL3N5c3RlbSNhZ2VudF9uYW1lIjoiYXV0aDB8NjEyM2MwODYwZTI0NWEwMDZhMjg0YTM3IiwiaXNzIjoiaHR0cHM6Ly90ZXJtaW51cy1jbG91ZC1kZXYuZXUuYXV0aDAuY29tLyIsInN1YiI6Iko0NWpKNmVYTDM4M3NXVU1ueFJNelJJMktsUFRnRnlKQGNsaWVudHMiLCJhdWQiOiJodHRwczovL3Rlcm1pbnVzY2xvdWQvYXBpX3Rva2VucyIsImlhdCI6MTYyOTczMzE3OCwiZXhwIjoxNjMyMzI1MTc4LCJhenAiOiJKNDVqSjZlWEwzODNzV1VNbnhSTXpSSTJLbFBUZ0Z5SiIsImd0eSI6ImNsaWVudC1jcmVkZW50aWFscyJ9.d7BvjSOxZz5yysdm8cUD6TQFqgp86ZJqoPQze_ODodHeZDfHB38y3l0w_AkK2pdewcNOiygRidyO5WKYtoSQrbUPmpQEplXh1GbGCP1IMK3D1YuRN6EfRwVGa0gPQZoNsmlTCI8XeUGiSBX9lap23aOIhwZ0UzggDZFsoyHbul1F_gMV8d5WL49NjEq_I_FyRdLIFeTSlf-zWACNIVrOBXlR5Ea0mmDqaOUbHT9c5zWmuWB8RXCWj-H6IvZYUB_9O27DXgWTS40RbI_rY8su_DRb10sfsB9VMF6YcpUzWQWl8Cjjm0_O-tqzAxIpP981ilGko3WsHbnsARMxM65CmA"
+def test_terminusx(terminusx_token):
     endpoint = "https://cloud-dev.dcm.ist/ubf40420team/"
-
     client = WOQLClient(endpoint)
-    client.connect(use_token=True)
+    client.connect(use_token=True, team="ubf40420team")
+    assert client._connected
+    # test create db
+    client.create_database("test_happy_path")
+    assert client.db == "test_happy_path"
+    assert "test_happy_path" in client.list_databases()
+    client.delete_database("test_happy_path", "ubf40420team")
+    assert client.db is None
+    assert "test_happy_path" not in client.list_databases()
 
 
 #

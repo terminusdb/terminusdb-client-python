@@ -1,4 +1,4 @@
-click.echo(import builtins
+import builtins
 import datetime as dt
 import enum
 import json
@@ -42,10 +42,7 @@ def startproject():
 
     if "http://127.0.0.1" not in server_location:
 
-        use_token = click.comfirm(
-            "Are you using the TERMINUSDB_ACCESS_TOKEN?",
-            type=bool,
-        )
+        use_token = click.confirm("Are you using the TERMINUSDB_ACCESS_TOKEN?")
         if use_token:
             click.echo(
                 "Please make sure you have set up TERMINUSDB_ACCESS_TOKEN in your enviroment variables."
@@ -116,7 +113,7 @@ def _connect(settings, new_db=True):
         branch = "main"
     client = WOQLClient(server)
     try:
-        client.connect(db=database, uset_token=use_token, team=team, branch=branch)
+        client.connect(db=database, use_token=use_token, team=team, branch=branch)
         return client, f"Connected to {database}."
     except InterfaceError as error:
         if "does not exist" in str(error) and new_db:
@@ -124,7 +121,7 @@ def _connect(settings, new_db=True):
             client.create_database(database)
             return client, f"{database} created."
         else:
-            raise InterfaceError(f"Cannot connect to {database}.")
+            raise InterfaceError(f"Cannot connect to {database}. Details: {error}")
 
 
 def _create_script(obj_list):
@@ -258,9 +255,7 @@ def _sync(client):
         file.close()
         click.echo(f"schema.py is updated with {client.db} schema.")
     else:
-        click.echo(
-            f"{client.db} schema is empty so schema.py has not be changed."
-        )
+        click.echo(f"{client.db} schema is empty so schema.py has not be changed.")
 
 
 @click.command()
