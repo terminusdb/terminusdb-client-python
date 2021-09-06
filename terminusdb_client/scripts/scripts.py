@@ -1,4 +1,4 @@
-import builtins
+click.echo(import builtins
 import datetime as dt
 import enum
 import json
@@ -90,7 +90,7 @@ def startproject():
     # create operational file for TerminiusDB
     with open(".TDB", "w") as outfile:
         json.dump({"branch": "main"}, outfile)
-    print(  # noqa: T001
+    click.echo(
         "config.json and schema.py created, please customize them to start your project."
     )
 
@@ -256,9 +256,9 @@ def _sync(client):
         file = open("schema.py", "w")
         file.write(print_script)
         file.close()
-        print(f"schema.py is updated with {client.db} schema.")  # noqa: T001
+        click.echo(f"schema.py is updated with {client.db} schema.")
     else:
-        print(  # noqa: T001
+        click.echo(
             f"{client.db} schema is empty so schema.py has not be changed."
         )
 
@@ -271,7 +271,7 @@ def sync():
     settings.update(status)
     settings["database"]
     client, msg = _connect(settings, new_db=False)
-    print(msg)  # noqa: T001
+    click.echo(msg)
     _sync(client)
 
 
@@ -283,7 +283,7 @@ def commit():
     settings.update(status)
     database = settings["database"]
     client, msg = _connect(settings)
-    print(msg)  # noqa: T001
+    click.echo(msg)
     sys.path.append(os.getcwd())
     schema_plan = __import__("schema", globals(), locals(), [], 0)
     all_obj = []
@@ -297,7 +297,7 @@ def commit():
         commit_msg="Schema updated by Python client.",
         graph_type="schema",
     )
-    print(f"{database} schema updated.")  # noqa: T001
+    click.echo(f"{database} schema updated.")
 
 
 @click.command()
@@ -320,7 +320,7 @@ def deletedb(database):
         status["branch"] = "main"
         with open(".TDB", "w") as outfile:
             json.dump(status, outfile)
-        print(f"{database} deleted.")  # noqa: T001
+        click.echo(f"{database} deleted.")
 
 
 def _get_existing_class(client):
@@ -412,7 +412,7 @@ def importcsv(csv_file, keys, class_name, chunksize, schema, na, sep):
                     commit_msg=f"Schema object insert/ update with {csv_file} insert by Python client.",
                     graph_type="schema",
                 )
-                print(  # noqa: T001
+                click.echo(
                     f"\nSchema object {class_name} created with {csv_file} inserted into database."
                 )
                 _sync(client)
@@ -441,7 +441,7 @@ def importcsv(csv_file, keys, class_name, chunksize, schema, na, sep):
                 commit_msg=f"Documents created with {csv_file} insert by Python client.",
             )
     key_type = "Random" if (na == "optional" and not keys) else "Hash"
-    print(  # noqa: T001
+    click.echo(
         f"Records in {csv_file} inserted as type {class_name} into database with {key_type} ids."
     )
 
@@ -509,7 +509,7 @@ def _exportcsv(
     if filename is None:
         filename = class_obj + ".csv"
     df.to_csv(filename, index=False)
-    print(  # noqa: T001
+    click.echo(
         f"CSV file {filename} created with {class_obj} from database {client.db}."
     )
 
@@ -562,9 +562,9 @@ def alldocs(schema, type_, query, export, keepid, maxdep, filename=None):
     client, msg = _connect(settings)
     if schema:
         if type_:
-            print(client.get_document(type_, graph_type="schema"))  # noqa: T001
+            click.echo(client.get_document(type_, graph_type="schema"))
         else:
-            print(list(client.get_all_documents(graph_type="schema")))  # noqa: T001
+            click.echo(list(client.get_all_documents(graph_type="schema")))
     elif type_:
         all_existing_class = _get_existing_class(client)
         if type_ not in all_existing_class:
@@ -601,9 +601,9 @@ def alldocs(schema, type_, query, export, keepid, maxdep, filename=None):
                 type_, client, result, all_existing_class, keepid, maxdep, filename
             )
         else:
-            print(result)  # noqa: T001
+            click.echo(result)
     else:
-        print(list(client.get_all_documents()))  # noqa: T001
+        click.echo(list(client.get_all_documents()))
 
 
 @click.command()
@@ -617,13 +617,13 @@ def branch(branch_name):
     if branch_name is None:
         all_branches = client.get_all_branches()
         all_branches = list(map(lambda item: item["name"], all_branches))
-        print("\n".join(all_branches))  # noqa: T001
+        click.echo("\n".join(all_branches))
     else:
         client.create_branch(branch_name)
         # status["branch"] = branch_name
         # with open(".TDB", "w") as outfile:
         #     json.dump(status, outfile)
-        print(  # noqa: T001
+        click.echo(
             f"Branch '{branch_name}' created. Remain on '{status['branch']}' branch."
         )
 
@@ -647,11 +647,11 @@ def checkout(branch_name, new_branch):
     with open(".TDB", "w") as outfile:
         json.dump(status, outfile)
     if new_branch:
-        print(  # noqa: T001
+        click.echo(
             f"Branch '{branch_name}' created, checked out '{branch_name}' branch."
         )
     else:
-        print(f"Checked out '{branch_name}' branch.")  # noqa: T001
+        click.echo(f"Checked out '{branch_name}' branch.")
 
 
 @click.command()
@@ -663,7 +663,7 @@ def status():
     message = f"Connecting to '{settings['database']}' at '{settings['server']}'\non branch '{settings['branch']}'"
     if settings.get("team"):
         message += f"\nwith team '{settings['team']}'"
-    print(message)  # noqa: T001
+    click.echo(message)
 
 
 @click.command()
@@ -675,7 +675,7 @@ def rebase(branch_name):
     settings.update(status)
     client, _ = _connect(settings)
     client.rebase(branch=branch_name)
-    print(f"Rebased {branch_name} branch.")  # noqa: T001
+    click.echo(f"Rebased {branch_name} branch.")
 
 
 terminusdb.add_command(startproject)
