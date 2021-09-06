@@ -41,21 +41,27 @@ def startproject():
     )
 
     if "http://127.0.0.1" not in server_location:
+
+        use_token = click.comfirm(
+            "Are you using the TERMINUSDB_ACCESS_TOKEN?",
+            type=bool,
+        )
+        if use_token:
+            click.echo(
+                "Please make sure you have set up TERMINUSDB_ACCESS_TOKEN in your enviroment variables."
+            )
         team = click.prompt(
             "Please enter the team for login",
             type=str,
         )
-        jwt_token = click.prompt(
-            "Please put in the JWT token",
-            type=str,
-        )
+
         # create config.json
         with open("config.json", "w") as outfile:
             json.dump(
                 {
                     "server": server_location,
                     "database": project_name,
-                    "JWT token": jwt_token,
+                    "use JWT token": use_token,
                     "team": team,
                 },
                 outfile,
@@ -101,7 +107,7 @@ def _load_settings(filename="config.json", check=("server", "database")):
 def _connect(settings, new_db=True):
     server = settings.get("server")
     database = settings.get("database")
-    jwt_token = settings.get("JWT token")
+    use_token = settings.get("use JWT token")
     team = settings.get("team")
     branch = settings.get("branch")
     if not team:
@@ -110,11 +116,11 @@ def _connect(settings, new_db=True):
         branch = "main"
     client = WOQLClient(server)
     try:
-        client.connect(db=database, jwt_token=jwt_token, team=team, branch=branch)
+        client.connect(db=database, uset_token=use_token, team=team, branch=branch)
         return client, f"Connected to {database}."
     except InterfaceError as error:
         if "does not exist" in str(error) and new_db:
-            client.connect(jwt_token=jwt_token, team=team, branch=branch)
+            client.connect(use_token=use_token, team=team, branch=branch)
             client.create_database(database)
             return client, f"{database} created."
         else:

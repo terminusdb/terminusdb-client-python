@@ -8,7 +8,7 @@
 
 from typing import List, Optional, Set
 
-from terminusdb_client.woqlschema.woql_schema import (
+from terminusdb_client.woqlschema import (
     DocumentTemplate,
     EnumTemplate,
     HashKey,
