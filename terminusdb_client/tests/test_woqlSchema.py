@@ -156,7 +156,7 @@ def test_cycling():
 
 def test_idgen():
     cheuk = Country()
-    assert cheuk._id[: len("Country_")] == "Country_"
+    assert cheuk._id[: len("Country/")] == "Country/"
 
 
 # def test_schema_delete():
