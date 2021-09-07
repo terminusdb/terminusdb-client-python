@@ -41,5 +41,10 @@ def test_script_happy_path(terminusx_token):
         result = runner.invoke(scripts.rebase, ["main"])
         assert result.exit_code == 0
         assert f"Rebased main branch." in result.output
-        result = runner.invoke(scripts.deletedb, [testdb])
+        result = runner.invoke(scripts.deletedb, input="y\n")
         assert result.exit_code == 0
+        assert (
+            f"Do you want to delete '{testdb}'? WARNING: This opertation is non-reversible."
+            in result.output
+        )
+        assert f"{testdb} deleted." in result.output

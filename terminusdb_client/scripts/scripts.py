@@ -296,19 +296,15 @@ def commit():
 
 
 @click.command()
-@click.argument("database")
-def deletedb(database):
+def deletedb():
     """Delete the database in this project."""
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
     settings.update(status)
-    settings["server"]
-    setting_database = settings["database"]
-    if database != setting_database:
-        raise ValueError(
-            "Name provided does not match project database name. You can only delete the database in this project."
-        )
-    else:
+    database = settings["database"]
+    if click.confirm(
+        f"Do you want to delete '{settings['database']}'? WARNING: This opertation is non-reversible."
+    ):
         client, _ = _connect(settings, new_db=False)
         client.delete_database(database, client.team)
         # reset to main branch
