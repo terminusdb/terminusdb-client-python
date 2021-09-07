@@ -19,7 +19,7 @@ def test_script_happy_path(terminusx_token):
         with open("config.json") as file:
             setting = json.load(file)
             assert setting.get("database") == testdb
-            assert setting.get("server") == "https://cloud-dev.dcm.ist/ubf40420team/"
+            assert setting.get("endpoint") == "https://cloud-dev.dcm.ist/ubf40420team/"
             assert setting.get("use JWT token")
             assert setting.get("team") == "ubf40420team"
         result = runner.invoke(scripts.commit)

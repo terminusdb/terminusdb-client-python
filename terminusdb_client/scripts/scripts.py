@@ -35,7 +35,7 @@ def startproject():
         "Please enter a project name (this will also be the database name)", type=str
     )
     server_location = click.prompt(
-        "Please enter a server location (press enter to use default)",
+        "Please enter a endpoint location (press enter to use localhost default)",
         type=str,
         default="http://127.0.0.1:6363/",
     )
@@ -56,7 +56,7 @@ def startproject():
         with open("config.json", "w") as outfile:
             json.dump(
                 {
-                    "server": server_location,
+                    "endpoint": server_location,
                     "database": project_name,
                     "use JWT token": use_token,
                     "team": team,
@@ -69,7 +69,11 @@ def startproject():
         # create config.json
         with open("config.json", "w") as outfile:
             json.dump(
-                {"server": server_location, "database": project_name, "team": "admin"},
+                {
+                    "endpoint": server_location,
+                    "database": project_name,
+                    "team": "admin",
+                },
                 outfile,
                 sort_keys=True,
                 indent=4,
@@ -92,7 +96,7 @@ def startproject():
     )
 
 
-def _load_settings(filename="config.json", check=("server", "database")):
+def _load_settings(filename="config.json", check=("endpoint", "database")):
     with open(filename) as input_file:
         config = json.load(input_file)
     for item in check:
@@ -102,7 +106,7 @@ def _load_settings(filename="config.json", check=("server", "database")):
 
 
 def _connect(settings, new_db=True):
-    server = settings.get("server")
+    server = settings.get("endpoint")
     database = settings.get("database")
     use_token = settings.get("use JWT token")
     team = settings.get("team")
@@ -651,7 +655,7 @@ def status():
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
     settings.update(status)
-    message = f"Connecting to '{settings['database']}' at '{settings['server']}'\non branch '{settings['branch']}'"
+    message = f"Connecting to '{settings['database']}' at '{settings['endpoint']}'\non branch '{settings['branch']}'"
     if settings.get("team"):
         message += f"\nwith team '{settings['team']}'"
     click.echo(message)
