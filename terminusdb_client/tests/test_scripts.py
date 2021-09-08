@@ -13,7 +13,7 @@ def test_startproject():
         with open("config.json") as file:
             setting = json.load(file)
             assert setting.get("database") == "mydb"
-            assert setting.get("server") == "http://127.0.0.1:6363/"
+            assert setting.get("endpoint") == "http://127.0.0.1:6363/"
 
 
 # def test_no_server():
