@@ -7,3 +7,4 @@ numpydoc
 typeguard
 requests
 tqdm
+shed
