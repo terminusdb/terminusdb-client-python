@@ -419,7 +419,6 @@ def importcsv(csv_file, keys, class_name, chunksize, schema, na, sep):
                     bad_key = []
                     for key, value in item.items():
                         if pd.isna(value):
-                            # item.pop(key)
                             bad_key.append(key)
                     for key in bad_key:
                         item.pop(key)
