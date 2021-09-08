@@ -87,6 +87,7 @@ class WOQLClient:
         db: Optional[str] = None,
         remote_auth: str = None,
         use_token: bool = False,
+        jwt_token: Optional[str] = None,
         key: str = "root",
         user: str = "admin",
         branch: str = "main",
@@ -110,8 +111,10 @@ class WOQLClient:
             API key for connecting, default to be "root"
         user: optional, str
             Name of the user, default to be "admin"
-        use_token: optional, bool
-            Use the ENV variable TERMINUSDB_ACCESS_TOKEN to connect with a Bearer JWT token
+        use_token: bool
+            Use the ENV variable TERMINUSDB_ACCESS_TOKEN or jwt_token to connect with a Bearer JWT token
+        jwt_token: optional, str§
+            The Bearer JWT token to connect. If None (default), it will use ENV variable TERMINUSDB_ACCESS_TOKEN as the JWT token.
         branch: optional, str
             Branch to be connected, default to be "main"
         ref: optional, str
@@ -133,6 +136,7 @@ class WOQLClient:
         self._key = key
         self.user = user
         self._use_token = use_token
+        self._jwt_token = jwt_token
         self.branch = branch
         self.ref = ref
         self.repo = repo
@@ -1529,7 +1533,12 @@ class WOQLClient:
         # if https basic
         if not self._use_token and self._connected and self._key and self.user:
             return (self.user, self._key)
-        return JWTAuth(os.environ["TERMINUSDB_ACCESS_TOKEN"])
+        elif self._connected and self._jwt_token is not None:
+            return JWTAuth(self._jwt_token)
+        elif self._connected:
+            return JWTAuth(os.environ["TERMINUSDB_ACCESS_TOKEN"])
+        else:
+            raise RuntimeError("Client not connected.")
         # TODO: remote_auth
 
     def get_database(self, dbid: str) -> Optional[dict]:
