@@ -42,6 +42,7 @@ extensions = [
     "sphinx_rtd_theme",
     "sphinxcontrib.napoleon",
     "sphinx_autodoc_typehints",
+    "sphinx_click",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
