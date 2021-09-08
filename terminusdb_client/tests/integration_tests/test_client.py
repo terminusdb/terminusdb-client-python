@@ -1,5 +1,6 @@
 # import csv
 # import filecmp
+import datetime as dt
 
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
@@ -55,17 +56,18 @@ def test_jwt(docker_url_jwt):
 
 
 def test_terminusx(terminusx_token):
+    testdb = "test_happy_" + str(dt.datetime.now()).replace(" ", "")
     endpoint = "https://cloud-dev.dcm.ist/ubf40420team/"
     client = WOQLClient(endpoint)
     client.connect(use_token=True, team="ubf40420team")
     assert client._connected
     # test create db
-    client.create_database("test_happy_path")
-    assert client.db == "test_happy_path"
-    assert "test_happy_path" in client.list_databases()
-    client.delete_database("test_happy_path", "ubf40420team")
+    client.create_database(testdb)
+    assert client.db == testdb
+    assert testdb in client.list_databases()
+    client.delete_database(testdb, "ubf40420team")
     assert client.db is None
-    assert "test_happy_path" not in client.list_databases()
+    assert testdb not in client.list_databases()
 
 
 #

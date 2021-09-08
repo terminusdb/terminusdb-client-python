@@ -7,7 +7,7 @@ from ...scripts import scripts
 
 
 def test_script_happy_path(terminusx_token):
-    testdb = "test" + str(dt.datetime.now()).replace(" ", "")
+    testdb = "test_" + str(dt.datetime.now()).replace(" ", "")
     endpoint = "https://cloud-dev.dcm.ist/ubf40420team/"
     runner = CliRunner()
     with runner.isolated_filesystem():
@@ -40,7 +40,7 @@ def test_script_happy_path(terminusx_token):
         )
         result = runner.invoke(scripts.rebase, ["main"])
         assert result.exit_code == 0
-        assert f"Rebased main branch." in result.output
+        assert "Rebased main branch." in result.output
         result = runner.invoke(scripts.deletedb, input="y\n")
         assert result.exit_code == 0
         assert (
