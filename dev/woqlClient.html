@@ -103,12 +103,13 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">TerminusDB Client</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">WOQLClient</a></li>
 <li class="toctree-l2"><a class="reference internal" href="woqlQuery.html">WOQLQuery</a></li>
-<li class="toctree-l2"><a class="reference internal" href="woqlLib.html">WOQLLib</a></li>
+<li class="toctree-l2"><a class="reference internal" href="woqlSchema.html">WOQLSchema</a></li>
 <li class="toctree-l2"><a class="reference internal" href="woqlView.html">WOQLView</a></li>
 <li class="toctree-l2"><a class="reference internal" href="woqlDataframe.html">woqlDataframe</a></li>
-<li class="toctree-l2"><a class="reference internal" href="SmartQuery.html">SmartQuery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Errors_and_Exceptions.html">Errors and Exceptions</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="Scaffolding_CLI_Tool.html">Scaffolding CLI Tool</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
 </ul>
 
@@ -506,7 +507,7 @@ a terminus:Database document to the Terminus Server.</p>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>InterfaceError</strong> – if the client does not connect to a server</p>
+<dd class="field-even"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a server</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -538,7 +539,7 @@ and the new value will be used in future requests to the server.</p>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>UserWarning</strong> – If the value of dbid is None.</p></li>
-<li><p><strong>InterfaceError</strong> – if the client does not connect to a server.</p></li>
+<li><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a server.</p></li>
 </ul>
 </dd>
 </dl>
@@ -563,7 +564,7 @@ and the new value will be used in future requests to the server.</p>
 <dd class="field-odd"><p><strong>graph_type</strong> (<em>str</em>) – Graph type, either “instance” or “schema”.</p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>InterfaceError</strong> – if the client does not connect to a database</p>
+<dd class="field-even"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p></p>
@@ -587,7 +588,7 @@ and the new value will be used in future requests to the server.</p>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>InterfaceError</strong> – if the client does not connect to a database</p>
+<dd class="field-even"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
@@ -608,7 +609,7 @@ and the new value will be used in future requests to the server.</p>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>InterfaceError</strong> – if the client does not connect to a database</p>
+<dd class="field-even"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
@@ -628,7 +629,7 @@ and the new value will be used in future requests to the server.</p>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>InterfaceError</strong> – if the client does not connect to a database</p>
+<dd class="field-even"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p></p>
@@ -652,7 +653,7 @@ and the new value will be used in future requests to the server.</p>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>InterfaceError</strong> – if the client does not connect to a database</p>
+<dd class="field-even"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p></p>
@@ -678,7 +679,7 @@ and the new value will be used in future requests to the server.</p>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>InterfaceError</strong> – if the client does not connect to a database</p>
+<dd class="field-even"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>Stream of dictionaries</p>
@@ -703,7 +704,7 @@ and the new value will be used in future requests to the server.</p>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>InterfaceError</strong> – if the client does not connect to a database</p>
+<dd class="field-even"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>Stream of dictionaries</p>
@@ -727,7 +728,7 @@ and the new value will be used in future requests to the server.</p>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>InterfaceError</strong> – if the client does not connect to a database</p>
+<dd class="field-even"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>list of ids of the inseted docuemnts</p>
@@ -751,7 +752,7 @@ and the new value will be used in future requests to the server.</p>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>InterfaceError</strong> – if the client does not connect to a database</p>
+<dd class="field-even"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
@@ -782,7 +783,7 @@ and the new value will be used in future requests to the server.</p>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>InterfaceError</strong> – if the client does not connect to a database</p>
+<dd class="field-even"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
@@ -846,7 +847,7 @@ and the new value will be used in future requests to the server.</p>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>InterfaceError</strong> – if the client does not connect to a database</p>
+<dd class="field-even"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -875,7 +876,7 @@ and the new value will be used in future requests to the server.</p>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>InterfaceError</strong> – if the client does not connect to a database</p>
+<dd class="field-even"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
@@ -897,7 +898,7 @@ and the new value will be used in future requests to the server.</p>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>InterfaceError</strong> – if the client does not connect to a database</p>
+<dd class="field-even"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p></p>
@@ -922,7 +923,7 @@ and the new value will be used in future requests to the server.</p>
 <dd class="field-odd"><p><strong>remote_id</strong> (<em>str</em>) – id of the remote</p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>InterfaceError</strong> – if the client does not connect to a database</p>
+<dd class="field-even"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
@@ -944,7 +945,7 @@ and the new value will be used in future requests to the server.</p>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>InterfaceError</strong> – if the client does not connect to a database</p>
+<dd class="field-even"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -977,7 +978,7 @@ and the new value will be used in future requests to the server.</p>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>InterfaceError</strong> – if the client does not connect to a database</p>
+<dd class="field-even"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p></p>
@@ -999,7 +1000,7 @@ and the new value will be used in future requests to the server.</p>
 <dd><p>Reset the current branch HEAD to the specified commit path. Doing it will reset the internal commit counter (self._commit_made) back to zero.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><strong>InterfaceError</strong> – if the client does not connect to a database</p>
+<dd class="field-odd"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -1032,7 +1033,7 @@ and the new value will be used in future requests to the server.</p>
 <dd><p>Optimize the specified path.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><strong>InterfaceError</strong> – if the client does not connect to a database</p>
+<dd class="field-odd"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -1060,7 +1061,7 @@ and the new value will be used in future requests to the server.</p>
 <dd><p>Squash the current branch HEAD into a commit</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><strong>InterfaceError</strong> – if the client does not connect to a database</p>
+<dd class="field-odd"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -1107,7 +1108,7 @@ and the new value will be used in future requests to the server.</p>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>InterfaceError</strong> – if the client does not connect to a database</p>
+<dd class="field-even"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -1131,7 +1132,7 @@ and the new value will be used in future requests to the server.</p>
 :type dbid: str</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><strong>InterfaceError</strong> – if the client does not connect to a server</p>
+<dd class="field-odd"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a server</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p></p>
@@ -1148,7 +1149,7 @@ and the new value will be used in future requests to the server.</p>
 <dd><p>Returns a list of database metadata records for all databases the user has access to</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><strong>InterfaceError</strong> – if the client does not connect to a server</p>
+<dd class="field-odd"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a server</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p></p>
@@ -1165,7 +1166,7 @@ and the new value will be used in future requests to the server.</p>
 <dd><p>Returns a list of database ids for all databases the user has access to</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><strong>InterfaceError</strong> – if the client does not connect to a server</p>
+<dd class="field-odd"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a server</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p></p>

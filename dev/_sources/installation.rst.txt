@@ -5,7 +5,7 @@ Requirements
 ------------
 * `TerminusDB <https://terminusdb.com/hub/download>`_
   (you can also `install using Docker <https://github.com/terminusdb/terminusdb-quickstart>`_)
-* Python >= 3.6
+* Python >= 3.7
 
 Install using pip
 -----------------
