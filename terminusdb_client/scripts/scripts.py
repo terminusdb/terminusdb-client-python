@@ -360,6 +360,7 @@ def importcsv(csv_file, keys, class_name, chunksize, schema, na, id, embedded, s
     # If chunksize is too small, pandas may decide certain column to be integer if all values in the 1st chunk are 0.0. This can be problmetic for some cases.
     na = na.lower()
     id = id.lower()
+    keys = list(map(lambda x: x.lower(), keys))
     try:
         pd = import_module("pandas")
         np = import_module("numpy")
@@ -389,7 +390,7 @@ def importcsv(csv_file, keys, class_name, chunksize, schema, na, id, embedded, s
             if converted_type == object:
                 converted_type = str  # pandas treats all string as objects
             converted_type = wt.to_woql_type(converted_type)
-            if na == "optional":
+            if na == "optional" and col not in keys:
                 class_dict[col] = {"@type": "Optional", "@class": converted_type}
             else:
                 class_dict[col] = converted_type
@@ -434,6 +435,10 @@ def importcsv(csv_file, keys, class_name, chunksize, schema, na, id, embedded, s
                     bad_key = []
                     for key, value in item.items():
                         if pd.isna(value):
+                            if key in keys:
+                                raise RuntimeError(
+                                    f"{key} is used as a key but missing in {item}. Cannot import CSV."
+                                )
                             bad_key.append(key)
                     for key in bad_key:
                         item.pop(key)
