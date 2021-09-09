@@ -19,7 +19,7 @@ from ..errors import InterfaceError
 
 # from ..woql_type import from_woql_type
 from ..woqlclient.woqlClient import WOQLClient
-from ..woqlschema.woql_schema import HashKey, RandomKey
+from ..woqlschema.woql_schema import LexicalKey, RandomKey
 
 
 @click.group()
@@ -350,15 +350,16 @@ def _get_existing_class(client):
     type=click.Choice(["skip", "optional", "error"], case_sensitive=False),
     help="Specify how to handle NAs: 'skip' will skip entries with NAs, 'optional' will make all properties optional in the database, 'error' will just thow an error if there's NAs",
 )
-@click.option("--id", help="Specify column to be used as id")
+@click.option("--id", help="Specify column to be used as ids instead of generated ids")
 @click.option("-e", "--embedded", multiple=True, help="Specify embedded columns")
 @click.option("--sep", default=",", show_default=True)
 # @click.option('--header ', default=',', show_default=True)
-def importcsv(csv_file, keys, class_name, chunksize, schema, na, sep):
+def importcsv(csv_file, keys, class_name, chunksize, schema, na, id, embedded, sep):
     """Import CSV file into pandas DataFrame then into TerminusDB, with read_csv() options.
     Options like chunksize, sep etc"""
     # If chunksize is too small, pandas may decide certain column to be integer if all values in the 1st chunk are 0.0. This can be problmetic for some cases.
     na = na.lower()
+    id = id.lower()
     try:
         pd = import_module("pandas")
         np = import_module("numpy")
@@ -392,12 +393,15 @@ def importcsv(csv_file, keys, class_name, chunksize, schema, na, sep):
                 class_dict[col] = {"@type": "Optional", "@class": converted_type}
             else:
                 class_dict[col] = converted_type
-        if keys:
-            class_dict["@key"] = {"@type": "Hash", "@fields": list(keys)}
+        if id is not None:
+            pass  # don't need key if id is specified
+        elif keys:
+            class_dict["@key"] = {"@type": "Lexical", "@fields": list(keys)}
         elif na == "optional":
+            # have to use random key cause keys will be optional
             class_dict["@key"] = {"@type": "Random"}
         else:
-            class_dict["@key"] = {"@type": "Hash", "@fields": list(df.columns)}
+            class_dict["@key"] = {"@type": "Lexical", "@fields": list(df.columns)}
         return class_dict
 
     with pd.read_csv(csv_file, sep=sep, chunksize=chunksize) as reader:
@@ -434,18 +438,31 @@ def importcsv(csv_file, keys, class_name, chunksize, schema, na, sep):
                     for key in bad_key:
                         item.pop(key)
                 item["@type"] = class_name
-                if keys:
-                    item_id = HashKey(list(keys)).idgen(item)
+                if id:
+                    if id in item:
+                        item_id = class_name + "/" + item[id]
+                    else:
+                        raise RuntimeError(
+                            f"id {id} is missing in {item}. Cannot import CSV."
+                        )
+                elif keys:
+                    item_id = LexicalKey(list(keys)).idgen(item)
                 elif na == "optional":
                     item_id = RandomKey().idgen(item)
                 else:
-                    item_id = HashKey(list(df.columns)).idgen(item)
+                    item_id = LexicalKey(list(df.columns)).idgen(item)
                 item["@id"] = item_id
             client.update_document(
                 obj_list,
                 commit_msg=f"Documents created with {csv_file} insert by Python client.",
             )
-    key_type = "Random" if (na == "optional" and not keys) else "Hash"
+    if id:
+        key_type = "specified"
+    elif na == "optional" and not keys:
+        key_type = "Random"
+    else:
+        key_type = "Lexical"
+    # key_type = "Random" if (na == "optional" and not keys) else "Lexical"
     click.echo(
         f"Records in {csv_file} inserted as type {class_name} into database with {key_type} ids."
     )
