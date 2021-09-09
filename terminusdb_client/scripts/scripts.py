@@ -362,9 +362,11 @@ def importcsv(csv_file, keys, class_name, chunksize, schema, na, id, embedded, s
     # If chunksize is too small, pandas may decide certain column to be integer if all values in the 1st chunk are 0.0. This can be problmetic for some cases.
     na = na.lower()
     if id:
-        id = id.lower()
+        id = id.lower().replace(" ", "_")
     if keys:
-        keys = list(map(lambda x: x.lower(), keys))
+        keys = list(map(lambda x: x.lower().replace(" ", "_"), keys))
+    if embedded:
+        embedded = list(map(lambda x: x.lower().replace(" ", "_"), embedded))
     try:
         pd = import_module("pandas")
         np = import_module("numpy")
@@ -394,7 +396,11 @@ def importcsv(csv_file, keys, class_name, chunksize, schema, na, id, embedded, s
             if converted_type == object:
                 converted_type = str  # pandas treats all string as objects
             converted_type = wt.to_woql_type(converted_type)
-            if na == "optional" and col not in keys:
+            if embedded and col in embedded:
+                class_dict[col] = class_name
+            elif id and col == id:
+                class_dict[col] = converted_type
+            elif na == "optional" and col not in keys:
                 class_dict[col] = {"@type": "Optional", "@class": converted_type}
             else:
                 class_dict[col] = converted_type
@@ -449,13 +455,14 @@ def importcsv(csv_file, keys, class_name, chunksize, schema, na, id, embedded, s
                         item.pop(key)
                 # handle embedded items
                 if embedded:
+                    new_items = {}
                     for key, value in item.items():
-                        new_items = {}
                         if key in embedded:
                             new_items[key] = {
                                 "@type": "@id",
                                 "@id": class_name + "/" + value,
                             }
+                    item.update(new_items)
                 # adding type
                 item["@type"] = class_name
                 # adding ids
