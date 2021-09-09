@@ -330,22 +330,33 @@ def _get_existing_class(client):
 @click.command()
 @click.argument("csv_file")
 @click.argument("keys", nargs=-1)
-@click.option("--classname", "class_name")
-@click.option("--chunksize", default=1000, show_default=True)
-@click.option("--schema", is_flag=True)
+@click.option(
+    "--classname",
+    "class_name",
+    help="Customize the class name that the data from the CSV will be import as",
+)
+@click.option(
+    "--chunksize",
+    default=1000,
+    show_default=True,
+    help="Large files will be load into database in chunks, size of the chunks",
+)
+@click.option(
+    "--schema", is_flag=True, help="Specify if schema to be updated, default True"
+)
 @click.option(
     "--na",
     default="optional",
     type=click.Choice(["skip", "optional", "error"], case_sensitive=False),
+    help="Specify how to handle NAs: 'skip' will skip entries with NAs, 'optional' will make all properties optional in the database, 'error' will just thow an error if there's NAs",
 )
+@click.option("--id", help="Specify column to be used as id")
+@click.option("-e", "--embedded", multiple=True, help="Specify embedded columns")
 @click.option("--sep", default=",", show_default=True)
 # @click.option('--header ', default=',', show_default=True)
 def importcsv(csv_file, keys, class_name, chunksize, schema, na, sep):
     """Import CSV file into pandas DataFrame then into TerminusDB, with read_csv() options.
-    Options:
-    --classname - Customize the class name that the data from the CSV will be import as
-    --chunksize - Large files will be load into database in chunks, size of the chunks
-    --na - skip, optional or error: skip will skip entries with NAs, optional will make all properties optional in the database, error will just thow an error if there's NAs"""
+    Options like chunksize, sep etc"""
     # If chunksize is too small, pandas may decide certain column to be integer if all values in the 1st chunk are 0.0. This can be problmetic for some cases.
     na = na.lower()
     try:
@@ -510,9 +521,19 @@ def _exportcsv(
 
 @click.command()
 @click.argument("class_obj")
-@click.option("--keepid", is_flag=True)
-@click.option("--maxdep", default=2, show_default=True)
-@click.option("--filename")
+@click.option(
+    "--keepid", is_flag=True, help="If the id of the object is to be kept in the CSV"
+)
+@click.option(
+    "--maxdep",
+    default=2,
+    show_default=True,
+    help="Specify the depth of the embedding operation. When maximum is hit, the values will be kept as object ids",
+)
+@click.option(
+    "--filename",
+    help="File name if the exported file, if not specify it will use the name of the class e.g. 'ClassName.csv'",
+)
 # @click.option('--header ', default=',', show_default=True)
 def exportcsv(class_obj, keepid, maxdep, filename=None):
     """Export all documents in a TerminusDB class into a flatten CSV file."""
@@ -539,13 +560,29 @@ def exportcsv(class_obj, keepid, maxdep, filename=None):
 
 
 @click.command()
-@click.option("--schema", is_flag=True)
-@click.option("--type", "type_")
-@click.option("-q", "--query", multiple=True)
-@click.option("-e", "--export", is_flag=True)
-@click.option("--keepid", is_flag=True)
-@click.option("--maxdep", default=2, show_default=True)
-@click.option("--filename")
+@click.option("--schema", is_flag=True, help="Specify if getting schema object instead")
+@click.option("--type", "type_", help="Type of the objects to be getting back")
+@click.option(
+    "-q", "--query", multiple=True, help="Use query to filter out objects getting back"
+)
+@click.option(
+    "-e",
+    "--export",
+    is_flag=True,
+    help="Specify if the result to be export as CSV. Only usable when using –type and not –schema",
+)
+@click.option(
+    "--keepid",
+    is_flag=True,
+    help="Option for export: if the id of the object is to be kept in the CSV",
+)
+@click.option(
+    "--maxdep",
+    default=2,
+    show_default=True,
+    help="Option for export: specify the depth of the embedding operation",
+)
+@click.option("--filename", help="Option for export: file name if the exported file")
 def alldocs(schema, type_, query, export, keepid, maxdep, filename=None):
     """Get all documents in the database, use --schema to specify schema, --type to select type and -q to make queries (e.g. -q date=2021-07-01)
 

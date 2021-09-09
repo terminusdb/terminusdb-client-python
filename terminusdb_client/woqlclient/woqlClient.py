@@ -178,9 +178,9 @@ class WOQLClient:
         """Get the whole commit history.
         Commit history - Commit id, author of the commit, commit message and the commit time, in the current branch from the current commit, ordered backwards in time, will be returned in a dictionary in the follow format:
         {"commit_id":
-            {"author": "commit_author",
-             "message": "commit_message",
-             "timestamp: <datetime object of the timestamp>" }
+        {"author": "commit_author",
+        "message": "commit_message",
+        "timestamp: <datetime object of the timestamp>" }
         }
 
         Parameters
@@ -206,9 +206,9 @@ class WOQLClient:
         kuv', 'author': 'TerminusDB', 'message': 'internal system operation', 'timstamp': datetime.datetime(2020, 9, 3, 15,
          29, 33)}]
 
-                Result
-                ------
-                list
+        Returns
+        -------
+        list
         """
         if max_history < 0:
             raise ValueError("max_history needs to be non-negative.")
@@ -1441,9 +1441,9 @@ class WOQLClient:
         dict
             A dict with the new commit id:
             {'@type' : 'api:SquashResponse',
-             'api:commit' : Commit,
-             'api:old_commit' : Old_Commit,
-             'api:status' : "api:success"}
+            'api:commit' : Commit,
+            'api:old_commit' : Old_Commit,
+            'api:status' : "api:success"}
 
         Examples
         --------

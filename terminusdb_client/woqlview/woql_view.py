@@ -135,8 +135,8 @@ class WOQLView:
     def show(self, result: dict):
         """Show the graph inline in the Jupyter notebook
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         result: the result that is returning from a query in dict format."""
         try:
             display(
@@ -172,8 +172,8 @@ class WOQLView:
     def export(self, filename: str, result: dict):
         """Export the graph into an html file
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         filename: the file name of the export file (without extention).
 
         result: the result that is returning from a query in dict format."""
@@ -225,7 +225,7 @@ class WOQLView:
     def print_js_config(self):
         """Print out the JavaScript config
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         result: the result that is returning from a query in dict format."""
         print(self.config)  # noqa
