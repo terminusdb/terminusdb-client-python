@@ -342,7 +342,9 @@ def _get_existing_class(client):
     help="Large files will be load into database in chunks, size of the chunks",
 )
 @click.option(
-    "--schema", is_flag=True, help="Specify if schema to be updated, default True"
+    "--schema",
+    is_flag=True,
+    help="Specify if schema to be updated if existed, default False",
 )
 @click.option(
     "--na",
@@ -359,8 +361,10 @@ def importcsv(csv_file, keys, class_name, chunksize, schema, na, id, embedded, s
     Options like chunksize, sep etc"""
     # If chunksize is too small, pandas may decide certain column to be integer if all values in the 1st chunk are 0.0. This can be problmetic for some cases.
     na = na.lower()
-    id = id.lower()
-    keys = list(map(lambda x: x.lower(), keys))
+    if id:
+        id = id.lower()
+    if keys:
+        keys = list(map(lambda x: x.lower(), keys))
     try:
         pd = import_module("pandas")
         np = import_module("numpy")
@@ -431,6 +435,7 @@ def importcsv(csv_file, keys, class_name, chunksize, schema, na, id, embedded, s
 
             obj_list = df.to_dict(orient="records")
             for item in obj_list:
+                # handle missing items
                 if na == "optional":
                     bad_key = []
                     for key, value in item.items():
@@ -442,7 +447,18 @@ def importcsv(csv_file, keys, class_name, chunksize, schema, na, id, embedded, s
                             bad_key.append(key)
                     for key in bad_key:
                         item.pop(key)
+                # handle embedded items
+                if embedded:
+                    for key, value in item.items():
+                        new_items = {}
+                        if key in embedded:
+                            new_items[key] = {
+                                "@type": "@id",
+                                "@id": class_name + "/" + value,
+                            }
+                # adding type
                 item["@type"] = class_name
+                # adding ids
                 if id:
                     if id in item:
                         item_id = class_name + "/" + item[id]
