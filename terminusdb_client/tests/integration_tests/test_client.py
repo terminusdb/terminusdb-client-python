@@ -57,15 +57,15 @@ def test_jwt(docker_url_jwt):
 
 def test_terminusx(terminusx_token):
     testdb = "test_happy_" + str(dt.datetime.now()).replace(" ", "")
-    endpoint = "https://cloud-dev.dcm.ist/ubf40420team/"
+    endpoint = "https://cloud-dev.dcm.ist/TerminusDBPythonClient/"
     client = WOQLClient(endpoint)
-    client.connect(use_token=True, team="ubf40420team")
+    client.connect(use_token=True, team="TerminusDBPythonClient")
     assert client._connected
     # test create db
     client.create_database(testdb)
     assert client.db == testdb
     assert testdb in client.list_databases()
-    client.delete_database(testdb, "ubf40420team")
+    client.delete_database(testdb, "TerminusDBPythonClient")
     assert client.db is None
     assert testdb not in client.list_databases()
 

@@ -8,20 +8,23 @@ from ...scripts import scripts
 
 def test_script_happy_path(terminusx_token):
     testdb = "test_" + str(dt.datetime.now()).replace(" ", "")
-    endpoint = "https://cloud-dev.dcm.ist/ubf40420team/"
+    endpoint = "https://cloud-dev.dcm.ist/TerminusDBPythonClient/"
     runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(
             scripts.startproject,
-            input=f"{testdb}\n{endpoint}\nyes\nubf40420team\n",
+            input=f"{testdb}\n{endpoint}\nyes\nTerminusDBPythonClient\n",
         )
         assert result.exit_code == 0
         with open("config.json") as file:
             setting = json.load(file)
             assert setting.get("database") == testdb
-            assert setting.get("endpoint") == "https://cloud-dev.dcm.ist/ubf40420team/"
+            assert (
+                setting.get("endpoint")
+                == "https://cloud-dev.dcm.ist/TerminusDBPythonClient/"
+            )
             assert setting.get("use JWT token")
-            assert setting.get("team") == "ubf40420team"
+            assert setting.get("team") == "TerminusDBPythonClient"
         result = runner.invoke(scripts.commit)
         assert result.exit_code == 0
         assert f"{testdb} created." in result.output
@@ -35,7 +38,7 @@ def test_script_happy_path(terminusx_token):
         result = runner.invoke(scripts.status)
         assert result.exit_code == 0
         assert (
-            f"Connecting to '{testdb}' at '{endpoint}'\non branch 'new'\nwith team 'ubf40420team'"
+            f"Connecting to '{testdb}' at '{endpoint}'\non branch 'new'\nwith team 'TerminusDBPythonClient'"
             in result.output
         )
         result = runner.invoke(scripts.rebase, ["main"])
