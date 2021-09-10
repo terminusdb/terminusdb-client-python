@@ -428,7 +428,7 @@ def importcsv(csv_file, keys, class_name, chunksize, schema, na, id_, embedded, 
             elif na == "skip":
                 df.dropna(inplace=True)
             for col in df.columns:
-                converted_col = col.lower().replace(" ", "_")
+                converted_col = col.lower().replace(" ", "_").replace(".", "_")
                 df.rename(columns={col: converted_col}, inplace=True)
             if not has_schema:
                 class_dict = _df_to_schema(class_name, df)
