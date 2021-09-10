@@ -488,9 +488,9 @@ class WOQLQuery:
 
         """
         if commit_msg is None:
-            return client.query(self, file_dict=file_dict)
+            return client.query(self)
         else:
-            return client.query(self, commit_msg, file_dict=file_dict)
+            return client.query(self, commit_msg)
 
     def to_json(self):
         """Dumps the JSON-LD format of the query in a json string"""
