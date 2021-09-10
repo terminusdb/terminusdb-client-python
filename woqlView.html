@@ -45,7 +45,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="woqlDataframe" href="woqlDataframe.html" />
-    <link rel="prev" title="WOQLLib" href="woqlLib.html" /> 
+    <link rel="prev" title="WOQLSchema" href="woqlSchema.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -97,18 +97,19 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">TerminusDB Client</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="woqlClient.html">WOQLClient</a></li>
 <li class="toctree-l2"><a class="reference internal" href="woqlQuery.html">WOQLQuery</a></li>
-<li class="toctree-l2"><a class="reference internal" href="woqlLib.html">WOQLLib</a></li>
+<li class="toctree-l2"><a class="reference internal" href="woqlSchema.html">WOQLSchema</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">WOQLView</a></li>
 <li class="toctree-l2"><a class="reference internal" href="woqlDataframe.html">woqlDataframe</a></li>
-<li class="toctree-l2"><a class="reference internal" href="SmartQuery.html">SmartQuery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Errors_and_Exceptions.html">Errors and Exceptions</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="Scaffolding_CLI_Tool.html">Scaffolding CLI Tool</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
 </ul>
 
@@ -188,8 +189,7 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLView.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLView.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLView.edges">
@@ -270,22 +270,36 @@
 <dt class="sig sig-object py" id="terminusdb_client.WOQLView.show">
 <span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLView.show" title="Permalink to this definition">¶</a></dt>
 <dd><p>Show the graph inline in the Jupyter notebook</p>
-<p>result: the result that is returning from a query in dict format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>result</strong> (<em>the result that is returning from a query in dict format.</em>) – </p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLView.export">
 <span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLView.export" title="Permalink to this definition">¶</a></dt>
 <dd><p>Export the graph into an html file</p>
-<p>filename: the file name of the export file (without extention).</p>
-<p>result: the result that is returning from a query in dict format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>the file name of the export file</em><em> (</em><em>without extention</em><em>)</em><em></em>) – </p></li>
+<li><p><strong>result</strong> (<em>the result that is returning from a query in dict format.</em>) – </p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLView.print_js_config">
 <span class="sig-name descname"><span class="pre">print_js_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLView.print_js_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print out the JavaScript config</p>
-<p>result: the result that is returning from a query in dict format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>result</strong> (<em>the result that is returning from a query in dict format.</em>) – </p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -299,7 +313,7 @@
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="woqlDataframe.html" class="btn btn-neutral float-right" title="woqlDataframe" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="woqlLib.html" class="btn btn-neutral float-left" title="WOQLLib" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="woqlSchema.html" class="btn btn-neutral float-left" title="WOQLSchema" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

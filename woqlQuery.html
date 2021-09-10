@@ -44,7 +44,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="WOQLLib" href="woqlLib.html" />
+    <link rel="next" title="WOQLSchema" href="woqlSchema.html" />
     <link rel="prev" title="WOQLClient" href="woqlClient.html" /> 
 </head>
 
@@ -97,18 +97,19 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">TerminusDB Client</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="woqlClient.html">WOQLClient</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">WOQLQuery</a></li>
-<li class="toctree-l2"><a class="reference internal" href="woqlLib.html">WOQLLib</a></li>
+<li class="toctree-l2"><a class="reference internal" href="woqlSchema.html">WOQLSchema</a></li>
 <li class="toctree-l2"><a class="reference internal" href="woqlView.html">WOQLView</a></li>
 <li class="toctree-l2"><a class="reference internal" href="woqlDataframe.html">woqlDataframe</a></li>
-<li class="toctree-l2"><a class="reference internal" href="SmartQuery.html">SmartQuery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Errors_and_Exceptions.html">Errors and Exceptions</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="Scaffolding_CLI_Tool.html">Scaffolding CLI Tool</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
 </ul>
 
@@ -183,11 +184,11 @@
 <h1>WOQLQuery<a class="headerlink" href="#woqlquery" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLQuery">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">terminusdb_client.</span></span><span class="sig-name descname"><span class="pre">WOQLQuery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'schema/main'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">terminusdb_client.</span></span><span class="sig-name descname"><span class="pre">WOQLQuery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'schema'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'schema/main'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.__init__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'schema'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>defines the internal functions of the woql query object - the language API is defined in WOQLQuery</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -338,12 +339,12 @@ Commonly used to combine WOQLQueries.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.woql_from">
-<span class="sig-name descname"><span class="pre">woql_from</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph_filter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.woql_from" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">woql_from</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.woql_from" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specifies the database URL that will be the default database for the enclosed query</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>graph_filter</strong> (<em>str</em>) – url of the database</p></li>
+<li><p><strong>graph</strong> (<em>str</em>) – url of the database</p></li>
 <li><p><strong>query</strong> (<em>WOQLQuery object</em><em>, </em><em>optional</em>) – </p></li>
 </ul>
 </dd>
@@ -383,9 +384,9 @@ Commonly used to combine WOQLQueries.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sub</strong> (<em>str</em>) – Subject</p></li>
-<li><p><strong>pred</strong> (<em>str</em>) – Predicate</p></li>
-<li><p><strong>obj</strong> (<em>str</em>) – Object</p></li>
+<li><p><strong>sub</strong> (<em>str</em>) – Subject, has to be a node (URI)</p></li>
+<li><p><strong>pred</strong> (<em>str</em>) – Predicate, can be variable (prefix with “v:”) or node</p></li>
+<li><p><strong>obj</strong> (<em>str</em>) – Object, can be variable or node or value</p></li>
 <li><p><strong>opt</strong> (<em>bool</em>) – weather or not this triple is optional, default to be False</p></li>
 </ul>
 </dd>
@@ -862,29 +863,6 @@ Otherwise two triples with the same predicate but different object values will b
 <dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.update_quad">
 <span class="sig-name descname"><span class="pre">update_quad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.update_quad" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.when">
-<span class="sig-name descname"><span class="pre">when</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consequent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.when" title="Permalink to this definition">¶</a></dt>
-<dd><p>When the sub-query in Condition is met, the Update query is executed</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>query</strong> (<em>WOQLQuery object</em><em> or </em><em>bool</em>) – </p></li>
-<li><p><strong>consequent</strong> (<em>WOQLQuery object</em><em>, </em><em>optional</em>) – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>WOQLQuery object</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>Functions which take a query as an argument advance the cursor to make the chaining of queries fall
-into the corrent place in the encompassing json</p>
-</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.trim">
@@ -1499,7 +1477,7 @@ e.g. WOQL.re(“(.).*”, “hello”, [“v:All”, “v:Sub”])</p>
 <li><p><strong>user_type</strong> (<em>str</em>) – type to be changed</p></li>
 <li><p><strong>result</strong> (<em>str</em>) – save the return variable</p></li>
 <li><p><strong>literal_type</strong> (<em>str</em><em>, </em><em>optional</em>) – literal type of`val`, can be used to treat <cite>val</cite> as a literal rather than an object or variable in the WOQL query.
-If literal type is “owl:Thing” or “woql:node”, <cite>val</cite> will be treated as object in the graph</p></li>
+If literal type is “owl:Thing” or “node”, <cite>val</cite> will be treated as object in the graph</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1586,7 +1564,7 @@ If literal type is “owl:Thing” or “woql:node”, <cite>val</cite> will be 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.path">
-<span class="sig-name descname"><span class="pre">path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.path" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a path object constructed by the rules specified with pattern.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1649,118 +1627,6 @@ It uses pattern construction syntax such as:
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.lib">
-<span class="sig-name descname"><span class="pre">lib</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.lib" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.abstract">
-<span class="sig-name descname"><span class="pre">abstract</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.abstract" title="Permalink to this definition">¶</a></dt>
-<dd><p>Internal Triple-builder functions which allow chaining of partial queries</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.node">
-<span class="sig-name descname"><span class="pre">node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.node" title="Permalink to this definition">¶</a></dt>
-<dd><p>Selects nodes with the ID NodeID as the subject of subsequent sub-queries. The second argument PatternType specifies what type of sub-queries are being constructed, options are: triple, quad, update_triple, update_quad, delete_triple, delete_quad</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>node</strong> (<em>str</em>) – node to be selected</p></li>
-<li><p><strong>node_type</strong> (<em>str</em>) – pattern type, optional (default is triple)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>WOQLQuery object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.property">
-<span class="sig-name descname"><span class="pre">property</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pro_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.property" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add a property at the current class/document</p>
-<p>A range could be another class/document or an “xsd”:”<a class="reference external" href="http://www.w3.org/2001">http://www.w3.org/2001</a>/XMLSchema#” type
-like string|integer|datatime|nonNegativeInteger|positiveInteger etc ..
-(you don’t need the prefix xsd for specific a type)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>pro_id</strong> (<em>str</em>) – property ID</p></li>
-<li><p><strong>property_type</strong> (<em>str</em>) – property type (range)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>WOQLQuery object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.insert">
-<span class="sig-name descname"><span class="pre">insert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">insert_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">insert_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_graph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.insert" title="Permalink to this definition">¶</a></dt>
-<dd><p>Inserts a new node of a specified type in a graph</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>insert_id</strong> (<em>str</em>) – ID of the node to be inserted</p></li>
-<li><p><strong>insert_type</strong> (<em>str</em>) – The rdf type of the node. This should be defined in your schema.</p></li>
-<li><p><strong>ref_graph</strong> (<em>str</em><em>, </em><em>optional</em>) – target graph</p></li>
-<li><p><strong>label</strong> (<em>str</em><em>, </em><em>optional</em>) – label for the insert object</p></li>
-<li><p><strong>description</strong> (<em>str</em><em>, </em><em>optional</em>) – description for the insert object</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>a query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>WOQLQuery object</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>If graph parameter is None then this is a shorthand for calling <a class="reference internal" href="#terminusdb_client.WOQLQuery.add_triple" title="terminusdb_client.WOQLQuery.add_triple"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_triple()</span></code></a> with
-rdf:type as predicate: <code class="docutils literal notranslate"><span class="pre">.add_triple(subject,</span> <span class="pre">'rdf:type',</span> <span class="pre">type).</span></code>
-Otherwise <a class="reference internal" href="#terminusdb_client.WOQLQuery.add_quad" title="terminusdb_client.WOQLQuery.add_quad"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_quad()</span></code></a> will be called.
-It will yield a json object like follows: <code class="docutils literal notranslate"><span class="pre">{'add_triple':</span> <span class="pre">['doc:subject',</span> <span class="pre">'rdf:type',</span> <span class="pre">'scm:type']}</span></code></p>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">update</span> <span class="o">=</span> <span class="n">WOQLQuery</span><span class="p">()</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s2">&quot;Dog&quot;</span><span class="p">,</span> <span class="s2">&quot;scm:Animal&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s1">&#39;Dog&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">qry</span> <span class="o">=</span> <span class="n">WOQLQuery</span><span class="p">()</span><span class="o">.</span><span class="n">when</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">update</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">qry</span><span class="o">.</span><span class="n">json</span><span class="p">(),</span> <span class="s1">&#39;MyDatabaseId&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#terminusdb_client.WOQLQuery.add_triple" title="terminusdb_client.WOQLQuery.add_triple"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_triple()</span></code></a>, <a class="reference internal" href="#terminusdb_client.WOQLQuery.add_quad" title="terminusdb_client.WOQLQuery.add_quad"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_quad()</span></code></a></p>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.insert_data">
-<span class="sig-name descname"><span class="pre">insert_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_graph</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.insert_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new node of the specified type in a graph, with description and label.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<em>dict</em>) – dictionary with id, label, description attributes.</p></li>
-<li><p><strong>ref_graph</strong> (<em>str</em>) – target graph</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>WOQLQuery object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.graph">
 <span class="sig-name descname"><span class="pre">graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.graph" title="Permalink to this definition">¶</a></dt>
 <dd><p>Used to specify that the rest of the query should use the graph g in calls to add_quad, quad, etc
@@ -1772,323 +1638,6 @@ It will yield a json object like follows: <code class="docutils literal notransl
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p>WOQLQuery object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.domain">
-<span class="sig-name descname"><span class="pre">domain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.domain" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specifies the domain of a new property
-:param d: target domain
-:type d: str</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>WOQLQuery object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.label">
-<span class="sig-name descname"><span class="pre">label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'en'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.label" title="Permalink to this definition">¶</a></dt>
-<dd><p>Depending on context, either adds a label match to a triple/quad or adds a label create to add_quad, add_triple
-The triple/quad that will get created will be for the rdfs:label predicate.
-:param lan: label to add
-:type lan: str
-:param lang: language, default is English “en”
-:type lang: str, optional</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>WOQLQuery object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.description">
-<span class="sig-name descname"><span class="pre">description</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">desc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'en'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.description" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds or matches a rdfs:comment field in a query
-:param c: description to be added
-:type c: str
-:param lang: language, default is English “en”
-:type lang: str, optional</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>WOQLQuery object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.parent">
-<span class="sig-name descname"><span class="pre">parent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.parent" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specifies that a new class should have parents listed in <a href="#id1"><span class="problematic" id="id2">*</span></a>args - (short hand for (a, rdfs:subClassOf b)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>args</strong> (<em>list</em>) – parent classes</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>WOQLQuery object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.max">
-<span class="sig-name descname"><span class="pre">max</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.max" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the maximum cardinality for a property to m</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>m</strong> (<em>int</em>) – maximum cardinality</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>WOQLQuery object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.cardinality">
-<span class="sig-name descname"><span class="pre">cardinality</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.cardinality" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the cardinality of a property to be precisely m</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>m</strong> (<em>int</em>) – cardinality</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>WOQLQuery object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.min">
-<span class="sig-name descname"><span class="pre">min</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.min" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the minimum cardinality for a property to m</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>m</strong> (<em>int</em>) – minimum cardinality</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>WOQLQuery object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.add_class">
-<span class="sig-name descname"><span class="pre">add_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.add_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generates a new Class with the given ClassID and writes it to the DB schema</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>classid</strong> (<em>str</em>) – class to be added</p></li>
-<li><p><strong>graph</strong> (<em>str</em><em>, </em><em>optional</em>) – target graph</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>WOQLQuery object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.insert_class_data">
-<span class="sig-name descname"><span class="pre">insert_class_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_graph</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.insert_class_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds a bunch of class data in one go</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.insert_doctype_data">
-<span class="sig-name descname"><span class="pre">insert_doctype_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_graph</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.insert_doctype_data" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.insert_property_data">
-<span class="sig-name descname"><span class="pre">insert_property_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_graph</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.insert_property_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>A function to insert the passed property data</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<em>str</em>) – class to be deleted</p></li>
-<li><p><strong>ref_graph</strong> (<em>str</em>) – target graph</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>WOQLQuery object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.delete_class">
-<span class="sig-name descname"><span class="pre">delete_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">classid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.delete_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Deletes the Class with the passed ID form the schema (and all references to it)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>classid</strong> (<em>str</em>) – class to be deleted</p></li>
-<li><p><strong>graph</strong> (<em>str</em><em>, </em><em>optional</em>) – target graph</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>WOQLQuery object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.add_property">
-<span class="sig-name descname"><span class="pre">add_property</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.add_property" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generates a new Property with the given PropertyID and a range of type PropType and writes it to the DB schema</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>p</strong> (<em>str</em>) – property id to be added</p></li>
-<li><p><strong>t</strong> (<em>str</em>) – type of the proerty</p></li>
-<li><p><strong>graph</strong> (<em>str</em><em>, </em><em>optional</em>) – target graph</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>WOQLQuery object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.delete_property">
-<span class="sig-name descname"><span class="pre">delete_property</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.delete_property" title="Permalink to this definition">¶</a></dt>
-<dd><p>Deletes the property with the passed ID from the schema (and all references to it)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>p</strong> (<em>str</em>) – property id to be deleted</p></li>
-<li><p><strong>graph</strong> (<em>str</em>) – target graph ,optional</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>WOQLQuery object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.box_classes">
-<span class="sig-name descname"><span class="pre">box_classes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excepts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.box_classes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.generate_choice_list">
-<span class="sig-name descname"><span class="pre">generate_choice_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clslabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clsdesc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.generate_choice_list" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.libs">
-<span class="sig-name descname"><span class="pre">libs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">libs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.libs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.add_datatype">
-<span class="sig-name descname"><span class="pre">add_datatype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">descr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.add_datatype" title="Permalink to this definition">¶</a></dt>
-<dd><p>A utility function for creating a datatype in woql.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>d_id</strong> (<em>str</em>) – the datatype id</p></li>
-<li><p><strong>label</strong> (<em>str</em>) – label for the datatype</p></li>
-<li><p><strong>descr</strong> (<em>str</em>) – description for the datatype</p></li>
-<li><p><strong>graph</strong> (<em>str</em><em>, </em><em>optional</em>) – Graph</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>a query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>WOQLQuery object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.box_datatype">
-<span class="sig-name descname"><span class="pre">box_datatype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datatype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">descr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.box_datatype" title="Permalink to this definition">¶</a></dt>
-<dd><p>A utility function for boxing a datatype in woql.
-The format is (predicate) prefix:datatype (domain) prefix:Datatype (range) xsd:datatype.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>datatype</strong> (<em>str</em><em>, </em><em>optional</em>) – the datatype</p></li>
-<li><p><strong>label</strong> (<em>str</em><em>, </em><em>optional</em>) – label for the data type</p></li>
-<li><p><strong>descr</strong> (<em>str</em><em>, </em><em>optional</em>) – description for the datatype</p></li>
-<li><p><strong>parent</strong> (<em>str</em><em>, </em><em>optional</em>) – the parent class of the box_class</p></li>
-<li><p><strong>graph</strong> (<em>str</em><em>, </em><em>optional</em>) – Graph</p></li>
-<li><p><strong>prefix</strong> (<em>str</em><em>, </em><em>optional</em>) – prefix for the box_class_id</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>WOQLQuery object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.doctype">
-<span class="sig-name descname"><span class="pre">doctype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.doctype" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new document class in the schema - equivalent to: add_quad(type, “rdf:type”, “owl:Class”, graph), add_quad(type, subclassof, tcs:Document, graph)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>user_type</strong> (<em>str</em>) – type of the document</p></li>
-<li><p><strong>graph</strong> (<em>str</em><em>, </em><em>optional</em>) – target graph</p></li>
-<li><p><strong>label</strong> (<em>str</em><em>, </em><em>optional</em>) – label for the doctype</p></li>
-<li><p><strong>description</strong> (<em>str</em><em>, </em><em>optional</em>) – description for the doctype</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>query object that can be chained and/or execute</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>WOQLQuery object</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2118,7 +1667,7 @@ The format is (predicate) prefix:datatype (domain) prefix:Datatype (range) xsd:d
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="woqlLib.html" class="btn btn-neutral float-right" title="WOQLLib" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="woqlSchema.html" class="btn btn-neutral float-right" title="WOQLSchema" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="woqlClient.html" class="btn btn-neutral float-left" title="WOQLClient" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
