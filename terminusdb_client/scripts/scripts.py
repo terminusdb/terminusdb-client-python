@@ -352,17 +352,19 @@ def _get_existing_class(client):
     type=click.Choice(["skip", "optional", "error"], case_sensitive=False),
     help="Specify how to handle NAs: 'skip' will skip entries with NAs, 'optional' will make all properties optional in the database, 'error' will just thow an error if there's NAs",
 )
-@click.option("--id", help="Specify column to be used as ids instead of generated ids")
+@click.option(
+    "--id", "id_", help="Specify column to be used as ids instead of generated ids"
+)
 @click.option("-e", "--embedded", multiple=True, help="Specify embedded columns")
 @click.option("--sep", default=",", show_default=True)
 # @click.option('--header ', default=',', show_default=True)
-def importcsv(csv_file, keys, class_name, chunksize, schema, na, id, embedded, sep):
+def importcsv(csv_file, keys, class_name, chunksize, schema, na, id_, embedded, sep):
     """Import CSV file into pandas DataFrame then into TerminusDB, with read_csv() options.
     Options like chunksize, sep etc"""
     # If chunksize is too small, pandas may decide certain column to be integer if all values in the 1st chunk are 0.0. This can be problmetic for some cases.
     na = na.lower()
-    if id:
-        id = id.lower().replace(" ", "_")
+    if id_:
+        id_ = id_.lower().replace(" ", "_")
     if keys:
         keys = list(map(lambda x: x.lower().replace(" ", "_"), keys))
     if embedded:
@@ -392,19 +394,21 @@ def importcsv(csv_file, keys, class_name, chunksize, schema, na, id, embedded, s
         }
         np_to_buildin[np.datetime64] = dt.datetime
         for col, dtype in dict(df.dtypes).items():
-            converted_type = np_to_buildin[dtype.type]
-            if converted_type == object:
-                converted_type = str  # pandas treats all string as objects
-            converted_type = wt.to_woql_type(converted_type)
             if embedded and col in embedded:
-                class_dict[col] = class_name
-            elif id and col == id:
+                converted_type = class_name
+            else:
+                converted_type = np_to_buildin[dtype.type]
+                if converted_type == object:
+                    converted_type = str  # pandas treats all string as objects
+                converted_type = wt.to_woql_type(converted_type)
+
+            if id_ and col == id_:
                 class_dict[col] = converted_type
             elif na == "optional" and col not in keys:
                 class_dict[col] = {"@type": "Optional", "@class": converted_type}
             else:
                 class_dict[col] = converted_type
-        if id is not None:
+        if id_ is not None:
             pass  # don't need key if id is specified
         elif keys:
             class_dict["@key"] = {"@type": "Lexical", "@fields": list(keys)}
@@ -466,9 +470,9 @@ def importcsv(csv_file, keys, class_name, chunksize, schema, na, id, embedded, s
                 # adding type
                 item["@type"] = class_name
                 # adding ids
-                if id:
-                    if id in item:
-                        item_id = class_name + "/" + item[id]
+                if id_:
+                    if id_ in item:
+                        item_id = class_name + "/" + item[id_]
                     else:
                         raise RuntimeError(
                             f"id {id} is missing in {item}. Cannot import CSV."
@@ -484,7 +488,7 @@ def importcsv(csv_file, keys, class_name, chunksize, schema, na, id, embedded, s
                 obj_list,
                 commit_msg=f"Documents created with {csv_file} insert by Python client.",
             )
-    if id:
+    if id_:
         key_type = "specified"
     elif na == "optional" and not keys:
         key_type = "Random"
