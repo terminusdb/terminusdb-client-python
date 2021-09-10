@@ -29,21 +29,12 @@ TerminusDB Client Python
 ![Demo gif](https://github.com/terminusdb/terminusdb-web-assets/blob/master/images/Web.gif)
 
 ## Requirements
-- [TerminusDB 4](https://github.com/terminusdb/terminusdb-server)
-- [Python >=3.6](https://www.python.org/downloads)
+- [TerminusDB v10.0](https://github.com/terminusdb/terminusdb-server)
+- [Python >=3.7](https://www.python.org/downloads)
 
 ## Release Notes and Previous Versions
 
-Please check [RELEASE_NOTES.md](RELEASE_NOTES.md) to find out what has changed.
-
-These previous version(s) works with these version(s) of TerminusDB:
-
-- 0.1.5 - works with TerminusDB server / console v2.0.4
-- 0.2.2 - works with TerminusDB server / console v2.0.5
-- 0.3.1 - works with TerminusDB server / console v3.0.0 to console v3.0.6
-- 0.4.0 - works with TerminusDB server / console v3.0.7
-- 0.5.0 - works with TerminusDB server / console v4.0.0
-- 0.6.1 - works with TerminusDB server / console v4.2.0
+TerminusDB Client v10.0 works with TerminusDB v10.0 and TerminusX. Please check [RELEASE_NOTES.md](RELEASE_NOTES.md) to find out what has changed.
 
 ## Installation
 -  TerminusDB Client can be downloaded form PyPI using pip:
@@ -51,7 +42,7 @@ These previous version(s) works with these version(s) of TerminusDB:
 
 This only includes the core Python Client (WOQLClient) and WOQLQuery.
 
-If you want to use woqlDataframe:
+If you want to use woqlDataframe or the import and export csv function in Scaffolding CLI tool:
 
 `python -m pip install terminusdb-client[dataframe]`
 
@@ -64,29 +55,128 @@ If you want to use woqlDataframe:
 `python -m pip install git+https://github.com/terminusdb/terminusdb-client-python.git`
 
 ## Usage
-```
->>> from terminusdb_client import WOQLQuery, WOQLClient
->>> client = WOQLClient(server_url = "https://127.0.0.1:6363")
->>> client.connect(key="root", account="admin", user="admin")
->>> client.create_database("university", accountid="admin", label="University Graph", description="graph connect
-")
-{'@type': 'api:DbCreateResponse', 'api:status': 'api:success'}
 
->>> client.get_database("university", account="admin")
-{'label': 'University Graph', 'comment': 'graph connecting students with their courses in the university', 'id':
- 'university', 'organization': 'admin'}
->>> WOQLQuery().doctype("scm:student").property("scm:name", "xsd:string").execute(client, "student schema created.")
-{'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': [], 'bindings': [{}], 'deletes'
-: 0, 'inserts': 5, 'transaction_retry_count': 0}
+### Python client
 
->>> WOQLQuery().insert("stu001", "scm:student").property("scm:name", "Alice").execute(client, "Adding Alice.")
-{'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': [], 'bindings': [{}], 'deletes': 0, 'inserts': 2, 'transaction_retry_count': 0}
->>> WOQLQuery().insert("stu002", "scm:student").property("scm:name", "Bob").execute(client, "Adding Bob.")
-{'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': [], 'bindings': [{}], 'deletes': 0, 'inserts': 2, 'transaction_retry_count': 0}
->>> client.query(WOQLQuery().star())
-{'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': ['Subject', 'Predicate', 'Object'], 'bindings': [{'Object': 'terminusdb:///schema#student', 'Predicate': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'Subject': 'terminusdb:///data/stu001'}, {'Object': {'@type': 'http://www.w3.org/2001/XMLSchema#string', '@value': 'Alice'}, 'Predicate': 'terminusdb:///schema#name', 'Subject': 'terminusdb:///data/stu001'}, {'Object': 'terminusdb:///schema#student', 'Predicate': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'Subject': 'terminusdb:///data/stu002'}, {'Object': {'@type': 'http://www.w3.org/2001/XMLSchema#string', '@value': 'Bob'}, 'Predicate': 'terminusdb:///schema#name', 'Subject': 'terminusdb:///data/stu002'}], 'deletes': 0, 'inserts': 0, 'transaction_retry_count': 0}
+#### Connect to a server
+
+Connect to local host
+
+```Python
+from terminusdb_client import WOQLClient
+
+client = WOQLClient("http://127.0.0.1:6363/")
+client.connect()
 ```
-Please check the [full Documentation](https://terminusdb.github.io/terminusdb-client-python/) for more information.
+
+Connect to TerminusX
+
+*check documentation for TerminusX about how to add the API token to the environment variable*
+
+
+```Python
+from terminusdb_client import WOQLClient
+
+team="MyTeam"
+client = WOQLClient(f"https://dashboard.terminusdb.com/{team}/")
+client.connect(team="MyTeam", use_token=True)
+```
+
+#### Create a database
+
+```Python
+client.create_database("MyDatabase")
+```
+
+#### Create a schema
+
+```Python
+from terminusdb_client.woqlschema import WOQLSchema, DocumentTemplate, RandomKey
+
+my_schema = WOQLSchema()
+
+class Pet(DocumentTemplate):
+    _schema = my_schema
+    name: str
+    species: str
+    age: int
+    weight: float
+
+my_schema.commit(client)
+```
+
+#### Create and insert doucments
+
+```Python
+my_dog = Pet(name="Honda", species="Huskey", age=3, weight=21.1)
+my_cat = Pet(name="Tiger", species="Bengal cat", age=5, weight=4.5)
+client.insert_document([my_dog, my_cat])
+```
+
+#### Get back all documents
+
+```Python
+print(list(client.get_all_documents()))
+```
+
+```
+[{'@id': 'Pet/b5edacf854e34fe79c228a91e2af45fb', '@type': 'Pet', 'age': 5, 'name': 'Tiger', 'species': 'Bengal cat', 'weight': 4.5}, {'@id': 'Pet/cdbe3f6d49394b38b952ae315309256d', '@type': 'Pet', 'age': 3, 'name': 'Honda', 'species': 'Huskey', 'weight': 21.1}]
+```
+
+#### Get a specific document
+
+```Python
+print(list(client.query_document({"@type":"Pet", "age":5})))
+```
+
+```
+[{'@id': 'Pet/145eb73966d14a1394f7cd5576d7d0b8', '@type': 'Pet', 'age': 5, 'name': 'Tiger', 'species': 'Bengal cat', 'weight': 4.5}]
+```
+
+#### Delete a database
+
+```Python
+client.delete_database("MyDatabase")
+```
+
+### Scaffolding CLI tool
+
+Start a project in the directory
+
+```bash
+$terminusdb startproject
+Please enter a project name (this will also be the database name): mydb
+Please enter a endpoint location (press enter to use localhost default) [http://127.0.0.1:6363/]:
+config.json and schema.py created, please customize them to start your project.
+```
+
+Import a CSV named `grades.csv`
+
+``` bash
+$terminusdb importcsv grades.csv --na=error
+0it [00:00, ?it/s]
+Schema object Grades created with grades.csv inserted into database.
+schema.py is updated with mydb schema.
+1it [00:00,  1.00it/s]
+Records in grades.csv inserted as type Grades into database with Lexical ids.
+```
+
+Get documents with query
+
+```bash
+terminusdb alldocs --type Grades -q grade="B-"
+[{'@id': 'Grades/Android_Electric_087-65-4321_42.0_23.0_36.0_45.0_47.0_B-', '@type': 'Grades', 'final': 47.0, 'first_name': 'Electric', 'grade': 'B-', 'last_name': 'Android', 'ssn': '087-65-4321', 'test1': 42.0, 'test2': 23.0, 'test3': 36.0, 'test4': 45.0}, {'@id': 'Grades/Elephant_Ima_456-71-9012_45.0_1.0_78.0_88.0_77.0_B-', '@type': 'Grades', 'final': 77.0, 'first_name': 'Ima', 'grade': 'B-', 'last_name': 'Elephant', 'ssn': '456-71-9012', 'test1': 45.0, 'test2': 1.0, 'test3': 78.0, 'test4': 88.0}, {'@id': 'Grades/Franklin_Benny_234-56-2890_50.0_1.0_90.0_80.0_90.0_B-', '@type': 'Grades', 'final': 90.0, 'first_name': 'Benny', 'grade': 'B-', 'last_name': 'Franklin', 'ssn': '234-56-2890', 'test1': 50.0, 'test2': 1.0, 'test3': 90.0, 'test4': 80.0}]
+```
+
+Delete the database
+
+```bash
+$terminusdb deletedb
+Do you want to delete 'mydb'? WARNING: This opertation is non-reversible. [y/N]: y
+mydb deleted.
+```
+
+### Please check the [full Documentation](https://terminusdb.github.io/terminusdb-client-python/) for more information.
 
 ## Tutorials
 
@@ -163,7 +253,3 @@ Please check [CONTRIBUTING.md](CONTRIBUTING.md) for more information.
 Apache License (Version 2.0)
 
 Copyright (c) 2019
-
-
-
-

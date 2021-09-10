@@ -408,15 +408,15 @@ def importcsv(csv_file, keys, class_name, chunksize, schema, na, id_, embedded, 
                 class_dict[col] = {"@type": "Optional", "@class": converted_type}
             else:
                 class_dict[col] = converted_type
-        if id_ is not None:
-            pass  # don't need key if id is specified
-        elif keys:
-            class_dict["@key"] = {"@type": "Lexical", "@fields": list(keys)}
-        elif na == "optional":
-            # have to use random key cause keys will be optional
-            class_dict["@key"] = {"@type": "Random"}
-        else:
-            class_dict["@key"] = {"@type": "Lexical", "@fields": list(df.columns)}
+        # if id_ is not None:
+        #     pass  # don't need key if id is specified
+        # elif keys:
+        #     class_dict["@key"] = {"@type": "Random"}
+        # elif na == "optional":
+        #     # have to use random key cause keys will be optional
+        #     class_dict["@key"] = {"@type": "Random"}
+        # else:
+        #     class_dict["@key"] = {"@type": "Random"}
         return class_dict
 
     with pd.read_csv(csv_file, sep=sep, chunksize=chunksize) as reader:
@@ -612,7 +612,10 @@ def exportcsv(class_obj, keepid, maxdep, filename=None):
 @click.option("--schema", is_flag=True, help="Specify if getting schema object instead")
 @click.option("--type", "type_", help="Type of the objects to be getting back")
 @click.option(
-    "-q", "--query", multiple=True, help="Use query to filter out objects getting back"
+    "-q",
+    "--query",
+    multiple=True,
+    help="Use query to filter out objects getting back. Need to be used with --type",
 )
 @click.option(
     "-e",
@@ -700,9 +703,6 @@ def branch(branch_name):
         click.echo("\n".join(all_branches))
     else:
         client.create_branch(branch_name)
-        # status["branch"] = branch_name
-        # with open(".TDB", "w") as outfile:
-        #     json.dump(status, outfile)
         click.echo(
             f"Branch '{branch_name}' created. Remain on '{status['branch']}' branch."
         )
