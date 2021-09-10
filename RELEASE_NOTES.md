@@ -1,6 +1,6 @@
 # TerminusDB Python Client Release Notes
 
-## v2.0.0
+## v10.0.0
 
 ### New
 
@@ -9,7 +9,7 @@
 - woql_schema:
   - sub-module to create schema in document interface
 - scrpits:
-  - sub-module to provide CLI for setting up project and working with document interface
+  - sub-module to provide CLI and Scaffolding tool for setting up project and working with document interface
 
 ### Changes
 
