@@ -1,10 +1,10 @@
 # TerminusDB Python Client Release Notes
 
-## v10.0.1
+## v10.0.2
 
 ### Bug Fixes / Improvements
 
-- Fixing key problems in Scaffolding tool
+- Fixing key problems for self/future referencing: backend currently not support id capture and work around by generate id in the client and suspend the `@key` in the schema
 
 ---
 
