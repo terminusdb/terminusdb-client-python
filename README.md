@@ -26,7 +26,7 @@ TerminusDB Client Python
 
 ### Python version of the TerminusDB client - for TerminusDB API and WOQLpy
 
-<!-- ![Demo gif](https://github.com/terminusdb/terminusdb-web-assets/blob/master/images/Web.gif) -->
+![Client Demo gif](https://github.com/terminusdb/terminusdb-web-assets/blob/master/images/terminusdb%20python%20v10%20client%20demo%201.gif)
 
 ## Requirements
 - [TerminusDB v10.0](https://github.com/terminusdb/terminusdb-server)
@@ -140,6 +140,8 @@ client.delete_database("MyDatabase")
 ```
 
 ### Scaffolding CLI tool
+
+![Scaffolding Demo gif](https://github.com/terminusdb/terminusdb-web-assets/blob/master/images/terminusdb%20python%20v10%20scaffolding%20demo%202.gif)
 
 Start a project in the directory
 
