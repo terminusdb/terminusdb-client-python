@@ -47,11 +47,13 @@ class DatabaseError(Error):
         ):
             self.error_obj = response.json()
             if self.error_obj.get("api:message"):
-                self.message = self.error_obj["api:message"]
+                self.message = self.error_obj["api:message"] + "\n" + response.json()
             elif "api:error" in self.error_obj and self.error_obj["api:error"].get(
                 "vio:message"
             ):
-                self.message = self.error_obj["api:error"]["vio:message"]
+                self.message = (
+                    self.error_obj["api:error"]["vio:message"] + "\n" + response.json()
+                )
             else:
                 self.message = (
                     # "Unknown Error: check DatabaseError.error_obj for details"
