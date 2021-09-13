@@ -6,6 +6,16 @@
 
 - Fixing key problems in Scaffolding tool
 
+---
+
+## v10.0.1
+
+### Bug Fixes / Improvements
+
+- Fixing key problems in Scaffolding tool
+
+---
+
 ## v10.0.0
 
 ### New
