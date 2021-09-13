@@ -208,14 +208,15 @@ class DocumentTemplate(metaclass=TerminusClass):
             result["@key"] = {"@type": "Random"}
         if hasattr(cls, "_abstract"):
             result["@abstract"] = cls._abstract
-        if hasattr(cls, "_key") and not hasattr(cls, "_subdocument"):
-            if hasattr(cls._key, "_keys"):
-                result["@key"] = {
-                    "@type": cls._key.__class__.at_type,
-                    "@fields": cls._key._keys,
-                }
-            else:
-                result["@key"] = {"@type": cls._key.__class__.at_type}
+        # TODO: now get around for self/future reference by not putting any @key for schema and generate id in the client
+        # if hasattr(cls, "_key") and not hasattr(cls, "_subdocument"):
+        #     if hasattr(cls._key, "_keys"):
+        #         result["@key"] = {
+        #             "@type": cls._key.__class__.at_type,
+        #             "@fields": cls._key._keys,
+        #         }
+        #     else:
+        #         result["@key"] = {"@type": cls._key.__class__.at_type}
         if hasattr(cls, "_annotations"):
             for attr, attr_type in cls._annotations.items():
                 result[attr] = wt.to_woql_type(attr_type)
