@@ -1,5 +1,14 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.3
+
+### Bug Fixes / Improvements
+
+- `_abstract` is now not inherited 
+- Forcing Database Error to print out the whole response from backend
+
+---
+
 ## v10.0.2
 
 ### Bug Fixes / Improvements

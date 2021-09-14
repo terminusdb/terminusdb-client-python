@@ -134,7 +134,7 @@ class TerminusClass(type):
             else:
                 abstract = True
 
-        # _abstract should not be inherted
+        # _abstract should not be inherited
         cls._abstract = nmspc.get("_abstract")
 
         def init(obj, *args, **kwargs):
