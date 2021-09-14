@@ -128,11 +128,14 @@ class TerminusClass(type):
             cls._annotations.update(base_annotations)
 
         abstract = False
-        if hasattr(cls, "_abstract"):
-            if isinstance(cls._abstract, bool):
-                abstract = cls._abstract
+        if "_abstract" in nmspc:
+            if isinstance(nmspc.get("_abstract"), bool):
+                abstract = nmspc.get("_abstract")
             else:
                 abstract = True
+
+        # _abstract should not be inherted
+        cls._abstract = nmspc.get("_abstract")
 
         def init(obj, *args, **kwargs):
             if abstract:
@@ -206,7 +209,7 @@ class DocumentTemplate(metaclass=TerminusClass):
         if hasattr(cls, "_subdocument"):
             result["@subdocument"] = cls._subdocument
             result["@key"] = {"@type": "Random"}
-        if hasattr(cls, "_abstract"):
+        if hasattr(cls, "_abstract") and cls._abstract is not None:
             result["@abstract"] = cls._abstract
         # TODO: now get around for self/future reference by not putting any @key for schema and generate id in the client
         # if hasattr(cls, "_key") and not hasattr(cls, "_subdocument"):

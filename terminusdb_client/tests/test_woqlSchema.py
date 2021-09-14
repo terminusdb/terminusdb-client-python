@@ -21,6 +21,12 @@ class Abstract(DocumentTemplate):
     name: str
 
 
+class ChildAbs(Abstract):
+    """Child of abstract class, should not be abstract by default"""
+
+    # _abstract = False
+
+
 class TypeCheck(DocumentTemplate):
     """For checking instance types"""
 
@@ -122,6 +128,15 @@ def test_schema_copy():
 def test_abstract_class():
     with pytest.raises(TypeError):
         Abstract()
+    assert Abstract._abstract == []
+    assert Abstract._to_dict().get("@abstract") == []
+
+
+def test_abstract_class_child():
+    it_ok_to_create = ChildAbs(name="It's ok")
+    assert it_ok_to_create.name == "It's ok"
+    assert ChildAbs._abstract is None
+    assert "@abstract" not in ChildAbs._to_dict()
 
 
 def test_type_check():
