@@ -39,6 +39,39 @@ def test_happy_path(docker_url):
     assert "test_happy_path" not in client.list_databases()
 
 
+def test_happy_carzy_path(docker_url):
+    # create client
+    client = WOQLClient(docker_url)
+    assert not client._connected
+    # test connect
+    client.connect()
+    assert client._connected
+    # test create db
+    client.create_database("test happy path")
+    init_commit = client._get_current_commit()
+    assert client.db == "test happy path"
+    assert "test happy path" in client.list_databases()
+    # assert client._context.get("doc") == "foo://"
+    assert len(client.get_commit_history()) == 1
+    # test adding something
+    client.query(WOQLQuery().add_quad("a", "rdf:type", "sys:Class", "schema"))
+    first_commit = client._get_current_commit()
+    assert first_commit != init_commit
+    assert len(client.get_commit_history()) == 1
+    client.query(WOQLQuery().add_quad("b", "rdf:type", "sys:Class", "schema"))
+    commit_history = client.get_commit_history()
+    assert client._get_target_commit(1) == first_commit
+    assert len(client.get_commit_history()) == 2
+    # test reset
+    client.reset(commit_history[-1]["commit"])
+    assert client._get_current_commit() == first_commit
+    client.create_branch("New Branch")
+    client.rebase("New Branch")
+    client.delete_database("test happy path", "admin")
+    assert client.db is None
+    assert "test happy path" not in client.list_databases()
+
+
 def test_jwt(docker_url_jwt):
     # create client
     client = WOQLClient(docker_url_jwt)
@@ -65,6 +98,23 @@ def test_terminusx(terminusx_token):
     client.create_database(testdb)
     assert client.db == testdb
     assert testdb in client.list_databases()
+    client.delete_database(testdb, "TerminusDBPythonClient")
+    assert client.db is None
+    assert testdb not in client.list_databases()
+
+
+def test_terminusx_crazy_path(terminusx_token):
+    testdb = "test happy_" + str(dt.datetime.now()).replace(" ", "")
+    endpoint = "https://cloud-dev.dcm.ist/TerminusDBPythonClient/"
+    client = WOQLClient(endpoint)
+    client.connect(use_token=True, team="TerminusDBPythonClient")
+    assert client._connected
+    # test create db
+    client.create_database(testdb)
+    assert client.db == testdb
+    assert testdb in client.list_databases()
+    client.create_branch("New Branch")
+    client.rebase("New Branch")
     client.delete_database(testdb, "TerminusDBPythonClient")
     assert client.db is None
     assert testdb not in client.list_databases()

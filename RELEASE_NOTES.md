@@ -1,10 +1,18 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.4
+
+### Bug Fixes / Improvements
+
+- URL parse all the user provide parameters that will be put into paths
+
+---
+
 ## v10.0.3
 
 ### Bug Fixes / Improvements
 
-- `_abstract` is now not inherited 
+- `_abstract` is now not inherited
 - Forcing Database Error to print out the whole response from backend
 
 ---

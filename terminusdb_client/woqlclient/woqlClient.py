@@ -3,6 +3,7 @@ WOQLClient is the Python public API for TerminusDB"""
 import copy
 import json
 import os
+import urllib.parse as urlparse
 import warnings
 from collections.abc import Iterable
 from datetime import datetime
@@ -80,6 +81,97 @@ class WOQLClient:
         self.server_url = server_url.strip("/")
         self.api = f"{self.server_url}/api"
         self._connected = False
+
+        # properties with get/setters
+        self._team = None
+        self._db = None
+        self._user = None
+        self._branch = None
+        self._ref = None
+        self._repo = None
+
+    @property
+    def team(self):
+        if isinstance(self._team, str):
+            return urlparse.unquote(self._team)
+        else:
+            return self._team
+
+    @team.setter
+    def team(self, value):
+        if isinstance(value, str):
+            self._team = urlparse.quote(value)
+        else:
+            self._team = value
+
+    @property
+    def db(self):
+        if isinstance(self._db, str):
+            return urlparse.unquote(self._db)
+        else:
+            return self._db
+
+    @db.setter
+    def db(self, value):
+        if isinstance(value, str):
+            self._db = urlparse.quote(value)
+        else:
+            self._db = value
+
+    @property
+    def user(self):
+        if isinstance(self._user, str):
+            return urlparse.unquote(self._user)
+        else:
+            return self._user
+
+    @user.setter
+    def user(self, value):
+        if isinstance(value, str):
+            self._user = urlparse.quote(value)
+        else:
+            self._user = value
+
+    @property
+    def branch(self):
+        if isinstance(self._branch, str):
+            return urlparse.unquote(self._branch)
+        else:
+            return self._branch
+
+    @branch.setter
+    def branch(self, value):
+        if isinstance(value, str):
+            self._branch = urlparse.quote(value)
+        else:
+            self._branch = value
+
+    @property
+    def repo(self):
+        if isinstance(self._repo, str):
+            return urlparse.unquote(self._repo)
+        else:
+            self._repo
+
+    @repo.setter
+    def repo(self, value):
+        if isinstance(value, str):
+            self._repo = urlparse.quote(value)
+        else:
+            self._repo = value
+
+    @property
+    def ref(self):
+        return self._ref
+
+    @ref.setter
+    def ref(self, value):
+        if isinstance(value, str):
+            value = value.lower()
+        if value in ["local", "remote", None]:
+            self._ref = value
+        else:
+            raise ValueError("ref can only be 'local' or 'remote'")
 
     def connect(
         self,
@@ -1605,61 +1697,63 @@ class WOQLClient:
         return all_dbs
 
     def _db_url_fragment(self):
-        if self.db == "_system":
-            return self.db
-        return f"{self.team}/{self.db}"
+        if self._db == "_system":
+            return self._db
+        return f"{self._team}/{self._db}"
 
     def _db_base(self, action: str):
         return f"{self.api}/{action}/{self._db_url_fragment()}"
 
     def _branch_url(self, branch_id: str):
         base_url = self._repo_base("branch")
+        branch_id = urlparse.quote(branch_id)
         return f"{base_url}/branch/{branch_id}"
 
     def _repo_base(self, action: str):
-        return self._db_base(action) + f"/{self.repo}"
+        return self._db_base(action) + f"/{self._repo}"
 
     def _branch_base(self, action: str):
         base = self._repo_base(action)
-        if self.repo == "_meta":
+        if self._repo == "_meta":
             return base
-        if self.branch == "_commits":
-            return base + f"/{self.branch}"
+        if self._branch == "_commits":
+            return base + f"/{self._branch}"
         elif self.ref:
-            return base + f"/commit/{self.ref}"
+            return base + f"/commit/{self._ref}"
         else:
-            return base + f"/branch/{self.branch}"
+            return base + f"/branch/{self._branch}"
         return base
 
     def _query_url(self):
-        if self.db == "_system":
+        if self._db == "_system":
             return self._db_base("woql")
         return self._branch_base("woql")
 
     def _class_frame_url(self):
-        if self.db == "_system":
+        if self._db == "_system":
             return self._db_base("schema")
         return self._branch_base("schema")
 
     def _documents_url(self):
-        if self.db == "_system":
+        if self._db == "_system":
             base_url = self._db_base("document")
         else:
             base_url = self._branch_base("document")
         return base_url
 
     def _triples_url(self, graph_type="instance"):
-        if self.db == "_system":
+        if self._db == "_system":
             base_url = self._db_base("triples")
         else:
             base_url = self._branch_base("triples")
         return f"{base_url}/{graph_type}"
 
     def _clone_url(self, new_repo_id: str):
-        return f"{self.api}/clone/{self.team}/{new_repo_id}"
+        new_repo_id = urlparse.quote(new_repo_id)
+        return f"{self.api}/clone/{self._team}/{new_repo_id}"
 
     def _cloneable_url(self):
-        crl = f"{self.server_url}/{self.team}/{self.db}"
+        crl = f"{self.server_url}/{self._team}/{self._db}"
         return crl
 
     def _pull_url(self):
@@ -1667,6 +1761,7 @@ class WOQLClient:
 
     def _fetch_url(self, remote_name: str):
         furl = self._branch_base("fetch")
+        remote_name = urlparse.quote(remote_name)
         return furl + "/" + remote_name + "/_commits"
 
     def _rebase_url(self):
@@ -1676,6 +1771,7 @@ class WOQLClient:
         return self._branch_base("reset")
 
     def _optimize_url(self, path: str):
+        path = urlparse.quote(path)
         return f"{self.api}/optimize/{path}"
 
     def _squash_url(self):

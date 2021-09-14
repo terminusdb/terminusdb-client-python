@@ -46,6 +46,30 @@ def mocked_requests_get(*args, **kwargs):
     return MockResponse(None, {}, 404)
 
 
+def mocked_requests_get2(*args, **kwargs):
+
+    if "http://localhost:6363/" in args[0]:
+        return MockResponse(
+            json.dumps(
+                [
+                    {
+                        "@id": "UserDatabase_48965a1628f9748db159df4ebacf3eca",
+                        "@type": "UserDatabase",
+                        "comment": "",
+                        "creation_date": "2021-08-10T12:30:44.565Z",
+                        "label": "my DB",
+                        "name": "my DB",
+                        "state": "finalized",
+                    }
+                ]
+            ),
+            {"key1": "value1"},
+            200,
+        )
+
+    return MockResponse(None, {}, 404)
+
+
 def mocked_requests_post(*args, **kwargs):
     # class MockResponse:
     #     def __init__(self, text, json_data, status_code):
@@ -182,6 +206,20 @@ def test_branch(mocked_requests, mocked_requests2):
         "http://localhost:6363/api/branch/admin/myDBName/local/branch/my_new_branch",
         auth=("admin", "root"),
         json={"origin": "admin/myDBName/local/branch/main"},
+    )
+
+
+@mock.patch("requests.get", side_effect=mocked_requests_get2)
+@mock.patch("requests.post", side_effect=mocked_requests_get)
+def test_crazy_branch(mocked_requests, mocked_requests2):
+    woql_client = WOQLClient("http://localhost:6363")
+    woql_client.connect(user="admin", team="amazing admin", key="root", db="my DB")
+    woql_client.create_branch("my new branch")
+
+    requests.post.assert_called_once_with(
+        "http://localhost:6363/api/branch/amazing%20admin/my%20DB/local/branch/my%20new%20branch",
+        auth=("admin", "root"),
+        json={"origin": "amazing admin/my DB/local/branch/main"},
     )
 
 
