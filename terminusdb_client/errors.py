@@ -1,5 +1,6 @@
 import json
 
+
 class Error(Exception):
     """Exception that is base class for all other error exceptions."""
 
@@ -48,19 +49,21 @@ class DatabaseError(Error):
             == "application/json"
         ):
             self.error_obj = response.json()
+            details = json.dumps(response.json(), indent=4, sort_keys=True)
             if self.error_obj.get("api:message"):
-                self.message = self.error_obj["api:message"] + "\n" + json.dumps(response.json(), indent=4, sort_keys=True)
+                self.message = self.error_obj["api:message"] + "\n" + details
             elif "api:error" in self.error_obj and self.error_obj["api:error"].get(
                 "vio:message"
             ):
                 self.message = (
-                    self.error_obj["api:error"]["vio:message"] + "\n" + json.dumps(response.json(), indent=4, sort_keys=True)
+                    self.error_obj["api:error"]["vio:message"] + "\n" + details
                 )
             else:
-                err = json.dumps(response.json(), indent=4, sort_keys=True)
                 self.message = (
                     # "Unknown Error: check DatabaseError.error_obj for details"
-                    f"Unknown Error:{err}"
+                    "Unknown Error:"
+                    + "\n"
+                    + details
                 )
         else:
             self.error_obj = None
