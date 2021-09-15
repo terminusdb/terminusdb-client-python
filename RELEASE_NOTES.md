@@ -1,5 +1,14 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.5
+
+### Bug Fixes / Improvements
+
+- Patch formating for DatabaseError
+
+---
+
+
 ## v10.0.4
 
 ### Bug Fixes / Improvements
