@@ -90,7 +90,7 @@ def startproject():
             )
     # create operational file for TerminiusDB
     with open(".TDB", "w") as outfile:
-        json.dump({"branch": "main"}, outfile)
+        json.dump({"branch": "main", "ref": None}, outfile)
     click.echo(
         "config.json and schema.py created, please customize them to start your project."
     )
@@ -111,6 +111,7 @@ def _connect(settings, new_db=True):
     use_token = settings.get("use JWT token")
     team = settings.get("team")
     branch = settings.get("branch")
+    ref = settings.get("ref")
     if not team:
         team = "admin"
     if not branch:
@@ -118,11 +119,16 @@ def _connect(settings, new_db=True):
     client = WOQLClient(server)
     try:
         client.connect(db=database, use_token=use_token, team=team, branch=branch)
+        if ref is not None:
+            client.reset(ref, soft=True)
         return client, f"Connected to {database}."
     except InterfaceError as error:
         if "does not exist" in str(error) and new_db:
-            client.connect(use_token=use_token, team=team, branch=branch)
+            client.connect(use_token=use_token, team=team)
             client.create_database(database)
+            if branch != "main" or ref is not None:
+                with open(".TDB", "w") as outfile:
+                    json.dump({"branch": "main", "ref": None}, outfile)
             return client, f"{database} created."
         else:
             raise InterfaceError(f"Cannot connect to {database}. Details: {error}")
@@ -320,6 +326,7 @@ def deletedb():
         client.delete_database(database, client.team)
         # reset to main branch
         status["branch"] = "main"
+        status["ref"] = None
         with open(".TDB", "w") as outfile:
             json.dump(status, outfile)
         click.echo(f"{database} deleted.")
@@ -775,6 +782,8 @@ def status():
     message = f"Connecting to '{settings['database']}' at '{settings['endpoint']}'\non branch '{settings['branch']}'"
     if settings.get("team"):
         message += f"\nwith team '{settings['team']}'"
+    if settings.get("ref"):
+        message += f"\nat commit '{settings['ref']}'"
     click.echo(message)
 
 
@@ -796,14 +805,25 @@ def log():
 
 @click.command()
 @click.argument("commit")
-def reset(commit):
-    """Reset the head of the commit to a certain commit with id as input."""
+@click.option(
+    "--soft",
+    is_flag=True,
+    help="Soft reset (referencing that commit) instead of hard reset (default, reset the state of the commit for the database, not reversible)",
+)
+def reset(commit, soft):
+    """Reset the head of the commit to a certain commit with id as input. Default to be a hard reset (newer commit will be wipped, not reversible)."""
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
     settings.update(status)
-    client, _ = _connect(settings)
-    client.reset(commit)
-    click.echo(f"Reset to commit {commit}")
+    if soft:
+        status["ref"] = commit
+        with open(".TDB", "w") as outfile:
+            json.dump(status, outfile)
+        click.echo(f"Soft reset to commit {commit}")
+    else:
+        client, _ = _connect(settings)
+        client.reset(commit)
+        click.echo(f"Hard reset to commit {commit}")
 
 
 terminusdb.add_command(startproject)

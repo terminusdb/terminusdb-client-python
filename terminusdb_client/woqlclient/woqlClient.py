@@ -1510,7 +1510,7 @@ class WOQLClient:
 
         return json.loads(_finish_response(result))
 
-    def reset(self, commit: str, use_path: bool = False) -> None:
+    def reset(self, commit: str, soft: bool = False, use_path: bool = False) -> None:
         """Reset the current branch HEAD to the specified commit path. Doing it will reset the internal commit counter (self._commit_made) back to zero.
 
         Raises
@@ -1538,6 +1538,13 @@ class WOQLClient:
         """
 
         self._check_connection()
+        if soft:
+            if use_path:
+                self._ref = commit.split("/")[-1]
+            else:
+                self._ref = commit
+            return None
+
         if use_path:
             commit_path = commit
         else:
