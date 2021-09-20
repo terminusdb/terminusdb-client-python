@@ -275,7 +275,12 @@ def sync():
 
 
 @click.command()
-def commit():
+@click.option(
+    "-m",
+    "--message",
+    help="Commit message for the commit",
+)
+def commit(message):
     """Push the current schema plan in schema.py to database."""
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
@@ -291,9 +296,11 @@ def commit():
         if isinstance(obj, woqlschema.TerminusClass) or isinstance(obj, enum.EnumMeta):
             if obj_str not in ["DocumentTemplate", "EnumTemplate", "TaggedUnion"]:
                 all_obj.append(obj)
+    if message is None:
+        message = "Schema updated by Python client."
     client.update_document(
         all_obj,
-        commit_msg="Schema updated by Python client.",
+        commit_msg=message,
         graph_type="schema",
     )
     click.echo(f"{database} schema updated.")
@@ -356,9 +363,16 @@ def _get_existing_class(client):
     "--id", "id_", help="Specify column to be used as ids instead of generated ids"
 )
 @click.option("-e", "--embedded", multiple=True, help="Specify embedded columns")
+@click.option(
+    "-m",
+    "--message",
+    help="Commit message for the import",
+)
 @click.option("--sep", default=",", show_default=True)
 # @click.option('--header ', default=',', show_default=True)
-def importcsv(csv_file, keys, class_name, chunksize, schema, na, id_, embedded, sep):
+def importcsv(
+    csv_file, keys, class_name, chunksize, schema, na, id_, embedded, message, sep
+):
     """Import CSV file into pandas DataFrame then into TerminusDB, with read_csv() options.
     Options like chunksize, sep etc"""
     # If chunksize is too small, pandas may decide certain column to be integer if all values in the 1st chunk are 0.0. This can be problmetic for some cases.
@@ -432,13 +446,17 @@ def importcsv(csv_file, keys, class_name, chunksize, schema, na, id_, embedded, 
                 df.rename(columns={col: converted_col}, inplace=True)
             if not has_schema:
                 class_dict = _df_to_schema(class_name, df)
+                if message is None:
+                    schema_msg = f"Schema object insert/ update with {csv_file} by Python client."
+                else:
+                    schema_msg = message + " (schema update)"
                 client.update_document(
                     class_dict,
-                    commit_msg=f"Schema object insert/ update with {csv_file} insert by Python client.",
+                    commit_msg=schema_msg,
                     graph_type="schema",
                 )
                 click.echo(
-                    f"\nSchema object {class_name} created with {csv_file} inserted into database."
+                    f"\nSchema object {class_name} created with {csv_file} being imported into database."
                 )
                 _sync(client)
                 has_schema = True
@@ -484,9 +502,11 @@ def importcsv(csv_file, keys, class_name, chunksize, schema, na, id_, embedded, 
                 else:
                     item_id = LexicalKey(list(df.columns)).idgen(item)
                 item["@id"] = item_id
+            if message is None:
+                message = f"Documents created with {csv_file} update by Python client."
             client.update_document(
                 obj_list,
-                commit_msg=f"Documents created with {csv_file} insert by Python client.",
+                commit_msg=message,
             )
     if id_:
         key_type = "specified"

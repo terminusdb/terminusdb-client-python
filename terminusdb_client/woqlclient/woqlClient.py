@@ -1059,14 +1059,21 @@ class WOQLClient:
         elif graph_type == "instance":
             stuff = "Document object"
 
+        if commit_msg is None:
+            insert_msg = f"{stuff} inserted by Python client."
+            replace_msg = f"{stuff} repleaced by Python client."
+        else:
+            insert_msg = commit_msg + " (inserts)"
+            replace_msg = commit_msg + " (repleces)"
+
         self.insert_document(
             insert_docs,
-            commit_msg=f"{stuff} inserted by Python client.",
+            commit_msg=insert_msg,
             graph_type=graph_type,
         )
         self.replace_document(
             update_docs,
-            commit_msg=f"{stuff} updated by Python client.",
+            commit_msg=replace_msg,
             graph_type=graph_type,
         )
 
