@@ -735,6 +735,18 @@ def checkout(branch_name, new_branch):
 
 
 @click.command()
+@click.argument("branch_name")
+def rebase(branch_name):
+    """Reapply commits on top of another base tip on another branch."""
+    settings = _load_settings()
+    status = _load_settings(".TDB", check=[])
+    settings.update(status)
+    client, _ = _connect(settings)
+    client.rebase(branch=branch_name)
+    click.echo(f"Rebased {branch_name} branch.")
+
+
+@click.command()
 def status():
     """Show the working status of the project."""
     settings = _load_settings()
@@ -748,7 +760,7 @@ def status():
 
 @click.command()
 def log():
-    """Show the working status of the project."""
+    """Show commit log of the project."""
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
     settings.update(status)
@@ -763,15 +775,15 @@ def log():
 
 
 @click.command()
-@click.argument("branch_name")
-def rebase(branch_name):
-    """Reapply commits on top of another base tip on another branch."""
+@click.argument("commit")
+def reset(commit):
+    """Reset the head of the commit to a certain commit with id as input."""
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
     settings.update(status)
     client, _ = _connect(settings)
-    client.rebase(branch=branch_name)
-    click.echo(f"Rebased {branch_name} branch.")
+    client.reset(commit)
+    click.echo(f"Reset to commit {commit}")
 
 
 terminusdb.add_command(startproject)
@@ -783,6 +795,7 @@ terminusdb.add_command(exportcsv)
 terminusdb.add_command(alldocs)
 terminusdb.add_command(branch)
 terminusdb.add_command(checkout)
+terminusdb.add_command(rebase)
 terminusdb.add_command(status)
 terminusdb.add_command(log)
-terminusdb.add_command(rebase)
+terminusdb.add_command(reset)
