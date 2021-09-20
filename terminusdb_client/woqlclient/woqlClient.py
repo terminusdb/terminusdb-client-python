@@ -801,8 +801,9 @@ class WOQLClient:
         graph_type: str = "instance",
         skip: int = 0,
         count: Optional[int] = None,
+        as_list: bool: False,
         **kwargs,
-    ) -> Iterable:
+    ) -> Union[Iterable, list]:
         """Retrieves the documents by type
 
         Parameters
@@ -844,15 +845,20 @@ class WOQLClient:
             params=payload,
             auth=self._auth(),
         )
-        return _result2stream(_finish_response(result))
+        return_obj = _result2stream(_finish_response(result))
+        if as_list:
+            return list(return_obj)
+        else:
+            return return_obj
 
     def get_all_documents(
         self,
         graph_type: str = "instance",
         skip: int = 0,
         count: Optional[int] = None,
+        as_list: bool: False,
         **kwargs,
-    ) -> Iterable:
+    ) -> Union[Iterable, list]:
         """Retrieves all avalibale the documents
 
         Parameters
@@ -892,7 +898,11 @@ class WOQLClient:
             params=payload,
             auth=self._auth(),
         )
-        return _result2stream(_finish_response(result))
+        return_obj = _result2stream(_finish_response(result))
+        if as_list:
+            return list(return_obj)
+        else:
+            return return_obj
 
     def _conv_to_dict(self, obj):
         if isinstance(obj, dict):
@@ -1081,7 +1091,7 @@ class WOQLClient:
 
     def delete_document(
         self,
-        doc_id: Union[str, List[str]],
+        doc_id: Union[str, List[str], Iterable],
         graph_type: str = "instance",
         commit_msg: Optional[str] = None,
     ) -> None:
@@ -1103,6 +1113,8 @@ class WOQLClient:
         """
         self._validate_graph_type(graph_type)
         self._check_connection()
+        if not isinstance(doc_id, [str,list]) and hasattr(doc_id, "iter"):
+            doc_id = list(doc_id)
         params = self._generate_commit(commit_msg)
         params["graph_type"] = graph_type
         _finish_response(
