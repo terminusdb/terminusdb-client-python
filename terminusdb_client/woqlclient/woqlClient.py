@@ -1233,6 +1233,28 @@ class WOQLClient:
             )
         )
 
+    def delete_branch(self, branch_id: str) -> None:
+        """Delete a branch
+
+        Parameters
+        ----------
+        branch_id : str
+            Branch to delete
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
+        """
+        self._check_connection()
+
+        _finish_response(
+            requests.delete(
+                self._branch_url(branch_id),
+                auth=self._auth(),
+            )
+        )
+
     def pull(
         self,
         remote: str = "origin",
