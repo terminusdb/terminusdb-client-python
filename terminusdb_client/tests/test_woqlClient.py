@@ -9,6 +9,7 @@ import requests
 from terminusdb_client.errors import InterfaceError
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 
+from ..__version__ import __version__
 from .woqljson.woqlStarJson import WoqlStar
 
 
@@ -118,6 +119,7 @@ def test_connection(mocked_requests):
     requests.get.assert_called_once_with(
         "http://localhost:6363/api/",
         auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
 
@@ -152,6 +154,7 @@ def test_create_database(mocked_requests, mocked_requests2):
         "http://localhost:6363/api/db/admin/myFirstTerminusDB",
         auth=("admin", "root"),
         json={"label": "my first db", "comment": "my first db comment"},
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
 
@@ -172,6 +175,7 @@ def test_create_database_with_schema(mocked_requests, mocked_requests2):
         "http://localhost:6363/api/db/admin/myFirstTerminusDB",
         auth=("admin", "root"),
         json={"label": "my first db", "comment": "my first db comment", "schema": True},
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
 
@@ -192,6 +196,7 @@ def test_create_database_and_change_team(mocked_requests, mocked_requests2):
         "http://localhost:6363/api/db/my_new_team/myFirstTerminusDB",
         auth=("admin", "root"),
         json={"label": "my first db", "comment": "my first db comment"},
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
 
@@ -206,6 +211,7 @@ def test_branch(mocked_requests, mocked_requests2):
         "http://localhost:6363/api/branch/admin/myDBName/local/branch/my_new_branch",
         auth=("admin", "root"),
         json={"origin": "admin/myDBName/local/branch/main"},
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
 
@@ -220,6 +226,7 @@ def test_crazy_branch(mocked_requests, mocked_requests2):
         "http://localhost:6363/api/branch/amazing%20admin/my%20DB/local/branch/my%20new%20branch",
         auth=("admin", "root"),
         json={"origin": "amazing admin/my DB/local/branch/main"},
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
 
@@ -243,6 +250,7 @@ def test_get_triples(mocked_requests):
     requests.get.assert_called_with(
         "http://localhost:6363/api/triples/admin/myDBName/local/branch/main/instance",
         auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
 
@@ -266,6 +274,7 @@ def test_query(mocked_requests, mocked_requests2):
             },
             "query": WoqlStar,
         },
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
 
