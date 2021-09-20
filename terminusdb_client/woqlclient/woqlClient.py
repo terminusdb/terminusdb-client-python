@@ -917,6 +917,7 @@ class WOQLClient:
             List["DocumentTemplate"],  # noqa:F821
         ],
         graph_type: str = "instance",
+        full_replace: bool = False,
         commit_msg: Optional[str] = None,
     ) -> None:
         """Inserts the specified document(s)
@@ -944,6 +945,7 @@ class WOQLClient:
         self._check_connection()
         params = self._generate_commit(commit_msg)
         params["graph_type"] = graph_type
+        params["full_replace"] = full_replace
 
         if isinstance(document, list):
             new_doc = []
