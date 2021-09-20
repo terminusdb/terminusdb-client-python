@@ -801,7 +801,7 @@ class WOQLClient:
         graph_type: str = "instance",
         skip: int = 0,
         count: Optional[int] = None,
-        as_list: bool: False,
+        as_list: bool = False,
         **kwargs,
     ) -> Union[Iterable, list]:
         """Retrieves the documents by type
@@ -856,7 +856,7 @@ class WOQLClient:
         graph_type: str = "instance",
         skip: int = 0,
         count: Optional[int] = None,
-        as_list: bool: False,
+        as_list: bool = False,
         **kwargs,
     ) -> Union[Iterable, list]:
         """Retrieves all avalibale the documents
@@ -1113,7 +1113,7 @@ class WOQLClient:
         """
         self._validate_graph_type(graph_type)
         self._check_connection()
-        if not isinstance(doc_id, [str,list]) and hasattr(doc_id, "iter"):
+        if not isinstance(doc_id, [str, list]) and hasattr(doc_id, "iter"):
             doc_id = list(doc_id)
         params = self._generate_commit(commit_msg)
         params["graph_type"] = graph_type
