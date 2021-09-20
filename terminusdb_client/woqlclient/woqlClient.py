@@ -286,15 +286,15 @@ class WOQLClient:
         >>> client = WOQLClient("https://127.0.0.1:6363"
         >>> client.connect(db="bank_balance_example")
         >>> client.get_commit_history()
-        [{'commit': 's90wike9v5xibmrb661emxjs8k7ynwc', 'author': 'admin', 'message': 'Adding Jane', 'timstamp': datetime.da
+        [{'commit': 's90wike9v5xibmrb661emxjs8k7ynwc', 'author': 'admin', 'message': 'Adding Jane', 'timestamp': datetime.da
         tetime(2020, 9, 3, 15, 29, 34)}, {'commit': '1qhge8qlodajx93ovj67kvkrkxsw3pg', 'author': 'gavin@terminusdb.com', 'm
-        essage': 'Adding Jim', 'timstamp': datetime.datetime(2020, 9, 3, 15, 29, 33)}, {'commit': 'rciy1rfu5foj67ch00ow6f6n
-        njjxe3i', 'author': 'gavin@terminusdb.com', 'message': 'Update mike', 'timstamp': datetime.datetime(2020, 9, 3, 15,
+        essage': 'Adding Jim', 'timestamp': datetime.datetime(2020, 9, 3, 15, 29, 33)}, {'commit': 'rciy1rfu5foj67ch00ow6f6n
+        njjxe3i', 'author': 'gavin@terminusdb.com', 'message': 'Update mike', 'timestamp': datetime.datetime(2020, 9, 3, 15,
          29, 33)}, {'commit': 'n4d86u8juzx852r2ekrega5hl838ovh', 'author': 'gavin@terminusdb.com', 'message': 'Add mike', '
-        timstamp': datetime.datetime(2020, 9, 3, 15, 29, 33)}, {'commit': '1vk2i8k8xce26p9jpi4zmq1h5vdqyuj', 'author': 'gav
-        in@terminusdb.com', 'message': 'Label for balance was wrong', 'timstamp': datetime.datetime(2020, 9, 3, 15, 29, 33)
+        timestamp': datetime.datetime(2020, 9, 3, 15, 29, 33)}, {'commit': '1vk2i8k8xce26p9jpi4zmq1h5vdqyuj', 'author': 'gav
+        in@terminusdb.com', 'message': 'Label for balance was wrong', 'timestamp': datetime.datetime(2020, 9, 3, 15, 29, 33)
         }, {'commit': '9si4na9zv2qol9b189y92fia7ac3hbg', 'author': 'gavin@terminusdb.com', 'message': 'Adding bank account
-        object to schema', 'timstamp': datetime.datetime(2020, 9, 3, 15, 29, 33)}, {'commit': '9egc4h0m36l5rbq1alr1fki6jbfu
+        object to schema', 'timestamp': datetime.datetime(2020, 9, 3, 15, 29, 33)}, {'commit': '9egc4h0m36l5rbq1alr1fki6jbfu
         kuv', 'author': 'TerminusDB', 'message': 'internal system operation', 'timstamp': datetime.datetime(2020, 9, 3, 15,
          29, 33)}]
 
@@ -331,7 +331,7 @@ class WOQLClient:
                         "commit": result_item["cid"]["@value"],
                         "author": result_item["author"]["@value"],
                         "message": result_item["message"]["@value"],
-                        "timstamp": datetime.fromtimestamp(
+                        "timestamp": datetime.fromtimestamp(
                             int(result_item["timestamp"]["@value"])
                         ),
                     }
