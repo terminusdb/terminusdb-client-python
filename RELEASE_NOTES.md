@@ -1,5 +1,14 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.6
+
+### Bug Fixes / Improvements
+
+- Fix typo in get_commit_history
+- Patch delete branch missing
+
+---
+
 ## v10.0.5
 
 ### Bug Fixes / Improvements
