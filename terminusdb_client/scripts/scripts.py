@@ -747,6 +747,22 @@ def status():
 
 
 @click.command()
+def log():
+    """Show the working status of the project."""
+    settings = _load_settings()
+    status = _load_settings(".TDB", check=[])
+    settings.update(status)
+    client, _ = _connect(settings)
+    history = client.get_commit_history()
+    click.echo("\n")
+    for item in history:
+        click.echo(f"commit {item['commit']}")
+        click.echo(f"Author: {item['author']}")
+        click.echo(f"Date: {str(item['timestamp'])}")
+        click.echo(f"\n    {item['message']}\n")
+
+
+@click.command()
 @click.argument("branch_name")
 def rebase(branch_name):
     """Reapply commits on top of another base tip on another branch."""
@@ -768,4 +784,5 @@ terminusdb.add_command(alldocs)
 terminusdb.add_command(branch)
 terminusdb.add_command(checkout)
 terminusdb.add_command(status)
+terminusdb.add_command(log)
 terminusdb.add_command(rebase)
