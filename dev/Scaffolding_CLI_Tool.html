@@ -356,10 +356,17 @@ Options like chunksize, sep etc</p>
 </section>
 <section id="terminusdb-reset">
 <h3>reset<a class="headerlink" href="#terminusdb-reset" title="Permalink to this headline"></a></h3>
-<p>Reset the head of the commit to a certain commit with id as input.</p>
+<p>Reset the head of the commit to a certain commit with id as input. Default to be a hard reset (newer commit will be wipped, not reversible).</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>terminusdb reset <span class="o">[</span>OPTIONS<span class="o">]</span> COMMIT
 </pre></div>
 </div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-terminusdb-reset-soft">
+<span class="sig-name descname"><span class="pre">--soft</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-terminusdb-reset-soft" title="Permalink to this definition"></a></dt>
+<dd><p>Soft reset (referencing that commit) instead of hard reset (default, reset the state of the commit for the database, not reversible)</p>
+</dd></dl>
+
 <p class="rubric">Arguments</p>
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-terminusdb-reset-arg-COMMIT">

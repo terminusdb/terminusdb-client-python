@@ -944,8 +944,8 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLClient.reset">
-<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.reset" title="Permalink to this definition"></a></dt>
-<dd><p>Reset the current branch HEAD to the specified commit path. Doing it will reset the internal commit counter (self._commit_made) back to zero.</p>
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soft</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.reset" title="Permalink to this definition"></a></dt>
+<dd><p>Reset the current branch HEAD to the specified commit path. If <cite>soft</cite> is not True, it will be a hard reset, meaning reset to that commit in the backend and newer commit will be wipped out. If <cite>soft</cite> is True, the client will only reference to that commit and can be reset to the newest commit when done.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
 <dd class="field-odd"><p><a class="reference internal" href="Errors_and_Exceptions.html#terminusdb_client.errors.InterfaceError" title="terminusdb_client.errors.InterfaceError"><strong>InterfaceError</strong></a> – if the client does not connect to a database</p>
@@ -956,7 +956,8 @@ and the new value will be used in future requests to the server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>commit</strong> (<em>string</em>) – Commit id or path to the commit (if use_path is True), for instance ‘234980523ffaf93’ or ‘admin/database/local/commit/234980523ffaf93’.</p></li>
+<li><p><strong>commit</strong> (<em>string</em>) – Commit id or path to the commit (if use_path is True), for instance ‘234980523ffaf93’ or ‘admin/database/local/commit/234980523ffaf93’. If not provided, it will reset to the newest commit (useful when need to go back after a soft reset).</p></li>
+<li><p><strong>soft</strong> (<em>bool</em>) – Flag indicating if the reset if soft, that is referencing to a previous commit instead of resetting to a previous commit in the backend and wipping newer commits.</p></li>
 <li><p><strong>use_path</strong> (<em>bool</em>) – Wheather or not the commit given is an id or path. Default using id and use_path is False.</p></li>
 </ul>
 </dd>
