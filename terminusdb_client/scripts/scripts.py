@@ -815,13 +815,16 @@ def reset(commit, soft):
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
     settings.update(status)
+    client, _ = _connect(settings)
     if soft:
+        commit_ids = [item["commit"] for item in client.get_commit_history()]
+        if commit not in commit_ids:
+            raise InterfaceError(f"{commit} is not a commit in {client.db}.'")
         status["ref"] = commit
         with open(".TDB", "w") as outfile:
             json.dump(status, outfile)
         click.echo(f"Soft reset to commit {commit}")
     else:
-        client, _ = _connect(settings)
         client.reset(commit)
         click.echo(f"Hard reset to commit {commit}")
 
