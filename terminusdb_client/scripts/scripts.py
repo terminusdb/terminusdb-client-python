@@ -804,19 +804,24 @@ def log():
 
 
 @click.command()
-@click.argument("commit")
+@click.argument("commit", required=False)
 @click.option(
     "--soft",
     is_flag=True,
     help="Soft reset (referencing that commit) instead of hard reset (default, reset the state of the commit for the database, not reversible)",
 )
 def reset(commit, soft):
-    """Reset the head of the commit to a certain commit with id as input. Default to be a hard reset (newer commit will be wipped, not reversible)."""
+    """Reset the head of the commit to a certain commit with id as input. Default to be a hard reset (newer commit will be wipped, not reversible). If no commit is is provided, it will reset to the newest commit."""
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
     settings.update(status)
     client, _ = _connect(settings)
-    if soft:
+    if commit is None:
+        status["ref"] = None
+        with open(".TDB", "w") as outfile:
+            json.dump(status, outfile)
+        click.echo(f"Reset head to newest commit")
+    elif soft:
         commit_ids = [item["commit"] for item in client.get_commit_history()]
         if commit not in commit_ids:
             raise InterfaceError(f"{commit} is not a commit in {client.db}.'")
