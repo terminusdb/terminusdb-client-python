@@ -1,5 +1,21 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.7
+
+### New
+
+ - Adding command `log` in CLI and Scaffolding tool to see commit history
+ - Adding command `reset` in CLI and Scaffolding tool to time travel
+
+### Bug Fixes / Improvements
+
+- Adding full_replace in insert document
+- Adding soft reset option in client.reset
+- User Agent is now terminusdb-client-pyhton/<version>
+- Allow customize commit message in scripts
+
+---
+
 ## v10.0.6
 
 ### Bug Fixes / Improvements
