@@ -1510,8 +1510,10 @@ class WOQLClient:
 
         return json.loads(_finish_response(result))
 
-    def reset(self, commit: str, soft: bool = False, use_path: bool = False) -> None:
-        """Reset the current branch HEAD to the specified commit path. Doing it will reset the internal commit counter (self._commit_made) back to zero.
+    def reset(
+        self, commit: Optional[str] = None, soft: bool = False, use_path: bool = False
+    ) -> None:
+        """Reset the current branch HEAD to the specified commit path. If `soft` is not True, it will be a hard reset, meaning reset to that commit in the backend and newer commit will be wipped out. If `soft` is True, the client will only reference to that commit and can be reset to the newest commit when done.
 
         Raises
         ------
@@ -1525,7 +1527,9 @@ class WOQLClient:
         Parameters
         ----------
         commit: string
-            Commit id or path to the commit (if use_path is True), for instance '234980523ffaf93' or 'admin/database/local/commit/234980523ffaf93'.
+            Commit id or path to the commit (if use_path is True), for instance '234980523ffaf93' or 'admin/database/local/commit/234980523ffaf93'. If not provided, it will reset to the newest commit (useful when need to go back after a soft reset).
+        soft: bool
+            Flag indicating if the reset if soft, that is referencing to a previous commit instead of resetting to a previous commit in the backend and wipping newer commits.
         use_path : bool
             Wheather or not the commit given is an id or path. Default using id and use_path is False.
 
@@ -1543,6 +1547,11 @@ class WOQLClient:
                 self._ref = commit.split("/")[-1]
             else:
                 self._ref = commit
+            return None
+        else:
+            self._ref = None
+
+        if commit is None:
             return None
 
         if use_path:

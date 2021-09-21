@@ -25,15 +25,24 @@ def test_happy_path(docker_url):
     # test adding something
     client.query(WOQLQuery().add_quad("a", "rdf:type", "sys:Class", "schema"))
     first_commit = client._get_current_commit()
+    first_obj = client.query(WOQLQuery().star())
     assert first_commit != init_commit
     assert len(client.get_commit_history()) == 1
     client.query(WOQLQuery().add_quad("b", "rdf:type", "sys:Class", "schema"))
     commit_history = client.get_commit_history()
+    more_obj = client.query(WOQLQuery().star())
+    assert first_obj != more_obj
     assert client._get_target_commit(1) == first_commit
     assert len(client.get_commit_history()) == 2
     # test reset
+    client.reset(commit_history[-1]["commit"], soft=True)
+    assert len(client.get_commit_history()) == 2
+    assert client._ref == commit_history[-1]["commit"]
+    assert client.query(WOQLQuery().star()) == first_obj
     client.reset(commit_history[-1]["commit"])
+    assert len(client.get_commit_history()) == 1
     assert client._get_current_commit() == first_commit
+    assert client._ref is None
     client.delete_database("test_happy_path", "admin")
     assert client.db is None
     assert "test_happy_path" not in client.list_databases()
