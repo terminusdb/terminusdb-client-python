@@ -14,6 +14,10 @@ def test_startproject():
             setting = json.load(file)
             assert setting.get("database") == "mydb"
             assert setting.get("endpoint") == "http://127.0.0.1:6363/"
+        with open(".TDB") as file:
+            setting = json.load(file)
+            assert setting.get("branch") == "main"
+            assert setting.get("ref") is None
 
 
 # def test_no_server():
