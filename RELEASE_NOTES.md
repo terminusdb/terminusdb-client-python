@@ -1,5 +1,13 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.8
+
+### Bug Fixes / Improvements
+
+- Add option to reset to latest commit in CLI and Scaffolding tool
+
+---
+
 ## v10.0.7
 
 ### New
