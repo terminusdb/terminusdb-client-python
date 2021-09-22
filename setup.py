@@ -25,14 +25,6 @@ for old_str, new_str in replace_pairs.items():
 
 requires = ["requests", "numpydoc", "click<8.0,>=7.0", "shed", "typeguard", "tqdm"]
 
-test_requirements = [
-    "pytest>=3",
-    "pytest-cov",
-    "pytest-mock",
-    "pytest-xdist",
-    "pytest-runner",
-]
-
 extras_require = {"dataframe": ["numpy >= 1.13.0", "pandas >= 0.23.0"]}
 
 setuptools.setup(
@@ -53,8 +45,6 @@ setuptools.setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
     ],
-    setup_requires=["pytest-runner"],
-    tests_require=test_requirements,
     extras_require=extras_require,
     python_requires=">=3.7",
     entry_points={

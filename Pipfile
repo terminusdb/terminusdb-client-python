@@ -23,6 +23,12 @@ shed = "*"
 
 [packages]
 requests = "*"
+numpydoc = "*"
+shed = "*"
+typeguard = "*"
+tqdm = "*"
+click = "~= 7.0"
+
 
 [pipenv]
 allow_prereleases = true
