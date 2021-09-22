@@ -5,6 +5,10 @@
 ### Bug Fixes / Improvements
 
 - Add option to reset to latest commit in CLI and Scaffolding tool
+- option to set TerminusX JWT token when startproject
+- take out setup_requires and tests_requires to increase security
+- temporary remove triples and WOQLView till they works with new TerminusDB
+- update woqldataframe to work with docucment API
 
 ---
 
