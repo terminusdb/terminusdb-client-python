@@ -19,6 +19,7 @@ from ..errors import InterfaceError
 
 # from ..woql_type import from_woql_type
 from ..woqlclient.woqlClient import WOQLClient
+from ..woqldataframe.woqlDataframe import result_to_df
 from ..woqlschema.woql_schema import LexicalKey, RandomKey
 
 
@@ -349,15 +350,6 @@ def deletedb():
         click.echo(f"{database} deleted.")
 
 
-def _get_existing_class(client):
-    all_existing_obj = client.get_all_documents(graph_type="schema")
-    all_existing_class = {}
-    for item in all_existing_obj:
-        if item.get("@id"):
-            all_existing_class[item["@id"]] = item
-    return all_existing_class
-
-
 @click.command()
 @click.argument("csv_file")
 @click.argument("keys", nargs=-1)
@@ -421,7 +413,7 @@ def importcsv(
     if not class_name:
         class_name = csv_file.split(".")[0].replace("_", " ").title().replace(" ", "")
     # "not schema" make it always False if adding the schema option
-    has_schema = not schema and class_name in _get_existing_class(client)
+    has_schema = not schema and class_name in client.get_existing_classes()
 
     def _df_to_schema(class_name, df):
         class_dict = {"@type": "Class", "@id": class_name}
@@ -544,74 +536,6 @@ def importcsv(
     )
 
 
-def _exportcsv(
-    class_obj, client, all_records, all_existing_class, keepid, maxdep, filename=None
-):
-    """Export into a flatten CSV file."""
-    try:
-        pd = import_module("pandas")
-    except ImportError:
-        raise ImportError(
-            "Library 'pandas' is required to export csv, either install 'pandas' or install woqlDataframe requirements as follows: python -m pip install -U terminus-client-python[dataframe]"
-        )
-
-    def expand_df(df):
-        for col in df.columns:
-            try:
-                expanded = pd.json_normalize(df[col])
-            except Exception:
-                expanded = None
-            if expanded is not None and "@id" in expanded.columns:
-                if not keepid:
-                    expanded.drop(
-                        columns=list(filter(lambda x: x[0] == "@", expanded.columns)),
-                        inplace=True,
-                    )
-                expanded.columns = list(map(lambda x: col + "." + x, expanded))
-                df.drop(columns=col, inplace=True)
-                df = df.join(expanded)
-        return df
-
-    def embed_obj(df, maxdep):
-        if maxdep == 0:
-            return df
-        for col in df.columns:
-            if "@" not in col:
-                col_comp = col.split(".")
-                if len(col_comp) == 1:
-                    prop_type = all_existing_class[class_obj][col]
-                else:
-                    prop_type = class_obj
-                    for comp in col_comp:
-                        prop_type = all_existing_class[prop_type][comp]
-                if (
-                    isinstance(prop_type, str)
-                    and prop_type[:4] != "xsd:"
-                    and prop_type != class_obj
-                ):
-                    df[col] = df[col].apply(client.get_document)
-        finish_df = expand_df(df)
-        if (
-            len(finish_df.columns) == len(df.columns)
-            and (finish_df.columns == df.columns).all()
-        ):
-            return finish_df
-        else:
-            return embed_obj(finish_df, maxdep - 1)
-
-    df = pd.DataFrame().from_records(list(all_records))
-    if not keepid:
-        df.drop(columns=list(filter(lambda x: x[0] == "@", df.columns)), inplace=True)
-    df = expand_df(df)
-    df = embed_obj(df, maxdep=maxdep)
-    if filename is None:
-        filename = class_obj + ".csv"
-    df.to_csv(filename, index=False)
-    click.echo(
-        f"CSV file {filename} created with {class_obj} from database {client.db}."
-    )
-
-
 @click.command()
 @click.argument("class_obj")
 @click.option(
@@ -635,20 +559,13 @@ def exportcsv(class_obj, keepid, maxdep, filename=None):
     settings.update(status)
     settings["database"]
     client, msg = _connect(settings, new_db=False)
-    all_existing_class = _get_existing_class(client)
-    if class_obj not in all_existing_class:
-        raise InterfaceError(
-            f"{class_obj} not found in database ({client.db}) schema.'"
-        )
     all_records = client.get_documents_by_type(class_obj)
-    _exportcsv(
-        class_obj,
-        client,
-        all_records,
-        all_existing_class,
-        keepid,
-        maxdep,
-        filename=None,
+    df = result_to_df(all_records, keepid, maxdep, client)
+    if filename is None:
+        filename = class_obj + ".csv"
+    df.to_csv(filename, index=False)
+    click.echo(
+        f"CSV file {filename} created with {class_obj} from database {client.db}."
     )
 
 
@@ -693,11 +610,6 @@ def alldocs(schema, type_, query, export, keepid, maxdep, filename=None):
         else:
             click.echo(list(client.get_all_documents(graph_type="schema")))
     elif type_:
-        all_existing_class = _get_existing_class(client)
-        if type_ not in all_existing_class:
-            raise InterfaceError(
-                f"{type_} not found in database ({client.db}) schema.'"
-            )
         if not query:
             result = list(client.get_documents_by_type(type_))
         else:
@@ -720,12 +632,16 @@ def alldocs(schema, type_, query, export, keepid, maxdep, filename=None):
                     else:
                         raise InterfaceError(f"{pair[1]} cannot be parse as boolean")
                 else:
-                    pair[1] = pair[1].strip('"')
+                    pair[1] = pair[1]  # don't quote in query
                 query_dict[pair[0]] = pair[1]
             result = list(client.query_document(query_dict, optimize=True))
         if export:
-            _exportcsv(
-                type_, client, result, all_existing_class, keepid, maxdep, filename
+            df = result_to_df(result, keepid, maxdep, client)
+            if filename is None:
+                filename = type_ + ".csv"
+            df.to_csv(filename, index=False)
+            click.echo(
+                f"CSV file {filename} created with {type_} from database {client.db}."
             )
         else:
             click.echo(result)

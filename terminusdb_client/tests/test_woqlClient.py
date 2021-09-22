@@ -240,6 +240,7 @@ def test_crazy_branch(mocked_requests, mocked_requests2):
 #         woql_client.create_graph("wrong_graph_name", "mygraph", "add a new graph")
 
 
+@pytest.mark.skip(reason="temporary not avaliable")
 @mock.patch("requests.get", side_effect=mocked_requests_get)
 def test_get_triples(mocked_requests):
     woql_client = WOQLClient("http://localhost:6363")

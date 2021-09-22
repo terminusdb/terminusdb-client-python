@@ -6,7 +6,7 @@ from click.testing import CliRunner
 from ...scripts import scripts
 
 
-def test_local_happy_path(docker_url):
+def test_local_happy_path(docker_url, test_csv):
     testdb = "test_" + str(dt.datetime.now()).replace(" ", "")
     runner = CliRunner()
     with runner.isolated_filesystem():
@@ -22,6 +22,7 @@ def test_local_happy_path(docker_url):
         result = runner.invoke(scripts.sync)
         assert result.exit_code == 0
         assert f"schema.py is updated with {testdb} schema." in result.output
+        # test checkout, branch and rebase
         result = runner.invoke(scripts.checkout, ["-b", "new"])
         assert result.exit_code == 0
         with open(".TDB") as file:
@@ -38,6 +39,7 @@ def test_local_happy_path(docker_url):
         result = runner.invoke(scripts.rebase, ["main"])
         assert result.exit_code == 0
         assert "Rebased main branch." in result.output
+        # test log and time travel
         result = runner.invoke(scripts.log)
         assert result.exit_code == 0
         assert "Schema updated by Python client." in result.output
@@ -69,6 +71,41 @@ def test_local_happy_path(docker_url):
         result = runner.invoke(scripts.log)
         assert "My message" not in result.output
         assert "Schema updated by Python client." in result.output
+        # test import export csv
+        with open("grades.csv", "w") as writer:
+            writer.write(test_csv)
+        result = runner.invoke(scripts.importcsv, ["grades.csv"])
+        assert result.exit_code == 0
+        result = runner.invoke(scripts.alldocs, ["--schema"])
+        assert "Grades" in result.output
+        result = runner.invoke(
+            scripts.exportcsv, ["Grades", "--filename", "new_grades.csv"]
+        )
+        assert result.exit_code == 0
+        with open("new_grades.csv") as file:
+            out_file = file.read()
+            assert "Elephant" in out_file
+        # test alldocs and export with alldocs
+        result = runner.invoke(scripts.alldocs, ["--type", "Grades", "-q", "grade=B-"])
+        assert result.exit_code == 0
+        assert "B-" in result.output
+        result = runner.invoke(
+            scripts.alldocs,
+            [
+                "--type",
+                "Grades",
+                "-q",
+                "grade=B-",
+                "--export",
+                "--filename",
+                "query_result.csv",
+            ],
+        )
+        assert result.exit_code == 0
+        with open("query_result.csv") as file:
+            out_file = file.read()
+            assert "B-" in out_file
+        # deletedb
         result = runner.invoke(scripts.deletedb, input="y\n")
         assert result.exit_code == 0
         assert (

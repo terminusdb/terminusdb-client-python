@@ -938,6 +938,15 @@ class WOQLClient:
         else:
             return return_obj
 
+    def get_existing_classes(self):
+        """Get all the existing classes (only ids) in a database."""
+        all_existing_obj = self.get_all_documents(graph_type="schema")
+        all_existing_class = {}
+        for item in all_existing_obj:
+            if item.get("@id"):
+                all_existing_class[item["@id"]] = item
+        return all_existing_class
+
     def _conv_to_dict(self, obj):
         if isinstance(obj, dict):
             return obj

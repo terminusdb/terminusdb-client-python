@@ -2,6 +2,8 @@ import json
 import warnings
 from numbers import Number
 
+from ..errors import InterfaceError
+
 try:
     from IPython.display import Javascript, display
 except ImportError:
