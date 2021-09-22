@@ -356,8 +356,8 @@ Options like chunksize, sep etc</p>
 </section>
 <section id="terminusdb-reset">
 <h3>reset<a class="headerlink" href="#terminusdb-reset" title="Permalink to this headline"></a></h3>
-<p>Reset the head of the commit to a certain commit with id as input. Default to be a hard reset (newer commit will be wipped, not reversible).</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>terminusdb reset <span class="o">[</span>OPTIONS<span class="o">]</span> COMMIT
+<p>Reset the head of the commit to a certain commit with id as input. Default to be a hard reset (newer commit will be wipped, not reversible). If no commit is is provided, it will reset to the newest commit.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>terminusdb reset <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>COMMIT<span class="o">]</span>
 </pre></div>
 </div>
 <p class="rubric">Options</p>
@@ -371,7 +371,7 @@ Options like chunksize, sep etc</p>
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-terminusdb-reset-arg-COMMIT">
 <span id="cmdoption-terminusdb-reset-arg-commit"></span><span class="sig-name descname"><span class="pre">COMMIT</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-terminusdb-reset-arg-COMMIT" title="Permalink to this definition"></a></dt>
-<dd><p>Required argument</p>
+<dd><p>Optional argument</p>
 </dd></dl>
 
 </section>
