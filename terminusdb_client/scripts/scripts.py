@@ -40,17 +40,34 @@ def startproject():
         default="http://127.0.0.1:6363/",
     )
 
+    # if not local host
     if "http://127.0.0.1" not in server_location:
-
-        use_token = click.confirm("Are you using the TERMINUSDB_ACCESS_TOKEN?")
-        if use_token:
-            click.echo(
-                "Please make sure you have set up TERMINUSDB_ACCESS_TOKEN in your enviroment variables."
-            )
         team = click.prompt(
             "Please enter the team for login",
             type=str,
         )
+
+        use_token = click.confirm("Are you using JWT login?")
+
+        if use_token:
+            # set_token = click.confirm("Do you want to set up the TERMINUSDB_ACCESS_TOKEN?")
+
+            if click.confirm("Do you want to set up the TERMINUSDB_ACCESS_TOKEN?"):
+                # set token
+                jwt_token = click.prompt(
+                    "Please enter the JWT token",
+                    type=str,
+                    hide_input=True,
+                )
+                os.environ["TERMINUSDB_ACCESS_TOKEN"] = jwt_token
+
+                click.echo(
+                    "Token added as TERMINUSDB_ACCESS_TOKEN in your enviroment variables."
+                )
+            else:
+                click.echo(
+                    "Please make sure you have set up TERMINUSDB_ACCESS_TOKEN in your enviroment variables."
+                )
 
         # create config.json
         with open("config.json", "w") as outfile:
@@ -820,7 +837,7 @@ def reset(commit, soft):
         status["ref"] = None
         with open(".TDB", "w") as outfile:
             json.dump(status, outfile)
-        click.echo(f"Reset head to newest commit")
+        click.echo("Reset head to newest commit")
     elif soft:
         commit_ids = [item["commit"] for item in client.get_commit_history()]
         if commit not in commit_ids:

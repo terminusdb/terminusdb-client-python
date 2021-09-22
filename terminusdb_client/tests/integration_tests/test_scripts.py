@@ -12,7 +12,7 @@ def test_local_happy_path(docker_url):
     with runner.isolated_filesystem():
         result = runner.invoke(
             scripts.startproject,
-            input=f"{testdb}\n{docker_url}\no\n",
+            input=f"{testdb}\n{docker_url}\n\n",
         )
         assert result.exit_code == 0
         result = runner.invoke(scripts.commit)
@@ -85,7 +85,7 @@ def test_script_happy_path(terminusx_token):
     with runner.isolated_filesystem():
         result = runner.invoke(
             scripts.startproject,
-            input=f"{testdb}\n{endpoint}\nyes\nTerminusDBPythonClient\n",
+            input=f"{testdb}\n{endpoint}\nTerminusDBPythonClient\nyes\ny\n{terminusx_token}\n",
         )
         assert result.exit_code == 0
         with open("config.json") as file:
