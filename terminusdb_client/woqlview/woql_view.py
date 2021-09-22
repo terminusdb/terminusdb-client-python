@@ -17,6 +17,9 @@ REQUIRE_CONFIG = """require.config({
 
 class WOQLView:
     def __init__(self):
+        ### TODO: make WOQLView works again
+        raise InterfaceError("WOQLView is temporary not avaliable in this version")
+
         self.config = ""
         self.obj = None
         try:

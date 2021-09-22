@@ -665,6 +665,9 @@ class WOQLClient:
         str
         """
 
+        ### TODO: make triples works again
+        raise InterfaceError("get_triples is temporary not avaliable in this version")
+
         self._check_connection()
         self._validate_graph_type(graph_type)
         result = requests.get(
@@ -691,6 +694,11 @@ class WOQLClient:
         InterfaceError
             if the client does not connect to a database
         """
+        ### TODO: make triples works again
+        raise InterfaceError(
+            "update_triples is temporary not avaliable in this version"
+        )
+
         self._check_connection()
         self._validate_graph_type(graph_type)
         params = {"commit_info": self._generate_commit(commit_msg)}
@@ -722,6 +730,11 @@ class WOQLClient:
         InterfaceError
             if the client does not connect to a database
         """
+        ### TODO: make triples works again
+        raise InterfaceError(
+            "insert_triples is temporary not avaliable in this version"
+        )
+
         self._check_connection()
         self._validate_graph_type(graph_type)
         params = {"commit_info": self._generate_commit(commit_msg)}
