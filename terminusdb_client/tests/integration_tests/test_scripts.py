@@ -15,6 +15,7 @@ def test_local_happy_path(docker_url, test_csv):
             input=f"{testdb}\n{docker_url}\n\n",
         )
         assert result.exit_code == 0
+        # test commit and sync
         result = runner.invoke(scripts.commit)
         assert result.exit_code == 0
         assert f"{testdb} created." in result.output
