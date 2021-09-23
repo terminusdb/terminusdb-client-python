@@ -53,6 +53,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#terminusdb-branch">branch</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#terminusdb-checkout">checkout</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#terminusdb-commit">commit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#terminusdb-config">config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#terminusdb-deletedb">deletedb</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#terminusdb-exportcsv">exportcsv</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#terminusdb-importcsv">importcsv</a></li>
@@ -201,6 +202,27 @@
 <dt class="sig sig-object std" id="cmdoption-terminusdb-commit-m">
 <span id="cmdoption-terminusdb-commit-message"></span><span class="sig-name descname"><span class="pre">-m</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--message</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;message&gt;</span></span><a class="headerlink" href="#cmdoption-terminusdb-commit-m" title="Permalink to this definition"></a></dt>
 <dd><p>Commit message for the commit</p>
+</dd></dl>
+
+</section>
+<section id="terminusdb-config">
+<h3>config<a class="headerlink" href="#terminusdb-config" title="Permalink to this headline"></a></h3>
+<p>Show or set config.json of the project. To set a config, use &lt;key&gt;=&lt;value&gt;, e.g. streams=MyClass</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>terminusdb config <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>SET_CONFIG<span class="o">]</span>...
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-terminusdb-config-d">
+<span id="cmdoption-terminusdb-config-delete"></span><span class="sig-name descname"><span class="pre">-d</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--delete</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;delete&gt;</span></span><a class="headerlink" href="#cmdoption-terminusdb-config-d" title="Permalink to this definition"></a></dt>
+<dd><p>Keys of items in the config.json to be deleted</p>
+</dd></dl>
+
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-terminusdb-config-arg-SET_CONFIG">
+<span id="cmdoption-terminusdb-config-arg-set-config"></span><span class="sig-name descname"><span class="pre">SET_CONFIG</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-terminusdb-config-arg-SET_CONFIG" title="Permalink to this definition"></a></dt>
+<dd><p>Optional argument(s)</p>
 </dd></dl>
 
 </section>
