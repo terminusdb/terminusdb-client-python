@@ -26,7 +26,8 @@ def test_startproject():
             == "Current config:\ndatabase=mydb\nendpoint=http://127.0.0.1:6363/\nteam=admin\n"
         )
         result = runner.invoke(
-            scripts.config, ["test_key=test_value", "database=newdb"]
+            scripts.config,
+            ["test_key=test_value", "test_list=[value1, value2]", "database=newdb"],
         )
         assert result.exit_code == 0
         assert result.output == "config.json updated\n"
@@ -35,12 +36,13 @@ def test_startproject():
             assert setting.get("database") == "newdb"
             assert setting.get("endpoint") == "http://127.0.0.1:6363/"
             assert setting.get("test_key") == "test_value"
+            assert setting.get("test_list") == ["value1", "value2"]
         result = runner.invoke(scripts.config)
         assert (
             result.output
-            == "Current config:\ndatabase=newdb\nendpoint=http://127.0.0.1:6363/\nteam=admin\ntest_key=test_value\n"
+            == "Current config:\ndatabase=newdb\nendpoint=http://127.0.0.1:6363/\nteam=admin\ntest_key=test_value\ntest_list=['value1', 'value2']\n"
         )
-        result = runner.invoke(scripts.config, ["-d", "test_key"])
+        result = runner.invoke(scripts.config, ["-d", "test_key", "-d", "test_list"])
         assert result.exit_code == 0
         assert result.output == "config.json updated\n"
         with open("config.json") as file:
