@@ -767,6 +767,35 @@ def reset(commit, soft):
         click.echo(f"Hard reset to commit {commit}")
 
 
+@click.command()
+@click.argument("set_config", required=False, nargs=-1)
+@click.option(
+    "-d",
+    "--delete",
+    multiple=True,
+    help="Keys of items in the config.json to be deleted",
+)
+def config(set_config, delete):
+    """Show or set config.json of the project. To set a config, use <key>=<value>, e.g. streams=MyClass"""
+    settings = _load_settings()
+    # status = _load_settings(".TDB", check=[])
+    # settings.update(status)
+    if not set_config and not delete:
+        click.echo("Current config:")
+        for key, value in settings.items():
+            click.echo(f"{key}={value}")
+    else:
+        for item in set_config:
+            key = item.split("=")[0]
+            value = item.split("=")[1]
+            settings.update({key: value})
+        for item in delete:
+            settings.pop(item, None)
+        with open("config.json", "w") as outfile:
+            json.dump(settings, outfile)
+        click.echo("config.json updated")
+
+
 terminusdb.add_command(startproject)
 terminusdb.add_command(sync)
 terminusdb.add_command(commit)
@@ -780,3 +809,4 @@ terminusdb.add_command(rebase)
 terminusdb.add_command(status)
 terminusdb.add_command(log)
 terminusdb.add_command(reset)
+terminusdb.add_command(config)
