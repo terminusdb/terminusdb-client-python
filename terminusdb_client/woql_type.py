@@ -7,7 +7,7 @@ CONVERT_TYPE = {
     bool: "xsd:boolean",
     float: "xsd:decimal",
     int: "xsd:integer",
-    dt.datetime: "xsd:dataTime",
+    dt.datetime: "xsd:dateTime",
     dt.date: "xsd:date",
     dt.time: "xsd:time",
     dt.timedelta: "xsd:duration",
