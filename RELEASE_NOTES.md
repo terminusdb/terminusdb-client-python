@@ -1,5 +1,14 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.9
+
+### Bug Fixes / Improvements
+
+- Fix typo in from_woql_type
+- Add config command in CLI and Scaffolding tool
+
+---
+
 ## v10.0.8
 
 ### Bug Fixes / Improvements
