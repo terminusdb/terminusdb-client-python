@@ -776,7 +776,7 @@ def reset(commit, soft):
     help="Keys of items in the config.json to be deleted",
 )
 def config(set_config, delete):
-    """Show or set config.json of the project. To set a config, use <key>=<value>, e.g. streams=MyClass"""
+    """Show or set config.json of the project. To set a config, use <key>=<value>, e.g. streams=MyClass or streams=\"[Class1, Class2]\""""
     settings = _load_settings()
     # status = _load_settings(".TDB", check=[])
     # settings.update(status)
@@ -788,6 +788,9 @@ def config(set_config, delete):
         for item in set_config:
             key = item.split("=")[0]
             value = item.split("=")[1]
+            if value[0] == "[" and value[-1] == "]":  # it's a list
+                value = value.strip("[]").split(",")
+                value = list(map(lambda x: x.strip(), value))
             settings.update({key: value})
         for item in delete:
             settings.pop(item, None)
