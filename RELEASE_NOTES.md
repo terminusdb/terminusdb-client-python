@@ -1,5 +1,13 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.10
+
+### Bug Fixes / Improvements
+
+- Using `number` instead of `decimal` in `jsonschema`
+
+---
+
 ## v10.0.9
 
 ### Bug Fixes / Improvements
