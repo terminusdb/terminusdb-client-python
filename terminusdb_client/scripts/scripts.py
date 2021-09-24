@@ -419,7 +419,7 @@ def importcsv(
         class_dict = {"@type": "Class", "@id": class_name}
         np_to_buildin = {
             v: getattr(builtins, k)
-            for k, v in np.typeDict.items()
+            for k, v in np.sctypeDict.items()
             if k in vars(builtins)
         }
         np_to_buildin[np.datetime64] = dt.datetime
