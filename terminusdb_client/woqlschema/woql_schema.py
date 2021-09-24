@@ -501,8 +501,7 @@ class WOQLSchema:
             "string": str,
             "integer": int,
             "boolean": bool,
-            "number": int,
-            "decimal": float,
+            "number": float,
         }
 
         def convert_property(prop_name, prop):
@@ -596,7 +595,10 @@ class WOQLSchema:
                 if isinstance(item, str):
                     # datatype properties
                     if item[:4] == "xsd:":
-                        json_properties[key] = {"type": item[4:]}
+                        if item[4:] == "decimal":
+                            json_properties[key] = {"type": "number"}
+                        else:
+                            json_properties[key] = {"type": item[4:]}
                     # object properties
                     else:
                         if isinstance(class_object, dict):
@@ -627,12 +629,16 @@ class WOQLSchema:
                         item = item["@class"]
                         # datatype properties
                         if item[:4] == "xsd:":
+                            if item[4:] == "decimal":
+                                dtype = "number"
+                            else:
+                                dtype = item[4:]
                             if prop_type == "Optional":
-                                json_properties[key] = {"type": ["null", item[4:]]}
+                                json_properties[key] = {"type": ["null", dtype]}
                             else:
                                 json_properties[key] = {
                                     "type": "array",
-                                    "items": {"type": item[4:]},
+                                    "items": {"type": dtype},
                                 }
                         # object properties
                         else:
