@@ -1,9 +1,21 @@
+import csv
 import datetime as dt
 import json
 
 from click.testing import CliRunner
 
 from ...scripts import scripts
+
+
+def _check_csv(csv_file, output):
+    with open(csv_file) as file:
+        csvreader = csv.reader(file)
+        header = next(csvreader)
+        for item in header:
+            assert item.lower().replace(" ", "_") in output
+        for row in csvreader:
+            for item in row:
+                assert item in output
 
 
 def test_local_happy_path(docker_url, test_csv):
@@ -79,6 +91,8 @@ def test_local_happy_path(docker_url, test_csv):
         assert result.exit_code == 0
         result = runner.invoke(scripts.alldocs, ["--schema"])
         assert "Grades" in result.output
+        result = runner.invoke(scripts.alldocs, ["--type", "Grades"])
+        _check_csv("grades.csv", result.output)
         result = runner.invoke(
             scripts.exportcsv, ["Grades", "--filename", "new_grades.csv"]
         )
@@ -86,6 +100,7 @@ def test_local_happy_path(docker_url, test_csv):
         with open("new_grades.csv") as file:
             out_file = file.read()
             assert "Elephant" in out_file
+            _check_csv("grades.csv", out_file)
         # test alldocs and export with alldocs
         result = runner.invoke(scripts.alldocs, ["--type", "Grades", "-q", "grade=B-"])
         assert result.exit_code == 0
