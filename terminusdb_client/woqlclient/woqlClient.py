@@ -748,8 +748,14 @@ class WOQLClient:
         return json.loads(_finish_response(result))
 
     def query_document(
-        self, document_template: dict, graph_type: str = "instance", **kwargs
-    ) -> Iterable:
+        self,
+        document_template: dict,
+        graph_type: str = "instance",
+        skip: int = 0,
+        count: Optional[int] = None,
+        as_list: bool = False,
+        **kwargs,
+    ) -> Union[Iterable, list]:
         """Retrieves all documents that match a given document template
 
         Parameters
@@ -772,8 +778,10 @@ class WOQLClient:
         self._check_connection()
 
         payload = {"query": document_template, "graph_type": graph_type}
-
-        add_args = ["prefixed", "minimized", "unfold", "skip", "count"]
+        payload["skip"] = skip
+        if count is not None:
+            payload["count"] = count
+        add_args = ["prefixed", "minimized", "unfold"]
         for the_arg in add_args:
             if the_arg in kwargs:
                 payload[the_arg] = kwargs[the_arg]
