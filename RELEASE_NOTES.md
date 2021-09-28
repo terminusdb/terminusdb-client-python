@@ -1,5 +1,15 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.11
+
+### Bug Fixes / Improvements
+
+- Make `query_document` parallel with `get_documents_by_type`
+- pass message printing from `_sync` to `sync`,
+- add `--head` option for `alldocs`
+
+---
+
 ## v10.0.10
 
 ### Bug Fixes / Improvements
