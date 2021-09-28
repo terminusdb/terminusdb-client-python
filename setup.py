@@ -29,7 +29,7 @@ extras_require = {"dataframe": ["numpy >= 1.13.0", "pandas >= 0.23.0"]}
 
 setuptools.setup(
     name="terminusdb-client",
-    version="10.0.10",
+    version="10.0.11",
     author="TerminusDB group",
     author_email="terminusdatabase@gmail.com",
     description="Python client for Terminus DB",
