@@ -117,6 +117,8 @@ def startproject():
 def _load_settings(filename="config.json", check=("endpoint", "database")):
     with open(filename) as input_file:
         config = json.load(input_file)
+        if not config:
+            raise RuntimeError(f"Cannot load in {filename}")
     for item in check:
         if config.get(item) is None:
             raise InterfaceError(f"'{item}' setting cannot be found.")
@@ -281,9 +283,9 @@ def _sync(client):
         file = open("schema.py", "w")
         file.write(print_script)
         file.close()
-        click.echo(f"schema.py is updated with {client.db} schema.")
+        return f"schema.py is updated with {client.db} schema."
     else:
-        click.echo(f"{client.db} schema is empty so schema.py has not be changed.")
+        return f"{client.db} schema is empty so schema.py has not be changed."
 
 
 @click.command()
@@ -295,7 +297,7 @@ def sync():
     settings["database"]
     client, msg = _connect(settings, new_db=False)
     click.echo(msg)
-    _sync(client)
+    click.echo(_sync(client))
 
 
 @click.command()
@@ -570,19 +572,24 @@ def exportcsv(class_obj, keepid, maxdep, filename=None):
 
 
 @click.command()
-@click.option("--schema", is_flag=True, help="Specify if getting schema object instead")
-@click.option("--type", "type_", help="Type of the objects to be getting back")
+@click.option(
+    "-s", "--schema", is_flag=True, help="Specify if getting schema object instead"
+)
+@click.option("-t", "--type", "type_", help="Type of the objects to be getting back")
 @click.option(
     "-q",
     "--query",
     multiple=True,
-    help="Use query to filter out objects getting back. Need to be used with --type",
+    help="Use query to filter out objects getting back. Need to be used with -t/--type",
+)
+@click.option(
+    "-h", "--head", help="Show/ export only set number of documents max", type=int
 )
 @click.option(
     "-e",
     "--export",
     is_flag=True,
-    help="Specify if the result to be export as CSV. Only usable when using –type and not –schema",
+    help="Specify if the result to be export as CSV. Only usable when using –t/--type and not -s/-–schema",
 )
 @click.option(
     "--keepid",
@@ -596,7 +603,7 @@ def exportcsv(class_obj, keepid, maxdep, filename=None):
     help="Option for export: specify the depth of the embedding operation",
 )
 @click.option("--filename", help="Option for export: file name if the exported file")
-def alldocs(schema, type_, query, export, keepid, maxdep, filename=None):
+def alldocs(schema, type_, query, head, export, keepid, maxdep, filename=None):
     """Get all documents in the database, use --schema to specify schema, --type to select type and -q to make queries (e.g. -q date=2021-07-01)
 
     If using --type and not --schema, can export using -e with options: --keepid, --maxdep and --filename"""
@@ -608,10 +615,10 @@ def alldocs(schema, type_, query, export, keepid, maxdep, filename=None):
         if type_:
             click.echo(client.get_document(type_, graph_type="schema"))
         else:
-            click.echo(list(client.get_all_documents(graph_type="schema")))
+            click.echo(list(client.get_all_documents(graph_type="schema", count=head)))
     elif type_:
         if not query:
-            result = list(client.get_documents_by_type(type_))
+            result = list(client.get_documents_by_type(type_, count=head))
         else:
             schema_dict = client.get_document(type_, graph_type="schema")
             query_dict = {"@type": type_}
@@ -634,7 +641,7 @@ def alldocs(schema, type_, query, export, keepid, maxdep, filename=None):
                 else:
                     pair[1] = pair[1]  # don't quote in query
                 query_dict[pair[0]] = pair[1]
-            result = list(client.query_document(query_dict, optimize=True))
+            result = list(client.query_document(query_dict, optimize=True, count=head))
         if export:
             df = result_to_df(result, keepid, maxdep, client)
             if filename is None:
@@ -646,7 +653,7 @@ def alldocs(schema, type_, query, export, keepid, maxdep, filename=None):
         else:
             click.echo(result)
     else:
-        click.echo(list(client.get_all_documents()))
+        click.echo(list(client.get_all_documents(count=head)))
 
 
 @click.command()
