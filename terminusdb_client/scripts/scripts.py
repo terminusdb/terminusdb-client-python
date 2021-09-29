@@ -802,7 +802,7 @@ def config(set_config, delete):
         for item in delete:
             settings.pop(item, None)
         with open("config.json", "w") as outfile:
-            json.dump(settings, outfile)
+            json.dump(settings, outfile, sort_keys=True, indent=4)
         click.echo("config.json updated")
 
 
