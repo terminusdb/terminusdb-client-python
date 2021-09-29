@@ -18,7 +18,12 @@ from ..woqlclient.woqlClient import WOQLClient
 class TerminusKey:
     def __init__(self, keys: Union[str, list, None] = None):
         if keys is not None:
-            self._keys = keys
+            if isinstance(keys, str):
+                self._keys = [keys]
+            elif isinstance(keys, list):
+                self._keys = keys
+            else:
+                ValueError(f"keys need to be either str or list but got {keys}")
 
     def _idgen_prep(self, obj: Union["DocumentTemplate", dict]):
         """Helper function to prepare prefix and key_list for idgen to use."""
