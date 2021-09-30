@@ -329,25 +329,44 @@ class TaggedUnion(DocumentTemplate):
 
 class WOQLSchema:
     def __init__(
-        self, title=None, description=None, authors=None, schema_ref=None, base_ref=None
+        self,
+        title: Optional[str] = None,
+        description: Optional[str] = None,
+        authors: Optional[List[str]] = None,
+        schema_ref=None,
+        base_ref=None,
     ):
         self.object = {}
         self._all_existing_classes = {}
-        self.context = {
+        self.title = title
+        self.description = description
+        self.authors = authors
+        self.schema_ref = schema_ref
+        self.base_ref = base_ref
+
+    @property
+    def context(self):
+        if self.title is None:
+            title = ""
+        else:
+            title = self.title
+        if self.description is None:
+            description = ""
+        else:
+            description = self.description
+        documentation = {"@title": title, "@description": description}
+        if self.authors is not None:
+            documentation["@authors"] = self.authors
+        return {
             "@type": "@context",
-            "@schema": schema_ref,
-            "@base": base_ref,
-            "xsd": "http://www.w3.org/2001/XMLSchema#",
+            "@documentation": documentation,
+            "@schema": self.schema_ref,
+            "@base": self.base_ref,
         }
-        documentation = {}
-        if title is not None:
-            documentation["@title"] = title
-        if description is not None:
-            documentation["@description"] = description
-        if title is not None:
-            documentation["@authors"] = authors
-        if documentation:
-            self.context["@documentation"] = documentation
+
+    @context.setter
+    def context(self, value):
+        raise Exception("Cannot set context")
 
     def _contruct_class(self, class_obj_dict):
         # if the class is already constructed properly
@@ -454,20 +473,50 @@ class WOQLSchema:
         self.add_obj(class_obj_dict["@id"], new_class)
         return new_class
 
-    def commit(self, client: WOQLClient, commit_msg: Optional[str] = None):
+    def _contruct_context(self, context_dict):
+        documentation = context_dict.get("@documentation")
+        if documentation:
+            if documentation.get("@title"):
+                self.title = documentation["@title"]
+            if documentation.get("@description"):
+                self.description = documentation["@description"]
+            if documentation.get("@authors"):
+                self.authors = documentation["@authors"]
+        self.base_ref = context_dict.get("@base")
+        self.schema_ref = context_dict.get("@schema")
+
+    def commit(
+        self, client: WOQLClient, commit_msg: Optional[str] = None, full_replace=False
+    ):
+        """Commit the schema to database
+
+        Parameters
+        ----------
+        client: WOQLClient
+            A client that is connected to a database.
+        commit_msg : str
+            Commit message.
+        full_replace : bool
+            Does the commit fully wiped out the old shcema graph. Default to be False.
+        """
         if self.context["@schema"] is None or self.context["@base"] is None:
             prefixes = client._get_prefixes()
             if self.context["@schema"] is None:
-                self.context["@schema"] = prefixes["@schema"]
+                self.schema_ref = prefixes["@schema"]
             if self.context["@base"] is None:
-                self.context["@base"] = prefixes["@base"]
+                self.base_ref = prefixes["@base"]
         if commit_msg is None:
             commit_msg = "Schema object insert/ update by Python client."
-        client.update_document(
-            self,
-            commit_msg=commit_msg,
-            graph_type="schema",
-        )
+        if full_replace:
+            client.insert_document(
+                self, commit_msg=commit_msg, graph_type="schema", full_replace=True
+            )
+        else:
+            client.update_document(
+                self,
+                commit_msg=commit_msg,
+                graph_type="schema",
+            )
 
     def from_db(self, client: WOQLClient, select: Optional[List[str]] = None):
         """Load classes in the database shcema into schema
@@ -485,6 +534,8 @@ class WOQLSchema:
             item_id = item.get("@id")
             if item_id:
                 self._all_existing_classes[item_id] = item
+            elif item.get("@type") == "@context":
+                self._contruct_context(item)
 
         for item_id, class_obj_dict in self._all_existing_classes.items():
             if select is None or (select is not None and item_id in select):

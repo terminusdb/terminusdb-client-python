@@ -1006,12 +1006,6 @@ class WOQLClient:
         """
         self._validate_graph_type(graph_type)
         self._check_connection()
-        # if full_replace:
-        #     # check_type("document", document, List[dict])
-        #     if document[0].get("@type") != "@context":
-        #         raise ValueError(
-        #             "The first item in docuemnts need to be dictionary representing the context object."
-        #         )
         params = self._generate_commit(commit_msg)
         params["graph_type"] = graph_type
         if full_replace:
@@ -1047,8 +1041,7 @@ class WOQLClient:
                 warnings.warn(
                     "To replace context, need to use `full_replace` or `replace_document`, skipping context object now."
                 )
-                document = document[1:]
-
+                document.pop(0)
         result = requests.post(
             self._documents_url(),
             headers={"user-agent": f"terminusdb-client-python/{__version__}"},
@@ -1132,8 +1125,6 @@ class WOQLClient:
         self._validate_graph_type(graph_type)
         self._check_connection()
 
-        # all_existing_obj = self.get_all_documents(graph_type=graph_type)
-        # all_existing_id = list(map(lambda x: x.get("@id"), all_existing_obj))
         all_existing_id = self.get_existing_classes()
         insert_docs = []
         update_docs = []

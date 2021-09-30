@@ -11,16 +11,13 @@ import click
 from shed import shed
 from tqdm import tqdm
 
-# from terminusdb_client.woqlschema.woql_schema import TerminusClass
 import terminusdb_client.woqlschema.woql_schema as woqlschema
 
 from .. import woql_type as wt
 from ..errors import InterfaceError
-
-# from ..woql_type import from_woql_type
 from ..woqlclient.woqlClient import WOQLClient
 from ..woqldataframe.woqlDataframe import result_to_df
-from ..woqlschema.woql_schema import LexicalKey, RandomKey
+from ..woqlschema.woql_schema import LexicalKey, RandomKey, WOQLSchema
 
 
 @click.group()
@@ -204,7 +201,18 @@ def _create_script(obj_list):
 # Use 'terminusdb commit' to commit changes to the database and
 # use 'terminusdb sync' to change this file according to
 # the exsisting database schema
-####\n\n"""
+####\n"""
+    context = obj_list.pop(0)
+    documentation = context.get("@documentation")
+    if documentation:
+        print_script += '"""\n'
+        if documentation.get("@title"):
+            print_script += "Title: " + documentation["@title"] + "\n"
+        if documentation.get("@description"):
+            print_script += "Description: " + documentation["@description"] + "\n"
+        if documentation.get("@authors"):
+            print_script += "Authors: " + ", ".join(documentation["@authors"]) + "\n"
+        print_script += '"""\n'
     for obj_str in dir(woqlschema):
         obj = eval(f"woqlschema.{obj_str}")  # noqa: S307
         if (
@@ -273,10 +281,11 @@ def _create_script(obj_list):
 
 
 def _sync(client):
-    all_existing_obj = client.get_all_documents(graph_type="schema")
-    all_obj_list = []
-    for obj in all_existing_obj:
-        all_obj_list.append(obj)
+    # all_existing_obj = client.get_all_documents(graph_type="schema")
+    # all_obj_list = []
+    # for obj in all_existing_obj:
+    #     all_obj_list.append(obj)
+    all_obj_list = client.get_all_documents(graph_type="schema", as_list=True)
     if len(all_obj_list) > 1:
         print_script = _create_script(all_obj_list)
         print_script = shed(source_code=print_script)
@@ -316,19 +325,37 @@ def commit(message):
     click.echo(msg)
     sys.path.append(os.getcwd())
     schema_plan = __import__("schema", globals(), locals(), [], 0)
-    all_obj = []
+    last_item = None
+    documentation = {}
+    for line in schema_plan.__doc__.split("\n"):
+        if "Title:" in line:
+            documentation["title"] = line[6:].strip()
+            last_tiem = documentation["title"]
+        elif "Description:" in line:
+            documentation["description"] = line[12:].strip()
+            last_tiem = documentation["description"]
+        elif "Authors:" in line:
+            documentation["authors"] = line[8:].strip()
+            last_tiem = documentation["authors"]
+        elif last_item is not None:
+            last_item += "\n" + line.strip()
+    authors = documentation.get("authors")
+    if authors:
+        authors = documentation["authors"].split(",")
+        authors = list(map(lambda x: x.strip(), authors))
+    schema_obj = WOQLSchema(
+        title=documentation.get("title"),
+        description=documentation.get("description"),
+        authors=authors,
+    )
     for obj_str in dir(schema_plan):
         obj = eval(f"schema_plan.{obj_str}")  # noqa: S307
         if isinstance(obj, woqlschema.TerminusClass) or isinstance(obj, enum.EnumMeta):
             if obj_str not in ["DocumentTemplate", "EnumTemplate", "TaggedUnion"]:
-                all_obj.append(obj)
+                schema_obj.add_obj(obj.__name__, obj)
     if message is None:
         message = "Schema updated by Python client."
-    client.update_document(
-        all_obj,
-        commit_msg=message,
-        graph_type="schema",
-    )
+    schema_obj.commit(client, commit_msg=message, full_replace=True)
     click.echo(f"{database} schema updated.")
 
 

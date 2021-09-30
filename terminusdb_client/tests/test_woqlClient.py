@@ -371,7 +371,7 @@ def test_full_replace_fail(mocked_requests):
 
 
 @mock.patch("requests.get", side_effect=mocked_requests_get)
-def test_insert_WOQLSchema_fail(mocked_requests):
+def test_insert_woqlschema_fail(mocked_requests):
     woql_client = WOQLClient("http://localhost:6363")
     woql_client.connect(db="myDBName")
     with pytest.raises(InterfaceError):

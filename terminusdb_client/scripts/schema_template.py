@@ -5,7 +5,11 @@
 # use 'terminusdb sync' to change this file according to
 # the exsisting database schema
 ####
-
+"""
+Title: This is an Example
+Description: Example to show how schema works
+Authors: TerminusDB, Cheuk
+"""
 from typing import List, Optional, Set
 
 from terminusdb_client.woqlschema import (
