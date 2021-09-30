@@ -7,7 +7,8 @@ import pytest
 import requests
 
 from terminusdb_client.errors import InterfaceError
-from terminusdb_client.woqlclient.woqlClient import WOQLClient
+from terminusdb_client.woqlclient import WOQLClient
+from terminusdb_client.woqlschema import WOQLSchema
 
 from ..__version__ import __version__
 from .woqljson.woqlStarJson import WoqlStar
@@ -357,3 +358,23 @@ def test_set_db(mocked_requests):
     woql_client.set_db("myDBName")
     assert woql_client.db == "myDBName"
     assert woql_client.repo == "local"
+
+
+@mock.patch("requests.get", side_effect=mocked_requests_get)
+def test_full_replace_fail(mocked_requests):
+    woql_client = WOQLClient("http://localhost:6363")
+    woql_client.connect(db="myDBName")
+    with pytest.raises(ValueError):
+        woql_client.insert_document(
+            [{"not_context": "no context provided"}], full_replace=True
+        )
+    with pytest.raises(TypeError):
+        woql_client.insert_document(WOQLSchema(), full_replace=True)
+
+
+@mock.patch("requests.get", side_effect=mocked_requests_get)
+def test_insert_WOQLSchema_fail(mocked_requests):
+    woql_client = WOQLClient("http://localhost:6363")
+    woql_client.connect(db="myDBName")
+    with pytest.raises(InterfaceError):
+        woql_client.insert_document(WOQLSchema(), graph_type="instance")

@@ -1008,8 +1008,8 @@ class WOQLClient:
         self._validate_graph_type(graph_type)
         self._check_connection()
         if full_replace:
-            check_type("documents", documents, List[dict])
-            if documents[0].get("@type") and documents[0].get("@type") != "@context":
+            check_type("document", document, List[dict])
+            if document[0].get("@type") != "@context":
                 raise ValueError(
                     "The first item in docuemnts need to be dictionary representing the context object."
                 )
