@@ -1024,6 +1024,10 @@ class WOQLClient:
                 new_doc.append(item_dict)
             document = new_doc
         else:
+            if hasattr(document, "to_dict") and graph_type != "schema":
+                raise InterfaceError(
+                    "Inserting WOQLSchema object into non-schema graph."
+                )
             document = self._conv_to_dict(document)
         result = requests.post(
             self._documents_url(),
@@ -1077,6 +1081,10 @@ class WOQLClient:
                 # id_list.append(item_dict['@id'])
             document = new_doc
         else:
+            if hasattr(document, "to_dict") and graph_type != "schema":
+                raise InterfaceError(
+                    "Inserting WOQLSchema object into non-schema graph."
+                )
             document = self._conv_to_dict(document)
         _finish_response(
             requests.put(
