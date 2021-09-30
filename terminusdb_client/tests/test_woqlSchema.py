@@ -174,6 +174,10 @@ def test_idgen():
     assert cheuk._id[: len("Country/")] == "Country/"
 
 
+def test_context():
+    assert my_schema.to_dict()[0].get("@type") == "@context"
+
+
 # def test_schema_delete():
 #     other_schema.delete_property(Title)
 #     assert other_schema.all_obj() == {Employee, Address, Team}

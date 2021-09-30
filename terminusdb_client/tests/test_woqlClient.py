@@ -368,8 +368,6 @@ def test_full_replace_fail(mocked_requests):
         woql_client.insert_document(
             [{"not_context": "no context provided"}], full_replace=True
         )
-    with pytest.raises(TypeError):
-        woql_client.insert_document(WOQLSchema(), full_replace=True)
 
 
 @mock.patch("requests.get", side_effect=mocked_requests_get)

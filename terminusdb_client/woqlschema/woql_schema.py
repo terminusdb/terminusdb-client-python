@@ -328,9 +328,26 @@ class TaggedUnion(DocumentTemplate):
 
 
 class WOQLSchema:
-    def __init__(self):
+    def __init__(
+        self, title=None, description=None, authors=None, schema_ref=None, base_ref=None
+    ):
         self.object = {}
         self._all_existing_classes = {}
+        self.context = {
+            "@type": "@context",
+            "@schema": schema_ref,
+            "@base": base_ref,
+            "xsd": "http://www.w3.org/2001/XMLSchema#",
+        }
+        documentation = {}
+        if title is not None:
+            documentation["@title"] = title
+        if description is not None:
+            documentation["@description"] = description
+        if title is not None:
+            documentation["@authors"] = authors
+        if documentation:
+            self.context["@documentation"] = documentation
 
     def _contruct_class(self, class_obj_dict):
         # if the class is already constructed properly
@@ -438,6 +455,12 @@ class WOQLSchema:
         return new_class
 
     def commit(self, client: WOQLClient, commit_msg: Optional[str] = None):
+        if self.context["@schema"] is None or self.context["@base"] is None:
+            prefixes = client._get_prefixes()
+            if self.context["@schema"] is None:
+                self.context["@schema"] = prefixes["@schema"]
+            if self.context["@base"] is None:
+                self.context["@base"] = prefixes["@base"]
         if commit_msg is None:
             commit_msg = "Schema object insert/ update by Python client."
         client.update_document(
@@ -572,7 +595,7 @@ class WOQLSchema:
 
     def to_dict(self):
         """Return the schema in the TerminusDB dictionary format"""
-        return list(map(lambda cls: cls._to_dict(), self.all_obj()))
+        return [self.context] + list(map(lambda cls: cls._to_dict(), self.all_obj()))
 
     def to_json_schema(self, class_object: Union[str, dict]):
         """Return the schema in the json schema (http://json-schema.org/) format as a dictionary for the class object.

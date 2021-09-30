@@ -11,7 +11,6 @@ from enum import Enum
 from typing import Any, Dict, List, Optional, Union
 
 import requests
-from typeguard import check_type
 
 from ..__version__ import __version__
 from ..errors import InterfaceError
@@ -1007,12 +1006,12 @@ class WOQLClient:
         """
         self._validate_graph_type(graph_type)
         self._check_connection()
-        if full_replace:
-            check_type("document", document, List[dict])
-            if document[0].get("@type") != "@context":
-                raise ValueError(
-                    "The first item in docuemnts need to be dictionary representing the context object."
-                )
+        # if full_replace:
+        #     # check_type("document", document, List[dict])
+        #     if document[0].get("@type") != "@context":
+        #         raise ValueError(
+        #             "The first item in docuemnts need to be dictionary representing the context object."
+        #         )
         params = self._generate_commit(commit_msg)
         params["graph_type"] = graph_type
         if full_replace:
@@ -1032,6 +1031,24 @@ class WOQLClient:
                     "Inserting WOQLSchema object into non-schema graph."
                 )
             document = self._conv_to_dict(document)
+
+        if len(document) == 0:
+            return
+        elif not isinstance(document, list):
+            document = [document]
+
+        if full_replace:
+            if document[0].get("@type") != "@context":
+                raise ValueError(
+                    "The first item in docuemnt need to be dictionary representing the context object."
+                )
+        else:
+            if document[0].get("@type") == "@context":
+                warnings.warn(
+                    "To replace context, need to use `full_replace` or `replace_document`, skipping context object now."
+                )
+                document = document[1:]
+
         result = requests.post(
             self._documents_url(),
             headers={"user-agent": f"terminusdb-client-python/{__version__}"},
@@ -1115,14 +1132,17 @@ class WOQLClient:
         self._validate_graph_type(graph_type)
         self._check_connection()
 
-        all_existing_obj = self.get_all_documents(graph_type=graph_type)
-        all_existing_id = list(map(lambda x: x.get("@id"), all_existing_obj))
+        # all_existing_obj = self.get_all_documents(graph_type=graph_type)
+        # all_existing_id = list(map(lambda x: x.get("@id"), all_existing_obj))
+        all_existing_id = self.get_existing_classes()
         insert_docs = []
         update_docs = []
+        context_obj = None
         if isinstance(document, list):
             update_list = document
-        elif hasattr(document, "all_obj"):
+        elif hasattr(document, "all_obj"):  # it's WOQLSchema
             update_list = document.all_obj()
+            context_obj = document.context
         else:
             update_list = [document]
 
@@ -1131,13 +1151,18 @@ class WOQLClient:
                 obj_id = obj._id
             elif hasattr(obj, "_to_dict"):
                 obj_id = obj._to_dict().get("@id")
-            else:
+            elif obj.get("@id"):
                 obj_id = obj.get("@id")
+            else:
+                context_obj = obj
 
             if obj_id is not None and obj_id in all_existing_id:
                 update_docs.append(obj)
             else:
                 insert_docs.append(obj)
+
+        if context_obj is not None:
+            update_docs = [context_obj] + update_docs
 
         if graph_type == "schema":
             stuff = "Schema object"

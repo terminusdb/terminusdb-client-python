@@ -52,42 +52,47 @@ def test_local_happy_path(docker_url, test_csv):
         result = runner.invoke(scripts.rebase, ["main"])
         assert result.exit_code == 0
         assert "Rebased main branch." in result.output
+        # # test log and time travel
+        # result = runner.invoke(scripts.log)
+        # assert result.exit_code == 0
+        # assert "Schema updated by Python client." in result.output
+        # first_commit = result.output.split("\n")[2].split(" ")[-1]
+        # result = runner.invoke(scripts.commit, ["-m", "My message"])
+        # result = runner.invoke(scripts.log)
+        # assert "My message" in result.output
+        # result = runner.invoke(scripts.reset, ["--soft", first_commit])
+        # assert result.exit_code == 0
+        # with open(".TDB") as file:
+        #     setting = json.load(file)
+        #     assert setting.get("branch") == "new"
+        #     assert setting.get("ref") == first_commit
+        # result = runner.invoke(scripts.status)
+        # assert (
+        #     f"Connecting to '{testdb}' at '{docker_url}'\non branch 'new'\nwith team 'admin'\nat commit '{first_commit}'"
+        #     in result.output
+        # )
+        # result = runner.invoke(scripts.log)
+        # assert "My message" in result.output
+        # result = runner.invoke(scripts.reset)
+        # assert "Reset head to newest commit" in result.output
+        # with open(".TDB") as file:
+        #     setting = json.load(file)
+        #     assert setting.get("branch") == "new"
+        #     assert setting.get("ref") is None
+        # result = runner.invoke(scripts.reset, [first_commit])
+        # assert result.exit_code == 0
+        # result = runner.invoke(scripts.log)
+        # assert "My message" not in result.output
+        # assert "Schema updated by Python client." in result.output
         # test log and time travel
         result = runner.invoke(scripts.log)
         assert result.exit_code == 0
         assert "Schema updated by Python client." in result.output
         first_commit = result.output.split("\n")[2].split(" ")[-1]
-        result = runner.invoke(scripts.commit, ["-m", "My message"])
-        result = runner.invoke(scripts.log)
-        assert "My message" in result.output
-        result = runner.invoke(scripts.reset, ["--soft", first_commit])
-        assert result.exit_code == 0
-        with open(".TDB") as file:
-            setting = json.load(file)
-            assert setting.get("branch") == "new"
-            assert setting.get("ref") == first_commit
-        result = runner.invoke(scripts.status)
-        assert (
-            f"Connecting to '{testdb}' at '{docker_url}'\non branch 'new'\nwith team 'admin'\nat commit '{first_commit}'"
-            in result.output
-        )
-        result = runner.invoke(scripts.log)
-        assert "My message" in result.output
-        result = runner.invoke(scripts.reset)
-        assert "Reset head to newest commit" in result.output
-        with open(".TDB") as file:
-            setting = json.load(file)
-            assert setting.get("branch") == "new"
-            assert setting.get("ref") is None
-        result = runner.invoke(scripts.reset, [first_commit])
-        assert result.exit_code == 0
-        result = runner.invoke(scripts.log)
-        assert "My message" not in result.output
-        assert "Schema updated by Python client." in result.output
         # test import export csv
         with open("grades.csv", "w") as writer:
             writer.write(test_csv)
-        result = runner.invoke(scripts.importcsv, ["grades.csv"])
+        result = runner.invoke(scripts.importcsv, ["grades.csv", "-m", "My message"])
         assert result.exit_code == 0
         result = runner.invoke(scripts.alldocs, ["--schema"])
         assert "Grades" in result.output
@@ -121,6 +126,33 @@ def test_local_happy_path(docker_url, test_csv):
         with open("query_result.csv") as file:
             out_file = file.read()
             assert "B-" in out_file
+        # cont' test log and time travel
+        result = runner.invoke(scripts.log)
+        assert "My message" in result.output
+        result = runner.invoke(scripts.reset, ["--soft", first_commit])
+        assert result.exit_code == 0
+        with open(".TDB") as file:
+            setting = json.load(file)
+            assert setting.get("branch") == "new"
+            assert setting.get("ref") == first_commit
+        result = runner.invoke(scripts.status)
+        assert (
+            f"Connecting to '{testdb}' at '{docker_url}'\non branch 'new'\nwith team 'admin'\nat commit '{first_commit}'"
+            in result.output
+        )
+        result = runner.invoke(scripts.log)
+        assert "My message" in result.output
+        result = runner.invoke(scripts.reset)
+        assert "Reset head to newest commit" in result.output
+        with open(".TDB") as file:
+            setting = json.load(file)
+            assert setting.get("branch") == "new"
+            assert setting.get("ref") is None
+        result = runner.invoke(scripts.reset, [first_commit])
+        assert result.exit_code == 0
+        result = runner.invoke(scripts.log)
+        assert "My message" not in result.output
+        assert "Schema updated by Python client." in result.output
         # deletedb
         result = runner.invoke(scripts.deletedb, input="y\n")
         assert result.exit_code == 0
