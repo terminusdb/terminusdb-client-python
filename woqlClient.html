@@ -661,6 +661,7 @@ and the new value will be used in future requests to the server.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>document</strong> (<em>dict</em><em> or </em><em>list of dict</em>) – Document(s) to be inserted.</p></li>
 <li><p><strong>graph_type</strong> (<em>str</em>) – Graph type, either “inference”, “instance” or “schema”.</p></li>
+<li><p><strong>full_replace:</strong> – bool: If True then the whole graph will be replaced. WARNING: you should also supply the context object as the first element in the list of documents  if using this option.</p></li>
 <li><p><strong>commit_msg</strong> (<em>str</em>) – Commit message.</p></li>
 </ul>
 </dd>
