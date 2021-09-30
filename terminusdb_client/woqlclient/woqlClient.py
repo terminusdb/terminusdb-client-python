@@ -11,6 +11,7 @@ from enum import Enum
 from typing import Any, Dict, List, Optional, Union
 
 import requests
+from typeguard import check_type
 
 from ..__version__ import __version__
 from ..errors import InterfaceError
@@ -989,6 +990,8 @@ class WOQLClient:
             Document(s) to be inserted.
         graph_type : str
             Graph type, either "inference", "instance" or "schema".
+        full_replace:: bool
+            If True then the whole graph will be replaced. WARNING: you should also supply the context object in the list of documents  if using this option.
         commit_msg : str
             Commit message.
 
@@ -1004,6 +1007,12 @@ class WOQLClient:
         """
         self._validate_graph_type(graph_type)
         self._check_connection()
+        if full_replace:
+            check_type("documents", documents, List[dict])
+            if documents[0].get("@type") and documents[0].get("@type") != "@context":
+                raise ValueError(
+                    "The first item in docuemnts need to be dictionary representing the context object."
+                )
         params = self._generate_commit(commit_msg)
         params["graph_type"] = graph_type
         params["full_replace"] = full_replace
