@@ -1015,7 +1015,10 @@ class WOQLClient:
                 )
         params = self._generate_commit(commit_msg)
         params["graph_type"] = graph_type
-        params["full_replace"] = full_replace
+        if full_replace:
+            params["full_replace"] = "true"
+        else:
+            params["full_replace"] = "false"
 
         if isinstance(document, list):
             new_doc = []
