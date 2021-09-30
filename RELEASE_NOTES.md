@@ -1,12 +1,24 @@
 # TerminusDB Python Client Release Notes
 
+
+## v10.0.12
+
+### Bug Fixes / Improvements
+
+
+- Improvement in `insert_docuemnts` with `full_replace=True` option
+- WOQLSchema now can store the `@context` of the schema
+- Allow documentation of schema in `schema.py`
+
+---
+
 ## v10.0.11
 
 ### Bug Fixes / Improvements
 
 - Make `query_document` parallel with `get_documents_by_type`
-- pass message printing from `_sync` to `sync`,
-- add `--head` option for `alldocs`
+- Pass message printing from `_sync` to `sync`,
+- Add `--head` option for `alldocs`
 
 ---
 
