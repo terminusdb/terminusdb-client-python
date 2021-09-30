@@ -990,7 +990,7 @@ class WOQLClient:
         graph_type : str
             Graph type, either "inference", "instance" or "schema".
         full_replace:: bool
-            If True then the whole graph will be replaced. WARNING: you should also supply the context object in the list of documents  if using this option.
+            If True then the whole graph will be replaced. WARNING: you should also supply the context object as the first element in the list of documents  if using this option.
         commit_msg : str
             Commit message.
 
