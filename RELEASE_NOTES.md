@@ -1,5 +1,13 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.13
+
+### Bug Fixes / Improvements
+
+
+- Cast `--id` and `-e` columns in `importcsv` as string when `read_csv`
+
+---
 
 ## v10.0.12
 
