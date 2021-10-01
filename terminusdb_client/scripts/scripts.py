@@ -402,7 +402,7 @@ def deletedb():
     "--na",
     default="optional",
     type=click.Choice(["skip", "optional", "error"], case_sensitive=False),
-    help="Specify how to handle NAs: 'skip' will skip entries with NAs, 'optional' will make all properties optional in the database, 'error' will just thow an error if there's NAs",
+    help="Specify how to handle NAs: 'skip' will skip entries with NAs, 'optional' will make all properties optional in the database, 'error' will just throw an error if there's NAs",
 )
 @click.option(
     "--id", "id_", help="Specify column to be used as ids instead of generated ids"
@@ -413,7 +413,12 @@ def deletedb():
     "--message",
     help="Commit message for the import",
 )
-@click.option("--sep", default=",", show_default=True)
+@click.option(
+    "--sep",
+    default=",",
+    show_default=True,
+    help="Specify separator character in the CSV",
+)
 # @click.option('--header ', default=',', show_default=True)
 def importcsv(
     csv_file, keys, class_name, chunksize, schema, na, id_, embedded, message, sep
@@ -422,11 +427,15 @@ def importcsv(
     Options like chunksize, sep etc"""
     # If chunksize is too small, pandas may decide certain column to be integer if all values in the 1st chunk are 0.0. This can be problmetic for some cases.
     na = na.lower()
+    dtype = None
     if id_:
+        dtype = {id_: "object"}
         id_ = id_.lower().replace(" ", "_")
     if keys:
         keys = list(map(lambda x: x.lower().replace(" ", "_"), keys))
     if embedded:
+        for item in embedded:
+            dtype[item] = "object"
         embedded = list(map(lambda x: x.lower().replace(" ", "_"), embedded))
     try:
         pd = import_module("pandas")
@@ -478,7 +487,7 @@ def importcsv(
         #     class_dict["@key"] = {"@type": "Random"}
         return class_dict
 
-    with pd.read_csv(csv_file, sep=sep, chunksize=chunksize) as reader:
+    with pd.read_csv(csv_file, sep=sep, chunksize=chunksize, dtype=dtype) as reader:
         for df in tqdm(reader):
             if any(df.isna().any()) and na == "error":
                 raise RuntimeError(
@@ -527,7 +536,7 @@ def importcsv(
                         if key in embedded:
                             new_items[key] = {
                                 "@type": "@id",
-                                "@id": class_name + "/" + value,
+                                "@id": class_name + "/" + str(value),
                             }
                     item.update(new_items)
                 # adding type
@@ -535,7 +544,7 @@ def importcsv(
                 # adding ids
                 if id_:
                     if id_ in item:
-                        item_id = class_name + "/" + item[id_]
+                        item_id = class_name + "/" + str(item[id_])
                     else:
                         raise RuntimeError(
                             f"id {id} is missing in {item}. Cannot import CSV."
