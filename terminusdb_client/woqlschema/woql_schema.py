@@ -1,4 +1,5 @@
 import json
+import weakref
 from copy import copy, deepcopy
 from enum import Enum, EnumMeta, _EnumDict
 from hashlib import sha256
@@ -141,6 +142,7 @@ class TerminusClass(type):
 
         # _abstract should not be inherited
         cls._abstract = nmspc.get("_abstract")
+        cls._instances = set()
 
         def init(obj, *args, **kwargs):
             if abstract:
@@ -157,6 +159,7 @@ class TerminusClass(type):
                 obj._id = obj._key.idgen(obj)
             obj._isinstance = True
             obj._annotations = cls._annotations
+            obj._instances.add(weakref.ref(obj))
 
         cls.__init__ = init
 
@@ -167,6 +170,16 @@ class TerminusClass(type):
 
         # super().__init__(name, bases, nmspc)
         globals()[name] = cls
+
+    def get_instances(cls):
+        dead = set()
+        for ref in cls._instances:
+            obj = ref()
+            if obj is not None:
+                yield obj
+            else:
+                dead.add(ref)
+        cls._instances -= dead
 
     def __repr__(cls):
         return cls.__name__
