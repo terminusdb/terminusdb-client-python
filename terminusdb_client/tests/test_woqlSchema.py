@@ -191,6 +191,17 @@ def test_import_objects():
     assert return_objs[0]._obj_to_dict() == cheuk_dict
 
 
+def test_get_instances():
+    cheuk = Person(
+        name="Cheuk",
+        age=21,
+        friend_of={
+            Person(),
+        },
+    )
+    assert len(list(Person.get_instances())) == 2
+
+
 # def test_schema_delete():
 #     other_schema.delete_property(Title)
 #     assert other_schema.all_obj() == {Employee, Address, Team}

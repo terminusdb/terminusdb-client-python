@@ -506,26 +506,24 @@ class WOQLSchema:
         type_dict = type_class._to_dict()
         params = {}
 
+        def create_obj(type_class, obj_id, params):
+            for obj in type_class.get_instances():
+                if obj._id == obj_id:
+                    for key, value in params.items():
+                        setattr(obj, key, value)
+                    return obj
+            params["_id"] = obj_id
+            new_obj = type_class.__new__(type_class)
+            new_obj.__init__(new_obj, **params)
+            return new_obj
+
         def convert_if_object(obj_type, value):
             if value is None:
                 return None
-            if isinstance(value, dict):
-                # if document is expressed as dict with '@id'
-                value = value.get("@id")
-            if isinstance(obj_type, str):
-                if obj_type[:4] == "xsd:":
-                    # it's datatype
-                    return value
-                elif isinstance(value, str):
-                    # it's a document
-                    value_type = obj_type
-                    value_class = self.object.get(value_type)
-                    value_obj = value_class.__new__(value_class)
-                    value_obj.__init__(value_obj, _id=value)
-                    return value_obj
-                elif isinstance(value, dict):
-                    # it's a subdocument
-                    return self._contruct_object(value)
+
+            if isinstance(obj_type, str) and obj_type[:4] == "xsd:":
+                # it's datatype
+                return value
             elif isinstance(obj_type, dict):
                 # it's List, Set, Optional etc
                 if obj_type["@type"] == "Optional":
@@ -536,6 +534,26 @@ class WOQLSchema:
                 if obj_type["@type"] == "Set":
                     value = set(value)
                 return value
+            elif isinstance(obj_type, str):
+                value_class = self.object.get(obj_type)
+                if not value_class:
+                    raise ValueError(f"{obj_type} is not in current schema.")
+                if isinstance(value, dict):
+                    if hasattr(value_class, "_subdocument"):
+                        # it's a subdocument
+                        return self._contruct_object(value)
+                    else:
+                        # document is expressed as dict with '@id'
+                        value = value.get("@id")
+                # it's a document or enum, value is id
+                if isinstance(value_class, TerminusClass):
+                    return create_obj(value_class, value, {})
+                else:
+                    the_key = None
+                    for key, item in value_class.__members__.items():
+                        if item._value_ == value:
+                            the_key = key
+                    return eval(f"value_class.{the_key}")
             else:
                 raise ValueError(f"Schema {type_dict} is not correct.")
 
@@ -543,10 +561,12 @@ class WOQLSchema:
             if key[0] != "@":
                 params[key] = convert_if_object(type_dict[key], value)
             elif key == "@id":
-                params["_id"] = value
-        new_obj = type_class.__new__(type_class)
-        new_obj.__init__(new_obj, **params)
-        return new_obj
+                # params["_id"] = value
+                obj_id = value
+        # new_obj = type_class.__new__(type_class)
+        # new_obj.__init__(new_obj, **params)
+        # return new_obj
+        return create_obj(type_class, obj_id, params)
 
     def commit(
         self, client: WOQLClient, commit_msg: Optional[str] = None, full_replace=False

@@ -1,6 +1,7 @@
 # import csv
 # import filecmp
 import datetime as dt
+from random import random
 
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
@@ -98,7 +99,9 @@ def test_jwt(docker_url_jwt):
 
 
 def test_terminusx(terminusx_token):
-    testdb = "test_happy_" + str(dt.datetime.now()).replace(" ", "")
+    testdb = (
+        "test_happy_" + str(dt.datetime.now()).replace(" ", "") + "_" + str(random())
+    )
     endpoint = "https://cloud-dev.dcm.ist/TerminusDBPythonClient/"
     client = WOQLClient(endpoint)
     client.connect(use_token=True, team="TerminusDBPythonClient")

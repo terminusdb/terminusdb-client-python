@@ -1,6 +1,7 @@
 import csv
 import datetime as dt
 import json
+from random import random
 
 from click.testing import CliRunner
 
@@ -164,7 +165,7 @@ def test_local_happy_path(docker_url, test_csv):
 
 
 def test_script_happy_path(terminusx_token):
-    testdb = "test_" + str(dt.datetime.now()).replace(" ", "")
+    testdb = "test_" + str(dt.datetime.now()).replace(" ", "") + "_" + str(random())
     endpoint = "https://cloud-dev.dcm.ist/TerminusDBPythonClient/"
     runner = CliRunner()
     with runner.isolated_filesystem():

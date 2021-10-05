@@ -4,7 +4,6 @@ from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from terminusdb_client.woqlschema.woql_schema import (
     DocumentTemplate,
     EnumTemplate,
-    HashKey,
     TaggedUnion,
     WOQLSchema,
 )
@@ -29,7 +28,7 @@ class Country(DocumentTemplate):
 class Address(DocumentTemplate):
     """This is address"""
 
-    _key = HashKey(["street", "postal_code"])
+    # _key = HashKey(["street", "postal_code"])
     # _key = LexicalKey(["street", "postal_code"])
     # _base = "Adddress_"
     _subdocument = []
@@ -169,3 +168,21 @@ def test_insert_cheuk(docker_url):
             assert item["managed_by"] == item["@id"]
         else:
             raise AssertionError()
+
+
+def test_getting_cheuk(docker_url):
+    assert "cheuk" not in globals()
+    assert "cheuk" not in locals()
+    client = WOQLClient(docker_url)
+    client.connect(db="test_docapi")
+    new_schema = WOQLSchema()
+    new_schema.from_db(client)
+    cheuk = new_schema.import_objects(
+        client.get_documents_by_type("Employee", as_list=True)
+    )[0]
+    result = cheuk._obj_to_dict()
+    assert result["address_of"]["postal_code"] == "A12 345"
+    assert result["address_of"]["street"] == "123 Abc Street"
+    assert result["name"] == "Cheuk"
+    assert result["age"] == 21
+    assert result["contact_number"] == "07777123456"
