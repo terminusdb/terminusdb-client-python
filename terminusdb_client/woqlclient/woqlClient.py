@@ -1125,7 +1125,7 @@ class WOQLClient:
         self._validate_graph_type(graph_type)
         self._check_connection()
 
-        all_existing_id = self.get_existing_classes()
+        all_existing_id = {doc['@id'] for doc in self.get_all_documents()}
         insert_docs = []
         update_docs = []
         context_obj = None
