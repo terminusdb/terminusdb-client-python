@@ -553,7 +553,7 @@ class WOQLSchema:
                     for key, item in value_class.__members__.items():
                         if item._value_ == value:
                             the_key = key
-                    return eval(f"value_class.{the_key}")
+                    return eval(f"value_class.{the_key}")  # noqa: S307
             else:
                 raise ValueError(f"Schema {type_dict} is not correct.")
 

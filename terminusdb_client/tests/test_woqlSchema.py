@@ -1,15 +1,12 @@
-from typing import List, Set
-
 import pytest
 
 from terminusdb_client.woqlschema.woql_schema import (
     DocumentTemplate,
-    EnumTemplate,
     WOQLSchema,
     _check_cycling,
 )
 
-my_schema = WOQLSchema()
+# my_schema = WOQLSchema()
 cycling_schema = WOQLSchema()
 
 
@@ -56,72 +53,77 @@ class CheckCycling(CheckCyclingPaPa):
     me: "CheckCycling"  # not allow
 
 
-class Coordinate(DocumentTemplate):
-    """Coordinate of location.
+#
+# class Coordinate(DocumentTemplate):
+#     """Coordinate of location.
+#
+#     Coordinate to identify the location of a place on earth, it could be found from Google map.
+#
+#     Attributes
+#     ----------
+#     x : float
+#         The X coordinate.
+#     y : float
+#         The Y coordinate.
+#     """
+#
+#     _schema = my_schema
+#     x: float
+#     y: float
+#
+#
+# class Country(DocumentTemplate):
+#     _schema = my_schema
+#     name: str
+#     perimeter: List[Coordinate]
+#
+#
+# class Address(DocumentTemplate):
+#     _schema = my_schema
+#     street: str
+#     country: Country
+#
+#
+# class Person(DocumentTemplate):
+#     _schema = my_schema
+#     name: str
+#     age: int
+#     friend_of: Set["Person"]
+#
+#
+# class Employee(Person):
+#     _schema = my_schema
+#     address_of: Address
+#     contact_number: str
+#     managed_by: "Employee"
+#
+#
+# class Team(EnumTemplate):
+#     _schema = my_schema
+#     IT = ()
+#     Marketing = ()
+#
 
-    Coordinate to identify the location of a place on earth, it could be found from Google map.
 
-    Attributes
-    ----------
-    x : float
-        The X coordinate.
-    y : float
-        The Y coordinate.
-    """
-
-    _schema = my_schema
-    x: float
-    y: float
-
-
-class Country(DocumentTemplate):
-    _schema = my_schema
-    name: str
-    perimeter: List[Coordinate]
-
-
-class Address(DocumentTemplate):
-    _schema = my_schema
-    street: str
-    country: Country
-
-
-class Person(DocumentTemplate):
-    _schema = my_schema
-    name: str
-    age: int
-    friend_of: Set["Person"]
-
-
-class Employee(Person):
-    _schema = my_schema
-    address_of: Address
-    contact_number: str
-    managed_by: "Employee"
-
-
-class Team(EnumTemplate):
-    _schema = my_schema
-    IT = ()
-    Marketing = ()
-
-
-def test_schema_construct():
-    assert my_schema.all_obj() == {Employee, Person, Address, Team, Country, Coordinate}
+def test_schema_construct(test_schema):
+    my_schema = test_schema
+    assert set(map(lambda x: x.__name__, my_schema.all_obj())) == {
+        "Employee",
+        "Person",
+        "Address",
+        "Team",
+        "Country",
+        "Coordinate",
+        "Role",
+    }
     # assert my_schema.all_prop() == {AddressOf, Title, PostCode}
     # assert Employee.properties == {AddressOf, Title}
 
 
-def test_schema_copy():
+def test_schema_copy(test_schema):
+    my_schema = test_schema
     copy_schema = my_schema.copy()
-    assert copy_schema.all_obj() == {
-        Employee,
-        Person,
-        Address,
-        Team,
-        Country,
-        Coordinate,
-    }
+    assert copy_schema.all_obj() == my_schema.all_obj()
     # assert copy_schema.all_prop() == {AddressOf, Title, PostCode}
 
 
@@ -147,7 +149,10 @@ def test_type_check():
         test_obj.age = "not a number"
 
 
-def test_inheritance():
+def test_inheritance(test_schema):
+    my_schema = test_schema
+    Person = my_schema.object.get("Person")
+    Employee = my_schema.object.get("Employee")
     for item in Person._annotations:
         if item not in Employee._annotations:
             raise AssertionError(f"{item} not inherted")
@@ -169,16 +174,21 @@ def test_cycling():
         cycling_schema.to_dict()
 
 
-def test_idgen():
+def test_idgen(test_schema):
+    my_schema = test_schema
+    Country = my_schema.object.get("Country")
     uk = Country()
     assert uk._id[: len("Country/")] == "Country/"
 
 
-def test_context():
+def test_context(test_schema):
+    my_schema = test_schema
     assert my_schema.to_dict()[0].get("@type") == "@context"
 
 
-def test_import_objects():
+def test_import_objects(test_schema):
+    my_schema = test_schema
+    Person = my_schema.object.get("Person")
     cheuk = Person(
         name="Cheuk",
         age=21,
@@ -187,12 +197,15 @@ def test_import_objects():
         },
     )
     cheuk_dict = cheuk._obj_to_dict()
+    del cheuk
     return_objs = my_schema.import_objects([cheuk_dict])
     assert return_objs[0]._obj_to_dict() == cheuk_dict
 
 
-def test_get_instances():
-    cheuk = Person(
+def test_get_instances(test_schema):
+    my_schema = test_schema
+    Person = my_schema.object.get("Person")
+    _ = Person(
         name="Cheuk",
         age=21,
         friend_of={

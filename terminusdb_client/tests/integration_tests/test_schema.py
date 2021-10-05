@@ -1,88 +1,82 @@
-from typing import List, Optional, Set
-
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
-from terminusdb_client.woqlschema.woql_schema import (
-    DocumentTemplate,
-    EnumTemplate,
-    TaggedUnion,
-    WOQLSchema,
-)
+from terminusdb_client.woqlschema.woql_schema import WOQLSchema
 
 # from woql_schema import WOQLSchema, Document, Property, WOQLObject
+#
+# my_schema = WOQLSchema()
+#
+#
+# class Coordinate(DocumentTemplate):
+#     _schema = my_schema
+#     x: float
+#     y: float
+#
+#
+# class Country(DocumentTemplate):
+#     _schema = my_schema
+#     name: str
+#     perimeter: List[Coordinate]
+#
+#
+# class Address(DocumentTemplate):
+#     """This is address"""
+#
+#     # _key = HashKey(["street", "postal_code"])
+#     # _key = LexicalKey(["street", "postal_code"])
+#     # _base = "Adddress_"
+#     _subdocument = []
+#     _schema = my_schema
+#     street: str
+#     postal_code: str
+#     country: Country
+#
+#
+# class Person(DocumentTemplate):
+#     """This is a person
+#
+#     Attributes
+#     ----------
+#     name : str
+#         Name of the person.
+#     age : int
+#         Age of the person.
+#     """
+#
+#     _schema = my_schema
+#     name: str
+#     age: int
+#     friend_of: Set["Person"]
+#
+#
+# class Employee(Person):
+#     address_of: Address
+#     contact_number: Optional[str]
+#     managed_by: "Employee"
+#     member_of: "Team"
+#     permisstion: Set["Role"]
+#
+#
+# class Team(EnumTemplate):
+#     _schema = my_schema
+#     IT = "Information Technology"
+#     Marketing = ()
+#
+#
+# class Role(EnumTemplate):
+#     "Test Enum in a set"
+#     _schema = my_schema
+#     Admin = ()
+#     Read = ()
+#     Write = ()
+#
+#
+# class Contact(TaggedUnion):
+#     local_number: int
+#     international: str
 
-my_schema = WOQLSchema()
 
-
-class Coordinate(DocumentTemplate):
-    _schema = my_schema
-    x: float
-    y: float
-
-
-class Country(DocumentTemplate):
-    _schema = my_schema
-    name: str
-    perimeter: List[Coordinate]
-
-
-class Address(DocumentTemplate):
-    """This is address"""
-
-    # _key = HashKey(["street", "postal_code"])
-    # _key = LexicalKey(["street", "postal_code"])
-    # _base = "Adddress_"
-    _subdocument = []
-    _schema = my_schema
-    street: str
-    postal_code: str
-    country: Country
-
-
-class Person(DocumentTemplate):
-    """This is a person
-
-    Attributes
-    ----------
-    name : str
-        Name of the person.
-    age : int
-        Age of the person.
-    """
-
-    _schema = my_schema
-    name: str
-    age: int
-    friend_of: Set["Person"]
-
-
-class Employee(Person):
-    address_of: Address
-    contact_number: Optional[str]
-    managed_by: "Employee"
-    member_of: "Team"
-    permisstion: Set["Role"]
-
-
-class Team(EnumTemplate):
-    _schema = my_schema
-    IT = "Information Technology"
-    Marketing = ()
-
-
-class Role(EnumTemplate):
-    "Test Enum in a set"
-    _schema = my_schema
-    Admin = ()
-    Read = ()
-    Write = ()
-
-
-class Contact(TaggedUnion):
-    local_number: int
-    international: str
-
-
-def test_create_schema(docker_url):
+def test_create_schema(docker_url, test_schema):
+    my_schema = test_schema
     client = WOQLClient(docker_url)
     client.connect()
     client.create_database("test_docapi")
@@ -107,7 +101,8 @@ def test_create_schema(docker_url):
             raise AssertionError()
 
 
-def test_create_schema2(docker_url):
+def test_create_schema2(docker_url, test_schema):
+    my_schema = test_schema
     client = WOQLClient(docker_url)
     client.connect()
     client.create_database("test_docapi2")
@@ -130,7 +125,14 @@ def test_create_schema2(docker_url):
             raise AssertionError()
 
 
-def test_insert_cheuk(docker_url):
+def test_insert_cheuk(docker_url, test_schema):
+    my_schema = test_schema
+    Country = my_schema.object.get("Country")
+    Address = my_schema.object.get("Address")
+    Employee = my_schema.object.get("Employee")
+    Role = my_schema.object.get("Role")
+    Team = my_schema.object.get("Team")
+
     uk = Country()
     uk.name = "United Kingdom"
     uk.perimeter = []
