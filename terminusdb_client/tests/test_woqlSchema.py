@@ -170,12 +170,25 @@ def test_cycling():
 
 
 def test_idgen():
-    cheuk = Country()
-    assert cheuk._id[: len("Country/")] == "Country/"
+    uk = Country()
+    assert uk._id[: len("Country/")] == "Country/"
 
 
 def test_context():
     assert my_schema.to_dict()[0].get("@type") == "@context"
+
+
+def test_import_objects():
+    cheuk = Person(
+        name="Cheuk",
+        age=21,
+        friend_of={
+            Person(),
+        },
+    )
+    cheuk_dict = cheuk._obj_to_dict()
+    return_objs = my_schema.import_objects([cheuk_dict])
+    assert return_objs[0]._obj_to_dict() == cheuk_dict
 
 
 # def test_schema_delete():

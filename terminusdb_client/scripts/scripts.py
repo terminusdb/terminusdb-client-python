@@ -327,18 +327,19 @@ def commit(message):
     schema_plan = __import__("schema", globals(), locals(), [], 0)
     last_item = None
     documentation = {}
-    for line in schema_plan.__doc__.split("\n"):
-        if "Title:" in line:
-            documentation["title"] = line[6:].strip()
-            last_tiem = documentation["title"]
-        elif "Description:" in line:
-            documentation["description"] = line[12:].strip()
-            last_tiem = documentation["description"]
-        elif "Authors:" in line:
-            documentation["authors"] = line[8:].strip()
-            last_tiem = documentation["authors"]
-        elif last_item is not None:
-            last_item += "\n" + line.strip()
+    if schema_plan.__doc__:
+        for line in schema_plan.__doc__.split("\n"):
+            if "Title:" in line:
+                documentation["title"] = line[6:].strip()
+                last_tiem = documentation["title"]
+            elif "Description:" in line:
+                documentation["description"] = line[12:].strip()
+                last_tiem = documentation["description"]
+            elif "Authors:" in line:
+                documentation["authors"] = line[8:].strip()
+                last_tiem = documentation["authors"]
+            elif last_item is not None:
+                last_item += "\n" + line.strip()
     authors = documentation.get("authors")
     if authors:
         authors = documentation["authors"].split(",")
