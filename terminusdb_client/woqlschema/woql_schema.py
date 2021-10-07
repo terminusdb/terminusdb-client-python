@@ -390,6 +390,7 @@ class WOQLSchema:
         # if the class is Enum
         if class_obj_dict.get("@type") == "Enum":
             attributedict = _EnumDict()
+            attributedict._cls_name = class_obj_dict.get("@id")
         else:
             attributedict = {}
         annotations = {}
