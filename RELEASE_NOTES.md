@@ -1,5 +1,14 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.14
+
+### Bug Fixes / Improvements
+
+
+- Adding `get_instances` and `import_objects` for `WOQLSchema`
+
+---
+
 ## v10.0.13
 
 ### Bug Fixes / Improvements
