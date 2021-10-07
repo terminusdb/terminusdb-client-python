@@ -236,7 +236,7 @@ class WOQLClient:
         self._connected = True
 
         try:
-            self._all_avaliable_db = json.loads(
+            self._all_available_db = json.loads(
                 _finish_response(
                     requests.get(
                         self.api + "/",
@@ -252,7 +252,7 @@ class WOQLClient:
                 f"Cannot connect to server, please make sure TerminusDB is running at {self.server_url} and the authentication details are correct. Details: {str(error)}"
             ) from None
 
-        all_db_name = list(map(lambda x: x.get("name"), self._all_avaliable_db))
+        all_db_name = list(map(lambda x: x.get("name"), self._all_available_db))
         if self.db is not None and self.db not in all_db_name:
             raise InterfaceError(f"Connection fail, {self.db} does not exist.")
 
