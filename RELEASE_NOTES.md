@@ -1,5 +1,15 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.15
+
+### Bug Fixes / Improvements
+
+
+- `import_objects` can be used on a single dict/ object
+- `terminusdb config` now can parse number configs ad int/ float
+
+---
+
 ## v10.0.14
 
 ### Bug Fixes / Improvements
