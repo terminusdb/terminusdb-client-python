@@ -11,6 +11,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      TERMINUSX_TOKEN: ${{ secrets.TERMINUSX_TOKEN_DEV }}
     strategy:
       matrix:
         python-version: ["3.7", "3.8", "3.9", "3.10"]
@@ -28,8 +30,6 @@ jobs:
         tox -e deps
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Test with pytest
-      env: |
-        TERMINUSX_TOKEN: ${{ secrets.TERMINUSX_TOKEN_DEV }}
       run: |
         tox -e test
         bash <(curl -s https://codecov.io/bash)
