@@ -1,7 +1,10 @@
 # import csv
 # import filecmp
 import datetime as dt
+import os
 from random import random
+
+import pytest
 
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
@@ -98,28 +101,34 @@ def test_jwt(docker_url_jwt):
     assert "test_happy_path" not in client.list_databases()
 
 
+@pytest.mark.skipif(
+    os.environ.get("TERMINUSX_TOKEN") is None, reason="TerminusX token does not exist"
+)
 def test_terminusx(terminusx_token):
     testdb = (
         "test_happy_" + str(dt.datetime.now()).replace(" ", "") + "_" + str(random())
     )
-    endpoint = "https://cloud-dev.dcm.ist/TerminusDBPythonClient/"
+    endpoint = "https://cloud-dev.dcm.ist/TerminusDBTest/"
     client = WOQLClient(endpoint)
-    client.connect(use_token=True, team="TerminusDBPythonClient")
+    client.connect(use_token=True, team="TerminusDBTest")
     assert client._connected
     # test create db
     client.create_database(testdb)
     assert client.db == testdb
     assert testdb in client.list_databases()
-    client.delete_database(testdb, "TerminusDBPythonClient")
+    client.delete_database(testdb, "TerminusDBTest")
     assert client.db is None
     assert testdb not in client.list_databases()
 
 
+@pytest.mark.skipif(
+    os.environ.get("TERMINUSX_TOKEN") is None, reason="TerminusX token does not exist"
+)
 def test_terminusx_crazy_path(terminusx_token):
     testdb = "test happy_" + str(dt.datetime.now()).replace(" ", "")
-    endpoint = "https://cloud-dev.dcm.ist/TerminusDBPythonClient/"
+    endpoint = "https://cloud-dev.dcm.ist/TerminusDBTest/"
     client = WOQLClient(endpoint)
-    client.connect(use_token=True, team="TerminusDBPythonClient")
+    client.connect(use_token=True, team="TerminusDBTest")
     assert client._connected
     # test create db
     client.create_database(testdb)
@@ -127,7 +136,7 @@ def test_terminusx_crazy_path(terminusx_token):
     assert testdb in client.list_databases()
     client.create_branch("New Branch")
     client.rebase("New Branch")
-    client.delete_database(testdb, "TerminusDBPythonClient")
+    client.delete_database(testdb, "TerminusDBTest")
     assert client.db is None
     assert testdb not in client.list_databases()
 

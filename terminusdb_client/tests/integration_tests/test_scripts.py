@@ -1,8 +1,10 @@
 import csv
 import datetime as dt
 import json
+import os
 from random import random
 
+import pytest
 from click.testing import CliRunner
 
 from ...scripts import scripts
@@ -164,25 +166,27 @@ def test_local_happy_path(docker_url, test_csv):
         assert f"{testdb} deleted." in result.output
 
 
+@pytest.mark.skipif(
+    os.environ.get("TERMINUSX_TOKEN") is None, reason="TerminusX token does not exist"
+)
 def test_script_happy_path(terminusx_token):
     testdb = "test_" + str(dt.datetime.now()).replace(" ", "") + "_" + str(random())
-    endpoint = "https://cloud-dev.dcm.ist/TerminusDBPythonClient/"
+    endpoint = "https://cloud-dev.dcm.ist/TerminusDBTest/"
     runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(
             scripts.startproject,
-            input=f"{testdb}\n{endpoint}\nTerminusDBPythonClient\nyes\ny\n{terminusx_token}\n",
+            input=f"{testdb}\n{endpoint}\nTerminusDBTest\nyes\ny\n{terminusx_token}\n",
         )
         assert result.exit_code == 0
         with open("config.json") as file:
             setting = json.load(file)
             assert setting.get("database") == testdb
             assert (
-                setting.get("endpoint")
-                == "https://cloud-dev.dcm.ist/TerminusDBPythonClient/"
+                setting.get("endpoint") == "https://cloud-dev.dcm.ist/TerminusDBTest/"
             )
             assert setting.get("use JWT token")
-            assert setting.get("team") == "TerminusDBPythonClient"
+            assert setting.get("team") == "TerminusDBTest"
         result = runner.invoke(scripts.commit)
         assert result.exit_code == 0
         assert f"{testdb} created." in result.output
@@ -196,7 +200,7 @@ def test_script_happy_path(terminusx_token):
         result = runner.invoke(scripts.status)
         assert result.exit_code == 0
         assert (
-            f"Connecting to '{testdb}' at '{endpoint}'\non branch 'new'\nwith team 'TerminusDBPythonClient'"
+            f"Connecting to '{testdb}' at '{endpoint}'\non branch 'new'\nwith team 'TerminusDBTest'"
             in result.output
         )
         result = runner.invoke(scripts.rebase, ["main"])

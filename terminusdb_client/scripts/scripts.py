@@ -822,8 +822,18 @@ def reset(commit, soft):
 def config(set_config, delete):
     """Show or set config.json of the project. To set a config, use <key>=<value>, e.g. streams=MyClass or streams=[Class1, Class2]"""
     settings = _load_settings()
-    # status = _load_settings(".TDB", check=[])
-    # settings.update(status)
+
+    def try_parsing(value):
+        try:
+            value = float(value)
+        except BaseException:
+            pass
+        try:
+            value = int(value)
+        except BaseException:
+            pass
+        return value
+
     if not set_config and not delete:
         click.echo("Current config:")
         for key, value in settings.items():
@@ -834,7 +844,9 @@ def config(set_config, delete):
             value = item.split("=")[1]
             if value[0] == "[" and value[-1] == "]":  # it's a list
                 value = value.strip("[]").split(",")
-                value = list(map(lambda x: x.strip(), value))
+                value = list(map(lambda x: try_parsing(x.strip()), value))
+            else:
+                value = try_parsing(value)
             settings.update({key: value})
         for item in delete:
             settings.pop(item, None)
