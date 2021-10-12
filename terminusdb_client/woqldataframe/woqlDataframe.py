@@ -29,6 +29,7 @@ def result_to_df(all_records, keepid=False, max_embed_dep=0, client=None):
                 expanded = None
             if expanded is not None and "@id" in expanded.columns:
                 if not keepid:
+                    # expanded.rename(columns={"@id": "Document id"}, inplace=True)
                     expanded.drop(
                         columns=list(filter(lambda x: x[0] == "@", expanded.columns)),
                         inplace=True,
@@ -42,7 +43,7 @@ def result_to_df(all_records, keepid=False, max_embed_dep=0, client=None):
         if maxdep == 0:
             return df
         for col in df.columns:
-            if "@" not in col:
+            if "@" not in col and col != "Document id":
                 col_comp = col.split(".")
                 if len(col_comp) == 1:
                     prop_type = all_existing_class[class_obj][col]
@@ -72,6 +73,7 @@ def result_to_df(all_records, keepid=False, max_embed_dep=0, client=None):
     else:
         class_obj = all_types[0]
     if not keepid:
+        df.rename(columns={"@id": "Document id"}, inplace=True)
         df.drop(columns=list(filter(lambda x: x[0] == "@", df.columns)), inplace=True)
     df = expand_df(df)
     if max_embed_dep > 0:

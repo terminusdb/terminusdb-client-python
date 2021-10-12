@@ -578,7 +578,9 @@ def importcsv(
 @click.command()
 @click.argument("class_obj")
 @click.option(
-    "--keepid", is_flag=True, help="If the id of the object is to be kept in the CSV"
+    "--keepid",
+    is_flag=True,
+    help="If used, the id of the object and the other meta (@) is to be kept as is in the CSV",
 )
 @click.option(
     "--maxdep",
