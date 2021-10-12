@@ -15,57 +15,6 @@ def pytest_addoption(parser):
 
 
 my_schema = WOQLSchema()
-#
-#
-# class Coordinate(DocumentTemplate):
-#     """Coordinate of location.
-#
-#     Coordinate to identify the location of a place on earth, it could be found from Google map.
-#
-#     Attributes
-#     ----------
-#     x : float
-#         The X coordinate.
-#     y : float
-#         The Y coordinate.
-#     """
-#
-#     _schema = my_schema
-#     x: float
-#     y: float
-#
-#
-# class Country(DocumentTemplate):
-#     _schema = my_schema
-#     name: str
-#     perimeter: List[Coordinate]
-#
-#
-# class Address(DocumentTemplate):
-#     _schema = my_schema
-#     street: str
-#     country: Country
-#
-#
-# class Person(DocumentTemplate):
-#     _schema = my_schema
-#     name: str
-#     age: int
-#     friend_of: Set["Person"]
-#
-#
-# class Employee(Person):
-#     _schema = my_schema
-#     address_of: Address
-#     contact_number: str
-#     managed_by: "Employee"
-#
-#
-# class Team(EnumTemplate):
-#     _schema = my_schema
-#     IT = ()
-#     Marketing = ()
-#
 
 
 class Coordinate(DocumentTemplate):

@@ -1181,7 +1181,7 @@ class WOQLClient:
 
     def delete_document(
         self,
-        doc_id: Union[str, List[str], Iterable],
+        document: Union[str, list, dict, Iterable],
         graph_type: str = "instance",
         commit_msg: Optional[str] = None,
     ) -> None:
@@ -1189,8 +1189,8 @@ class WOQLClient:
 
         Parameters
         ----------
-        doc_id: str or list of str
-            Id(s) of document(s) to be updated.
+        document: str or list of str
+            Document(s) (as dictionary or DocumentTemplate objects) or id(s) of document(s) to be updated.
         graph_type : str
             Graph type, either "instance" or "schema".
         commit_msg : str
@@ -1203,8 +1203,20 @@ class WOQLClient:
         """
         self._validate_graph_type(graph_type)
         self._check_connection()
-        if not isinstance(doc_id, (str, list)) and hasattr(doc_id, "__iter__"):
-            doc_id = list(doc_id)
+        doc_id = []
+        if not isinstance(document, (str, list, dict)) and hasattr(
+            document, "__iter__"
+        ):
+            document = list(document)
+        if not isinstance(document, list):
+            document = [document]
+        for doc in document:
+            if hasattr(doc, "_obj_to_dict"):
+                doc = doc._obj_to_dict()
+            if isinstance(doc, dict) and doc.get("@id"):
+                doc_id.append(doc.get("@id"))
+            elif isinstance(doc, str):
+                doc_id.append(doc)
         params = self._generate_commit(commit_msg)
         params["graph_type"] = graph_type
         _finish_response(

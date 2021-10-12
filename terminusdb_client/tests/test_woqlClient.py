@@ -376,3 +376,71 @@ def test_insert_woqlschema_fail(mocked_requests):
     woql_client.connect(db="myDBName")
     with pytest.raises(InterfaceError):
         woql_client.insert_document(WOQLSchema(), graph_type="instance")
+
+
+@mock.patch("requests.delete", side_effect=mocked_requests_get)
+@mock.patch("requests.get", side_effect=mocked_requests_get)
+def test_delete_document(mocked_requests, mocked_requests2, test_schema):
+    woql_client = WOQLClient(
+        "http://localhost:6363", user="admin", key="root", team="admin"
+    )
+    woql_client.connect(db="myDBName")
+
+    woql_client.delete_document(["id1", "id2"])
+
+    requests.delete.assert_called_with(
+        "http://localhost:6363/api/document/admin/myDBName/local/branch/main",
+        auth=("admin", "root"),
+        json=["id1", "id2"],
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+        params={
+            "author": "admin",
+            "graph_type": "instance",
+            "message": f"Commit via python client {__version__}",
+        },
+    )
+
+    woql_client.delete_document("id1")
+
+    requests.delete.assert_called_with(
+        "http://localhost:6363/api/document/admin/myDBName/local/branch/main",
+        auth=("admin", "root"),
+        json=["id1"],
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+        params={
+            "author": "admin",
+            "graph_type": "instance",
+            "message": f"Commit via python client {__version__}",
+        },
+    )
+    my_schema = test_schema
+    Coordinate = my_schema.object.get("Coordinate")
+    home = Coordinate(_id="Coordinate/home", x=123.431, y=342.435)
+
+    woql_client.delete_document(home)
+
+    requests.delete.assert_called_with(
+        "http://localhost:6363/api/document/admin/myDBName/local/branch/main",
+        auth=("admin", "root"),
+        json=["Coordinate/home"],
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+        params={
+            "author": "admin",
+            "graph_type": "instance",
+            "message": f"Commit via python client {__version__}",
+        },
+    )
+
+    woql_client.delete_document(home._obj_to_dict())
+
+    requests.delete.assert_called_with(
+        "http://localhost:6363/api/document/admin/myDBName/local/branch/main",
+        auth=("admin", "root"),
+        json=["Coordinate/home"],
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+        params={
+            "author": "admin",
+            "graph_type": "instance",
+            "message": f"Commit via python client {__version__}",
+        },
+    )

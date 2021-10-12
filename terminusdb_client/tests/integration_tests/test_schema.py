@@ -172,7 +172,7 @@ def test_insert_cheuk(docker_url, test_schema):
             raise AssertionError()
 
 
-def test_getting_cheuk(docker_url):
+def test_getting_and_deleting_cheuk(docker_url):
     assert "cheuk" not in globals()
     assert "cheuk" not in locals()
     client = WOQLClient(docker_url)
@@ -188,3 +188,5 @@ def test_getting_cheuk(docker_url):
     assert result["name"] == "Cheuk"
     assert result["age"] == 21
     assert result["contact_number"] == "07777123456"
+    client.delete_document(cheuk)
+    assert client.get_documents_by_type("Employee", as_list=True) == []
