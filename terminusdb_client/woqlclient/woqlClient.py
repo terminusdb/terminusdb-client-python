@@ -1203,7 +1203,7 @@ class WOQLClient:
         """
         self._validate_graph_type(graph_type)
         self._check_connection()
-        if not isinstance(doc_id, [str, list]) and hasattr(doc_id, "iter"):
+        if not isinstance(doc_id, (str, list)) and hasattr(doc_id, "__iter__"):
             doc_id = list(doc_id)
         params = self._generate_commit(commit_msg)
         params["graph_type"] = graph_type
