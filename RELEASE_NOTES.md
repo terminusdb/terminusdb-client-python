@@ -1,5 +1,16 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.16
+
+### Bug Fixes / Improvements
+
+
+- `delete_document` can accept dict(s)/ document object(s) instead of ids
+- `result_to_df` will provide the object ids (only the top levels) even if not using `keepid=True`
+- adding `add_enum_class` for `WOQLSchema` to construct enum class with function calls
+
+---
+
 ## v10.0.15
 
 ### Bug Fixes / Improvements
