@@ -236,6 +236,26 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="terminusdb_client.woqlschema.woql_schema.WOQLSchema.add_enum_class">
+<span class="sig-name descname"><span class="pre">add_enum_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.woqlschema.woql_schema.WOQLSchema.add_enum_class" title="Permalink to this definition"></a></dt>
+<dd><p>Construct a TerminusDB Enum class by provideing class name and member values then add into the schema.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>class_name</strong> (<em>str</em>) – Name of the class object constructed.</p></li>
+<li><p><strong>class_values</strong> (<em>list</em>) – A list of values in this Enum.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A Enum object with the sepcified name and members</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#terminusdb_client.woqlschema.woql_schema.EnumMetaTemplate" title="terminusdb_client.woqlschema.woql_schema.EnumMetaTemplate">EnumMetaTemplate</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.woqlschema.woql_schema.WOQLSchema.commit">
 <span class="sig-name descname"><span class="pre">commit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_replace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.woqlschema.woql_schema.WOQLSchema.commit" title="Permalink to this definition"></a></dt>
 <dd><p>Commit the schema to database</p>
