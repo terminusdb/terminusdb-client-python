@@ -569,6 +569,29 @@ class WOQLSchema:
         # return new_obj
         return create_obj(type_class, obj_id, params)
 
+    def add_enum_class(self, class_name: str, class_values: list):
+        """Construct a TerminusDB Enum class by provideing class name and member values then add into the schema.
+
+        Parameters
+        ----------
+        class_name: str
+            Name of the class object constructed.
+        class_values : list
+            A list of values in this Enum.
+
+        Returns
+        -------
+        EnumMetaTemplate
+            A Enum object with the sepcified name and members
+        """
+        attributedict = _EnumDict()
+        attributedict._cls_name = class_name
+        for value in class_values:
+            attributedict[value.lower().replace(" ", "_")] = value
+        new_class = type(class_name, (EnumTemplate,), attributedict)
+        self.add_obj(class_name, new_class)
+        return new_class
+
     def commit(
         self, client: WOQLClient, commit_msg: Optional[str] = None, full_replace=False
     ):

@@ -215,6 +215,15 @@ def test_get_instances(test_schema):
     assert len(list(Person.get_instances())) == 2
 
 
+def test_add_enum_class():
+    new_schema = WOQLSchema()
+    my_enum = new_schema.add_enum_class("MyEnum", ["item1", "item2"])
+    assert "item1" in my_enum.__members__
+    assert "item2" in my_enum.__members__
+    assert my_enum.__name__ == "MyEnum"
+    assert "MyEnum" in new_schema.object
+
+
 # def test_schema_delete():
 #     other_schema.delete_property(Title)
 #     assert other_schema.all_obj() == {Employee, Address, Team}
