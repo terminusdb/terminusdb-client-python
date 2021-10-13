@@ -23,6 +23,8 @@ def result_to_df(all_records, keepid=False, max_embed_dep=0, client=None):
 
     def expand_df(df):
         for col in df.columns:
+            if col == "Document id":
+                continue
             try:
                 expanded = pd.json_normalize(df[col])
             except Exception:
@@ -55,6 +57,7 @@ def result_to_df(all_records, keepid=False, max_embed_dep=0, client=None):
                     isinstance(prop_type, str)
                     and prop_type[:4] != "xsd:"
                     and prop_type != class_obj
+                    and all_existing_class[prop_type].get("@type") != "Enum"
                 ):
                     df[col] = df[col].apply(client.get_document)
         finish_df = expand_df(df)
