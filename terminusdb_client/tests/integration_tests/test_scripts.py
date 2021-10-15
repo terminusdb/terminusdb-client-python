@@ -91,7 +91,7 @@ def test_local_happy_path(docker_url, test_csv):
         result = runner.invoke(scripts.log)
         assert result.exit_code == 0
         assert "Schema updated by Python client." in result.output
-        first_commit = result.output.split("\n")[2].split(" ")[-1]
+        first_commit = result.output.split("\n")[6].split(" ")[-1]
         # test import export csv
         with open("grades.csv", "w") as writer:
             writer.write(test_csv)
