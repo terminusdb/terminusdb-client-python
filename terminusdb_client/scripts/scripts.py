@@ -752,18 +752,22 @@ def rebase(branch_name):
     click.echo(f"Rebased {branch_name} branch.")
 
 
+def _status(settings):
+    message = f"Connecting to '{settings['database']}' at '{settings['endpoint']}'\non branch '{settings['branch']}'"
+    if settings.get("team"):
+        message += f"\nwith team '{settings['team']}'"
+    if settings.get("ref"):
+        message += f"\nat commit '{settings['ref']}'"
+    return message
+
+
 @click.command()
 def status():
     """Show the working status of the project."""
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
     settings.update(status)
-    message = f"Connecting to '{settings['database']}' at '{settings['endpoint']}'\non branch '{settings['branch']}'"
-    if settings.get("team"):
-        message += f"\nwith team '{settings['team']}'"
-    if settings.get("ref"):
-        message += f"\nat commit '{settings['ref']}'"
-    click.echo(message)
+    click.echo(_status(settings))
 
 
 @click.command()
@@ -774,7 +778,9 @@ def log():
     settings.update(status)
     client, _ = _connect(settings)
     history = client.get_commit_history()
-    click.echo("\n")
+    click.echo("========")
+    click.echo(_status(settings))
+    click.echo("========\n")
     for item in history:
         click.echo(f"commit {item['commit']}")
         click.echo(f"Author: {item['author']}")
