@@ -1,5 +1,15 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.17
+
+### Bug Fixes / Improvements
+
+
+- `terminusdb log` would also show info about `status`
+- Fix for dealing with `Enum` in `result_to_df`
+
+---
+
 ## v10.0.16
 
 ### Bug Fixes / Improvements
