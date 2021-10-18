@@ -108,15 +108,18 @@ def _check_missing_prop(doc_obj: "DocumentTemplate"):
     """Helper function to check if the the document is missing properties (and if they are right types)"""
     class_obj = doc_obj.__class__
     for prop, prop_type in class_obj._annotations.items():
-        try:
-            check_type(str(None), None, prop_type)
+        try:  # check to let Optional pass
+            check_type("None (Optional)", None, prop_type)
         except TypeError:
-            if not hasattr(doc_obj, prop):
-                raise ValueError(f"{doc_obj} missing property: {prop}")
-            else:
-                prop_value = eval(f"doc_obj.{prop}")  # noqa: S307
-                check_type(prop, prop_value, prop_type)
-                # raise TypeError(f"Property of {doc_obj} missing should be type {prop_type} but got {prop_value} which is {type(prop_value)}")
+            try:  # extra check to let Set pass
+                check_type("Empty set", set(), prop_type)
+            except TypeError:
+                if not hasattr(doc_obj, prop):
+                    raise ValueError(f"{doc_obj} missing property: {prop}")
+                else:
+                    prop_value = eval(f"doc_obj.{prop}")  # noqa: S307
+                    check_type(prop, prop_value, prop_type)
+                    # raise TypeError(f"Property of {doc_obj} missing should be type {prop_type} but got {prop_value} which is {type(prop_value)}")
 
 
 class TerminusClass(type):

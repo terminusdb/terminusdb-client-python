@@ -1,3 +1,5 @@
+from typing import Set
+
 import pytest
 
 from terminusdb_client.woqlschema.woql_schema import (
@@ -53,56 +55,9 @@ class CheckCycling(CheckCyclingPaPa):
     me: "CheckCycling"  # not allow
 
 
-#
-# class Coordinate(DocumentTemplate):
-#     """Coordinate of location.
-#
-#     Coordinate to identify the location of a place on earth, it could be found from Google map.
-#
-#     Attributes
-#     ----------
-#     x : float
-#         The X coordinate.
-#     y : float
-#         The Y coordinate.
-#     """
-#
-#     _schema = my_schema
-#     x: float
-#     y: float
-#
-#
-# class Country(DocumentTemplate):
-#     _schema = my_schema
-#     name: str
-#     perimeter: List[Coordinate]
-#
-#
-# class Address(DocumentTemplate):
-#     _schema = my_schema
-#     street: str
-#     country: Country
-#
-#
-# class Person(DocumentTemplate):
-#     _schema = my_schema
-#     name: str
-#     age: int
-#     friend_of: Set["Person"]
-#
-#
-# class Employee(Person):
-#     _schema = my_schema
-#     address_of: Address
-#     contact_number: str
-#     managed_by: "Employee"
-#
-#
-# class Team(EnumTemplate):
-#     _schema = my_schema
-#     IT = ()
-#     Marketing = ()
-#
+class CheckEmptySet(DocumentTemplate):
+
+    some_set: Set[str]
 
 
 def test_schema_construct(test_schema):
@@ -222,6 +177,11 @@ def test_add_enum_class():
     assert "item2" in my_enum.__members__
     assert my_enum.__name__ == "MyEnum"
     assert "MyEnum" in new_schema.object
+
+
+def test_empty_set():
+    test_obj = CheckEmptySet()
+    test_obj._obj_to_dict()
 
 
 # def test_schema_delete():
