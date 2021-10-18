@@ -1,5 +1,14 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.18
+
+### Bug Fixes / Improvements
+
+
+- Sets are default to be optional, i.e. it will not be check if missing
+
+---
+
 ## v10.0.17
 
 ### Bug Fixes / Improvements
