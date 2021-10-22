@@ -1,5 +1,15 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.19
+
+### Bug Fixes / Improvements
+
+
+- Adding delete branch (`branch -d`) in scripts
+- `terminus branch` will add `*` to show the current branch
+
+---
+
 ## v10.0.18
 
 ### Bug Fixes / Improvements

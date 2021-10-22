@@ -7,6 +7,7 @@ from random import random
 import pytest
 from click.testing import CliRunner
 
+from ...errors import InterfaceError
 from ...scripts import scripts
 
 
@@ -55,38 +56,21 @@ def test_local_happy_path(docker_url, test_csv):
         result = runner.invoke(scripts.rebase, ["main"])
         assert result.exit_code == 0
         assert "Rebased main branch." in result.output
-        # # test log and time travel
-        # result = runner.invoke(scripts.log)
-        # assert result.exit_code == 0
-        # assert "Schema updated by Python client." in result.output
-        # first_commit = result.output.split("\n")[2].split(" ")[-1]
-        # result = runner.invoke(scripts.commit, ["-m", "My message"])
-        # result = runner.invoke(scripts.log)
-        # assert "My message" in result.output
-        # result = runner.invoke(scripts.reset, ["--soft", first_commit])
-        # assert result.exit_code == 0
-        # with open(".TDB") as file:
-        #     setting = json.load(file)
-        #     assert setting.get("branch") == "new"
-        #     assert setting.get("ref") == first_commit
-        # result = runner.invoke(scripts.status)
-        # assert (
-        #     f"Connecting to '{testdb}' at '{docker_url}'\non branch 'new'\nwith team 'admin'\nat commit '{first_commit}'"
-        #     in result.output
-        # )
-        # result = runner.invoke(scripts.log)
-        # assert "My message" in result.output
-        # result = runner.invoke(scripts.reset)
-        # assert "Reset head to newest commit" in result.output
-        # with open(".TDB") as file:
-        #     setting = json.load(file)
-        #     assert setting.get("branch") == "new"
-        #     assert setting.get("ref") is None
-        # result = runner.invoke(scripts.reset, [first_commit])
-        # assert result.exit_code == 0
-        # result = runner.invoke(scripts.log)
-        # assert "My message" not in result.output
-        # assert "Schema updated by Python client." in result.output
+        result = runner.invoke(scripts.branch, ["-d", "not_exist"])
+        assert result.exit_code == 1
+        assert isinstance(result.exception, InterfaceError)
+        assert "not_exist does not exist." in str(result.exception)
+        result = runner.invoke(scripts.branch, ["-d", "new"])
+        assert result.exit_code == 1
+        assert isinstance(result.exception, InterfaceError)
+        assert (
+            "Cannot delete new which is current branch, please checkout to another branch first."
+            in str(result.exception)
+        )
+        result = runner.invoke(scripts.checkout, ["main"])
+        result = runner.invoke(scripts.branch, ["-d", "new"])
+        assert result.exit_code == 0
+        assert "Branch 'new' deleted. Remain on 'main' branch." in result.output
         # test log and time travel
         result = runner.invoke(scripts.log)
         assert result.exit_code == 0
@@ -136,11 +120,11 @@ def test_local_happy_path(docker_url, test_csv):
         assert result.exit_code == 0
         with open(".TDB") as file:
             setting = json.load(file)
-            assert setting.get("branch") == "new"
+            assert setting.get("branch") == "main"
             assert setting.get("ref") == first_commit
         result = runner.invoke(scripts.status)
         assert (
-            f"Connecting to '{testdb}' at '{docker_url}'\non branch 'new'\nwith team 'admin'\nat commit '{first_commit}'"
+            f"Connecting to '{testdb}' at '{docker_url}'\non branch 'main'\nwith team 'admin'\nat commit '{first_commit}'"
             in result.output
         )
         result = runner.invoke(scripts.log)
@@ -149,7 +133,7 @@ def test_local_happy_path(docker_url, test_csv):
         assert "Reset head to newest commit" in result.output
         with open(".TDB") as file:
             setting = json.load(file)
-            assert setting.get("branch") == "new"
+            assert setting.get("branch") == "main"
             assert setting.get("ref") is None
         result = runner.invoke(scripts.reset, [first_commit])
         assert result.exit_code == 0

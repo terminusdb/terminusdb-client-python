@@ -697,21 +697,50 @@ def alldocs(schema, type_, query, head, export, keepid, maxdep, filename=None):
 
 @click.command()
 @click.argument("branch_name", required=False)
-def branch(branch_name):
+@click.option(
+    "-d",
+    "--delete",
+    multiple=True,
+    help="Branch(es) to be deleted",
+)
+def branch(branch_name, delete):
     """Create or list branch."""
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
     settings.update(status)
     client, _ = _connect(settings)
-    if branch_name is None:
+    if delete:
         all_branches = client.get_all_branches()
         all_branches = list(map(lambda item: item["name"], all_branches))
-        click.echo("\n".join(all_branches))
+        for delete_branch in delete:
+            if delete_branch in all_branches:
+                if delete_branch != status["branch"]:
+                    client.delete_branch(delete_branch)
+                    click.echo(
+                        f"Branch '{delete_branch}' deleted. Remain on '{status['branch']}' branch."
+                    )
+                else:
+                    raise InterfaceError(
+                        f"Cannot delete {delete_branch} which is current branch, please checkout to another branch first."
+                    )
+            else:
+                raise InterfaceError(f"{delete_branch} does not exist.")
     else:
-        client.create_branch(branch_name)
-        click.echo(
-            f"Branch '{branch_name}' created. Remain on '{status['branch']}' branch."
-        )
+        if branch_name is None:
+            all_branches = client.get_all_branches()
+            all_branches = list(map(lambda item: item["name"], all_branches))
+            new_all_branches = []
+            for each_branch in all_branches:
+                if each_branch == status["branch"]:
+                    new_all_branches.append("* " + each_branch)
+                else:
+                    new_all_branches.append("  " + each_branch)
+            click.echo("\n".join(new_all_branches))
+        else:
+            client.create_branch(branch_name)
+            click.echo(
+                f"Branch '{branch_name}' created. Remain on '{status['branch']}' branch."
+            )
 
 
 @click.command()
