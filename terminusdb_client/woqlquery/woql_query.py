@@ -2380,6 +2380,20 @@ class WOQLQuery:
         return self
 
     def type_of(self, value, vtype):
+        """Sets the given value and type for cursor.
+
+        Parameters
+        ----------
+        value : str
+            Value which needs to be set
+        vtype : type
+            Type which needs to be set
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         if value and value == "args":
             return ["value", "type"]
         if not value or not vtype:
@@ -2500,6 +2514,13 @@ class WOQLQuery:
         return self._add_sub_query(groupquery)
 
     def true(self):
+        """Sets true for cursor type.
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         self._cursor["@type"] = "True"
         return self
 
@@ -2543,6 +2564,18 @@ class WOQLQuery:
         return self
 
     def size(self, graph, size):
+        """Sets the given graph and size for cursor.
+
+        Parameters
+        ----------
+        graph: Graph which needs to be set as resource
+        size: Size which needs to be set
+
+        Returns
+        -------
+        WOQLQuery object
+                    query object that can be chained and/or execute
+        """
         if graph and graph == "args":
             return ["resource", "size"]
         if self._cursor.get("@type"):
@@ -2553,6 +2586,18 @@ class WOQLQuery:
         return self
 
     def triple_count(self, graph, triple_count):
+        """Sets the given triple count and size for cursor.
+
+        Parameters
+        ----------
+        graph: Graph which needs to be set as resource
+        triple_count: Triple count which needs to be set
+
+        Returns
+        -------
+        WOQLQuery object
+                    query object that can be chained and/or execute
+        """
         if graph and graph == "args":
             return ["resource", "triple_count"]
         if self._cursor.get("@type"):
@@ -2596,6 +2641,24 @@ class WOQLQuery:
             return self.triple(subj, pred, obj)
 
     def all(self, subj=None, pred=None, obj=None, graph=None):
+        """Calls the star method and returns the result of the same.
+
+        Parameters
+        ----------
+        subj : str, optional
+            target subject
+        pred : str, optional
+            target predicate
+        obj : str, optional
+            target object
+        graph : str
+            graphIRI
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         return self.star(subj=subj, pred=pred, obj=obj, graph=graph)
 
     def graph(self, g):
@@ -2612,6 +2675,20 @@ class WOQLQuery:
         return self._set_context({"graph": g})
 
     def _get_object(self, s, p):
+        """Function to get the object for the given subject and predicate.
+
+        Parameters
+        ----------
+        s: str
+            Subject of the object
+        p: str
+            Predicate of the object
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         if self._cursor.get("@type") == "And":
             for item in self._cursor["query_list"]:
                 subq = item.get("query")
@@ -2675,6 +2752,24 @@ class WOQLQuery:
         return False
 
     def _add_partial(self, s, p, o, g=None):
+        """Adds the query based on action given in builder context.
+
+        Parameters
+        ----------
+        s : str
+            target subject
+        p : str
+            target predicate
+        o : str
+            target object
+        g : str
+            graphIRI
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         ctxt = self._triple_builder_context
         if s is None:
             s = ctxt.get("subject")
