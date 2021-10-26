@@ -576,7 +576,7 @@ Commonly used to combine WOQLQueries.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
-<dt><a class="reference internal" href="#terminusdb_client.WOQLQuery.remote" title="terminusdb_client.WOQLQuery.remote"><code class="xref py py-meth docutils literal notranslate"><span class="pre">remote()</span></code></a></dt><dd><p>If your csv file is a uri then use <a class="reference internal" href="#terminusdb_client.WOQLQuery.remote" title="terminusdb_client.WOQLQuery.remote"><code class="xref py py-meth docutils literal notranslate"><span class="pre">remote()</span></code></a> instead of <cite>.file</cite>.</p>
+<dt><a class="reference internal" href="#terminusdb_client.WOQLQuery.remote" title="terminusdb_client.WOQLQuery.remote"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remote</span></code></a></dt><dd><p>If your csv file is a uri then use <a class="reference internal" href="#terminusdb_client.WOQLQuery.remote" title="terminusdb_client.WOQLQuery.remote"><code class="xref py py-meth docutils literal notranslate"><span class="pre">remote()</span></code></a> instead of <cite>.file</cite>.</p>
 </dd>
 </dl>
 </div>
@@ -634,7 +634,7 @@ Commonly used to combine WOQLQueries.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
-<dt><a class="reference internal" href="#terminusdb_client.WOQLQuery.file" title="terminusdb_client.WOQLQuery.file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">file()</span></code></a></dt><dd><p>If your csv file is local then use <a class="reference internal" href="#terminusdb_client.WOQLQuery.file" title="terminusdb_client.WOQLQuery.file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">file()</span></code></a> instead of <cite>.remote</cite>.</p>
+<dt><a class="reference internal" href="#terminusdb_client.WOQLQuery.file" title="terminusdb_client.WOQLQuery.file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">file</span></code></a></dt><dd><p>If your csv file is local then use <a class="reference internal" href="#terminusdb_client.WOQLQuery.file" title="terminusdb_client.WOQLQuery.file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">file()</span></code></a> instead of <cite>.remote</cite>.</p>
 </dd>
 </dl>
 </div>
@@ -710,7 +710,7 @@ One needs to delete the previous triple first.
 Otherwise two triples with the same predicate but different object values will be present.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#terminusdb_client.WOQLQuery.delete_triple" title="terminusdb_client.WOQLQuery.delete_triple"><code class="xref py py-meth docutils literal notranslate"><span class="pre">delete_triple()</span></code></a>, <a class="reference internal" href="#terminusdb_client.WOQLQuery.add_quad" title="terminusdb_client.WOQLQuery.add_quad"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_quad()</span></code></a></p>
+<p><a class="reference internal" href="#terminusdb_client.WOQLQuery.delete_triple" title="terminusdb_client.WOQLQuery.delete_triple"><code class="xref py py-obj docutils literal notranslate"><span class="pre">delete_triple</span></code></a>, <a class="reference internal" href="#terminusdb_client.WOQLQuery.add_quad" title="terminusdb_client.WOQLQuery.add_quad"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_quad</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -1396,7 +1396,22 @@ If literal type is “owl:Thing” or “node”, <cite>val</cite> will be treat
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.type_of">
 <span class="sig-name descname"><span class="pre">type_of</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vtype</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.type_of" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Sets the given value and type for cursor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> (<em>str</em>) – Value which needs to be set</p></li>
+<li><p><strong>vtype</strong> (<em>type</em>) – Type which needs to be set</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>query object that can be chained and/or execute</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>WOQLQuery object</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.order_by">
@@ -1464,7 +1479,16 @@ If literal type is “owl:Thing” or “node”, <cite>val</cite> will be treat
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.true">
 <span class="sig-name descname"><span class="pre">true</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.true" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Sets true for cursor type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>query object that can be chained and/or execute</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>WOQLQuery object</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.path">
@@ -1496,12 +1520,42 @@ It uses pattern construction syntax such as:
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.size">
 <span class="sig-name descname"><span class="pre">size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.size" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Sets the given graph and size for cursor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>graph</strong> (<em>Graph which needs to be set as resource</em>) – </p></li>
+<li><p><strong>size</strong> (<em>Size which needs to be set</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>query object that can be chained and/or execute</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>WOQLQuery object</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.triple_count">
 <span class="sig-name descname"><span class="pre">triple_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">triple_count</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.triple_count" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Sets the given triple count and size for cursor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>graph</strong> (<em>Graph which needs to be set as resource</em>) – </p></li>
+<li><p><strong>triple_count</strong> (<em>Triple count which needs to be set</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>query object that can be chained and/or execute</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>WOQLQuery object</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.star">
@@ -1528,7 +1582,24 @@ It uses pattern construction syntax such as:
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.all">
 <span class="sig-name descname"><span class="pre">all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.all" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Calls the star method and returns the result of the same.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>subj</strong> (<em>str</em><em>, </em><em>optional</em>) – target subject</p></li>
+<li><p><strong>pred</strong> (<em>str</em><em>, </em><em>optional</em>) – target predicate</p></li>
+<li><p><strong>obj</strong> (<em>str</em><em>, </em><em>optional</em>) – target object</p></li>
+<li><p><strong>graph</strong> (<em>str</em>) – graphIRI</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>query object that can be chained and/or execute</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>WOQLQuery object</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.graph">
