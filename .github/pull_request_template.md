@@ -1,2 +1,2 @@
-Please read https://github.com/terminusdb/terminus-client-python/blob/master/Contributing.md
+Please read https://github.com/terminusdb/terminusdb-client-python/blob/master/CONTRIBUTING.md
 before submitting a pull request.
