@@ -652,9 +652,16 @@ def alldocs(schema, type_, query, head, export, keepid, maxdep, filename=None):
     client, msg = _connect(settings)
     if schema:
         if type_:
-            click.echo(client.get_document(type_, graph_type="schema"))
+            click.echo(
+                json.dumps(client.get_document(type_, graph_type="schema"), indent=4)
+            )
         else:
-            click.echo(list(client.get_all_documents(graph_type="schema", count=head)))
+            click.echo(
+                json.dumps(
+                    list(client.get_all_documents(graph_type="schema", count=head)),
+                    indent=4,
+                )
+            )
     elif type_:
         if not query:
             result = list(client.get_documents_by_type(type_, count=head))
@@ -690,9 +697,9 @@ def alldocs(schema, type_, query, head, export, keepid, maxdep, filename=None):
                 f"CSV file {filename} created with {type_} from database {client.db}."
             )
         else:
-            click.echo(result)
+            click.echo(json.dumps(result, indent=4))
     else:
-        click.echo(list(client.get_all_documents(count=head)))
+        click.echo(json.dumps(list(client.get_all_documents(count=head)), indent=4))
 
 
 @click.command()
