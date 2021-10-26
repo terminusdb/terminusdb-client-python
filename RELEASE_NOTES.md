@@ -1,5 +1,14 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.20
+
+### Bug Fixes / Improvements
+
+
+- `terminudb alldocs` using json dumps to export json instead of printing dict
+
+---
+
 ## v10.0.19
 
 ### Bug Fixes / Improvements
