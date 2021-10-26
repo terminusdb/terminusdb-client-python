@@ -30,6 +30,18 @@ class WOQLView:
             pass
 
     def edges(self, *args: list):
+        """Configure edges for the WOQLView
+
+        Parameters
+        ----------
+        args: List of edges
+            Edges to be configured in woqlGraphConfig
+
+        Returns
+        -------
+        WOQLView object
+            View object
+        """
         for item in args:
             if not isinstance(item, list):
                 raise TypeError("argument of edges need to be lists")
@@ -38,14 +50,50 @@ class WOQLView:
         return self
 
     def height(self, height_input: Number):
+        """ Configure height for the WOQLView
+
+        Parameters
+        ----------
+        height_input: Number
+            Height of the view
+
+        Returns
+        -------
+        WOQLView object
+            View object
+        """
         self.config += f"woqlGraphConfig.height({height_input});\n"
         return self
 
     def width(self, width_input: Number):
+        """Configure width for the WOQLView
+
+        Parameters
+        ----------
+        width_input: Number
+            Width of the view
+
+        Returns
+        -------
+        WOQLView object
+            View object
+        """
         self.config += f"woqlGraphConfig.width({width_input});\n"
         return self
 
     def edge(self, start: str, end: str):
+        """ Add Edges in the given range
+
+        Parameters
+        ----------
+        start: str
+        end: str
+
+        Returns
+        -------
+        WOQLView object
+            View object
+        """
         if not isinstance(start, str) or not isinstance(end, str):
             raise TypeError("arguments of edge() need to be strings")
         arguments = ",".join(map(lambda x: f'"{x}"', [start, end]))
@@ -53,6 +101,17 @@ class WOQLView:
         return self
 
     def node(self, *args: str):
+        """ Configure the list of nodes to graph
+
+        Parameters
+        ----------
+        args: *str
+
+        Returns
+        -------
+        WOQLView object
+            View object
+        """
         # if not isinstance(select_node, str):
         #     raise TypeError("argument of node() need to be string")
         # self.obj = f'woqlGraphConfig.node("{select_node}")'
@@ -66,24 +125,72 @@ class WOQLView:
         return self
 
     def text(self, input_text: str):
+        """ Configure text for WOQLView
+
+        Parameters
+        ----------
+        input_text: str
+            Text of the view
+
+        Returns
+        -------
+        WOQLView object
+            View object
+        """
         if self.obj is None:
             raise SyntaxError("text() should be used following a node() or edge()")
         self.config += self.obj + f'.text("{input_text}");\n'
         return self
 
     def distance(self, input_distance: Number):
+        """ Configure distance for the WOQLView
+
+        Parameters
+        ----------
+        input_distance: Number
+            distance of the view
+
+        Returns
+        -------
+        WOQLView object
+            View object
+        """
         if self.obj is None:
             raise SyntaxError("distance() should be used following a node() or edge()")
         self.config += self.obj + f".distance({input_distance});\n"
         return self
 
     def weight(self, input_weight: Number):
+        """ Configure weight for the WOQLView
+
+        Parameters
+        ----------
+        input_weight: Number
+            Weight of the view
+
+        Returns
+        -------
+        WOQLView object
+            View object
+        """
         if self.obj is None:
             raise SyntaxError("weight() should be used following a node() or edge()")
         self.config += self.obj + f".weight({input_weight});\n"
         return self
 
     def color(self, input_color: list):
+        """ Configure colors for the WOQLView
+
+        Parameters
+        ----------
+        input_color: list
+            Color list of the view
+
+        Returns
+        -------
+        WOQLView object
+            View object
+        """
         if not isinstance(input_color, list):
             raise TypeError("argument of color() need to be list")
         if len(input_color) > 3:
@@ -97,6 +204,18 @@ class WOQLView:
         return self
 
     def icon(self, input_dict: dict):
+        """ Configure icon for the WOQLView
+
+        Parameters
+        ----------
+        input_dict: dict
+            Icons mapped as key value
+
+        Returns
+        -------
+        WOQLView object
+            View object
+        """
         if not isinstance(input_dict, dict):
             raise TypeError("argument of icon() need to be dict")
         if self.obj is None:
@@ -105,12 +224,36 @@ class WOQLView:
         return self
 
     def size(self, input_size: Number):
+        """ Configure size for the WOQLView
+
+        Parameters
+        ----------
+        input_size: Number
+            Weight of the view
+
+        Returns
+        -------
+        WOQLView object
+            View object
+        """
         if self.obj is None:
             raise SyntaxError("size() should be used following a node() or edge()")
         self.config += self.obj + f".size({input_size});\n"
         return self
 
     def collision_radius(self, input_radius: Number):
+        """ Configure radius for the WOQLView
+
+        Parameters
+        ----------
+        input_radius: Number
+            Radius of the view
+
+        Returns
+        -------
+        WOQLView object
+            View object
+        """
         if self.obj is None:
             raise SyntaxError(
                 "collision_radius() should be used following a node() or edge()"
@@ -119,6 +262,18 @@ class WOQLView:
         return self
 
     def hidden(self, input_choice: bool):
+        """ Configure hidden choice for the WOQLView
+
+        Parameters
+        ----------
+        input_choice: bool
+            Hidden Choice of the view
+
+        Returns
+        -------
+        WOQLView object
+            View object
+        """
         if input_choice:
             self.config += self.obj + ".hidden(true);\n"
         else:
@@ -126,12 +281,36 @@ class WOQLView:
         return self
 
     def charge(self, input_charge: Number):
+        """ Configure charge for the WOQLView
+
+        Parameters
+        ----------
+        input_charge: Number
+            Charge of the view
+
+        Returns
+        -------
+        WOQLView object
+            View object
+        """
         if self.obj is None:
             raise SyntaxError("charge(() should be used following a node() or edge()")
         self.config += self.obj + f".charge({input_charge});\n"
         return self
 
     def of(self, input_obj: str):
+        """ Configure IN object for the WOQLView
+
+        Parameters
+        ----------
+        input_obj: str
+            Object of the view
+
+        Returns
+        -------
+        WOQLView object
+            View object
+        """
         if self.obj is None:
             raise SyntaxError("in() should be used following a node() or edge()")
         self.obj += f'.in("{input_obj}")'
