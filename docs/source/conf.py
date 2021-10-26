@@ -40,7 +40,7 @@ master_doc = "index"
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx_rtd_theme",
-    "sphinxcontrib.napoleon",
+    "sphinx.ext.napoleon",
     "sphinx_autodoc_typehints",
     "sphinx_click",
 ]

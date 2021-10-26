@@ -1,6 +1,5 @@
 sphinx>=3.0
 sphinx_rtd_theme
-sphinxcontrib-napoleon
 sphinx_autodoc_typehints
 sphinx_click
 numpydoc
