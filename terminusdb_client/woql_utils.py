@@ -19,10 +19,30 @@ STANDARD_URLS = {
 
 
 def encode_uri_component(value):
+    """ Encode a URI.
+
+    Parameters
+    ----------
+    value: Value which needs to be encoded
+
+    Returns
+    -------
+        Encoded Value
+    """
     return urllib.parse.urlencode(value, doseq=True)
 
 
 def uri_encode_payload(payload):
+    """ Encode the given payload
+
+    Parameters
+    ----------
+    payload: dict
+
+    Returns
+    -------
+        Encoded payload array
+    """
     if isinstance(payload, str):
         return encode_uri_component(payload)
     payload_arr = []
@@ -41,6 +61,17 @@ def uri_encode_payload(payload):
 
 
 def add_params_to_url(url, payload):
+    """ Add params / payload to given url
+
+    Parameters
+    ----------
+    url: str
+    payload: dict
+
+    Returns
+    -------
+        Url with payload appended
+    """
     if payload:
         params = uri_encode_payload(payload)
         if params:
@@ -52,12 +83,33 @@ def add_params_to_url(url, payload):
 
 
 def add_namespaces_to_variable(var):
+    """ Adds namespace to given variable
+
+    Parameters
+    ----------
+    var: str
+        Variable
+
+    Returns
+    -------
+        Variable attached with namespace
+    """
     if var[:2] != "v:":
         return "v:" + var
     return var
 
 
 def add_namespaces_to_variables(variables):
+    """ Adds namespace to given variables
+
+    Parameters
+    ----------
+    variables: list [str]
+
+    Returns
+    -------
+        Variables attached with namespace
+    """
     nvars = []
     for v_item in variables:
         nvars.append(add_namespaces_to_variable(v_item))
@@ -85,6 +137,17 @@ def empty(obj):
 
 
 def shorten(url, prefixes=None):
+    """ Get shortened url
+
+    Parameters
+    ----------
+    url: str
+    prefixes: dict
+
+    Returns
+    -------
+        Url with prefixes added and shortened
+    """
     prefixes = prefixes if prefixes else STANDARD_URLS
     for pref, val in prefixes.items():
         short_url = url[: len(val)]
@@ -94,6 +157,16 @@ def shorten(url, prefixes=None):
 
 
 def is_data_type(stype):
+    """ Checks if the given type is a datatype or not
+
+    Parameters
+    ----------
+    stype: str
+
+    Returns
+    -------
+    bool
+    """
     sh = shorten(stype)
     if sh and (sh[:4] == "xsd:" or sh[:4] == "xdd:"):
         return True
@@ -101,12 +174,35 @@ def is_data_type(stype):
 
 
 def valid_url(string):
+    """ Checks if the given url is valid
+
+    Parameters
+    ----------
+    string: str
+        Url which needs to be validated
+
+    Returns
+    -------
+    bool
+    """
     if string and (string[:7] == "http://" or string[:8] == "https://"):
         return True
     return False
 
 
 def url_fraqment(url):
+    """ Gets the url fragment
+
+    Parameters
+    ----------
+    url: str
+
+    Returns
+    -------
+    str
+        url fragment
+
+    """
     bits = url.split("#")
     if len(bits) > 1:
         return bits[1]
@@ -114,6 +210,17 @@ def url_fraqment(url):
 
 
 def label_from_url(url):
+    """ Get the label from url
+
+    Parameters
+    ----------
+    url: str
+
+    Returns
+    -------
+    str
+        Label
+    """
     nurl = url_fraqment(url)
     nurl = nurl if nurl else url
     last_char = nurl.rfind("/")
@@ -140,6 +247,23 @@ def _result2stream(result):
 
 
 def _finish_response(request_response):
+    """ Get the response text
+
+    Parameters
+    ----------
+    request_response: Response Object
+
+    Returns
+    -------
+    str
+        Response text
+
+    Raises
+    ------
+    DatabaseError
+        For status codes 400 to 598
+
+    """
     if request_response.status_code == 200:
         return request_response.text  # if not a json not it raises an error
     elif request_response.status_code > 399 and request_response.status_code < 599:
