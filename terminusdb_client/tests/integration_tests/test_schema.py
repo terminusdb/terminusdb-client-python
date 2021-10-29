@@ -1,5 +1,7 @@
+import datetime as dt
+
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
-from terminusdb_client.woqlschema.woql_schema import WOQLSchema
+from terminusdb_client.woqlschema.woql_schema import DocumentTemplate, WOQLSchema
 
 # from woql_schema import WOQLSchema, Document, Property, WOQLObject
 #
@@ -190,3 +192,28 @@ def test_getting_and_deleting_cheuk(docker_url):
     assert result["contact_number"] == "07777123456"
     client.delete_document(cheuk)
     assert client.get_documents_by_type("Employee", as_list=True) == []
+
+
+class CheckDatetime(DocumentTemplate):
+
+    datetime: dt.datetime
+    duration: dt.timedelta
+
+
+def test_datetime_backend(docker_url):
+    datetime_obj = dt.datetime(2019, 5, 18, 15, 17, 8, 132263)
+    delta = dt.timedelta(
+        days=50,
+        seconds=27,
+        microseconds=10,
+        milliseconds=29000,
+        minutes=5,
+        hours=8,
+        weeks=2,
+    )
+    test_obj = CheckDatetime(datetime=datetime_obj, duration=delta)
+    client = WOQLClient(docker_url)
+    client.connect()
+    client.create_database("test_datetime")
+    client.insert_document(CheckDatetime, graph_type="schema")
+    client.insert_document(test_obj)

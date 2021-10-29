@@ -129,7 +129,7 @@ def datetime_from_woql(dt_str, woql_type):
             delta_obj = -delta_obj
         return delta_obj
     else:
-        dt_obj = dt.datetime().fromisoformat(dt_str.replace("Z", ""))
+        dt_obj = dt.datetime.fromisoformat(dt_str.replace("Z", ""))
         if woql_type == "xsd:dateTime":
             return dt_obj
         elif woql_type == "xsd:date":

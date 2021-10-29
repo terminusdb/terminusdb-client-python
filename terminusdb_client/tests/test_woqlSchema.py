@@ -1,3 +1,4 @@
+import datetime as dt
 from typing import Set
 
 import pytest
@@ -58,6 +59,12 @@ class CheckCycling(CheckCyclingPaPa):
 class CheckEmptySet(DocumentTemplate):
 
     some_set: Set[str]
+
+
+class CheckDatetime(DocumentTemplate):
+
+    datetime: dt.datetime
+    duration: dt.timedelta
 
 
 def test_schema_construct(test_schema):
@@ -182,6 +189,28 @@ def test_add_enum_class():
 def test_empty_set():
     test_obj = CheckEmptySet()
     test_obj._obj_to_dict()
+
+
+def test_datetime():
+    datetime_obj = dt.datetime(2019, 5, 18, 15, 17, 8, 132263)
+    delta = dt.timedelta(
+        days=50,
+        seconds=27,
+        microseconds=10,
+        milliseconds=29000,
+        minutes=5,
+        hours=8,
+        weeks=2,
+    )
+    test_obj = CheckDatetime(datetime=datetime_obj, duration=delta)
+    test_dict = test_obj._obj_to_dict()
+    assert test_dict["datetime"] == "2019-05-18T15:17:08.132263"
+    assert test_dict["duration"] == "PT5558756.00001S"
+    datetime_schema = WOQLSchema()
+    datetime_schema.add_obj("CheckDatetime", CheckDatetime)
+    new_obj = datetime_schema.import_objects(test_dict)
+    assert new_obj.datetime == datetime_obj
+    assert new_obj.duration == delta
 
 
 # def test_schema_delete():

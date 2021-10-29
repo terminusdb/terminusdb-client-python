@@ -529,13 +529,13 @@ class WOQLSchema:
 
             if isinstance(obj_type, str) and obj_type[:4] == "xsd:":
                 # it's datatype
-                if object_type in [
+                if obj_type in [
                     "xsd:dateTime",
                     "xsd:date",
                     "xsd:time",
                     "xsd:duration",
                 ]:
-                    return wt.datetime_from_woql(value)
+                    return wt.datetime_from_woql(value, obj_type)
                 return value
             elif isinstance(obj_type, dict):
                 # it's List, Set, Optional etc
