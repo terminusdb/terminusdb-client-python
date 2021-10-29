@@ -158,6 +158,8 @@ class TerminusClass(type):
                 setattr(obj, key, value)
             if kwargs.get("_id"):
                 obj._id = kwargs.get("_id")
+            elif hasattr(obj, "_subdocument"):
+                pass
             elif hasattr(obj, "_key") and hasattr(obj._key, "idgen"):
                 obj._id = obj._key.idgen(obj)
             obj._isinstance = True
@@ -286,7 +288,7 @@ class DocumentTemplate(metaclass=TerminusClass):
                         if isinstance(the_item, Enum):
                             result[item] = str(the_item)
                         else:
-                            result[item] = the_item
+                            result[item] = wt.datetime_to_woql(the_item)
         return result
 
 
@@ -527,6 +529,13 @@ class WOQLSchema:
 
             if isinstance(obj_type, str) and obj_type[:4] == "xsd:":
                 # it's datatype
+                if object_type in [
+                    "xsd:dateTime",
+                    "xsd:date",
+                    "xsd:time",
+                    "xsd:duration",
+                ]:
+                    return wt.datetime_from_woql(value)
                 return value
             elif isinstance(obj_type, dict):
                 # it's List, Set, Optional etc
