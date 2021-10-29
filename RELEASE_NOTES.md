@@ -1,5 +1,14 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.21
+
+### Bug Fixes / Improvements
+
+
+- Adding datetime convertion between WOQL xsd types and Python datetime.
+
+---
+
 ## v10.0.20
 
 ### Bug Fixes / Improvements
