@@ -1,142 +1,126 @@
 # helper functions for WOQLCore
+import re
 
-
-def _get_clause_and_remainder(pat):
-    """Breaks a graph pattern up into two parts - the next clause, and the remainder of the string
-    Parameters
-    ----------
-    pat: str
-         graph pattern fragment
-    """
-    pat = pat.strip()
-    opening = 1
-    # if there is a parentheses, we treat it as a clause and go to the end
-    if pat[0] == "(":
-        for idx, char in enumerate(pat[1:]):
-            if char == "(":
-                opening += 1
-            elif char == ")":
-                opening -= 1
-            if opening == 0:
-                rem = pat[idx + 2 :].strip()
-                if rem:
-                    return [pat[1 : idx + 1], rem]
-                return _get_clause_and_remainder(pat[1 : idx + 1])
-                # whole thing surrounded by parentheses, strip them out and reparse
-        return []
-    if pat[0] == "+" or pat[0] == "*" or pat[0] == "," or pat[0] == "|":
-        ret = [pat[0]]
-        if pat[1:]:
-            ret.append(pat[1:])
-        return ret
-    if pat[0] == "{":
-        close_idx = pat.find("}") + 1
-        ret = [pat[:close_idx]]
-        if pat[close_idx:]:
-            ret.append(pat[close_idx:])
-        return ret
-    for idx, char in enumerate(pat[1:]):
-        if char in [",", "|", "+", "*", "{"]:
-            return [pat[: idx + 1], pat[idx + 1 :]]
-    return [pat]
-
-
-def _tokenize(pat):
-    """Tokenizes the pattern into a sequence of tokens which may be clauses or operators"""
-    parts = _get_clause_and_remainder(pat)
-    seq = []
-    while len(parts) == 2:
-        seq.append(parts[0])
-        parts = _get_clause_and_remainder(parts[1])
-    seq.append(parts[0])
-    return seq
-
-
-def _tokens_to_json(seq, query):
-    """Turns a sequence of tokens into the appropriate JSON-LD
-    Parameters
-    ----------
-    seq: list
-    query: WOQLQuery"""
-    if len(seq) == 1:  # may need to be further tokenized
-        ntoks = _tokenize(seq[0])
-        if len(ntoks) == 1:
-            tok = ntoks[0].strip()
-            return _compile_predicate(tok, query)
+def _split_at(op,tokens):
+    results = []
+    stack = []
+    paren_depth = 0
+    brace_depth = 0
+    for token in tokens:
+        if token == ')':
+            paren_depth -= 1
+            stack.append(token)
+        elif token == '(':
+            paren_depth += 1
+            stack.append(token)
+        elif token == '}':
+            brace_depth -= 1
+            stack.append(token)
+        elif token == '{':
+            brace_depth += 1
+            stack.append(token)
+        elif paren_depth == 0 and brace_depth == 0 and token == op:
+            results.append(stack)
+            stack = []
         else:
-            return _tokens_to_json(ntoks, query)
-    elif "|" in seq:  # binds most loosely
-        left = seq[: seq.index("|")]
-        right = seq[seq.index("|") + 1 :]
-        return {
-            "@type": "PathOr",
-            "or": [_tokens_to_json(left, query), _tokens_to_json(right, query)],
-        }
-    elif "," in seq:  # binds tighter
-        first = seq[: seq.index(",")]
-        second = seq[seq.index(",") + 1 :]
-        return {
-            "@type": "PathSequence",
-            "sequence": [_tokens_to_json(first, query), _tokens_to_json(second, query)],
-        }
-    elif seq[1] == "+":  # binds tightest of all
-        return {
-            "@type": "PathPlus",
-            "plus": _tokens_to_json([seq[0]], query),
-        }
-    elif seq[1] == "*":  # binds tightest of all
-        return {
-            "@type": "PathStar",
-            "star": _tokens_to_json([seq[0]], query),
-        }
-    elif seq[1][0] == "{":  # binds tightest of all
-        meat = seq[1][1:-1].split(",")
-        return {
-            "@type": "PathTimes",
-            "from": int(meat[0]),
-            "to": int(meat[1]),
-            "times": _tokens_to_json([seq[0]], query),
-        }
+            stack.append(token)
+
+    if paren_depth < 0 or brace_depth < 0:
+        raise SyntaxError(f"Unbalanced parenthesis or braces in path pattern {tokens}")
+
+    results.append(stack)
+    return results
+
+def _path_tokens_to_json(tokens):
+    seqs = _split_at(',',tokens)
+    phrases = []
+    for seq in seqs:
+        phrases.append(_path_or_parser(seq))
+    # In the degenerate case where there is only one operand
+    # we just return the operand (and(q) == q)
+    if len(phrases) == 1:
+        return phrases[0]
     else:
-        query._parameter_error("Pattern error - could not be parsed " + seq[0])
-        return {
-            "@type": "PathPredicate",
-            "rdfs:label": "failed to parse query " + seq[0],
-        }
+        return { "@type": "PathSequence",
+                 "sequence": phrases}
 
-
-def _compile_predicate(pp, query):
-    if "<" in pp and ">" in pp:
-        pred = pp[1:-1]
-        cleaned = query._clean_path_predicate(pred)
-        return {
-            "@type": "PathOr",
-            "or": [
-                {
-                    "@type": "InversePathPredicate",
-                    "predicate": cleaned,
-                },
-                {
-                    "@type": "PathPredicate",
-                    "predicate": cleaned,
-                },
-            ],
-        }
-    elif "<" in pp:
-        pred = pp[1:]
-        cleaned = query._clean_path_predicate(pred)
-        return {
-            "@type": "InversePathPredicate",
-            "predicate": cleaned,
-        }
-    elif ">" in pp:
-        pred = pp[:-1]
-        cleaned = query._clean_path_predicate(pred)
-        return {"@type": "PathPredicate", "predicate": cleaned}
+def _path_or_parser(tokens):
+    ors = _split_at('|',tokens)
+    phrases = []
+    for or_tokens in ors:
+        phrases.append(_phrase_parser(or_tokens))
+    # In the degenerate case where there is only one operand
+    # we just return the operand (or(q) == q)
+    if len(phrases) == 1:
+        return phrases[0]
     else:
-        pred = query._clean_path_predicate(pp)
-        return {"@type": "PathPredicate", "predicate": pred}
+        return { '@type' : "PathOr",
+                 'or' :  phrases }
 
+def _group(tokens):
+    group = []
+    depth = 0
+
+    while depth >= 0 and not (tokens == []):
+        tok = tokens.pop(0)
+        if tok == '(':
+            depth += 1
+        elif tok == ')':
+            depth -= 1
+
+        group.append(tok)
+
+    if depth < 1:
+        tokens.append(group.pop())
+    return group
+
+def _phrase_parser(tokens):
+    result = None
+    while not (tokens == []):
+        token = tokens.pop(0)
+        if token == '(':
+            print(f"tokens: {tokens}")
+            group = _group(tokens)
+            print(f"group: {group}")
+            result = _path_tokens_to_json(group)
+        elif token == ')':
+            return result
+        elif token == '<':
+            token = tokens.pop(0)
+            result = { '@type' : "InversePathPredicate",
+                       'predicate' : token }
+        elif token == '>':
+            result = result
+        elif token == '.':
+            result = { '@type' : "PathPredicate" }
+        elif token == '*' and not result is None:
+            result = { '@type' : "PathStar",
+                       'star' : result }
+        elif token == '+' and not result is None:
+            result = { '@type' : "PathPlus",
+                       'plus' : result }
+        elif token == '{' and not result is None:
+            n = int(tokens.pop(0))
+            comma = tokens.pop(0)
+            if not comma == ',':
+                raise ErrorBadSyntax('incorrect separation in braced path pattern')
+            m = int(tokens.pop(0))
+            close_brace = tokens.pop(0)
+            if not close_brace == '}':
+                raise ErrorBadSyntax('no matching brace in path pattern')
+            result = { '@type' : "PathTimes",
+                       'from' : n,
+                       'to' : m,
+                       'times' : result }
+        else:
+            result = { '@type' : "PathPredicate",
+                       'predicate' : token }
+    return result
+
+def _path_tokenize(pat):
+    """Tokenizes the pattern into a sequence of tokens which may be clauses or operators"""
+    lexer = r"[@:_\w']+|[\.\|\+\*\{\}\,\(\)<>]"
+    return re.findall(lexer, pat)
 
 def _copy_dict(orig, rollup=None):
     if type(orig) is list:
