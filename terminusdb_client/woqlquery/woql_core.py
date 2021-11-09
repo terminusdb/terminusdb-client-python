@@ -21,7 +21,7 @@ def _get_clause_and_remainder(pat):
                 rem = pat[idx + 2 :].strip()
                 if rem:
                     return [pat[1 : idx + 1], rem]
-                return _get_clause_and_remainder(pat[1:idx])
+                return _get_clause_and_remainder(pat[1 : idx + 1])
                 # whole thing surrounded by parentheses, strip them out and reparse
         return []
     if pat[0] == "+" or pat[0] == "*" or pat[0] == "," or pat[0] == "|":

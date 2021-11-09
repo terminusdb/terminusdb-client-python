@@ -542,3 +542,32 @@ class TestTripleBuilderChainer:
                 "variable": "z",
             },
         ]
+
+    def test_path_method(self):
+        query = WOQLQuery().path(
+            "v:person",
+            "((capability_userstory|userstory_gap){1,2})",
+            "v:circle",
+            "v:path_var5",
+        )
+        assert (
+            query.to_json()
+            == '{"@type": "Path", "object": {"@type": "Value", "variable": "circle"}, "path": {"@type": "Value", "variable": "path_var5"}, "pattern": {"@type": "PathTimes", "from": 1, "times": {"@type": "PathOr", "or": [{"@type": "PathPredicate", "predicate": "capability_userstory"}, {"@type": "PathPredicate", "predicate": "userstory_gap"}]}, "to": 2}, "subject": {"@type": "NodeValue", "variable": "person"}}'
+        )
+
+    def test_compile_path_pattern(self):
+        result = WOQLQuery()._compile_path_pattern(
+            "((capability_userstory|userstory_gap){1,2})"
+        )
+        assert result == {
+            "@type": "PathTimes",
+            "from": 1,
+            "to": 2,
+            "times": {
+                "@type": "PathOr",
+                "or": [
+                    {"@type": "PathPredicate", "predicate": "capability_userstory"},
+                    {"@type": "PathPredicate", "predicate": "userstory_gap"},
+                ],
+            },
+        }
