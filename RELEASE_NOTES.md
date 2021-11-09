@@ -1,5 +1,14 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.22
+
+### Bug Fixes / Improvements
+
+
+- Fix path pattern parser.
+
+---
+
 ## v10.0.21
 
 ### Bug Fixes / Improvements
