@@ -1615,7 +1615,6 @@ class WOQLClient:
         Examples
         --------
         >>> client = WOQLClient("https://127.0.0.1:6363/")
-        >>> client.checkout("some_branch")
         >>> client.reset('234980523ffaf93')
         >>> client.reset('admin/database/local/commit/234980523ffaf93', use_path=True)
         """
