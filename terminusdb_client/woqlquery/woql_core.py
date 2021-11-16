@@ -1,22 +1,23 @@
 # helper functions for WOQLCore
 import re
 
-def _split_at(op,tokens):
+
+def _split_at(op, tokens):
     results = []
     stack = []
     paren_depth = 0
     brace_depth = 0
     for token in tokens:
-        if token == ')':
+        if token == ")":
             paren_depth -= 1
             stack.append(token)
-        elif token == '(':
+        elif token == "(":
             paren_depth += 1
             stack.append(token)
-        elif token == '}':
+        elif token == "}":
             brace_depth -= 1
             stack.append(token)
-        elif token == '{':
+        elif token == "{":
             brace_depth += 1
             stack.append(token)
         elif paren_depth == 0 and brace_depth == 0 and token == op:
@@ -31,8 +32,9 @@ def _split_at(op,tokens):
     results.append(stack)
     return results
 
+
 def _path_tokens_to_json(tokens):
-    seqs = _split_at(',',tokens)
+    seqs = _split_at(",", tokens)
     phrases = []
     for seq in seqs:
         phrases.append(_path_or_parser(seq))
@@ -41,11 +43,11 @@ def _path_tokens_to_json(tokens):
     if len(phrases) == 1:
         return phrases[0]
     else:
-        return { "@type": "PathSequence",
-                 "sequence": phrases}
+        return {"@type": "PathSequence", "sequence": phrases}
+
 
 def _path_or_parser(tokens):
-    ors = _split_at('|',tokens)
+    ors = _split_at("|", tokens)
     phrases = []
     for or_tokens in ors:
         phrases.append(_phrase_parser(or_tokens))
@@ -54,8 +56,8 @@ def _path_or_parser(tokens):
     if len(phrases) == 1:
         return phrases[0]
     else:
-        return { '@type' : "PathOr",
-                 'or' :  phrases }
+        return {"@type": "PathOr", "or": phrases}
+
 
 def _group(tokens):
     group = []
@@ -63,9 +65,9 @@ def _group(tokens):
 
     while depth >= 0 and not (tokens == []):
         tok = tokens.pop(0)
-        if tok == '(':
+        if tok == "(":
             depth += 1
-        elif tok == ')':
+        elif tok == ")":
             depth -= 1
 
         group.append(tok)
@@ -74,53 +76,47 @@ def _group(tokens):
         tokens.append(group.pop())
     return group
 
+
 def _phrase_parser(tokens):
     result = None
     while not (tokens == []):
         token = tokens.pop(0)
-        if token == '(':
-            print(f"tokens: {tokens}")
+        if token == "(":
             group = _group(tokens)
-            print(f"group: {group}")
             result = _path_tokens_to_json(group)
-        elif token == ')':
+        elif token == ")":
             return result
-        elif token == '<':
+        elif token == "<":
             token = tokens.pop(0)
-            result = { '@type' : "InversePathPredicate",
-                       'predicate' : token }
-        elif token == '>':
+            result = {"@type": "InversePathPredicate", "predicate": token}
+        elif token == ">":
             result = result
-        elif token == '.':
-            result = { '@type' : "PathPredicate" }
-        elif token == '*' and not result is None:
-            result = { '@type' : "PathStar",
-                       'star' : result }
-        elif token == '+' and not result is None:
-            result = { '@type' : "PathPlus",
-                       'plus' : result }
-        elif token == '{' and not result is None:
+        elif token == ".":
+            result = {"@type": "PathPredicate"}
+        elif token == "*" and result is not None:
+            result = {"@type": "PathStar", "star": result}
+        elif token == "+" and result is not None:
+            result = {"@type": "PathPlus", "plus": result}
+        elif token == "{" and result is not None:
             n = int(tokens.pop(0))
             comma = tokens.pop(0)
-            if not comma == ',':
-                raise ErrorBadSyntax('incorrect separation in braced path pattern')
+            if not comma == ",":
+                raise ValueError("incorrect separation in braced path pattern")
             m = int(tokens.pop(0))
             close_brace = tokens.pop(0)
-            if not close_brace == '}':
-                raise ErrorBadSyntax('no matching brace in path pattern')
-            result = { '@type' : "PathTimes",
-                       'from' : n,
-                       'to' : m,
-                       'times' : result }
+            if not close_brace == "}":
+                raise ValueError("no matching brace in path pattern")
+            result = {"@type": "PathTimes", "from": n, "to": m, "times": result}
         else:
-            result = { '@type' : "PathPredicate",
-                       'predicate' : token }
+            result = {"@type": "PathPredicate", "predicate": token}
     return result
+
 
 def _path_tokenize(pat):
     """Tokenizes the pattern into a sequence of tokens which may be clauses or operators"""
     lexer = r"[@:_\w']+|[\.\|\+\*\{\}\,\(\)<>]"
     return re.findall(lexer, pat)
+
 
 def _copy_dict(orig, rollup=None):
     if type(orig) is list:
