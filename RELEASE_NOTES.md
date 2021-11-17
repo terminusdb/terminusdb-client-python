@@ -1,5 +1,14 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.23
+
+### Bug Fixes / Improvements
+
+
+- Client.squash now return a commit id that can be used directly in reset, also added option to reset right after squash.
+
+---
+
 ## v10.0.22
 
 ### Bug Fixes / Improvements

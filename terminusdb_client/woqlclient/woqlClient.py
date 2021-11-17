@@ -1679,8 +1679,11 @@ class WOQLClient:
         )
 
     def squash(
-        self, message: Optional[str] = None, author: Optional[str] = None
-    ) -> dict:
+        self,
+        message: Optional[str] = None,
+        author: Optional[str] = None,
+        reset: bool = False,
+    ) -> str:
         """Squash the current branch HEAD into a commit
 
         Raises
@@ -1698,15 +1701,13 @@ class WOQLClient:
             Message for the newly created squash commit
         author : string
             Author of the commit
+        reset : bool
+            Perform reset after squash
 
         Returns
         -------
-        dict
-            A dict with the new commit id:
-            {'@type' : 'api:SquashResponse',
-            'api:commit' : Commit,
-            'api:old_commit' : Old_Commit,
-            'api:status' : "api:success"}
+        str
+            commit id to be reset
 
         Examples
         --------
@@ -1723,7 +1724,16 @@ class WOQLClient:
             auth=self._auth(),
         )
 
-        return json.loads(_finish_response(result))
+        # API response:
+        # {'@type' : 'api:SquashResponse',
+        # 'api:commit' : Commit,
+        # 'api:old_commit' : Old_Commit,
+        # 'api:status' : "api:success"}
+
+        commit_id = json.loads(_finish_response(result)).get("api:commit")
+        if reset:
+            self.reset(commit_id)
+        return commit_id
 
     def clonedb(
         self, clone_source: str, newid: str, description: Optional[str] = None
