@@ -1062,6 +1062,7 @@ class WOQLClient:
         ],
         graph_type: str = "instance",
         commit_msg: Optional[str] = None,
+        create: bool = False,
     ) -> None:
         """Updates the specified document(s)
 
@@ -1073,6 +1074,8 @@ class WOQLClient:
             Graph type, either "instance" or "schema".
         commit_msg : str
             Commit message.
+        create : bool
+            Create the document if it does not yet exist.
 
         Raises
         ------
@@ -1083,7 +1086,7 @@ class WOQLClient:
         self._check_connection()
         params = self._generate_commit(commit_msg)
         params["graph_type"] = graph_type
-
+        params["create"] = "true" if create else "false"
         if isinstance(document, list):
             new_doc = []
             for item in document:
@@ -1121,63 +1124,7 @@ class WOQLClient:
         graph_type: str = "instance",
         commit_msg: Optional[str] = None,
     ) -> None:
-
-        self._validate_graph_type(graph_type)
-        self._check_connection()
-
-        all_existing_obj = self.get_all_documents(graph_type=graph_type)
-        all_existing_id = list(map(lambda x: x.get("@id"), all_existing_obj))
-        insert_docs = []
-        update_docs = []
-        context_obj = None
-        if isinstance(document, list):
-            update_list = document
-        elif hasattr(document, "all_obj"):  # it's WOQLSchema
-            update_list = document.all_obj()
-            context_obj = document.context
-        else:
-            update_list = [document]
-
-        for obj in update_list:
-            if hasattr(obj, "_id"):
-                obj_id = obj._id
-            elif hasattr(obj, "_to_dict"):
-                obj_id = obj._to_dict().get("@id")
-            elif obj.get("@id"):
-                obj_id = obj.get("@id")
-            else:
-                context_obj = obj
-
-            if obj_id is not None and obj_id in all_existing_id:
-                update_docs.append(obj)
-            else:
-                insert_docs.append(obj)
-
-        if context_obj is not None:
-            update_docs = [context_obj] + update_docs
-
-        if graph_type == "schema":
-            stuff = "Schema object"
-        elif graph_type == "instance":
-            stuff = "Document object"
-
-        if commit_msg is None:
-            insert_msg = f"{stuff} inserted by Python client."
-            replace_msg = f"{stuff} repleaced by Python client."
-        else:
-            insert_msg = commit_msg + " (inserts)"
-            replace_msg = commit_msg + " (repleces)"
-
-        self.insert_document(
-            insert_docs,
-            commit_msg=insert_msg,
-            graph_type=graph_type,
-        )
-        self.replace_document(
-            update_docs,
-            commit_msg=replace_msg,
-            graph_type=graph_type,
-        )
+        self.replace_document(document, graph_type, commit_msg, True)
 
     def delete_document(
         self,
