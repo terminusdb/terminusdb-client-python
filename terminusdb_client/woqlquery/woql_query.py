@@ -4,7 +4,7 @@ import json
 # import pprint
 import re
 
-from .woql_core import _copy_dict, _tokenize, _tokens_to_json
+from .woql_core import _copy_dict, _path_tokenize, _path_tokens_to_json
 
 # pp = pprint.PrettyPrinter(indent=4)
 
@@ -592,9 +592,9 @@ class WOQLQuery:
 
     def _compile_path_pattern(self, pat):
         """Turns a textual path pattern into a JSON-LD description"""
-        toks = _tokenize(pat)
+        toks = _path_tokenize(pat)
         if toks:
-            return _tokens_to_json(toks, self)
+            return _path_tokens_to_json(toks)
         else:
             raise ValueError("Pattern error - could not be parsed " + pat)
 

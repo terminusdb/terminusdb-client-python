@@ -571,3 +571,58 @@ class TestTripleBuilderChainer:
                 ],
             },
         }
+
+    def test_compile_path_pattern2(self):
+        result = WOQLQuery()._compile_path_pattern("(pred|qred|res)*")
+        assert result == {
+            "@type": "PathStar",
+            "star": {
+                "@type": "PathOr",
+                "or": [
+                    {"@type": "PathPredicate", "predicate": "pred"},
+                    {"@type": "PathPredicate", "predicate": "qred"},
+                    {"@type": "PathPredicate", "predicate": "res"},
+                ],
+            },
+        }
+
+    def test_compile_path_pattern3(self):
+        result = WOQLQuery()._compile_path_pattern("<left*,right>*")
+        assert result == {
+            "@type": "PathSequence",
+            "sequence": [
+                {
+                    "@type": "PathStar",
+                    "star": {"@type": "InversePathPredicate", "predicate": "left"},
+                },
+                {
+                    "@type": "PathStar",
+                    "star": {"@type": "PathPredicate", "predicate": "right"},
+                },
+            ],
+        }
+
+    def test_compile_path_pattern4(self):
+        result = WOQLQuery()._compile_path_pattern(".*,date")
+
+        assert result == {
+            "@type": "PathSequence",
+            "sequence": [
+                {"@type": "PathStar", "star": {"@type": "PathPredicate"}},
+                {"@type": "PathPredicate", "predicate": "date"},
+            ],
+        }
+
+    def test_compile_path_pattern5(self):
+        result = WOQLQuery()._compile_path_pattern("(ex:pred|evo:qred)*")
+
+        assert result == {
+            "@type": "PathStar",
+            "star": {
+                "@type": "PathOr",
+                "or": [
+                    {"@type": "PathPredicate", "predicate": "ex:pred"},
+                    {"@type": "PathPredicate", "predicate": "evo:qred"},
+                ],
+            },
+        }
