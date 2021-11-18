@@ -4,7 +4,8 @@
 
 ### Bug Fixes / Improvements
 
-
+- Refactor path pattern parsing
+- Improve performance for update_document
 - Client.squash now return a commit id that can be used directly in reset, also added option to reset right after squash.
 
 ---
