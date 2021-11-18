@@ -88,7 +88,7 @@
 <span id="errors-and-exceptions"></span><h1>Errors and Exceptions<a class="headerlink" href="#module-terminusdb_client.errors" title="Permalink to this headline"></a></h1>
 <dl class="py exception">
 <dt class="sig sig-object py" id="terminusdb_client.errors.Error">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">terminusdb_client.errors.</span></span><span class="sig-name descname"><span class="pre">Error</span></span><a class="headerlink" href="#terminusdb_client.errors.Error" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">terminusdb_client.errors.</span></span><span class="sig-name descname"><span class="pre">Error</span></span><a class="headerlink" href="#terminusdb_client.errors.Error" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 <p>Exception that is base class for all other error exceptions.</p>
 <dl class="py method">
@@ -100,7 +100,7 @@
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="terminusdb_client.errors.InterfaceError">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">terminusdb_client.errors.</span></span><span class="sig-name descname"><span class="pre">InterfaceError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.errors.InterfaceError" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">terminusdb_client.errors.</span></span><span class="sig-name descname"><span class="pre">InterfaceError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.errors.InterfaceError" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#terminusdb_client.errors.Error" title="terminusdb_client.errors.Error"><code class="xref py py-class docutils literal notranslate"><span class="pre">terminusdb_client.errors.Error</span></code></a></p>
 <p>Exception raised for errors that are related to the database interface rather than the database itself.</p>
 <dl class="py attribute">
@@ -123,7 +123,7 @@
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="terminusdb_client.errors.DatabaseError">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">terminusdb_client.errors.</span></span><span class="sig-name descname"><span class="pre">DatabaseError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.errors.DatabaseError" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">terminusdb_client.errors.</span></span><span class="sig-name descname"><span class="pre">DatabaseError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.errors.DatabaseError" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#terminusdb_client.errors.Error" title="terminusdb_client.errors.Error"><code class="xref py py-class docutils literal notranslate"><span class="pre">terminusdb_client.errors.Error</span></code></a></p>
 <p>Exception for errors related to the database.</p>
 <dl class="py attribute">
@@ -174,20 +174,20 @@
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="terminusdb_client.errors.OperationalError">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">terminusdb_client.errors.</span></span><span class="sig-name descname"><span class="pre">OperationalError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.errors.OperationalError" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">terminusdb_client.errors.</span></span><span class="sig-name descname"><span class="pre">OperationalError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.errors.OperationalError" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#terminusdb_client.errors.DatabaseError" title="terminusdb_client.errors.DatabaseError"><code class="xref py py-class docutils literal notranslate"><span class="pre">terminusdb_client.errors.DatabaseError</span></code></a></p>
 <p>Exception for operational errors related to the database.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="terminusdb_client.errors.AccessDeniedError">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">terminusdb_client.errors.</span></span><span class="sig-name descname"><span class="pre">AccessDeniedError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.errors.AccessDeniedError" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">terminusdb_client.errors.</span></span><span class="sig-name descname"><span class="pre">AccessDeniedError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.errors.AccessDeniedError" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#terminusdb_client.errors.DatabaseError" title="terminusdb_client.errors.DatabaseError"><code class="xref py py-class docutils literal notranslate"><span class="pre">terminusdb_client.errors.DatabaseError</span></code></a></p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="terminusdb_client.errors.APIError">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">terminusdb_client.errors.</span></span><span class="sig-name descname"><span class="pre">APIError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err_obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.errors.APIError" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">terminusdb_client.errors.</span></span><span class="sig-name descname"><span class="pre">APIError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err_obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.errors.APIError" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#terminusdb_client.errors.DatabaseError" title="terminusdb_client.errors.DatabaseError"><code class="xref py py-class docutils literal notranslate"><span class="pre">terminusdb_client.errors.DatabaseError</span></code></a></p>
 <p>Exceptions to do with return messages from HTTP</p>
 <dl class="py attribute">
@@ -254,7 +254,7 @@
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="terminusdb_client.errors.InvalidURIError">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">terminusdb_client.errors.</span></span><span class="sig-name descname"><span class="pre">InvalidURIError</span></span><a class="headerlink" href="#terminusdb_client.errors.InvalidURIError" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">terminusdb_client.errors.</span></span><span class="sig-name descname"><span class="pre">InvalidURIError</span></span><a class="headerlink" href="#terminusdb_client.errors.InvalidURIError" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#terminusdb_client.errors.Error" title="terminusdb_client.errors.Error"><code class="xref py py-class docutils literal notranslate"><span class="pre">terminusdb_client.errors.Error</span></code></a></p>
 </dd></dl>
 
