@@ -679,7 +679,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLClient.replace_document">
-<span class="sig-name descname"><span class="pre">replace_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'instance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.replace_document" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">replace_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'instance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.replace_document" title="Permalink to this definition"></a></dt>
 <dd><p>Updates the specified document(s)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -687,6 +687,7 @@ and the new value will be used in future requests to the server.</p>
 <li><p><strong>document</strong> (<em>dict</em><em> or </em><em>list of dict</em>) – Document(s) to be updated.</p></li>
 <li><p><strong>graph_type</strong> (<em>str</em>) – Graph type, either “instance” or “schema”.</p></li>
 <li><p><strong>commit_msg</strong> (<em>str</em>) – Commit message.</p></li>
+<li><p><strong>create</strong> (<em>bool</em>) – Create the document if it does not yet exist.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
@@ -1012,7 +1013,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLClient.squash">
-<span class="sig-name descname"><span class="pre">squash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">author</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.squash" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">squash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">author</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.squash" title="Permalink to this definition"></a></dt>
 <dd><p>Squash the current branch HEAD into a commit</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
@@ -1026,17 +1027,14 @@ and the new value will be used in future requests to the server.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>message</strong> (<em>string</em>) – Message for the newly created squash commit</p></li>
 <li><p><strong>author</strong> (<em>string</em>) – Author of the commit</p></li>
+<li><p><strong>reset</strong> (<em>bool</em>) – Perform reset after squash</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A dict with the new commit id:
-<a class="reference external" href="mailto:{'&#37;&#52;&#48;type">{‘<span>&#64;</span>type</a>’ : ‘api:SquashResponse’,
-‘api:commit’ : Commit,
-‘api:old_commit’ : Old_Commit,
-‘api:status’ : “api:success”}</p>
+<dd class="field-even"><p>commit id to be reset</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dict</p>
+<dd class="field-odd"><p>str</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
