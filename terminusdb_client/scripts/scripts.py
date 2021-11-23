@@ -14,8 +14,8 @@ from tqdm import tqdm
 import terminusdb_client.woqlschema.woql_schema as woqlschema
 
 from .. import woql_type as wt
+from ..client.Client import Client
 from ..errors import InterfaceError
-from ..woqlclient.woqlClient import WOQLClient
 from ..woqldataframe.woqlDataframe import result_to_df
 from ..woqlschema.woql_schema import LexicalKey, RandomKey, WOQLSchema
 
@@ -133,7 +133,7 @@ def _connect(settings, new_db=True):
         team = "admin"
     if not branch:
         branch = "main"
-    client = WOQLClient(server)
+    client = Client(server)
     try:
         client.connect(db=database, use_token=use_token, team=team, branch=branch)
         if ref is not None:

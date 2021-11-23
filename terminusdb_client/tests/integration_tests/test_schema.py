@@ -1,6 +1,6 @@
 import datetime as dt
 
-from terminusdb_client.woqlclient.woqlClient import WOQLClient
+from terminusdb_client.client.Client import Client
 from terminusdb_client.woqlschema.woql_schema import DocumentTemplate, WOQLSchema
 
 # from woql_schema import WOQLSchema, Document, Property, WOQLObject
@@ -79,7 +79,7 @@ from terminusdb_client.woqlschema.woql_schema import DocumentTemplate, WOQLSchem
 
 def test_create_schema(docker_url, test_schema):
     my_schema = test_schema
-    client = WOQLClient(docker_url)
+    client = Client(docker_url)
     client.connect()
     client.create_database("test_docapi")
     client.insert_document(
@@ -105,7 +105,7 @@ def test_create_schema(docker_url, test_schema):
 
 def test_create_schema2(docker_url, test_schema):
     my_schema = test_schema
-    client = WOQLClient(docker_url)
+    client = Client(docker_url)
     client.connect()
     client.create_database("test_docapi2")
     my_schema.commit(client, "I am checking in the schema")
@@ -154,7 +154,7 @@ def test_insert_cheuk(docker_url, test_schema):
     cheuk.friend_of = {cheuk}
     cheuk.member_of = Team.IT
 
-    client = WOQLClient(docker_url)
+    client = Client(docker_url)
     client.connect(db="test_docapi")
     # client.create_database("test_docapi")
     # print(cheuk._obj_to_dict())
@@ -177,7 +177,7 @@ def test_insert_cheuk(docker_url, test_schema):
 def test_getting_and_deleting_cheuk(docker_url):
     assert "cheuk" not in globals()
     assert "cheuk" not in locals()
-    client = WOQLClient(docker_url)
+    client = Client(docker_url)
     client.connect(db="test_docapi")
     new_schema = WOQLSchema()
     new_schema.from_db(client)
@@ -212,7 +212,7 @@ def test_datetime_backend(docker_url):
         weeks=2,
     )
     test_obj = CheckDatetime(datetime=datetime_obj, duration=delta)
-    client = WOQLClient(docker_url)
+    client = Client(docker_url)
     client.connect()
     client.create_database("test_datetime")
     client.insert_document(CheckDatetime, graph_type="schema")

@@ -12,8 +12,8 @@ from numpydoc.docscrape import ClassDoc
 from typeguard import check_type
 
 from .. import woql_type as wt
+from ..client.Client import Client
 from ..woql_type import CONVERT_TYPE, to_woql_type
-from ..woqlclient.woqlClient import WOQLClient
 
 
 class TerminusKey:
@@ -605,13 +605,13 @@ class WOQLSchema:
         return new_class
 
     def commit(
-        self, client: WOQLClient, commit_msg: Optional[str] = None, full_replace=False
+        self, client: Client, commit_msg: Optional[str] = None, full_replace=False
     ):
         """Commit the schema to database
 
         Parameters
         ----------
-        client: WOQLClient
+        client: Client
             A client that is connected to a database.
         commit_msg : str
             Commit message.
@@ -637,12 +637,12 @@ class WOQLSchema:
                 graph_type="schema",
             )
 
-    def from_db(self, client: WOQLClient, select: Optional[List[str]] = None):
+    def from_db(self, client: Client, select: Optional[List[str]] = None):
         """Load classes in the database shcema into schema
 
         Parameters
         ----------
-        client: WOQLClient
+        client: Client
             Client that is connected to the database
         select: list of str, optional
             The classes (and depended classes) that will be imported, default to None which will import all classes

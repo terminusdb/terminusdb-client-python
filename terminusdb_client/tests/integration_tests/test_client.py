@@ -6,7 +6,7 @@ from random import random
 
 import pytest
 
-from terminusdb_client.woqlclient.woqlClient import WOQLClient
+from terminusdb_client.client.Client import Client
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 # from terminusdb_client.woqlquery.woql_query import WOQLQuery
@@ -14,7 +14,7 @@ from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 def test_happy_path(docker_url):
     # create client
-    client = WOQLClient(docker_url)
+    client = Client(docker_url)
     assert not client._connected
     # test connect
     client.connect()
@@ -54,7 +54,7 @@ def test_happy_path(docker_url):
 
 def test_happy_carzy_path(docker_url):
     # create client
-    client = WOQLClient(docker_url)
+    client = Client(docker_url)
     assert not client._connected
     # test connect
     client.connect()
@@ -87,7 +87,7 @@ def test_happy_carzy_path(docker_url):
 
 def test_jwt(docker_url_jwt):
     # create client
-    client = WOQLClient(docker_url_jwt)
+    client = Client(docker_url_jwt)
     assert not client._connected
     # test connect
     client.connect(use_token=True)
@@ -109,7 +109,7 @@ def test_terminusx(terminusx_token):
         "test_happy_" + str(dt.datetime.now()).replace(" ", "") + "_" + str(random())
     )
     endpoint = "https://cloud-dev.dcm.ist/TerminusDBTest/"
-    client = WOQLClient(endpoint)
+    client = Client(endpoint)
     client.connect(use_token=True, team="TerminusDBTest")
     assert client._connected
     # test create db
@@ -127,7 +127,7 @@ def test_terminusx(terminusx_token):
 def test_terminusx_crazy_path(terminusx_token):
     testdb = "test happy_" + str(dt.datetime.now()).replace(" ", "")
     endpoint = "https://cloud-dev.dcm.ist/TerminusDBTest/"
-    client = WOQLClient(endpoint)
+    client = Client(endpoint)
     client.connect(use_token=True, team="TerminusDBTest")
     assert client._connected
     # test create db
@@ -168,7 +168,7 @@ def test_terminusx_crazy_path(terminusx_token):
 #
 #
 # def test_csv_handeling(docker_url):
-#     client = WOQLClient(docker_url)
+#     client = Client(docker_url)
 #     assert not client._connected
 #     # test connect
 #     client.connect()

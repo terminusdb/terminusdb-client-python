@@ -1,5 +1,5 @@
-"""woqlClient.py
-WOQLClient is the Python public API for TerminusDB"""
+"""Client.py
+Client is the Python public API for TerminusDB"""
 import copy
 import json
 import os
@@ -17,7 +17,7 @@ from ..errors import InterfaceError
 from ..woql_utils import _finish_response, _result2stream
 from ..woqlquery.woql_query import WOQLQuery
 
-# WOQL client object
+# client object
 # license Apache Version 2
 # summary Python module for accessing the Terminus DB API
 
@@ -44,8 +44,8 @@ class ResourceType(Enum):
     BRANCH = 6
 
 
-class WOQLClient:
-    """Client for querying a TerminusDB server using WOQL queries.
+class Client:
+    """Client for TerminusDB server.
 
     Attributes
     ----------
@@ -68,7 +68,7 @@ class WOQLClient:
     """
 
     def __init__(self, server_url: str, **kwargs) -> None:
-        r"""The WOQLClient constructor.
+        r"""The Client constructor.
 
         Parameters
         ----------
@@ -218,7 +218,7 @@ class WOQLClient:
 
         Examples
         -------
-        >>> client = WOQLClient("https://127.0.0.1:6363")
+        >>> client = Client("https://127.0.0.1:6363")
         >>> client.connect(key="root", team="admin", user="admin", db="example_db")
         """
 
@@ -290,8 +290,8 @@ class WOQLClient:
 
         Example
         -------
-        >>> from terminusdb_client import WOQLClient
-        >>> client = WOQLClient("https://127.0.0.1:6363"
+        >>> from terminusdb_client import Client
+        >>> client = Client("https://127.0.0.1:6363"
         >>> client.connect(db="bank_balance_example")
         >>> client.get_commit_history()
         [{'commit': 's90wike9v5xibmrb661emxjs8k7ynwc', 'author': 'admin', 'message': 'Adding Jane', 'timestamp': datetime.da
@@ -397,24 +397,24 @@ class WOQLClient:
         Raises
         ----------
         NotImplementedError
-            Since TerminusDB currently does not support open transactions. This method is not applicable to it's usage. To reset commit head, use WOQLClient.reset
+            Since TerminusDB currently does not support open transactions. This method is not applicable to it's usage. To reset commit head, use Client.reset
 
         """
         raise NotImplementedError(
-            "Open transactions are currently not supported. To reset commit head, check WOQLClient.reset"
+            "Open transactions are currently not supported. To reset commit head, check Client.reset"
         )
 
-    def copy(self) -> "WOQLClient":
+    def copy(self) -> "Client":
         """Create a deep copy of this client.
 
         Returns
         -------
-        WOQLClient
+        Client
             The copied client instance.
 
         Examples
         --------
-        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client = Client("https://127.0.0.1:6363/")
         >>> clone = client.copy()
         >>> assert client is not clone
         """
@@ -437,7 +437,7 @@ class WOQLClient:
 
         Examples
         --------
-        >>> client = WOQLClient("https://127.0.0.1:6363")
+        >>> client = Client("https://127.0.0.1:6363")
         >>> client.set_db("database1")
         'database1'
         """
@@ -474,7 +474,7 @@ class WOQLClient:
 
         Examples
         --------
-        >>> client = WOQLClient("https://127.0.0.1:6363")
+        >>> client = Client("https://127.0.0.1:6363")
         >>> client.resource(ResourceType.DB)
         '<team>/<db>/'
         >>> client.resource(ResourceType.META)
@@ -551,7 +551,7 @@ class WOQLClient:
 
         Examples
         --------
-        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client = Client("https://127.0.0.1:6363/")
         >>> client.create_database("someDB", "admin", "Database Label", "My Description")
         """
 
@@ -614,7 +614,7 @@ class WOQLClient:
 
         Examples
         -------
-        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client = Client("https://127.0.0.1:6363/")
         >>> client.delete_database("<database>", "<team>")
         """
 
@@ -1247,7 +1247,7 @@ class WOQLClient:
 
         Examples
         -------
-        >>> WOQLClient(server="http://localhost:6363").query(woql, "updating graph")
+        >>> Client(server="http://localhost:6363").query(woql, "updating graph")
 
         Returns
         -------
@@ -1361,7 +1361,7 @@ class WOQLClient:
 
         Examples
         --------
-        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client = Client("https://127.0.0.1:6363/")
         >>> client.pull()
         """
         self._check_connection()
@@ -1438,7 +1438,7 @@ class WOQLClient:
 
         Examples
         -------
-        >>> WOQLClient(server="http://localhost:6363").push(remote="origin", remote_branch = "main", author = "admin", message = "commit message"})
+        >>> Client(server="http://localhost:6363").push(remote="origin", remote_branch = "main", author = "admin", message = "commit message"})
 
         Returns
         -------
@@ -1505,7 +1505,7 @@ class WOQLClient:
 
         Examples
         --------
-        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client = Client("https://127.0.0.1:6363/")
         >>> client.rebase("the_branch")
         """
         self._check_connection()
@@ -1561,7 +1561,7 @@ class WOQLClient:
 
         Examples
         --------
-        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client = Client("https://127.0.0.1:6363/")
         >>> client.reset('234980523ffaf93')
         >>> client.reset('admin/database/local/commit/234980523ffaf93', use_path=True)
         """
@@ -1612,7 +1612,7 @@ class WOQLClient:
 
         Examples
         --------
-        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client = Client("https://127.0.0.1:6363/")
         >>> client.optimize('admin/database/_meta')
         """
         self._check_connection()
@@ -1658,7 +1658,7 @@ class WOQLClient:
 
         Examples
         --------
-        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client = Client("https://127.0.0.1:6363/")
         >>> client.connect(user="admin", key="root", team="admin", db="some_db")
         >>> client.squash('This is a squash commit message!')
         """
@@ -1703,7 +1703,7 @@ class WOQLClient:
 
         Examples
         --------
-        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client = Client("https://127.0.0.1:6363/")
         >>> client.clonedb("http://terminusdb.com/some_user/test_db", "my_test_db")
         """
         self._check_connection()
@@ -1739,7 +1739,7 @@ class WOQLClient:
 
         Examples
         --------
-        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client = Client("https://127.0.0.1:6363/")
         >>> client._generate_commit("<message>", "<author>")
         {'author': '<author>', 'message': '<message>'}
         """
