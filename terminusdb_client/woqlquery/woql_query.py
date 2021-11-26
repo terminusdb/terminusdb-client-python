@@ -1799,7 +1799,7 @@ class WOQLQuery:
 
     def like(self, left, right, dist):
         if left and left == "args":
-            return ["left", "right", "like_similarity"]
+            return ["left", "right", "similarity"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Like"
