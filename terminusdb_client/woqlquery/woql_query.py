@@ -1806,7 +1806,7 @@ class WOQLQuery:
         self._cursor["left"] = self._clean_data_value(left, "xsd:string")
         self._cursor["right"] = self._clean_data_value(right, "xsd:string")
         if dist:
-            self._cursor["like_similarity"] = self._clean_object(dist, "xsd:decimal")
+            self._cursor["similarity"] = self._clean_object(dist, "xsd:decimal")
         return self
 
     def less(self, left, right):
