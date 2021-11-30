@@ -626,3 +626,15 @@ class TestTripleBuilderChainer:
                 ],
             },
         }
+
+    def test_dot(self):
+        result = WOQLQuery().dot("document", "field", "value")
+        assert result.to_dict() == {
+            "@type": "Dot",
+            "document": {"@type": "Value", "node": "document"},
+            "field": {
+                "@type": "DataValue",
+                "data": {"@type": "xsd:string", "@value": "field"},
+            },
+            "value": {"@type": "Value", "node": "value"},
+        }

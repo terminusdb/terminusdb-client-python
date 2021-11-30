@@ -1159,7 +1159,7 @@ class WOQLQuery:
             length, "xsd:nonNegativeInteger"
         )
         self._cursor["after"] = self._clean_data_value(after, "xsd:nonNegativeInteger")
-        self._cursor["substring"] = self._clean_datat_value(substring, "xsd:string")
+        self._cursor["substring"] = self._clean_data_value(substring, "xsd:string")
         return self
 
     def update_object(self, docjson):
@@ -2817,3 +2817,12 @@ class WOQLQuery:
         if len(vars_tuple) == 1:
             vars_tuple = vars_tuple[0]
         return vars_tuple
+
+    def dot(self, document, field, value):
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "Dot"
+        self._cursor["document"] = self._expand_value_variable(document)
+        self._cursor["field"] = self._clean_data_value(field, "xsd:string")
+        self._cursor["value"] = self._expand_value_variable(value)
+        return self
