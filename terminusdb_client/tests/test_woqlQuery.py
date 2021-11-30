@@ -519,8 +519,8 @@ class TestTripleBuilderChainer:
     def test_vars(self):
         single_vars = WOQLQuery().vars("a")
         vars1, vars2, vars3 = WOQLQuery().vars("a", "b", "c")
-        assert single_vars == "v:a"
-        assert (vars1, vars2, vars3) == ("v:a", "v:b", "v:c")
+        assert single_vars.name == "a"
+        assert (vars1.name, vars2.name, vars3.name) == ("a", "b", "c")
 
     def test_woql_as_method(self):
         [x, y, z] = WOQLQuery().vars("x", "y", "z")
