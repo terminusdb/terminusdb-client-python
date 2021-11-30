@@ -252,6 +252,7 @@ class WOQLQuery:
         return qobj
 
     def _raw_var(self, varb):
+        print(varb)
         if isinstance(varb, Var):
             return varb.name
         if varb[:2] == "v:":
@@ -299,7 +300,9 @@ class WOQLQuery:
         elif type(colname_or_index) is str:
             asvar["@type"] = "Column"
             asvar["indicator"] = {"@type": "Indicator", "name": colname_or_index}
-        if vname[:2] == "v:":
+        if isinstance(vname, Var):
+            vname = vname.name
+        elif vname[:2] == "v:":
             vname = vname[2:]
         asvar["variable"] = vname
         if obj_type:
@@ -397,6 +400,11 @@ class WOQLQuery:
                 return self._expand_value_variable(user_obj)
             else:
                 obj["node"] = user_obj
+        elif type(user_obj) is list:
+            elts = []
+            for obj in user_obj:
+                elts.append(self._clean_object(obj))
+            return elts
         elif isinstance(user_obj, Var):
             return self._expand_value_variable(user_obj)
         elif isinstance(user_obj, Doc):
@@ -1390,7 +1398,7 @@ class WOQLQuery:
                             map_type = onemap[2]
                         oasv = self._asv(onemap[0], onemap[1], map_type)
                         self._query.append(oasv)
-        elif type(args[0]) in [int, str]:
+        elif type(args[0]) in [int, str] or isinstance(args[0], Var):
             if len(args) > 2 and type(args[2]) is str:
                 oasv = self._asv(args[0], args[1], args[2])
             elif len(args) > 1 and type(args[1]) is str:
@@ -1405,6 +1413,7 @@ class WOQLQuery:
             self._query.append(args[0].to_dict())
         elif type(args[0]) is dict:
             self._query.append(args[0])
+
         return self
 
     def file(self, fpath, opts=None):
