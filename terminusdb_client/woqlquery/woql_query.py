@@ -252,6 +252,7 @@ class WOQLQuery:
         return qobj
 
     def _raw_var(self, varb):
+        print(varb)
         if isinstance(varb, Var):
             return varb.name
         if varb[:2] == "v:":
