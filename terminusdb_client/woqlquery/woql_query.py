@@ -1241,7 +1241,7 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "ReadDocument"
         self._cursor["identifier"] = self._clean_node_value(iri)
-        self._cursor["document"] = self._expand_data_variable(output_var)
+        self._cursor["document"] = self._expand_value_variable(output_var)
         return self
 
     def get(self, as_vars, query_resource=None):

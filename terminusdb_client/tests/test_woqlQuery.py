@@ -502,7 +502,7 @@ class TestTripleBuilder:
         woql_object = WOQLQuery().read_document("iri", "output")
         json_obj = {
             "@type": "ReadDocument",
-            "document": {"@type": "DataValue", "node": "output"},
+            "document": {"@type": "Value", "node": "output"},
             "identifier": {"@type": "NodeValue", "node": "iri"},
         }
         assert woql_object.to_dict() == json_obj
