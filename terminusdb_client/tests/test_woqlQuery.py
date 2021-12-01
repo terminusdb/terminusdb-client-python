@@ -498,6 +498,15 @@ class TestTripleBuilder:
         }
         assert woql_object.to_dict() == json_obj
 
+    def test_insert_method(self):
+        woql_object = WOQLQuery().insert_document("x", "iri")
+        json_obj = {
+            "@type": "InsertDocument",
+            "document": {"@type": "Value", "node": "x"},
+            "identifier": {"@type": "NodeValue", "node": "iri"},
+        }
+        assert woql_object.to_dict() == json_obj
+
     def test_read_method(self):
         woql_object = WOQLQuery().read_document("iri", "output")
         json_obj = {

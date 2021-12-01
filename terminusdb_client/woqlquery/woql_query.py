@@ -1196,6 +1196,21 @@ class WOQLQuery:
             self._cursor["identifier"] = self._clean_node_value(json_or_iri)
         return self._updated()
 
+    def insert_document(self, docjson, json_or_iri=None):
+        if docjson and docjson == "args":
+            return ["document"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "InsertDocument"
+        if isinstance(docjson, str):
+            doc = self._expand_value_variable(docjson)
+        else:
+            doc = docjson
+        self._cursor["document"] = doc
+        if json_or_iri is not None:
+            self._cursor["identifier"] = self._clean_node_value(json_or_iri)
+        return self._updated()
+
     def delete_object(self, json_or_iri):
         warnings.warn(
             "delete_object() is deprecated; use delete_document()",
