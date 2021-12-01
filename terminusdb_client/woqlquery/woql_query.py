@@ -1188,7 +1188,7 @@ class WOQLQuery:
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "UpdateDocument"
         if isinstance(docjson, str):
-            doc = self._expand_data_variable(docjson)
+            doc = self._expand_value_variable(docjson)
         else:
             doc = docjson
         self._cursor["document"] = doc
