@@ -80,6 +80,7 @@ class WOQLQuery:
         self.update = self.update_document  # self.update_object
         self.delete = self.delete_document  # self.delete_object
         self.read = self.read_document  # self.read_object
+        self.insert = self.insert_document
         self.optional = self.opt
         self.idgenerator = self.idgen
         self.concatenate = self.concat
