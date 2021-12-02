@@ -482,10 +482,37 @@ class TestTripleBuilder:
         assert woql_object.to_dict() == WOQL_JSON["isAJson"]
 
     def test_delete_method(self):
-        woql_object = WOQLQuery().delete_object("x")
+        woql_object = WOQLQuery().delete_document("x")
         json_obj = {
-            "@type": "DeleteObject",
-            "document_uri": {"@type": "NodeValue", "node": "x"},
+            "@type": "DeleteDocument",
+            "identifier": {"@type": "NodeValue", "node": "x"},
+        }
+        assert woql_object.to_dict() == json_obj
+
+    def test_update_method(self):
+        woql_object = WOQLQuery().update_document("x", "iri")
+        json_obj = {
+            "@type": "UpdateDocument",
+            "document": {"@type": "Value", "node": "x"},
+            "identifier": {"@type": "NodeValue", "node": "iri"},
+        }
+        assert woql_object.to_dict() == json_obj
+
+    def test_insert_method(self):
+        woql_object = WOQLQuery().insert_document("x", "iri")
+        json_obj = {
+            "@type": "InsertDocument",
+            "document": {"@type": "Value", "node": "x"},
+            "identifier": {"@type": "NodeValue", "node": "iri"},
+        }
+        assert woql_object.to_dict() == json_obj
+
+    def test_read_method(self):
+        woql_object = WOQLQuery().read_document("iri", "output")
+        json_obj = {
+            "@type": "ReadDocument",
+            "document": {"@type": "Value", "node": "output"},
+            "identifier": {"@type": "NodeValue", "node": "iri"},
         }
         assert woql_object.to_dict() == json_obj
 
