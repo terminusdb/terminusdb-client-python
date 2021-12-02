@@ -158,7 +158,7 @@ class TerminusClass(type):
                 setattr(obj, key, value)
             if kwargs.get("_id"):
                 obj._id = kwargs.get("_id")
-            elif hasattr(obj.__class__, "_subdocument"):
+            elif hasattr(obj, "_subdocument"):
                 pass
             elif hasattr(obj, "_key") and hasattr(obj._key, "idgen"):
                 obj._id = obj._key.idgen(obj)
