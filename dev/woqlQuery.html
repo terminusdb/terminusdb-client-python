@@ -195,7 +195,7 @@ ignoring blank node ids</p>
 <dd><p>Ensures that the solutions for the variables [V1…Vn] are distinct</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>args</strong> – The variables to make distinct</p>
+<dd class="field-odd"><p><strong>args</strong> – The variables to make distinct with the final argument being a query.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>query object that can be chained and/or execute</p>
@@ -204,6 +204,11 @@ ignoring blank node ids</p>
 <dd class="field-odd"><p>WOQLQuery object</p>
 </dd>
 </dl>
+<p class="rubric">Example</p>
+<p>To load a local csv file:
+&gt;&gt;&gt; x,y = WOQLQUery().vars(“X”,”Y”)
+&gt;&gt;&gt; WOQLQuery().distinct(x).triple(x,’foo’,y)
+See Also</p>
 </dd></dl>
 
 <dl class="py method">
@@ -526,13 +531,33 @@ Commonly used to combine WOQLQueries.</p>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.update_document">
+<span class="sig-name descname"><span class="pre">update_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">docjson</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">json_or_iri</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.update_document" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.insert_document">
+<span class="sig-name descname"><span class="pre">insert_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">docjson</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">json_or_iri</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.insert_document" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.delete_object">
 <span class="sig-name descname"><span class="pre">delete_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_or_iri</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.delete_object" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.delete_document">
+<span class="sig-name descname"><span class="pre">delete_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_or_iri</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.delete_document" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.read_object">
 <span class="sig-name descname"><span class="pre">read_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iri</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_var</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.read_object" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.read_document">
+<span class="sig-name descname"><span class="pre">read_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iri</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_var</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.read_document" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1631,6 +1656,11 @@ It uses pattern construction syntax such as:
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.dot">
+<span class="sig-name descname"><span class="pre">dot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.dot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 

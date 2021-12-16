@@ -404,8 +404,6 @@ Commit history - Commit id, author of the commit, commit message and the commit 
 <span class="go">&#39;&lt;team&gt;/&lt;db&gt;/_meta&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="n">ResourceType</span><span class="o">.</span><span class="n">COMMITS</span><span class="p">)</span>
 <span class="go">&#39;&lt;team&gt;/&lt;db&gt;/&lt;repo&gt;/_commits&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="n">ResourceType</span><span class="o">.</span><span class="n">META</span><span class="p">)</span>
-<span class="go">&#39;&lt;team&gt;/&lt;db&gt;/&lt;repo&gt;/_meta&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="n">ResourceType</span><span class="o">.</span><span class="n">REF</span><span class="p">,</span> <span class="s2">&quot;&lt;reference&gt;&quot;</span><span class="p">)</span>
 <span class="go">&#39;&lt;team&gt;/&lt;db&gt;/&lt;repo&gt;/commit/&lt;reference&gt;&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="n">ResourceType</span><span class="o">.</span><span class="n">BRANCH</span><span class="p">,</span> <span class="s2">&quot;&lt;branch&gt;&quot;</span><span class="p">)</span>
@@ -1001,7 +999,9 @@ and the new value will be used in future requests to the server.</p>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">WOQLClient</span><span class="p">(</span><span class="s2">&quot;https://127.0.0.1:6363/&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="s1">&#39;admin/database/_meta&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="s1">&#39;admin/database&#39;</span><span class="p">)</span> <span class="c1"># optimise database branch (here main)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="s1">&#39;admin/database/_meta&#39;</span><span class="p">)</span> <span class="c1"># optimise the repository graph (actually creates a squashed flat layer)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="s1">&#39;admin/database/local/_commits&#39;</span><span class="p">)</span> <span class="c1"># commit graph is optimised</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
