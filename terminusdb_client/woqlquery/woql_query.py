@@ -3,6 +3,7 @@ import json
 
 # import pprint
 import re
+import warnings
 
 from .woql_core import _copy_dict, _path_tokenize, _path_tokens_to_json
 
@@ -76,9 +77,10 @@ class WOQLQuery:
         self.subsumption = self.sub
         self.equals = self.eq
         self.substring = self.substr
-        self.update = self.update_object
-        self.delete = self.delete_object
-        self.read = self.read_object
+        self.update = self.update_document  # self.update_object
+        self.delete = self.delete_document  # self.delete_object
+        self.read = self.read_document  # self.read_object
+        self.insert = self.insert_document
         self.optional = self.opt
         self.idgenerator = self.idgen
         self.concatenate = self.concat
@@ -692,12 +694,18 @@ class WOQLQuery:
         Parameters
         ----------
         args
-            The variables to make distinct
+            The variables to make distinct with the final argument being a query.
 
         Returns
         -------
         WOQLQuery object
             query object that can be chained and/or execute
+        Example
+        -------
+        To load a local csv file:
+        >>> x,y = WOQLQUery().vars("X","Y")
+        >>> WOQLQuery().distinct(x).triple(x,'foo',y)
+        See Also
         """
         """Select the set of variables that the result will return"""
         queries = list(args)
@@ -1159,39 +1167,103 @@ class WOQLQuery:
             length, "xsd:nonNegativeInteger"
         )
         self._cursor["after"] = self._clean_data_value(after, "xsd:nonNegativeInteger")
-        self._cursor["substring"] = self._clean_datat_value(substring, "xsd:string")
+        self._cursor["substring"] = self._clean_data_value(substring, "xsd:string")
         return self
 
     def update_object(self, docjson):
+        warnings.warn(
+            "update_object() is deprecated; use update_document()",
+            warnings.DeprecationWarning,
+        )
+        return self.update_document(docjson)
+        # if docjson and docjson == "args":
+        #     return ["document"]
+        # if self._cursor.get("@type"):
+        #     self._wrap_cursor_with_and()
+        # self._cursor["@type"] = "UpdateObject"
+        # if isinstance(docjson, str):
+        #     doc = self._expand_data_value(docjson)
+        # else:
+        #     doc = docjson
+        # self._cursor["document"] = doc
+        # return self._updated()
+
+    def update_document(self, docjson, json_or_iri=None):
         if docjson and docjson == "args":
             return ["document"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
-        self._cursor["@type"] = "UpdateObject"
+        self._cursor["@type"] = "UpdateDocument"
         if isinstance(docjson, str):
-            doc = self._expand_data_value(docjson)
+            doc = self._expand_value_variable(docjson)
         else:
             doc = docjson
         self._cursor["document"] = doc
+        if json_or_iri is not None:
+            self._cursor["identifier"] = self._clean_node_value(json_or_iri)
+        return self._updated()
+
+    def insert_document(self, docjson, json_or_iri=None):
+        if docjson and docjson == "args":
+            return ["document"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "InsertDocument"
+        if isinstance(docjson, str):
+            doc = self._expand_value_variable(docjson)
+        else:
+            doc = docjson
+        self._cursor["document"] = doc
+        if json_or_iri is not None:
+            self._cursor["identifier"] = self._clean_node_value(json_or_iri)
         return self._updated()
 
     def delete_object(self, json_or_iri):
+        warnings.warn(
+            "delete_object() is deprecated; use delete_document()",
+            warnings.DeprecationWarning,
+        )
+        return self.delete_document(json_or_iri)
+        # if json_or_iri and json_or_iri == "args":
+        #     return ["document"]
+        # if self._cursor.get("@type"):
+        #     self._wrap_cursor_with_and()
+        # self._cursor["@type"] = "DeleteObject"
+        # self._cursor["document_uri"] = self._clean_node_value(json_or_iri)
+        # return self._updated()
+
+    def delete_document(self, json_or_iri):
         if json_or_iri and json_or_iri == "args":
             return ["document"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
-        self._cursor["@type"] = "DeleteObject"
-        self._cursor["document_uri"] = self._clean_node_value(json_or_iri)
+        self._cursor["@type"] = "DeleteDocument"
+        self._cursor["identifier"] = self._clean_node_value(json_or_iri)
         return self._updated()
 
     def read_object(self, iri, output_var):
+        warnings.warn(
+            "read_object() is deprecated; use read_document()",
+            warnings.DeprecationWarning,
+        )
+        return self.read_document(iri, output_var)
+        # if iri and iri == "args":
+        #     return ["document"]
+        # if self._cursor.get("@type"):
+        #     self._wrap_cursor_with_and()
+        # self._cursor["@type"] = "ReadObject"
+        # self._cursor["document_uri"] = iri
+        # self._cursor["document"] = self._expand_data_variable(output_var)
+        # return self
+
+    def read_document(self, iri, output_var):
         if iri and iri == "args":
             return ["document"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
-        self._cursor["@type"] = "ReadObject"
-        self._cursor["document_uri"] = iri
-        self._cursor["document"] = self._expand_data_variable(output_var)
+        self._cursor["@type"] = "ReadDocument"
+        self._cursor["identifier"] = self._clean_node_value(iri)
+        self._cursor["document"] = self._expand_value_variable(output_var)
         return self
 
     def get(self, as_vars, query_resource=None):
@@ -2817,3 +2889,12 @@ class WOQLQuery:
         if len(vars_tuple) == 1:
             vars_tuple = vars_tuple[0]
         return vars_tuple
+
+    def dot(self, document, field, value):
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "Dot"
+        self._cursor["document"] = self._expand_value_variable(document)
+        self._cursor["field"] = self._clean_data_value(field, "xsd:string")
+        self._cursor["value"] = self._expand_value_variable(value)
+        return self

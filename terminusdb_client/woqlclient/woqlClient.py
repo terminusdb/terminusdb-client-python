@@ -481,8 +481,6 @@ class WOQLClient:
         '<team>/<db>/_meta'
         >>> client.resource(ResourceType.COMMITS)
         '<team>/<db>/<repo>/_commits'
-        >>> client.resource(ResourceType.META)
-        '<team>/<db>/<repo>/_meta'
         >>> client.resource(ResourceType.REF, "<reference>")
         '<team>/<db>/<repo>/commit/<reference>'
         >>> client.resource(ResourceType.BRANCH, "<branch>")
@@ -1613,7 +1611,9 @@ class WOQLClient:
         Examples
         --------
         >>> client = WOQLClient("https://127.0.0.1:6363/")
-        >>> client.optimize('admin/database/_meta')
+        >>> client.optimize('admin/database') # optimise database branch (here main)
+        >>> client.optimize('admin/database/_meta') # optimise the repository graph (actually creates a squashed flat layer)
+        >>> client.optimize('admin/database/local/_commits') # commit graph is optimised
         """
         self._check_connection()
 
