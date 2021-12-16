@@ -694,12 +694,18 @@ class WOQLQuery:
         Parameters
         ----------
         args
-            The variables to make distinct
+            The variables to make distinct with the final argument being a query.
 
         Returns
         -------
         WOQLQuery object
             query object that can be chained and/or execute
+        Example
+        -------
+        To load a local csv file:
+        >>> x,y = WOQLQUery().vars("X","Y")
+        >>> WOQLQuery().distinct(x).triple(x,'foo',y)
+        See Also
         """
         """Select the set of variables that the result will return"""
         queries = list(args)
