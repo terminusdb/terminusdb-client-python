@@ -1,5 +1,21 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.24
+
+### New
+
+- Adding `dot`
+
+### Bug Fixes / Improvements
+
+- Fixing `%` in path
+- Adding `dot`
+- Updating `object` operations to `document` operations in query
+- Skip `idgen` for subdocuments
+- Fixing docstrings
+
+---
+
 ## v10.0.23
 
 ### Bug Fixes / Improvements
