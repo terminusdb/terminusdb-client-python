@@ -455,6 +455,30 @@ class TestWoqlQueries:
         }
         assert woql_object.to_dict() == json_object
 
+    def test_percent_in_path(self):
+        query = WOQLQuery().path(
+            "after_uri",
+            "general_variables,relationship_to_preceding_%28quasi%29polity,known,value",
+            "relationship",
+        )
+        assert query.to_dict() == {
+            "@type": "Path",
+            "subject": {"@type": "NodeValue", "node": "after_uri"},
+            "pattern": {
+                "@type": "PathSequence",
+                "sequence": [
+                    {"@type": "PathPredicate", "predicate": "general_variables"},
+                    {
+                        "@type": "PathPredicate",
+                        "predicate": "relationship_to_preceding_%28quasi%29polity",
+                    },
+                    {"@type": "PathPredicate", "predicate": "known"},
+                    {"@type": "PathPredicate", "predicate": "value"},
+                ],
+            },
+            "object": {"@type": "Value", "node": "relationship"},
+        }
+
 
 class TestTripleBuilder:
     def test_triple_method(self, triple_opt):
