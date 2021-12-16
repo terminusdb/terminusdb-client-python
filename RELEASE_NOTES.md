@@ -13,6 +13,7 @@
 - Updating `object` operations to `document` operations in query
 - Skip `idgen` for subdocuments
 - Fixing docstrings
+- Fixing `like` in query
 
 ---
 
