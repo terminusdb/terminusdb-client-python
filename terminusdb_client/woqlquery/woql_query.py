@@ -1871,14 +1871,14 @@ class WOQLQuery:
 
     def like(self, left, right, dist):
         if left and left == "args":
-            return ["left", "right", "like_similarity"]
+            return ["left", "right", "similarity"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Like"
         self._cursor["left"] = self._clean_data_value(left, "xsd:string")
         self._cursor["right"] = self._clean_data_value(right, "xsd:string")
         if dist:
-            self._cursor["like_similarity"] = self._clean_object(dist, "xsd:decimal")
+            self._cursor["similarity"] = self._clean_object(dist, "xsd:decimal")
         return self
 
     def less(self, left, right):
