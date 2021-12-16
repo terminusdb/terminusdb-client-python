@@ -195,7 +195,7 @@ ignoring blank node ids</p>
 <dd><p>Ensures that the solutions for the variables [V1…Vn] are distinct</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>args</strong> – The variables to make distinct</p>
+<dd class="field-odd"><p><strong>args</strong> – The variables to make distinct with the final argument being a query.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>query object that can be chained and/or execute</p>
@@ -204,6 +204,11 @@ ignoring blank node ids</p>
 <dd class="field-odd"><p>WOQLQuery object</p>
 </dd>
 </dl>
+<p class="rubric">Example</p>
+<p>To load a local csv file:
+&gt;&gt;&gt; x,y = WOQLQUery().vars(“X”,”Y”)
+&gt;&gt;&gt; WOQLQuery().distinct(x).triple(x,’foo’,y)
+See Also</p>
 </dd></dl>
 
 <dl class="py method">
