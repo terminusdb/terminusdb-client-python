@@ -51,12 +51,14 @@ SHORT_NAME_MAPPING = {
     "polygon": "xdd:coordinatePolygon",
 }
 
+
 class Var:
     def __init__(self, name):
         self.name = name
 
     def __str__(self):
         return self.name
+
 
 class Doc:
     def __init__(self, dictionary):
@@ -66,46 +68,83 @@ class Doc:
     def __str__(self):
         return str(self.dictionary)
 
-    def _convert(self,obj):
+    def _convert(self, obj):
         if type(obj) is str:
-            return { '@type' : 'Value',
-                     'data' : { "@type" : "xsd:string",
-                                "@value" : obj }}
+            return {"@type": "Value", "data": {"@type": "xsd:string", "@value": obj}}
         elif type(obj) is bool:
-            return { '@type' : 'Value',
-                     'data' : { "@type" : "xsd:boolean",
-                                "@value" : obj }}
+            return {"@type": "Value", "data": {"@type": "xsd:boolean", "@value": obj}}
         elif type(obj) is int:
-            return { '@type' : 'Value',
-                     'data' : { "@type" : "xsd:integer",
-                                "@value" : obj }}
+            return {"@type": "Value", "data": {"@type": "xsd:integer", "@value": obj}}
         elif type(obj) is float:
-            return { '@type' : 'Value',
-                     'data' : { "@type" : "xsd:decimal",
-                                "@value" : obj }}
+            return {"@type": "Value", "data": {"@type": "xsd:decimal", "@value": obj}}
         elif obj is None:
             return null
         elif type(obj) is list:
             ls = []
             for elt in obj:
                 ls.append(self._convert(elt))
-            return { '@type' : 'Value',
-                     'list' : ls }
+            return {"@type": "Value", "list": ls}
         elif isinstance(obj, Var):
-            return { '@type' : 'Value',
-                     'variable' : obj.name }
+            return {"@type": "Value", "variable": obj.name}
         elif type(obj) is dict:
             keys = obj.keys()
             pairs = []
             for key in keys:
                 v = obj[key]
                 val = self._convert(v)
-                pairs.append({ '@type' : 'FieldValuePair',
-                               'field' : key,
-                               'value' : val})
-            return { '@type' : 'Value',
-                     'dictionary' : { '@type' : 'DictionaryTemplate',
-                                      'data' : pairs }}
+                pairs.append({"@type": "FieldValuePair", "field": key, "value": val})
+            return {
+                "@type": "Value",
+                "dictionary": {"@type": "DictionaryTemplate", "data": pairs},
+            }
+
+
+class Var:
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return self.name
+
+
+class Doc:
+    def __init__(self, dictionary):
+        self.dictionary = dictionary
+        self.encoded = self._convert(dictionary)
+
+    def __str__(self):
+        return str(self.dictionary)
+
+    def _convert(self, obj):
+        if type(obj) is str:
+            return {"@type": "Value", "data": {"@type": "xsd:string", "@value": obj}}
+        elif type(obj) is bool:
+            return {"@type": "Value", "data": {"@type": "xsd:boolean", "@value": obj}}
+        elif type(obj) is int:
+            return {"@type": "Value", "data": {"@type": "xsd:integer", "@value": obj}}
+        elif type(obj) is float:
+            return {"@type": "Value", "data": {"@type": "xsd:decimal", "@value": obj}}
+        elif obj is None:
+            return null
+        elif type(obj) is list:
+            ls = []
+            for elt in obj:
+                ls.append(self._convert(elt))
+            return {"@type": "Value", "list": ls}
+        elif isinstance(obj, Var):
+            return {"@type": "Value", "variable": obj.name}
+        elif type(obj) is dict:
+            keys = obj.keys()
+            pairs = []
+            for key in keys:
+                v = obj[key]
+                val = self._convert(v)
+                pairs.append({"@type": "FieldValuePair", "field": key, "value": val})
+            return {
+                "@type": "Value",
+                "dictionary": {"@type": "DictionaryTemplate", "data": pairs},
+            }
+
 
 class WOQLQuery:
     def __init__(self, query=None, graph="schema"):
@@ -235,7 +274,7 @@ class WOQLQuery:
         return {"@type": val_type, "@value": val}
 
     def _varj(self, varb):
-        if isinstance(varb,Var):
+        if isinstance(varb, Var):
             return {"@type": "Value", "variable": varb.name}
         if varb[:2] == "v:":
             varb = varb[2:]
@@ -535,7 +574,7 @@ class WOQLQuery:
                  if True it will be transformed no matter it starts with 'v:' or not. Default to be False
         """
         if isinstance(varname, Var):
-            return {"@type" : target_type, "variable" : varname.name }
+            return {"@type": target_type, "variable": varname.name}
         if varname[:2] == "v:" or always:
             if varname[:2] == "v:":
                 varname = varname[2:]
