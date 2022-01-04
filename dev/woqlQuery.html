@@ -1481,13 +1481,13 @@ If literal type is “owl:Thing” or “node”, <cite>val</cite> will be treat
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.group_by">
-<span class="sig-name descname"><span class="pre">group_by</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gvarlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupedvar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupquery</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.group_by" title="Permalink to this definition"></a></dt>
-<dd><p>Groups the results of groupquery together by the list of variables gvarlist, using the variable groupedvar as a grouping and saves the result into variable output.</p>
+<span class="sig-name descname"><span class="pre">group_by</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupquery</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.group_by" title="Permalink to this definition"></a></dt>
+<dd><p>Groups the results of groupquery together by the list of variables group_vars, using the variable template as a grouping and saves the result into variable output.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>gvarlist</strong> (<em>list</em><em> or </em><em>dict</em><em> or </em><em>WOQLQuery object</em>) – list of variables to group</p></li>
-<li><p><strong>groupedvar</strong> (<em>list</em><em> or </em><em>str</em>) – grouping template variable(s)</p></li>
+<li><p><strong>group_vars</strong> (<em>list</em><em> or </em><em>str</em><em> or </em><em>Var object</em>) – list of variables to group</p></li>
+<li><p><strong>template</strong> (<em>dict</em><em> or </em><em>list</em><em> or </em><em>str</em>) – template of data to group with free variable(s)</p></li>
 <li><p><strong>output</strong> (<em>str</em><em>, </em><em>optional</em>) – output variable</p></li>
 <li><p><strong>groupquery</strong> (<em>dict</em><em>, </em><em>optional</em>) – </p></li>
 </ul>
