@@ -87,10 +87,12 @@ def test_happy_carzy_path(docker_url):
 
 def test_jwt(docker_url_jwt):
     # create client
-    client = WOQLClient(docker_url_jwt)
+    url = docker_url_jwt[0]
+    token = docker_url_jwt[1]
+    client = WOQLClient(url)
     assert not client._connected
     # test connect
-    client.connect(use_token=True)
+    client.connect(use_token=True, jwt_token=token)
     assert client._connected
     # test create db
     client.create_database("test_happy_path")

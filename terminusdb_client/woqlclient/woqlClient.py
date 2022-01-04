@@ -33,6 +33,17 @@ class JWTAuth(requests.auth.AuthBase):
         return r
 
 
+class APITokenAuth(requests.auth.AuthBase):
+    """Class for API Token Authentication in requests"""
+
+    def __init__(self, token):
+        self._token = token
+
+    def __call__(self, r):
+        r.headers["API_TOKEN"] = f"{self._token}"
+        return r
+
+
 class ResourceType(Enum):
     """Enum for the different TerminusDB resources"""
 
@@ -180,6 +191,7 @@ class WOQLClient:
         remote_auth: str = None,
         use_token: bool = False,
         jwt_token: Optional[str] = None,
+        api_token: Optional[str] = None,
         key: str = "root",
         user: str = "admin",
         branch: str = "main",
@@ -204,9 +216,11 @@ class WOQLClient:
         user: optional, str
             Name of the user, default to be "admin"
         use_token: bool
-            Use the ENV variable TERMINUSDB_ACCESS_TOKEN or jwt_token to connect with a Bearer JWT token
-        jwt_token: optional, str§
-            The Bearer JWT token to connect. If None (default), it will use ENV variable TERMINUSDB_ACCESS_TOKEN as the JWT token.
+            Use token to connect. If both `jwt_token` and `api_token` is not provided (None), then it will use the ENV variable TERMINUSDB_ACCESS_TOKEN to connect as the API token
+        jwt_token: optional, str
+            The Bearer JWT token to connect. Default to be None.
+        api_token: optional, strs
+            The API token to connect. Default to be None.
         branch: optional, str
             Branch to be connected, default to be "main"
         ref: optional, str
@@ -229,6 +243,7 @@ class WOQLClient:
         self.user = user
         self._use_token = use_token
         self._jwt_token = jwt_token
+        self._api_token = api_token
         self.branch = branch
         self.ref = ref
         self.repo = repo
@@ -1757,8 +1772,10 @@ class WOQLClient:
             return (self.user, self._key)
         elif self._connected and self._jwt_token is not None:
             return JWTAuth(self._jwt_token)
+        elif self._connected and self._api_token is not None:
+            return APITokenAuth(self._api_token)
         elif self._connected:
-            return JWTAuth(os.environ["TERMINUSDB_ACCESS_TOKEN"])
+            return APITokenAuth(os.environ["TERMINUSDB_ACCESS_TOKEN"])
         else:
             raise RuntimeError("Client not connected.")
         # TODO: remote_auth
