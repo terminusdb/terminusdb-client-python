@@ -52,6 +52,100 @@ SHORT_NAME_MAPPING = {
 }
 
 
+class Var:
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return self.name
+
+
+class Doc:
+    def __init__(self, dictionary):
+        self.dictionary = dictionary
+        self.encoded = self._convert(dictionary)
+
+    def __str__(self):
+        return str(self.dictionary)
+
+    def _convert(self, obj):
+        if type(obj) is str:
+            return {"@type": "Value", "data": {"@type": "xsd:string", "@value": obj}}
+        elif type(obj) is bool:
+            return {"@type": "Value", "data": {"@type": "xsd:boolean", "@value": obj}}
+        elif type(obj) is int:
+            return {"@type": "Value", "data": {"@type": "xsd:integer", "@value": obj}}
+        elif type(obj) is float:
+            return {"@type": "Value", "data": {"@type": "xsd:decimal", "@value": obj}}
+        elif obj is None:
+            return null
+        elif type(obj) is list:
+            ls = []
+            for elt in obj:
+                ls.append(self._convert(elt))
+            return {"@type": "Value", "list": ls}
+        elif isinstance(obj, Var):
+            return {"@type": "Value", "variable": obj.name}
+        elif type(obj) is dict:
+            keys = obj.keys()
+            pairs = []
+            for key in keys:
+                v = obj[key]
+                val = self._convert(v)
+                pairs.append({"@type": "FieldValuePair", "field": key, "value": val})
+            return {
+                "@type": "Value",
+                "dictionary": {"@type": "DictionaryTemplate", "data": pairs},
+            }
+
+
+class Var:
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return self.name
+
+
+class Doc:
+    def __init__(self, dictionary):
+        self.dictionary = dictionary
+        self.encoded = self._convert(dictionary)
+
+    def __str__(self):
+        return str(self.dictionary)
+
+    def _convert(self, obj):
+        if type(obj) is str:
+            return {"@type": "Value", "data": {"@type": "xsd:string", "@value": obj}}
+        elif type(obj) is bool:
+            return {"@type": "Value", "data": {"@type": "xsd:boolean", "@value": obj}}
+        elif type(obj) is int:
+            return {"@type": "Value", "data": {"@type": "xsd:integer", "@value": obj}}
+        elif type(obj) is float:
+            return {"@type": "Value", "data": {"@type": "xsd:decimal", "@value": obj}}
+        elif obj is None:
+            return null
+        elif type(obj) is list:
+            ls = []
+            for elt in obj:
+                ls.append(self._convert(elt))
+            return {"@type": "Value", "list": ls}
+        elif isinstance(obj, Var):
+            return {"@type": "Value", "variable": obj.name}
+        elif type(obj) is dict:
+            keys = obj.keys()
+            pairs = []
+            for key in keys:
+                v = obj[key]
+                val = self._convert(v)
+                pairs.append({"@type": "FieldValuePair", "field": key, "value": val})
+            return {
+                "@type": "Value",
+                "dictionary": {"@type": "DictionaryTemplate", "data": pairs},
+            }
+
+
 class WOQLQuery:
     def __init__(self, query=None, graph="schema"):
         """defines the internal functions of the woql query object - the language API is defined in WOQLQuery
@@ -180,6 +274,8 @@ class WOQLQuery:
         return {"@type": val_type, "@value": val}
 
     def _varj(self, varb):
+        if isinstance(varb, Var):
+            return {"@type": "Value", "variable": varb.name}
         if varb[:2] == "v:":
             varb = varb[2:]
         if type(varb) is str:
@@ -195,6 +291,9 @@ class WOQLQuery:
         return qobj
 
     def _raw_var(self, varb):
+        print(varb)
+        if isinstance(varb, Var):
+            return varb.name
         if varb[:2] == "v:":
             return varb[2:]
         return varb
@@ -209,7 +308,7 @@ class WOQLQuery:
         # TODO: orig is Nonetype
         """takes input that can be either a string (variable name)
         or an array - each element of the array is a member of the list"""
-        if type(wvar) is str:
+        if type(wvar) is str or isinstance(wvar, Var):
             return self._expand_data_variable(wvar, True)
         if type(wvar) is list:
             ret = []
@@ -222,7 +321,7 @@ class WOQLQuery:
         # TODO: orig is Nonetype
         """takes input that can be either a string (variable name)
         or an array - each element of the array is a member of the list"""
-        if type(wvar) is str:
+        if type(wvar) is str or isinstance(wvar, Var):
             return self._expand_value_variable(wvar, True)
         if type(wvar) is list:
             ret = []
@@ -240,7 +339,9 @@ class WOQLQuery:
         elif type(colname_or_index) is str:
             asvar["@type"] = "Column"
             asvar["indicator"] = {"@type": "Indicator", "name": colname_or_index}
-        if vname[:2] == "v:":
+        if isinstance(vname, Var):
+            vname = vname.name
+        elif vname[:2] == "v:":
             vname = vname[2:]
         asvar["variable"] = vname
         if obj_type:
@@ -299,6 +400,8 @@ class WOQLQuery:
             else:
                 subj = obj
             return self._expand_node_variable(subj)
+        elif isinstance(obj, Var):
+            return self._expand_node_variable(obj)
         raise ValueError("Subject must be a URI string")
 
     def _clean_predicate(self, predicate):
@@ -336,6 +439,15 @@ class WOQLQuery:
                 return self._expand_value_variable(user_obj)
             else:
                 obj["node"] = user_obj
+        elif type(user_obj) is list:
+            elts = []
+            for obj in user_obj:
+                elts.append(self._clean_object(obj))
+            return elts
+        elif isinstance(user_obj, Var):
+            return self._expand_value_variable(user_obj)
+        elif isinstance(user_obj, Doc):
+            return user_obj.encoded
         elif type(user_obj) is float:
             if not target:
                 target = "xsd:decimal"
@@ -371,6 +483,8 @@ class WOQLQuery:
                 if not target:
                     target = "xsd:string"
                 obj["data"] = self._jlt(user_obj, target)
+        elif isinstance(user_obj, Var):
+            return self._expand_data_variable(user_obj)
         elif type(user_obj) is float:
             if not target:
                 target = "xsd:decimal"
@@ -437,6 +551,8 @@ class WOQLQuery:
                 return self._expand_node_variable(user_obj)
             else:
                 obj["node"] = user_obj
+        elif isinstance(user_obj, Var):
+            return self._expand_node_variable(user_obj)
         elif type(user_obj) is dict:
             return user_obj
         else:
@@ -457,6 +573,8 @@ class WOQLQuery:
         always : bool
                  if True it will be transformed no matter it starts with 'v:' or not. Default to be False
         """
+        if isinstance(varname, Var):
+            return {"@type": target_type, "variable": varname.name}
         if varname[:2] == "v:" or always:
             if varname[:2] == "v:":
                 varname = varname[2:]
@@ -1319,7 +1437,7 @@ class WOQLQuery:
                             map_type = onemap[2]
                         oasv = self._asv(onemap[0], onemap[1], map_type)
                         self._query.append(oasv)
-        elif type(args[0]) in [int, str]:
+        elif type(args[0]) in [int, str] or isinstance(args[0], Var):
             if len(args) > 2 and type(args[2]) is str:
                 oasv = self._asv(args[0], args[1], args[2])
             elif len(args) > 1 and type(args[1]) is str:
@@ -1334,6 +1452,7 @@ class WOQLQuery:
             self._query.append(args[0].to_dict())
         elif type(args[0]) is dict:
             self._query.append(args[0])
+
         return self
 
     def file(self, fpath, opts=None):
@@ -2150,6 +2269,33 @@ class WOQLQuery:
         self._cursor["list"] = self._data_list(output)
         return self
 
+    def dot(self, dictionary, field, value):
+        """Iterates through a list and returns a value for each member
+
+        Parameters
+        ----------
+        dictionary
+            a WOQL dictionary or variable representing a dictionary
+        field : str
+            a string representing the field or key to access the dictionary
+        value
+            a WOQL value representing the result
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if dictionary and dictionary == "args":
+            return ["member", "list"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "Dot"
+        self._cursor["document"] = self._clean_object(dictionary)
+        self._cursor["field"] = self._clean_predicate(field)
+        self._cursor["value"] = self._clean_object(value)
+        return self
+
     def member(self, member, mem_list):
         """Iterates through a list and returns a value for each member
 
@@ -2547,16 +2693,16 @@ class WOQLQuery:
                 self._cursor["ordering"].append(item)
         return self._add_sub_query(embedquery)
 
-    def group_by(self, gvarlist, groupedvar, output, groupquery=None):
+    def group_by(self, group_vars, template, output, groupquery=None):
         """
-        Groups the results of groupquery together by the list of variables gvarlist, using the variable groupedvar as a grouping and saves the result into variable output.
+        Groups the results of groupquery together by the list of variables group_vars, using the variable template as a grouping and saves the result into variable output.
 
         Parameters
         ----------
-        gvarlist : list or dict or WOQLQuery object
+        group_vars : list or str or Var object
             list of variables to group
-        groupedvar : list or str
-            grouping template variable(s)
+        template : dict or list or str
+            template of data to group with free variable(s)
         output : str, optional
             output variable
         groupquery : dict, optional
@@ -2566,7 +2712,7 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        if gvarlist and gvarlist == "args":
+        if group_vars and group_vars == "args":
             return [
                 "group_by",
                 "template",
@@ -2576,12 +2722,10 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "GroupBy"
-        if type(gvarlist) is str:
-            gvarlist = [gvarlist]
-        self._cursor["group_by"] = self._raw_var_list(gvarlist)
-        if type(groupedvar) is str:
-            groupedvar = [groupedvar]
-        self._cursor["template"] = self._raw_var_list(groupedvar)
+        if not type(group_vars) is list:
+            group_vars = [group_vars]
+        self._cursor["group_by"] = self._raw_var_list(group_vars)
+        self._cursor["template"] = self._clean_object(template)
         self._cursor["grouped"] = self._clean_object(output)
         return self._add_sub_query(groupquery)
 
@@ -2885,7 +3029,7 @@ class WOQLQuery:
         tuple/string
             args prefixed with "v:"
         """
-        vars_tuple = tuple(f"v:{arg}" for arg in args)
+        vars_tuple = tuple(Var(arg) for arg in args)
         if len(vars_tuple) == 1:
             vars_tuple = vars_tuple[0]
         return vars_tuple
