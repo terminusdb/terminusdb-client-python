@@ -45,19 +45,19 @@ def startproject():
             type=str,
         )
 
-        use_token = click.confirm("Are you using JWT login?")
+        use_token = click.confirm("Are you using API token login?")
 
         if use_token:
             # set_token = click.confirm("Do you want to set up the TERMINUSDB_ACCESS_TOKEN?")
 
             if click.confirm("Do you want to set up the TERMINUSDB_ACCESS_TOKEN?"):
                 # set token
-                jwt_token = click.prompt(
-                    "Please enter the JWT token",
+                api_token = click.prompt(
+                    "Please enter the API token",
                     type=str,
                     hide_input=True,
                 )
-                os.environ["TERMINUSDB_ACCESS_TOKEN"] = jwt_token
+                os.environ["TERMINUSDB_ACCESS_TOKEN"] = api_token
 
                 click.echo(
                     "Token added as TERMINUSDB_ACCESS_TOKEN in your enviroment variables."
