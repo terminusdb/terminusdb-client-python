@@ -2,17 +2,14 @@ import json
 import weakref
 from copy import copy, deepcopy
 from enum import Enum, EnumMeta, _EnumDict
-from hashlib import sha256
 from io import StringIO, TextIOWrapper
 from typing import List, Optional, Set, Union
-from urllib.parse import quote
-from uuid import uuid4
 
 from numpydoc.docscrape import ClassDoc
 from typeguard import check_type
 
 from .. import woql_type as wt
-from ..woql_type import CONVERT_TYPE, to_woql_type
+from ..woql_type import to_woql_type
 from ..woqlclient.woqlClient import WOQLClient
 
 
@@ -26,42 +23,11 @@ class TerminusKey:
             else:
                 ValueError(f"keys need to be either str or list but got {keys}")
 
-    def _idgen_prep(self, obj: Union["DocumentTemplate", dict]):
-        """Helper function to prepare prefix and key_list for idgen to use."""
-        key_list = []
-        if hasattr(self, "_keys"):
-            for item in self._keys:
-                if hasattr(obj, item):
-                    key_item = eval(f"obj.{item}")  # noqa: S307
-                elif isinstance(obj, dict) and obj.get(item) is not None:
-                    key_item = obj.get(item)
-                else:
-                    raise ValueError(f"Cannot get {item} from {obj}")
-
-                if isinstance(key_item, tuple(CONVERT_TYPE.keys())):
-                    key_list.append(str(key_item))
-                else:
-                    raise ValueError("Keys need to be datatype object")
-
-        if isinstance(obj, dict) and obj.get("@type") is not None:
-            prefix = obj.get("@type") + "/"
-        elif hasattr(obj.__class__, "_base"):
-            prefix = obj.__class__._base + "/"
-        elif hasattr(obj.__class__, "__name__"):
-            prefix = obj.__class__.__name__ + "/"
-        else:
-            raise ValueError(f"Cannot determine prefix from {obj}")
-        return prefix, key_list
-
 
 class HashKey(TerminusKey):
     """Generating ID with SHA256 using provided keys"""
 
     at_type = "Hash"
-
-    def idgen(self, obj: Union["DocumentTemplate", dict]):
-        prefix, key_list = self._idgen_prep(obj)
-        return prefix + sha256((quote("_".join(key_list))).encode("utf-8")).hexdigest()
 
 
 class LexicalKey(TerminusKey):
@@ -69,30 +35,17 @@ class LexicalKey(TerminusKey):
 
     at_type = "Lexical"
 
-    def idgen(self, obj: Union["DocumentTemplate", dict]):
-        prefix, key_list = self._idgen_prep(obj)
-        return prefix + quote("_".join(key_list))
-
 
 class ValueHashKey(TerminusKey):
     """Generating ID with SHA256"""
 
     at_type = "ValueHash"
 
-    def __init__(self):
-        raise RuntimeError("ValueHashKey is not avaliable yet.")
-
-    # TODO: idgen
-
 
 class RandomKey(TerminusKey):
     """Generating ID with UUID4"""
 
     at_type = "Random"
-
-    def idgen(self, obj: Union["DocumentTemplate", dict]):
-        prefix, _ = self._idgen_prep(obj)
-        return prefix + uuid4().hex
 
 
 def _check_cycling(class_obj: "TerminusClass"):
@@ -120,6 +73,12 @@ def _check_missing_prop(doc_obj: "DocumentTemplate"):
                     prop_value = eval(f"doc_obj.{prop}")  # noqa: S307
                     check_type(prop, prop_value, prop_type)
                     # raise TypeError(f"Property of {doc_obj} missing should be type {prop_type} but got {prop_value} which is {type(prop_value)}")
+
+
+def _check_and_fix_custom_id(class_name, custom_id):
+    if custom_id[: len(class_name) + 1] != (class_name + "/"):
+        custom_id = class_name + "/" + custom_id
+    return custom_id
 
 
 class TerminusClass(type):
@@ -157,11 +116,9 @@ class TerminusClass(type):
                     value = None
                 setattr(obj, key, value)
             if kwargs.get("_id"):
-                obj._id = kwargs.get("_id")
-            elif hasattr(obj.__class__, "_subdocument"):
-                pass
-            elif hasattr(obj, "_key") and hasattr(obj._key, "idgen"):
-                obj._id = obj._key.idgen(obj)
+                obj._custom_id = kwargs.get("_id")
+            if not hasattr(obj.__class__, "_subdocument"):
+                obj._capture = str(id(obj))
             obj._isinstance = True
             obj._annotations = cls._annotations
             obj._instances.add(weakref.ref(obj))
@@ -246,19 +203,37 @@ class DocumentTemplate(metaclass=TerminusClass):
                 result[attr] = wt.to_woql_type(attr_type)
         return result
 
+    @property
+    def _id(self):
+        if hasattr(self, "_custom_id"):
+            return _check_and_fix_custom_id(str(self.__class__), self._custom_id)
+        else:
+            return None
+
+    @_id.setter
+    def _id(self, custom_id):
+        self._custom_id = custom_id
+
     def _embeded_rep(self):
         """get representation for embedding as object property"""
         if hasattr(self.__class__, "_subdocument"):
             return self._obj_to_dict()
-        elif hasattr(self, "_id"):
+        elif hasattr(self, "_id") and self._id:
             return {"@id": self._id, "@type": "@id"}
+        else:
+            # creature capture and ref
+            # if not hasattr(self, "_capture"):
+            #     self._capture = str(id(self))
+            return {"@ref": self._capture}
 
     def _obj_to_dict(self, skip_checking=False):
         if not skip_checking:
             _check_missing_prop(self)
         result = {"@type": str(self.__class__)}
-        if hasattr(self, "_id"):
+        if hasattr(self, "_id") and self._id:
             result["@id"] = self._id
+        if hasattr(self, "_capture"):
+            result["@capture"] = self._capture
         # elif hasattr(self.__class__, "_key") and hasattr(self.__class__._key, "idgen"):
         #     result["@id"] = self.__class__._key.idgen(self)
 

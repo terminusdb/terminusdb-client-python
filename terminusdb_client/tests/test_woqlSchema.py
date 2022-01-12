@@ -136,11 +136,11 @@ def test_cycling():
         cycling_schema.to_dict()
 
 
-def test_idgen(test_schema):
-    my_schema = test_schema
-    Country = my_schema.object.get("Country")
-    uk = Country()
-    assert uk._id[: len("Country/")] == "Country/"
+# def test_idgen(test_schema):
+#     my_schema = test_schema
+#     Country = my_schema.object.get("Country")
+#     uk = Country()
+#     assert uk._id[: len("Country/")] == "Country/"
 
 
 def test_context(test_schema):
@@ -148,6 +148,7 @@ def test_context(test_schema):
     assert my_schema.to_dict()[0].get("@type") == "@context"
 
 
+@pytest.mark.skip(reason="need to be done with backend")
 def test_import_objects(test_schema):
     my_schema = test_schema
     Person = my_schema.object.get("Person")
@@ -202,7 +203,7 @@ def test_datetime():
         hours=8,
         weeks=2,
     )
-    test_obj = CheckDatetime(datetime=datetime_obj, duration=delta)
+    test_obj = CheckDatetime(_id="test_obj", datetime=datetime_obj, duration=delta)
     test_dict = test_obj._obj_to_dict()
     assert test_dict["datetime"] == "2019-05-18T15:17:08.132263"
     assert test_dict["duration"] == "PT5558756.00001S"
