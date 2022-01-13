@@ -150,7 +150,12 @@ def test_insert_cheuk_again(docker_url, test_schema):
 
     location = Coordinate(x=0.7, y=51.3)
     uk.perimeter = [location]
-    # uk.name = "United Kingdom of Great Britain and Northern Ireland"
+    with pytest.raises(ValueError) as error:
+        uk.name = "United Kingdom of Great Britain and Northern Ireland"
+        assert (
+            str(error.value)
+            == "name has been used to generated id hance cannot be changed."
+        )
 
     cheuk = Employee()
     cheuk.permisstion = {Role.admin, Role.read}

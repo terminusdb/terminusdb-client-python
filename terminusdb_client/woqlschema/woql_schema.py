@@ -188,9 +188,15 @@ class DocumentTemplate(metaclass=TerminusClass):
         if name[0] != "_" and value is not None:
             correct_type = self._annotations.get(name)
             _check_mismatch_type(name, value, correct_type)
-            # check_type(str(value), value, correct_type)
-            # if not correct_type or not check_type(str(value), value, correct_type):
-            #     raise AttributeError(f"{value} is not type {correct_type}")
+        if (
+            self._id
+            and hasattr(self, "_key")
+            and hasattr(self._key, "_keys")
+            and name in self._key._keys
+        ):
+            raise ValueError(
+                f"{name} has been used to generated id hance cannot be changed."
+            )
         super().__setattr__(name, value)
 
     @classmethod
