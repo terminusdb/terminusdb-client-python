@@ -983,6 +983,50 @@ class WOQLClient:
         else:
             raise ValueError("Object cannot convert to dictionary")
 
+    def _ref_extract(self, target_key, search_item):
+        if hasattr(search_item, "items"):
+            for key, value in search_item.items():
+                if key == target_key:
+                    yield value
+                if isinstance(value, dict):
+                    yield from self._ref_extract(target_key, value)
+                elif isinstance(value, list):
+                    for item in value:
+                        yield from self._ref_extract(target_key, item)
+
+    def _convert_dcoument(self, document, graph_type):
+        if isinstance(document, list):
+            new_doc = []
+            captured = []
+            referenced = []
+
+            for item in document:
+                item_dict = self._conv_to_dict(item)
+                new_doc.append(item_dict)
+                item_capture = item_dict.get("@capture")
+                if item_capture:
+                    captured.append(item_capture)
+                referenced += list(self._ref_extract("@ref", item_dict))
+
+            referenced = list(set(referenced))
+
+            for item in referenced:
+                if item not in captured:
+                    raise ValueError(
+                        f"{item} is referenced but not captured. Seems you forgot to submit one or more object(s)."
+                    )
+        else:
+            if hasattr(document, "to_dict") and graph_type != "schema":
+                raise InterfaceError(
+                    "Inserting WOQLSchema object into non-schema graph."
+                )
+            new_doc = self._conv_to_dict(document)
+            if isinstance(new_doc, dict) and list(self._ref_extract("@ref", new_doc)):
+                raise ValueError(
+                    "There are uncaptured references. Seems you forgot to submit one or more object(s)."
+                )
+        return new_doc
+
     def insert_document(
         self,
         document: Union[
@@ -1028,17 +1072,7 @@ class WOQLClient:
         else:
             params["full_replace"] = "false"
 
-        if isinstance(document, list):
-            new_doc = []
-            for item in document:
-                item_dict = self._conv_to_dict(item)
-                new_doc.append(item_dict)
-        else:
-            if hasattr(document, "to_dict") and graph_type != "schema":
-                raise InterfaceError(
-                    "Inserting WOQLSchema object into non-schema graph."
-                )
-            new_doc = self._conv_to_dict(document)
+        new_doc = self._convert_dcoument(document, graph_type)
 
         if len(new_doc) == 0:
             return
@@ -1106,17 +1140,9 @@ class WOQLClient:
         params = self._generate_commit(commit_msg)
         params["graph_type"] = graph_type
         params["create"] = "true" if create else "false"
-        if isinstance(document, list):
-            new_doc = []
-            for item in document:
-                item_dict = self._conv_to_dict(item)
-                new_doc.append(item_dict)
-        else:
-            if hasattr(document, "to_dict") and graph_type != "schema":
-                raise InterfaceError(
-                    "Inserting WOQLSchema object into non-schema graph."
-                )
-            new_doc = self._conv_to_dict(document)
+
+        new_doc = self._convert_dcoument(document, graph_type)
+
         result = requests.put(
             self._documents_url(),
             headers={"user-agent": f"terminusdb-client-python/{__version__}"},
