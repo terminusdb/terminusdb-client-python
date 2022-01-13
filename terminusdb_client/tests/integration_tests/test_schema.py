@@ -90,7 +90,10 @@ def test_insert_cheuk(docker_url, test_schema):
     with pytest.raises(ValueError) as error:
         client.insert_document(home)
         assert str(error.value) == "Subdocument cannot be added directly"
+    assert cheuk._id is None and uk._id is None
     client.insert_document([uk, cheuk], commit_msg="Adding cheuk")
+    assert cheuk._backend_id and cheuk._id
+    assert uk._backend_id and uk._id
     result = client.get_all_documents()
     for item in result:
         if item.get("@type") == "Country":
@@ -138,11 +141,16 @@ def test_insert_cheuk_again(docker_url, test_schema):
     Employee = new_schema.object.get("Employee")
     Role = new_schema.object.get("Role")
     Team = new_schema.object.get("Team")
+    Coordinate = new_schema.object.get("Coordinate")
 
     home = Address()
     home.street = "123 Abc Street"
     home.country = uk
     home.postal_code = "A12 345"
+
+    location = Coordinate(x=0.7, y=51.3)
+    uk.perimeter = [location]
+    # uk.name = "United Kingdom of Great Britain and Northern Ireland"
 
     cheuk = Employee()
     cheuk.permisstion = {Role.admin, Role.read}
@@ -155,11 +163,16 @@ def test_insert_cheuk_again(docker_url, test_schema):
     cheuk.member_of = Team.information_technology
     cheuk._id = "Cheuk is back"
 
-    client.insert_document(cheuk, commit_msg="Adding cheuk again")
+    client.update_document([location, uk, cheuk], commit_msg="Adding cheuk again")
+    assert location._backend_id and location._id
+    location.x = -0.7
+    result = client.replace_document([location], commit_msg="Fixing location")
+    assert len(result) == 1
     result = client.get_all_documents()
     for item in result:
         if item.get("@type") == "Country":
             assert item["name"] == "United Kingdom"
+            assert item["perimeter"]
         elif item.get("@type") == "Employee":
             assert item["@id"] == "Employee/Cheuk%20is%20back"
             assert item["address_of"]["postal_code"] == "A12 345"
@@ -168,6 +181,9 @@ def test_insert_cheuk_again(docker_url, test_schema):
             assert item["age"] == 21
             assert item["contact_number"] == "07777123456"
             assert item["managed_by"] == item["@id"]
+        elif item.get("@type") == "Coordinate":
+            assert item["x"] == -0.7
+            assert item["y"] == 51.3
         else:
             raise AssertionError()
 

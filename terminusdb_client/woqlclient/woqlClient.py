@@ -1033,38 +1033,42 @@ class WOQLClient:
             for item in document:
                 item_dict = self._conv_to_dict(item)
                 new_doc.append(item_dict)
-            document = new_doc
         else:
             if hasattr(document, "to_dict") and graph_type != "schema":
                 raise InterfaceError(
                     "Inserting WOQLSchema object into non-schema graph."
                 )
-            document = self._conv_to_dict(document)
+            new_doc = self._conv_to_dict(document)
 
-        if len(document) == 0:
+        if len(new_doc) == 0:
             return
-        elif not isinstance(document, list):
-            document = [document]
+        elif not isinstance(new_doc, list):
+            new_doc = [new_doc]
 
         if full_replace:
-            if document[0].get("@type") != "@context":
+            if new_doc[0].get("@type") != "@context":
                 raise ValueError(
                     "The first item in docuemnt need to be dictionary representing the context object."
                 )
         else:
-            if document[0].get("@type") == "@context":
+            if new_doc[0].get("@type") == "@context":
                 warnings.warn(
                     "To replace context, need to use `full_replace` or `replace_document`, skipping context object now."
                 )
-                document.pop(0)
+                new_doc.pop(0)
         result = requests.post(
             self._documents_url(),
             headers={"user-agent": f"terminusdb-client-python/{__version__}"},
             params=params,
-            json=document,
+            json=new_doc,
             auth=self._auth(),
         )
-        return json.loads(_finish_response(result))
+        result = json.loads(_finish_response(result))
+        if isinstance(document, list):
+            for idx, item in enumerate(document):
+                if hasattr(item, "_obj_to_dict") and not hasattr(item, "_backend_id"):
+                    item._backend_id = result[idx][len("terminusdb:///data/") :]
+        return result
 
     def replace_document(
         self,
@@ -1105,27 +1109,27 @@ class WOQLClient:
         if isinstance(document, list):
             new_doc = []
             for item in document:
-                # while document:
-                #     item = document.pop()
                 item_dict = self._conv_to_dict(item)
                 new_doc.append(item_dict)
-                # id_list.append(item_dict['@id'])
-            document = new_doc
         else:
             if hasattr(document, "to_dict") and graph_type != "schema":
                 raise InterfaceError(
                     "Inserting WOQLSchema object into non-schema graph."
                 )
-            document = self._conv_to_dict(document)
-        _finish_response(
-            requests.put(
-                self._documents_url(),
-                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
-                params=params,
-                json=document,
-                auth=self._auth(),
-            )
+            new_doc = self._conv_to_dict(document)
+        result = requests.put(
+            self._documents_url(),
+            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            params=params,
+            json=new_doc,
+            auth=self._auth(),
         )
+        result = json.loads(_finish_response(result))
+        if isinstance(document, list):
+            for idx, item in enumerate(document):
+                if hasattr(item, "_obj_to_dict") and not hasattr(item, "_backend_id"):
+                    item._backend_id = result[idx][len("terminusdb:///data/") :]
+        return result
 
     def update_document(
         self,
