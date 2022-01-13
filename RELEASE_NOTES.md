@@ -1,5 +1,26 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.25
+
+### New
+
+- Using API token as default to connect to TerminusX, JWT token still supported but no longer default
+- Doc and Var class in WOQLQuery
+- Adding dot method in WOQLQuery
+- Support id capture and fixing support for all Key types in documents:
+  - Custom keys are only available using RandomKey (default key type)
+  - Custom keys are not avaliable for subdocuments
+  - Getting backend generated id when import object
+  - insert_document and update_document will fill in object ids if object(s) is passed in as a list.
+  - Checking if a capture object is reference but not submit together
+
+### Bug Fixes / Improvements
+
+- Fixing `group_by` in WOQLQuery
+- Adding check in if subdocument is submitted directly
+
+---
+
 ## v10.0.24
 
 ### New
