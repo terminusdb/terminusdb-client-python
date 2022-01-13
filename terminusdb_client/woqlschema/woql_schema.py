@@ -1,4 +1,5 @@
 import json
+import urllib.parse as urlparse
 import weakref
 from copy import copy, deepcopy
 from enum import Enum, EnumMeta, _EnumDict
@@ -57,6 +58,18 @@ def _check_cycling(class_obj: "TerminusClass"):
                 raise RecursionError(f"Embbding {prop_type} cause recursions.")
 
 
+def _check_mismatch_type(prop, prop_value, prop_type):
+    if hasattr(prop_type, "_to_dict"):
+        prop_value_id = prop_value.__class__._to_dict().get("@id")
+        prop_type_id = prop_type._to_dict().get("@id")
+        if prop_value_id != prop_type_id:
+            raise ValueError(
+                f"Property {prop} should be of type {prop_type_id} but got value of type {prop_value_id}"
+            )
+    else:
+        check_type(prop, prop_value, prop_type)
+
+
 def _check_missing_prop(doc_obj: "DocumentTemplate"):
     """Helper function to check if the the document is missing properties (and if they are right types)"""
     class_obj = doc_obj.__class__
@@ -71,14 +84,14 @@ def _check_missing_prop(doc_obj: "DocumentTemplate"):
                     raise ValueError(f"{doc_obj} missing property: {prop}")
                 else:
                     prop_value = eval(f"doc_obj.{prop}")  # noqa: S307
-                    check_type(prop, prop_value, prop_type)
+                    _check_mismatch_type(prop, prop_value, prop_type)
                     # raise TypeError(f"Property of {doc_obj} missing should be type {prop_type} but got {prop_value} which is {type(prop_value)}")
 
 
 def _check_and_fix_custom_id(class_name, custom_id):
     if custom_id[: len(class_name) + 1] != (class_name + "/"):
         custom_id = class_name + "/" + custom_id
-    return custom_id
+    return urlparse.quote(custom_id)
 
 
 class TerminusClass(type):
@@ -102,6 +115,16 @@ class TerminusClass(type):
             else:
                 abstract = True
 
+        if "_subdocument" in nmspc:
+            allow_custom_id = False
+        elif "_key" in nmspc:
+            if nmspc.get("_key").__class__ == RandomKey:
+                allow_custom_id = True
+            else:
+                allow_custom_id = False
+        else:
+            allow_custom_id = True
+
         # _abstract should not be inherited
         cls._abstract = nmspc.get("_abstract")
         cls._instances = set()
@@ -115,10 +138,20 @@ class TerminusClass(type):
                 else:
                     value = None
                 setattr(obj, key, value)
-            if kwargs.get("_id"):
-                obj._custom_id = kwargs.get("_id")
-            if not hasattr(obj.__class__, "_subdocument"):
-                obj._capture = str(id(obj))
+            if allow_custom_id:
+                if kwargs.get("_id"):
+                    obj._custom_id = kwargs.get("_id")
+                else:
+                    obj._custom_id = None
+            else:
+                if kwargs.get("_id"):
+                    raise ValueError(
+                        f"Customized id is not allowed. {str(obj.__class__)} is a subdocument or has set id key scheme."
+                    )
+            if kwargs.get("_backend_id"):
+                obj._backend_id = kwargs.get("_backend_id")
+            # if not hasattr(obj.__class__, "_subdocument"):
+            #     obj._capture = str(id(obj))
             obj._isinstance = True
             obj._annotations = cls._annotations
             obj._instances.add(weakref.ref(obj))
@@ -154,7 +187,8 @@ class DocumentTemplate(metaclass=TerminusClass):
     def __setattr__(self, name, value):
         if name[0] != "_" and value is not None:
             correct_type = self._annotations.get(name)
-            check_type(str(value), value, correct_type)
+            _check_mismatch_type(name, value, correct_type)
+            # check_type(str(value), value, correct_type)
             # if not correct_type or not check_type(str(value), value, correct_type):
             #     raise AttributeError(f"{value} is not type {correct_type}")
         super().__setattr__(name, value)
@@ -189,15 +223,14 @@ class DocumentTemplate(metaclass=TerminusClass):
             result["@key"] = {"@type": "Random"}
         if hasattr(cls, "_abstract") and cls._abstract is not None:
             result["@abstract"] = cls._abstract
-        # TODO: now get around for self/future reference by not putting any @key for schema and generate id in the client
-        # if hasattr(cls, "_key") and not hasattr(cls, "_subdocument"):
-        #     if hasattr(cls._key, "_keys"):
-        #         result["@key"] = {
-        #             "@type": cls._key.__class__.at_type,
-        #             "@fields": cls._key._keys,
-        #         }
-        #     else:
-        #         result["@key"] = {"@type": cls._key.__class__.at_type}
+        if hasattr(cls, "_key") and not hasattr(cls, "_subdocument"):
+            if hasattr(cls._key, "_keys"):
+                result["@key"] = {
+                    "@type": cls._key.__class__.at_type,
+                    "@fields": cls._key._keys,
+                }
+            else:
+                result["@key"] = {"@type": cls._key.__class__.at_type}
         if hasattr(cls, "_annotations"):
             for attr, attr_type in cls._annotations.items():
                 result[attr] = wt.to_woql_type(attr_type)
@@ -205,14 +238,21 @@ class DocumentTemplate(metaclass=TerminusClass):
 
     @property
     def _id(self):
-        if hasattr(self, "_custom_id"):
+        if hasattr(self, "_backend_id") and self._backend_id:
+            return self._backend_id
+        if hasattr(self, "_custom_id") and self._custom_id:
             return _check_and_fix_custom_id(str(self.__class__), self._custom_id)
         else:
             return None
 
     @_id.setter
     def _id(self, custom_id):
-        self._custom_id = custom_id
+        if hasattr(self, "_custom_id"):
+            self._custom_id = custom_id
+        else:
+            raise ValueError(
+                f"Customized id is not allowed. {str(self.__class__)} is a subdocument or has set id key scheme."
+            )
 
     def _embeded_rep(self):
         """get representation for embedding as object property"""
@@ -224,7 +264,7 @@ class DocumentTemplate(metaclass=TerminusClass):
             # creature capture and ref
             # if not hasattr(self, "_capture"):
             #     self._capture = str(id(self))
-            return {"@ref": self._capture}
+            return {"@ref": str(id(self))}
 
     def _obj_to_dict(self, skip_checking=False):
         if not skip_checking:
@@ -232,8 +272,8 @@ class DocumentTemplate(metaclass=TerminusClass):
         result = {"@type": str(self.__class__)}
         if hasattr(self, "_id") and self._id:
             result["@id"] = self._id
-        if hasattr(self, "_capture"):
-            result["@capture"] = self._capture
+        elif not hasattr(self, "_subdocument"):
+            result["@capture"] = str(id(self))
         # elif hasattr(self.__class__, "_key") and hasattr(self.__class__._key, "idgen"):
         #     result["@id"] = self.__class__._key.idgen(self)
 
@@ -493,7 +533,7 @@ class WOQLSchema:
                     for key, value in params.items():
                         setattr(obj, key, value)
                     return obj
-            params["_id"] = obj_id
+            params["_backend_id"] = obj_id
             new_obj = type_class.__new__(type_class)
             new_obj.__init__(new_obj, **params)
             return new_obj

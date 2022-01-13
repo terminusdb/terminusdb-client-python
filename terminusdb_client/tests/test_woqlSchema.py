@@ -178,6 +178,64 @@ def test_get_instances(test_schema):
     assert len(list(Person.get_instances())) == 2
 
 
+def test_id_and_capture(test_schema):
+    my_schema = test_schema
+    Person = my_schema.object.get("Person")
+    Country = my_schema.object.get("Country")
+    Address = my_schema.object.get("Address")
+
+    ireland = Country()
+    ireland.name = "Republic of Ireland"
+    ireland.perimeter = []
+    with pytest.raises(ValueError) as error:
+        ireland._id = "ireland"
+        assert (
+            str(error.value)
+            == "Customized id is not allowed. Country is a subdocument or has set id key scheme."
+        )
+
+    home = Address()
+    home.street = "123 Abc Street"
+    home.country = ireland
+    home.postal_code = "A12 345"
+    with pytest.raises(ValueError) as error:
+        home._id = "home_sweet_home"
+        assert (
+            str(error.value)
+            == "Customized id is not allowed. Address is a subdocument or has set id key scheme."
+        )
+
+    cheuk_with_id = Person(
+        _id="cheuk",
+        name="Cheuk",
+        age=21,
+    )
+    cheuk_with_id.friend_of = {
+        cheuk_with_id,
+    }
+    assert cheuk_with_id._obj_to_dict() == {
+        "@type": "Person",
+        "@id": "Person/cheuk",
+        "name": "Cheuk",
+        "age": 21,
+        "friend_of": [{"@id": "Person/cheuk", "@type": "@id"}],
+    }
+    cheuk_no_id = Person(
+        name="Cheuk",
+        age=21,
+    )
+    cheuk_no_id.friend_of = {
+        cheuk_no_id,
+    }
+    assert cheuk_no_id._obj_to_dict() == {
+        "@type": "Person",
+        "@capture": str(id(cheuk_no_id)),
+        "name": "Cheuk",
+        "age": 21,
+        "friend_of": [{"@ref": str(id(cheuk_no_id))}],
+    }
+
+
 def test_add_enum_class():
     new_schema = WOQLSchema()
     my_enum = new_schema.add_enum_class("MyEnum", ["item1", "item2"])

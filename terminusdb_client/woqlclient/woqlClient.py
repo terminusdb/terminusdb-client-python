@@ -975,7 +975,7 @@ class WOQLClient:
             return obj.to_dict()
         elif hasattr(obj, "_to_dict"):
             if hasattr(obj, "_isinstance") and obj._isinstance:
-                if hasattr(obj, "_subdocument") and obj._subdocument:
+                if hasattr(obj.__class__, "_subdocument"):
                     raise ValueError("Subdocument cannot be added directly")
                 return obj._obj_to_dict()
             else:
@@ -1057,7 +1057,6 @@ class WOQLClient:
                     "To replace context, need to use `full_replace` or `replace_document`, skipping context object now."
                 )
                 document.pop(0)
-        # import pdb; pdb.set_trace()
         result = requests.post(
             self._documents_url(),
             headers={"user-agent": f"terminusdb-client-python/{__version__}"},

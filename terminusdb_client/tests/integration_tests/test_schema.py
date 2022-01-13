@@ -1,5 +1,7 @@
 import datetime as dt
 
+import pytest
+
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from terminusdb_client.woqlschema.woql_schema import DocumentTemplate, WOQLSchema
 
@@ -85,6 +87,9 @@ def test_insert_cheuk(docker_url, test_schema):
     client.connect(db="test_docapi")
     # client.create_database("test_docapi")
     # print(cheuk._obj_to_dict())
+    with pytest.raises(ValueError) as error:
+        client.insert_document(home)
+        assert str(error.value) == "Subdocument cannot be added directly"
     client.insert_document([uk, cheuk], commit_msg="Adding cheuk")
     result = client.get_all_documents()
     for item in result:
@@ -117,8 +122,54 @@ def test_getting_and_deleting_cheuk(docker_url):
     assert result["name"] == "Cheuk"
     assert result["age"] == 21
     assert result["contact_number"] == "07777123456"
+    assert result.get("@id")
     client.delete_document(cheuk)
     assert client.get_documents_by_type("Employee", as_list=True) == []
+
+
+def test_insert_cheuk_again(docker_url, test_schema):
+    client = WOQLClient(docker_url)
+    client.connect(db="test_docapi")
+    new_schema = WOQLSchema()
+    new_schema.from_db(client)
+    uk = new_schema.import_objects(client.get_document("Country/United%20Kingdom"))
+
+    Address = new_schema.object.get("Address")
+    Employee = new_schema.object.get("Employee")
+    Role = new_schema.object.get("Role")
+    Team = new_schema.object.get("Team")
+
+    home = Address()
+    home.street = "123 Abc Street"
+    home.country = uk
+    home.postal_code = "A12 345"
+
+    cheuk = Employee()
+    cheuk.permisstion = {Role.admin, Role.read}
+    cheuk.address_of = home
+    cheuk.contact_number = "07777123456"
+    cheuk.age = 21
+    cheuk.name = "Cheuk"
+    cheuk.managed_by = cheuk
+    cheuk.friend_of = {cheuk}
+    cheuk.member_of = Team.information_technology
+    cheuk._id = "Cheuk is back"
+
+    client.insert_document(cheuk, commit_msg="Adding cheuk again")
+    result = client.get_all_documents()
+    for item in result:
+        if item.get("@type") == "Country":
+            assert item["name"] == "United Kingdom"
+        elif item.get("@type") == "Employee":
+            assert item["@id"] == "Employee/Cheuk%20is%20back"
+            assert item["address_of"]["postal_code"] == "A12 345"
+            assert item["address_of"]["street"] == "123 Abc Street"
+            assert item["name"] == "Cheuk"
+            assert item["age"] == 21
+            assert item["contact_number"] == "07777123456"
+            assert item["managed_by"] == item["@id"]
+        else:
+            raise AssertionError()
 
 
 class CheckDatetime(DocumentTemplate):
