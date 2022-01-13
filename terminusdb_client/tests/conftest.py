@@ -5,6 +5,7 @@ import pytest
 from terminusdb_client.woqlschema.woql_schema import (
     DocumentTemplate,
     EnumTemplate,
+    LexicalKey,
     TaggedUnion,
     WOQLSchema,
 )
@@ -25,6 +26,7 @@ class Coordinate(DocumentTemplate):
 
 class Country(DocumentTemplate):
     _schema = my_schema
+    _key = LexicalKey(["name"])
     name: str
     perimeter: List[Coordinate]
 

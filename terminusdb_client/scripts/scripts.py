@@ -17,7 +17,7 @@ from .. import woql_type as wt
 from ..errors import InterfaceError
 from ..woqlclient.woqlClient import WOQLClient
 from ..woqldataframe.woqlDataframe import result_to_df
-from ..woqlschema.woql_schema import LexicalKey, RandomKey, WOQLSchema
+from ..woqlschema.woql_schema import WOQLSchema
 
 
 @click.group()
@@ -551,12 +551,13 @@ def importcsv(
                             f"id {id} is missing in {item}. Cannot import CSV."
                         )
                 elif keys:
-                    item_id = LexicalKey(list(keys)).idgen(item)
+                    item_id = "_".join(list(keys))
                 elif na == "optional":
-                    item_id = RandomKey().idgen(item)
+                    item_id = None
                 else:
-                    item_id = LexicalKey(list(df.columns)).idgen(item)
-                item["@id"] = item_id
+                    item_id = "_".join(list(df.columns))
+                if item_id:
+                    item["@id"] = item_id
             if message is None:
                 message = f"Documents created with {csv_file} update by Python client."
             client.update_document(
@@ -569,7 +570,6 @@ def importcsv(
         key_type = "Random"
     else:
         key_type = "Lexical"
-    # key_type = "Random" if (na == "optional" and not keys) else "Lexical"
     click.echo(
         f"Records in {csv_file} inserted as type {class_name} into database with {key_type} ids."
     )

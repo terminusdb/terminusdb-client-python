@@ -416,7 +416,6 @@ def test_delete_document(mocked_requests, mocked_requests2, test_schema):
     my_schema = test_schema
     Coordinate = my_schema.object.get("Coordinate")
     home = Coordinate(_id="Coordinate/home", x=123.431, y=342.435)
-
     woql_client.delete_document(home)
 
     requests.delete.assert_called_with(

@@ -975,11 +975,57 @@ class WOQLClient:
             return obj.to_dict()
         elif hasattr(obj, "_to_dict"):
             if hasattr(obj, "_isinstance") and obj._isinstance:
+                if hasattr(obj.__class__, "_subdocument"):
+                    raise ValueError("Subdocument cannot be added directly")
                 return obj._obj_to_dict()
             else:
                 return obj._to_dict()
         else:
             raise ValueError("Object cannot convert to dictionary")
+
+    def _ref_extract(self, target_key, search_item):
+        if hasattr(search_item, "items"):
+            for key, value in search_item.items():
+                if key == target_key:
+                    yield value
+                if isinstance(value, dict):
+                    yield from self._ref_extract(target_key, value)
+                elif isinstance(value, list):
+                    for item in value:
+                        yield from self._ref_extract(target_key, item)
+
+    def _convert_dcoument(self, document, graph_type):
+        if isinstance(document, list):
+            new_doc = []
+            captured = []
+            referenced = []
+
+            for item in document:
+                item_dict = self._conv_to_dict(item)
+                new_doc.append(item_dict)
+                item_capture = item_dict.get("@capture")
+                if item_capture:
+                    captured.append(item_capture)
+                referenced += list(self._ref_extract("@ref", item_dict))
+
+            referenced = list(set(referenced))
+
+            for item in referenced:
+                if item not in captured:
+                    raise ValueError(
+                        f"{item} is referenced but not captured. Seems you forgot to submit one or more object(s)."
+                    )
+        else:
+            if hasattr(document, "to_dict") and graph_type != "schema":
+                raise InterfaceError(
+                    "Inserting WOQLSchema object into non-schema graph."
+                )
+            new_doc = self._conv_to_dict(document)
+            if isinstance(new_doc, dict) and list(self._ref_extract("@ref", new_doc)):
+                raise ValueError(
+                    "There are uncaptured references. Seems you forgot to submit one or more object(s)."
+                )
+        return new_doc
 
     def insert_document(
         self,
@@ -1026,43 +1072,37 @@ class WOQLClient:
         else:
             params["full_replace"] = "false"
 
-        if isinstance(document, list):
-            new_doc = []
-            for item in document:
-                item_dict = self._conv_to_dict(item)
-                new_doc.append(item_dict)
-            document = new_doc
-        else:
-            if hasattr(document, "to_dict") and graph_type != "schema":
-                raise InterfaceError(
-                    "Inserting WOQLSchema object into non-schema graph."
-                )
-            document = self._conv_to_dict(document)
+        new_doc = self._convert_dcoument(document, graph_type)
 
-        if len(document) == 0:
+        if len(new_doc) == 0:
             return
-        elif not isinstance(document, list):
-            document = [document]
+        elif not isinstance(new_doc, list):
+            new_doc = [new_doc]
 
         if full_replace:
-            if document[0].get("@type") != "@context":
+            if new_doc[0].get("@type") != "@context":
                 raise ValueError(
                     "The first item in docuemnt need to be dictionary representing the context object."
                 )
         else:
-            if document[0].get("@type") == "@context":
+            if new_doc[0].get("@type") == "@context":
                 warnings.warn(
                     "To replace context, need to use `full_replace` or `replace_document`, skipping context object now."
                 )
-                document.pop(0)
+                new_doc.pop(0)
         result = requests.post(
             self._documents_url(),
             headers={"user-agent": f"terminusdb-client-python/{__version__}"},
             params=params,
-            json=document,
+            json=new_doc,
             auth=self._auth(),
         )
-        return json.loads(_finish_response(result))
+        result = json.loads(_finish_response(result))
+        if isinstance(document, list):
+            for idx, item in enumerate(document):
+                if hasattr(item, "_obj_to_dict") and not hasattr(item, "_backend_id"):
+                    item._backend_id = result[idx][len("terminusdb:///data/") :]
+        return result
 
     def replace_document(
         self,
@@ -1100,30 +1140,22 @@ class WOQLClient:
         params = self._generate_commit(commit_msg)
         params["graph_type"] = graph_type
         params["create"] = "true" if create else "false"
-        if isinstance(document, list):
-            new_doc = []
-            for item in document:
-                # while document:
-                #     item = document.pop()
-                item_dict = self._conv_to_dict(item)
-                new_doc.append(item_dict)
-                # id_list.append(item_dict['@id'])
-            document = new_doc
-        else:
-            if hasattr(document, "to_dict") and graph_type != "schema":
-                raise InterfaceError(
-                    "Inserting WOQLSchema object into non-schema graph."
-                )
-            document = self._conv_to_dict(document)
-        _finish_response(
-            requests.put(
-                self._documents_url(),
-                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
-                params=params,
-                json=document,
-                auth=self._auth(),
-            )
+
+        new_doc = self._convert_dcoument(document, graph_type)
+
+        result = requests.put(
+            self._documents_url(),
+            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            params=params,
+            json=new_doc,
+            auth=self._auth(),
         )
+        result = json.loads(_finish_response(result))
+        if isinstance(document, list):
+            for idx, item in enumerate(document):
+                if hasattr(item, "_obj_to_dict") and not hasattr(item, "_backend_id"):
+                    item._backend_id = result[idx][len("terminusdb:///data/") :]
+        return result
 
     def update_document(
         self,

@@ -1,80 +1,9 @@
 import datetime as dt
 
+import pytest
+
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from terminusdb_client.woqlschema.woql_schema import DocumentTemplate, WOQLSchema
-
-# from woql_schema import WOQLSchema, Document, Property, WOQLObject
-#
-# my_schema = WOQLSchema()
-#
-#
-# class Coordinate(DocumentTemplate):
-#     _schema = my_schema
-#     x: float
-#     y: float
-#
-#
-# class Country(DocumentTemplate):
-#     _schema = my_schema
-#     name: str
-#     perimeter: List[Coordinate]
-#
-#
-# class Address(DocumentTemplate):
-#     """This is address"""
-#
-#     # _key = HashKey(["street", "postal_code"])
-#     # _key = LexicalKey(["street", "postal_code"])
-#     # _base = "Adddress_"
-#     _subdocument = []
-#     _schema = my_schema
-#     street: str
-#     postal_code: str
-#     country: Country
-#
-#
-# class Person(DocumentTemplate):
-#     """This is a person
-#
-#     Attributes
-#     ----------
-#     name : str
-#         Name of the person.
-#     age : int
-#         Age of the person.
-#     """
-#
-#     _schema = my_schema
-#     name: str
-#     age: int
-#     friend_of: Set["Person"]
-#
-#
-# class Employee(Person):
-#     address_of: Address
-#     contact_number: Optional[str]
-#     managed_by: "Employee"
-#     member_of: "Team"
-#     permisstion: Set["Role"]
-#
-#
-# class Team(EnumTemplate):
-#     _schema = my_schema
-#     IT = "Information Technology"
-#     Marketing = ()
-#
-#
-# class Role(EnumTemplate):
-#     "Test Enum in a set"
-#     _schema = my_schema
-#     Admin = ()
-#     Read = ()
-#     Write = ()
-#
-#
-# class Contact(TaggedUnion):
-#     local_number: int
-#     international: str
 
 
 def test_create_schema(docker_url, test_schema):
@@ -158,7 +87,25 @@ def test_insert_cheuk(docker_url, test_schema):
     client.connect(db="test_docapi")
     # client.create_database("test_docapi")
     # print(cheuk._obj_to_dict())
-    client.insert_document([uk, home, cheuk], commit_msg="Adding cheuk")
+    with pytest.raises(ValueError) as error:
+        client.insert_document(home)
+        assert str(error.value) == "Subdocument cannot be added directly"
+    with pytest.raises(ValueError) as error:
+        client.insert_document([cheuk])
+        assert (
+            str(error.value)
+            == f"{str(id(uk))} is referenced but not captured. Seems you forgot to submit one or more object(s)."
+        )
+    with pytest.raises(ValueError) as error:
+        client.insert_document(cheuk)
+        assert (
+            str(error.value)
+            == "There are uncaptured references. Seems you forgot to submit one or more object(s)."
+        )
+    assert cheuk._id is None and uk._id is None
+    client.insert_document([uk, cheuk], commit_msg="Adding cheuk")
+    assert cheuk._backend_id and cheuk._id
+    assert uk._backend_id and uk._id
     result = client.get_all_documents()
     for item in result:
         if item.get("@type") == "Country":
@@ -190,8 +137,85 @@ def test_getting_and_deleting_cheuk(docker_url):
     assert result["name"] == "Cheuk"
     assert result["age"] == 21
     assert result["contact_number"] == "07777123456"
+    assert result.get("@id")
     client.delete_document(cheuk)
     assert client.get_documents_by_type("Employee", as_list=True) == []
+
+
+def test_insert_cheuk_again(docker_url, test_schema):
+    client = WOQLClient(docker_url)
+    client.connect(db="test_docapi")
+    new_schema = WOQLSchema()
+    new_schema.from_db(client)
+    uk = new_schema.import_objects(client.get_document("Country/United%20Kingdom"))
+
+    Address = new_schema.object.get("Address")
+    Employee = new_schema.object.get("Employee")
+    Role = new_schema.object.get("Role")
+    Team = new_schema.object.get("Team")
+    Coordinate = new_schema.object.get("Coordinate")
+
+    home = Address()
+    home.street = "123 Abc Street"
+    home.country = uk
+    home.postal_code = "A12 345"
+
+    location = Coordinate(x=0.7, y=51.3)
+    uk.perimeter = [location]
+    with pytest.raises(ValueError) as error:
+        uk.name = "United Kingdom of Great Britain and Northern Ireland"
+        assert (
+            str(error.value)
+            == "name has been used to generated id hance cannot be changed."
+        )
+
+    cheuk = Employee()
+    cheuk.permisstion = {Role.admin, Role.read}
+    cheuk.address_of = home
+    cheuk.contact_number = "07777123456"
+    cheuk.age = 21
+    cheuk.name = "Cheuk"
+    cheuk.managed_by = cheuk
+    cheuk.friend_of = {cheuk}
+    cheuk.member_of = Team.information_technology
+    cheuk._id = "Cheuk is back"
+
+    with pytest.raises(ValueError) as error:
+        client.update_document([uk])
+        assert (
+            str(error.value)
+            == f"{str(id(location))} is referenced but not captured. Seems you forgot to submit one or more object(s)."
+        )
+    with pytest.raises(ValueError) as error:
+        client.insert_document(uk)
+        assert (
+            str(error.value)
+            == "There are uncaptured references. Seems you forgot to submit one or more object(s)."
+        )
+
+    client.update_document([location, uk, cheuk], commit_msg="Adding cheuk again")
+    assert location._backend_id and location._id
+    location.x = -0.7
+    result = client.replace_document([location], commit_msg="Fixing location")
+    assert len(result) == 1
+    result = client.get_all_documents()
+    for item in result:
+        if item.get("@type") == "Country":
+            assert item["name"] == "United Kingdom"
+            assert item["perimeter"]
+        elif item.get("@type") == "Employee":
+            assert item["@id"] == "Employee/Cheuk%20is%20back"
+            assert item["address_of"]["postal_code"] == "A12 345"
+            assert item["address_of"]["street"] == "123 Abc Street"
+            assert item["name"] == "Cheuk"
+            assert item["age"] == 21
+            assert item["contact_number"] == "07777123456"
+            assert item["managed_by"] == item["@id"]
+        elif item.get("@type") == "Coordinate":
+            assert item["x"] == -0.7
+            assert item["y"] == 51.3
+        else:
+            raise AssertionError()
 
 
 class CheckDatetime(DocumentTemplate):
