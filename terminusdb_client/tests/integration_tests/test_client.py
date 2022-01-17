@@ -100,6 +100,12 @@ def test_diff_ops(docker_url, test_schema):
     )
     assert result.content == result_patch.content
 
+    result = client.diff(
+        [{"@id": "Person/Jane", "@type": "Person", "name": "Jane"}],
+        [{"@id": "Person/Jane", "@type": "Person", "name": "Janine"}],
+    )
+    assert result.content[0] == result_patch.content
+
     Person = test_schema.object.get("Person")
     jane = Person(
         _id="Jane",
@@ -113,6 +119,8 @@ def test_diff_ops(docker_url, test_schema):
     )
     result = client.diff(jane, janine)
     assert result.content == result_patch.content
+    result = client.diff([jane], [janine])
+    assert result.content[0] == result_patch.content
 
     my_schema = test_schema.copy()
     my_schema.object.pop("Employee")
@@ -141,6 +149,18 @@ def test_diff_ops(docker_url, test_schema):
         "@op": "SwapList",
         "@rest": {"@op": "KeepList"},
     }
+
+    assert client.patch(
+        {"@id": "Person/Jane", "@type": "Person", "name": "Jane"}, result_patch
+    ) == {"@id": "Person/Jane", "@type": "Person", "name": "Janine"}
+    assert client.patch(jane, result_patch) == {
+        "@id": "Person/Jane",
+        "@type": "Person",
+        "name": "Janine",
+        "age": 18,
+    }
+    ## TODO: upstreamm bug fix ##
+    # assert client.patch(test_schema, result) == my_schema.to_dict()
 
 
 def test_jwt(docker_url_jwt):

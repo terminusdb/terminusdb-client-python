@@ -1746,6 +1746,16 @@ class WOQLClient:
             self.reset(commit_id)
         return commit_id
 
+    def _convert_diff_dcoument(self, document):
+        if isinstance(document, list):
+            new_doc = []
+            for item in document:
+                item_dict = self._conv_to_dict(item)
+                new_doc.append(item_dict)
+        else:
+            new_doc = self._conv_to_dict(document)
+        return new_doc
+
     def diff(
         self,
         before: Union[
@@ -1778,19 +1788,9 @@ class WOQLClient:
         >>> result.to_json = '{ "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'"""
         self._check_connection()
 
-        def convert_diff_dcoument(document):
-            if isinstance(document, list):
-                new_doc = []
-                for item in document:
-                    item_dict = self._conv_to_dict(item)
-                    new_doc.append(item_dict)
-            else:
-                new_doc = self._conv_to_dict(document)
-            return new_doc
-
         request_dict = {
-            "before": convert_diff_dcoument(before),
-            "after": convert_diff_dcoument(after),
+            "before": self._convert_diff_dcoument(before),
+            "after": self._convert_diff_dcoument(after),
         }
 
         result = _finish_response(
@@ -1802,6 +1802,50 @@ class WOQLClient:
             )
         )
         return Patch(json=result)
+
+    def patch(
+        self,
+        before: Union[
+            dict,
+            List[dict],
+            "WOQLSchema",  # noqa:F821
+            "DocumentTemplate",  # noqa:F821
+            List["DocumentTemplate"],  # noqa:F821
+        ],
+        patch: Patch,
+    ):
+        """Apply the patch object to the before object and return an after object. Note that this change does not commit changes to the graph.
+
+        Returns
+        -------
+        dict
+            After object
+
+        Examples
+        --------
+        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client.connect(user="admin", key="root", team="admin", db="some_db")
+        >>> patch_obj = Patch(json='{"name" : { "@op" : "ValueSwap", "@before" : "Jane", "@after": "Janine" }}')
+        >>> result = client.patch({ "@id" : "Person/Jane", "@type" : Person", "name" : "Jane"}, patch_obj)
+        >>> print(result)
+        '{ "@id" : "Person/Jane", "@type" : Person", "name" : "Janine"}'"""
+
+        self._check_connection()
+
+        request_dict = {
+            "before": self._convert_diff_dcoument(before),
+            "patch": patch.content,
+        }
+
+        result = _finish_response(
+            requests.post(
+                self._patch_url(),
+                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                json=request_dict,
+                auth=self._auth(),
+            )
+        )
+        return json.loads(result)
 
     def clonedb(
         self, clone_source: str, newid: str, description: Optional[str] = None
@@ -2033,6 +2077,9 @@ class WOQLClient:
 
     def _diff_url(self):
         return self._branch_base("diff")
+
+    def _patch_url(self):
+        return self._branch_base("patch")
 
     def _push_url(self):
         return self._branch_base("push")
