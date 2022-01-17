@@ -55,6 +55,23 @@ class ResourceType(Enum):
     BRANCH = 6
 
 
+class Patch:
+    def __init__(self, json=None):
+        if json:
+            self.from_json(json)
+        else:
+            self.content = None
+
+    def from_json(self, json_str):
+        self.content = json.loads(json_str)
+
+    def to_json(self):
+        return json.dumps(self.content)
+
+    def copy(self):
+        return copy.deepcopy(self)
+
+
 class WOQLClient:
     """Client for querying a TerminusDB server using WOQL queries.
 
@@ -1729,6 +1746,63 @@ class WOQLClient:
             self.reset(commit_id)
         return commit_id
 
+    def diff(
+        self,
+        before: Union[
+            dict,
+            List[dict],
+            "WOQLSchema",  # noqa:F821
+            "DocumentTemplate",  # noqa:F821
+            List["DocumentTemplate"],  # noqa:F821
+        ],
+        after: Union[
+            dict,
+            List[dict],
+            "WOQLSchema",  # noqa:F821
+            "DocumentTemplate",  # noqa:F821
+            List["DocumentTemplate"],  # noqa:F821
+        ],
+    ):
+        """Perform diff on 2 set of document(s), result in a Patch object
+
+        Returns
+        -------
+        obj
+            Patch object
+
+        Examples
+        --------
+        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client.connect(user="admin", key="root", team="admin", db="some_db")
+        >>> result = client.diff({ "@id" : "Person/Jane", "@type" : "Person", "name" : "Jane"}, { "@id" : "Person/Jane", "@type" : "Person", "name" : "Janine"})
+        >>> result.to_json = '{ "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'"""
+        self._check_connection()
+
+        def convert_diff_dcoument(document):
+            if isinstance(document, list):
+                new_doc = []
+                for item in document:
+                    item_dict = self._conv_to_dict(item)
+                    new_doc.append(item_dict)
+            else:
+                new_doc = self._conv_to_dict(document)
+            return new_doc
+
+        request_dict = {
+            "before": convert_diff_dcoument(before),
+            "after": convert_diff_dcoument(after),
+        }
+
+        result = _finish_response(
+            requests.post(
+                self._diff_url(),
+                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                json=request_dict,
+                auth=self._auth(),
+            )
+        )
+        return Patch(json=result)
+
     def clonedb(
         self, clone_source: str, newid: str, description: Optional[str] = None
     ) -> None:
@@ -1956,6 +2030,9 @@ class WOQLClient:
 
     def _squash_url(self):
         return self._branch_base("squash")
+
+    def _diff_url(self):
+        return self._branch_base("diff")
 
     def _push_url(self):
         return self._branch_base("push")

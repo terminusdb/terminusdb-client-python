@@ -59,6 +59,7 @@ class Person(DocumentTemplate):
 
 
 class Employee(Person):
+    _schema = my_schema
     address_of: Address
     contact_number: Optional[str]
     managed_by: "Employee"
