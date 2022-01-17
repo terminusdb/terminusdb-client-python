@@ -429,11 +429,8 @@ Commonly used to combine WOQLQueries.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>input_str</strong> (<em>str</em>) – the given input string</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dict</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -446,11 +443,8 @@ Commonly used to combine WOQLQueries.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>input_bool</strong> (<em>bool</em>) – the given input string</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dict</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -463,11 +457,8 @@ Commonly used to combine WOQLQueries.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>input_obj</strong> (<em>str</em>) – the given input dateTime object</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dict</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -493,11 +484,8 @@ Commonly used to combine WOQLQueries.</p>
 <li><p><strong>child</strong> (<em>str</em><em>, </em><em>optional</em>) – the child class to be checked</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>bool</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>
@@ -966,11 +954,8 @@ Otherwise two triples with the same predicate but different object values will b
 <li><p><strong>of_type</strong> (<em>str</em>) – type to be checked</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>bool</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1180,6 +1165,27 @@ Otherwise two triples with the same predicate but different object values will b
 <li><p><strong>user_input</strong> (<em>str</em>) – input string or WOQL variable “v:”</p></li>
 <li><p><strong>glue</strong> (<em>str</em>) – character string to separate string into list</p></li>
 <li><p><strong>output</strong> (<em>str</em>) – WOQL variable that stores output list</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>query object that can be chained and/or execute</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>WOQLQuery object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.dot">
+<span class="sig-name descname"><span class="pre">dot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.dot" title="Permalink to this definition"></a></dt>
+<dd><p>Iterates through a list and returns a value for each member</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dictionary</strong> – a WOQL dictionary or variable representing a dictionary</p></li>
+<li><p><strong>field</strong> (<em>str</em>) – a string representing the field or key to access the dictionary</p></li>
+<li><p><strong>value</strong> – a WOQL value representing the result</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1445,7 +1451,7 @@ If literal type is “owl:Thing” or “node”, <cite>val</cite> will be treat
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>gvarlist</strong> (<em>list</em><em> or </em><em>dict of WOQLQuery</em><em>(</em><em>)</em><em>asc</em><em> or </em><a class="reference internal" href="#terminusdb_client.WOQLQuery" title="terminusdb_client.WOQLQuery"><em>WOQLQuery</em></a><em>(</em><em>)</em><em>desc objects</em>) – </p></li>
+<li><p><strong>gvarlist</strong> (<em>list</em><em> or </em><em>dict of WOQLQuery</em><em>(</em><em>)</em><em>.asc</em><em> or </em><a class="reference internal" href="#terminusdb_client.WOQLQuery" title="terminusdb_client.WOQLQuery"><em>WOQLQuery</em></a><em>(</em><em>)</em><em>.desc objects</em>) – </p></li>
 <li><p><strong>query</strong> (<em>WOQLQuery object</em><em>, </em><em>optional</em>) – </p></li>
 </ul>
 </dd>
@@ -1656,11 +1662,6 @@ It uses pattern construction syntax such as:
 </dd>
 </dl>
 </dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="terminusdb_client.WOQLQuery.dot">
-<span class="sig-name descname"><span class="pre">dot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLQuery.dot" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 
