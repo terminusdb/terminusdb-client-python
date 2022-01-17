@@ -78,54 +78,7 @@ class Doc:
         elif type(obj) is float:
             return {"@type": "Value", "data": {"@type": "xsd:decimal", "@value": obj}}
         elif obj is None:
-            return null
-        elif type(obj) is list:
-            ls = []
-            for elt in obj:
-                ls.append(self._convert(elt))
-            return {"@type": "Value", "list": ls}
-        elif isinstance(obj, Var):
-            return {"@type": "Value", "variable": obj.name}
-        elif type(obj) is dict:
-            keys = obj.keys()
-            pairs = []
-            for key in keys:
-                v = obj[key]
-                val = self._convert(v)
-                pairs.append({"@type": "FieldValuePair", "field": key, "value": val})
-            return {
-                "@type": "Value",
-                "dictionary": {"@type": "DictionaryTemplate", "data": pairs},
-            }
-
-
-class Var:
-    def __init__(self, name):
-        self.name = name
-
-    def __str__(self):
-        return self.name
-
-
-class Doc:
-    def __init__(self, dictionary):
-        self.dictionary = dictionary
-        self.encoded = self._convert(dictionary)
-
-    def __str__(self):
-        return str(self.dictionary)
-
-    def _convert(self, obj):
-        if type(obj) is str:
-            return {"@type": "Value", "data": {"@type": "xsd:string", "@value": obj}}
-        elif type(obj) is bool:
-            return {"@type": "Value", "data": {"@type": "xsd:boolean", "@value": obj}}
-        elif type(obj) is int:
-            return {"@type": "Value", "data": {"@type": "xsd:integer", "@value": obj}}
-        elif type(obj) is float:
-            return {"@type": "Value", "data": {"@type": "xsd:decimal", "@value": obj}}
-        elif obj is None:
-            return null
+            return None
         elif type(obj) is list:
             ls = []
             for elt in obj:
@@ -291,7 +244,6 @@ class WOQLQuery:
         return qobj
 
     def _raw_var(self, varb):
-        print(varb)
         if isinstance(varb, Var):
             return varb.name
         if varb[:2] == "v:":
@@ -2269,7 +2221,7 @@ class WOQLQuery:
         self._cursor["list"] = self._data_list(output)
         return self
 
-    def dot(self, dictionary, field, value):
+    def dot(self, document, field, value):
         """Iterates through a list and returns a value for each member
 
         Parameters
@@ -2286,14 +2238,12 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        if dictionary and dictionary == "args":
-            return ["member", "list"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Dot"
-        self._cursor["document"] = self._clean_object(dictionary)
-        self._cursor["field"] = self._clean_predicate(field)
-        self._cursor["value"] = self._clean_object(value)
+        self._cursor["document"] = self._expand_value_variable(document)
+        self._cursor["field"] = self._clean_data_value(field, "xsd:string")
+        self._cursor["value"] = self._expand_value_variable(value)
         return self
 
     def member(self, member, mem_list):
@@ -3033,12 +2983,3 @@ class WOQLQuery:
         if len(vars_tuple) == 1:
             vars_tuple = vars_tuple[0]
         return vars_tuple
-
-    def dot(self, document, field, value):
-        if self._cursor.get("@type"):
-            self._wrap_cursor_with_and()
-        self._cursor["@type"] = "Dot"
-        self._cursor["document"] = self._expand_value_variable(document)
-        self._cursor["field"] = self._clean_data_value(field, "xsd:string")
-        self._cursor["value"] = self._expand_value_variable(value)
-        return self
