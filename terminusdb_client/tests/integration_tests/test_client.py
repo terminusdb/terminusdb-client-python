@@ -6,7 +6,7 @@ from random import random
 
 import pytest
 
-from terminusdb_client.woqlclient.woqlClient import WOQLClient
+from terminusdb_client.woqlclient.woqlClient import Patch, WOQLClient
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 # from terminusdb_client.woqlquery.woql_query import WOQLQuery
@@ -83,6 +83,58 @@ def test_happy_carzy_path(docker_url):
     client.delete_database("test happy path", "admin")
     assert client.db is None
     assert "test happy path" not in client.list_databases()
+
+
+def test_diff_ops(docker_url, test_schema):
+    # create client and db
+    client = WOQLClient(docker_url)
+    client.connect()
+    client.create_database("test_diff_ops")
+
+    result_patch = Patch(
+        json='{ "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'
+    )
+    result = client.diff(
+        {"@id": "Person/Jane", "@type": "Person", "name": "Jane"},
+        {"@id": "Person/Jane", "@type": "Person", "name": "Janine"},
+    )
+    assert result.content == result_patch.content
+
+    result = client.diff(
+        [{"@id": "Person/Jane", "@type": "Person", "name": "Jane"}],
+        [{"@id": "Person/Jane", "@type": "Person", "name": "Janine"}],
+    )
+    assert result.content[0] == result_patch.content
+
+    Person = test_schema.object.get("Person")
+    jane = Person(
+        _id="Jane",
+        name="Jane",
+        age=18,
+    )
+    janine = Person(
+        _id="Jane",
+        name="Janine",
+        age=18,
+    )
+    result = client.diff(jane, janine)
+    assert result.content == result_patch.content
+    result = client.diff([jane], [janine])
+    assert result.content[0] == result_patch.content
+    assert client.patch(
+        {"@id": "Person/Jane", "@type": "Person", "name": "Jane"}, result_patch
+    ) == {"@id": "Person/Jane", "@type": "Person", "name": "Janine"}
+    assert client.patch(jane, result_patch) == {
+        "@id": "Person/Jane",
+        "@type": "Person",
+        "name": "Janine",
+        "age": 18,
+    }
+    my_schema = test_schema.copy()
+    my_schema.object.pop("Employee")
+    assert my_schema.to_dict() != test_schema.to_dict()
+    result = client.diff(test_schema, my_schema)
+    assert client.patch(test_schema, result) == my_schema.to_dict()
 
 
 def test_jwt(docker_url_jwt):
