@@ -159,8 +159,7 @@ def test_diff_ops(docker_url, test_schema):
         "name": "Janine",
         "age": 18,
     }
-    ## TODO: upstreamm bug fix ##
-    # assert client.patch(test_schema, result) == my_schema.to_dict()
+    assert client.patch(test_schema, result) == my_schema.to_dict()
 
 
 def test_jwt(docker_url_jwt):
