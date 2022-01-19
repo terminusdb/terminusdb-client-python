@@ -6,6 +6,7 @@ from random import random
 
 import pytest
 
+from terminusdb_client.errors import InterfaceError
 from terminusdb_client.woqlclient.woqlClient import Patch, WOQLClient
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
@@ -19,6 +20,11 @@ def test_happy_path(docker_url):
     # test connect
     client.connect()
     assert client._connected
+    assert client._db_info is not None
+    # test db does not exist
+    with pytest.raises(InterfaceError) as error:
+        client.connect(db="test_happy_path")
+        assert error.value == "Connection fail, test_happy_path does not exist."
     # test create db
     client.create_database("test_happy_path")
     init_commit = client._get_current_commit()

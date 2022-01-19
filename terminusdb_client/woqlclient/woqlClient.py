@@ -13,7 +13,7 @@ from typing import Any, Dict, List, Optional, Union
 import requests
 
 from ..__version__ import __version__
-from ..errors import InterfaceError
+from ..errors import DatabaseError, InterfaceError
 from ..woql_utils import _finish_response, _result2stream
 from ..woqlquery.woql_query import WOQLQuery
 
@@ -268,10 +268,10 @@ class WOQLClient:
         self._connected = True
 
         try:
-            self._all_available_db = json.loads(
+            self._db_info = json.loads(
                 _finish_response(
                     requests.get(
-                        self.api + "/",
+                        self.api + "/info",
                         headers={
                             "user-agent": f"terminusdb-client-python/{__version__}"
                         },
@@ -283,11 +283,20 @@ class WOQLClient:
             raise InterfaceError(
                 f"Cannot connect to server, please make sure TerminusDB is running at {self.server_url} and the authentication details are correct. Details: {str(error)}"
             ) from None
-
-        all_db_name = list(map(lambda x: x.get("name"), self._all_available_db))
-        if self.db is not None and self.db not in all_db_name:
-            raise InterfaceError(f"Connection fail, {self.db} does not exist.")
-
+        if self.db is not None:
+            try:
+                _finish_response(
+                    requests.head(
+                        self._db_url(),
+                        headers={
+                            "user-agent": f"terminusdb-client-python/{__version__}"
+                        },
+                        params={"exists": "true"},
+                        auth=self._auth(),
+                    )
+                )
+            except DatabaseError:
+                raise InterfaceError(f"Connection fail, {self.db} does not exist.")
         self._author = self.user
 
     def close(self) -> None:
@@ -540,7 +549,6 @@ class WOQLClient:
             auth=self._auth(),
         )
         return json.loads(_finish_response(result))
-        # return self._dispatch_json("get", self._db_base("prefixes")).get("@context")
 
     def create_database(
         self,
