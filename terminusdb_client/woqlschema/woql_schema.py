@@ -792,7 +792,9 @@ class WOQLSchema:
 
     def to_dict(self):
         """Return the schema in the TerminusDB dictionary format"""
-        return [self.context] + list(map(lambda cls: cls._to_dict(), self.all_obj()))
+        all_obj = list(map(lambda cls: cls._to_dict(), self.all_obj()))
+        all_obj.sort(key=lambda item: item.get("@id"))
+        return [self.context] + all_obj
 
     def to_json_schema(self, class_object: Union[str, dict]):
         """Return the schema in the json schema (http://json-schema.org/) format as a dictionary for the class object.

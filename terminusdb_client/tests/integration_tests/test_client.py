@@ -94,8 +94,82 @@ def test_happy_carzy_path(docker_url):
 def test_diff_ops(docker_url, test_schema):
     # create client and db
     client = WOQLClient(docker_url)
-    client.connect()
-    client.create_database("test_diff_ops")
+
+    result_patch = Patch(
+        json='{ "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'
+    )
+    result = client.diff(
+        {"@id": "Person/Jane", "@type": "Person", "name": "Jane"},
+        {"@id": "Person/Jane", "@type": "Person", "name": "Janine"},
+    )
+    assert result.content == result_patch.content
+
+    result = client.diff(
+        [{"@id": "Person/Jane", "@type": "Person", "name": "Jane"}],
+        [{"@id": "Person/Jane", "@type": "Person", "name": "Janine"}],
+    )
+    assert result.content[0] == result_patch.content
+
+    Person = test_schema.object.get("Person")
+    jane = Person(
+        _id="Jane",
+        name="Jane",
+        age=18,
+    )
+    janine = Person(
+        _id="Jane",
+        name="Janine",
+        age=18,
+    )
+    result = client.diff(jane, janine)
+    assert result.content == result_patch.content
+    result = client.diff([jane], [janine])
+    assert result.content[0] == result_patch.content
+    assert client.patch(
+        {"@id": "Person/Jane", "@type": "Person", "name": "Jane"}, result_patch
+    ) == {"@id": "Person/Jane", "@type": "Person", "name": "Janine"}
+    assert client.patch(jane, result_patch) == {
+        "@id": "Person/Jane",
+        "@type": "Person",
+        "name": "Janine",
+        "age": 18,
+    }
+    my_schema = test_schema.copy()
+    my_schema.object.pop("Employee")
+    assert my_schema.to_dict() != test_schema.to_dict()
+    result = client.diff(test_schema, my_schema)
+    assert result.content == {
+        "@op": "CopyList",
+        "@rest": {
+            "@after": [],
+            "@before": [
+                {
+                    "@id": "Employee",
+                    "@inherits": ["Person"],
+                    "@key": {"@type": "Random"},
+                    "@type": "Class",
+                    "address_of": "Address",
+                    "age": "xsd:integer",
+                    "contact_number": {"@class": "xsd:string", "@type": "Optional"},
+                    "friend_of": {"@class": "Person", "@type": "Set"},
+                    "managed_by": "Employee",
+                    "member_of": "Team",
+                    "name": "xsd:string",
+                    "permisstion": {"@class": "Role", "@type": "Set"},
+                }
+            ],
+            "@op": "SwapList",
+            "@rest": {"@op": "KeepList"},
+        },
+        "@to": 4,
+    }
+    assert client.patch(test_schema, result) == my_schema.to_dict()
+
+
+@pytest.mark.skip(reason="temporary not avaliable")
+def test_diff_ops_no_auth(test_schema):
+    # create client and db
+    client = WOQLClient("https://cloud-dev.dcm.ist")
 
     result_patch = Patch(
         json='{ "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'

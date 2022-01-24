@@ -1,1 +1,1 @@
-from .woqlClient import WOQLClient  # noqa
+from .woqlClient import Patch, WOQLClient  # noqa

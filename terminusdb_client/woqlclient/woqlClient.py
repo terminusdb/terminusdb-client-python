@@ -62,6 +62,24 @@ class Patch:
         else:
             self.content = None
 
+    @property
+    def update(self):
+        set_dict = {}
+        for key, item in self.content.items():
+            if isinstance(item, dict):
+                operation = item.get("@op")
+                if operation is not None and operation == "SwapValue":
+                    set_dict[key] = item.get("@after")
+        return {"$set": set_dict}
+
+    @update.setter
+    def update(self):
+        raise Exception("Cannot set update for patch")
+
+    @update.deleter
+    def update(self):
+        raise Exception("Cannot delete update for patch")
+
     def from_json(self, json_str):
         self.content = json.loads(json_str)
 
@@ -1794,7 +1812,7 @@ class WOQLClient:
         >>> client.connect(user="admin", key="root", team="admin", db="some_db")
         >>> result = client.diff({ "@id" : "Person/Jane", "@type" : "Person", "name" : "Jane"}, { "@id" : "Person/Jane", "@type" : "Person", "name" : "Janine"})
         >>> result.to_json = '{ "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'"""
-        self._check_connection()
+        # self._check_connection()
 
         request_dict = {
             "before": self._convert_diff_dcoument(before),
@@ -1806,7 +1824,7 @@ class WOQLClient:
                 self._diff_url(),
                 headers={"user-agent": f"terminusdb-client-python/{__version__}"},
                 json=request_dict,
-                auth=self._auth(),
+                # auth=self._auth(),
             )
         )
         return Patch(json=result)
@@ -1838,7 +1856,7 @@ class WOQLClient:
         >>> print(result)
         '{ "@id" : "Person/Jane", "@type" : Person", "name" : "Janine"}'"""
 
-        self._check_connection()
+        # self._check_connection()
 
         request_dict = {
             "before": self._convert_diff_dcoument(before),
@@ -1850,7 +1868,7 @@ class WOQLClient:
                 self._patch_url(),
                 headers={"user-agent": f"terminusdb-client-python/{__version__}"},
                 json=request_dict,
-                auth=self._auth(),
+                # auth=self._auth(),
             )
         )
         return json.loads(result)
