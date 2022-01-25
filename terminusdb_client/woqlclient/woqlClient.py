@@ -64,13 +64,18 @@ class Patch:
 
     @property
     def update(self):
-        set_dict = {}
-        for key, item in self.content.items():
-            if isinstance(item, dict):
-                operation = item.get("@op")
-                if operation is not None and operation == "SwapValue":
-                    set_dict[key] = item.get("@after")
-        return {"$set": set_dict}
+        def swap_value(swap_item):
+            result_dict = {}
+            for key, item in swap_item.items():
+                if isinstance(item, dict):
+                    operation = item.get("@op")
+                    if operation is not None and operation == "SwapValue":
+                        result_dict[key] = item.get("@after")
+                    elif operation is None:
+                        result_dict[key] = swap_value(item)
+            return result_dict
+
+        return {"$set": swap_value(self.content)}
 
     @update.setter
     def update(self):
@@ -79,6 +84,31 @@ class Patch:
     @update.deleter
     def update(self):
         raise Exception("Cannot delete update for patch")
+
+    @property
+    def before(self):
+        def extract_before(extract_item):
+            before_dict = {}
+            for key, item in extract_item.items():
+                if isinstance(item, dict):
+                    value = item.get("@before")
+                    if value is not None:
+                        before_dict[key] = value
+                    else:
+                        before_dict[key] = extract_before(item)
+                else:
+                    before_dict[key] = item
+            return before_dict
+
+        return extract_before(self.content)
+
+    @before.setter
+    def before(self):
+        raise Exception("Cannot set before for patch")
+
+    @before.deleter
+    def before(self):
+        raise Exception("Cannot delete before for patch")
 
     def from_json(self, json_str):
         self.content = json.loads(json_str)
