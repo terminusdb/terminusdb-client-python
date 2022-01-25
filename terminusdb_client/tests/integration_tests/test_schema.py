@@ -218,6 +218,33 @@ def test_insert_cheuk_again(docker_url, test_schema):
             raise AssertionError()
 
 
+def test_get_version(docker_url):
+    client = WOQLClient(docker_url)
+    client.connect(db="test_docapi")
+    result, version = client.get_all_documents(graph_type="schema", get_version=True)
+    assert version
+    result, version = client.get_all_documents(
+        graph_type="schema", get_version=True, as_list=True
+    )
+    assert version
+    result, version = client.get_documents_by_type(
+        "Class", graph_type="schema", get_version=True
+    )
+    assert version
+    result, version = client.get_documents_by_type(
+        "Class", graph_type="schema", get_version=True, as_list=True
+    )
+    assert version
+    result, version = client.get_document("Team", graph_type="schema", get_version=True)
+    assert version
+    result, version = client.query_document(
+        {"@type": "Employee", "@id": "Cheuk%20is%20back"}, get_version=True
+    )
+    assert version
+    result, version = client.get_all_branches(get_version=True)
+    assert version
+
+
 class CheckDatetime(DocumentTemplate):
 
     datetime: dt.datetime

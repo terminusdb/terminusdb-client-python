@@ -476,7 +476,7 @@ class WOQLClient:
         target_commit = result.get("bindings")[0].get("cid").get("@value")
         return target_commit
 
-    def get_all_branches(self):
+    def get_all_branches(self, get_version=False):
         """Get all the branches available in the database."""
         self._check_connection()
         api_url = self._documents_url().split("/")
@@ -488,6 +488,11 @@ class WOQLClient:
             params={"type": "Branch"},
             auth=self._auth(),
         )
+
+        if get_version:
+            result, version = _finish_response(result, get_version)
+            return list(_result2stream(result)), version
+
         return list(_result2stream(_finish_response(result)))
 
     def rollback(self, steps=1) -> None:
@@ -850,6 +855,7 @@ class WOQLClient:
         skip: int = 0,
         count: Optional[int] = None,
         as_list: bool = False,
+        get_version: bool = False,
         **kwargs,
     ) -> Union[Iterable, list]:
         """Retrieves all documents that match a given document template
@@ -891,9 +897,19 @@ class WOQLClient:
             json=payload,
             auth=self._auth(),
         )
+        if get_version:
+            result, version = _finish_response(result, get_version)
+            return _result2stream(result), version
+
         return _result2stream(_finish_response(result))
 
-    def get_document(self, iri_id: str, graph_type: str = "instance", **kwargs) -> dict:
+    def get_document(
+        self,
+        iri_id: str,
+        graph_type: str = "instance",
+        get_version: bool = False,
+        **kwargs,
+    ) -> dict:
         """Retrieves the document of the iri_id
 
         Parameters
@@ -929,6 +945,11 @@ class WOQLClient:
             params=payload,
             auth=self._auth(),
         )
+
+        if get_version:
+            result, version = _finish_response(result, get_version)
+            return json.loads(result), version
+
         return json.loads(_finish_response(result))
 
     def get_documents_by_type(
@@ -938,6 +959,7 @@ class WOQLClient:
         skip: int = 0,
         count: Optional[int] = None,
         as_list: bool = False,
+        get_version=False,
         **kwargs,
     ) -> Union[Iterable, list]:
         """Retrieves the documents by type
@@ -982,6 +1004,15 @@ class WOQLClient:
             params=payload,
             auth=self._auth(),
         )
+
+        if get_version:
+            result, version = _finish_response(result, get_version)
+            return_obj = _result2stream(result)
+            if as_list:
+                return list(return_obj), version
+            else:
+                return return_obj, version
+
         return_obj = _result2stream(_finish_response(result))
         if as_list:
             return list(return_obj)
@@ -994,8 +1025,9 @@ class WOQLClient:
         skip: int = 0,
         count: Optional[int] = None,
         as_list: bool = False,
+        get_version: bool = False,
         **kwargs,
-    ) -> Union[Iterable, list]:
+    ) -> Union[Iterable, list, tuple]:
         """Retrieves all avalibale the documents
 
         Parameters
@@ -1036,6 +1068,15 @@ class WOQLClient:
             params=payload,
             auth=self._auth(),
         )
+
+        if get_version:
+            result, version = _finish_response(result, get_version)
+            return_obj = _result2stream(result)
+            if as_list:
+                return list(return_obj), version
+            else:
+                return return_obj, version
+
         return_obj = _result2stream(_finish_response(result))
         if as_list:
             return list(return_obj)
@@ -1355,6 +1396,7 @@ class WOQLClient:
         self,
         woql_query: Union[dict, WOQLQuery],
         commit_msg: Optional[str] = None,
+        get_version: bool = False,
         # file_dict: Optional[dict] = None,
     ) -> Union[dict, str]:
         """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
@@ -1395,11 +1437,18 @@ class WOQLClient:
             json=query_obj,
             auth=self._auth(),
         )
-        fin_reqult = json.loads(_finish_response(result))
+        if get_version:
+            result, version = _finish_response(result, get_version)
+            result = json.loads(result)
+        else:
+            result = json.loads(_finish_response(result))
 
-        if fin_reqult.get("inserts") or fin_reqult.get("deletes"):
+        if result.get("inserts") or result.get("deletes"):
             return "Commit successfully made."
-        return fin_reqult
+        elif get_version:
+            return result, version
+        else:
+            return result
 
     def create_branch(self, new_branch_id: str, empty: bool = False) -> None:
         """Create a branch starting from the current branch.
