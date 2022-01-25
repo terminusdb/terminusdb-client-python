@@ -1,5 +1,6 @@
 import json
 import urllib.parse
+from datetime import datetime
 
 from .errors import DatabaseError
 
@@ -19,7 +20,7 @@ STANDARD_URLS = {
 
 
 def encode_uri_component(value):
-    """ Encode a URI.
+    """Encode a URI.
 
     Parameters
     ----------
@@ -33,7 +34,7 @@ def encode_uri_component(value):
 
 
 def uri_encode_payload(payload):
-    """ Encode the given payload
+    """Encode the given payload
 
     Parameters
     ----------
@@ -61,7 +62,7 @@ def uri_encode_payload(payload):
 
 
 def add_params_to_url(url, payload):
-    """ Add params / payload to given url
+    """Add params / payload to given url
 
     Parameters
     ----------
@@ -83,7 +84,7 @@ def add_params_to_url(url, payload):
 
 
 def add_namespaces_to_variable(var):
-    """ Adds namespace to given variable
+    """Adds namespace to given variable
 
     Parameters
     ----------
@@ -100,7 +101,7 @@ def add_namespaces_to_variable(var):
 
 
 def add_namespaces_to_variables(variables):
-    """ Adds namespace to given variables
+    """Adds namespace to given variables
 
     Parameters
     ----------
@@ -137,7 +138,7 @@ def empty(obj):
 
 
 def shorten(url, prefixes=None):
-    """ Get shortened url
+    """Get shortened url
 
     Parameters
     ----------
@@ -157,7 +158,7 @@ def shorten(url, prefixes=None):
 
 
 def is_data_type(stype):
-    """ Checks if the given type is a datatype or not
+    """Checks if the given type is a datatype or not
 
     Parameters
     ----------
@@ -174,7 +175,7 @@ def is_data_type(stype):
 
 
 def valid_url(string):
-    """ Checks if the given url is valid
+    """Checks if the given url is valid
 
     Parameters
     ----------
@@ -191,7 +192,7 @@ def valid_url(string):
 
 
 def url_fraqment(url):
-    """ Gets the url fragment
+    """Gets the url fragment
 
     Parameters
     ----------
@@ -210,7 +211,7 @@ def url_fraqment(url):
 
 
 def label_from_url(url):
-    """ Get the label from url
+    """Get the label from url
 
     Parameters
     ----------
@@ -247,7 +248,7 @@ def _result2stream(result):
 
 
 def _finish_response(request_response):
-    """ Get the response text
+    """Get the response text
 
     Parameters
     ----------
@@ -268,3 +269,69 @@ def _finish_response(request_response):
         return request_response.text  # if not a json not it raises an error
     elif request_response.status_code > 399 and request_response.status_code < 599:
         raise DatabaseError(request_response)
+
+
+def _clean_list(obj):
+    cleaned = []
+    for item in obj:
+        if isinstance(item, str):
+            cleaned.append(item)
+        elif hasattr(item, "items"):
+            cleaned.append(_clean_dict(item))
+        elif not isinstance(item, str) and hasattr(item, "__iter__"):
+            cleaned.append(_clean_list(item))
+        elif hasattr(item, "isoformat"):
+            cleaned.append(item.isoformat())
+        else:
+            cleaned.append(item)
+    return cleaned
+
+
+def _clean_dict(obj):
+    cleaned = {}
+    for key, item in obj.items():
+        if isinstance(item, str):
+            cleaned[key] = item
+        elif hasattr(item, "items"):
+            cleaned[key] = _clean_dict(item)
+        elif hasattr(item, "__iter__"):
+            cleaned[key] = _clean_list(item)
+        elif hasattr(item, "isoformat"):
+            cleaned[key] = item.isoformat()
+        else:
+            cleaned[key] = item
+    return cleaned
+
+
+def _dt_list(obj):
+    cleaned = []
+    for item in obj:
+        if isinstance(item, str):
+            try:
+                cleaned.append(datetime.fromisoformat(item))
+            except ValueError:
+                cleaned.append(item)
+        elif hasattr(item, "items"):
+            cleaned.append(_clean_dict(item))
+        elif hasattr(item, "__iter__"):
+            cleaned.append(_clean_list(item))
+        else:
+            cleaned.append(item)
+    return cleaned
+
+
+def _dt_dict(obj):
+    cleaned = {}
+    for key, item in obj.items():
+        if isinstance(item, str):
+            try:
+                cleaned[key] = datetime.fromisoformat(item)
+            except ValueError:
+                cleaned[key] = item
+        elif hasattr(item, "items"):
+            cleaned[key] = _dt_dict(item)
+        elif hasattr(item, "__iter__"):
+            cleaned[key] = _dt_list(item)
+        else:
+            cleaned[key] = item
+    return cleaned
