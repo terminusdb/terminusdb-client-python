@@ -75,7 +75,7 @@ class Patch:
                         result_dict[key] = swap_value(item)
             return result_dict
 
-        return {"$set": swap_value(self.content)}
+        return swap_value(self.content)
 
     @update.setter
     def update(self):
