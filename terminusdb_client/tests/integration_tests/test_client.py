@@ -13,7 +13,6 @@ from terminusdb_client.woqlquery.woql_query import WOQLQuery
 # from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 
-@pytest.mark.xfail(reason="https://github.com/terminusdb/terminusdb/issues/922")
 def test_happy_path(docker_url):
     # create client
     client = WOQLClient(docker_url)

@@ -22,7 +22,6 @@ def _check_csv(csv_file, output):
                 assert item in output
 
 
-@pytest.mark.xfail(reason="https://github.com/terminusdb/terminusdb/issues/922")
 def test_local_happy_path(docker_url, test_csv):
     testdb = "test_" + str(dt.datetime.now()).replace(" ", "")
     runner = CliRunner()
