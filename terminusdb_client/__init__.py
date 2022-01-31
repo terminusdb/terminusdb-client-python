@@ -1,4 +1,4 @@
-from .woqlclient import WOQLClient  # noqa
+from .woqlclient import Patch, WOQLClient  # noqa
 from .woqldataframe import woqlDataframe as WOQLDataFrame  # noqa
 from .woqlquery import WOQLQuery  # noqa
 from .woqlschema import *  # noqa
