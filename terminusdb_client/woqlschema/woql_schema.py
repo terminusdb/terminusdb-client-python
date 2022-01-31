@@ -97,6 +97,8 @@ def _check_and_fix_custom_id(class_name, custom_id):
 class TerminusClass(type):
     def __init__(cls, name, bases, nmspc):
 
+        cls._capture_order = 0
+
         if "__annotations__" in nmspc:
             cls._annotations = copy(nmspc["__annotations__"])
         else:
@@ -150,11 +152,12 @@ class TerminusClass(type):
                     )
             if kwargs.get("_backend_id"):
                 obj._backend_id = kwargs.get("_backend_id")
-            # if not hasattr(obj.__class__, "_subdocument"):
-            #     obj._capture = str(id(obj))
             obj._isinstance = True
             obj._annotations = cls._annotations
             obj._instances.add(weakref.ref(obj))
+
+            obj._capture = f"{name}/{cls._capture_order}"
+            cls._capture_order += 1
 
         cls.__init__ = init
 
@@ -267,10 +270,7 @@ class DocumentTemplate(metaclass=TerminusClass):
         elif hasattr(self, "_id") and self._id:
             return {"@id": self._id, "@type": "@id"}
         else:
-            # creature capture and ref
-            # if not hasattr(self, "_capture"):
-            #     self._capture = str(id(self))
-            return {"@ref": str(id(self))}
+            return {"@ref": self._capture}
 
     def _obj_to_dict(self, skip_checking=False):
         if not skip_checking:
@@ -279,7 +279,7 @@ class DocumentTemplate(metaclass=TerminusClass):
         if hasattr(self, "_id") and self._id:
             result["@id"] = self._id
         elif not hasattr(self, "_subdocument"):
-            result["@capture"] = str(id(self))
+            result["@capture"] = self._capture
         # elif hasattr(self.__class__, "_key") and hasattr(self.__class__._key, "idgen"):
         #     result["@id"] = self.__class__._key.idgen(self)
 
