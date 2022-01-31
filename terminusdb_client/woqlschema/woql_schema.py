@@ -680,6 +680,7 @@ class WOQLSchema:
         for item_id, class_obj_dict in self._all_existing_classes.items():
             if select is None or (select is not None and item_id in select):
                 self._contruct_class(class_obj_dict)
+        return self
 
     def import_objects(self, obj_dict: Union[List[dict], dict]):
         """Import a list of documents in json format to Python objects. The schema of those documents need to be in this schema."""

@@ -2,6 +2,7 @@ import datetime as dt
 
 import pytest
 
+from terminusdb_client.errors import DatabaseError
 from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from terminusdb_client.woqlschema.woql_schema import DocumentTemplate, WOQLSchema
 
@@ -221,6 +222,8 @@ def test_insert_cheuk_again(docker_url, test_schema):
 def test_get_version(docker_url):
     client = WOQLClient(docker_url)
     client.connect(db="test_docapi")
+    result, version = client.get_all_branches(get_version=True)
+    assert version
     result, version = client.get_all_documents(graph_type="schema", get_version=True)
     assert version
     result, version = client.get_all_documents(
@@ -238,11 +241,41 @@ def test_get_version(docker_url):
     result, version = client.get_document("Team", graph_type="schema", get_version=True)
     assert version
     result, version = client.query_document(
-        {"@type": "Employee", "@id": "Cheuk%20is%20back"}, get_version=True
+        {"@type": "Employee", "@id": "Employee/Cheuk%20is%20back"},
+        get_version=True,
+        as_list=True,
     )
     assert version
-    result, version = client.get_all_branches(get_version=True)
-    assert version
+    new_schema = WOQLSchema().from_db(client)
+    cheuk = new_schema.import_objects(result[0])
+    cheuk.name = "Cheuk Ting Ho"
+    client.replace_document(cheuk, last_version=version)
+    result, version2 = client.get_document(
+        "Employee/Cheuk%20is%20back", get_version=True
+    )
+    assert version != version2
+    with pytest.raises(DatabaseError) as error:
+        client.update_document(cheuk, last_version=version)
+        assert (
+            "Requested data version in header does not match actual data version."
+            in str(error.value)
+        )
+    client.update_document(cheuk, last_version=version2)
+
+    _, version = client.get_all_documents(get_version=True)
+    Country = new_schema.object.get("Country")
+    ireland = Country()
+    ireland.name = "The Republic of Ireland"
+    ireland.perimeter = []
+    client.insert_document(ireland, last_version=version)
+    with pytest.raises(DatabaseError) as error:
+        client.delete_document(ireland, last_version=version)
+        assert (
+            "Requested data version in header does not match actual data version."
+            in str(error.value)
+        )
+    _, version2 = client.get_all_documents(get_version=True)
+    client.delete_document(ireland, last_version=version2)
 
 
 class CheckDatetime(DocumentTemplate):

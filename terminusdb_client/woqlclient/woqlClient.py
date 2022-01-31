@@ -866,6 +866,10 @@ class WOQLClient:
             Template for the document that is being retrived
         graph_type : str, optional
             Graph type, either "instance" or "schema".
+        as_list: bool
+            If the result returned as list rather than an iterator.
+        get_version: bool
+            If the version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.
 
         Raises
         ------
@@ -899,9 +903,17 @@ class WOQLClient:
         )
         if get_version:
             result, version = _finish_response(result, get_version)
-            return _result2stream(result), version
+            return_obj = _result2stream(result)
+            if as_list:
+                return list(return_obj), version
+            else:
+                return return_obj, version
 
-        return _result2stream(_finish_response(result))
+        return_obj = _result2stream(_finish_response(result))
+        if as_list:
+            return list(return_obj)
+        else:
+            return return_obj
 
     def get_document(
         self,
@@ -918,6 +930,8 @@ class WOQLClient:
             Iri id for the docuemnt that is retriving
         graph_type : str, optional
             Graph type, either "instance" or "schema".
+        get_version: bool
+            If the version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.
         kwargs:
             Additional boolean flags for retriving. Currently avaliable: "prefixed", "minimized", "unfold"
 
@@ -974,6 +988,10 @@ class WOQLClient:
             The starting posiion of the returning results, default to be 0
         count: int or None
             The maximum number of returned result, if None (default) it will return all of the avalible result.
+        as_list: bool
+            If the result returned as list rather than an iterator.
+        get_version: bool
+            If the version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.
         kwargs:
             Additional boolean flags for retriving. Currently avaliable: "prefixed", "unfold"
 
@@ -1038,6 +1056,10 @@ class WOQLClient:
             The starting posiion of the returning results, default to be 0
         count: int or None
             The maximum number of returned result, if None (default) it will return all of the avalible result.
+        as_list: bool
+            If the result returned as list rather than an iterator.
+        get_version: bool
+            If the version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.
         kwargs:
             Additional boolean flags for retriving. Currently avaliable: "prefixed", "unfold"
 
@@ -1163,6 +1185,7 @@ class WOQLClient:
         graph_type: str = "instance",
         full_replace: bool = False,
         commit_msg: Optional[str] = None,
+        last_version: Optional[str] = None,
     ) -> None:
         """Inserts the specified document(s)
 
@@ -1176,6 +1199,8 @@ class WOQLClient:
             If True then the whole graph will be replaced. WARNING: you should also supply the context object as the first element in the list of documents  if using this option.
         commit_msg : str
             Commit message.
+        last_version : str
+            Last version before the update, used to check if the document has been changed unknowingly
 
         Raises
         ------
@@ -1195,6 +1220,10 @@ class WOQLClient:
             params["full_replace"] = "true"
         else:
             params["full_replace"] = "false"
+
+        headers = {"user-agent": f"terminusdb-client-python/{__version__}"}
+        if last_version is not None:
+            headers["TerminusDB-Data-Version"] = last_version
 
         new_doc = self._convert_dcoument(document, graph_type)
 
@@ -1216,7 +1245,7 @@ class WOQLClient:
                 new_doc.pop(0)
         result = requests.post(
             self._documents_url(),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=headers,
             params=params,
             json=new_doc,
             auth=self._auth(),
@@ -1239,6 +1268,7 @@ class WOQLClient:
         ],
         graph_type: str = "instance",
         commit_msg: Optional[str] = None,
+        last_version: Optional[str] = None,
         create: bool = False,
     ) -> None:
         """Updates the specified document(s)
@@ -1251,6 +1281,8 @@ class WOQLClient:
             Graph type, either "instance" or "schema".
         commit_msg : str
             Commit message.
+        last_version : str
+            Last version before the update, used to check if the document has been changed unknowingly
         create : bool
             Create the document if it does not yet exist.
 
@@ -1265,11 +1297,15 @@ class WOQLClient:
         params["graph_type"] = graph_type
         params["create"] = "true" if create else "false"
 
+        headers = {"user-agent": f"terminusdb-client-python/{__version__}"}
+        if last_version is not None:
+            headers["TerminusDB-Data-Version"] = last_version
+
         new_doc = self._convert_dcoument(document, graph_type)
 
         result = requests.put(
             self._documents_url(),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=headers,
             params=params,
             json=new_doc,
             auth=self._auth(),
@@ -1292,14 +1328,34 @@ class WOQLClient:
         ],
         graph_type: str = "instance",
         commit_msg: Optional[str] = None,
+        last_version: Optional[str] = None,
     ) -> None:
-        self.replace_document(document, graph_type, commit_msg, True)
+        """Updates the specified document(s). Add the document if not existed.
+
+        Parameters
+        ----------
+        document: dict or list of dict
+            Document(s) to be updated.
+        graph_type : str
+            Graph type, either "instance" or "schema".
+        commit_msg : str
+            Commit message.
+        last_version : str
+            Last version before the update, used to check if the document has been changed unknowingly
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
+        """
+        self.replace_document(document, graph_type, commit_msg, last_version, True)
 
     def delete_document(
         self,
         document: Union[str, list, dict, Iterable],
         graph_type: str = "instance",
         commit_msg: Optional[str] = None,
+        last_version: Optional[str] = None,
     ) -> None:
         """Delete the specified document(s)
 
@@ -1311,6 +1367,8 @@ class WOQLClient:
             Graph type, either "instance" or "schema".
         commit_msg : str
             Commit message.
+        last_version : str
+            Last version before the update, used to check if the document has been changed unknowingly
 
         Raises
         ------
@@ -1335,10 +1393,15 @@ class WOQLClient:
                 doc_id.append(doc)
         params = self._generate_commit(commit_msg)
         params["graph_type"] = graph_type
+
+        headers = {"user-agent": f"terminusdb-client-python/{__version__}"}
+        if last_version is not None:
+            headers["TerminusDB-Data-Version"] = last_version
+
         _finish_response(
             requests.delete(
                 self._documents_url(),
-                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                headers=headers,
                 params=params,
                 json=doc_id,
                 auth=self._auth(),
@@ -1397,6 +1460,7 @@ class WOQLClient:
         woql_query: Union[dict, WOQLQuery],
         commit_msg: Optional[str] = None,
         get_version: bool = False,
+        last_version: Optional[str] = None,
         # file_dict: Optional[dict] = None,
     ) -> Union[dict, str]:
         """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
@@ -1407,6 +1471,10 @@ class WOQLClient:
             A woql query as an object or dict
         commit_mg : str
             A message that will be written to the commit log to describe the change
+        get_version: bool
+            If the version of the query result(s) should be obtained. If True, the method return the result and the version as a tuple.
+        last_version : str
+            Last version before the update, used to check if the document has been changed unknowingly
         file_dict: **deprecated**
             File dictionary to be associated with post name => filename, for multipart POST
 
@@ -1431,9 +1499,13 @@ class WOQLClient:
             request_woql_query = woql_query
         query_obj["query"] = request_woql_query
 
+        headers = {"user-agent": f"terminusdb-client-python/{__version__}"}
+        if last_version is not None:
+            headers["TerminusDB-Data-Version"] = last_version
+
         result = requests.post(
             self._query_url(),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=headers,
             json=query_obj,
             auth=self._auth(),
         )
