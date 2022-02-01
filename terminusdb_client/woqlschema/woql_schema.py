@@ -156,7 +156,7 @@ class TerminusClass(type):
             obj._annotations = cls._annotations
             obj._instances.add(weakref.ref(obj))
 
-            obj._capture = f"{name}/{cls._capture_order}"
+            obj._capture = f"{name}{id(cls)}/{cls._capture_order}"
             cls._capture_order += 1
 
         cls.__init__ = init
