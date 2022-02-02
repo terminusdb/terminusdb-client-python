@@ -95,7 +95,7 @@ def test_insert_cheuk(docker_url, test_schema):
         client.insert_document([cheuk])
         assert (
             str(error.value)
-            == f"{str(id(uk))} is referenced but not captured. Seems you forgot to submit one or more object(s)."
+            == f"{uk._capture} is referenced but not captured. Seems you forgot to submit one or more object(s)."
         )
     with pytest.raises(ValueError) as error:
         client.insert_document(cheuk)
@@ -185,7 +185,7 @@ def test_insert_cheuk_again(docker_url, test_schema):
         client.update_document([uk])
         assert (
             str(error.value)
-            == f"{str(id(location))} is referenced but not captured. Seems you forgot to submit one or more object(s)."
+            == f"{location._capture} is referenced but not captured. Seems you forgot to submit one or more object(s)."
         )
     with pytest.raises(ValueError) as error:
         client.insert_document(uk)

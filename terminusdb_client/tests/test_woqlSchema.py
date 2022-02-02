@@ -229,10 +229,10 @@ def test_id_and_capture(test_schema):
     }
     assert cheuk_no_id._obj_to_dict() == {
         "@type": "Person",
-        "@capture": str(id(cheuk_no_id)),
+        "@capture": cheuk_no_id._capture,
         "name": "Cheuk",
         "age": 21,
-        "friend_of": [{"@ref": str(id(cheuk_no_id))}],
+        "friend_of": [{"@ref": cheuk_no_id._capture}],
     }
 
 
