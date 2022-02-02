@@ -104,12 +104,6 @@ def test_diff_ops(docker_url, test_schema):
     )
     assert result.content == result_patch.content
 
-    # result = client.diff(
-    #     [{"@id": "Person/Jane", "@type": "Person", "name": "Jane"}],
-    #     [{"@id": "Person/Jane", "@type": "Person", "name": "Janine"}],
-    # )
-    # assert result.content[0] == result_patch.content
-
     Person = test_schema.object.get("Person")
     jane = Person(
         _id="Jane",
@@ -123,8 +117,6 @@ def test_diff_ops(docker_url, test_schema):
     )
     result = client.diff(jane, janine)
     assert result.content == result_patch.content
-    # result = client.diff([jane], [janine])
-    # assert result.content[0] == result_patch.content
     assert client.patch(
         {"@id": "Person/Jane", "@type": "Person", "name": "Jane"}, result_patch
     ) == {"@id": "Person/Jane", "@type": "Person", "name": "Janine"}
@@ -180,12 +172,6 @@ def test_diff_ops_no_auth(test_schema):
     )
     assert result.content == result_patch.content
 
-    # result = client.diff(
-    #     [{"@id": "Person/Jane", "@type": "Person", "name": "Jane"}],
-    #     [{"@id": "Person/Jane", "@type": "Person", "name": "Janine"}],
-    # )
-    # assert result.content[0] == result_patch.content
-
     Person = test_schema.object.get("Person")
     jane = Person(
         _id="Jane",
@@ -199,8 +185,6 @@ def test_diff_ops_no_auth(test_schema):
     )
     result = client.diff(jane, janine)
     assert result.content == result_patch.content
-    # result = client.diff([jane], [janine])
-    # assert result.content[0] == result_patch.content
     assert client.patch(
         {"@id": "Person/Jane", "@type": "Person", "name": "Jane"}, result_patch
     ) == {"@id": "Person/Jane", "@type": "Person", "name": "Janine"}

@@ -247,7 +247,7 @@ def _result2stream(result):
         yield data
 
 
-def _finish_response(request_response):
+def _finish_response(request_response, get_version=False):
     """Get the response text
 
     Parameters
@@ -266,6 +266,10 @@ def _finish_response(request_response):
 
     """
     if request_response.status_code == 200:
+        if get_version:
+            return request_response.text, request_response.headers.get(
+                "Terminusdb-Data-Version"
+            )
         return request_response.text  # if not a json not it raises an error
     elif request_response.status_code > 399 and request_response.status_code < 599:
         raise DatabaseError(request_response)
