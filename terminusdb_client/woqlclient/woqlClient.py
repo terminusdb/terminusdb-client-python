@@ -1973,21 +1973,29 @@ class WOQLClient:
         >>> client.connect(user="admin", key="root", team="admin", db="some_db")
         >>> result = client.diff({ "@id" : "Person/Jane", "@type" : "Person", "name" : "Jane"}, { "@id" : "Person/Jane", "@type" : "Person", "name" : "Janine"})
         >>> result.to_json = '{ "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'"""
-        # self._check_connection()
 
         request_dict = {
             "before": self._convert_diff_dcoument(before),
             "after": self._convert_diff_dcoument(after),
         }
 
-        result = _finish_response(
-            requests.post(
-                self._diff_url(),
-                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
-                json=request_dict,
-                # auth=self._auth(),
+        if self._connected:
+            result = _finish_response(
+                requests.post(
+                    self._diff_url(),
+                    headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                    json=request_dict,
+                    auth=self._auth(),
+                )
             )
-        )
+        else:
+            result = _finish_response(
+                requests.post(
+                    self._diff_url(),
+                    headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                    json=request_dict,
+                )
+            )
         return Patch(json=result)
 
     def patch(
@@ -2017,21 +2025,28 @@ class WOQLClient:
         >>> print(result)
         '{ "@id" : "Person/Jane", "@type" : Person", "name" : "Janine"}'"""
 
-        # self._check_connection()
-
         request_dict = {
             "before": self._convert_diff_dcoument(before),
             "patch": patch.content,
         }
 
-        result = _finish_response(
-            requests.post(
-                self._patch_url(),
-                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
-                json=request_dict,
-                # auth=self._auth(),
+        if self._connected:
+            result = _finish_response(
+                requests.post(
+                    self._patch_url(),
+                    headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                    json=request_dict,
+                    auth=self._auth(),
+                )
             )
-        )
+        else:
+            result = _finish_response(
+                requests.post(
+                    self._patch_url(),
+                    headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                    json=request_dict,
+                )
+            )
         return json.loads(result)
 
     def clonedb(
