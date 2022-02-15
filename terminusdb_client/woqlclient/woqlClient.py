@@ -476,7 +476,7 @@ class WOQLClient:
         target_commit = result.get("bindings")[0].get("cid").get("@value")
         return target_commit
 
-    def get_all_branches(self, get_version=False):
+    def get_all_branches(self, get_data_version=False):
         """Get all the branches available in the database."""
         self._check_connection()
         api_url = self._documents_url().split("/")
@@ -489,8 +489,8 @@ class WOQLClient:
             auth=self._auth(),
         )
 
-        if get_version:
-            result, version = _finish_response(result, get_version)
+        if get_data_version:
+            result, version = _finish_response(result, get_data_version)
             return list(_result2stream(result)), version
 
         return list(_result2stream(_finish_response(result)))
@@ -855,7 +855,7 @@ class WOQLClient:
         skip: int = 0,
         count: Optional[int] = None,
         as_list: bool = False,
-        get_version: bool = False,
+        get_data_version: bool = False,
         **kwargs,
     ) -> Union[Iterable, list]:
         """Retrieves all documents that match a given document template
@@ -868,8 +868,8 @@ class WOQLClient:
             Graph type, either "instance" or "schema".
         as_list: bool
             If the result returned as list rather than an iterator.
-        get_version: bool
-            If the version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.
+        get_data_version: bool
+            If the data version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.
 
         Raises
         ------
@@ -901,8 +901,8 @@ class WOQLClient:
             json=payload,
             auth=self._auth(),
         )
-        if get_version:
-            result, version = _finish_response(result, get_version)
+        if get_data_version:
+            result, version = _finish_response(result, get_data_version)
             return_obj = _result2stream(result)
             if as_list:
                 return list(return_obj), version
@@ -919,7 +919,7 @@ class WOQLClient:
         self,
         iri_id: str,
         graph_type: str = "instance",
-        get_version: bool = False,
+        get_data_version: bool = False,
         **kwargs,
     ) -> dict:
         """Retrieves the document of the iri_id
@@ -930,8 +930,8 @@ class WOQLClient:
             Iri id for the docuemnt that is retriving
         graph_type : str, optional
             Graph type, either "instance" or "schema".
-        get_version: bool
-            If the version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.
+        get_data_version: bool
+            If the data version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.
         kwargs:
             Additional boolean flags for retriving. Currently avaliable: "prefixed", "minimized", "unfold"
 
@@ -960,8 +960,8 @@ class WOQLClient:
             auth=self._auth(),
         )
 
-        if get_version:
-            result, version = _finish_response(result, get_version)
+        if get_data_version:
+            result, version = _finish_response(result, get_data_version)
             return json.loads(result), version
 
         return json.loads(_finish_response(result))
@@ -973,7 +973,7 @@ class WOQLClient:
         skip: int = 0,
         count: Optional[int] = None,
         as_list: bool = False,
-        get_version=False,
+        get_data_version=False,
         **kwargs,
     ) -> Union[Iterable, list]:
         """Retrieves the documents by type
@@ -990,7 +990,7 @@ class WOQLClient:
             The maximum number of returned result, if None (default) it will return all of the avalible result.
         as_list: bool
             If the result returned as list rather than an iterator.
-        get_version: bool
+        get_data_version: bool
             If the version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.
         kwargs:
             Additional boolean flags for retriving. Currently avaliable: "prefixed", "unfold"
@@ -1023,8 +1023,8 @@ class WOQLClient:
             auth=self._auth(),
         )
 
-        if get_version:
-            result, version = _finish_response(result, get_version)
+        if get_data_version:
+            result, version = _finish_response(result, get_data_version)
             return_obj = _result2stream(result)
             if as_list:
                 return list(return_obj), version
@@ -1043,7 +1043,7 @@ class WOQLClient:
         skip: int = 0,
         count: Optional[int] = None,
         as_list: bool = False,
-        get_version: bool = False,
+        get_data_version: bool = False,
         **kwargs,
     ) -> Union[Iterable, list, tuple]:
         """Retrieves all avalibale the documents
@@ -1058,7 +1058,7 @@ class WOQLClient:
             The maximum number of returned result, if None (default) it will return all of the avalible result.
         as_list: bool
             If the result returned as list rather than an iterator.
-        get_version: bool
+        get_data_version: bool
             If the version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.
         kwargs:
             Additional boolean flags for retriving. Currently avaliable: "prefixed", "unfold"
@@ -1091,8 +1091,8 @@ class WOQLClient:
             auth=self._auth(),
         )
 
-        if get_version:
-            result, version = _finish_response(result, get_version)
+        if get_data_version:
+            result, version = _finish_response(result, get_data_version)
             return_obj = _result2stream(result)
             if as_list:
                 return list(return_obj), version
@@ -1185,7 +1185,7 @@ class WOQLClient:
         graph_type: str = "instance",
         full_replace: bool = False,
         commit_msg: Optional[str] = None,
-        last_version: Optional[str] = None,
+        last_data_version: Optional[str] = None,
     ) -> None:
         """Inserts the specified document(s)
 
@@ -1199,7 +1199,7 @@ class WOQLClient:
             If True then the whole graph will be replaced. WARNING: you should also supply the context object as the first element in the list of documents  if using this option.
         commit_msg : str
             Commit message.
-        last_version : str
+        last_data_version : str
             Last version before the update, used to check if the document has been changed unknowingly
 
         Raises
@@ -1222,8 +1222,8 @@ class WOQLClient:
             params["full_replace"] = "false"
 
         headers = {"user-agent": f"terminusdb-client-python/{__version__}"}
-        if last_version is not None:
-            headers["TerminusDB-Data-Version"] = last_version
+        if last_data_version is not None:
+            headers["TerminusDB-Data-Version"] = last_data_version
 
         new_doc = self._convert_dcoument(document, graph_type)
 
@@ -1268,7 +1268,7 @@ class WOQLClient:
         ],
         graph_type: str = "instance",
         commit_msg: Optional[str] = None,
-        last_version: Optional[str] = None,
+        last_data_version: Optional[str] = None,
         create: bool = False,
     ) -> None:
         """Updates the specified document(s)
@@ -1281,7 +1281,7 @@ class WOQLClient:
             Graph type, either "instance" or "schema".
         commit_msg : str
             Commit message.
-        last_version : str
+        last_data_version : str
             Last version before the update, used to check if the document has been changed unknowingly
         create : bool
             Create the document if it does not yet exist.
@@ -1298,8 +1298,8 @@ class WOQLClient:
         params["create"] = "true" if create else "false"
 
         headers = {"user-agent": f"terminusdb-client-python/{__version__}"}
-        if last_version is not None:
-            headers["TerminusDB-Data-Version"] = last_version
+        if last_data_version is not None:
+            headers["TerminusDB-Data-Version"] = last_data_version
 
         new_doc = self._convert_dcoument(document, graph_type)
 
@@ -1328,7 +1328,7 @@ class WOQLClient:
         ],
         graph_type: str = "instance",
         commit_msg: Optional[str] = None,
-        last_version: Optional[str] = None,
+        last_data_version: Optional[str] = None,
     ) -> None:
         """Updates the specified document(s). Add the document if not existed.
 
@@ -1340,7 +1340,7 @@ class WOQLClient:
             Graph type, either "instance" or "schema".
         commit_msg : str
             Commit message.
-        last_version : str
+        last_data_version : str
             Last version before the update, used to check if the document has been changed unknowingly
 
         Raises
@@ -1348,14 +1348,14 @@ class WOQLClient:
         InterfaceError
             if the client does not connect to a database
         """
-        self.replace_document(document, graph_type, commit_msg, last_version, True)
+        self.replace_document(document, graph_type, commit_msg, last_data_version, True)
 
     def delete_document(
         self,
         document: Union[str, list, dict, Iterable],
         graph_type: str = "instance",
         commit_msg: Optional[str] = None,
-        last_version: Optional[str] = None,
+        last_data_version: Optional[str] = None,
     ) -> None:
         """Delete the specified document(s)
 
@@ -1367,7 +1367,7 @@ class WOQLClient:
             Graph type, either "instance" or "schema".
         commit_msg : str
             Commit message.
-        last_version : str
+        last_data_version : str
             Last version before the update, used to check if the document has been changed unknowingly
 
         Raises
@@ -1395,8 +1395,8 @@ class WOQLClient:
         params["graph_type"] = graph_type
 
         headers = {"user-agent": f"terminusdb-client-python/{__version__}"}
-        if last_version is not None:
-            headers["TerminusDB-Data-Version"] = last_version
+        if last_data_version is not None:
+            headers["TerminusDB-Data-Version"] = last_data_version
 
         _finish_response(
             requests.delete(
@@ -1459,8 +1459,8 @@ class WOQLClient:
         self,
         woql_query: Union[dict, WOQLQuery],
         commit_msg: Optional[str] = None,
-        get_version: bool = False,
-        last_version: Optional[str] = None,
+        get_data_version: bool = False,
+        last_data_version: Optional[str] = None,
         # file_dict: Optional[dict] = None,
     ) -> Union[dict, str]:
         """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
@@ -1471,9 +1471,9 @@ class WOQLClient:
             A woql query as an object or dict
         commit_mg : str
             A message that will be written to the commit log to describe the change
-        get_version: bool
-            If the version of the query result(s) should be obtained. If True, the method return the result and the version as a tuple.
-        last_version : str
+        get_data_version: bool
+            If the data version of the query result(s) should be obtained. If True, the method return the result and the version as a tuple.
+        last_data_version : str
             Last version before the update, used to check if the document has been changed unknowingly
         file_dict: **deprecated**
             File dictionary to be associated with post name => filename, for multipart POST
@@ -1500,8 +1500,8 @@ class WOQLClient:
         query_obj["query"] = request_woql_query
 
         headers = {"user-agent": f"terminusdb-client-python/{__version__}"}
-        if last_version is not None:
-            headers["TerminusDB-Data-Version"] = last_version
+        if last_data_version is not None:
+            headers["TerminusDB-Data-Version"] = last_data_version
 
         result = requests.post(
             self._query_url(),
@@ -1509,15 +1509,15 @@ class WOQLClient:
             json=query_obj,
             auth=self._auth(),
         )
-        if get_version:
-            result, version = _finish_response(result, get_version)
+        if get_data_version:
+            result, version = _finish_response(result, get_data_version)
             result = json.loads(result)
         else:
             result = json.loads(_finish_response(result))
 
         if result.get("inserts") or result.get("deletes"):
             return "Commit successfully made."
-        elif get_version:
+        elif get_data_version:
             return result, version
         else:
             return result

@@ -219,63 +219,67 @@ def test_insert_cheuk_again(docker_url, test_schema):
             raise AssertionError()
 
 
-def test_get_version(docker_url):
+def test_get_data_version(docker_url):
     client = WOQLClient(docker_url)
     client.connect(db="test_docapi")
-    result, version = client.get_all_branches(get_version=True)
-    assert version
-    result, version = client.get_all_documents(graph_type="schema", get_version=True)
+    result, version = client.get_all_branches(get_data_version=True)
     assert version
     result, version = client.get_all_documents(
-        graph_type="schema", get_version=True, as_list=True
+        graph_type="schema", get_data_version=True
+    )
+    assert version
+    result, version = client.get_all_documents(
+        graph_type="schema", get_data_version=True, as_list=True
     )
     assert version
     result, version = client.get_documents_by_type(
-        "Class", graph_type="schema", get_version=True
+        "Class", graph_type="schema", get_data_version=True
     )
     assert version
     result, version = client.get_documents_by_type(
-        "Class", graph_type="schema", get_version=True, as_list=True
+        "Class", graph_type="schema", get_data_version=True, as_list=True
     )
     assert version
-    result, version = client.get_document("Team", graph_type="schema", get_version=True)
+    result, version = client.get_document(
+        "Team", graph_type="schema", get_data_version=True
+    )
     assert version
     result, version = client.query_document(
         {"@type": "Employee", "@id": "Employee/Cheuk%20is%20back"},
-        get_version=True,
+        get_data_version=True,
         as_list=True,
     )
     assert version
     new_schema = WOQLSchema().from_db(client)
     cheuk = new_schema.import_objects(result[0])
     cheuk.name = "Cheuk Ting Ho"
-    client.replace_document(cheuk, last_version=version)
+    client.replace_document(cheuk, last_data_version=version)
     result, version2 = client.get_document(
-        "Employee/Cheuk%20is%20back", get_version=True
+        "Employee/Cheuk%20is%20back", get_data_version=True
     )
     assert version != version2
     with pytest.raises(DatabaseError) as error:
-        client.update_document(cheuk, last_version=version)
+        client.update_document(cheuk, last_data_version=version)
         assert (
             "Requested data version in header does not match actual data version."
             in str(error.value)
         )
-    client.update_document(cheuk, last_version=version2)
+    client.update_document(cheuk, last_data_version=version2)
 
-    _, version = client.get_all_documents(get_version=True)
+    _, version = client.get_all_documents(get_data_version=True)
     Country = new_schema.object.get("Country")
     ireland = Country()
     ireland.name = "The Republic of Ireland"
     ireland.perimeter = []
-    client.insert_document(ireland, last_version=version)
+    client.insert_document(ireland, last_data_version=version)
     with pytest.raises(DatabaseError) as error:
-        client.delete_document(ireland, last_version=version)
+        client.delete_document(ireland, last_data_version=version)
         assert (
             "Requested data version in header does not match actual data version."
             in str(error.value)
         )
-    _, version2 = client.get_all_documents(get_version=True)
-    client.delete_document(ireland, last_version=version2)
+    _, version2 = client.get_all_documents(get_data_version=True)
+    client.delete_document(ireland, last_data_version=version2)
 
 
 class CheckDatetime(DocumentTemplate):
