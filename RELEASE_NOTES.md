@@ -1,5 +1,19 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.26
+
+### New
+
+- Diff and Patch in client
+- Tracking data versions for documents and in WOQL query
+
+### Bug Fixes / Improvements
+
+- Fasting connect by pinging the head of the db to check if exist
+- Capture objects with their class id and the order of instance created rathe than python internal id
+
+---
+
 ## v10.0.25
 
 ### New
