@@ -312,7 +312,7 @@ Commit history - Commit id, author of the commit, commit message and the commit 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLClient.get_all_branches">
-<span class="sig-name descname"><span class="pre">get_all_branches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">get_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_all_branches" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_all_branches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">get_data_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_all_branches" title="Permalink to this definition"></a></dt>
 <dd><p>Get all the branches available in the database.</p>
 </dd></dl>
 
@@ -543,7 +543,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLClient.query_document">
-<span class="sig-name descname"><span class="pre">query_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document_template</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'instance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.query_document" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">query_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document_template</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'instance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_data_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.query_document" title="Permalink to this definition"></a></dt>
 <dd><p>Retrieves all documents that match a given document template</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -551,7 +551,7 @@ and the new value will be used in future requests to the server.</p>
 <li><p><strong>document_template</strong> (<em>dict</em>) – Template for the document that is being retrived</p></li>
 <li><p><strong>graph_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Graph type, either “instance” or “schema”.</p></li>
 <li><p><strong>as_list</strong> (<em>bool</em>) – If the result returned as list rather than an iterator.</p></li>
-<li><p><strong>get_version</strong> (<em>bool</em>) – If the version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.</p></li>
+<li><p><strong>get_data_version</strong> (<em>bool</em>) – If the data version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
@@ -565,14 +565,14 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLClient.get_document">
-<span class="sig-name descname"><span class="pre">get_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iri_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'instance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_document" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iri_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'instance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_data_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_document" title="Permalink to this definition"></a></dt>
 <dd><p>Retrieves the document of the iri_id</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>iri_id</strong> (<em>str</em>) – Iri id for the docuemnt that is retriving</p></li>
 <li><p><strong>graph_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Graph type, either “instance” or “schema”.</p></li>
-<li><p><strong>get_version</strong> (<em>bool</em>) – If the version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.</p></li>
+<li><p><strong>get_data_version</strong> (<em>bool</em>) – If the data version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.</p></li>
 <li><p><strong>kwargs</strong> – Additional boolean flags for retriving. Currently avaliable: “prefixed”, “minimized”, “unfold”</p></li>
 </ul>
 </dd>
@@ -587,7 +587,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLClient.get_documents_by_type">
-<span class="sig-name descname"><span class="pre">get_documents_by_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'instance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_documents_by_type" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_documents_by_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'instance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_data_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_documents_by_type" title="Permalink to this definition"></a></dt>
 <dd><p>Retrieves the documents by type</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -597,7 +597,7 @@ and the new value will be used in future requests to the server.</p>
 <li><p><strong>skip</strong> (<em>int</em>) – The starting posiion of the returning results, default to be 0</p></li>
 <li><p><strong>count</strong> (<em>int</em><em> or </em><em>None</em>) – The maximum number of returned result, if None (default) it will return all of the avalible result.</p></li>
 <li><p><strong>as_list</strong> (<em>bool</em>) – If the result returned as list rather than an iterator.</p></li>
-<li><p><strong>get_version</strong> (<em>bool</em>) – If the version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.</p></li>
+<li><p><strong>get_data_version</strong> (<em>bool</em>) – If the version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.</p></li>
 <li><p><strong>kwargs</strong> – Additional boolean flags for retriving. Currently avaliable: “prefixed”, “unfold”</p></li>
 </ul>
 </dd>
@@ -615,7 +615,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLClient.get_all_documents">
-<span class="sig-name descname"><span class="pre">get_all_documents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'instance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_all_documents" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_all_documents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'instance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_data_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.get_all_documents" title="Permalink to this definition"></a></dt>
 <dd><p>Retrieves all avalibale the documents</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -624,7 +624,7 @@ and the new value will be used in future requests to the server.</p>
 <li><p><strong>skip</strong> (<em>int</em>) – The starting posiion of the returning results, default to be 0</p></li>
 <li><p><strong>count</strong> (<em>int</em><em> or </em><em>None</em>) – The maximum number of returned result, if None (default) it will return all of the avalible result.</p></li>
 <li><p><strong>as_list</strong> (<em>bool</em>) – If the result returned as list rather than an iterator.</p></li>
-<li><p><strong>get_version</strong> (<em>bool</em>) – If the version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.</p></li>
+<li><p><strong>get_data_version</strong> (<em>bool</em>) – If the version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.</p></li>
 <li><p><strong>kwargs</strong> – Additional boolean flags for retriving. Currently avaliable: “prefixed”, “unfold”</p></li>
 </ul>
 </dd>
@@ -648,7 +648,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLClient.insert_document">
-<span class="sig-name descname"><span class="pre">insert_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'instance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_replace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.insert_document" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">insert_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'instance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_replace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_data_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.insert_document" title="Permalink to this definition"></a></dt>
 <dd><p>Inserts the specified document(s)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -657,7 +657,7 @@ and the new value will be used in future requests to the server.</p>
 <li><p><strong>graph_type</strong> (<em>str</em>) – Graph type, either “inference”, “instance” or “schema”.</p></li>
 <li><p><strong>full_replace:</strong> – bool: If True then the whole graph will be replaced. WARNING: you should also supply the context object as the first element in the list of documents  if using this option.</p></li>
 <li><p><strong>commit_msg</strong> (<em>str</em>) – Commit message.</p></li>
-<li><p><strong>last_version</strong> (<em>str</em>) – Last version before the update, used to check if the document has been changed unknowingly</p></li>
+<li><p><strong>last_data_version</strong> (<em>str</em>) – Last version before the update, used to check if the document has been changed unknowingly</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
@@ -674,7 +674,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLClient.replace_document">
-<span class="sig-name descname"><span class="pre">replace_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'instance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.replace_document" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">replace_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'instance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_data_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.replace_document" title="Permalink to this definition"></a></dt>
 <dd><p>Updates the specified document(s)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -682,7 +682,7 @@ and the new value will be used in future requests to the server.</p>
 <li><p><strong>document</strong> (<em>dict</em><em> or </em><em>list of dict</em>) – Document(s) to be updated.</p></li>
 <li><p><strong>graph_type</strong> (<em>str</em>) – Graph type, either “instance” or “schema”.</p></li>
 <li><p><strong>commit_msg</strong> (<em>str</em>) – Commit message.</p></li>
-<li><p><strong>last_version</strong> (<em>str</em>) – Last version before the update, used to check if the document has been changed unknowingly</p></li>
+<li><p><strong>last_data_version</strong> (<em>str</em>) – Last version before the update, used to check if the document has been changed unknowingly</p></li>
 <li><p><strong>create</strong> (<em>bool</em>) – Create the document if it does not yet exist.</p></li>
 </ul>
 </dd>
@@ -697,7 +697,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLClient.update_document">
-<span class="sig-name descname"><span class="pre">update_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'instance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.update_document" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">update_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'instance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_data_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.update_document" title="Permalink to this definition"></a></dt>
 <dd><p>Updates the specified document(s). Add the document if not existed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -705,7 +705,7 @@ and the new value will be used in future requests to the server.</p>
 <li><p><strong>document</strong> (<em>dict</em><em> or </em><em>list of dict</em>) – Document(s) to be updated.</p></li>
 <li><p><strong>graph_type</strong> (<em>str</em>) – Graph type, either “instance” or “schema”.</p></li>
 <li><p><strong>commit_msg</strong> (<em>str</em>) – Commit message.</p></li>
-<li><p><strong>last_version</strong> (<em>str</em>) – Last version before the update, used to check if the document has been changed unknowingly</p></li>
+<li><p><strong>last_data_version</strong> (<em>str</em>) – Last version before the update, used to check if the document has been changed unknowingly</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
@@ -719,7 +719,7 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLClient.delete_document">
-<span class="sig-name descname"><span class="pre">delete_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'instance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.delete_document" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">delete_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'instance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_data_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.delete_document" title="Permalink to this definition"></a></dt>
 <dd><p>Delete the specified document(s)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -727,7 +727,7 @@ and the new value will be used in future requests to the server.</p>
 <li><p><strong>document</strong> (<em>str</em><em> or </em><em>list of str</em>) – Document(s) (as dictionary or DocumentTemplate objects) or id(s) of document(s) to be updated.</p></li>
 <li><p><strong>graph_type</strong> (<em>str</em>) – Graph type, either “instance” or “schema”.</p></li>
 <li><p><strong>commit_msg</strong> (<em>str</em>) – Commit message.</p></li>
-<li><p><strong>last_version</strong> (<em>str</em>) – Last version before the update, used to check if the document has been changed unknowingly</p></li>
+<li><p><strong>last_data_version</strong> (<em>str</em>) – Last version before the update, used to check if the document has been changed unknowingly</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
@@ -784,15 +784,15 @@ and the new value will be used in future requests to the server.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLClient.query">
-<span class="sig-name descname"><span class="pre">query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">woql_query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.query" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">woql_query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_data_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_data_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.query" title="Permalink to this definition"></a></dt>
 <dd><p>Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>woql_query</strong> (<em>dict</em><em> or </em><em>WOQLQuery object</em>) – A woql query as an object or dict</p></li>
 <li><p><strong>commit_mg</strong> (<em>str</em>) – A message that will be written to the commit log to describe the change</p></li>
-<li><p><strong>get_version</strong> (<em>bool</em>) – If the version of the query result(s) should be obtained. If True, the method return the result and the version as a tuple.</p></li>
-<li><p><strong>last_version</strong> (<em>str</em>) – Last version before the update, used to check if the document has been changed unknowingly</p></li>
+<li><p><strong>get_data_version</strong> (<em>bool</em>) – If the data version of the query result(s) should be obtained. If True, the method return the result and the version as a tuple.</p></li>
+<li><p><strong>last_data_version</strong> (<em>str</em>) – Last version before the update, used to check if the document has been changed unknowingly</p></li>
 <li><p><strong>file_dict</strong> (<strong>deprecated</strong>) – File dictionary to be associated with post name =&gt; filename, for multipart POST</p></li>
 </ul>
 </dd>
