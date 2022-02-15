@@ -159,10 +159,13 @@ def test_diff_ops(docker_url, test_schema):
     # assert client.patch(test_schema, result) == my_schema.to_dict()
 
 
-@pytest.mark.skip(reason="temporary not avaliable")
-def test_diff_ops_no_auth(test_schema):
+@pytest.mark.skipif(
+    os.environ.get("TERMINUSX_TOKEN") is None, reason="TerminusX token does not exist"
+)
+def test_diff_ops_no_auth(test_schema, terminusx_token):
     # create client and db
-    client = WOQLClient("https://cloud-dev.dcm.ist")
+    client = WOQLClient("https://cloud-dev.dcm.ist/TerminusDBTest/")
+    client.connect(use_token=True, team="TerminusDBTest")
 
     result_patch = Patch(
         json='{"@id": "Person/Jane", "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'
@@ -198,8 +201,9 @@ def test_diff_ops_no_auth(test_schema):
     my_schema = test_schema.copy()
     my_schema.object.pop("Employee")
     assert my_schema.to_dict() != test_schema.to_dict()
-    result = client.diff(test_schema, my_schema)
-    assert client.patch(test_schema, result) == my_schema.to_dict()
+    ## Temporary switch off schema diff
+    # result = client.diff(test_schema, my_schema)
+    # assert client.patch(test_schema, result) == my_schema.to_dict()
 
 
 def test_jwt(docker_url_jwt):
