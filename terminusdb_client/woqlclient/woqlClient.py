@@ -1980,22 +1980,18 @@ class WOQLClient:
         }
 
         if self._connected:
-            result = _finish_response(
-                requests.post(
-                    self._diff_url(),
-                    headers={"user-agent": f"terminusdb-client-python/{__version__}"},
-                    json=request_dict,
-                    auth=self._auth(),
-                )
-            )
+            auth = self._auth()
         else:
-            result = _finish_response(
-                requests.post(
-                    self._diff_url(),
-                    headers={"user-agent": f"terminusdb-client-python/{__version__}"},
-                    json=request_dict,
-                )
+            auth = None
+
+        result = _finish_response(
+            requests.post(
+                self._diff_url(),
+                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                json=request_dict,
+                auth=auth,
             )
+        )
         return Patch(json=result)
 
     def patch(
@@ -2031,22 +2027,18 @@ class WOQLClient:
         }
 
         if self._connected:
-            result = _finish_response(
-                requests.post(
-                    self._patch_url(),
-                    headers={"user-agent": f"terminusdb-client-python/{__version__}"},
-                    json=request_dict,
-                    auth=self._auth(),
-                )
-            )
+            auth = self._auth()
         else:
-            result = _finish_response(
-                requests.post(
-                    self._patch_url(),
-                    headers={"user-agent": f"terminusdb-client-python/{__version__}"},
-                    json=request_dict,
-                )
+            auth = None
+
+        result = _finish_response(
+            requests.post(
+                self._patch_url(),
+                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                json=request_dict,
+                auth=auth,
             )
+        )
         return json.loads(result)
 
     def clonedb(
@@ -2278,10 +2270,22 @@ class WOQLClient:
         return self._branch_base("squash")
 
     def _diff_url(self):
-        return self._branch_base("diff")
+        if not self._connected and self.server_url in [
+            "https://cloud-dev.dcm.ist",
+            "https://cloud.terminusdb.com",
+        ]:
+            return f"{self.server_url}/jsondiff"
+        else:
+            return self._branch_base("diff")
 
     def _patch_url(self):
-        return self._branch_base("patch")
+        if not self._connected and self.server_url in [
+            "https://cloud-dev.dcm.ist",
+            "https://cloud.terminusdb.com",
+        ]:
+            return f"{self.server_url}/jsonpatch"
+        else:
+            return self._branch_base("patch")
 
     def _push_url(self):
         return self._branch_base("push")
