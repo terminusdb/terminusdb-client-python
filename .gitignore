@@ -41,5 +41,6 @@ venv/
 *.egg
 
 .DS_Store
+.python-version
 
 Pipfile.lock
