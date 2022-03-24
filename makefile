@@ -4,27 +4,28 @@ init:
 	python -m pip install poetry --upgrade
 	poetry lock
 	poetry install
-	python -m pip install -e .
+	# poetry run python -m pip install -e .
 
 #test without integration test
 unittest:
-	pytest terminusdb_client/tests --ignore=terminusdb_client/tests/integration_tests
+	poetry run pytest terminusdb_client/tests --ignore=terminusdb_client/tests/integration_tests
 
 # Command to run test and generate a coverage report on terminal
 coverage:
-	pytest --cov=terminusdb_client terminusdb_client/tests/
+	poetry run pytest --cov=terminusdb_client terminusdb_client/tests/
 	coverage report
 
 # Command to generate a coverage report html
 coverage_html:
-	coverage html -d terminusdb_client_coverage
+	poetry run coverage html -d terminusdb_client_coverage
 
 # Command to generate a documentation coverage report
 interrogate:
-	interrogate -c setup.cfg
+	poetry run interrogate -c setup.cfg
 
 # command line for release: bumpversion (patch), tag and push
 # assuming patches are in master
+# run in poetry shell
 publish_patch:
 	tox
 	pip install -U bumpversion
