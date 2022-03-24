@@ -198,20 +198,22 @@ There is a [list of examples](https://terminusdb.github.io/terminusdb-client-pyt
 1. Clone this repository
 `git clone https://github.com/terminusdb/terminusdb-client-python.git`
 
-2. Install all development dependencies using pipenv
+2. Install all development dependencies using poetry
 ```sh
 $ make init
 ```
 
 3. (a) To run test files only
 ```sh
-$ pytest terminusdb_client/tests
+$ poetry run pytest terminusdb_client/tests
 ```
 
 3. (b) To run full test
 ```sh
-$ tox -e test
+$ poetry run tox -e test
 ```
+
+Or you can run tests in [poetry shell](https://python-poetry.org/docs/basic-usage/#activating-the-virtual-environment) then no need to use `poetry run`
 
 ## Documentation
 
