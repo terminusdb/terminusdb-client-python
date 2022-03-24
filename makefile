@@ -4,7 +4,7 @@ init:
 	python -m pip install poetry --upgrade
 	poetry lock
 	poetry install
-	# poetry run python -m pip install -e .
+	# poetry run python -m pip install -U -e .
 
 #test without integration test
 unittest:
