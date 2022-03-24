@@ -1,8 +1,9 @@
 # Command to initialize dev enviroment
 init:
 	python -m pip install --upgrade pip
-	python -m pip install pipenv --upgrade
-	pipenv install --dev --pre
+	python -m pip install poetry --upgrade
+	poetry lock
+	poetry install
 	python -m pip install -e .
 
 #test without integration test
