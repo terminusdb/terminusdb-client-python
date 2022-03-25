@@ -6,7 +6,7 @@ authors = ["TerminusDB group"]
 license = "Apache Software License"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.6"
 requests = "*"
 numpydoc = "*"
 shed = "*"
