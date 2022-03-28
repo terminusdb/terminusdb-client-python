@@ -164,7 +164,7 @@ def test_diff_ops(docker_url, test_schema):
 )
 def test_diff_ops_no_auth(test_schema, terminusx_token):
     # create client and db
-    client = WOQLClient("https://cloud-dev.dcm.ist/TerminusDBTest/")
+    client = WOQLClient("https://cloud-dev.terminusdb.com/TerminusDBTest//")
     client.connect(use_token=True, team="TerminusDBTest")
 
     result_patch = Patch(
@@ -231,7 +231,7 @@ def test_terminusx(terminusx_token):
     testdb = (
         "test_happy_" + str(dt.datetime.now()).replace(" ", "") + "_" + str(random())
     )
-    endpoint = "https://cloud-dev.dcm.ist/TerminusDBTest/"
+    endpoint = "https://cloud-dev.terminusdb.com/TerminusDBTest/"
     client = WOQLClient(endpoint)
     client.connect(use_token=True, team="TerminusDBTest")
     assert client._connected
@@ -249,7 +249,7 @@ def test_terminusx(terminusx_token):
 )
 def test_terminusx_crazy_path(terminusx_token):
     testdb = "test happy_" + str(dt.datetime.now()).replace(" ", "")
-    endpoint = "https://cloud-dev.dcm.ist/TerminusDBTest/"
+    endpoint = "https://cloud-dev.terminusdb.com/TerminusDBTest/"
     client = WOQLClient(endpoint)
     client.connect(use_token=True, team="TerminusDBTest")
     assert client._connected

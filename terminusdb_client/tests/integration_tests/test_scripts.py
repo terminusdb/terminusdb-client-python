@@ -155,7 +155,7 @@ def test_local_happy_path(docker_url, test_csv):
 )
 def test_script_happy_path(terminusx_token):
     testdb = "test_" + str(dt.datetime.now()).replace(" ", "") + "_" + str(random())
-    endpoint = "https://cloud-dev.dcm.ist/TerminusDBTest/"
+    endpoint = "https://cloud-dev.terminusdb.com/TerminusDBTest/"
     runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(
@@ -167,7 +167,8 @@ def test_script_happy_path(terminusx_token):
             setting = json.load(file)
             assert setting.get("database") == testdb
             assert (
-                setting.get("endpoint") == "https://cloud-dev.dcm.ist/TerminusDBTest/"
+                setting.get("endpoint")
+                == "https://cloud-dev.terminusdb.com/TerminusDBTest/"
             )
             assert setting.get("use JWT token")
             assert setting.get("team") == "TerminusDBTest"
