@@ -104,7 +104,9 @@
 <section id="terminusdb-alldocs">
 <h3>alldocs<a class="headerlink" href="#terminusdb-alldocs" title="Permalink to this headline"></a></h3>
 <p>Get all documents in the database, use –schema to specify schema, –type to select type and -q to make queries (e.g. -q date=2021-07-01)</p>
-<p>If using –type and not –schema, can export using -e with options: –keepid, –maxdep and –filename</p>
+<blockquote>
+<div><p>If using –type and not –schema, can export using -e with options: –keepid, –maxdep and –filename</p>
+</div></blockquote>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>terminusdb alldocs <span class="o">[</span>OPTIONS<span class="o">]</span>
 </pre></div>
 </div>
@@ -286,8 +288,10 @@
 </section>
 <section id="terminusdb-importcsv">
 <h3>importcsv<a class="headerlink" href="#terminusdb-importcsv" title="Permalink to this headline"></a></h3>
-<p>Import CSV file into pandas DataFrame then into TerminusDB, with read_csv() options.
-Options like chunksize, sep etc</p>
+<dl class="simple">
+<dt>Import CSV file into pandas DataFrame then into TerminusDB, with read_csv() options.</dt><dd><p>Options like chunksize, sep etc</p>
+</dd>
+</dl>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>terminusdb importcsv <span class="o">[</span>OPTIONS<span class="o">]</span> CSV_FILE <span class="o">[</span>KEYS<span class="o">]</span>...
 </pre></div>
 </div>
