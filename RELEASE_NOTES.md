@@ -1,5 +1,13 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.27
+
+### Bug Fixes / Improvements
+
+- Update dependency versions
+
+---
+
 ## v10.0.26
 
 ### New
