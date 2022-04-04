@@ -66,6 +66,7 @@ jobs:
         python-version: 3.9
     - name: Run setup.py sdist
       run: |
+        pip install wheel
         python setup.py sdist bdist_wheel
         tar -xf dist/*.tar.gz
         cat terminusdb-client-*/terminusdb_client.egg-info/requires.txt
