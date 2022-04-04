@@ -66,9 +66,14 @@ jobs:
         python-version: 3.9
     - name: Run setup.py sdist
       run: |
-        python setup.py sdist
+        python setup.py sdist bdist_wheel
+        tar -xf dist/*.tar.gz
+        cat terminusdb-client-*/terminusdb_client.egg-info/requires.txt
+        unzip -n dist/*.whl
+        head -20 *.dist-info/METADATA
+
     - name: Deploy to pypi
-      uses: pypa/gh-action-pypi-publish@v1.4.1
+      uses: pypa/gh-action-pypi-publish@release/v1
       with:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
