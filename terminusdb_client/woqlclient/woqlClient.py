@@ -1978,7 +1978,6 @@ class WOQLClient:
             "before": self._convert_diff_dcoument(before),
             "after": self._convert_diff_dcoument(after),
         }
-
         if self._connected:
             result = _finish_response(
                 requests.post(
@@ -1991,7 +1990,7 @@ class WOQLClient:
         else:
             result = _finish_response(
                 requests.post(
-                    self._diff_url(),
+                    self.server_url,
                     headers={"user-agent": f"terminusdb-client-python/{__version__}"},
                     json=request_dict,
                 )
@@ -2042,7 +2041,7 @@ class WOQLClient:
         else:
             result = _finish_response(
                 requests.post(
-                    self._patch_url(),
+                    self.server_url,
                     headers={"user-agent": f"terminusdb-client-python/{__version__}"},
                     json=request_dict,
                 )
