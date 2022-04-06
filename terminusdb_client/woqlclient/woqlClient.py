@@ -1960,7 +1960,9 @@ class WOQLClient:
             List["DocumentTemplate"],  # noqa:F821
         ],
     ):
-        """Perform diff on 2 set of document(s), result in a Patch object
+        """Perform diff on 2 set of document(s), result in a Patch object.
+
+        Do not connect when using public API.
 
         Returns
         -------
@@ -2009,6 +2011,8 @@ class WOQLClient:
         patch: Patch,
     ):
         """Apply the patch object to the before object and return an after object. Note that this change does not commit changes to the graph.
+
+        Do not connect when using public API.
 
         Returns
         -------
