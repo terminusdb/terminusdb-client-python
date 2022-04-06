@@ -94,6 +94,8 @@ def test_happy_carzy_path(docker_url):
 def test_diff_ops(docker_url, test_schema):
     # create client and db
     client = WOQLClient(docker_url)
+    public_diff = woqlClient("https://cloud.terminusdb.com/jsondiff")
+    public_patch = woqlClient("https://cloud.terminusdb.com/jsonpatch")
 
     result_patch = Patch(
         json='{"@id": "Person/Jane", "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'
@@ -102,7 +104,12 @@ def test_diff_ops(docker_url, test_schema):
         {"@id": "Person/Jane", "@type": "Person", "name": "Jane"},
         {"@id": "Person/Jane", "@type": "Person", "name": "Janine"},
     )
+    public_result = public_diff.diff(
+        {"@id": "Person/Jane", "@type": "Person", "name": "Jane"},
+        {"@id": "Person/Jane", "@type": "Person", "name": "Janine"},
+    )
     assert result.content == result_patch.content
+    assert result_patch.content == xresult_patch.content
 
     Person = test_schema.object.get("Person")
     jane = Person(
@@ -116,11 +123,22 @@ def test_diff_ops(docker_url, test_schema):
         age=18,
     )
     result = client.diff(jane, janine)
+    public_diff.diff(jane, janine)
     assert result.content == result_patch.content
+    assert public_diff.content == result_patch.content
     assert client.patch(
         {"@id": "Person/Jane", "@type": "Person", "name": "Jane"}, result_patch
     ) == {"@id": "Person/Jane", "@type": "Person", "name": "Janine"}
+    assert public_patch.patch(
+        {"@id": "Person/Jane", "@type": "Person", "name": "Jane"}, result_patch
+    ) == {"@id": "Person/Jane", "@type": "Person", "name": "Janine"}
     assert client.patch(jane, result_patch) == {
+        "@id": "Person/Jane",
+        "@type": "Person",
+        "name": "Janine",
+        "age": 18,
+    }
+    assert public_patch.patch(jane, result_patch) == {
         "@id": "Person/Jane",
         "@type": "Person",
         "name": "Janine",
