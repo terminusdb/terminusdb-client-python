@@ -1049,7 +1049,8 @@ and the new value will be used in future requests to the server.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="terminusdb_client.WOQLClient.diff">
 <span class="sig-name descname"><span class="pre">diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">before</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">after</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.diff" title="Permalink to this definition"></a></dt>
-<dd><p>Perform diff on 2 set of document(s), result in a Patch object</p>
+<dd><p>Perform diff on 2 set of document(s), result in a Patch object.</p>
+<p>Do not connect when using public API.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>Patch object</p>
@@ -1071,6 +1072,7 @@ and the new value will be used in future requests to the server.</p>
 <dt class="sig sig-object py" id="terminusdb_client.WOQLClient.patch">
 <span class="sig-name descname"><span class="pre">patch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">before</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patch</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terminusdb_client.WOQLClient.patch" title="Permalink to this definition"></a></dt>
 <dd><p>Apply the patch object to the before object and return an after object. Note that this change does not commit changes to the graph.</p>
+<p>Do not connect when using public API.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>After object</p>
