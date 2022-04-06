@@ -1960,7 +1960,9 @@ class WOQLClient:
             List["DocumentTemplate"],  # noqa:F821
         ],
     ):
-        """Perform diff on 2 set of document(s), result in a Patch object
+        """Perform diff on 2 set of document(s), result in a Patch object.
+
+        Do not connect when using public API.
 
         Returns
         -------
@@ -1978,7 +1980,6 @@ class WOQLClient:
             "before": self._convert_diff_dcoument(before),
             "after": self._convert_diff_dcoument(after),
         }
-
         if self._connected:
             result = _finish_response(
                 requests.post(
@@ -1991,7 +1992,7 @@ class WOQLClient:
         else:
             result = _finish_response(
                 requests.post(
-                    self._diff_url(),
+                    self.server_url,
                     headers={"user-agent": f"terminusdb-client-python/{__version__}"},
                     json=request_dict,
                 )
@@ -2010,6 +2011,8 @@ class WOQLClient:
         patch: Patch,
     ):
         """Apply the patch object to the before object and return an after object. Note that this change does not commit changes to the graph.
+
+        Do not connect when using public API.
 
         Returns
         -------
@@ -2042,7 +2045,7 @@ class WOQLClient:
         else:
             result = _finish_response(
                 requests.post(
-                    self._patch_url(),
+                    self.server_url,
                     headers={"user-agent": f"terminusdb-client-python/{__version__}"},
                     json=request_dict,
                 )
