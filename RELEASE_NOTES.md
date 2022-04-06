@@ -1,6 +1,14 @@
 # TerminusDB Python Client Release Notes
 
-## v10.0.27
+## v10.0.30
+
+### Bug Fixes / Improvements
+
+- Fix working with public diff and patch endpoints.
+
+---
+
+## v10.0.27 / v10.0.28 / v10.0.29
 
 ### Bug Fixes / Improvements
 
