@@ -31,6 +31,7 @@ interrogate = "*"
 docker-compose = "*"
 pre-commit = "*"
 shed = "*"
+pyupgrade = "2.31.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
