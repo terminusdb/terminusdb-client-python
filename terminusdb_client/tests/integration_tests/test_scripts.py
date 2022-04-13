@@ -7,6 +7,8 @@ from random import random
 import pytest
 from click.testing import CliRunner
 
+from terminusdb_client.woqlclient.woqlClient import WOQLClient
+
 from ...errors import InterfaceError
 from ...scripts import scripts
 
@@ -140,6 +142,37 @@ def test_local_happy_path(docker_url, test_csv):
         result = runner.invoke(scripts.log)
         assert "My message" not in result.output
         assert "Schema updated by Python client." in result.output
+        # test inherits
+        client = WOQLClient(docker_url)
+        client.connect(db=testdb)
+        schema_objects = [
+            {
+                "@type": "Class",
+                "@id": "ThingWithId",
+                "@abstract": [],
+                "id": "xsd:string",
+                "@key": {"@type": "Lexical", "@fields": ["id"]},
+            },
+            {
+                "@type": "Class",
+                "@id": "Study",
+                "@inherits": "ThingWithId",
+                "title": {"@type": "Optional", "@class": "xsd:string"},
+                "@key": {"@type": "Lexical", "@fields": ["id"]},
+            },
+        ]
+        client.insert_document(schema_objects, graph_type="schema")
+        client.insert_document({"@type": "Study", "id": "foo", "title": "My Study"})
+        result = runner.invoke(
+            scripts.alldocs,
+            [
+                "--type",
+                "Study",
+                "-q",
+                "id=foo",
+            ],
+        )
+        assert result.exit_code == 0
         # deletedb
         result = runner.invoke(scripts.deletedb, input="y\n")
         assert result.exit_code == 0
