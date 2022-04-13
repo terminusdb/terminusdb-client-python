@@ -1,5 +1,13 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.32
+
+### Bug Fixes / Improvements
+
+- Fix type checking when getting porperty that is inherited.
+
+---
+
 ## v10.0.30 / v10.0.31
 
 ### Bug Fixes / Improvements
