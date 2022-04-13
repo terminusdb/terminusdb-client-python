@@ -21,7 +21,7 @@ def _check_csv(csv_file, output):
             for item in row:
                 assert item in output
 
-@pytest.mark.xfail(reason="unknow pyupdate dependency issue")
+
 def test_local_happy_path(docker_url, test_csv):
     testdb = "test_" + str(dt.datetime.now()).replace(" ", "")
     runner = CliRunner()
@@ -150,10 +150,9 @@ def test_local_happy_path(docker_url, test_csv):
         assert f"{testdb} deleted." in result.output
 
 
-# @pytest.mark.skipif(
-#     os.environ.get("TERMINUSX_TOKEN") is None, reason="TerminusX token does not exist"
-# )
-@pytest.mark.xfail(reason="unknow pyupdate dependency issue")
+@pytest.mark.skipif(
+    os.environ.get("TERMINUSX_TOKEN") is None, reason="TerminusX token does not exist"
+)
 def test_script_happy_path(terminusx_token):
     testdb = "test_" + str(dt.datetime.now()).replace(" ", "") + "_" + str(random())
     endpoint = "https://cloud-dev.terminusdb.com/TerminusDBTest/"
