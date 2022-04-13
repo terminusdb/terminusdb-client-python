@@ -667,16 +667,27 @@ def alldocs(schema, type_, query, head, export, keepid, maxdep, filename=None):
             result = list(client.get_documents_by_type(type_, count=head))
         else:
             schema_dict = client.get_document(type_, graph_type="schema")
+            # check if it got inherited props
+            combined = {}
+            if "@inherits" in schema_dict:
+                parents = schema_dict["@inherits"]
+                if not isinstance(parents, list):
+                    parents = [parents]
+                for parent in parents:
+                    parent_dict = client.get_document(parent, graph_type="schema")
+                    combined.update(parent_dict)
+            combined.update(schema_dict)
+
             query_dict = {"@type": type_}
             for item in query:
                 pair = item.split("=")
-                if schema_dict.get(pair[0]) is None:
+                if combined.get(pair[0]) is None:
                     raise InterfaceError(f"{pair[0]} is not a proerty in {type_}")
-                elif schema_dict.get(pair[0]) == "xsd:integer":
+                elif combined.get(pair[0]) == "xsd:integer":
                     pair[1] = int(pair[1].strip('"'))
-                elif schema_dict.get(pair[0]) == "xsd:decimal":
+                elif combined.get(pair[0]) == "xsd:decimal":
                     pair[1] = float(pair[1].strip('"'))
-                elif schema_dict.get(pair[0]) == "xsd:boolean":
+                elif combined.get(pair[0]) == "xsd:boolean":
                     pair[1] = pair[1].strip('"')
                     if pair[1].lower() == "false":
                         pair[1] = False
