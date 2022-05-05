@@ -270,7 +270,7 @@ def _finish_response(request_response, get_version=False):
             return request_response.text, request_response.headers.get(
                 "Terminusdb-Data-Version"
             )
-        return request_response.text  # if not a json not it raises an error
+        return request_response.text  # if not a json it raises an error
     elif request_response.status_code > 399 and request_response.status_code < 599:
         raise DatabaseError(request_response)
 

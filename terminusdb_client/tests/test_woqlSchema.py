@@ -1,13 +1,20 @@
 import datetime as dt
+import unittest.mock as mock
 from typing import Set
+from unittest.mock import ANY
 
 import pytest
+import requests
 
+from terminusdb_client.woqlclient import WOQLClient
 from terminusdb_client.woqlschema.woql_schema import (
     DocumentTemplate,
     WOQLSchema,
     _check_cycling,
 )
+
+from ..__version__ import __version__
+from .conftest import mocked_request_success
 
 # my_schema = WOQLSchema()
 cycling_schema = WOQLSchema()
@@ -270,6 +277,88 @@ def test_datetime():
     new_obj = datetime_schema.import_objects(test_dict)
     assert new_obj.datetime == datetime_obj
     assert new_obj.duration == delta
+
+
+@mock.patch("requests.head", side_effect=mocked_request_success)
+@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch("requests.post", side_effect=mocked_request_success)
+@mock.patch("requests.put", side_effect=mocked_request_success)
+def test_compress_data(patched, patched2, patched3, patched4):
+    datetime_obj = dt.datetime(2019, 5, 18, 15, 17, 8, 132263)
+    delta = dt.timedelta(
+        days=50,
+        seconds=27,
+        microseconds=10,
+        milliseconds=29000,
+        minutes=5,
+        hours=8,
+        weeks=2,
+    )
+    test_obj = [CheckDatetime(datetime=datetime_obj, duration=delta) for _ in range(10)]
+    client = WOQLClient("http://127.0.0.1:6366")
+    client.connect(db="test_compress_data")
+    client.insert_document(test_obj, compress=0)
+    requests.post.assert_called_once_with(
+        "http://127.0.0.1:6366/api/document/admin/test_compress_data/local/branch/main",
+        auth=("admin", "root"),
+        headers={
+            "user-agent": f"terminusdb-client-python/{__version__}",
+            "Content-Encoding": "gzip",
+            "Content-Type": "application/json",
+        },
+        params={
+            "author": "admin",
+            "message": f"Commit via python client {__version__}",
+            "graph_type": "instance",
+            "full_replace": "false",
+        },
+        data=ANY,
+    )
+    requests.post.reset_mock()
+    client.insert_document(test_obj, compress="never")
+    requests.post.assert_called_once_with(
+        "http://127.0.0.1:6366/api/document/admin/test_compress_data/local/branch/main",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+        params={
+            "author": "admin",
+            "message": f"Commit via python client {__version__}",
+            "graph_type": "instance",
+            "full_replace": "false",
+        },
+        json=ANY,
+    )
+    client.replace_document(test_obj, compress=0)
+    requests.put.assert_called_once_with(
+        "http://127.0.0.1:6366/api/document/admin/test_compress_data/local/branch/main",
+        auth=("admin", "root"),
+        headers={
+            "user-agent": f"terminusdb-client-python/{__version__}",
+            "Content-Encoding": "gzip",
+            "Content-Type": "application/json",
+        },
+        params={
+            "author": "admin",
+            "message": f"Commit via python client {__version__}",
+            "graph_type": "instance",
+            "create": "false",
+        },
+        data=ANY,
+    )
+    requests.put.reset_mock()
+    client.replace_document(test_obj, compress="never")
+    requests.put.assert_called_once_with(
+        "http://127.0.0.1:6366/api/document/admin/test_compress_data/local/branch/main",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+        params={
+            "author": "admin",
+            "message": f"Commit via python client {__version__}",
+            "graph_type": "instance",
+            "create": "false",
+        },
+        json=ANY,
+    )
 
 
 # def test_schema_delete():

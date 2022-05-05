@@ -1,6 +1,7 @@
 """woqlClient.py
 WOQLClient is the Python public API for TerminusDB"""
 import copy
+import gzip
 import json
 import os
 import urllib.parse as urlparse
@@ -1186,6 +1187,7 @@ class WOQLClient:
         full_replace: bool = False,
         commit_msg: Optional[str] = None,
         last_data_version: Optional[str] = None,
+        compress: Union[str, int] = 1024,
     ) -> None:
         """Inserts the specified document(s)
 
@@ -1201,6 +1203,8 @@ class WOQLClient:
             Commit message.
         last_data_version : str
             Last version before the update, used to check if the document has been changed unknowingly
+        compress : str or int
+            If it is an integer, size of the data larger than this (in bytes) will be compress with gzip in the request (assume encoding as UTF-8, 0 = always compress). If it is `never` it will never compress the data.
 
         Raises
         ------
@@ -1243,13 +1247,27 @@ class WOQLClient:
                     "To replace context, need to use `full_replace` or `replace_document`, skipping context object now."
                 )
                 new_doc.pop(0)
-        result = requests.post(
-            self._documents_url(),
-            headers=headers,
-            params=params,
-            json=new_doc,
-            auth=self._auth(),
-        )
+
+        json_string = json.dumps(new_doc).encode("utf-8")
+        if compress != "never" and len(json_string) > compress:
+            headers.update(
+                {"Content-Encoding": "gzip", "Content-Type": "application/json"}
+            )
+            result = requests.post(
+                self._documents_url(),
+                headers=headers,
+                params=params,
+                data=gzip.compress(json_string),
+                auth=self._auth(),
+            )
+        else:
+            result = requests.post(
+                self._documents_url(),
+                headers=headers,
+                params=params,
+                json=new_doc,
+                auth=self._auth(),
+            )
         result = json.loads(_finish_response(result))
         if isinstance(document, list):
             for idx, item in enumerate(document):
@@ -1269,6 +1287,7 @@ class WOQLClient:
         graph_type: str = "instance",
         commit_msg: Optional[str] = None,
         last_data_version: Optional[str] = None,
+        compress: Union[str, int] = 1024,
         create: bool = False,
     ) -> None:
         """Updates the specified document(s)
@@ -1283,6 +1302,8 @@ class WOQLClient:
             Commit message.
         last_data_version : str
             Last version before the update, used to check if the document has been changed unknowingly
+        compress : str or int
+            If it is an integer, size of the data larger than this (in bytes) will be compress with gzip in the request (assume encoding as UTF-8, 0 = always compress). If it is `never` it will never compress the data.
         create : bool
             Create the document if it does not yet exist.
 
@@ -1303,13 +1324,26 @@ class WOQLClient:
 
         new_doc = self._convert_dcoument(document, graph_type)
 
-        result = requests.put(
-            self._documents_url(),
-            headers=headers,
-            params=params,
-            json=new_doc,
-            auth=self._auth(),
-        )
+        json_string = json.dumps(new_doc).encode("utf-8")
+        if compress != "never" and len(json_string) > compress:
+            headers.update(
+                {"Content-Encoding": "gzip", "Content-Type": "application/json"}
+            )
+            result = requests.put(
+                self._documents_url(),
+                headers=headers,
+                params=params,
+                data=gzip.compress(json_string),
+                auth=self._auth(),
+            )
+        else:
+            result = requests.put(
+                self._documents_url(),
+                headers=headers,
+                params=params,
+                json=new_doc,
+                auth=self._auth(),
+            )
         result = json.loads(_finish_response(result))
         if isinstance(document, list):
             for idx, item in enumerate(document):
@@ -1329,6 +1363,7 @@ class WOQLClient:
         graph_type: str = "instance",
         commit_msg: Optional[str] = None,
         last_data_version: Optional[str] = None,
+        compress: Union[str, int] = 1024,
     ) -> None:
         """Updates the specified document(s). Add the document if not existed.
 
@@ -1342,13 +1377,17 @@ class WOQLClient:
             Commit message.
         last_data_version : str
             Last version before the update, used to check if the document has been changed unknowingly
+        compress : str or int
+            If it is an integer, size of the data larger than this (in bytes) will be compress with gzip in the request (assume encoding as UTF-8, 0 = always compress). If it is `never` it will never compress the data.
 
         Raises
         ------
         InterfaceError
             if the client does not connect to a database
         """
-        self.replace_document(document, graph_type, commit_msg, last_data_version, True)
+        self.replace_document(
+            document, graph_type, commit_msg, last_data_version, compress, True
+        )
 
     def delete_document(
         self,
