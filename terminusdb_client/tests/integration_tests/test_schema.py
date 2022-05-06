@@ -305,3 +305,25 @@ def test_datetime_backend(docker_url):
     client.create_database("test_datetime")
     client.insert_document(CheckDatetime, graph_type="schema")
     client.insert_document(test_obj)
+
+
+def test_compress_data(docker_url):
+    datetime_obj = dt.datetime(2019, 5, 18, 15, 17, 8, 132263)
+    delta = dt.timedelta(
+        days=50,
+        seconds=27,
+        microseconds=10,
+        milliseconds=29000,
+        minutes=5,
+        hours=8,
+        weeks=2,
+    )
+    test_obj = [CheckDatetime(datetime=datetime_obj, duration=delta) for _ in range(10)]
+    client = WOQLClient(docker_url)
+    client.connect()
+    client.create_database("test_compress_data")
+    client.insert_document(CheckDatetime, graph_type="schema")
+    client.insert_document(test_obj, compress=0)
+    test_obj2 = client.get_all_documents(as_list=True)
+    assert len(test_obj2) == 10
+    client.update_document(test_obj2, compress=0)
