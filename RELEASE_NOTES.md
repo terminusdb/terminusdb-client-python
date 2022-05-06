@@ -1,5 +1,13 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.33
+
+### New
+
+- Adding compression option for insert_documrnt, replace_docmuent and updata_document. Default to be compressing when byte size is larger than 1024 in all of them.
+
+---
+
 ## v10.0.32
 
 ### Bug Fixes / Improvements
