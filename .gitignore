@@ -2,6 +2,9 @@
 /requirements-dev.txt
 /requirements.txt
 
+# converage file
+cov.xml
+
 .mypy_cache/
 
 .pytest_cache/
