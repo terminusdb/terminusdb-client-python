@@ -17,9 +17,9 @@
 import re
 import os 
 
-fDir = "./build/markdown/"
+f_dir = "./build/markdown/"
 
-fInput = ['Errors_and_Exceptions', 
+f_input = ['Errors_and_Exceptions', 
     'modules', 
     'Scaffolding_CLI_Tool', 
     'woqlClient', 
@@ -30,14 +30,14 @@ fInput = ['Errors_and_Exceptions',
 ]
 
 aPyFile = []
-fMD = None
+f_md = None
 
 #  * Create GitBook compatibility for 
 #  * 
 #  * 
 #  * @param {string} s - 
 #  */
-def _preProcessScript(s):
+def _pre_process_script(s):
     """Create GitBook compatibility for scripts.
     Parameters
     ----------
@@ -61,7 +61,7 @@ def _preProcessScript(s):
     s= re.sub("^[ \t]+","",s,flags=re.MULTILINE)
     return s
 
-def _preProcess(s):
+def _pre_process(s):
 
     """Create GitBook compatibility for class and module defintions.
     Parameters
@@ -102,7 +102,7 @@ def _preProcess(s):
     s= re.sub("^[ \t]+","",s,flags=re.MULTILINE)
     return s
 
-def createMDFile(s):
+def create_md_file(s):
     """Convert .py file to an array and write to md file a line at a time. Note - can be achieved with one write operation. 
     The 'line at a time' approach enables output to be fine-tuned should this be required in future.
 
@@ -129,16 +129,16 @@ def _md(line, nL = 0):
     s : string String to write to file.
     nL : integer Number of carriage returns to write after string.
     """
-    lineEnd = ""
+    line_end = ""
     if nL == 0:
-        lineEnd = "\n"
+        line_end = "\n"
     else:
-        lineEnd = "\n\n"
+        line_end = "\n\n"
 
-    fMD.write(line + lineEnd)
+    f_md.write(line + line_end)
     
 
-path = fDir+'gitbook-md'
+path = f_dir+'gitbook-md'
     
 # Create the directory 'gitbook' in  'build/markdown/' 
 if not os.path.exists(path):
@@ -148,20 +148,20 @@ if not os.path.exists(path):
         print(error)
 
 # Loop through each file for conversion
-for f in fInput:
-    file = open(fDir+f+'.md',"r")
-    fileData = file.read()
+for f in f_input:
+    file = open(f_dir+f+'.md',"r")
+    file_data = file.read()
 
-    fMD = open(path+"/"+f+'.md', "w")
+    f_md = open(path+"/"+f+'.md', "w")
 
-    f = fDir+f+'.md'
+    f = f_dir+f+'.md'
 
-    processData = ""
+    process_data = ""
     if re.search("Scaffolding", f): 
-        processData = _preProcessScript(fileData)
+        process_data = _pre_process_script(file_data)
        
     else:
-        processData = _preProcess(fileData)
+        process_data = _pre_process(file_data)
 
-    createMDFile(processData)
-    fMD.close()
+    create_md_file(process_data)
+    f_md.close()
