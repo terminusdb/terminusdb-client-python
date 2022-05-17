@@ -2031,7 +2031,7 @@ class WOQLClient:
                 else:
                     raise ValueError(f"Valid document id starts with `terminusdb:///data`, but got {document_id}")
             else:
-                raise ValueError(f"`document_id` can only be used in conjusction with a data version or commit ID as `before`, not a document object")
+                raise ValueError("`document_id` can only be used in conjusction with a data version or commit ID as `before`, not a document object")
         if self._connected:
             result = _finish_response(
                 requests.post(
