@@ -1985,6 +1985,7 @@ class WOQLClient:
     def diff(
         self,
         before: Union[
+            str,
             dict,
             List[dict],
             "WOQLSchema",  # noqa:F821
@@ -1992,12 +1993,14 @@ class WOQLClient:
             List["DocumentTemplate"],  # noqa:F821
         ],
         after: Union[
+            str,
             dict,
             List[dict],
             "WOQLSchema",  # noqa:F821
             "DocumentTemplate",  # noqa:F821
             List["DocumentTemplate"],  # noqa:F821
         ],
+        document_id: Union[str, None] = None
     ):
         """Perform diff on 2 set of document(s), result in a Patch object.
 
@@ -2015,10 +2018,20 @@ class WOQLClient:
         >>> result = client.diff({ "@id" : "Person/Jane", "@type" : "Person", "name" : "Jane"}, { "@id" : "Person/Jane", "@type" : "Person", "name" : "Janine"})
         >>> result.to_json = '{ "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'"""
 
-        request_dict = {
-            "before": self._convert_diff_dcoument(before),
-            "after": self._convert_diff_dcoument(after),
-        }
+        request_dict = {}
+        for key, item in {"before": before, "after": after}.items():
+            if isinstance(item, str):
+                request_dict[f"{key}_data_version"] = item
+            else:
+                request_dict[key] = self._convert_diff_dcoument(item)
+        if document_id is not None:
+            if "before_data_version" in request_dict:
+                if document_id[:len("terminusdb:///data")] == "terminusdb:///data":
+                    request_dict["document_id"] = document_id
+                else:
+                    raise ValueError(f"Valid document id starts with `terminusdb:///data`, but got {document_id}")
+            else:
+                raise ValueError(f"`document_id` can only be used in conjusction with a data version or commit ID as `before`, not a document object")
         if self._connected:
             result = _finish_response(
                 requests.post(
