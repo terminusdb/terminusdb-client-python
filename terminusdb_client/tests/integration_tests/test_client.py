@@ -126,18 +126,30 @@ def test_diff_ops(docker_url, test_schema):
     )
     result = client.diff(jane, janine)
     public_result = public_diff.diff(jane, janine)
-    # test with document_id
+    # test commit_id and data_version with after obj
     test_schema.commit(client)
     jane_id = client.insert_document(jane)[0]
+    data_version = client.get_document(jane_id, get_data_version=True)[-1]
     current_commit = client._get_current_commit()
-    docid_result = client.diff(current_commit, janine, document_id=jane_id)
+    commit_id_result = client.diff(current_commit, janine, document_id=jane_id)
+    data_version_result =  client.diff(data_version, janine, document_id=jane_id)
+    # test commit_id and data_version both before and after
     client.update_document(janine)
+    new_data_version = client.get_document(jane_id, get_data_version=True)[-1]
     new_commit = client._get_current_commit()
-    docid_result2 = client.diff(current_commit, new_commit, document_id=jane_id)
+    commit_id_result2 = client.diff(current_commit, new_commit, document_id=jane_id)
+    data_version_result2 = client.diff(data_version, new_data_version, document_id=jane_id)
+    # test all diff commit_id and data_version
+    commit_id_result_all = client.diff(current_commit, new_commit)
+    data_version_result_all = client.diff(data_version, new_data_version)
     assert result.content == result_patch.content
     assert public_result.content == result_patch.content
-    assert docid_result.content == result_patch.content
-    assert docid_result2.content == result_patch.content
+    assert commit_id_result.content == result_patch.content
+    assert commit_id_result2.content == result_patch.content
+    assert data_version_result.content == result_patch.content
+    assert data_version_result2.content == result_patch.content
+    assert commit_id_result_all.content == [result_patch.content]
+    assert data_version_result_all.content == [result_patch.content]
     assert client.patch(
         {"@id": "Person/Jane", "@type": "Person", "name": "Jane"}, result_patch
     ) == {"@id": "Person/Jane", "@type": "Person", "name": "Janine"}
