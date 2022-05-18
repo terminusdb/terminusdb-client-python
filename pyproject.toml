@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "terminusdb-client"
-version = "10.0.33"
+version = "10.0.34"
 description = "Python client for Terminus DB"
 authors = ["TerminusDB group"]
 license = "Apache Software License"
