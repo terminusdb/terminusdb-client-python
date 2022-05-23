@@ -21,7 +21,7 @@ from ..woqlschema.woql_schema import WOQLSchema
 
 
 @click.group()
-def terminusdb():
+def tdbpy():
     pass
 
 
@@ -910,17 +910,17 @@ def config(set_config, delete):
         click.echo("config.json updated")
 
 
-terminusdb.add_command(startproject)
-terminusdb.add_command(sync)
-terminusdb.add_command(commit)
-terminusdb.add_command(deletedb)
-terminusdb.add_command(importcsv)
-terminusdb.add_command(exportcsv)
-terminusdb.add_command(alldocs)
-terminusdb.add_command(branch)
-terminusdb.add_command(checkout)
-terminusdb.add_command(rebase)
-terminusdb.add_command(status)
-terminusdb.add_command(log)
-terminusdb.add_command(reset)
-terminusdb.add_command(config)
+tdbpy.add_command(startproject)
+tdbpy.add_command(sync)
+tdbpy.add_command(commit)
+tdbpy.add_command(deletedb)
+tdbpy.add_command(importcsv)
+tdbpy.add_command(exportcsv)
+tdbpy.add_command(alldocs)
+tdbpy.add_command(branch)
+tdbpy.add_command(checkout)
+tdbpy.add_command(rebase)
+tdbpy.add_command(status)
+tdbpy.add_command(log)
+tdbpy.add_command(reset)
+tdbpy.add_command(config)
