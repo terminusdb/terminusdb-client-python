@@ -357,7 +357,7 @@ class WOQLQuery:
         raise ValueError("Subject must be a URI string")
 
     def _clean_predicate(self, predicate):
-        """Transforms whatever is passed in as the predicate (id or variable) into the appropriate json-ld form """
+        """Transforms whatever is passed in as the predicate (id or variable) into the appropriate json-ld form"""
         pred = False
         if type(predicate) is dict:
             return predicate

@@ -138,7 +138,9 @@ def test_diff_ops(docker_url, test_schema):
     new_data_version = client.get_document(jane_id, get_data_version=True)[-1]
     new_commit = client._get_current_commit()
     commit_id_result2 = client.diff(current_commit, new_commit, document_id=jane_id)
-    data_version_result2 = client.diff(data_version, new_data_version, document_id=jane_id)
+    data_version_result2 = client.diff(
+        data_version, new_data_version, document_id=jane_id
+    )
     # test all diff commit_id and data_version
     commit_id_result_all = client.diff(current_commit, new_commit)
     data_version_result_all = client.diff(data_version, new_data_version)

@@ -50,7 +50,7 @@ class WOQLView:
         return self
 
     def height(self, height_input: Number):
-        """ Configure height for the WOQLView
+        """Configure height for the WOQLView
 
         Parameters
         ----------
@@ -82,7 +82,7 @@ class WOQLView:
         return self
 
     def edge(self, start: str, end: str):
-        """ Add Edges in the given range
+        """Add Edges in the given range
 
         Parameters
         ----------
@@ -101,7 +101,7 @@ class WOQLView:
         return self
 
     def node(self, *args: str):
-        """ Configure the list of nodes to graph
+        """Configure the list of nodes to graph
 
         Parameters
         ----------
@@ -125,7 +125,7 @@ class WOQLView:
         return self
 
     def text(self, input_text: str):
-        """ Configure text for WOQLView
+        """Configure text for WOQLView
 
         Parameters
         ----------
@@ -143,7 +143,7 @@ class WOQLView:
         return self
 
     def distance(self, input_distance: Number):
-        """ Configure distance for the WOQLView
+        """Configure distance for the WOQLView
 
         Parameters
         ----------
@@ -161,7 +161,7 @@ class WOQLView:
         return self
 
     def weight(self, input_weight: Number):
-        """ Configure weight for the WOQLView
+        """Configure weight for the WOQLView
 
         Parameters
         ----------
@@ -179,7 +179,7 @@ class WOQLView:
         return self
 
     def color(self, input_color: list):
-        """ Configure colors for the WOQLView
+        """Configure colors for the WOQLView
 
         Parameters
         ----------
@@ -204,7 +204,7 @@ class WOQLView:
         return self
 
     def icon(self, input_dict: dict):
-        """ Configure icon for the WOQLView
+        """Configure icon for the WOQLView
 
         Parameters
         ----------
@@ -224,7 +224,7 @@ class WOQLView:
         return self
 
     def size(self, input_size: Number):
-        """ Configure size for the WOQLView
+        """Configure size for the WOQLView
 
         Parameters
         ----------
@@ -242,7 +242,7 @@ class WOQLView:
         return self
 
     def collision_radius(self, input_radius: Number):
-        """ Configure radius for the WOQLView
+        """Configure radius for the WOQLView
 
         Parameters
         ----------
@@ -262,7 +262,7 @@ class WOQLView:
         return self
 
     def hidden(self, input_choice: bool):
-        """ Configure hidden choice for the WOQLView
+        """Configure hidden choice for the WOQLView
 
         Parameters
         ----------
@@ -281,7 +281,7 @@ class WOQLView:
         return self
 
     def charge(self, input_charge: Number):
-        """ Configure charge for the WOQLView
+        """Configure charge for the WOQLView
 
         Parameters
         ----------
@@ -299,7 +299,7 @@ class WOQLView:
         return self
 
     def of(self, input_obj: str):
-        """ Configure IN object for the WOQLView
+        """Configure IN object for the WOQLView
 
         Parameters
         ----------
