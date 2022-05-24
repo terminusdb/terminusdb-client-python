@@ -1465,7 +1465,7 @@ class WOQLClient:
         self._validate_graph_type(graph_type)
         self._check_connection()
         all_existing_obj = self.get_all_documents(graph_type=graph_type)
-        all_existing_id = list(map(lambda x: x.get("@id"), all_existing_obj))
+        all_existing_id = [x.get("@id") for x in all_existing_obj]
         return doc_id in all_existing_id
 
     def get_class_frame(self, class_name):

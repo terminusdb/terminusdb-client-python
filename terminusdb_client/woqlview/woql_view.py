@@ -96,7 +96,7 @@ class WOQLView:
         """
         if not isinstance(start, str) or not isinstance(end, str):
             raise TypeError("arguments of edge() need to be strings")
-        arguments = ",".join(map(lambda x: f'"{x}"', [start, end]))
+        arguments = f'"{start}","{end}"'
         self.obj = f"woqlGraphConfig.edge({arguments})"
         return self
 
@@ -120,7 +120,7 @@ class WOQLView:
         for item in args:
             if not isinstance(item, str):
                 raise TypeError("arguments of node() need to be strings")
-        arguments = ",".join(map(lambda x: f'"{x}"', args))
+        arguments = ",".join([f'"{x}"' for x in args])
         self.obj = f"woqlGraphConfig.node({arguments})"
         return self
 

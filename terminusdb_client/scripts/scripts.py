@@ -343,7 +343,7 @@ def commit(message):
     authors = documentation.get("authors")
     if authors:
         authors = documentation["authors"].split(",")
-        authors = list(map(lambda x: x.strip(), authors))
+        authors = [x.strip() for x in authors]
     schema_obj = WOQLSchema(
         title=documentation.get("title"),
         description=documentation.get("description"),
@@ -433,11 +433,11 @@ def importcsv(
         dtype = {id_: "object"}
         id_ = id_.lower().replace(" ", "_")
     if keys:
-        keys = list(map(lambda x: x.lower().replace(" ", "_"), keys))
+        keys = [x.lower().replace(" ", "_") for x in keys]
     if embedded:
         for item in embedded:
             dtype[item] = "object"
-        embedded = list(map(lambda x: x.lower().replace(" ", "_"), embedded))
+        embedded = [x.lower().replace(" ", "_") for x in embedded]
     try:
         pd = import_module("pandas")
         np = import_module("numpy")
@@ -729,7 +729,7 @@ def branch(branch_name, delete):
     client, _ = _connect(settings)
     if delete:
         all_branches = client.get_all_branches()
-        all_branches = list(map(lambda item: item["name"], all_branches))
+        all_branches = [item["name"] for item in all_branches]
         for delete_branch in delete:
             if delete_branch in all_branches:
                 if delete_branch != status["branch"]:
@@ -746,7 +746,7 @@ def branch(branch_name, delete):
     else:
         if branch_name is None:
             all_branches = client.get_all_branches()
-            all_branches = list(map(lambda item: item["name"], all_branches))
+            all_branches = [item["name"] for item in all_branches]
             new_all_branches = []
             for each_branch in all_branches:
                 if each_branch == status["branch"]:
@@ -773,7 +773,7 @@ def checkout(branch_name, new_branch):
     if new_branch:
         client.create_branch(branch_name)
     all_branches = client.get_all_branches()
-    all_branches = list(map(lambda item: item["name"], all_branches))
+    all_branches = [item["name"] for item in all_branches]
     if branch_name not in all_branches:
         raise InterfaceError(f"{branch_name} does not exist.")
     status["branch"] = branch_name
@@ -899,7 +899,7 @@ def config(set_config, delete):
             value = item.split("=")[1]
             if value[0] == "[" and value[-1] == "]":  # it's a list
                 value = value.strip("[]").split(",")
-                value = list(map(lambda x: try_parsing(x.strip()), value))
+                value = [try_parsing(x.strip()) for x in value]
             else:
                 value = try_parsing(value)
             settings.update({key: value})
