@@ -1,5 +1,13 @@
 # TerminusDB Python Client Release Notes
 
+## v10.0.34
+
+### New
+
+- Adding option to use commit ID / data version with document id as before (and after) in diff.
+
+---
+
 ## v10.0.33
 
 ### New
