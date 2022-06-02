@@ -42,11 +42,11 @@ def test_connection(mocked_requests):
 
 @mock.patch("requests.get", side_effect=mocked_request_success)
 def test_user_agent_set(mocked_requests):
-    woql_client = WOQLClient("http://localhost:6363")
+    woql_client = WOQLClient("http://localhost:6363", user_agent="test_user_agent")
 
     # before connect it connection is empty
 
-    woql_client.connect(key="root", team="admin", user="admin", user_agent="test_user_agent")
+    woql_client.connect(key="root", team="admin", user="admin")
 
     requests.get.assert_called_once_with(
         "http://localhost:6363/api/info",
