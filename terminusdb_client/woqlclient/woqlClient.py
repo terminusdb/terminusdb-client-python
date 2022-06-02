@@ -273,6 +273,7 @@ class WOQLClient:
         branch: str = "main",
         ref: Optional[str] = None,
         repo: str = "local",
+        user_agent: str = f"terminusdb-client-python/{__version__}"}
         **kwargs,
     ) -> None:
         r"""Connect to a Terminus server at the given URI with an API key.
@@ -303,6 +304,8 @@ class WOQLClient:
             Ref setting
         repo: optional, str
             Local or remote repo, default to be "local"
+        user_agent: optional, str
+            User agent header when making requests. Defaults to terminusdb-client-python with the version appended.
         \**kwargs
             Extra configuration options.
 
@@ -320,6 +323,9 @@ class WOQLClient:
         self._use_token = use_token
         self._jwt_token = jwt_token
         self._api_token = api_token
+        self._default_headers = {
+            "user-agent": user_agent
+        }
         self.branch = branch
         self.ref = ref
         self.repo = repo
@@ -331,9 +337,7 @@ class WOQLClient:
                 _finish_response(
                     requests.get(
                         self.api + "/info",
-                        headers={
-                            "user-agent": f"terminusdb-client-python/{__version__}"
-                        },
+                        headers=self._default_headers,
                         auth=self._auth(),
                     )
                 )
@@ -347,9 +351,7 @@ class WOQLClient:
                 _finish_response(
                     requests.head(
                         self._db_url(),
-                        headers={
-                            "user-agent": f"terminusdb-client-python/{__version__}"
-                        },
+                        headers=self._default_headers,
                         params={"exists": "true"},
                         auth=self._auth(),
                     )
@@ -485,7 +487,7 @@ class WOQLClient:
         api_url = "/".join(api_url) + "/_commits"
         result = requests.get(
             api_url,
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             params={"type": "Branch"},
             auth=self._auth(),
         )
@@ -609,7 +611,7 @@ class WOQLClient:
         self._check_connection()
         result = requests.get(
             self._db_base("prefixes"),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             auth=self._auth(),
         )
         return json.loads(_finish_response(result))
@@ -682,7 +684,7 @@ class WOQLClient:
         _finish_response(
             requests.post(
                 self._db_url(),
-                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                headers=self._default_headers,
                 json=details,
                 auth=self._auth(),
             )
@@ -738,7 +740,7 @@ class WOQLClient:
         _finish_response(
             requests.delete(
                 self._db_url(),
-                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                headers=self._default_headers,
                 auth=self._auth(),
                 params=payload,
             )
@@ -774,7 +776,7 @@ class WOQLClient:
         self._validate_graph_type(graph_type)
         result = requests.get(
             self._triples_url(graph_type),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             auth=self._auth(),
         )
         return json.loads(_finish_response(result))
@@ -807,7 +809,7 @@ class WOQLClient:
         params["turtle"] = turtle
         result = requests.post(
             self._triples_url(graph_type),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             params=params,
             auth=self._auth(),
         )
@@ -843,7 +845,7 @@ class WOQLClient:
         params["turtle"] = turtle
         result = requests.put(
             self._triples_url(graph_type),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             params=params,
             auth=self._auth(),
         )
@@ -892,13 +894,11 @@ class WOQLClient:
         for the_arg in add_args:
             if the_arg in kwargs:
                 payload[the_arg] = kwargs[the_arg]
-
+        headers = self._default_headers
+        headers["X-HTTP-Method-Override"] = "GET"
         result = requests.post(
             self._documents_url(),
-            headers={
-                "user-agent": f"terminusdb-client-python/{__version__}",
-                "X-HTTP-Method-Override": "GET",
-            },
+            headers=headers,
             json=payload,
             auth=self._auth(),
         )
@@ -956,7 +956,7 @@ class WOQLClient:
 
         result = requests.get(
             self._documents_url(),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             params=payload,
             auth=self._auth(),
         )
@@ -1019,7 +1019,7 @@ class WOQLClient:
                 payload[the_arg] = kwargs[the_arg]
         result = requests.get(
             self._documents_url(),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             params=payload,
             auth=self._auth(),
         )
@@ -1087,7 +1087,7 @@ class WOQLClient:
                 payload[the_arg] = kwargs[the_arg]
         result = requests.get(
             self._documents_url(),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             params=payload,
             auth=self._auth(),
         )
@@ -1225,7 +1225,7 @@ class WOQLClient:
         else:
             params["full_replace"] = "false"
 
-        headers = {"user-agent": f"terminusdb-client-python/{__version__}"}
+        headers = self._default_headers
         if last_data_version is not None:
             headers["TerminusDB-Data-Version"] = last_data_version
 
@@ -1318,7 +1318,7 @@ class WOQLClient:
         params["graph_type"] = graph_type
         params["create"] = "true" if create else "false"
 
-        headers = {"user-agent": f"terminusdb-client-python/{__version__}"}
+        headers = self._default_headers
         if last_data_version is not None:
             headers["TerminusDB-Data-Version"] = last_data_version
 
@@ -1433,7 +1433,7 @@ class WOQLClient:
         params = self._generate_commit(commit_msg)
         params["graph_type"] = graph_type
 
-        headers = {"user-agent": f"terminusdb-client-python/{__version__}"}
+        headers = self._default_headers
         if last_data_version is not None:
             headers["TerminusDB-Data-Version"] = last_data_version
 
@@ -1485,7 +1485,7 @@ class WOQLClient:
         opts = {"type": class_name}
         result = requests.get(
             self._class_frame_url(),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             params=opts,
             auth=self._auth(),
         )
@@ -1538,7 +1538,7 @@ class WOQLClient:
             request_woql_query = woql_query
         query_obj["query"] = request_woql_query
 
-        headers = {"user-agent": f"terminusdb-client-python/{__version__}"}
+        headers = self._default_headers
         if last_data_version is not None:
             headers["TerminusDB-Data-Version"] = last_data_version
 
@@ -1589,7 +1589,7 @@ class WOQLClient:
         _finish_response(
             requests.post(
                 self._branch_url(new_branch_id),
-                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                headers = self._default_headers,
                 json=source,
                 auth=self._auth(),
             )
@@ -1613,7 +1613,7 @@ class WOQLClient:
         _finish_response(
             requests.delete(
                 self._branch_url(branch_id),
-                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                headers=self._default_headers,
                 auth=self._auth(),
             )
         )
@@ -1670,7 +1670,7 @@ class WOQLClient:
 
         result = requests.post(
             self._pull_url(),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             json=rc_args,
             auth=self._auth(),
         )
@@ -1693,7 +1693,7 @@ class WOQLClient:
 
         result = requests.post(
             self._fetch_url(remote_id),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             auth=self._auth(),
         )
 
@@ -1750,7 +1750,7 @@ class WOQLClient:
 
         result = requests.post(
             self._push_url(),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             json=rc_args,
             auth=self._auth(),
         )
@@ -1817,7 +1817,7 @@ class WOQLClient:
 
         result = requests.post(
             self._rebase_url(),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             json=rc_args,
             auth=self._auth(),
         )
@@ -1875,7 +1875,7 @@ class WOQLClient:
         _finish_response(
             requests.post(
                 self._reset_url(),
-                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                headers=self._default_headers,
                 json={"commit_descriptor": commit_path},
                 auth=self._auth(),
             )
@@ -1910,7 +1910,7 @@ class WOQLClient:
         _finish_response(
             requests.post(
                 self._optimize_url(path),
-                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                headers=self._default_headers,
                 auth=self._auth(),
             )
         )
@@ -1956,7 +1956,7 @@ class WOQLClient:
 
         result = requests.post(
             self._squash_url(),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             json={"commit_info": self._generate_commit(message, author)},
             auth=self._auth(),
         )
@@ -2036,7 +2036,7 @@ class WOQLClient:
             result = _finish_response(
                 requests.post(
                     self._diff_url(),
-                    headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                    headers=self._default_headers,
                     json=request_dict,
                     auth=self._auth(),
                 )
@@ -2045,7 +2045,7 @@ class WOQLClient:
             result = _finish_response(
                 requests.post(
                     self.server_url,
-                    headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                    headers=self._default_headers,
                     json=request_dict,
                 )
             )
@@ -2089,7 +2089,7 @@ class WOQLClient:
             result = _finish_response(
                 requests.post(
                     self._patch_url(),
-                    headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                    headers=self._default_headers,
                     json=request_dict,
                     auth=self._auth(),
                 )
@@ -2098,7 +2098,7 @@ class WOQLClient:
             result = _finish_response(
                 requests.post(
                     self.server_url,
-                    headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                    headers=self._default_headers,
                     json=request_dict,
                 )
             )
@@ -2136,7 +2136,7 @@ class WOQLClient:
         _finish_response(
             requests.post(
                 self._clone_url(newid),
-                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                headers=self._default_headers,
                 json=rc_args,
                 auth=self._auth(),
             )
@@ -2227,7 +2227,7 @@ class WOQLClient:
 
         result = requests.get(
             self.api + "/",
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             auth=self._auth(),
         )
         return json.loads(_finish_response(result))

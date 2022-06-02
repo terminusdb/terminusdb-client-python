@@ -12,6 +12,8 @@ from terminusdb_client.woqlclient.woqlClient import WOQLClient
 from ...errors import InterfaceError
 from ...scripts import scripts
 
+test_user_agent = "terminusdb-client-python-tests"
+
 
 def _check_csv(csv_file, output):
     with open(csv_file) as file:
@@ -144,7 +146,7 @@ def test_local_happy_path(docker_url, test_csv):
         assert "Schema updated by Python client." in result.output
         # test inherits
         client = WOQLClient(docker_url)
-        client.connect(db=testdb)
+        client.connect(db=testdb, user_agent=test_user_agent)
         schema_objects = [
             {
                 "@type": "Class",
