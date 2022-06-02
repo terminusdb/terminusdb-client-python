@@ -145,8 +145,8 @@ def test_local_happy_path(docker_url, test_csv):
         assert "My message" not in result.output
         assert "Schema updated by Python client." in result.output
         # test inherits
-        client = WOQLClient(docker_url)
-        client.connect(db=testdb, user_agent=test_user_agent)
+        client = WOQLClient(docker_url, user_agent=test_user_agent)
+        client.connect(db=testdb)
         schema_objects = [
             {
                 "@type": "Class",

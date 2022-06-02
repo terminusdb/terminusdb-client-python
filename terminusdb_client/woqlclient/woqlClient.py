@@ -154,13 +154,18 @@ class WOQLClient:
         Repo identifier of the database that this client is connected to. Default to "local".
     """
 
-    def __init__(self, server_url: str, **kwargs) -> None:
+    def __init__(self,
+                 server_url: str,
+                 user_agent: str = f"terminusdb-client-python/{__version__}",
+                 **kwargs) -> None:
         r"""The WOQLClient constructor.
 
         Parameters
         ----------
         server_url : str
             URL of the server that this client will connect to.
+        user_agent: optional, str
+            User agent header when making requests. Defaults to terminusdb-client-python with the version appended.
         \**kwargs
             Extra configuration options
 
@@ -176,6 +181,11 @@ class WOQLClient:
         self._branch = None
         self._ref = None
         self._repo = None
+
+        # Default headers
+        self._default_headers = {
+            "user-agent": user_agent
+        }
 
     @property
     def team(self):
@@ -273,7 +283,6 @@ class WOQLClient:
         branch: str = "main",
         ref: Optional[str] = None,
         repo: str = "local",
-        user_agent: str = f"terminusdb-client-python/{__version__}",
         **kwargs,
     ) -> None:
         r"""Connect to a Terminus server at the given URI with an API key.
@@ -304,8 +313,6 @@ class WOQLClient:
             Ref setting
         repo: optional, str
             Local or remote repo, default to be "local"
-        user_agent: optional, str
-            User agent header when making requests. Defaults to terminusdb-client-python with the version appended.
         \**kwargs
             Extra configuration options.
 
@@ -323,9 +330,6 @@ class WOQLClient:
         self._use_token = use_token
         self._jwt_token = jwt_token
         self._api_token = api_token
-        self._default_headers = {
-            "user-agent": user_agent
-        }
         self.branch = branch
         self.ref = ref
         self.repo = repo

@@ -11,8 +11,8 @@ test_user_agent = "terminusdb-client-python-tests"
 
 def test_create_schema(docker_url, test_schema):
     my_schema = test_schema
-    client = WOQLClient(docker_url)
-    client.connect(user_agent=test_user_agent)
+    client = WOQLClient(docker_url, user_agent=test_user_agent)
+    client.connect()
     client.create_database("test_docapi")
     client.insert_document(
         my_schema, commit_msg="I am checking in the schema", graph_type="schema"
@@ -37,8 +37,8 @@ def test_create_schema(docker_url, test_schema):
 
 def test_create_schema2(docker_url, test_schema):
     my_schema = test_schema
-    client = WOQLClient(docker_url)
-    client.connect(user_agent=test_user_agent)
+    client = WOQLClient(docker_url, user_agent=test_user_agent)
+    client.connect()
     client.create_database("test_docapi2")
     my_schema.commit(client, "I am checking in the schema")
     result = client.get_all_documents(graph_type="schema")
@@ -86,8 +86,8 @@ def test_insert_cheuk(docker_url, test_schema):
     cheuk.friend_of = {cheuk}
     cheuk.member_of = Team.IT
 
-    client = WOQLClient(docker_url)
-    client.connect(db="test_docapi", user_agent=test_user_agent)
+    client = WOQLClient(docker_url, user_agent=test_user_agent)
+    client.connect(db="test_docapi")
     # client.create_database("test_docapi")
     # print(cheuk._obj_to_dict())
     with pytest.raises(ValueError) as error:
@@ -127,8 +127,8 @@ def test_insert_cheuk(docker_url, test_schema):
 def test_getting_and_deleting_cheuk(docker_url):
     assert "cheuk" not in globals()
     assert "cheuk" not in locals()
-    client = WOQLClient(docker_url)
-    client.connect(db="test_docapi", user_agent=test_user_agent)
+    client = WOQLClient(docker_url, user_agent=test_user_agent)
+    client.connect(db="test_docapi")
     new_schema = WOQLSchema()
     new_schema.from_db(client)
     cheuk = new_schema.import_objects(
@@ -146,8 +146,8 @@ def test_getting_and_deleting_cheuk(docker_url):
 
 
 def test_insert_cheuk_again(docker_url, test_schema):
-    client = WOQLClient(docker_url)
-    client.connect(db="test_docapi", user_agent=test_user_agent)
+    client = WOQLClient(docker_url, user_agent=test_user_agent)
+    client.connect(db="test_docapi")
     new_schema = WOQLSchema()
     new_schema.from_db(client)
     uk = new_schema.import_objects(client.get_document("Country/United%20Kingdom"))
@@ -222,8 +222,8 @@ def test_insert_cheuk_again(docker_url, test_schema):
 
 
 def test_get_data_version(docker_url):
-    client = WOQLClient(docker_url)
-    client.connect(db="test_docapi", user_agent=test_user_agent)
+    client = WOQLClient(docker_url, user_agent=test_user_agent)
+    client.connect(db="test_docapi")
     result, version = client.get_all_branches(get_data_version=True)
     assert version
     result, version = client.get_all_documents(
@@ -302,8 +302,8 @@ def test_datetime_backend(docker_url):
         weeks=2,
     )
     test_obj = CheckDatetime(datetime=datetime_obj, duration=delta)
-    client = WOQLClient(docker_url)
-    client.connect(user_agent=test_user_agent)
+    client = WOQLClient(docker_url, user_agent=test_user_agent)
+    client.connect()
     client.create_database("test_datetime")
     client.insert_document(CheckDatetime, graph_type="schema")
     client.insert_document(test_obj)
@@ -321,8 +321,8 @@ def test_compress_data(docker_url):
         weeks=2,
     )
     test_obj = [CheckDatetime(datetime=datetime_obj, duration=delta) for _ in range(10)]
-    client = WOQLClient(docker_url)
-    client.connect(user_agent=test_user_agent)
+    client = WOQLClient(docker_url, user_agent=test_user_agent)
+    client.connect()
     client.create_database("test_compress_data")
     client.insert_document(CheckDatetime, graph_type="schema")
     client.insert_document(test_obj, compress=0)
