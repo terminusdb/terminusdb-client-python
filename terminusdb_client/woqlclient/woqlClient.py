@@ -898,7 +898,7 @@ class WOQLClient:
         for the_arg in add_args:
             if the_arg in kwargs:
                 payload[the_arg] = kwargs[the_arg]
-        headers = self._default_headers
+        headers = self._default_headers.copy()
         headers["X-HTTP-Method-Override"] = "GET"
         result = requests.post(
             self._documents_url(),
@@ -1229,7 +1229,7 @@ class WOQLClient:
         else:
             params["full_replace"] = "false"
 
-        headers = self._default_headers
+        headers = self._default_headers.copy()
         if last_data_version is not None:
             headers["TerminusDB-Data-Version"] = last_data_version
 
@@ -1322,7 +1322,7 @@ class WOQLClient:
         params["graph_type"] = graph_type
         params["create"] = "true" if create else "false"
 
-        headers = self._default_headers
+        headers = self._default_headers.copy()
         if last_data_version is not None:
             headers["TerminusDB-Data-Version"] = last_data_version
 
@@ -1437,7 +1437,7 @@ class WOQLClient:
         params = self._generate_commit(commit_msg)
         params["graph_type"] = graph_type
 
-        headers = self._default_headers
+        headers = self._default_headers.copy()
         if last_data_version is not None:
             headers["TerminusDB-Data-Version"] = last_data_version
 
@@ -1542,7 +1542,7 @@ class WOQLClient:
             request_woql_query = woql_query
         query_obj["query"] = request_woql_query
 
-        headers = self._default_headers
+        headers = self._default_headers.copy()
         if last_data_version is not None:
             headers["TerminusDB-Data-Version"] = last_data_version
 
