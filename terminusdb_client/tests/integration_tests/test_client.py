@@ -98,8 +98,12 @@ def test_diff_ops(docker_url, test_schema):
     client = WOQLClient(docker_url, user_agent=test_user_agent)
     client.connect()
     client.create_database("test_diff_ops")
-    public_diff = WOQLClient("https://cloud.terminusdb.com/jsondiff", user_agent=test_user_agent)
-    public_patch = WOQLClient("https://cloud.terminusdb.com/jsonpatch", user_agent=test_user_agent)
+    public_diff = WOQLClient(
+        "https://cloud.terminusdb.com/jsondiff", user_agent=test_user_agent
+    )
+    public_patch = WOQLClient(
+        "https://cloud.terminusdb.com/jsonpatch", user_agent=test_user_agent
+    )
 
     result_patch = Patch(
         json='{"@id": "Person/Jane", "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'
@@ -140,7 +144,9 @@ def test_diff_ops(docker_url, test_schema):
     new_data_version = client.get_document(jane_id, get_data_version=True)[-1]
     new_commit = client._get_current_commit()
     commit_id_result2 = client.diff(current_commit, new_commit, document_id=jane_id)
-    data_version_result2 = client.diff(data_version, new_data_version, document_id=jane_id)
+    data_version_result2 = client.diff(
+        data_version, new_data_version, document_id=jane_id
+    )
     # test all diff commit_id and data_version
     commit_id_result_all = client.diff(current_commit, new_commit)
     data_version_result_all = client.diff(data_version, new_data_version)
@@ -208,7 +214,9 @@ def test_diff_ops(docker_url, test_schema):
 )
 def test_diff_ops_no_auth(test_schema, terminusx_token):
     # create client and db
-    client = WOQLClient("https://cloud-dev.terminusdb.com/TerminusDBTest//", user_agent=test_user_agent)
+    client = WOQLClient(
+        "https://cloud-dev.terminusdb.com/TerminusDBTest//", user_agent=test_user_agent
+    )
     client.connect(use_token=True, team="TerminusDBTest")
 
     result_patch = Patch(
