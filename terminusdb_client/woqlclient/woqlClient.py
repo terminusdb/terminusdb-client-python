@@ -273,7 +273,7 @@ class WOQLClient:
         branch: str = "main",
         ref: Optional[str] = None,
         repo: str = "local",
-        user_agent: str = f"terminusdb-client-python/{__version__}"}
+        user_agent: str = f"terminusdb-client-python/{__version__}",
         **kwargs,
     ) -> None:
         r"""Connect to a Terminus server at the given URI with an API key.
