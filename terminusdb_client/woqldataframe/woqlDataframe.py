@@ -36,7 +36,7 @@ def result_to_df(all_records, keepid=False, max_embed_dep=0, client=None):
                         columns=list(filter(lambda x: x[0] == "@", expanded.columns)),
                         inplace=True,
                     )
-                expanded.columns = list(map(lambda x: col + "." + x, expanded))
+                expanded.columns = [col + "." + x for x in expanded]
                 df.drop(columns=col, inplace=True)
                 df = df.join(expanded)
         return df

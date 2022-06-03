@@ -76,7 +76,7 @@ class CheckDatetime(DocumentTemplate):
 
 def test_schema_construct(test_schema):
     my_schema = test_schema
-    assert set(map(lambda x: x.__name__, my_schema.all_obj())) == {
+    assert {x.__name__ for x in my_schema.all_obj()} == {
         "Employee",
         "Person",
         "Address",
