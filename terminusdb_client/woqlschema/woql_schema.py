@@ -52,7 +52,7 @@ class RandomKey(TerminusKey):
 def _check_cycling(class_obj: "TerminusClass"):
     """Helper function to check if the embedded subdocument is cycling"""
     if hasattr(class_obj, "_subdocument"):
-        mro_names = list(map(lambda obj: obj.__name__, class_obj.__mro__))
+        mro_names = [obj.__name__ for obj in class_obj.__mro__]
         for prop_type in class_obj._annotations.values():
             if str(prop_type) in mro_names:
                 raise RecursionError(f"Embbding {prop_type} cause recursions.")
@@ -209,7 +209,7 @@ class DocumentTemplate(metaclass=TerminusClass):
         result = {"@type": "Class", "@id": cls.__name__}
         if cls.__base__.__name__ != "DocumentTemplate":
             # result["@inherits"] = cls.__base__.__name__
-            parents = list(map(lambda x: x.__name__, cls.__mro__))
+            parents = [x.__name__ for x in cls.__mro__]
             result["@inherits"] = parents[1 : parents.index("DocumentTemplate")]
         elif cls.__base__.__name__ == "TaggedUnion":
             result["@type"] = "TaggedUnion"
@@ -793,7 +793,7 @@ class WOQLSchema:
 
     def to_dict(self):
         """Return the schema in the TerminusDB dictionary format"""
-        all_obj = list(map(lambda cls: cls._to_dict(), self.all_obj()))
+        all_obj = [cls._to_dict() for cls in self.all_obj()]
         all_obj.sort(key=lambda item: item.get("@id"))
         return [self.context] + all_obj
 

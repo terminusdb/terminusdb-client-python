@@ -1,5 +1,17 @@
 # TerminusDB Python Client Release Notes
 
+## v10.1.0
+
+### Changes
+
+- CLI command renamed from `terminusdb` to `tdbpy`
+
+### New
+
+- `user_agent` can be customize when creating the client.
+
+---
+
 ## v10.0.34
 
 ### New
