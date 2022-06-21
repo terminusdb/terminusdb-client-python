@@ -155,7 +155,7 @@ client.delete_database("MyDatabase")
 Start a project in the directory
 
 ```bash
-$terminusdb startproject
+$tdbpy startproject
 Please enter a project name (this will also be the database name): mydb
 Please enter a endpoint location (press enter to use localhost default) [http://127.0.0.1:6363/]:
 config.json and schema.py created, please customize them to start your project.
@@ -164,7 +164,7 @@ config.json and schema.py created, please customize them to start your project.
 Import a CSV named `grades.csv`
 
 ``` bash
-$terminusdb importcsv grades.csv --na=error
+$tdbpy importcsv grades.csv --na=error
 0it [00:00, ?it/s]
 Schema object Grades created with grades.csv inserted into database.
 schema.py is updated with mydb schema.
@@ -175,14 +175,14 @@ Records in grades.csv inserted as type Grades into database with Lexical ids.
 Get documents with query
 
 ```bash
-terminusdb alldocs --type Grades -q grade="B-"
+tdbpy alldocs --type Grades -q grade="B-"
 [{'@id': 'Grades/Android_Electric_087-65-4321_42.0_23.0_36.0_45.0_47.0_B-', '@type': 'Grades', 'final': 47.0, 'first_name': 'Electric', 'grade': 'B-', 'last_name': 'Android', 'ssn': '087-65-4321', 'test1': 42.0, 'test2': 23.0, 'test3': 36.0, 'test4': 45.0}, {'@id': 'Grades/Elephant_Ima_456-71-9012_45.0_1.0_78.0_88.0_77.0_B-', '@type': 'Grades', 'final': 77.0, 'first_name': 'Ima', 'grade': 'B-', 'last_name': 'Elephant', 'ssn': '456-71-9012', 'test1': 45.0, 'test2': 1.0, 'test3': 78.0, 'test4': 88.0}, {'@id': 'Grades/Franklin_Benny_234-56-2890_50.0_1.0_90.0_80.0_90.0_B-', '@type': 'Grades', 'final': 90.0, 'first_name': 'Benny', 'grade': 'B-', 'last_name': 'Franklin', 'ssn': '234-56-2890', 'test1': 50.0, 'test2': 1.0, 'test3': 90.0, 'test4': 80.0}]
 ```
 
 Delete the database
 
 ```bash
-$terminusdb deletedb
+$tdbpy deletedb
 Do you want to delete 'mydb'? WARNING: This opertation is non-reversible. [y/N]: y
 mydb deleted.
 ```
