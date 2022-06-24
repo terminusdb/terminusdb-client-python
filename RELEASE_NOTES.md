@@ -1,5 +1,13 @@
 # TerminusDB Python Client Release Notes
 
+## v10.1.1
+
+### Bug Fixes / Improvements
+
+- Fix conversion of subdocuments in `from_json_schema` of `WOQLSchema`.
+
+---
+
 ## v10.1.0
 
 ### Changes
