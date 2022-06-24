@@ -734,7 +734,20 @@ class WOQLSchema:
             # it's datetime
             if "format" in prop and prop["format"] == "date-time":
                 return "xsd:dataTime"
-            # it's another object
+            # it's a subdocument
+            elif prop.get("type") is not None and prop["type"] == "object":
+                if prop.get("properties") is None:
+                    raise RuntimeError(
+                        f"subdocument {prop_name} not in proper format: 'properties' is missing"
+                    )
+                sub_dict = {"@id": prop_name, "@type": "Class", "@subdocument": []}
+                for sub_prop_name, sub_prop in prop["properties"].items():
+                    sub_dict[sub_prop_name] = convert_property(sub_prop_name, sub_prop)
+                if pipe:  # end of journey for pipemode
+                    return sub_dict
+                self._contruct_class(sub_dict)
+                return prop_name
+            # it's another document
             elif prop.get("type") is None and prop.get("$ref") is not None:
                 prop_type = prop["$ref"].split("/")[-1]
                 if defs is None or prop_type not in defs:
