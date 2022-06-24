@@ -363,26 +363,41 @@ def test_compress_data(patched, patched2, patched3, patched4):
 
 def test_from_json_schema():
     test_json_schema = {
-          "type": "object",
-          "properties": {
-            "first_name": { "type": "string" },
-            "last_name": { "type": "string" },
-            "birthday": { "type": "string", "format": "date" },
+        "type": "object",
+        "properties": {
+            "first_name": {"type": "string"},
+            "last_name": {"type": "string"},
+            "birthday": {"type": "string", "format": "date"},
             "address": {
-              "type": "object",
-              "properties": {
-                "street_address": { "type": "string" },
-                "city": { "type": "string" },
-                "state": { "type": "string" },
-                "country": { "type" : "string" }
-              }
-            }
-          }
-        }
+                "type": "object",
+                "properties": {
+                    "street_address": {"type": "string"},
+                    "city": {"type": "string"},
+                    "state": {"type": "string"},
+                    "country": {"type": "string"},
+                },
+            },
+        },
+    }
 
     schema = WOQLSchema()
     test_result = schema.from_json_schema("TestJSON", test_json_schema, pipe=True)
-    assert test_result == {'@id': 'TestJSON', '@type': 'Class', 'first_name': 'xsd:string', 'last_name': 'xsd:string', 'birthday': 'xsd:string', 'address': {'@id': 'address', '@type': 'Class', '@subdocument': [], 'street_address': 'xsd:string', 'city': 'xsd:string', 'state': 'xsd:string', 'country': 'xsd:string'}}
+    assert test_result == {
+        "@id": "TestJSON",
+        "@type": "Class",
+        "first_name": "xsd:string",
+        "last_name": "xsd:string",
+        "birthday": "xsd:string",
+        "address": {
+            "@id": "address",
+            "@type": "Class",
+            "@subdocument": [],
+            "street_address": "xsd:string",
+            "city": "xsd:string",
+            "state": "xsd:string",
+            "country": "xsd:string",
+        },
+    }
 
 
 # def test_schema_delete():
