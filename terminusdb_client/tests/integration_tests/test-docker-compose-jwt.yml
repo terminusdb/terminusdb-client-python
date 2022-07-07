@@ -15,3 +15,4 @@ services:
       - TERMINUSDB_SERVER_PORT=6367
       - TERMINUSDB_JWT_ENABLED=true
       - TERMINUSDB_SERVER_JWKS_ENDPOINT=https://cdn.terminusdb.com/jwks.json
+      - TERMINUSDB_JWT_AGENT_NAME_PROPERTY=http://terminusdb.com/schema/system#agent_name
