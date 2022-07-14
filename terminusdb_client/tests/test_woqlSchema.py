@@ -311,6 +311,7 @@ def test_compress_data(patched, patched2, patched3, patched4):
             "message": f"Commit via python client {__version__}",
             "graph_type": "instance",
             "full_replace": "false",
+            "raw_json": "false",
         },
         data=ANY,
     )
