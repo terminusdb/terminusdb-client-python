@@ -1192,6 +1192,7 @@ class WOQLClient:
         commit_msg: Optional[str] = None,
         last_data_version: Optional[str] = None,
         compress: Union[str, int] = 1024,
+        raw_json: bool = False
     ) -> None:
         """Inserts the specified document(s)
 
@@ -1209,6 +1210,8 @@ class WOQLClient:
             Last version before the update, used to check if the document has been changed unknowingly
         compress : str or int
             If it is an integer, size of the data larger than this (in bytes) will be compress with gzip in the request (assume encoding as UTF-8, 0 = always compress). If it is `never` it will never compress the data.
+        raw_json : bool
+            Update as raw json
 
         Raises
         ------
@@ -1228,6 +1231,7 @@ class WOQLClient:
             params["full_replace"] = "true"
         else:
             params["full_replace"] = "false"
+        params["raw_json"] = "true" if raw_json else "false"
 
         headers = self._default_headers.copy()
         if last_data_version is not None:
@@ -1293,6 +1297,7 @@ class WOQLClient:
         last_data_version: Optional[str] = None,
         compress: Union[str, int] = 1024,
         create: bool = False,
+        raw_json: bool = False,
     ) -> None:
         """Updates the specified document(s)
 
@@ -1310,6 +1315,8 @@ class WOQLClient:
             If it is an integer, size of the data larger than this (in bytes) will be compress with gzip in the request (assume encoding as UTF-8, 0 = always compress). If it is `never` it will never compress the data.
         create : bool
             Create the document if it does not yet exist.
+        raw_json : bool
+            Update as raw json
 
         Raises
         ------
@@ -1321,6 +1328,7 @@ class WOQLClient:
         params = self._generate_commit(commit_msg)
         params["graph_type"] = graph_type
         params["create"] = "true" if create else "false"
+        params["raw_json"] = "true" if raw_json else "false"
 
         headers = self._default_headers.copy()
         if last_data_version is not None:
