@@ -740,7 +740,9 @@ class WOQLClient:
             )
         else:
             self.team = team
-        payload = {"force": force}
+        payload = {}
+        if force:
+            payload["force"] = "true"
         _finish_response(
             requests.delete(
                 self._db_url(),
