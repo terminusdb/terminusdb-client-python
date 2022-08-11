@@ -207,12 +207,12 @@ class DocumentTemplate(metaclass=TerminusClass):
         if not skip_checking:
             _check_cycling(cls)
         result = {"@type": "Class", "@id": cls.__name__}
-        if cls.__base__.__name__ not in ["DocumentTemplate", "TaggedUnion"]:
+        if cls.__base__.__name__ == "TaggedUnion":
+            result["@type"] = "TaggedUnion"
+        elif cls.__base__.__name__ not in ["DocumentTemplate", "TaggedUnion"]:
             # result["@inherits"] = cls.__base__.__name__
             parents = [x.__name__ for x in cls.__mro__]
             result["@inherits"] = parents[1 : parents.index("DocumentTemplate")]
-        elif cls.__base__.__name__ == "TaggedUnion":
-            result["@type"] = "TaggedUnion"
 
         if cls.__doc__:
             doc_obj = ClassDoc(cls)
@@ -405,7 +405,7 @@ class WOQLSchema:
     def context(self, value):
         raise Exception("Cannot set context")
 
-    def _contruct_class(self, class_obj_dict):
+    def _construct_class(self, class_obj_dict):
         # if the class is already constructed properly
         if (
             class_obj_dict.get("@id")
@@ -431,7 +431,7 @@ class WOQLSchema:
                 elif parent not in self._all_existing_classes:
                     raise RuntimeError(f"{parent} not exist in database schema")
                 else:
-                    self._contruct_class(self._all_existing_classes[parent])
+                    self._construct_class(self._all_existing_classes[parent])
                     superclasses.append(self.object[parent])
         else:
             inherits = []
@@ -511,7 +511,7 @@ class WOQLSchema:
         self.add_obj(class_obj_dict["@id"], new_class)
         return new_class
 
-    def _contruct_context(self, context_dict):
+    def _construct_context(self, context_dict):
         documentation = context_dict.get("@documentation")
         if documentation:
             if documentation.get("@title"):
@@ -523,7 +523,7 @@ class WOQLSchema:
         self.base_ref = context_dict.get("@base")
         self.schema_ref = context_dict.get("@schema")
 
-    def _contruct_object(self, obj_dict):
+    def _construct_object(self, obj_dict):
         obj_type = obj_dict.get("@type")
         if obj_type and obj_type not in self.object:
             raise ValueError(
@@ -575,7 +575,7 @@ class WOQLSchema:
                 if isinstance(value, dict):
                     if hasattr(value_class, "_subdocument"):
                         # it's a subdocument
-                        return self._contruct_object(value)
+                        return self._construct_object(value)
                     else:
                         # document is expressed as dict with '@id'
                         value = value.get("@id")
@@ -659,7 +659,7 @@ class WOQLSchema:
             )
 
     def from_db(self, client: WOQLClient, select: Optional[List[str]] = None):
-        """Load classes in the database shcema into schema
+        """Load classes in the database schema into schema
 
         Parameters
         ----------
@@ -675,18 +675,18 @@ class WOQLSchema:
             if item_id:
                 self._all_existing_classes[item_id] = item
             elif item.get("@type") == "@context":
-                self._contruct_context(item)
+                self._construct_context(item)
 
         for item_id, class_obj_dict in self._all_existing_classes.items():
             if select is None or (select is not None and item_id in select):
-                self._contruct_class(class_obj_dict)
+                self._construct_class(class_obj_dict)
         return self
 
     def import_objects(self, obj_dict: Union[List[dict], dict]):
         """Import a list of documents in json format to Python objects. The schema of those documents need to be in this schema."""
         if isinstance(obj_dict, dict):
-            return self._contruct_object(obj_dict)
-        return list(map(self._contruct_object, obj_dict))
+            return self._construct_object(obj_dict)
+        return list(map(self._construct_object, obj_dict))
 
     def from_json_schema(
         self,
@@ -745,7 +745,7 @@ class WOQLSchema:
                     sub_dict[sub_prop_name] = convert_property(sub_prop_name, sub_prop)
                 if pipe:  # end of journey for pipemode
                     return sub_dict
-                self._contruct_class(sub_dict)
+                self._construct_class(sub_dict)
                 return prop_name
             # it's another document
             elif prop.get("type") is None and prop.get("$ref") is not None:
@@ -765,7 +765,7 @@ class WOQLSchema:
                 if pipe:
                     return enum_dict
                 else:
-                    self._contruct_class(enum_dict)
+                    self._construct_class(enum_dict)
                     return self.object[enum_name]._to_dict()
             # it's a List
             elif prop["type"] == "array":
@@ -796,7 +796,7 @@ class WOQLSchema:
         if pipe:  # end of journey for pipemode
             return class_dict
 
-        self._contruct_class(class_dict)
+        self._construct_class(class_dict)
 
     def add_obj(self, name, obj):
         self.object[name] = obj
