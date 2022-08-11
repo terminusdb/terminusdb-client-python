@@ -207,7 +207,7 @@ class DocumentTemplate(metaclass=TerminusClass):
         if not skip_checking:
             _check_cycling(cls)
         result = {"@type": "Class", "@id": cls.__name__}
-        if cls.__base__.__name__ != "DocumentTemplate":
+        if cls.__base__.__name__ not in ["DocumentTemplate", "TaggedUnion"]:
             # result["@inherits"] = cls.__base__.__name__
             parents = [x.__name__ for x in cls.__mro__]
             result["@inherits"] = parents[1 : parents.index("DocumentTemplate")]
