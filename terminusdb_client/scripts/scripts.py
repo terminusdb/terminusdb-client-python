@@ -233,6 +233,8 @@ def _create_script(obj_list):
                 result_obj = ResultObj(obj["@id"], obj["@inherits"])
             elif obj["@type"] == "Class":
                 result_obj = ResultObj(obj["@id"], "DocumentTemplate")
+            elif obj["@type"] == "TaggedUnion":
+                result_obj = ResultObj(obj["@id"], "TaggedUnion")
             elif obj["@type"] == "Enum":
                 result_obj = ResultObj(obj["@id"], "EnumTemplate")
                 for value in obj["@value"]:
