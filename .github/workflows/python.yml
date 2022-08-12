@@ -52,7 +52,6 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install tox
         tox -e deps
-        if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
     - name: Linting
       run: |
         tox -e check
