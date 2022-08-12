@@ -300,7 +300,9 @@ def test_terminusx(terminusx_token):
     os.environ.get("TERMINUSX_TOKEN") is None, reason="TerminusX token does not exist"
 )
 def test_terminusx_crazy_path(terminusx_token):
-    testdb = "test happy_" + str(dt.datetime.now()).replace(" ", "")
+    testdb = (
+        "test_crazy" + str(dt.datetime.now()).replace(" ", "") + "_" + str(random())
+    )
     endpoint = "https://cloud-dev.terminusdb.com/TerminusDBTest/"
     client = WOQLClient(endpoint, user_agent=test_user_agent)
     client.connect(use_token=True, team="TerminusDBTest")
