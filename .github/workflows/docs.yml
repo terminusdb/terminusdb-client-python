@@ -37,6 +37,6 @@ jobs:
         destination_folder: 'index/terminusx-db/reference-guides/python-client-reference'
         destination_base_branch: 'main'
         destination_head_branch: ${{ env.BRANCH_NAME }}
-        user_email: 'neel@terminusdb.com'
-        user_name: 'Neelterminusdb'
-        pull_request_reviewers: 'mark-terminusdb'
+        user_email: 'robin@terminusdb.com'
+        user_name: 'rrooij'
+        pull_request_reviewers: 'GavinMendelGleason'
