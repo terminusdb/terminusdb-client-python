@@ -7,3 +7,4 @@ typeguard
 requests
 tqdm
 shed
+sphinx-markdown-builder
