@@ -1,14 +1,11 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Generate docs
+name: Generate docs and Create PR on docs repo
 
 on:
   push:
     branches:
-      - dev
-      - canary
-      - rc
       - master
 
 jobs:
@@ -26,26 +23,20 @@ jobs:
         python -m pip install --upgrade pip
         cd docs
         python -m pip install -r requirements.txt
-        make html
-        touch build/html/.nojekyll
-    - name: Extract branch name
-      shell: bash
-      run: |
-        echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-      id: extract_branch
-    - name: Deploy to subdir 🚀
-      uses: JamesIves/github-pages-deploy-action@4.0.0
+        make markdown
+        python generateGitbookMD.py
+    - name: Set destination BRANCH_NAME for docs repo
+      run: echo "BRANCH_NAME=Python-Reference-Updates-$(date +%s)" >> $GITHUB_ENV
+    - name: Create pull request in terminusdb/terminusdb-docs
+      uses: paygoc6/action-pull-request-another-repo@v1.0.1
+      env:
+        API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
-        branch: gh-pages # The branch the action should deploy to.
-        folder: docs/build/html # The folder the action should deploy.
-        target-folder: ${{ steps.extract_branch.outputs.branch }}
-    - name: Deploy to root 🚀
-      uses: JamesIves/github-pages-deploy-action@4.0.0
-      if: ${{ steps.extract_branch.outputs.branch == 'master' }}
-      with:
-        branch: gh-pages
-        folder: docs/build/html
-        clean-exclude: |
-          dev
-          canary
-          rc
+        source_folder: 'docs/build/markdown/gitbook-md/.'
+        destination_repo: 'terminusdb/terminusdb-docs'
+        destination_folder: 'index/terminusx-db/reference-guides/python-client-reference'
+        destination_base_branch: 'main'
+        destination_head_branch: ${{ env.BRANCH_NAME }}
+        user_email: 'neel@terminusdb.com'
+        user_name: 'Neelterminusdb'
+        pull_request_reviewers: 'mark-terminusdb'
