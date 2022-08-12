@@ -5,8 +5,8 @@ name: Generate docs and Create PR on docs repo
 
 on:
   push:
-    branches:
-      - master
+    tags:
+      - v*
 
 jobs:
   make_docs:
