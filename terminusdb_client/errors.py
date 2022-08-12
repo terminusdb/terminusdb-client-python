@@ -44,7 +44,9 @@ class DatabaseError(Error):
             response from the api call
         """
         super().__init__()
-        if (
+        if not response.text:
+            self.message = "Unknown Error - No error message from response."
+        elif (
             response.headers["content-type"][: len("application/json")]
             == "application/json"
         ):

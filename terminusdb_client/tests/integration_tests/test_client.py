@@ -6,10 +6,13 @@ from random import random
 
 import pytest
 
-from terminusdb_client.client.Client import Client
+from terminusdb_client.errors import InterfaceError
+from terminusdb_client.client.Client import Patch, Client
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 # from terminusdb_client.woqlquery.woql_query import WOQLQuery
+
+test_user_agent = "terminusdb-client-python-tests"
 
 
 def test_happy_path(docker_url):
@@ -19,6 +22,11 @@ def test_happy_path(docker_url):
     # test connect
     client.connect()
     assert client._connected
+    assert client._db_info is not None
+    # test db does not exist
+    with pytest.raises(InterfaceError) as error:
+        client.connect(db="test_happy_path")
+        assert error.value == "Connection fail, test_happy_path does not exist."
     # test create db
     client.create_database("test_happy_path")
     init_commit = client._get_current_commit()
@@ -52,9 +60,9 @@ def test_happy_path(docker_url):
     assert "test_happy_path" not in client.list_databases()
 
 
-def test_happy_carzy_path(docker_url):
+def test_happy_crazy_path(docker_url):
     # create client
-    client = Client(docker_url)
+    client = Client(docker_url, user_agent=test_user_agent)
     assert not client._connected
     # test connect
     client.connect()
@@ -85,12 +93,179 @@ def test_happy_carzy_path(docker_url):
     assert "test happy path" not in client.list_databases()
 
 
+def test_diff_ops(docker_url, test_schema):
+    # create client and db
+    client = WOQLClient(docker_url, user_agent=test_user_agent)
+    client.connect()
+    client.create_database("test_diff_ops")
+    public_diff = WOQLClient(
+        "https://cloud.terminusdb.com/jsondiff", user_agent=test_user_agent
+    )
+    public_patch = WOQLClient(
+        "https://cloud.terminusdb.com/jsonpatch", user_agent=test_user_agent
+    )
+
+    result_patch = Patch(
+        json='{"@id": "Person/Jane", "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'
+    )
+    result = client.diff(
+        {"@id": "Person/Jane", "@type": "Person", "name": "Jane"},
+        {"@id": "Person/Jane", "@type": "Person", "name": "Janine"},
+    )
+    public_result = public_diff.diff(
+        {"@id": "Person/Jane", "@type": "Person", "name": "Jane"},
+        {"@id": "Person/Jane", "@type": "Person", "name": "Janine"},
+    )
+    assert result.content == result_patch.content
+    assert public_result.content == result_patch.content
+
+    Person = test_schema.object.get("Person")
+    jane = Person(
+        _id="Jane",
+        name="Jane",
+        age=18,
+    )
+    janine = Person(
+        _id="Jane",
+        name="Janine",
+        age=18,
+    )
+    result = client.diff(jane, janine)
+    public_result = public_diff.diff(jane, janine)
+    # test commit_id and data_version with after obj
+    test_schema.commit(client)
+    jane_id = client.insert_document(jane)[0]
+    data_version = client.get_document(jane_id, get_data_version=True)[-1]
+    current_commit = client._get_current_commit()
+    commit_id_result = client.diff(current_commit, janine, document_id=jane_id)
+    data_version_result = client.diff(data_version, janine, document_id=jane_id)
+    # test commit_id and data_version both before and after
+    client.update_document(janine)
+    new_data_version = client.get_document(jane_id, get_data_version=True)[-1]
+    new_commit = client._get_current_commit()
+    commit_id_result2 = client.diff(current_commit, new_commit, document_id=jane_id)
+    data_version_result2 = client.diff(
+        data_version, new_data_version, document_id=jane_id
+    )
+    # test all diff commit_id and data_version
+    commit_id_result_all = client.diff(current_commit, new_commit)
+    data_version_result_all = client.diff(data_version, new_data_version)
+    assert result.content == result_patch.content
+    assert public_result.content == result_patch.content
+    assert commit_id_result.content == result_patch.content
+    assert commit_id_result2.content == result_patch.content
+    assert data_version_result.content == result_patch.content
+    assert data_version_result2.content == result_patch.content
+    assert commit_id_result_all.content == [result_patch.content]
+    assert data_version_result_all.content == [result_patch.content]
+    assert client.patch(
+        {"@id": "Person/Jane", "@type": "Person", "name": "Jane"}, result_patch
+    ) == {"@id": "Person/Jane", "@type": "Person", "name": "Janine"}
+    assert public_patch.patch(
+        {"@id": "Person/Jane", "@type": "Person", "name": "Jane"}, result_patch
+    ) == {"@id": "Person/Jane", "@type": "Person", "name": "Janine"}
+    assert client.patch(jane, result_patch) == {
+        "@id": "Person/Jane",
+        "@type": "Person",
+        "name": "Janine",
+        "age": 18,
+    }
+    assert public_patch.patch(jane, result_patch) == {
+        "@id": "Person/Jane",
+        "@type": "Person",
+        "name": "Janine",
+        "age": 18,
+    }
+    my_schema = test_schema.copy()
+    my_schema.object.pop("Employee")
+    assert my_schema.to_dict() != test_schema.to_dict()
+    ## Temporary switch off schema diff
+    # result = client.diff(test_schema, my_schema)
+    # assert result.content == {
+    #     "@op": "CopyList",
+    #     "@rest": {
+    #         "@after": [],
+    #         "@before": [
+    #             {
+    #                 "@id": "Employee",
+    #                 "@inherits": ["Person"],
+    #                 "@key": {"@type": "Random"},
+    #                 "@type": "Class",
+    #                 "address_of": "Address",
+    #                 "age": "xsd:integer",
+    #                 "contact_number": {"@class": "xsd:string", "@type": "Optional"},
+    #                 "friend_of": {"@class": "Person", "@type": "Set"},
+    #                 "managed_by": "Employee",
+    #                 "member_of": "Team",
+    #                 "name": "xsd:string",
+    #                 "permisstion": {"@class": "Role", "@type": "Set"},
+    #             }
+    #         ],
+    #         "@op": "SwapList",
+    #         "@rest": {"@op": "KeepList"},
+    #     },
+    #     "@to": 4,
+    # }
+    # assert client.patch(test_schema, result) == my_schema.to_dict()
+
+
+@pytest.mark.skipif(
+    os.environ.get("TERMINUSX_TOKEN") is None, reason="TerminusX token does not exist"
+)
+def test_diff_ops_no_auth(test_schema, terminusx_token):
+    # create client and db
+    client = WOQLClient(
+        "https://cloud-dev.terminusdb.com/TerminusDBTest//", user_agent=test_user_agent
+    )
+    client.connect(use_token=True, team="TerminusDBTest")
+
+    result_patch = Patch(
+        json='{"@id": "Person/Jane", "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'
+    )
+    result = client.diff(
+        {"@id": "Person/Jane", "@type": "Person", "name": "Jane"},
+        {"@id": "Person/Jane", "@type": "Person", "name": "Janine"},
+    )
+    assert result.content == result_patch.content
+
+    Person = test_schema.object.get("Person")
+    jane = Person(
+        _id="Jane",
+        name="Jane",
+        age=18,
+    )
+    janine = Person(
+        _id="Jane",
+        name="Janine",
+        age=18,
+    )
+    result = client.diff(jane, janine)
+    assert result.content == result_patch.content
+    assert client.patch(
+        {"@id": "Person/Jane", "@type": "Person", "name": "Jane"}, result_patch
+    ) == {"@id": "Person/Jane", "@type": "Person", "name": "Janine"}
+    assert client.patch(jane, result_patch) == {
+        "@id": "Person/Jane",
+        "@type": "Person",
+        "name": "Janine",
+        "age": 18,
+    }
+    my_schema = test_schema.copy()
+    my_schema.object.pop("Employee")
+    assert my_schema.to_dict() != test_schema.to_dict()
+    ## Temporary switch off schema diff
+    # result = client.diff(test_schema, my_schema)
+    # assert client.patch(test_schema, result) == my_schema.to_dict()
+
+
 def test_jwt(docker_url_jwt):
     # create client
-    client = Client(docker_url_jwt)
+    url = docker_url_jwt[0]
+    token = docker_url_jwt[1]
+    client = Client(url, user_agent=test_user_agent)
     assert not client._connected
     # test connect
-    client.connect(use_token=True)
+    client.connect(use_token=True, jwt_token=token)
     assert client._connected
     # test create db
     client.create_database("test_happy_path")
@@ -107,9 +282,9 @@ def test_jwt(docker_url_jwt):
 def test_terminusx(terminusx_token):
     testdb = (
         "test_happy_" + str(dt.datetime.now()).replace(" ", "") + "_" + str(random())
-    )
-    endpoint = "https://cloud-dev.dcm.ist/TerminusDBTest/"
-    client = Client(endpoint)
+    ).replace(":", "_").replace(".", "")
+    endpoint = "https://cloud-dev.terminusdb.com/TerminusDBTest/"
+    client = Client(endpoint, user_agent=test_user_agent)
     client.connect(use_token=True, team="TerminusDBTest")
     assert client._connected
     # test create db
@@ -125,9 +300,11 @@ def test_terminusx(terminusx_token):
     os.environ.get("TERMINUSX_TOKEN") is None, reason="TerminusX token does not exist"
 )
 def test_terminusx_crazy_path(terminusx_token):
-    testdb = "test happy_" + str(dt.datetime.now()).replace(" ", "")
-    endpoint = "https://cloud-dev.dcm.ist/TerminusDBTest/"
-    client = Client(endpoint)
+    testdb = (
+        "test_crazy" + str(dt.datetime.now()).replace(" ", "") + "_" + str(random())
+    ).replace(":", "_").replace(".", "")
+    endpoint = "https://cloud-dev.terminusdb.com/TerminusDBTest/"
+    client = Client(endpoint, user_agent=test_user_agent)
     client.connect(use_token=True, team="TerminusDBTest")
     assert client._connected
     # test create db

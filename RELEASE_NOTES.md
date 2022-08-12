@@ -1,5 +1,117 @@
 # TerminusDB Python Client Release Notes
 
+## v10.1.1
+
+### Bug Fixes / Improvements
+
+- Fix conversion of subdocuments in `from_json_schema` of `WOQLSchema`.
+
+---
+
+## v10.1.0
+
+### Changes
+
+- CLI command renamed from `terminusdb` to `tdbpy`
+
+### New
+
+- `user_agent` can be customize when creating the client.
+
+---
+
+## v10.0.34
+
+### New
+
+- Adding option to use commit ID / data version with document id as before (and after) in diff.
+
+---
+
+## v10.0.33
+
+### New
+
+- Adding compression option for insert_documrnt, replace_docmuent and updata_document. Default to be compressing when byte size is larger than 1024 in all of them.
+
+---
+
+## v10.0.32
+
+### Bug Fixes / Improvements
+
+- Fix type checking when getting porperty that is inherited.
+
+---
+
+## v10.0.30 / v10.0.31
+
+### Bug Fixes / Improvements
+
+- Fix working with public diff and patch endpoints.
+
+---
+
+## v10.0.27 / v10.0.28 / v10.0.29
+
+### Bug Fixes / Improvements
+
+- Update dependency versions
+
+---
+
+## v10.0.26
+
+### New
+
+- Diff and Patch in client
+- Tracking data versions for documents and in WOQL query
+
+### Bug Fixes / Improvements
+
+- Fasting connect by pinging the head of the db to check if exist
+- Capture objects with their class id and the order of instance created rathe than python internal id
+
+---
+
+## v10.0.25
+
+### New
+
+- Using API token as default to connect to TerminusX, JWT token still supported but no longer default
+- Doc and Var class in WOQLQuery
+- Adding dot method in WOQLQuery
+- Support id capture and fixing support for all Key types in documents:
+  - Custom keys are only available using RandomKey (default key type)
+  - Custom keys are not avaliable for subdocuments
+  - Getting backend generated id when import object
+  - insert_document and update_document will fill in object ids if object(s) is passed in as a list.
+  - Checking if a capture object is reference but not submit together
+
+### Bug Fixes / Improvements
+
+- Fixing `group_by` in WOQLQuery
+- Adding check in if subdocument is submitted directly
+
+---
+
+## v10.0.24
+
+### New
+
+- Adding `dot`
+
+### Bug Fixes / Improvements
+
+- Fixing `%` in path
+- Adding `dot`
+- Updating `object` operations to `document` operations in query
+- Skip `idgen` for subdocuments
+- Fixing docstrings
+- Fixing `like` in query
+
+---
+
 ## v10.0.23
 
 ### Bug Fixes / Improvements

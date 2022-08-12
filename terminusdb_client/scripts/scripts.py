@@ -17,11 +17,11 @@ from .. import woql_type as wt
 from ..client.Client import Client
 from ..errors import InterfaceError
 from ..woqldataframe.woqlDataframe import result_to_df
-from ..woqlschema.woql_schema import LexicalKey, RandomKey, WOQLSchema
+from ..woqlschema.woql_schema import WOQLSchema
 
 
 @click.group()
-def terminusdb():
+def tdbpy():
     pass
 
 
@@ -45,19 +45,19 @@ def startproject():
             type=str,
         )
 
-        use_token = click.confirm("Are you using JWT login?")
+        use_token = click.confirm("Are you using API token login?")
 
         if use_token:
             # set_token = click.confirm("Do you want to set up the TERMINUSDB_ACCESS_TOKEN?")
 
             if click.confirm("Do you want to set up the TERMINUSDB_ACCESS_TOKEN?"):
                 # set token
-                jwt_token = click.prompt(
-                    "Please enter the JWT token",
+                api_token = click.prompt(
+                    "Please enter the API token",
                     type=str,
                     hide_input=True,
                 )
-                os.environ["TERMINUSDB_ACCESS_TOKEN"] = jwt_token
+                os.environ["TERMINUSDB_ACCESS_TOKEN"] = api_token
 
                 click.echo(
                     "Token added as TERMINUSDB_ACCESS_TOKEN in your enviroment variables."
@@ -233,6 +233,8 @@ def _create_script(obj_list):
                 result_obj = ResultObj(obj["@id"], obj["@inherits"])
             elif obj["@type"] == "Class":
                 result_obj = ResultObj(obj["@id"], "DocumentTemplate")
+            elif obj["@type"] == "TaggedUnion":
+                result_obj = ResultObj(obj["@id"], "TaggedUnion")
             elif obj["@type"] == "Enum":
                 result_obj = ResultObj(obj["@id"], "EnumTemplate")
                 for value in obj["@value"]:
@@ -343,7 +345,7 @@ def commit(message):
     authors = documentation.get("authors")
     if authors:
         authors = documentation["authors"].split(",")
-        authors = list(map(lambda x: x.strip(), authors))
+        authors = [x.strip() for x in authors]
     schema_obj = WOQLSchema(
         title=documentation.get("title"),
         description=documentation.get("description"),
@@ -433,11 +435,11 @@ def importcsv(
         dtype = {id_: "object"}
         id_ = id_.lower().replace(" ", "_")
     if keys:
-        keys = list(map(lambda x: x.lower().replace(" ", "_"), keys))
+        keys = [x.lower().replace(" ", "_") for x in keys]
     if embedded:
         for item in embedded:
             dtype[item] = "object"
-        embedded = list(map(lambda x: x.lower().replace(" ", "_"), embedded))
+        embedded = [x.lower().replace(" ", "_") for x in embedded]
     try:
         pd = import_module("pandas")
         np = import_module("numpy")
@@ -551,12 +553,13 @@ def importcsv(
                             f"id {id} is missing in {item}. Cannot import CSV."
                         )
                 elif keys:
-                    item_id = LexicalKey(list(keys)).idgen(item)
+                    item_id = "_".join(list(keys))
                 elif na == "optional":
-                    item_id = RandomKey().idgen(item)
+                    item_id = None
                 else:
-                    item_id = LexicalKey(list(df.columns)).idgen(item)
-                item["@id"] = item_id
+                    item_id = "_".join(list(df.columns))
+                if item_id:
+                    item["@id"] = item_id
             if message is None:
                 message = f"Documents created with {csv_file} update by Python client."
             client.update_document(
@@ -569,7 +572,6 @@ def importcsv(
         key_type = "Random"
     else:
         key_type = "Lexical"
-    # key_type = "Random" if (na == "optional" and not keys) else "Lexical"
     click.echo(
         f"Records in {csv_file} inserted as type {class_name} into database with {key_type} ids."
     )
@@ -667,16 +669,27 @@ def alldocs(schema, type_, query, head, export, keepid, maxdep, filename=None):
             result = list(client.get_documents_by_type(type_, count=head))
         else:
             schema_dict = client.get_document(type_, graph_type="schema")
+            # check if it got inherited props
+            combined = {}
+            if "@inherits" in schema_dict:
+                parents = schema_dict["@inherits"]
+                if not isinstance(parents, list):
+                    parents = [parents]
+                for parent in parents:
+                    parent_dict = client.get_document(parent, graph_type="schema")
+                    combined.update(parent_dict)
+            combined.update(schema_dict)
+
             query_dict = {"@type": type_}
             for item in query:
                 pair = item.split("=")
-                if schema_dict.get(pair[0]) is None:
+                if combined.get(pair[0]) is None:
                     raise InterfaceError(f"{pair[0]} is not a proerty in {type_}")
-                elif schema_dict.get(pair[0]) == "xsd:integer":
+                elif combined.get(pair[0]) == "xsd:integer":
                     pair[1] = int(pair[1].strip('"'))
-                elif schema_dict.get(pair[0]) == "xsd:decimal":
+                elif combined.get(pair[0]) == "xsd:decimal":
                     pair[1] = float(pair[1].strip('"'))
-                elif schema_dict.get(pair[0]) == "xsd:boolean":
+                elif combined.get(pair[0]) == "xsd:boolean":
                     pair[1] = pair[1].strip('"')
                     if pair[1].lower() == "false":
                         pair[1] = False
@@ -718,7 +731,7 @@ def branch(branch_name, delete):
     client, _ = _connect(settings)
     if delete:
         all_branches = client.get_all_branches()
-        all_branches = list(map(lambda item: item["name"], all_branches))
+        all_branches = [item["name"] for item in all_branches]
         for delete_branch in delete:
             if delete_branch in all_branches:
                 if delete_branch != status["branch"]:
@@ -735,7 +748,7 @@ def branch(branch_name, delete):
     else:
         if branch_name is None:
             all_branches = client.get_all_branches()
-            all_branches = list(map(lambda item: item["name"], all_branches))
+            all_branches = [item["name"] for item in all_branches]
             new_all_branches = []
             for each_branch in all_branches:
                 if each_branch == status["branch"]:
@@ -762,7 +775,7 @@ def checkout(branch_name, new_branch):
     if new_branch:
         client.create_branch(branch_name)
     all_branches = client.get_all_branches()
-    all_branches = list(map(lambda item: item["name"], all_branches))
+    all_branches = [item["name"] for item in all_branches]
     if branch_name not in all_branches:
         raise InterfaceError(f"{branch_name} does not exist.")
     status["branch"] = branch_name
@@ -888,7 +901,7 @@ def config(set_config, delete):
             value = item.split("=")[1]
             if value[0] == "[" and value[-1] == "]":  # it's a list
                 value = value.strip("[]").split(",")
-                value = list(map(lambda x: try_parsing(x.strip()), value))
+                value = [try_parsing(x.strip()) for x in value]
             else:
                 value = try_parsing(value)
             settings.update({key: value})
@@ -899,17 +912,17 @@ def config(set_config, delete):
         click.echo("config.json updated")
 
 
-terminusdb.add_command(startproject)
-terminusdb.add_command(sync)
-terminusdb.add_command(commit)
-terminusdb.add_command(deletedb)
-terminusdb.add_command(importcsv)
-terminusdb.add_command(exportcsv)
-terminusdb.add_command(alldocs)
-terminusdb.add_command(branch)
-terminusdb.add_command(checkout)
-terminusdb.add_command(rebase)
-terminusdb.add_command(status)
-terminusdb.add_command(log)
-terminusdb.add_command(reset)
-terminusdb.add_command(config)
+tdbpy.add_command(startproject)
+tdbpy.add_command(sync)
+tdbpy.add_command(commit)
+tdbpy.add_command(deletedb)
+tdbpy.add_command(importcsv)
+tdbpy.add_command(exportcsv)
+tdbpy.add_command(alldocs)
+tdbpy.add_command(branch)
+tdbpy.add_command(checkout)
+tdbpy.add_command(rebase)
+tdbpy.add_command(status)
+tdbpy.add_command(log)
+tdbpy.add_command(reset)
+tdbpy.add_command(config)

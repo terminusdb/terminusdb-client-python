@@ -455,6 +455,30 @@ class TestWoqlQueries:
         }
         assert woql_object.to_dict() == json_object
 
+    def test_percent_in_path(self):
+        query = WOQLQuery().path(
+            "after_uri",
+            "general_variables,relationship_to_preceding_%28quasi%29polity,known,value",
+            "relationship",
+        )
+        assert query.to_dict() == {
+            "@type": "Path",
+            "subject": {"@type": "NodeValue", "node": "after_uri"},
+            "pattern": {
+                "@type": "PathSequence",
+                "sequence": [
+                    {"@type": "PathPredicate", "predicate": "general_variables"},
+                    {
+                        "@type": "PathPredicate",
+                        "predicate": "relationship_to_preceding_%28quasi%29polity",
+                    },
+                    {"@type": "PathPredicate", "predicate": "known"},
+                    {"@type": "PathPredicate", "predicate": "value"},
+                ],
+            },
+            "object": {"@type": "Value", "node": "relationship"},
+        }
+
 
 class TestTripleBuilder:
     def test_triple_method(self, triple_opt):
@@ -482,10 +506,37 @@ class TestTripleBuilder:
         assert woql_object.to_dict() == WOQL_JSON["isAJson"]
 
     def test_delete_method(self):
-        woql_object = WOQLQuery().delete_object("x")
+        woql_object = WOQLQuery().delete_document("x")
         json_obj = {
-            "@type": "DeleteObject",
-            "document_uri": {"@type": "NodeValue", "node": "x"},
+            "@type": "DeleteDocument",
+            "identifier": {"@type": "NodeValue", "node": "x"},
+        }
+        assert woql_object.to_dict() == json_obj
+
+    def test_update_method(self):
+        woql_object = WOQLQuery().update_document("x", "iri")
+        json_obj = {
+            "@type": "UpdateDocument",
+            "document": {"@type": "Value", "node": "x"},
+            "identifier": {"@type": "NodeValue", "node": "iri"},
+        }
+        assert woql_object.to_dict() == json_obj
+
+    def test_insert_method(self):
+        woql_object = WOQLQuery().insert_document("x", "iri")
+        json_obj = {
+            "@type": "InsertDocument",
+            "document": {"@type": "Value", "node": "x"},
+            "identifier": {"@type": "NodeValue", "node": "iri"},
+        }
+        assert woql_object.to_dict() == json_obj
+
+    def test_read_method(self):
+        woql_object = WOQLQuery().read_document("iri", "output")
+        json_obj = {
+            "@type": "ReadDocument",
+            "document": {"@type": "Value", "node": "output"},
+            "identifier": {"@type": "NodeValue", "node": "iri"},
         }
         assert woql_object.to_dict() == json_obj
 
@@ -519,8 +570,8 @@ class TestTripleBuilderChainer:
     def test_vars(self):
         single_vars = WOQLQuery().vars("a")
         vars1, vars2, vars3 = WOQLQuery().vars("a", "b", "c")
-        assert single_vars == "v:a"
-        assert (vars1, vars2, vars3) == ("v:a", "v:b", "v:c")
+        assert single_vars.name == "a"
+        assert (vars1.name, vars2.name, vars3.name) == ("a", "b", "c")
 
     def test_woql_as_method(self):
         [x, y, z] = WOQLQuery().vars("x", "y", "z")
@@ -625,4 +676,16 @@ class TestTripleBuilderChainer:
                     {"@type": "PathPredicate", "predicate": "evo:qred"},
                 ],
             },
+        }
+
+    def test_dot(self):
+        result = WOQLQuery().dot("document", "field", "value")
+        assert result.to_dict() == {
+            "@type": "Dot",
+            "document": {"@type": "Value", "node": "document"},
+            "field": {
+                "@type": "DataValue",
+                "data": {"@type": "xsd:string", "@value": "field"},
+            },
+            "value": {"@type": "Value", "node": "value"},
         }

@@ -1,6 +1,7 @@
 """Client.py
 Client is the Python public API for TerminusDB"""
 import copy
+import gzip
 import json
 import os
 import urllib.parse as urlparse
@@ -13,8 +14,14 @@ from typing import Any, Dict, List, Optional, Union
 import requests
 
 from ..__version__ import __version__
-from ..errors import InterfaceError
-from ..woql_utils import _finish_response, _result2stream
+from ..errors import DatabaseError, InterfaceError
+from ..woql_utils import (
+    _clean_dict,
+    _dt_dict,
+    _dt_list,
+    _finish_response,
+    _result2stream,
+)
 from ..woqlquery.woql_query import WOQLQuery
 
 # client object
@@ -30,6 +37,17 @@ class JWTAuth(requests.auth.AuthBase):
 
     def __call__(self, r):
         r.headers["Authorization"] = f"Bearer {self._token}"
+        return r
+
+
+class APITokenAuth(requests.auth.AuthBase):
+    """Class for API Token Authentication in requests"""
+
+    def __init__(self, token):
+        self._token = token
+
+    def __call__(self, r):
+        r.headers["API_TOKEN"] = f"{self._token}"
         return r
 
 
@@ -67,13 +85,87 @@ class Client:
         Repo identifier of the database that this client is connected to. Default to "local".
     """
 
-    def __init__(self, server_url: str, **kwargs) -> None:
-        r"""The Client constructor.
+    def __init__(self, json=None):
+        if json:
+            self.from_json(json)
+        else:
+            self.content = None
+
+    @property
+    def update(self):
+        def swap_value(swap_item):
+            result_dict = {}
+            for key, item in swap_item.items():
+                if isinstance(item, dict):
+                    operation = item.get("@op")
+                    if operation is not None and operation == "SwapValue":
+                        result_dict[key] = item.get("@after")
+                    elif operation is None:
+                        result_dict[key] = swap_value(item)
+            return result_dict
+
+        return swap_value(self.content)
+
+    @update.setter
+    def update(self):
+        raise Exception("Cannot set update for patch")
+
+    @update.deleter
+    def update(self):
+        raise Exception("Cannot delete update for patch")
+
+    @property
+    def before(self):
+        def extract_before(extract_item):
+            before_dict = {}
+            for key, item in extract_item.items():
+                if isinstance(item, dict):
+                    value = item.get("@before")
+                    if value is not None:
+                        before_dict[key] = value
+                    else:
+                        before_dict[key] = extract_before(item)
+                else:
+                    before_dict[key] = item
+            return before_dict
+
+        return extract_before(self.content)
+
+    @before.setter
+    def before(self):
+        raise Exception("Cannot set before for patch")
+
+    @before.deleter
+    def before(self):
+        raise Exception("Cannot delete before for patch")
+
+    def from_json(self, json_str):
+        content = json.loads(json_str)
+        if isinstance(content, dict):
+            self.content = _dt_dict(content)
+        else:
+            self.content = _dt_list(content)
+
+    def to_json(self):
+        return json.dumps(_clean_dict(self.content))
+
+    def copy(self):
+        return copy.deepcopy(self)
+
+    def __init__(
+        self,
+        server_url: str,
+        user_agent: str = f"terminusdb-client-python/{__version__}",
+        **kwargs,
+    ) -> None:
+        r"""The WOQLClient constructor.
 
         Parameters
         ----------
         server_url : str
             URL of the server that this client will connect to.
+        user_agent: optional, str
+            User agent header when making requests. Defaults to terminusdb-client-python with the version appended.
         \**kwargs
             Extra configuration options
 
@@ -89,6 +181,9 @@ class Client:
         self._branch = None
         self._ref = None
         self._repo = None
+
+        # Default headers
+        self._default_headers = {"user-agent": user_agent}
 
     @property
     def team(self):
@@ -180,6 +275,7 @@ class Client:
         remote_auth: str = None,
         use_token: bool = False,
         jwt_token: Optional[str] = None,
+        api_token: Optional[str] = None,
         key: str = "root",
         user: str = "admin",
         branch: str = "main",
@@ -204,9 +300,11 @@ class Client:
         user: optional, str
             Name of the user, default to be "admin"
         use_token: bool
-            Use the ENV variable TERMINUSDB_ACCESS_TOKEN or jwt_token to connect with a Bearer JWT token
-        jwt_token: optional, str§
-            The Bearer JWT token to connect. If None (default), it will use ENV variable TERMINUSDB_ACCESS_TOKEN as the JWT token.
+            Use token to connect. If both `jwt_token` and `api_token` is not provided (None), then it will use the ENV variable TERMINUSDB_ACCESS_TOKEN to connect as the API token
+        jwt_token: optional, str
+            The Bearer JWT token to connect. Default to be None.
+        api_token: optional, strs
+            The API token to connect. Default to be None.
         branch: optional, str
             Branch to be connected, default to be "main"
         ref: optional, str
@@ -229,6 +327,7 @@ class Client:
         self.user = user
         self._use_token = use_token
         self._jwt_token = jwt_token
+        self._api_token = api_token
         self.branch = branch
         self.ref = ref
         self.repo = repo
@@ -236,13 +335,11 @@ class Client:
         self._connected = True
 
         try:
-            self._all_available_db = json.loads(
+            self._db_info = json.loads(
                 _finish_response(
                     requests.get(
-                        self.api + "/",
-                        headers={
-                            "user-agent": f"terminusdb-client-python/{__version__}"
-                        },
+                        self.api + "/info",
+                        headers=self._default_headers,
                         auth=self._auth(),
                     )
                 )
@@ -251,11 +348,18 @@ class Client:
             raise InterfaceError(
                 f"Cannot connect to server, please make sure TerminusDB is running at {self.server_url} and the authentication details are correct. Details: {str(error)}"
             ) from None
-
-        all_db_name = list(map(lambda x: x.get("name"), self._all_available_db))
-        if self.db is not None and self.db not in all_db_name:
-            raise InterfaceError(f"Connection fail, {self.db} does not exist.")
-
+        if self.db is not None:
+            try:
+                _finish_response(
+                    requests.head(
+                        self._db_url(),
+                        headers=self._default_headers,
+                        params={"exists": "true"},
+                        auth=self._auth(),
+                    )
+                )
+            except DatabaseError:
+                raise InterfaceError(f"Connection fail, {self.db} does not exist.")
         self._author = self.user
 
     def close(self) -> None:
@@ -377,7 +481,7 @@ class Client:
         target_commit = result.get("bindings")[0].get("cid").get("@value")
         return target_commit
 
-    def get_all_branches(self):
+    def get_all_branches(self, get_data_version=False):
         """Get all the branches available in the database."""
         self._check_connection()
         api_url = self._documents_url().split("/")
@@ -385,10 +489,15 @@ class Client:
         api_url = "/".join(api_url) + "/_commits"
         result = requests.get(
             api_url,
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             params={"type": "Branch"},
             auth=self._auth(),
         )
+
+        if get_data_version:
+            result, version = _finish_response(result, get_data_version)
+            return list(_result2stream(result)), version
+
         return list(_result2stream(_finish_response(result)))
 
     def rollback(self, steps=1) -> None:
@@ -481,8 +590,6 @@ class Client:
         '<team>/<db>/_meta'
         >>> client.resource(ResourceType.COMMITS)
         '<team>/<db>/<repo>/_commits'
-        >>> client.resource(ResourceType.META)
-        '<team>/<db>/<repo>/_meta'
         >>> client.resource(ResourceType.REF, "<reference>")
         '<team>/<db>/<repo>/commit/<reference>'
         >>> client.resource(ResourceType.BRANCH, "<branch>")
@@ -506,11 +613,10 @@ class Client:
         self._check_connection()
         result = requests.get(
             self._db_base("prefixes"),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             auth=self._auth(),
         )
         return json.loads(_finish_response(result))
-        # return self._dispatch_json("get", self._db_base("prefixes")).get("@context")
 
     def create_database(
         self,
@@ -580,7 +686,7 @@ class Client:
         _finish_response(
             requests.post(
                 self._db_url(),
-                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                headers=self._default_headers,
                 json=details,
                 auth=self._auth(),
             )
@@ -632,11 +738,13 @@ class Client:
             )
         else:
             self.team = team
-        payload = {"force": force}
+        payload = {}
+        if force:
+            payload["force"] = "true"
         _finish_response(
             requests.delete(
                 self._db_url(),
-                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                headers=self._default_headers,
                 auth=self._auth(),
                 params=payload,
             )
@@ -672,7 +780,7 @@ class Client:
         self._validate_graph_type(graph_type)
         result = requests.get(
             self._triples_url(graph_type),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             auth=self._auth(),
         )
         return json.loads(_finish_response(result))
@@ -705,7 +813,7 @@ class Client:
         params["turtle"] = turtle
         result = requests.post(
             self._triples_url(graph_type),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             params=params,
             auth=self._auth(),
         )
@@ -741,7 +849,7 @@ class Client:
         params["turtle"] = turtle
         result = requests.put(
             self._triples_url(graph_type),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             params=params,
             auth=self._auth(),
         )
@@ -754,6 +862,7 @@ class Client:
         skip: int = 0,
         count: Optional[int] = None,
         as_list: bool = False,
+        get_data_version: bool = False,
         **kwargs,
     ) -> Union[Iterable, list]:
         """Retrieves all documents that match a given document template
@@ -764,6 +873,10 @@ class Client:
             Template for the document that is being retrived
         graph_type : str, optional
             Graph type, either "instance" or "schema".
+        as_list: bool
+            If the result returned as list rather than an iterator.
+        get_data_version: bool
+            If the data version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.
 
         Raises
         ------
@@ -785,19 +898,35 @@ class Client:
         for the_arg in add_args:
             if the_arg in kwargs:
                 payload[the_arg] = kwargs[the_arg]
-
+        headers = self._default_headers.copy()
+        headers["X-HTTP-Method-Override"] = "GET"
         result = requests.post(
             self._documents_url(),
-            headers={
-                "user-agent": f"terminusdb-client-python/{__version__}",
-                "X-HTTP-Method-Override": "GET",
-            },
+            headers=headers,
             json=payload,
             auth=self._auth(),
         )
-        return _result2stream(_finish_response(result))
+        if get_data_version:
+            result, version = _finish_response(result, get_data_version)
+            return_obj = _result2stream(result)
+            if as_list:
+                return list(return_obj), version
+            else:
+                return return_obj, version
 
-    def get_document(self, iri_id: str, graph_type: str = "instance", **kwargs) -> dict:
+        return_obj = _result2stream(_finish_response(result))
+        if as_list:
+            return list(return_obj)
+        else:
+            return return_obj
+
+    def get_document(
+        self,
+        iri_id: str,
+        graph_type: str = "instance",
+        get_data_version: bool = False,
+        **kwargs,
+    ) -> dict:
         """Retrieves the document of the iri_id
 
         Parameters
@@ -806,6 +935,8 @@ class Client:
             Iri id for the docuemnt that is retriving
         graph_type : str, optional
             Graph type, either "instance" or "schema".
+        get_data_version: bool
+            If the data version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.
         kwargs:
             Additional boolean flags for retriving. Currently avaliable: "prefixed", "minimized", "unfold"
 
@@ -829,10 +960,15 @@ class Client:
 
         result = requests.get(
             self._documents_url(),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             params=payload,
             auth=self._auth(),
         )
+
+        if get_data_version:
+            result, version = _finish_response(result, get_data_version)
+            return json.loads(result), version
+
         return json.loads(_finish_response(result))
 
     def get_documents_by_type(
@@ -842,6 +978,7 @@ class Client:
         skip: int = 0,
         count: Optional[int] = None,
         as_list: bool = False,
+        get_data_version=False,
         **kwargs,
     ) -> Union[Iterable, list]:
         """Retrieves the documents by type
@@ -856,6 +993,10 @@ class Client:
             The starting posiion of the returning results, default to be 0
         count: int or None
             The maximum number of returned result, if None (default) it will return all of the avalible result.
+        as_list: bool
+            If the result returned as list rather than an iterator.
+        get_data_version: bool
+            If the version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.
         kwargs:
             Additional boolean flags for retriving. Currently avaliable: "prefixed", "unfold"
 
@@ -882,10 +1023,19 @@ class Client:
                 payload[the_arg] = kwargs[the_arg]
         result = requests.get(
             self._documents_url(),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             params=payload,
             auth=self._auth(),
         )
+
+        if get_data_version:
+            result, version = _finish_response(result, get_data_version)
+            return_obj = _result2stream(result)
+            if as_list:
+                return list(return_obj), version
+            else:
+                return return_obj, version
+
         return_obj = _result2stream(_finish_response(result))
         if as_list:
             return list(return_obj)
@@ -898,8 +1048,9 @@ class Client:
         skip: int = 0,
         count: Optional[int] = None,
         as_list: bool = False,
+        get_data_version: bool = False,
         **kwargs,
-    ) -> Union[Iterable, list]:
+    ) -> Union[Iterable, list, tuple]:
         """Retrieves all avalibale the documents
 
         Parameters
@@ -910,6 +1061,10 @@ class Client:
             The starting posiion of the returning results, default to be 0
         count: int or None
             The maximum number of returned result, if None (default) it will return all of the avalible result.
+        as_list: bool
+            If the result returned as list rather than an iterator.
+        get_data_version: bool
+            If the version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.
         kwargs:
             Additional boolean flags for retriving. Currently avaliable: "prefixed", "unfold"
 
@@ -936,10 +1091,19 @@ class Client:
                 payload[the_arg] = kwargs[the_arg]
         result = requests.get(
             self._documents_url(),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             params=payload,
             auth=self._auth(),
         )
+
+        if get_data_version:
+            result, version = _finish_response(result, get_data_version)
+            return_obj = _result2stream(result)
+            if as_list:
+                return list(return_obj), version
+            else:
+                return return_obj, version
+
         return_obj = _result2stream(_finish_response(result))
         if as_list:
             return list(return_obj)
@@ -957,16 +1121,62 @@ class Client:
 
     def _conv_to_dict(self, obj):
         if isinstance(obj, dict):
-            return obj
+            return _clean_dict(obj)
         elif hasattr(obj, "to_dict"):
             return obj.to_dict()
         elif hasattr(obj, "_to_dict"):
             if hasattr(obj, "_isinstance") and obj._isinstance:
+                if hasattr(obj.__class__, "_subdocument"):
+                    raise ValueError("Subdocument cannot be added directly")
                 return obj._obj_to_dict()
             else:
                 return obj._to_dict()
         else:
             raise ValueError("Object cannot convert to dictionary")
+
+    def _ref_extract(self, target_key, search_item):
+        if hasattr(search_item, "items"):
+            for key, value in search_item.items():
+                if key == target_key:
+                    yield value
+                if isinstance(value, dict):
+                    yield from self._ref_extract(target_key, value)
+                elif isinstance(value, list):
+                    for item in value:
+                        yield from self._ref_extract(target_key, item)
+
+    def _convert_dcoument(self, document, graph_type):
+        if isinstance(document, list):
+            new_doc = []
+            captured = []
+            referenced = []
+
+            for item in document:
+                item_dict = self._conv_to_dict(item)
+                new_doc.append(item_dict)
+                item_capture = item_dict.get("@capture")
+                if item_capture:
+                    captured.append(item_capture)
+                referenced += list(self._ref_extract("@ref", item_dict))
+
+            referenced = list(set(referenced))
+
+            for item in referenced:
+                if item not in captured:
+                    raise ValueError(
+                        f"{item} is referenced but not captured. Seems you forgot to submit one or more object(s)."
+                    )
+        else:
+            if hasattr(document, "to_dict") and graph_type != "schema":
+                raise InterfaceError(
+                    "Inserting WOQLSchema object into non-schema graph."
+                )
+            new_doc = self._conv_to_dict(document)
+            if isinstance(new_doc, dict) and list(self._ref_extract("@ref", new_doc)):
+                raise ValueError(
+                    "There are uncaptured references. Seems you forgot to submit one or more object(s)."
+                )
+        return new_doc
 
     def insert_document(
         self,
@@ -980,6 +1190,9 @@ class Client:
         graph_type: str = "instance",
         full_replace: bool = False,
         commit_msg: Optional[str] = None,
+        last_data_version: Optional[str] = None,
+        compress: Union[str, int] = 1024,
+        raw_json: bool = False
     ) -> None:
         """Inserts the specified document(s)
 
@@ -993,6 +1206,12 @@ class Client:
             If True then the whole graph will be replaced. WARNING: you should also supply the context object as the first element in the list of documents  if using this option.
         commit_msg : str
             Commit message.
+        last_data_version : str
+            Last version before the update, used to check if the document has been changed unknowingly
+        compress : str or int
+            If it is an integer, size of the data larger than this (in bytes) will be compress with gzip in the request (assume encoding as UTF-8, 0 = always compress). If it is `never` it will never compress the data.
+        raw_json : bool
+            Update as raw json
 
         Raises
         ------
@@ -1012,44 +1231,57 @@ class Client:
             params["full_replace"] = "true"
         else:
             params["full_replace"] = "false"
+        params["raw_json"] = "true" if raw_json else "false"
 
-        if isinstance(document, list):
-            new_doc = []
-            for item in document:
-                item_dict = self._conv_to_dict(item)
-                new_doc.append(item_dict)
-            document = new_doc
-        else:
-            if hasattr(document, "to_dict") and graph_type != "schema":
-                raise InterfaceError(
-                    "Inserting WOQLSchema object into non-schema graph."
-                )
-            document = self._conv_to_dict(document)
+        headers = self._default_headers.copy()
+        if last_data_version is not None:
+            headers["TerminusDB-Data-Version"] = last_data_version
 
-        if len(document) == 0:
+        new_doc = self._convert_dcoument(document, graph_type)
+
+        if len(new_doc) == 0:
             return
-        elif not isinstance(document, list):
-            document = [document]
+        elif not isinstance(new_doc, list):
+            new_doc = [new_doc]
 
         if full_replace:
-            if document[0].get("@type") != "@context":
+            if new_doc[0].get("@type") != "@context":
                 raise ValueError(
                     "The first item in docuemnt need to be dictionary representing the context object."
                 )
         else:
-            if document[0].get("@type") == "@context":
+            if new_doc[0].get("@type") == "@context":
                 warnings.warn(
                     "To replace context, need to use `full_replace` or `replace_document`, skipping context object now."
                 )
-                document.pop(0)
-        result = requests.post(
-            self._documents_url(),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
-            params=params,
-            json=document,
-            auth=self._auth(),
-        )
-        return json.loads(_finish_response(result))
+                new_doc.pop(0)
+
+        json_string = json.dumps(new_doc).encode("utf-8")
+        if compress != "never" and len(json_string) > compress:
+            headers.update(
+                {"Content-Encoding": "gzip", "Content-Type": "application/json"}
+            )
+            result = requests.post(
+                self._documents_url(),
+                headers=headers,
+                params=params,
+                data=gzip.compress(json_string),
+                auth=self._auth(),
+            )
+        else:
+            result = requests.post(
+                self._documents_url(),
+                headers=headers,
+                params=params,
+                json=new_doc,
+                auth=self._auth(),
+            )
+        result = json.loads(_finish_response(result))
+        if isinstance(document, list):
+            for idx, item in enumerate(document):
+                if hasattr(item, "_obj_to_dict") and not hasattr(item, "_backend_id"):
+                    item._backend_id = result[idx][len("terminusdb:///data/") :]
+        return result
 
     def replace_document(
         self,
@@ -1062,7 +1294,10 @@ class Client:
         ],
         graph_type: str = "instance",
         commit_msg: Optional[str] = None,
+        last_data_version: Optional[str] = None,
+        compress: Union[str, int] = 1024,
         create: bool = False,
+        raw_json: bool = False,
     ) -> None:
         """Updates the specified document(s)
 
@@ -1074,8 +1309,14 @@ class Client:
             Graph type, either "instance" or "schema".
         commit_msg : str
             Commit message.
+        last_data_version : str
+            Last version before the update, used to check if the document has been changed unknowingly
+        compress : str or int
+            If it is an integer, size of the data larger than this (in bytes) will be compress with gzip in the request (assume encoding as UTF-8, 0 = always compress). If it is `never` it will never compress the data.
         create : bool
             Create the document if it does not yet exist.
+        raw_json : bool
+            Update as raw json
 
         Raises
         ------
@@ -1087,30 +1328,40 @@ class Client:
         params = self._generate_commit(commit_msg)
         params["graph_type"] = graph_type
         params["create"] = "true" if create else "false"
-        if isinstance(document, list):
-            new_doc = []
-            for item in document:
-                # while document:
-                #     item = document.pop()
-                item_dict = self._conv_to_dict(item)
-                new_doc.append(item_dict)
-                # id_list.append(item_dict['@id'])
-            document = new_doc
-        else:
-            if hasattr(document, "to_dict") and graph_type != "schema":
-                raise InterfaceError(
-                    "Inserting WOQLSchema object into non-schema graph."
-                )
-            document = self._conv_to_dict(document)
-        _finish_response(
-            requests.put(
+        params["raw_json"] = "true" if raw_json else "false"
+
+        headers = self._default_headers.copy()
+        if last_data_version is not None:
+            headers["TerminusDB-Data-Version"] = last_data_version
+
+        new_doc = self._convert_dcoument(document, graph_type)
+
+        json_string = json.dumps(new_doc).encode("utf-8")
+        if compress != "never" and len(json_string) > compress:
+            headers.update(
+                {"Content-Encoding": "gzip", "Content-Type": "application/json"}
+            )
+            result = requests.put(
                 self._documents_url(),
-                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                headers=headers,
                 params=params,
-                json=document,
+                data=gzip.compress(json_string),
                 auth=self._auth(),
             )
-        )
+        else:
+            result = requests.put(
+                self._documents_url(),
+                headers=headers,
+                params=params,
+                json=new_doc,
+                auth=self._auth(),
+            )
+        result = json.loads(_finish_response(result))
+        if isinstance(document, list):
+            for idx, item in enumerate(document):
+                if hasattr(item, "_obj_to_dict") and not hasattr(item, "_backend_id"):
+                    item._backend_id = result[idx][len("terminusdb:///data/") :]
+        return result
 
     def update_document(
         self,
@@ -1123,14 +1374,39 @@ class Client:
         ],
         graph_type: str = "instance",
         commit_msg: Optional[str] = None,
+        last_data_version: Optional[str] = None,
+        compress: Union[str, int] = 1024,
     ) -> None:
-        self.replace_document(document, graph_type, commit_msg, True)
+        """Updates the specified document(s). Add the document if not existed.
+
+        Parameters
+        ----------
+        document: dict or list of dict
+            Document(s) to be updated.
+        graph_type : str
+            Graph type, either "instance" or "schema".
+        commit_msg : str
+            Commit message.
+        last_data_version : str
+            Last version before the update, used to check if the document has been changed unknowingly
+        compress : str or int
+            If it is an integer, size of the data larger than this (in bytes) will be compress with gzip in the request (assume encoding as UTF-8, 0 = always compress). If it is `never` it will never compress the data.
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
+        """
+        self.replace_document(
+            document, graph_type, commit_msg, last_data_version, compress, True
+        )
 
     def delete_document(
         self,
         document: Union[str, list, dict, Iterable],
         graph_type: str = "instance",
         commit_msg: Optional[str] = None,
+        last_data_version: Optional[str] = None,
     ) -> None:
         """Delete the specified document(s)
 
@@ -1142,6 +1418,8 @@ class Client:
             Graph type, either "instance" or "schema".
         commit_msg : str
             Commit message.
+        last_data_version : str
+            Last version before the update, used to check if the document has been changed unknowingly
 
         Raises
         ------
@@ -1166,10 +1444,15 @@ class Client:
                 doc_id.append(doc)
         params = self._generate_commit(commit_msg)
         params["graph_type"] = graph_type
+
+        headers = self._default_headers.copy()
+        if last_data_version is not None:
+            headers["TerminusDB-Data-Version"] = last_data_version
+
         _finish_response(
             requests.delete(
                 self._documents_url(),
-                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                headers=headers,
                 params=params,
                 json=doc_id,
                 auth=self._auth(),
@@ -1194,7 +1477,7 @@ class Client:
         self._validate_graph_type(graph_type)
         self._check_connection()
         all_existing_obj = self.get_all_documents(graph_type=graph_type)
-        all_existing_id = list(map(lambda x: x.get("@id"), all_existing_obj))
+        all_existing_id = [x.get("@id") for x in all_existing_obj]
         return doc_id in all_existing_id
 
     def get_class_frame(self, class_name):
@@ -1214,7 +1497,7 @@ class Client:
         opts = {"type": class_name}
         result = requests.get(
             self._class_frame_url(),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             params=opts,
             auth=self._auth(),
         )
@@ -1227,6 +1510,8 @@ class Client:
         self,
         woql_query: Union[dict, WOQLQuery],
         commit_msg: Optional[str] = None,
+        get_data_version: bool = False,
+        last_data_version: Optional[str] = None,
         # file_dict: Optional[dict] = None,
     ) -> Union[dict, str]:
         """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
@@ -1237,6 +1522,10 @@ class Client:
             A woql query as an object or dict
         commit_mg : str
             A message that will be written to the commit log to describe the change
+        get_data_version: bool
+            If the data version of the query result(s) should be obtained. If True, the method return the result and the version as a tuple.
+        last_data_version : str
+            Last version before the update, used to check if the document has been changed unknowingly
         file_dict: **deprecated**
             File dictionary to be associated with post name => filename, for multipart POST
 
@@ -1261,17 +1550,28 @@ class Client:
             request_woql_query = woql_query
         query_obj["query"] = request_woql_query
 
+        headers = self._default_headers.copy()
+        if last_data_version is not None:
+            headers["TerminusDB-Data-Version"] = last_data_version
+
         result = requests.post(
             self._query_url(),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=headers,
             json=query_obj,
             auth=self._auth(),
         )
-        fin_reqult = json.loads(_finish_response(result))
+        if get_data_version:
+            result, version = _finish_response(result, get_data_version)
+            result = json.loads(result)
+        else:
+            result = json.loads(_finish_response(result))
 
-        if fin_reqult.get("inserts") or fin_reqult.get("deletes"):
+        if result.get("inserts") or result.get("deletes"):
             return "Commit successfully made."
-        return fin_reqult
+        elif get_data_version:
+            return result, version
+        else:
+            return result
 
     def create_branch(self, new_branch_id: str, empty: bool = False) -> None:
         """Create a branch starting from the current branch.
@@ -1301,7 +1601,7 @@ class Client:
         _finish_response(
             requests.post(
                 self._branch_url(new_branch_id),
-                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                headers=self._default_headers,
                 json=source,
                 auth=self._auth(),
             )
@@ -1325,7 +1625,7 @@ class Client:
         _finish_response(
             requests.delete(
                 self._branch_url(branch_id),
-                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                headers=self._default_headers,
                 auth=self._auth(),
             )
         )
@@ -1382,7 +1682,7 @@ class Client:
 
         result = requests.post(
             self._pull_url(),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             json=rc_args,
             auth=self._auth(),
         )
@@ -1405,7 +1705,7 @@ class Client:
 
         result = requests.post(
             self._fetch_url(remote_id),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             auth=self._auth(),
         )
 
@@ -1462,7 +1762,7 @@ class Client:
 
         result = requests.post(
             self._push_url(),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             json=rc_args,
             auth=self._auth(),
         )
@@ -1529,7 +1829,7 @@ class Client:
 
         result = requests.post(
             self._rebase_url(),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             json=rc_args,
             auth=self._auth(),
         )
@@ -1587,7 +1887,7 @@ class Client:
         _finish_response(
             requests.post(
                 self._reset_url(),
-                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                headers=self._default_headers,
                 json={"commit_descriptor": commit_path},
                 auth=self._auth(),
             )
@@ -1613,14 +1913,16 @@ class Client:
         Examples
         --------
         >>> client = Client("https://127.0.0.1:6363/")
-        >>> client.optimize('admin/database/_meta')
+        >>> client.optimize('admin/database') # optimise database branch (here main)
+        >>> client.optimize('admin/database/_meta') # optimise the repository graph (actually creates a squashed flat layer)
+        >>> client.optimize('admin/database/local/_commits') # commit graph is optimised
         """
         self._check_connection()
 
         _finish_response(
             requests.post(
                 self._optimize_url(path),
-                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                headers=self._default_headers,
                 auth=self._auth(),
             )
         )
@@ -1666,7 +1968,7 @@ class Client:
 
         result = requests.post(
             self._squash_url(),
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             json={"commit_info": self._generate_commit(message, author)},
             auth=self._auth(),
         )
@@ -1681,6 +1983,142 @@ class Client:
         if reset:
             self.reset(commit_id)
         return commit_id
+
+    def _convert_diff_dcoument(self, document):
+        if isinstance(document, list):
+            new_doc = []
+            for item in document:
+                item_dict = self._conv_to_dict(item)
+                new_doc.append(item_dict)
+        else:
+            new_doc = self._conv_to_dict(document)
+        return new_doc
+
+    def diff(
+        self,
+        before: Union[
+            str,
+            dict,
+            List[dict],
+            "WOQLSchema",  # noqa:F821
+            "DocumentTemplate",  # noqa:F821
+            List["DocumentTemplate"],  # noqa:F821
+        ],
+        after: Union[
+            str,
+            dict,
+            List[dict],
+            "WOQLSchema",  # noqa:F821
+            "DocumentTemplate",  # noqa:F821
+            List["DocumentTemplate"],  # noqa:F821
+        ],
+        document_id: Union[str, None] = None,
+    ):
+        """Perform diff on 2 set of document(s), result in a Patch object.
+
+        Do not connect when using public API.
+
+        Returns
+        -------
+        obj
+            Patch object
+
+        Examples
+        --------
+        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client.connect(user="admin", key="root", team="admin", db="some_db")
+        >>> result = client.diff({ "@id" : "Person/Jane", "@type" : "Person", "name" : "Jane"}, { "@id" : "Person/Jane", "@type" : "Person", "name" : "Janine"})
+        >>> result.to_json = '{ "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'"""
+
+        request_dict = {}
+        for key, item in {"before": before, "after": after}.items():
+            if isinstance(item, str):
+                request_dict[f"{key}_data_version"] = item
+            else:
+                request_dict[key] = self._convert_diff_dcoument(item)
+        if document_id is not None:
+            if "before_data_version" in request_dict:
+                if document_id[: len("terminusdb:///data")] == "terminusdb:///data":
+                    request_dict["document_id"] = document_id
+                else:
+                    raise ValueError(
+                        f"Valid document id starts with `terminusdb:///data`, but got {document_id}"
+                    )
+            else:
+                raise ValueError(
+                    "`document_id` can only be used in conjusction with a data version or commit ID as `before`, not a document object"
+                )
+        if self._connected:
+            result = _finish_response(
+                requests.post(
+                    self._diff_url(),
+                    headers=self._default_headers,
+                    json=request_dict,
+                    auth=self._auth(),
+                )
+            )
+        else:
+            result = _finish_response(
+                requests.post(
+                    self.server_url,
+                    headers=self._default_headers,
+                    json=request_dict,
+                )
+            )
+        return Patch(json=result)
+
+    def patch(
+        self,
+        before: Union[
+            dict,
+            List[dict],
+            "WOQLSchema",  # noqa:F821
+            "DocumentTemplate",  # noqa:F821
+            List["DocumentTemplate"],  # noqa:F821
+        ],
+        patch: Patch,
+    ):
+        """Apply the patch object to the before object and return an after object. Note that this change does not commit changes to the graph.
+
+        Do not connect when using public API.
+
+        Returns
+        -------
+        dict
+            After object
+
+        Examples
+        --------
+        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client.connect(user="admin", key="root", team="admin", db="some_db")
+        >>> patch_obj = Patch(json='{"name" : { "@op" : "ValueSwap", "@before" : "Jane", "@after": "Janine" }}')
+        >>> result = client.patch({ "@id" : "Person/Jane", "@type" : Person", "name" : "Jane"}, patch_obj)
+        >>> print(result)
+        '{ "@id" : "Person/Jane", "@type" : Person", "name" : "Janine"}'"""
+
+        request_dict = {
+            "before": self._convert_diff_dcoument(before),
+            "patch": patch.content,
+        }
+
+        if self._connected:
+            result = _finish_response(
+                requests.post(
+                    self._patch_url(),
+                    headers=self._default_headers,
+                    json=request_dict,
+                    auth=self._auth(),
+                )
+            )
+        else:
+            result = _finish_response(
+                requests.post(
+                    self.server_url,
+                    headers=self._default_headers,
+                    json=request_dict,
+                )
+            )
+        return json.loads(result)
 
     def clonedb(
         self, clone_source: str, newid: str, description: Optional[str] = None
@@ -1714,7 +2152,7 @@ class Client:
         _finish_response(
             requests.post(
                 self._clone_url(newid),
-                headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+                headers=self._default_headers,
                 json=rc_args,
                 auth=self._auth(),
             )
@@ -1757,8 +2195,10 @@ class Client:
             return (self.user, self._key)
         elif self._connected and self._jwt_token is not None:
             return JWTAuth(self._jwt_token)
+        elif self._connected and self._api_token is not None:
+            return APITokenAuth(self._api_token)
         elif self._connected:
-            return JWTAuth(os.environ["TERMINUSDB_ACCESS_TOKEN"])
+            return APITokenAuth(os.environ["TERMINUSDB_ACCESS_TOKEN"])
         else:
             raise RuntimeError("Client not connected.")
         # TODO: remote_auth
@@ -1803,7 +2243,7 @@ class Client:
 
         result = requests.get(
             self.api + "/",
-            headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+            headers=self._default_headers,
             auth=self._auth(),
         )
         return json.loads(_finish_response(result))
@@ -1907,6 +2347,12 @@ class Client:
 
     def _squash_url(self):
         return self._branch_base("squash")
+
+    def _diff_url(self):
+        return self._branch_base("diff")
+
+    def _patch_url(self):
+        return self._branch_base("patch")
 
     def _push_url(self):
         return self._branch_base("push")

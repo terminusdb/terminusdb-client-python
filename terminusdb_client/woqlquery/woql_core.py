@@ -114,7 +114,7 @@ def _phrase_parser(tokens):
 
 def _path_tokenize(pat):
     """Tokenizes the pattern into a sequence of tokens which may be clauses or operators"""
-    lexer = r"[@:_\w']+|[\.\|\+\*\{\}\,\(\)<>]"
+    lexer = r"[@:_\w'%]+|[\.\|\+\*\{\}\,\(\)<>]"
     return re.findall(lexer, pat)
 
 

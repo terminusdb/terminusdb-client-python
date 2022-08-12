@@ -7,8 +7,12 @@ from random import random
 import pytest
 from click.testing import CliRunner
 
+from terminusdb_client.woqlclient.woqlClient import WOQLClient
+
 from ...errors import InterfaceError
 from ...scripts import scripts
+
+test_user_agent = "terminusdb-client-python-tests"
 
 
 def _check_csv(csv_file, output):
@@ -140,6 +144,37 @@ def test_local_happy_path(docker_url, test_csv):
         result = runner.invoke(scripts.log)
         assert "My message" not in result.output
         assert "Schema updated by Python client." in result.output
+        # test inherits
+        client = WOQLClient(docker_url, user_agent=test_user_agent)
+        client.connect(db=testdb)
+        schema_objects = [
+            {
+                "@type": "Class",
+                "@id": "ThingWithId",
+                "@abstract": [],
+                "id": "xsd:string",
+                "@key": {"@type": "Lexical", "@fields": ["id"]},
+            },
+            {
+                "@type": "Class",
+                "@id": "Study",
+                "@inherits": "ThingWithId",
+                "title": {"@type": "Optional", "@class": "xsd:string"},
+                "@key": {"@type": "Lexical", "@fields": ["id"]},
+            },
+        ]
+        client.insert_document(schema_objects, graph_type="schema")
+        client.insert_document({"@type": "Study", "id": "foo", "title": "My Study"})
+        result = runner.invoke(
+            scripts.alldocs,
+            [
+                "--type",
+                "Study",
+                "-q",
+                "id=foo",
+            ],
+        )
+        assert result.exit_code == 0
         # deletedb
         result = runner.invoke(scripts.deletedb, input="y\n")
         assert result.exit_code == 0
@@ -155,7 +190,7 @@ def test_local_happy_path(docker_url, test_csv):
 )
 def test_script_happy_path(terminusx_token):
     testdb = "test_" + str(dt.datetime.now()).replace(" ", "") + "_" + str(random())
-    endpoint = "https://cloud-dev.dcm.ist/TerminusDBTest/"
+    endpoint = "https://cloud-dev.terminusdb.com/TerminusDBTest/"
     runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(
@@ -167,7 +202,8 @@ def test_script_happy_path(terminusx_token):
             setting = json.load(file)
             assert setting.get("database") == testdb
             assert (
-                setting.get("endpoint") == "https://cloud-dev.dcm.ist/TerminusDBTest/"
+                setting.get("endpoint")
+                == "https://cloud-dev.terminusdb.com/TerminusDBTest/"
             )
             assert setting.get("use JWT token")
             assert setting.get("team") == "TerminusDBTest"

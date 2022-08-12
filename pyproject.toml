@@ -1,0 +1,38 @@
+[tool.poetry]
+name = "terminusdb-client"
+version = "10.1.1"
+description = "Python client for Terminus DB"
+authors = ["TerminusDB group"]
+license = "Apache Software License"
+
+[tool.poetry.dependencies]
+python = ">=3.7.1,<4.0"
+requests = "*"
+numpydoc = "*"
+shed = "*"
+typeguard = "*"
+tqdm = "*"
+click = ">=8.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "*"
+pytest-mock = "*"
+flake8 = "*"
+pytest-cov = "*"
+bumpversion = "*"
+sphinx = "*"
+sphinx_rtd_theme = "*"
+sphinxcontrib-napoleon = "*"
+sphinx_autodoc_typehints = "*"
+sphinx_click = "*"
+pandas = "~1.3.0"
+tox = "*"
+interrogate = "*"
+docker-compose = "*"
+pre-commit = "*"
+shed = "~0.9.0"
+PyYAML = "<6.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

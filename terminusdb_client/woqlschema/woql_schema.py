@@ -1,12 +1,10 @@
 import json
+import urllib.parse as urlparse
 import weakref
 from copy import copy, deepcopy
 from enum import Enum, EnumMeta, _EnumDict
-from hashlib import sha256
 from io import StringIO, TextIOWrapper
 from typing import List, Optional, Set, Union
-from urllib.parse import quote
-from uuid import uuid4
 
 from numpydoc.docscrape import ClassDoc
 from typeguard import check_type
@@ -26,42 +24,11 @@ class TerminusKey:
             else:
                 ValueError(f"keys need to be either str or list but got {keys}")
 
-    def _idgen_prep(self, obj: Union["DocumentTemplate", dict]):
-        """Helper function to prepare prefix and key_list for idgen to use."""
-        key_list = []
-        if hasattr(self, "_keys"):
-            for item in self._keys:
-                if hasattr(obj, item):
-                    key_item = eval(f"obj.{item}")  # noqa: S307
-                elif isinstance(obj, dict) and obj.get(item) is not None:
-                    key_item = obj.get(item)
-                else:
-                    raise ValueError(f"Cannot get {item} from {obj}")
-
-                if isinstance(key_item, tuple(CONVERT_TYPE.keys())):
-                    key_list.append(str(key_item))
-                else:
-                    raise ValueError("Keys need to be datatype object")
-
-        if isinstance(obj, dict) and obj.get("@type") is not None:
-            prefix = obj.get("@type") + "/"
-        elif hasattr(obj.__class__, "_base"):
-            prefix = obj.__class__._base + "/"
-        elif hasattr(obj.__class__, "__name__"):
-            prefix = obj.__class__.__name__ + "/"
-        else:
-            raise ValueError(f"Cannot determine prefix from {obj}")
-        return prefix, key_list
-
 
 class HashKey(TerminusKey):
     """Generating ID with SHA256 using provided keys"""
 
     at_type = "Hash"
-
-    def idgen(self, obj: Union["DocumentTemplate", dict]):
-        prefix, key_list = self._idgen_prep(obj)
-        return prefix + sha256((quote("_".join(key_list))).encode("utf-8")).hexdigest()
 
 
 class LexicalKey(TerminusKey):
@@ -69,20 +36,11 @@ class LexicalKey(TerminusKey):
 
     at_type = "Lexical"
 
-    def idgen(self, obj: Union["DocumentTemplate", dict]):
-        prefix, key_list = self._idgen_prep(obj)
-        return prefix + quote("_".join(key_list))
-
 
 class ValueHashKey(TerminusKey):
     """Generating ID with SHA256"""
 
     at_type = "ValueHash"
-
-    def __init__(self):
-        raise RuntimeError("ValueHashKey is not avaliable yet.")
-
-    # TODO: idgen
 
 
 class RandomKey(TerminusKey):
@@ -90,18 +48,26 @@ class RandomKey(TerminusKey):
 
     at_type = "Random"
 
-    def idgen(self, obj: Union["DocumentTemplate", dict]):
-        prefix, _ = self._idgen_prep(obj)
-        return prefix + uuid4().hex
-
 
 def _check_cycling(class_obj: "TerminusClass"):
     """Helper function to check if the embedded subdocument is cycling"""
     if hasattr(class_obj, "_subdocument"):
-        mro_names = list(map(lambda obj: obj.__name__, class_obj.__mro__))
+        mro_names = [obj.__name__ for obj in class_obj.__mro__]
         for prop_type in class_obj._annotations.values():
             if str(prop_type) in mro_names:
                 raise RecursionError(f"Embbding {prop_type} cause recursions.")
+
+
+def _check_mismatch_type(prop, prop_value, prop_type):
+    if hasattr(prop_type, "_to_dict"):
+        prop_value_id = prop_value.__class__._to_dict().get("@id")
+        prop_type_id = prop_type._to_dict().get("@id")
+        if prop_value_id != prop_type_id:
+            raise ValueError(
+                f"Property {prop} should be of type {prop_type_id} but got value of type {prop_value_id}"
+            )
+    else:
+        check_type(prop, prop_value, prop_type)
 
 
 def _check_missing_prop(doc_obj: "DocumentTemplate"):
@@ -118,12 +84,20 @@ def _check_missing_prop(doc_obj: "DocumentTemplate"):
                     raise ValueError(f"{doc_obj} missing property: {prop}")
                 else:
                     prop_value = eval(f"doc_obj.{prop}")  # noqa: S307
-                    check_type(prop, prop_value, prop_type)
+                    _check_mismatch_type(prop, prop_value, prop_type)
                     # raise TypeError(f"Property of {doc_obj} missing should be type {prop_type} but got {prop_value} which is {type(prop_value)}")
+
+
+def _check_and_fix_custom_id(class_name, custom_id):
+    if custom_id[: len(class_name) + 1] != (class_name + "/"):
+        custom_id = class_name + "/" + custom_id
+    return urlparse.quote(custom_id)
 
 
 class TerminusClass(type):
     def __init__(cls, name, bases, nmspc):
+
+        cls._capture_order = 0
 
         if "__annotations__" in nmspc:
             cls._annotations = copy(nmspc["__annotations__"])
@@ -143,6 +117,16 @@ class TerminusClass(type):
             else:
                 abstract = True
 
+        if "_subdocument" in nmspc:
+            allow_custom_id = False
+        elif "_key" in nmspc:
+            if nmspc.get("_key").__class__ == RandomKey:
+                allow_custom_id = True
+            else:
+                allow_custom_id = False
+        else:
+            allow_custom_id = True
+
         # _abstract should not be inherited
         cls._abstract = nmspc.get("_abstract")
         cls._instances = set()
@@ -156,15 +140,24 @@ class TerminusClass(type):
                 else:
                     value = None
                 setattr(obj, key, value)
-            if kwargs.get("_id"):
-                obj._id = kwargs.get("_id")
-            elif hasattr(obj, "_subdocument"):
-                pass
-            elif hasattr(obj, "_key") and hasattr(obj._key, "idgen"):
-                obj._id = obj._key.idgen(obj)
+            if allow_custom_id:
+                if kwargs.get("_id"):
+                    obj._custom_id = kwargs.get("_id")
+                else:
+                    obj._custom_id = None
+            else:
+                if kwargs.get("_id"):
+                    raise ValueError(
+                        f"Customized id is not allowed. {str(obj.__class__)} is a subdocument or has set id key scheme."
+                    )
+            if kwargs.get("_backend_id"):
+                obj._backend_id = kwargs.get("_backend_id")
             obj._isinstance = True
             obj._annotations = cls._annotations
             obj._instances.add(weakref.ref(obj))
+
+            obj._capture = f"{name}{id(cls)}/{cls._capture_order}"
+            cls._capture_order += 1
 
         cls.__init__ = init
 
@@ -197,9 +190,16 @@ class DocumentTemplate(metaclass=TerminusClass):
     def __setattr__(self, name, value):
         if name[0] != "_" and value is not None:
             correct_type = self._annotations.get(name)
-            check_type(str(value), value, correct_type)
-            # if not correct_type or not check_type(str(value), value, correct_type):
-            #     raise AttributeError(f"{value} is not type {correct_type}")
+            _check_mismatch_type(name, value, correct_type)
+        if (
+            self._id
+            and hasattr(self, "_key")
+            and hasattr(self._key, "_keys")
+            and name in self._key._keys
+        ):
+            raise ValueError(
+                f"{name} has been used to generated id hance cannot be changed."
+            )
         super().__setattr__(name, value)
 
     @classmethod
@@ -207,12 +207,12 @@ class DocumentTemplate(metaclass=TerminusClass):
         if not skip_checking:
             _check_cycling(cls)
         result = {"@type": "Class", "@id": cls.__name__}
-        if cls.__base__.__name__ != "DocumentTemplate":
-            # result["@inherits"] = cls.__base__.__name__
-            parents = list(map(lambda x: x.__name__, cls.__mro__))
-            result["@inherits"] = parents[1 : parents.index("DocumentTemplate")]
-        elif cls.__base__.__name__ == "TaggedUnion":
+        if cls.__base__.__name__ == "TaggedUnion":
             result["@type"] = "TaggedUnion"
+        elif cls.__base__.__name__ not in ["DocumentTemplate", "TaggedUnion"]:
+            # result["@inherits"] = cls.__base__.__name__
+            parents = [x.__name__ for x in cls.__mro__]
+            result["@inherits"] = parents[1 : parents.index("DocumentTemplate")]
 
         if cls.__doc__:
             doc_obj = ClassDoc(cls)
@@ -232,33 +232,54 @@ class DocumentTemplate(metaclass=TerminusClass):
             result["@key"] = {"@type": "Random"}
         if hasattr(cls, "_abstract") and cls._abstract is not None:
             result["@abstract"] = cls._abstract
-        # TODO: now get around for self/future reference by not putting any @key for schema and generate id in the client
-        # if hasattr(cls, "_key") and not hasattr(cls, "_subdocument"):
-        #     if hasattr(cls._key, "_keys"):
-        #         result["@key"] = {
-        #             "@type": cls._key.__class__.at_type,
-        #             "@fields": cls._key._keys,
-        #         }
-        #     else:
-        #         result["@key"] = {"@type": cls._key.__class__.at_type}
+        if hasattr(cls, "_key") and not hasattr(cls, "_subdocument"):
+            if hasattr(cls._key, "_keys"):
+                result["@key"] = {
+                    "@type": cls._key.__class__.at_type,
+                    "@fields": cls._key._keys,
+                }
+            else:
+                result["@key"] = {"@type": cls._key.__class__.at_type}
         if hasattr(cls, "_annotations"):
             for attr, attr_type in cls._annotations.items():
                 result[attr] = wt.to_woql_type(attr_type)
         return result
 
+    @property
+    def _id(self):
+        if hasattr(self, "_backend_id") and self._backend_id:
+            return self._backend_id
+        if hasattr(self, "_custom_id") and self._custom_id:
+            return _check_and_fix_custom_id(str(self.__class__), self._custom_id)
+        else:
+            return None
+
+    @_id.setter
+    def _id(self, custom_id):
+        if hasattr(self, "_custom_id"):
+            self._custom_id = custom_id
+        else:
+            raise ValueError(
+                f"Customized id is not allowed. {str(self.__class__)} is a subdocument or has set id key scheme."
+            )
+
     def _embeded_rep(self):
         """get representation for embedding as object property"""
         if hasattr(self.__class__, "_subdocument"):
             return self._obj_to_dict()
-        elif hasattr(self, "_id"):
+        elif hasattr(self, "_id") and self._id:
             return {"@id": self._id, "@type": "@id"}
+        else:
+            return {"@ref": self._capture}
 
     def _obj_to_dict(self, skip_checking=False):
         if not skip_checking:
             _check_missing_prop(self)
         result = {"@type": str(self.__class__)}
-        if hasattr(self, "_id"):
+        if hasattr(self, "_id") and self._id:
             result["@id"] = self._id
+        elif not hasattr(self, "_subdocument"):
+            result["@capture"] = self._capture
         # elif hasattr(self.__class__, "_key") and hasattr(self.__class__._key, "idgen"):
         #     result["@id"] = self.__class__._key.idgen(self)
 
@@ -384,7 +405,7 @@ class WOQLSchema:
     def context(self, value):
         raise Exception("Cannot set context")
 
-    def _contruct_class(self, class_obj_dict):
+    def _construct_class(self, class_obj_dict):
         # if the class is already constructed properly
         if (
             class_obj_dict.get("@id")
@@ -410,7 +431,7 @@ class WOQLSchema:
                 elif parent not in self._all_existing_classes:
                     raise RuntimeError(f"{parent} not exist in database schema")
                 else:
-                    self._contruct_class(self._all_existing_classes[parent])
+                    self._construct_class(self._all_existing_classes[parent])
                     superclasses.append(self.object[parent])
         else:
             inherits = []
@@ -490,7 +511,7 @@ class WOQLSchema:
         self.add_obj(class_obj_dict["@id"], new_class)
         return new_class
 
-    def _contruct_context(self, context_dict):
+    def _construct_context(self, context_dict):
         documentation = context_dict.get("@documentation")
         if documentation:
             if documentation.get("@title"):
@@ -502,7 +523,7 @@ class WOQLSchema:
         self.base_ref = context_dict.get("@base")
         self.schema_ref = context_dict.get("@schema")
 
-    def _contruct_object(self, obj_dict):
+    def _construct_object(self, obj_dict):
         obj_type = obj_dict.get("@type")
         if obj_type and obj_type not in self.object:
             raise ValueError(
@@ -518,7 +539,7 @@ class WOQLSchema:
                     for key, value in params.items():
                         setattr(obj, key, value)
                     return obj
-            params["_id"] = obj_id
+            params["_backend_id"] = obj_id
             new_obj = type_class.__new__(type_class)
             new_obj.__init__(new_obj, **params)
             return new_obj
@@ -554,7 +575,7 @@ class WOQLSchema:
                 if isinstance(value, dict):
                     if hasattr(value_class, "_subdocument"):
                         # it's a subdocument
-                        return self._contruct_object(value)
+                        return self._construct_object(value)
                     else:
                         # document is expressed as dict with '@id'
                         value = value.get("@id")
@@ -638,7 +659,7 @@ class WOQLSchema:
             )
 
     def from_db(self, client: Client, select: Optional[List[str]] = None):
-        """Load classes in the database shcema into schema
+        """Load classes in the database schema into schema
 
         Parameters
         ----------
@@ -654,17 +675,18 @@ class WOQLSchema:
             if item_id:
                 self._all_existing_classes[item_id] = item
             elif item.get("@type") == "@context":
-                self._contruct_context(item)
+                self._construct_context(item)
 
         for item_id, class_obj_dict in self._all_existing_classes.items():
             if select is None or (select is not None and item_id in select):
-                self._contruct_class(class_obj_dict)
+                self._construct_class(class_obj_dict)
+        return self
 
     def import_objects(self, obj_dict: Union[List[dict], dict]):
         """Import a list of documents in json format to Python objects. The schema of those documents need to be in this schema."""
         if isinstance(obj_dict, dict):
-            return self._contruct_object(obj_dict)
-        return list(map(self._contruct_object, obj_dict))
+            return self._construct_object(obj_dict)
+        return list(map(self._construct_object, obj_dict))
 
     def from_json_schema(
         self,
@@ -712,7 +734,20 @@ class WOQLSchema:
             # it's datetime
             if "format" in prop and prop["format"] == "date-time":
                 return "xsd:dataTime"
-            # it's another object
+            # it's a subdocument
+            elif prop.get("type") is not None and prop["type"] == "object":
+                if prop.get("properties") is None:
+                    raise RuntimeError(
+                        f"subdocument {prop_name} not in proper format: 'properties' is missing"
+                    )
+                sub_dict = {"@id": prop_name, "@type": "Class", "@subdocument": []}
+                for sub_prop_name, sub_prop in prop["properties"].items():
+                    sub_dict[sub_prop_name] = convert_property(sub_prop_name, sub_prop)
+                if pipe:  # end of journey for pipemode
+                    return sub_dict
+                self._construct_class(sub_dict)
+                return prop_name
+            # it's another document
             elif prop.get("type") is None and prop.get("$ref") is not None:
                 prop_type = prop["$ref"].split("/")[-1]
                 if defs is None or prop_type not in defs:
@@ -730,7 +765,7 @@ class WOQLSchema:
                 if pipe:
                     return enum_dict
                 else:
-                    self._contruct_class(enum_dict)
+                    self._construct_class(enum_dict)
                     return self.object[enum_name]._to_dict()
             # it's a List
             elif prop["type"] == "array":
@@ -761,7 +796,7 @@ class WOQLSchema:
         if pipe:  # end of journey for pipemode
             return class_dict
 
-        self._contruct_class(class_dict)
+        self._construct_class(class_dict)
 
     def add_obj(self, name, obj):
         self.object[name] = obj
@@ -771,7 +806,9 @@ class WOQLSchema:
 
     def to_dict(self):
         """Return the schema in the TerminusDB dictionary format"""
-        return [self.context] + list(map(lambda cls: cls._to_dict(), self.all_obj()))
+        all_obj = [cls._to_dict() for cls in self.all_obj()]
+        all_obj.sort(key=lambda item: item.get("@id"))
+        return [self.context] + all_obj
 
     def to_json_schema(self, class_object: Union[str, dict]):
         """Return the schema in the json schema (http://json-schema.org/) format as a dictionary for the class object.

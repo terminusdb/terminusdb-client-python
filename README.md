@@ -1,34 +1,39 @@
-<img src="https://assets.terminusdb.com/images/main_lockup.png" width="700px"/>
+[![TerminusDB Python Client](https://assets.terminusdb.com/readmes/terminusdb-client-python/header.gif)][terminusdb-client-python-docs]
 
-TerminusDB Client Python
-==========================
+[terminusdb-client-python-docs]: https://terminusdb.github.io/terminusdb-client-python/
 
-![Discord online](https://img.shields.io/discord/689805612053168129?color=7289da&logo=Discord&label=Discord%20chat)
-![Discourse topics](https://img.shields.io/discourse/topics?color=yellow&logo=Discourse&server=https%3A%2F%2Fdiscuss.terminusdb.com%2F)
-![Follow on Twitter](https://img.shields.io/twitter/follow/terminusdb?color=skyblue&label=Follow%20on%20Twitter&logo=twitter&style=flat)
+---
 
+[![Discord](https://img.shields.io/discord/689805612053168129?label=Discord&logo=Discord&style=plastic)](https://discord.gg/yTJKAma)
+[![Discourse](https://img.shields.io/discourse/topics?color=yellow&logo=Discourse&server=https%3A%2F%2Fdiscuss.terminusdb.com%2F&style=plastic)](https://discuss.terminusdb.com/)
+[![Twitter](https://img.shields.io/twitter/follow/terminusdb?color=skyblue&label=Follow%20on%20Twitter&logo=twitter&style=flat)](https://twitter.com/TerminusDB)
 
-**Development status ⚙️**
+[![release version](https://img.shields.io/pypi/v/terminusdb-client.svg?logo=pypi)](https://pypi.python.org/pypi/terminusdb-client/)
+[![downloads](https://img.shields.io/pypi/dm/terminusdb-client.svg?logo=pypi)](https://pypi.python.org/pypi/terminusdb-client/)
 
-[![Build Status](https://img.shields.io/github/workflow/status/terminusdb/terminusdb-client-python/Python%20package?logo=github)](https://github.com/terminusdb/terminusdb-client-python/actions)
-[![Documentation Status](https://img.shields.io/github/deployments/terminusdb/terminusdb-client-python/github-pages?label=documentation&logo=github)](https://terminusdb.github.io/terminusdb-client-python/)
-[![codecov](https://codecov.io/gh/terminusdb/terminusdb-client-python/branch/master/graph/badge.svg?token=BclAUaOPnQ)](https://codecov.io/gh/terminusdb/terminusdb-client-python)
-[![last commit](https://img.shields.io/github/last-commit/terminusdb/terminusdb-client-python?logo=github)](https://github.com/terminusdb/terminusdb-client-python/commits/master)
-[![number of contributors](https://img.shields.io/github/contributors/terminusdb/terminusdb-client-python?color=blue&logo=github)](https://github.com/terminusdb/terminusdb-client-python/graphs/contributors)
+[![build status](https://img.shields.io/github/workflow/status/terminusdb/terminusdb-client-python/Python%20package?logo=github)](https://github.com/terminusdb/terminusdb-client-python/actions)
+[![documentation](https://img.shields.io/github/deployments/terminusdb/terminusdb-client-python/github-pages?label=documentation&logo=github)](https://terminusdb.github.io/terminusdb-client-python/)
+[![code coverage](https://codecov.io/gh/terminusdb/terminusdb-client-python/branch/master/graph/badge.svg?token=BclAUaOPnQ)](https://codecov.io/gh/terminusdb/terminusdb-client-python)
+[![license](https://img.shields.io/github/license/terminusdb/terminusdb-client-python?color=pink&logo=apache)](https://github.com/terminusdb/terminusdb-client-python/blob/master/LICENSE)
 
-**Python Package status 📦**
+> Python client for TerminusDB and TerminusX.
 
-[![PyPI version shields.io](https://img.shields.io/pypi/v/terminusdb-client.svg?logo=pypi)](https://pypi.python.org/pypi/terminusdb-client/)
-[![PyPI pyversions](https://img.shields.io/pypi/pyversions/terminusdb-client.svg?logo=python)](https://pypi.python.org/pypi/terminusdb-client/)
-[![GitHub license](https://img.shields.io/github/license/terminusdb/terminusdb-client-python?color=pink&logo=apache)](https://github.com/terminusdb/terminusdb-client-python/blob/master/LICENSE)
-[![PyPI download month](https://img.shields.io/pypi/dm/terminusdb-client.svg?logo=pypi)](https://pypi.python.org/pypi/terminusdb-client/)
+[**TerminusDB**][terminusdb] is an [open-source][terminusdb-repo] graph database
+and document store. It allows you to link JSON documents in a powerful knowledge
+graph all through a simple document API.
 
+[terminusdb]: https://terminusdb.com/
+[terminusdb-docs]: https://terminusdb.com/docs/
+[terminusdb-repo]: https://github.com/terminusdb/terminusdb
 
-### Python version of the TerminusDB client - for TerminusDB API and WOQLpy
+**TerminusX** is a self-service data platform that allows you to build, deploy,
+execute, monitor, and share versioned data products. It is built on TerminusDB.
+TerminusX is in public beta and you can [sign up now][dashboard].
 
-![Client Demo gif](https://github.com/terminusdb/terminusdb-web-assets/blob/master/images/terminusdb%20python%20v10%20client%20demo%201.gif)
+[dashboard]: https://dashboard.terminusdb.com/
 
 ## Requirements
+
 - [TerminusDB v10.0](https://github.com/terminusdb/terminusdb-server)
 - [Python >=3.7](https://www.python.org/downloads)
 
@@ -53,6 +58,10 @@ If you want to use woqlDataframe or the import and export csv function in Scaffo
 - Install from source:
 
 `python -m pip install git+https://github.com/terminusdb/terminusdb-client-python.git`
+
+## Demo
+
+![Client Demo gif](https://github.com/terminusdb/terminusdb-web-assets/blob/master/images/terminusdb%20python%20v10%20client%20demo%201.gif)
 
 ## Usage
 
@@ -146,7 +155,7 @@ client.delete_database("MyDatabase")
 Start a project in the directory
 
 ```bash
-$terminusdb startproject
+$tdbpy startproject
 Please enter a project name (this will also be the database name): mydb
 Please enter a endpoint location (press enter to use localhost default) [http://127.0.0.1:6363/]:
 config.json and schema.py created, please customize them to start your project.
@@ -155,7 +164,7 @@ config.json and schema.py created, please customize them to start your project.
 Import a CSV named `grades.csv`
 
 ``` bash
-$terminusdb importcsv grades.csv --na=error
+$tdbpy importcsv grades.csv --na=error
 0it [00:00, ?it/s]
 Schema object Grades created with grades.csv inserted into database.
 schema.py is updated with mydb schema.
@@ -166,14 +175,14 @@ Records in grades.csv inserted as type Grades into database with Lexical ids.
 Get documents with query
 
 ```bash
-terminusdb alldocs --type Grades -q grade="B-"
+tdbpy alldocs --type Grades -q grade="B-"
 [{'@id': 'Grades/Android_Electric_087-65-4321_42.0_23.0_36.0_45.0_47.0_B-', '@type': 'Grades', 'final': 47.0, 'first_name': 'Electric', 'grade': 'B-', 'last_name': 'Android', 'ssn': '087-65-4321', 'test1': 42.0, 'test2': 23.0, 'test3': 36.0, 'test4': 45.0}, {'@id': 'Grades/Elephant_Ima_456-71-9012_45.0_1.0_78.0_88.0_77.0_B-', '@type': 'Grades', 'final': 77.0, 'first_name': 'Ima', 'grade': 'B-', 'last_name': 'Elephant', 'ssn': '456-71-9012', 'test1': 45.0, 'test2': 1.0, 'test3': 78.0, 'test4': 88.0}, {'@id': 'Grades/Franklin_Benny_234-56-2890_50.0_1.0_90.0_80.0_90.0_B-', '@type': 'Grades', 'final': 90.0, 'first_name': 'Benny', 'grade': 'B-', 'last_name': 'Franklin', 'ssn': '234-56-2890', 'test1': 50.0, 'test2': 1.0, 'test3': 90.0, 'test4': 80.0}]
 ```
 
 Delete the database
 
 ```bash
-$terminusdb deletedb
+$tdbpy deletedb
 Do you want to delete 'mydb'? WARNING: This opertation is non-reversible. [y/N]: y
 mydb deleted.
 ```
@@ -189,26 +198,28 @@ There is a [list of examples](https://terminusdb.github.io/terminusdb-client-pyt
 1. Clone this repository
 `git clone https://github.com/terminusdb/terminusdb-client-python.git`
 
-2. Install all development dependencies using pipenv
+2. Install all development dependencies using poetry
 ```sh
 $ make init
 ```
 
 3. (a) To run test files only
 ```sh
-$ pytest terminusdb_client/tests
+$ poetry run pytest terminusdb_client/tests
 ```
 
 3. (b) To run full test
 ```sh
-$ tox -e test
+$ poetry run tox -e test
 ```
+
+Or you can run tests in [poetry shell](https://python-poetry.org/docs/basic-usage/#activating-the-virtual-environment) then no need to use `poetry run`
 
 ## Documentation
 
-Visit our [TerminusDB Documentation](https://terminusdb.com/docs/terminusdb/#/) for the full explanation of using TerminusDB.
+Visit our [TerminusDB Documentation][terminusdb-docs] for the full explanation of using TerminusDB.
 
-Documentation specifically on the latest version of the Python Client can be found [here](https://terminusdb.github.io/terminusdb-client-python/).
+Documentation specifically on the latest version of the Python Client can be found [here][terminusdb-client-python-docs].
 
 ### Generating Documentation Locally using Sphinx
 
