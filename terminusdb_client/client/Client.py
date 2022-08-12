@@ -62,29 +62,7 @@ class ResourceType(Enum):
     BRANCH = 6
 
 
-class Client:
-    """Client for TerminusDB server.
-
-    Attributes
-    ----------
-    server_url: str
-        URL of the server that this client connected.
-    api: str
-        API endpoint for this client.
-    team: str
-        Team that this client is using. "admin" for local dbs.
-    db: str
-        Database that this client is connected to.
-    user: str
-        TerminiusDB user that this client is using. "admin" for local dbs.
-    branch: str
-        Branch of the database that this client is connected to. Default to "main".
-    ref: str, None
-        Ref setting for the client. Default to None.
-    repo: str
-        Repo identifier of the database that this client is connected to. Default to "local".
-    """
-
+class Patch:
     def __init__(self, json=None):
         if json:
             self.from_json(json)
@@ -151,6 +129,40 @@ class Client:
 
     def copy(self):
         return copy.deepcopy(self)
+
+
+class Client:
+    """Client for TerminusDB server.
+
+    Attributes
+    ----------
+    server_url: str
+        URL of the server that this client connected.
+    api: str
+        API endpoint for this client.
+    team: str
+        Team that this client is using. "admin" for local dbs.
+    db: str
+        Database that this client is connected to.
+    user: str
+        TerminiusDB user that this client is using. "admin" for local dbs.
+    branch: str
+        Branch of the database that this client is connected to. Default to "main".
+    ref: str, None
+        Ref setting for the client. Default to None.
+    repo: str
+        Repo identifier of the database that this client is connected to. Default to "local".
+    """
+
+    def from_json(self, json_str):
+        content = json.loads(json_str)
+        if isinstance(content, dict):
+            self.content = _dt_dict(content)
+        else:
+            self.content = _dt_list(content)
+
+    def to_json(self):
+        return json.dumps(_clean_dict(self.content))
 
     def __init__(
         self,

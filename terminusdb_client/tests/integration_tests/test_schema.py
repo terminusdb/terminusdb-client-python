@@ -146,7 +146,7 @@ def test_getting_and_deleting_cheuk(docker_url):
 
 
 def test_insert_cheuk_again(docker_url, test_schema):
-    client = WOQLClient(docker_url, user_agent=test_user_agent)
+    client = Client(docker_url, user_agent=test_user_agent)
     client.connect(db="test_docapi")
     new_schema = WOQLSchema()
     new_schema.from_db(client)
@@ -222,7 +222,7 @@ def test_insert_cheuk_again(docker_url, test_schema):
 
 
 def test_get_data_version(docker_url):
-    client = WOQLClient(docker_url, user_agent=test_user_agent)
+    client = Client(docker_url, user_agent=test_user_agent)
     client.connect(db="test_docapi")
     result, version = client.get_all_branches(get_data_version=True)
     assert version
@@ -321,7 +321,7 @@ def test_compress_data(docker_url):
         weeks=2,
     )
     test_obj = [CheckDatetime(datetime=datetime_obj, duration=delta) for _ in range(10)]
-    client = WOQLClient(docker_url, user_agent=test_user_agent)
+    client = Client(docker_url, user_agent=test_user_agent)
     client.connect()
     client.create_database("test_compress_data")
     client.insert_document(CheckDatetime, graph_type="schema")

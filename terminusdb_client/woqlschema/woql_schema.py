@@ -11,7 +11,7 @@ from typeguard import check_type
 
 from .. import woql_type as wt
 from ..client.Client import Client
-from ..woql_type import CONVERT_TYPE, to_woql_type
+from ..woql_type import to_woql_type
 
 
 class TerminusKey:

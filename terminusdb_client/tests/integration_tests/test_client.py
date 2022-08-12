@@ -95,13 +95,13 @@ def test_happy_crazy_path(docker_url):
 
 def test_diff_ops(docker_url, test_schema):
     # create client and db
-    client = WOQLClient(docker_url, user_agent=test_user_agent)
+    client = Client(docker_url, user_agent=test_user_agent)
     client.connect()
     client.create_database("test_diff_ops")
-    public_diff = WOQLClient(
+    public_diff = Client(
         "https://cloud.terminusdb.com/jsondiff", user_agent=test_user_agent
     )
-    public_patch = WOQLClient(
+    public_patch = Client(
         "https://cloud.terminusdb.com/jsonpatch", user_agent=test_user_agent
     )
 
@@ -214,7 +214,7 @@ def test_diff_ops(docker_url, test_schema):
 )
 def test_diff_ops_no_auth(test_schema, terminusx_token):
     # create client and db
-    client = WOQLClient(
+    client = Client(
         "https://cloud-dev.terminusdb.com/TerminusDBTest//", user_agent=test_user_agent
     )
     client.connect(use_token=True, team="TerminusDBTest")
@@ -371,7 +371,7 @@ def test_terminusx_crazy_path(terminusx_token):
 #
 
 # def test_create_graph(docker_url):
-#     client = WOQLClient(docker_url)
+#     client = Client(docker_url)
 #     assert not client._connected
 #     # test connect
 #     client.connect()

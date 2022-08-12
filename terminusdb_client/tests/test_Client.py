@@ -42,11 +42,11 @@ def test_connection(mocked_requests):
 
 @mock.patch("requests.get", side_effect=mocked_request_success)
 def test_user_agent_set(mocked_requests):
-    woql_client = WOQLClient("http://localhost:6363", user_agent="test_user_agent")
+    client = Client("http://localhost:6363", user_agent="test_user_agent")
 
     # before connect it connection is empty
 
-    woql_client.connect(key="root", team="admin", user="admin")
+    client.connect(key="root", team="admin", user="admin")
 
     requests.get.assert_called_once_with(
         "http://localhost:6363/api/info",
@@ -57,24 +57,24 @@ def test_user_agent_set(mocked_requests):
 
 @mock.patch("requests.get", side_effect=mocked_request_success)
 def test_connected_flag(mocked_requests):
-    woql_client = Client("http://localhost:6363")
-    assert not woql_client._connected
-    woql_client.connect(key="root", team="admin", user="admin")
-    assert woql_client._connected
-    woql_client.close()
-    assert not woql_client._connected
+    client = Client("http://localhost:6363")
+    assert not client._connected
+    client.connect(key="root", team="admin", user="admin")
+    assert client._connected
+    client.close()
+    assert not client._connected
 
 
 @mock.patch("requests.post", side_effect=mocked_request_success)
 @mock.patch("requests.get", side_effect=mocked_request_success)
 def test_create_database(mocked_requests, mocked_requests2):
-    woql_client = Client(
+    client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
     )
-    woql_client.connect()
-    assert woql_client.user == "admin"
+    client.connect()
+    assert client.user == "admin"
 
-    woql_client.create_database(
+    client.create_database(
         "myFirstTerminusDB",
         "admin",
         label="my first db",
@@ -94,9 +94,9 @@ def test_create_database(mocked_requests, mocked_requests2):
 @mock.patch("requests.get", side_effect=mocked_request_success)
 # @mock.patch("terminusdb_client.woqlclient.woqlClient.WOQLClient.create_graph")
 def test_create_database_with_schema(mocked_requests, mocked_requests2):
-    woql_client = Client("http://localhost:6363")
-    woql_client.connect()
-    woql_client.create_database(
+    client = Client("http://localhost:6363")
+    client.connect()
+    client.create_database(
         "myFirstTerminusDB",
         "admin",
         label="my first db",
@@ -114,9 +114,9 @@ def test_create_database_with_schema(mocked_requests, mocked_requests2):
 @mock.patch("requests.post", side_effect=mocked_request_success)
 @mock.patch("requests.get", side_effect=mocked_request_success)
 def test_create_database_and_change_team(mocked_requests, mocked_requests2):
-    woql_client = Client("http://localhost:6363")
-    woql_client.connect(user="admin", team="admin", key="root")
-    woql_client.create_database(
+    client = Client("http://localhost:6363")
+    client.connect(user="admin", team="admin", key="root")
+    client.create_database(
         "myFirstTerminusDB",
         "my_new_team",
         label="my first db",
@@ -169,9 +169,9 @@ def test_crazy_branch(mocked_requests, mocked_requests2, mocked_requests3):
 @mock.patch("requests.get", side_effect=mocked_request_success)
 def test_get_triples(mocked_requests, mocked_requests2):
     client = Client("http://localhost:6363")
-    woql_client.connect(user="admin", team="admin", key="root", db="myDBName")
+    client.connect(user="admin", team="admin", key="root", db="myDBName")
 
-    woql_client.get_triples("instance")
+    client.get_triples("instance")
 
     requests.get.assert_called_with(
         "http://localhost:6363/api/triples/admin/myDBName/local/branch/main/instance",
@@ -207,10 +207,10 @@ def test_query(mocked_requests, mocked_requests2, mocked_requests3):
 
 @mock.patch("requests.get", side_effect=mocked_request_success)
 def test_query_nodb(mocked_requests):
-    woql_client = Client("http://localhost:6363")
-    woql_client.connect(user="admin", team="admin", key="root")
+    client = Client("http://localhost:6363")
+    client.connect(user="admin", team="admin", key="root")
     with pytest.raises(InterfaceError):
-        woql_client.query(WoqlStar)
+        client.query(WoqlStar)
 
 
 @mock.patch("requests.head", side_effect=mocked_request_success)
@@ -238,7 +238,7 @@ def test_delete_database(mocked_requests, mocked_requests2):
     )
 
     with pytest.raises(UserWarning):
-        woql_client.delete_database()
+        client.delete_database()
 
 
 @mock.patch("requests.get", side_effect=mocked_request_success)
