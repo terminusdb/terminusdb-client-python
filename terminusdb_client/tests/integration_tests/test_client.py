@@ -282,7 +282,7 @@ def test_jwt(docker_url_jwt):
 def test_terminusx(terminusx_token):
     testdb = (
         "test_happy_" + str(dt.datetime.now()).replace(" ", "") + "_" + str(random())
-    )
+    ).replace(":", "_").replace(".", "")
     endpoint = "https://cloud-dev.terminusdb.com/TerminusDBTest/"
     client = WOQLClient(endpoint, user_agent=test_user_agent)
     client.connect(use_token=True, team="TerminusDBTest")
@@ -302,7 +302,7 @@ def test_terminusx(terminusx_token):
 def test_terminusx_crazy_path(terminusx_token):
     testdb = (
         "test_crazy" + str(dt.datetime.now()).replace(" ", "") + "_" + str(random())
-    )
+    ).replace(":", "_").replace(".", "")
     endpoint = "https://cloud-dev.terminusdb.com/TerminusDBTest/"
     client = WOQLClient(endpoint, user_agent=test_user_agent)
     client.connect(use_token=True, team="TerminusDBTest")
