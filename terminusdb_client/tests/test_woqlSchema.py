@@ -6,7 +6,7 @@ from unittest.mock import ANY
 import pytest
 import requests
 
-from terminusdb_client.woqlclient import WOQLClient
+from terminusdb_client.client import Client
 from terminusdb_client.woqlschema.woql_schema import (
     DocumentTemplate,
     WOQLSchema,
@@ -295,7 +295,7 @@ def test_compress_data(patched, patched2, patched3, patched4):
         weeks=2,
     )
     test_obj = [CheckDatetime(datetime=datetime_obj, duration=delta) for _ in range(10)]
-    client = WOQLClient("http://127.0.0.1:6366")
+    client = Client("http://127.0.0.1:6366")
     client.connect(db="test_compress_data")
     client.insert_document(test_obj, compress=0)
     requests.post.assert_called_once_with(
