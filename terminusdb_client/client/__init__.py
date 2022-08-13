@@ -1,1 +1,1 @@
-from .Client import Client  # noqa
+from .Client import Patch, Client  # noqa
