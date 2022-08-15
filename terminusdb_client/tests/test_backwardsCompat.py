@@ -1,11 +1,13 @@
 # import sys
 # sys.path.append('client')
 import unittest.mock as mock
+from .conftest import mocked_request_success
+from ..__version__ import __version__
 
-import pytest
 import requests
 
 from terminusdb_client.woqlclient import WOQLClient
+
 
 @mock.patch("requests.get", side_effect=mocked_request_success)
 def test_connection(mocked_requests):
