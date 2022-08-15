@@ -1157,7 +1157,7 @@ class Client:
                     for item in value:
                         yield from self._ref_extract(target_key, item)
 
-    def _convert_dcoument(self, document, graph_type):
+    def _convert_document(self, document, graph_type):
         if isinstance(document, list):
             new_doc = []
             captured = []
@@ -1249,7 +1249,7 @@ class Client:
         if last_data_version is not None:
             headers["TerminusDB-Data-Version"] = last_data_version
 
-        new_doc = self._convert_dcoument(document, graph_type)
+        new_doc = self._convert_document(document, graph_type)
 
         if len(new_doc) == 0:
             return
@@ -1346,7 +1346,7 @@ class Client:
         if last_data_version is not None:
             headers["TerminusDB-Data-Version"] = last_data_version
 
-        new_doc = self._convert_dcoument(document, graph_type)
+        new_doc = self._convert_document(document, graph_type)
 
         json_string = json.dumps(new_doc).encode("utf-8")
         if compress != "never" and len(json_string) > compress:
