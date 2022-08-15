@@ -1,1 +1,2 @@
-from .woql_schema import *  # noqa
+from ..schema import *  # noqa
+WOQLSchema = Schema
