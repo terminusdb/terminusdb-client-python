@@ -695,7 +695,7 @@ class Schema:
         pipe=False,
         subdoc=False,
     ):
-        """Load classe object from json schema (http://json-schema.org/) and, if pipe mode is off, add into schema. All referenced object will be treated as subdocuments.
+        """Load class object from json schema (http://json-schema.org/) and, if pipe mode is off, add into schema. All referenced object will be treated as subdocuments.
 
         Parameters
         ----------
