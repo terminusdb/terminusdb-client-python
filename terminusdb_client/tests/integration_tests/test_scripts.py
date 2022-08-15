@@ -7,7 +7,7 @@ from random import random
 import pytest
 from click.testing import CliRunner
 
-from terminusdb_client.woqlclient.woqlClient import WOQLClient
+from terminusdb_client.client.Client import Client
 
 from ...errors import InterfaceError
 from ...scripts import scripts
@@ -145,7 +145,7 @@ def test_local_happy_path(docker_url, test_csv):
         assert "My message" not in result.output
         assert "Schema updated by Python client." in result.output
         # test inherits
-        client = WOQLClient(docker_url, user_agent=test_user_agent)
+        client = Client(docker_url, user_agent=test_user_agent)
         client.connect(db=testdb)
         schema_objects = [
             {

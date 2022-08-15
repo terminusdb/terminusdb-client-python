@@ -7,23 +7,23 @@ import pytest
 import requests
 
 from terminusdb_client.client import Client
-from terminusdb_client.woqlschema.woql_schema import (
+from terminusdb_client.schema.schema import (
     DocumentTemplate,
-    WOQLSchema,
+    Schema,
     _check_cycling,
 )
 
 from ..__version__ import __version__
 from .conftest import mocked_request_success
 
-# my_schema = WOQLSchema()
-cycling_schema = WOQLSchema()
+# my_schema = Schema()
+cycling_schema = Schema()
 
 
 class Abstract(DocumentTemplate):
     """This is abstract class"""
 
-    _schema = WOQLSchema()
+    _schema = Schema()
     _abstract = []
     name: str
 
@@ -37,7 +37,7 @@ class ChildAbs(Abstract):
 class TypeCheck(DocumentTemplate):
     """For checking instance types"""
 
-    _schema = WOQLSchema()
+    _schema = Schema()
     name: str
     age: int
 
@@ -244,7 +244,7 @@ def test_id_and_capture(test_schema):
 
 
 def test_add_enum_class():
-    new_schema = WOQLSchema()
+    new_schema = Schema()
     my_enum = new_schema.add_enum_class("MyEnum", ["item1", "item2"])
     assert "item1" in my_enum.__members__
     assert "item2" in my_enum.__members__
@@ -272,7 +272,7 @@ def test_datetime():
     test_dict = test_obj._obj_to_dict()
     assert test_dict["datetime"] == "2019-05-18T15:17:08.132263"
     assert test_dict["duration"] == "PT5558756.00001S"
-    datetime_schema = WOQLSchema()
+    datetime_schema = Schema()
     datetime_schema.add_obj("CheckDatetime", CheckDatetime)
     new_obj = datetime_schema.import_objects(test_dict)
     assert new_obj.datetime == datetime_obj
@@ -384,7 +384,7 @@ def test_from_json_schema():
         },
     }
 
-    schema = WOQLSchema()
+    schema = Schema()
     test_result = schema.from_json_schema("TestJSON", test_json_schema, pipe=True)
     assert test_result == {
         "@id": "TestJSON",

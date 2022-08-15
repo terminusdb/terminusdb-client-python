@@ -1,1 +1,2 @@
-from .woqlClient import Patch, WOQLClient  # noqa
+from ..client import Patch, Client  # noqa
+WOQLClient = Client

@@ -551,7 +551,7 @@ class WOQLQuery:
 
         Parameters
         ----------
-        client: WOQLClient object
+        client: Client object
             client that provide connection to the database for the query to execute.
         commit_msg: str
             optional, commit message for this query. Recommended for query that carrries an update.

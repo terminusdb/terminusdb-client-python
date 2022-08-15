@@ -7,7 +7,7 @@ from random import random
 import pytest
 
 from terminusdb_client.errors import InterfaceError
-from terminusdb_client.woqlclient.woqlClient import Patch, WOQLClient
+from terminusdb_client.client.Client import Patch, Client
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 # from terminusdb_client.woqlquery.woql_query import WOQLQuery
@@ -17,7 +17,7 @@ test_user_agent = "terminusdb-client-python-tests"
 
 def test_happy_path(docker_url):
     # create client
-    client = WOQLClient(docker_url, user_agent=test_user_agent)
+    client = Client(docker_url)
     assert not client._connected
     # test connect
     client.connect()
@@ -60,9 +60,9 @@ def test_happy_path(docker_url):
     assert "test_happy_path" not in client.list_databases()
 
 
-def test_happy_carzy_path(docker_url):
+def test_happy_crazy_path(docker_url):
     # create client
-    client = WOQLClient(docker_url, user_agent=test_user_agent)
+    client = Client(docker_url, user_agent=test_user_agent)
     assert not client._connected
     # test connect
     client.connect()
@@ -95,13 +95,13 @@ def test_happy_carzy_path(docker_url):
 
 def test_diff_ops(docker_url, test_schema):
     # create client and db
-    client = WOQLClient(docker_url, user_agent=test_user_agent)
+    client = Client(docker_url, user_agent=test_user_agent)
     client.connect()
     client.create_database("test_diff_ops")
-    public_diff = WOQLClient(
+    public_diff = Client(
         "https://cloud.terminusdb.com/jsondiff", user_agent=test_user_agent
     )
-    public_patch = WOQLClient(
+    public_patch = Client(
         "https://cloud.terminusdb.com/jsonpatch", user_agent=test_user_agent
     )
 
@@ -214,7 +214,7 @@ def test_diff_ops(docker_url, test_schema):
 )
 def test_diff_ops_no_auth(test_schema, terminusx_token):
     # create client and db
-    client = WOQLClient(
+    client = Client(
         "https://cloud-dev.terminusdb.com/TerminusDBTest//", user_agent=test_user_agent
     )
     client.connect(use_token=True, team="TerminusDBTest")
@@ -262,7 +262,7 @@ def test_jwt(docker_url_jwt):
     # create client
     url = docker_url_jwt[0]
     token = docker_url_jwt[1]
-    client = WOQLClient(url, user_agent=test_user_agent)
+    client = Client(url, user_agent=test_user_agent)
     assert not client._connected
     # test connect
     client.connect(use_token=True, jwt_token=token)
@@ -284,7 +284,7 @@ def test_terminusx(terminusx_token):
         "test_happy_" + str(dt.datetime.now()).replace(" ", "") + "_" + str(random())
     ).replace(":", "_").replace(".", "")
     endpoint = "https://cloud-dev.terminusdb.com/TerminusDBTest/"
-    client = WOQLClient(endpoint, user_agent=test_user_agent)
+    client = Client(endpoint, user_agent=test_user_agent)
     client.connect(use_token=True, team="TerminusDBTest")
     assert client._connected
     # test create db
@@ -304,7 +304,7 @@ def test_terminusx_crazy_path(terminusx_token):
         "test_crazy" + str(dt.datetime.now()).replace(" ", "") + "_" + str(random())
     ).replace(":", "_").replace(".", "")
     endpoint = "https://cloud-dev.terminusdb.com/TerminusDBTest/"
-    client = WOQLClient(endpoint, user_agent=test_user_agent)
+    client = Client(endpoint, user_agent=test_user_agent)
     client.connect(use_token=True, team="TerminusDBTest")
     assert client._connected
     # test create db
@@ -345,7 +345,7 @@ def test_terminusx_crazy_path(terminusx_token):
 #
 #
 # def test_csv_handeling(docker_url):
-#     client = WOQLClient(docker_url)
+#     client = Client(docker_url)
 #     assert not client._connected
 #     # test connect
 #     client.connect()
@@ -371,7 +371,7 @@ def test_terminusx_crazy_path(terminusx_token):
 #
 
 # def test_create_graph(docker_url):
-#     client = WOQLClient(docker_url)
+#     client = Client(docker_url)
 #     assert not client._connected
 #     # test connect
 #     client.connect()

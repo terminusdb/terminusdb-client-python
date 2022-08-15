@@ -364,7 +364,7 @@ class TaggedUnion(DocumentTemplate):
     pass
 
 
-class WOQLSchema:
+class Schema:
     def __init__(
         self,
         title: Optional[str] = None,
