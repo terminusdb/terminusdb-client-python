@@ -171,19 +171,37 @@ def test_import_objects(test_schema):
     return_objs = my_schema.import_objects([cheuk_dict])
     assert return_objs[0]._obj_to_dict() == cheuk_dict
 
-
 def test_get_instances(test_schema):
     my_schema = test_schema
     Person = my_schema.object.get("Person")
     _ = Person(
         name="Cheuk",
         age=21,
-        friend_of={
-            Person(),
-        },
+        friend_of={Person()},
     )
     assert len(list(Person.get_instances())) == 2
 
+def test_embedded_object(test_schema):
+    my_schema = test_schema
+    Person = my_schema.object.get("Person")
+    Country = my_schema.object.get("Country")
+    Address = my_schema.object.get("Address")
+
+    gavin = Person(
+        name = "Gavin",
+        age=43,
+        address= Address(
+            street="test",
+            country=Country(name="Republic of Ireland"),
+        ),
+        friend_of = { Person(
+            name = "Katy",
+            age = 51
+        )}
+    )
+    client = Client("http://127.0.0.1:6366")
+    result = client._convert_document(gavin,'instance')
+    assert(result == '')
 
 def test_id_and_capture(test_schema):
     my_schema = test_schema
