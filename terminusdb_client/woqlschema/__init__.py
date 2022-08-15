@@ -1,2 +1,2 @@
 from ..schema import *  # noqa
-WOQLSchema = Schema
+WOQLSchema = Schema # noqa
