@@ -203,7 +203,7 @@ def test_embedded_object(test_schema):
     client = Client("http://127.0.0.1:6366")
     result = client._convert_document(gavin, 'instance')
     # Finds the internal object and splays it out properly
-    assert(len(result) == 2)
+    assert (len(result) == 2)
 
 
 def test_id_and_capture(test_schema):
