@@ -177,6 +177,7 @@ def test_insert_cheuk_again(docker_url, test_schema):
     result = client.replace_document([location], commit_msg="Fixing location")
     assert len(result) == 1
     result = client.get_all_documents()
+    print(result)
     for item in result:
         if item.get("@type") == "Country":
             assert item["name"] == "United Kingdom"
