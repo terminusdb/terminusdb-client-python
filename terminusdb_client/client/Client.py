@@ -1176,7 +1176,7 @@ class Client:
         while document != []:
             for item in document:
                 item_dict = self._conv_to_dict(item)
-                if hasattr(item,"_capture"):
+                if hasattr(item, "_capture"):
                     seen[item._capture] = item_dict
 
             document = self._unseen(seen)
