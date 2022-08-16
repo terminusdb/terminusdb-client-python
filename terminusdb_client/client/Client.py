@@ -1143,7 +1143,7 @@ class Client:
                     raise ValueError("Subdocument cannot be added directly")
                 (d, refs) = obj._obj_to_dict()
                 # merge all refs
-                self._references = self._references | refs
+                self._references = {**self._references, **refs}
                 return d
             else:
                 return obj._to_dict()
