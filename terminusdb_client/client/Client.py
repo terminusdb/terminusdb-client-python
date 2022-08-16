@@ -1296,7 +1296,7 @@ class Client:
         if isinstance(document, list):
             for idx, item in enumerate(document):
                 if hasattr(item, "_obj_to_dict") and not hasattr(item, "_backend_id"):
-                    item._backend_id = result[idx][len("terminusdb:///data/") :]
+                    item._backend_id = result[idx]
         return result
 
     def replace_document(
