@@ -1173,15 +1173,25 @@ class Client:
             document = [document]
 
         seen = {}
+        objects = []
         while document != []:
             for item in document:
+                if hasattr(item, "to_dict") and graph_type != "schema":
+                    raise InterfaceError(
+                        "Inserting WOQLSchema object into non-schema graph."
+                    )
                 item_dict = self._conv_to_dict(item)
                 if hasattr(item, "_capture"):
                     seen[item._capture] = item_dict
+                else:
+                    if isinstance(item_dict, list):
+                        objects += item_dict
+                    else:
+                        objects.append(item_dict)
 
             document = self._unseen(seen)
 
-        return list(seen.values())
+        return list(seen.values()) + objects
 
     def insert_document(
         self,
@@ -1245,13 +1255,10 @@ class Client:
         # make sure we track only internal references
         self._references = {}
         new_doc = self._convert_document(document, graph_type)
-
         self._references = {}
 
         if len(new_doc) == 0:
             return
-        elif not isinstance(new_doc, list):
-            new_doc = [new_doc]
 
         if full_replace:
             if new_doc[0].get("@type") != "@context":
