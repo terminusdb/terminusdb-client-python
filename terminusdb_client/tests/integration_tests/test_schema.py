@@ -171,19 +171,6 @@ def test_insert_cheuk_again(docker_url, test_schema):
     cheuk.member_of = Team.information_technology
     cheuk._id = "Cheuk is back"
 
-    with pytest.raises(ValueError) as error:
-        client.update_document([uk])
-        assert (
-            str(error.value)
-            == f"{location._capture} is referenced but not captured. Seems you forgot to submit one or more object(s)."
-        )
-    with pytest.raises(ValueError) as error:
-        client.insert_document(uk)
-        assert (
-            str(error.value)
-            == "There are uncaptured references. Seems you forgot to submit one or more object(s)."
-        )
-
     client.update_document([location, uk, cheuk], commit_msg="Adding cheuk again")
     assert location._backend_id and location._id
     location.x = -0.7
