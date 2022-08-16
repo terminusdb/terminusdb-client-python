@@ -193,6 +193,7 @@ class Client:
         self._branch = None
         self._ref = None
         self._repo = None
+        self._references = {}
 
         # Default headers
         self._default_headers = {"user-agent": user_agent}
@@ -1140,7 +1141,10 @@ class Client:
             if hasattr(obj, "_isinstance") and obj._isinstance:
                 if hasattr(obj.__class__, "_subdocument"):
                     raise ValueError("Subdocument cannot be added directly")
-                return obj._obj_to_dict()
+                (d,refs) = obj._obj_to_dict()
+                # merge all refs
+                self._references = self._references | refs
+                return d
             else:
                 return obj._to_dict()
         else:
@@ -1157,45 +1161,34 @@ class Client:
                     for item in value:
                         yield from self._ref_extract(target_key, item)
 
-    def _convert_document(self, document, graph_type):
-        if isinstance(document, list):
-            new_doc = []
-            captured = []
-            referenced = []
+    def _unseen(self, seen):
+        unseen = []
+        for key in self._references:
+            if not key in seen:
+                unseen.append(self._references[key])
+        return unseen
 
+    def _convert_document(self, document, graph_type):
+        if not isinstance(document, list):
+            document = [document]
+
+        covered = False
+        seen = {}
+        while document != []:
             for item in document:
                 item_dict = self._conv_to_dict(item)
-                new_doc.append(item_dict)
-                item_capture = item_dict.get("@capture")
-                if item_capture:
-                    captured.append(item_capture)
-                referenced += list(self._ref_extract("@ref", item_dict))
+                seen[item._capture] = item_dict
 
-            referenced = list(set(referenced))
+            document = self._unseen(seen)
 
-            for item in referenced:
-                if item not in captured:
-                    raise ValueError(
-                        f"{item} is referenced but not captured. Seems you forgot to submit one or more object(s)."
-                    )
-        else:
-            if hasattr(document, "to_dict") and graph_type != "schema":
-                raise InterfaceError(
-                    "Inserting WOQLSchema object into non-schema graph."
-                )
-            new_doc = self._conv_to_dict(document)
-            if isinstance(new_doc, dict) and list(self._ref_extract("@ref", new_doc)):
-                raise ValueError(
-                    "There are uncaptured references. Seems you forgot to submit one or more object(s)."
-                )
-        return new_doc
+        return list(seen.values())
 
     def insert_document(
         self,
         document: Union[
             dict,
             List[dict],
-            "WOQLSchema",  # noqa:F821
+            "Schema",  # noqa:F821
             "DocumentTemplate",  # noqa:F821
             List["DocumentTemplate"],  # noqa:F821
         ],
@@ -1249,7 +1242,11 @@ class Client:
         if last_data_version is not None:
             headers["TerminusDB-Data-Version"] = last_data_version
 
+        # make sure we track only internal references
+        self._references = {}
         new_doc = self._convert_document(document, graph_type)
+        print(new_doc)
+        self._references = {}
 
         if len(new_doc) == 0:
             return
@@ -1300,7 +1297,7 @@ class Client:
         document: Union[
             dict,
             List[dict],
-            "WOQLSchema",  # noqa:F821
+            "Schema",  # noqa:F821
             "DocumentTemplate",  # noqa:F821
             List["DocumentTemplate"],  # noqa:F821
         ],
@@ -1380,7 +1377,7 @@ class Client:
         document: Union[
             dict,
             List[dict],
-            "WOQLSchema",  # noqa:F821
+            "Schema",  # noqa:F821
             "DocumentTemplate",  # noqa:F821
             List["DocumentTemplate"],  # noqa:F821
         ],
@@ -1449,7 +1446,7 @@ class Client:
             document = [document]
         for doc in document:
             if hasattr(doc, "_obj_to_dict"):
-                doc = doc._obj_to_dict()
+                (doc,refs) = doc._obj_to_dict()
             if isinstance(doc, dict) and doc.get("@id"):
                 doc_id.append(doc.get("@id"))
             elif isinstance(doc, str):
@@ -2012,7 +2009,7 @@ class Client:
             str,
             dict,
             List[dict],
-            "WOQLSchema",  # noqa:F821
+            "Schema",  # noqa:F821
             "DocumentTemplate",  # noqa:F821
             List["DocumentTemplate"],  # noqa:F821
         ],
@@ -2020,7 +2017,7 @@ class Client:
             str,
             dict,
             List[dict],
-            "WOQLSchema",  # noqa:F821
+            "Schema",  # noqa:F821
             "DocumentTemplate",  # noqa:F821
             List["DocumentTemplate"],  # noqa:F821
         ],
@@ -2084,7 +2081,7 @@ class Client:
         before: Union[
             dict,
             List[dict],
-            "WOQLSchema",  # noqa:F821
+            "Schema",  # noqa:F821
             "DocumentTemplate",  # noqa:F821
             List["DocumentTemplate"],  # noqa:F821
         ],
