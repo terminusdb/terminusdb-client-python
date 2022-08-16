@@ -1141,7 +1141,7 @@ class Client:
             if hasattr(obj, "_isinstance") and obj._isinstance:
                 if hasattr(obj.__class__, "_subdocument"):
                     raise ValueError("Subdocument cannot be added directly")
-                (d,refs) = obj._obj_to_dict()
+                (d, refs) = obj._obj_to_dict()
                 # merge all refs
                 self._references = self._references | refs
                 return d
@@ -1164,7 +1164,7 @@ class Client:
     def _unseen(self, seen):
         unseen = []
         for key in self._references:
-            if not key in seen:
+            if key not in seen:
                 unseen.append(self._references[key])
         return unseen
 
@@ -1172,7 +1172,6 @@ class Client:
         if not isinstance(document, list):
             document = [document]
 
-        covered = False
         seen = {}
         while document != []:
             for item in document:
@@ -1245,7 +1244,7 @@ class Client:
         # make sure we track only internal references
         self._references = {}
         new_doc = self._convert_document(document, graph_type)
-        print(new_doc)
+
         self._references = {}
 
         if len(new_doc) == 0:
@@ -1446,7 +1445,7 @@ class Client:
             document = [document]
         for doc in document:
             if hasattr(doc, "_obj_to_dict"):
-                (doc,refs) = doc._obj_to_dict()
+                (doc, refs) = doc._obj_to_dict()
             if isinstance(doc, dict) and doc.get("@id"):
                 doc_id.append(doc.get("@id"))
             elif isinstance(doc, str):

@@ -166,10 +166,11 @@ def test_import_objects(test_schema):
             Person(),
         },
     )
-    (cheuk_dict,_) = cheuk._obj_to_dict()
+    (cheuk_dict, _) = cheuk._obj_to_dict()
     del cheuk
     return_objs = my_schema.import_objects([cheuk_dict])
     assert (return_objs[0]._obj_to_dict())[0] == cheuk_dict
+
 
 def test_get_instances(test_schema):
     my_schema = test_schema
@@ -181,28 +182,29 @@ def test_get_instances(test_schema):
     )
     assert len(list(Person.get_instances())) == 2
 
+
 def test_embedded_object(test_schema):
     my_schema = test_schema
     Person = my_schema.object.get("Person")
     Country = my_schema.object.get("Country")
     Address = my_schema.object.get("Address")
-
     gavin = Person(
-        name = "Gavin",
+        name="Gavin",
         age=43,
-        address= Address(
+        address=Address(
             street="test",
             country=Country(name="Republic of Ireland"),
         ),
-        friend_of = { Person(
-            name = "Katy",
-            age = 51
+        friend_of={Person(
+            name="Katy",
+            age=51
         )}
     )
     client = Client("http://127.0.0.1:6366")
-    result = client._convert_document(gavin,'instance')
+    result = client._convert_document(gavin, 'instance')
     # Finds the internal object and splays it out properly
     assert(len(result) == 2)
+
 
 def test_id_and_capture(test_schema):
     my_schema = test_schema
@@ -239,7 +241,6 @@ def test_id_and_capture(test_schema):
     cheuk_with_id.friend_of = {
         cheuk_with_id,
     }
-    print(cheuk_with_id._obj_to_dict())
     assert (cheuk_with_id._obj_to_dict())[0] == {
         "@type": "Person",
         "@id": "Person/cheuk",
@@ -254,7 +255,6 @@ def test_id_and_capture(test_schema):
     cheuk_no_id.friend_of = {
         cheuk_no_id,
     }
-    print(cheuk_no_id._obj_to_dict())
     assert (cheuk_no_id._obj_to_dict())[0] == {
         "@type": "Person",
         "@capture": cheuk_no_id._capture,

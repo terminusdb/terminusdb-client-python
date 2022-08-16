@@ -315,7 +315,7 @@ class DocumentTemplate(metaclass=TerminusClass):
                             result[item] = str(the_item)
                         else:
                             result[item] = wt.datetime_to_woql(the_item)
-        return (result,references)
+        return (result, references)
 
 
 class EnumMetaTemplate(EnumMeta):
