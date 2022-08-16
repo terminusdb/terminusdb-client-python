@@ -94,7 +94,7 @@ def test_insert_cheuk(docker_url, test_schema):
         client.insert_document(home)
         assert str(error.value) == "Subdocument cannot be added directly"
     assert cheuk._id is None and uk._id is None
-    client.insert_document([heuk], commit_msg="Adding cheuk")
+    client.insert_document([cheuk], commit_msg="Adding cheuk")
     assert cheuk._backend_id and cheuk._id
     assert uk._backend_id and uk._id
     result = client.get_all_documents()
