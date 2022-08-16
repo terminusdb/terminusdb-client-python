@@ -291,6 +291,12 @@ class DocumentTemplate(metaclass=TerminusClass):
                         ref_obj = the_item._embedded_rep()
                         if '@ref' in ref_obj:
                             references[ref_obj['@ref']] = the_item
+                        elif '@id' in ref_obj:
+                            pass
+                        else:
+                            (sub_item, refs) = ref_obj
+                            references = {**references, **refs}
+                            ref_obj = sub_item
                         result[item] = ref_obj
                     # handle list and set (set end up passing as list for jsonlize)
                     elif isinstance(the_item, (list, set)):
@@ -301,6 +307,12 @@ class DocumentTemplate(metaclass=TerminusClass):
                                 ref_obj = sub_item._embedded_rep()
                                 if '@ref' in ref_obj:
                                     references[ref_obj['@ref']] = sub_item
+                                elif '@id' in ref_obj:
+                                    pass
+                                else:
+                                    (sub_item, refs) = ref_obj
+                                    references = {**references, **refs}
+                                    ref_obj = sub_item
                                 new_item.append(ref_obj)
                             # inner is Enum
                             elif isinstance(sub_item, Enum):
