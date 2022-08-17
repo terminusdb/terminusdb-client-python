@@ -88,8 +88,6 @@ def test_insert_cheuk(docker_url, test_schema):
 
     client = Client(docker_url, user_agent=test_user_agent)
     client.connect(db="test_docapi")
-    # client.create_database("test_docapi")
-    # print(cheuk._obj_to_dict())
     with pytest.raises(ValueError) as error:
         client.insert_document(home)
         assert str(error.value) == "Subdocument cannot be added directly"
@@ -122,7 +120,7 @@ def test_getting_and_deleting_cheuk(docker_url):
     cheuk = new_schema.import_objects(
         client.get_documents_by_type("Employee", as_list=True)
     )[0]
-    result = cheuk._obj_to_dict()
+    result = cheuk._obj_to_dict()[0]
     assert result["address_of"]["postal_code"] == "A12 345"
     assert result["address_of"]["street"] == "123 Abc Street"
     assert result["name"] == "Cheuk"
@@ -177,7 +175,7 @@ def test_insert_cheuk_again(docker_url, test_schema):
     result = client.replace_document([location], commit_msg="Fixing location")
     assert len(result) == 1
     result = client.get_all_documents()
-    print(result)
+
     for item in result:
         if item.get("@type") == "Country":
             assert item["name"] == "United Kingdom"

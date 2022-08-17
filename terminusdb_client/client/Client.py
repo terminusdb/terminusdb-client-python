@@ -1255,6 +1255,7 @@ class Client:
         # make sure we track only internal references
         self._references = {}
         new_doc = self._convert_document(document, graph_type)
+        all_docs = list(self._references.values())
         self._references = {}
 
         if len(new_doc) == 0:
@@ -1293,8 +1294,8 @@ class Client:
                 auth=self._auth(),
             )
         result = json.loads(_finish_response(result))
-        if isinstance(document, list):
-            for idx, item in enumerate(document):
+        if isinstance(all_docs, list):
+            for idx, item in enumerate(all_docs):
                 if hasattr(item, "_obj_to_dict") and not hasattr(item, "_backend_id"):
                     item._backend_id = result[idx]
         return result
@@ -1350,7 +1351,10 @@ class Client:
         if last_data_version is not None:
             headers["TerminusDB-Data-Version"] = last_data_version
 
+        self._references = {}
         new_doc = self._convert_document(document, graph_type)
+        all_docs = list(self._references.values())
+        self._references = {}
 
         json_string = json.dumps(new_doc).encode("utf-8")
         if compress != "never" and len(json_string) > compress:
@@ -1373,8 +1377,8 @@ class Client:
                 auth=self._auth(),
             )
         result = json.loads(_finish_response(result))
-        if isinstance(document, list):
-            for idx, item in enumerate(document):
+        if isinstance(all_docs, list):
+            for idx, item in enumerate(all_docs):
                 if hasattr(item, "_obj_to_dict") and not hasattr(item, "_backend_id"):
                     item._backend_id = result[idx][len("terminusdb:///data/") :]
         return result
@@ -2000,7 +2004,7 @@ class Client:
             self.reset(commit_id)
         return commit_id
 
-    def _convert_diff_dcoument(self, document):
+    def _convert_diff_document(self, document):
         if isinstance(document, list):
             new_doc = []
             for item in document:
@@ -2051,7 +2055,7 @@ class Client:
             if isinstance(item, str):
                 request_dict[f"{key}_data_version"] = item
             else:
-                request_dict[key] = self._convert_diff_dcoument(item)
+                request_dict[key] = self._convert_diff_document(item)
         if document_id is not None:
             if "before_data_version" in request_dict:
                 if document_id[: len("terminusdb:///data")] == "terminusdb:///data":
@@ -2113,7 +2117,7 @@ class Client:
         '{ "@id" : "Person/Jane", "@type" : Person", "name" : "Janine"}'"""
 
         request_dict = {
-            "before": self._convert_diff_dcoument(before),
+            "before": self._convert_diff_document(before),
             "patch": patch.content,
         }
 
