@@ -123,6 +123,7 @@ def test_getting_and_deleting_cheuk(docker_url):
         client.get_documents_by_type("Employee", as_list=True)
     )[0]
     result = cheuk._obj_to_dict()
+    print(f"result: {result}") # noqa
     assert result["address_of"]["postal_code"] == "A12 345"
     assert result["address_of"]["street"] == "123 Abc Street"
     assert result["name"] == "Cheuk"
