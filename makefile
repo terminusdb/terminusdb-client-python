@@ -29,11 +29,11 @@ interrogate:
 publish_patch:
 	tox
 	pip install -U bumpversion
-	git checkout master
-	git pull origin master
+	git checkout main
+	git pull origin main
 	bumpversion patch
-	git push origin master
-	git push origin master:dev
+	git push origin main
+	git push origin main:dev
 	git push origin --tags
 
 publish_release:
@@ -41,10 +41,10 @@ publish_release:
 	pip install -U bumpversion
 	git checkout dev
 	git pull origin dev
-	git pull origin master
+	git pull origin main
 	bumpversion minor
 	git push origin dev
-	git push origin dev:master
+	git push origin dev:main
 	git push origin --tags
 
 publish_release_major:
@@ -52,8 +52,8 @@ publish_release_major:
 	pip install -U bumpversion
 	git checkout dev
 	git pull origin dev
-	git pull origin master
+	git pull origin main
 	bumpversion major
 	git push origin dev
-	git push origin dev:master
+	git push origin dev:main
 	git push origin --tags
