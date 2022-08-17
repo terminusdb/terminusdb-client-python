@@ -263,7 +263,7 @@ class DocumentTemplate(metaclass=TerminusClass):
                 f"Customized id is not allowed. {str(self.__class__)} is a subdocument or has set id key scheme."
             )
 
-    def _embeded_rep(self):
+    def _embedded_rep(self):
         """get representation for embedding as object property"""
         if hasattr(self.__class__, "_subdocument"):
             return self._obj_to_dict()
@@ -280,23 +280,40 @@ class DocumentTemplate(metaclass=TerminusClass):
             result["@id"] = self._id
         elif not hasattr(self, "_subdocument"):
             result["@capture"] = self._capture
-        # elif hasattr(self.__class__, "_key") and hasattr(self.__class__._key, "idgen"):
-        #     result["@id"] = self.__class__._key.idgen(self)
 
+        references = {}
         for item in self._annotations.keys():
             if hasattr(self, item):
                 the_item = eval(f"self.{item}")  # noqa: S307
                 if the_item is not None:
                     # object properties
-                    if hasattr(the_item, "_embeded_rep"):
-                        result[item] = the_item._embeded_rep()
+                    if hasattr(the_item, "_embedded_rep"):
+                        ref_obj = the_item._embedded_rep()
+                        if '@ref' in ref_obj:
+                            references[ref_obj['@ref']] = the_item
+                        elif '@id' in ref_obj:
+                            pass
+                        else:
+                            (sub_item, refs) = ref_obj
+                            references = {**references, **refs}
+                            ref_obj = sub_item
+                        result[item] = ref_obj
                     # handle list and set (set end up passing as list for jsonlize)
                     elif isinstance(the_item, (list, set)):
                         new_item = []
                         for sub_item in the_item:
                             # inner is object properties
-                            if hasattr(sub_item, "_embeded_rep"):
-                                new_item.append(sub_item._embeded_rep())
+                            if hasattr(sub_item, "_embedded_rep"):
+                                ref_obj = sub_item._embedded_rep()
+                                if '@ref' in ref_obj:
+                                    references[ref_obj['@ref']] = sub_item
+                                elif '@id' in ref_obj:
+                                    pass
+                                else:
+                                    (sub_item, refs) = ref_obj
+                                    references = {**references, **refs}
+                                    ref_obj = sub_item
+                                new_item.append(ref_obj)
                             # inner is Enum
                             elif isinstance(sub_item, Enum):
                                 new_item.append(str(sub_item))
@@ -310,7 +327,7 @@ class DocumentTemplate(metaclass=TerminusClass):
                             result[item] = str(the_item)
                         else:
                             result[item] = wt.datetime_to_woql(the_item)
-        return result
+        return (result, references)
 
 
 class EnumMetaTemplate(EnumMeta):

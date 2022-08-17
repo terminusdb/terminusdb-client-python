@@ -88,25 +88,11 @@ def test_insert_cheuk(docker_url, test_schema):
 
     client = Client(docker_url, user_agent=test_user_agent)
     client.connect(db="test_docapi")
-    # client.create_database("test_docapi")
-    # print(cheuk._obj_to_dict())
     with pytest.raises(ValueError) as error:
         client.insert_document(home)
         assert str(error.value) == "Subdocument cannot be added directly"
-    with pytest.raises(ValueError) as error:
-        client.insert_document([cheuk])
-        assert (
-            str(error.value)
-            == f"{uk._capture} is referenced but not captured. Seems you forgot to submit one or more object(s)."
-        )
-    with pytest.raises(ValueError) as error:
-        client.insert_document(cheuk)
-        assert (
-            str(error.value)
-            == "There are uncaptured references. Seems you forgot to submit one or more object(s)."
-        )
     assert cheuk._id is None and uk._id is None
-    client.insert_document([uk, cheuk], commit_msg="Adding cheuk")
+    client.insert_document([cheuk], commit_msg="Adding cheuk")
     assert cheuk._backend_id and cheuk._id
     assert uk._backend_id and uk._id
     result = client.get_all_documents()
@@ -134,7 +120,7 @@ def test_getting_and_deleting_cheuk(docker_url):
     cheuk = new_schema.import_objects(
         client.get_documents_by_type("Employee", as_list=True)
     )[0]
-    result = cheuk._obj_to_dict()
+    result = cheuk._obj_to_dict()[0]
     assert result["address_of"]["postal_code"] == "A12 345"
     assert result["address_of"]["street"] == "123 Abc Street"
     assert result["name"] == "Cheuk"
@@ -183,25 +169,13 @@ def test_insert_cheuk_again(docker_url, test_schema):
     cheuk.member_of = Team.information_technology
     cheuk._id = "Cheuk is back"
 
-    with pytest.raises(ValueError) as error:
-        client.update_document([uk])
-        assert (
-            str(error.value)
-            == f"{location._capture} is referenced but not captured. Seems you forgot to submit one or more object(s)."
-        )
-    with pytest.raises(ValueError) as error:
-        client.insert_document(uk)
-        assert (
-            str(error.value)
-            == "There are uncaptured references. Seems you forgot to submit one or more object(s)."
-        )
-
     client.update_document([location, uk, cheuk], commit_msg="Adding cheuk again")
     assert location._backend_id and location._id
     location.x = -0.7
     result = client.replace_document([location], commit_msg="Fixing location")
     assert len(result) == 1
     result = client.get_all_documents()
+
     for item in result:
         if item.get("@type") == "Country":
             assert item["name"] == "United Kingdom"

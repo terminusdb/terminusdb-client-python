@@ -193,6 +193,7 @@ class Client:
         self._branch = None
         self._ref = None
         self._repo = None
+        self._references = {}
 
         # Default headers
         self._default_headers = {"user-agent": user_agent}
@@ -1140,7 +1141,10 @@ class Client:
             if hasattr(obj, "_isinstance") and obj._isinstance:
                 if hasattr(obj.__class__, "_subdocument"):
                     raise ValueError("Subdocument cannot be added directly")
-                return obj._obj_to_dict()
+                (d, refs) = obj._obj_to_dict()
+                # merge all refs
+                self._references = {**self._references, **refs}
+                return d
             else:
                 return obj._to_dict()
         else:
@@ -1157,45 +1161,44 @@ class Client:
                     for item in value:
                         yield from self._ref_extract(target_key, item)
 
+    def _unseen(self, seen):
+        unseen = []
+        for key in self._references:
+            if key not in seen:
+                unseen.append(self._references[key])
+        return unseen
+
     def _convert_document(self, document, graph_type):
-        if isinstance(document, list):
-            new_doc = []
-            captured = []
-            referenced = []
+        if not isinstance(document, list):
+            document = [document]
 
+        seen = {}
+        objects = []
+        while document != []:
             for item in document:
-                item_dict = self._conv_to_dict(item)
-                new_doc.append(item_dict)
-                item_capture = item_dict.get("@capture")
-                if item_capture:
-                    captured.append(item_capture)
-                referenced += list(self._ref_extract("@ref", item_dict))
-
-            referenced = list(set(referenced))
-
-            for item in referenced:
-                if item not in captured:
-                    raise ValueError(
-                        f"{item} is referenced but not captured. Seems you forgot to submit one or more object(s)."
+                if hasattr(item, "to_dict") and graph_type != "schema":
+                    raise InterfaceError(
+                        "Inserting WOQLSchema object into non-schema graph."
                     )
-        else:
-            if hasattr(document, "to_dict") and graph_type != "schema":
-                raise InterfaceError(
-                    "Inserting WOQLSchema object into non-schema graph."
-                )
-            new_doc = self._conv_to_dict(document)
-            if isinstance(new_doc, dict) and list(self._ref_extract("@ref", new_doc)):
-                raise ValueError(
-                    "There are uncaptured references. Seems you forgot to submit one or more object(s)."
-                )
-        return new_doc
+                item_dict = self._conv_to_dict(item)
+                if hasattr(item, "_capture"):
+                    seen[item._capture] = item_dict
+                else:
+                    if isinstance(item_dict, list):
+                        objects += item_dict
+                    else:
+                        objects.append(item_dict)
+
+            document = self._unseen(seen)
+
+        return list(seen.values()) + objects
 
     def insert_document(
         self,
         document: Union[
             dict,
             List[dict],
-            "WOQLSchema",  # noqa:F821
+            "Schema",  # noqa:F821
             "DocumentTemplate",  # noqa:F821
             List["DocumentTemplate"],  # noqa:F821
         ],
@@ -1249,12 +1252,14 @@ class Client:
         if last_data_version is not None:
             headers["TerminusDB-Data-Version"] = last_data_version
 
+        # make sure we track only internal references
+        self._references = {}
         new_doc = self._convert_document(document, graph_type)
+        all_docs = list(self._references.values())
+        self._references = {}
 
         if len(new_doc) == 0:
             return
-        elif not isinstance(new_doc, list):
-            new_doc = [new_doc]
 
         if full_replace:
             if new_doc[0].get("@type") != "@context":
@@ -1289,10 +1294,10 @@ class Client:
                 auth=self._auth(),
             )
         result = json.loads(_finish_response(result))
-        if isinstance(document, list):
-            for idx, item in enumerate(document):
+        if isinstance(all_docs, list):
+            for idx, item in enumerate(all_docs):
                 if hasattr(item, "_obj_to_dict") and not hasattr(item, "_backend_id"):
-                    item._backend_id = result[idx][len("terminusdb:///data/") :]
+                    item._backend_id = result[idx]
         return result
 
     def replace_document(
@@ -1300,7 +1305,7 @@ class Client:
         document: Union[
             dict,
             List[dict],
-            "WOQLSchema",  # noqa:F821
+            "Schema",  # noqa:F821
             "DocumentTemplate",  # noqa:F821
             List["DocumentTemplate"],  # noqa:F821
         ],
@@ -1346,7 +1351,10 @@ class Client:
         if last_data_version is not None:
             headers["TerminusDB-Data-Version"] = last_data_version
 
+        self._references = {}
         new_doc = self._convert_document(document, graph_type)
+        all_docs = list(self._references.values())
+        self._references = {}
 
         json_string = json.dumps(new_doc).encode("utf-8")
         if compress != "never" and len(json_string) > compress:
@@ -1369,8 +1377,8 @@ class Client:
                 auth=self._auth(),
             )
         result = json.loads(_finish_response(result))
-        if isinstance(document, list):
-            for idx, item in enumerate(document):
+        if isinstance(all_docs, list):
+            for idx, item in enumerate(all_docs):
                 if hasattr(item, "_obj_to_dict") and not hasattr(item, "_backend_id"):
                     item._backend_id = result[idx][len("terminusdb:///data/") :]
         return result
@@ -1380,7 +1388,7 @@ class Client:
         document: Union[
             dict,
             List[dict],
-            "WOQLSchema",  # noqa:F821
+            "Schema",  # noqa:F821
             "DocumentTemplate",  # noqa:F821
             List["DocumentTemplate"],  # noqa:F821
         ],
@@ -1449,7 +1457,7 @@ class Client:
             document = [document]
         for doc in document:
             if hasattr(doc, "_obj_to_dict"):
-                doc = doc._obj_to_dict()
+                (doc, refs) = doc._obj_to_dict()
             if isinstance(doc, dict) and doc.get("@id"):
                 doc_id.append(doc.get("@id"))
             elif isinstance(doc, str):
@@ -1996,7 +2004,7 @@ class Client:
             self.reset(commit_id)
         return commit_id
 
-    def _convert_diff_dcoument(self, document):
+    def _convert_diff_document(self, document):
         if isinstance(document, list):
             new_doc = []
             for item in document:
@@ -2012,7 +2020,7 @@ class Client:
             str,
             dict,
             List[dict],
-            "WOQLSchema",  # noqa:F821
+            "Schema",  # noqa:F821
             "DocumentTemplate",  # noqa:F821
             List["DocumentTemplate"],  # noqa:F821
         ],
@@ -2020,7 +2028,7 @@ class Client:
             str,
             dict,
             List[dict],
-            "WOQLSchema",  # noqa:F821
+            "Schema",  # noqa:F821
             "DocumentTemplate",  # noqa:F821
             List["DocumentTemplate"],  # noqa:F821
         ],
@@ -2047,7 +2055,7 @@ class Client:
             if isinstance(item, str):
                 request_dict[f"{key}_data_version"] = item
             else:
-                request_dict[key] = self._convert_diff_dcoument(item)
+                request_dict[key] = self._convert_diff_document(item)
         if document_id is not None:
             if "before_data_version" in request_dict:
                 if document_id[: len("terminusdb:///data")] == "terminusdb:///data":
@@ -2084,7 +2092,7 @@ class Client:
         before: Union[
             dict,
             List[dict],
-            "WOQLSchema",  # noqa:F821
+            "Schema",  # noqa:F821
             "DocumentTemplate",  # noqa:F821
             List["DocumentTemplate"],  # noqa:F821
         ],
@@ -2109,7 +2117,7 @@ class Client:
         '{ "@id" : "Person/Jane", "@type" : Person", "name" : "Janine"}'"""
 
         request_dict = {
-            "before": self._convert_diff_dcoument(before),
+            "before": self._convert_diff_document(before),
             "patch": patch.content,
         }
 
