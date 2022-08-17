@@ -909,3 +909,5 @@ class Schema:
 
     def copy(self):
         return deepcopy(self)
+
+WOQLSchema = Schema # noqa
