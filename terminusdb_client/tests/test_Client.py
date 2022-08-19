@@ -414,6 +414,7 @@ def test_delete_user(mocked_requests):
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
+
 @mock.patch("requests.delete", side_effect=mocked_request_success)
 def test_delete_organization(mocked_requests):
     client = Client(
@@ -444,7 +445,7 @@ def test_change_user_password(mocked_requests):
     client.change_user_password(user, "newPassword")
 
     requests.put.assert_called_with(
-       "http://localhost:6363/api/users",
+        "http://localhost:6363/api/users",
         auth=("admin", "root"),
         json={"name": user, "password": "newPassword"},
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
@@ -467,6 +468,7 @@ def test_add_organization(mocked_requests):
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
+
 @mock.patch("requests.get", side_effect=mocked_request_success)
 def test_get_organization_users(mocked_requests):
     client = Client(
@@ -479,6 +481,7 @@ def test_get_organization_users(mocked_requests):
         auth=("admin", "root"),
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
+
 
 @mock.patch("requests.get", side_effect=mocked_request_success)
 def test_get_organization_user(mocked_requests):
@@ -493,6 +496,7 @@ def test_get_organization_user(mocked_requests):
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
+
 @mock.patch("requests.get", side_effect=mocked_request_success)
 def test_get_organizations(mocked_requests):
     client = Client(
@@ -505,6 +509,7 @@ def test_get_organizations(mocked_requests):
         auth=("admin", "root"),
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
+
 
 @mock.patch("requests.post", side_effect=mocked_request_success)
 def test_capabilities_change(mocked_requests):
@@ -531,6 +536,7 @@ def test_capabilities_change(mocked_requests):
         json=capability_change,
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
+
 
 @mock.patch("requests.post", side_effect=mocked_request_success)
 def test_add_role(mocked_requests):
@@ -571,6 +577,7 @@ def test_add_role(mocked_requests):
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
+
 @mock.patch("requests.put", side_effect=mocked_request_success)
 def test_change_role(mocked_requests):
     client = Client(
@@ -601,7 +608,7 @@ def test_change_role(mocked_requests):
     }
     try:
         client.add_role(role)
-        del role['action'][2] # delete clone as action
+        del role['action'][2]  # Delete clone as action
         client.change_role(role)
     except(InterfaceError):
         pass

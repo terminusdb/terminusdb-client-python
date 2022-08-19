@@ -2329,7 +2329,6 @@ class Client:
         )
         return json.loads(_finish_response(result))
 
-
     def get_organizations(self) -> Optional[dict]:
         """
         Returns a list of organizations in the database.
@@ -2403,7 +2402,6 @@ class Client:
             auth=self._auth(),
         )
         return json.loads(_finish_response(result))
-
 
     def change_capabilities(self, capability_change: dict) -> Optional[dict]:
         """
@@ -2659,7 +2657,6 @@ class Client:
             auth=self._auth(),
         )
         return json.loads(_finish_response(result))
-
 
     def get_database(self, dbid: str) -> Optional[dict]:
         """
