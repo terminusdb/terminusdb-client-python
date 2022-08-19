@@ -647,3 +647,35 @@ def test_get_roles(mocked_requests):
         auth=("admin", "root"),
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
+
+
+@mock.patch("requests.get", side_effect=mocked_request_success)
+def test_get_users(mocked_requests):
+    client = Client(
+        "http://localhost:6363", user="admin", key="root", team="admin"
+    )
+    client.connect()
+    try:
+        client.get_users()
+    except InterfaceError:
+        pass
+    requests.get.assert_called_with(
+        "http://localhost:6363/api/users",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+    )
+
+
+@mock.patch("requests.get", side_effect=mocked_request_success)
+def test_get_user(mocked_requests):
+    client = Client(
+        "http://localhost:6363", user="admin", key="root", team="admin"
+    )
+    client.connect()
+    user = "Gavin" + str(random.randrange(100000))
+    client.get_user(user)
+    requests.get.assert_called_with(
+        f"http://localhost:6363/api/users/{user}",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+    )

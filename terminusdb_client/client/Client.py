@@ -2603,6 +2603,53 @@ class Client:
         )
         return json.loads(_finish_response(result))
 
+    def get_user(self, username: str) -> Optional[dict]:
+        """
+        Get a user
+
+        Parameters
+        ----------
+        username : str
+            The username of the user
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if failed
+        """
+        self._check_connection(check_db=False)
+        result = requests.get(
+            f"{self._users_url()}/{username}",
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def get_users(self) -> Optional[dict]:
+        """
+        Get all users
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if failed
+        """
+        self._check_connection(check_db=False)
+        result = requests.get(
+            f"{self._users_url()}",
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
     def delete_user(self, username: str) -> Optional[dict]:
         """
         Delete a user
