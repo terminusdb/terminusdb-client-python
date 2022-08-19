@@ -379,8 +379,9 @@ def test_delete_document(
     )
 
 
+@mock.patch("requests.get", side_effect=mocked_request_success)
 @mock.patch("requests.post", side_effect=mocked_request_success)
-def test_add_user(mocked_requests):
+def test_add_user(mocked_requests, mocked_requests2):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
     )
@@ -397,8 +398,10 @@ def test_add_user(mocked_requests):
     )
 
 
+@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch("requests.post", side_effect=mocked_request_success)
 @mock.patch("requests.delete", side_effect=mocked_request_success)
-def test_delete_user(mocked_requests):
+def test_delete_user(mocked_requests, mocked_requests2, mocked_requests3):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
     )
@@ -415,8 +418,10 @@ def test_delete_user(mocked_requests):
     )
 
 
+@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch("requests.post", side_effect=mocked_request_success)
 @mock.patch("requests.delete", side_effect=mocked_request_success)
-def test_delete_organization(mocked_requests):
+def test_delete_organization(mocked_requests, mocked_requests2, mocked_requests3):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
     )
@@ -433,8 +438,10 @@ def test_delete_organization(mocked_requests):
     )
 
 
+@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch("requests.post", side_effect=mocked_request_success)
 @mock.patch("requests.put", side_effect=mocked_request_success)
-def test_change_user_password(mocked_requests):
+def test_change_user_password(mocked_requests, mocked_requests2, mocked_requests3):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
     )
@@ -452,8 +459,9 @@ def test_change_user_password(mocked_requests):
     )
 
 
+@mock.patch("requests.get", side_effect=mocked_request_success)
 @mock.patch("requests.post", side_effect=mocked_request_success)
-def test_add_organization(mocked_requests):
+def test_add_organization(mocked_requests, mocked_requests2):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
     )
@@ -511,8 +519,9 @@ def test_get_organizations(mocked_requests):
     )
 
 
+@mock.patch("requests.get", side_effect=mocked_request_success)
 @mock.patch("requests.post", side_effect=mocked_request_success)
-def test_capabilities_change(mocked_requests):
+def test_capabilities_change(mocked_requests, mocked_requests2):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
     )
@@ -538,8 +547,9 @@ def test_capabilities_change(mocked_requests):
     )
 
 
+@mock.patch("requests.get", side_effect=mocked_request_success)
 @mock.patch("requests.post", side_effect=mocked_request_success)
-def test_add_role(mocked_requests):
+def test_add_role(mocked_requests, mocked_requests2):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
     )
@@ -578,8 +588,10 @@ def test_add_role(mocked_requests):
     )
 
 
+@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch("requests.post", side_effect=mocked_request_success)
 @mock.patch("requests.put", side_effect=mocked_request_success)
-def test_change_role(mocked_requests):
+def test_change_role(mocked_requests, mocked_requests2, mocked_requests3):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
     )
