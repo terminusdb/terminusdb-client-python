@@ -531,3 +531,100 @@ def test_capabilities_change(mocked_requests):
         json=capability_change,
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
+
+@mock.patch("requests.post", side_effect=mocked_request_success)
+def test_add_role(mocked_requests):
+    client = Client(
+        "http://localhost:6363", user="admin", key="root", team="admin"
+    )
+    client.connect()
+    role = {
+        "name": "Grand Pubah",
+        "action": [
+            "branch",
+            "class_frame",
+            "clone",
+            "commit_read_access",
+            "commit_write_access",
+            "create_database",
+            "delete_database",
+            "fetch",
+            "instance_read_access",
+            "instance_write_access",
+            "manage_capabilities",
+            "meta_read_access",
+            "meta_write_access",
+            "push",
+            "rebase",
+            "schema_read_access",
+            "schema_write_access"
+        ]
+    }
+    try:
+        client.add_role(role)
+    except(InterfaceError):
+        pass
+    requests.post.assert_called_with(
+        "http://localhost:6363/api/roles",
+        auth=("admin", "root"),
+        json=role,
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+    )
+
+@mock.patch("requests.put", side_effect=mocked_request_success)
+def test_change_role(mocked_requests):
+    client = Client(
+        "http://localhost:6363", user="admin", key="root", team="admin"
+    )
+    client.connect()
+    role = {
+        "name": "Grand Pubahz",
+        "action": [
+            "branch",
+            "class_frame",
+            "clone",
+            "commit_read_access",
+            "commit_write_access",
+            "create_database",
+            "delete_database",
+            "fetch",
+            "instance_read_access",
+            "instance_write_access",
+            "manage_capabilities",
+            "meta_read_access",
+            "meta_write_access",
+            "push",
+            "rebase",
+            "schema_read_access",
+            "schema_write_access"
+        ]
+    }
+    try:
+        client.add_role(role)
+        del role['action'][2] # delete clone as action
+        client.change_role(role)
+    except(InterfaceError):
+        pass
+    requests.put.assert_called_with(
+        "http://localhost:6363/api/roles",
+        auth=("admin", "root"),
+        json=role,
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+    )
+
+
+@mock.patch("requests.get", side_effect=mocked_request_success)
+def test_get_roles(mocked_requests):
+    client = Client(
+        "http://localhost:6363", user="admin", key="root", team="admin"
+    )
+    client.connect()
+    try:
+        client.get_available_roles()
+    except(InterfaceError):
+        pass
+    requests.get.assert_called_with(
+        "http://localhost:6363/api/roles",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+    )

@@ -2275,7 +2275,7 @@ class Client:
         )
         return json.loads(_finish_response(result))
 
-    def get_organization_user(self, org: str, username: str):
+    def get_organization_user(self, org: str, username: str) -> Optional[dict]:
         """
         Returns user info related to an organization.
 
@@ -2302,7 +2302,7 @@ class Client:
         )
         return json.loads(_finish_response(result))
 
-    def get_organization_user_databases(self, org: str, username: str):
+    def get_organization_user_databases(self, org: str, username: str) -> Optional[dict]:
         """
         Returns the databases available to a user which are inside an organization
 
@@ -2405,7 +2405,7 @@ class Client:
         return json.loads(_finish_response(result))
 
 
-    def change_capabilities(self, capability_change: dict):
+    def change_capabilities(self, capability_change: dict) -> Optional[dict]:
         """
         Change the capabilities of a certain user
 
@@ -2440,6 +2440,138 @@ class Client:
             f"{self._capabilities_url()}",
             headers=self._default_headers,
             json=capability_change,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def add_role(self, role: dict) -> Optional[dict]:
+        """
+        Add a new role
+
+        Parameters
+        ----------
+        role : dict
+            The role dict
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if failed
+
+        Examples
+        -------
+        >>> client = Client("https://127.0.0.1:6363")
+        >>> client.connect(key="root", team="admin", user="admin", db="example_db")
+        >>> role = {
+            "name": "Grand Pubah",
+            "action": [
+                "branch",
+                "class_frame",
+                "clone",
+                "commit_read_access",
+                "commit_write_access",
+                "create_database",
+                "delete_database",
+                "fetch",
+                "instance_read_access",
+                "instance_write_access",
+                "manage_capabilities",
+                "meta_read_access",
+                "meta_write_access",
+                "push",
+                "rebase",
+                "schema_read_access",
+                "schema_write_access"
+              ]
+          }
+        >>> client.add_role(role)
+        """
+        self._check_connection(check_db=False)
+        result = requests.post(
+            f"{self._roles_url()}",
+            headers=self._default_headers,
+            json=role,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def change_role(self, role: dict) -> Optional[dict]:
+        """
+        Change role actions for a particular role
+
+        Parameters
+        ----------
+        role : dict
+            Role dict
+
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if failed
+
+        Examples
+        -------
+        >>> client = Client("https://127.0.0.1:6363")
+        >>> client.connect(key="root", team="admin", user="admin", db="example_db")
+        >>> role = {
+            "name": "Grand Pubah",
+            "action": [
+                "branch",
+                "class_frame",
+                "clone",
+                "commit_read_access",
+                "commit_write_access",
+                "create_database",
+                "delete_database",
+                "fetch",
+                "instance_read_access",
+                "instance_write_access",
+                "manage_capabilities",
+                "meta_read_access",
+                "meta_write_access",
+                "push",
+                "rebase",
+                "schema_read_access",
+                "schema_write_access"
+              ]
+          }
+        >>> client.change_role(role)
+        """
+        self._check_connection(check_db=False)
+        result = requests.put(
+            f"{self._roles_url()}",
+            headers=self._default_headers,
+            json=role,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def get_available_roles(self) -> Optional[dict]:
+        """
+        Get the available roles for the current authenticated user
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if failed
+        """
+        self._check_connection(check_db=False)
+        result = requests.get(
+            f"{self._roles_url()}",
+            headers=self._default_headers,
             auth=self._auth(),
         )
         return json.loads(_finish_response(result))
@@ -2639,6 +2771,9 @@ class Client:
 
     def _users_url(self):
         return f"{self.api}/users"
+
+    def _roles_url(self):
+        return f"{self.api}/roles"
 
     def _documents_url(self):
         if self._db == "_system":
