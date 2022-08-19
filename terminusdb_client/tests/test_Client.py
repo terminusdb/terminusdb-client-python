@@ -528,7 +528,7 @@ def test_capabilities_change(mocked_requests):
     }
     try:
         client.change_capabilities(capability_change)
-    except(InterfaceError):
+    except InterfaceError:
         pass
     requests.post.assert_called_with(
         "http://localhost:6363/api/capabilities",
@@ -568,7 +568,7 @@ def test_add_role(mocked_requests):
     }
     try:
         client.add_role(role)
-    except(InterfaceError):
+    except InterfaceError:
         pass
     requests.post.assert_called_with(
         "http://localhost:6363/api/roles",
@@ -610,7 +610,7 @@ def test_change_role(mocked_requests):
         client.add_role(role)
         del role['action'][2]  # Delete clone as action
         client.change_role(role)
-    except(InterfaceError):
+    except InterfaceError:
         pass
     requests.put.assert_called_with(
         "http://localhost:6363/api/roles",
@@ -628,7 +628,7 @@ def test_get_roles(mocked_requests):
     client.connect()
     try:
         client.get_available_roles()
-    except(InterfaceError):
+    except InterfaceError:
         pass
     requests.get.assert_called_with(
         "http://localhost:6363/api/roles",
