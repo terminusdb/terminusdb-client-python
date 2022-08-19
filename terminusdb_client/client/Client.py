@@ -329,7 +329,7 @@ class Client:
 
         Examples
         -------
-        >>> client = Client("https://127.0.0.1:6363")
+        >>> client = Client("http://127.0.0.1:6363")
         >>> client.connect(key="root", team="admin", user="admin", db="example_db")
         """
 
@@ -408,7 +408,7 @@ class Client:
         Example
         -------
         >>> from terminusdb_client import Client
-        >>> client = Client("https://127.0.0.1:6363"
+        >>> client = Client("http://127.0.0.1:6363"
         >>> client.connect(db="bank_balance_example")
         >>> client.get_commit_history()
         [{'commit': 's90wike9v5xibmrb661emxjs8k7ynwc', 'author': 'admin', 'message': 'Adding Jane', 'timestamp': datetime.da
@@ -536,7 +536,7 @@ class Client:
 
         Examples
         --------
-        >>> client = Client("https://127.0.0.1:6363/")
+        >>> client = Client("http://127.0.0.1:6363/")
         >>> clone = client.copy()
         >>> assert client is not clone
         """
@@ -559,7 +559,7 @@ class Client:
 
         Examples
         --------
-        >>> client = Client("https://127.0.0.1:6363")
+        >>> client = Client("http://127.0.0.1:6363")
         >>> client.set_db("database1")
         'database1'
         """
@@ -596,7 +596,7 @@ class Client:
 
         Examples
         --------
-        >>> client = Client("https://127.0.0.1:6363")
+        >>> client = Client("http://127.0.0.1:6363")
         >>> client.resource(ResourceType.DB)
         '<team>/<db>/'
         >>> client.resource(ResourceType.META)
@@ -670,7 +670,7 @@ class Client:
 
         Examples
         --------
-        >>> client = Client("https://127.0.0.1:6363/")
+        >>> client = Client("http://127.0.0.1:6363/")
         >>> client.create_database("someDB", "admin", "Database Label", "My Description")
         """
 
@@ -733,7 +733,7 @@ class Client:
 
         Examples
         -------
-        >>> client = Client("https://127.0.0.1:6363/")
+        >>> client = Client("http://127.0.0.1:6363/")
         >>> client.delete_database("<database>", "<team>")
         """
 
@@ -1681,7 +1681,7 @@ class Client:
 
         Examples
         --------
-        >>> client = Client("https://127.0.0.1:6363/")
+        >>> client = Client("http://127.0.0.1:6363/")
         >>> client.pull()
         """
         self._check_connection()
@@ -1825,7 +1825,7 @@ class Client:
 
         Examples
         --------
-        >>> client = Client("https://127.0.0.1:6363/")
+        >>> client = Client("http://127.0.0.1:6363/")
         >>> client.rebase("the_branch")
         """
         self._check_connection()
@@ -1881,7 +1881,7 @@ class Client:
 
         Examples
         --------
-        >>> client = Client("https://127.0.0.1:6363/")
+        >>> client = Client("http://127.0.0.1:6363/")
         >>> client.reset('234980523ffaf93')
         >>> client.reset('admin/database/local/commit/234980523ffaf93', use_path=True)
         """
@@ -1932,7 +1932,7 @@ class Client:
 
         Examples
         --------
-        >>> client = Client("https://127.0.0.1:6363/")
+        >>> client = Client("http://127.0.0.1:6363/")
         >>> client.optimize('admin/database') # optimise database branch (here main)
         >>> client.optimize('admin/database/_meta') # optimise the repository graph (actually creates a squashed flat layer)
         >>> client.optimize('admin/database/local/_commits') # commit graph is optimised
@@ -1980,7 +1980,7 @@ class Client:
 
         Examples
         --------
-        >>> client = Client("https://127.0.0.1:6363/")
+        >>> client = Client("http://127.0.0.1:6363/")
         >>> client.connect(user="admin", key="root", team="admin", db="some_db")
         >>> client.squash('This is a squash commit message!')
         """
@@ -2045,7 +2045,7 @@ class Client:
 
         Examples
         --------
-        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client = WOQLClient("http://127.0.0.1:6363/")
         >>> client.connect(user="admin", key="root", team="admin", db="some_db")
         >>> result = client.diff({ "@id" : "Person/Jane", "@type" : "Person", "name" : "Jane"}, { "@id" : "Person/Jane", "@type" : "Person", "name" : "Janine"})
         >>> result.to_json = '{ "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'"""
@@ -2109,7 +2109,7 @@ class Client:
 
         Examples
         --------
-        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client = WOQLClient("http://127.0.0.1:6363/")
         >>> client.connect(user="admin", key="root", team="admin", db="some_db")
         >>> patch_obj = Patch(json='{"name" : { "@op" : "ValueSwap", "@before" : "Jane", "@after": "Janine" }}')
         >>> result = client.patch({ "@id" : "Person/Jane", "@type" : Person", "name" : "Jane"}, patch_obj)
@@ -2161,7 +2161,7 @@ class Client:
 
         Examples
         --------
-        >>> client = Client("https://127.0.0.1:6363/")
+        >>> client = Client("http://127.0.0.1:6363/")
         >>> client.clonedb("http://terminusdb.com/some_user/test_db", "my_test_db")
         """
         self._check_connection()
@@ -2197,7 +2197,7 @@ class Client:
 
         Examples
         --------
-        >>> client = Client("https://127.0.0.1:6363/")
+        >>> client = Client("http://127.0.0.1:6363/")
         >>> client._generate_commit("<message>", "<author>")
         {'author': '<author>', 'message': '<message>'}
         """
@@ -2462,7 +2462,7 @@ class Client:
 
         Examples
         -------
-        >>> client = Client("https://127.0.0.1:6363")
+        >>> client = Client("http://127.0.0.1:6363")
         >>> client.connect(key="root", team="admin", user="admin", db="example_db")
         >>> role = {
             "name": "Grand Pubah",
@@ -2518,7 +2518,7 @@ class Client:
 
         Examples
         -------
-        >>> client = Client("https://127.0.0.1:6363")
+        >>> client = Client("http://127.0.0.1:6363")
         >>> client.connect(key="root", team="admin", user="admin", db="example_db")
         >>> role = {
             "name": "Grand Pubah",
