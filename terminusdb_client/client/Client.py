@@ -2223,6 +2223,312 @@ class Client:
             raise RuntimeError("Client not connected.")
         # TODO: remote_auth
 
+    def add_organization(self, org: str) -> Optional[dict]:
+        """
+        Add a new organization
+
+        Parameters
+        ----------
+        org : str
+            The id of the organization
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if failed
+        """
+        self._check_connection(check_db=False)
+        result = requests.post(
+            f"{self._organization_url()}/{org}",
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def get_organization_users(self, org: str) -> Optional[dict]:
+        """
+        Returns a list of users in an organization.
+
+        Parameters
+        ----------
+        org: str
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if not found
+
+        """
+        self._check_connection(check_db=False)
+        result = requests.get(
+            f"{self._organization_url()}/{org}/users",
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def get_organization_user(self, org: str, username: str):
+        """
+        Returns user info related to an organization.
+
+        Parameters
+        ----------
+        org: str
+        username: str
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if not found
+
+        """
+        self._check_connection(check_db=False)
+        result = requests.get(
+            f"{self._organization_url()}/{org}/users/{username}",
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def get_organization_user_databases(self, org: str, username: str):
+        """
+        Returns the databases available to a user which are inside an organization
+
+        Parameters
+        ----------
+        org: str
+        username: str
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if not found
+
+        """
+        self._check_connection(check_db=False)
+        result = requests.get(
+            f"{self._organization_url()}/{org}/users/{username}/databases",
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+
+    def get_organizations(self) -> Optional[dict]:
+        """
+        Returns a list of organizations in the database.
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if not found
+
+        """
+        self._check_connection(check_db=False)
+        result = requests.get(
+            self._organization_url(),
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def get_organization(self, org: str) -> Optional[dict]:
+        """
+        Returns a specific organization
+
+        Parameters
+        ----------
+        org : str
+            The id of the organization
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if not found
+        """
+        self._check_connection(check_db=False)
+        result = requests.get(
+            f"{self._organization_url()}/{org}",
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def delete_organization(self, org: str) -> Optional[dict]:
+        """
+        Deletes a specific organization
+
+        Parameters
+        ----------
+        org : str
+            The id of the organization
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if request failed
+        """
+        self._check_connection(check_db=False)
+        result = requests.delete(
+            f"{self._organization_url()}/{org}",
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+
+    def change_capabilities(self, capability_change: dict):
+        """
+        Change the capabilities of a certain user
+
+        Parameters
+        ----------
+        capability_change: dict
+            Dict for the capability change request.
+
+            Example:
+            {
+             "operation": "revoke",
+             "scope": "UserDatabase/f5a0ef94469b32e1aee321678436c7dfd5a96d9c476672b3282ae89a45b5200e",
+             "user": "User/admin",
+             "roles": [
+                 "Role/consumer",
+                 "Role/admin"
+              ]
+            }
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if request failed
+
+        """
+        self._check_connection(check_db=False)
+        result = requests.post(
+            f"{self._capabilities_url()}",
+            headers=self._default_headers,
+            json=capability_change,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def add_user(self, username: str, password: str) -> Optional[dict]:
+        """
+        Add a new user
+
+        Parameters
+        ----------
+        username : str
+            The username of the user
+        password: str
+            The user's password
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if failed
+        """
+        self._check_connection(check_db=False)
+        result = requests.post(
+            f"{self._users_url()}",
+            headers=self._default_headers,
+            json={"name": username, "password": password},
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def delete_user(self, username: str) -> Optional[dict]:
+        """
+        Delete a user
+
+        Parameters
+        ----------
+        username : str
+            The username of the user
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if failed
+        """
+        self._check_connection(check_db=False)
+        result = requests.delete(
+            f"{self._users_url()}/{username}",
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def change_user_password(self, username: str, password: str) -> Optional[dict]:
+        """
+        Change user's password
+
+        Parameters
+        ----------
+        username : str
+            The username of the user
+        password: str
+            The new password
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if failed
+        """
+        self._check_connection(check_db=False)
+        result = requests.put(
+            f"{self._users_url()}",
+            headers=self._default_headers,
+            json={"name": username, "password": password},
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+
     def get_database(self, dbid: str) -> Optional[dict]:
         """
         Returns metadata (id, organization, label, comment) about the requested database
@@ -2324,6 +2630,15 @@ class Client:
         if self._db == "_system":
             return self._db_base("schema")
         return self._branch_base("schema")
+
+    def _capabilities_url(self):
+        return f"{self.api}/capabilities"
+
+    def _organization_url(self):
+        return f"{self.api}/organizations"
+
+    def _users_url(self):
+        return f"{self.api}/users"
 
     def _documents_url(self):
         if self._db == "_system":
