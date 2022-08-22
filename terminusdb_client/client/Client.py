@@ -2705,13 +2705,15 @@ class Client:
         )
         return json.loads(_finish_response(result))
 
-    def get_database(self, dbid: str) -> Optional[dict]:
+    def get_database(self, dbid: str, team: Optional[str] = None) -> Optional[dict]:
         """
         Returns metadata (id, organization, label, comment) about the requested database
         Parameters
         ----------
         dbid : str
             The id of the database
+        team : str
+            The organization of the database (default self.team)
 
         Raises
         ------
@@ -2723,10 +2725,13 @@ class Client:
         dict or None if not found
         """
         self._check_connection(check_db=False)
-        for this_db in self.get_databases():
-            if this_db["name"] == dbid:
-                return this_db
-        return None
+        team = team if team else self.team
+        result = requests.get(
+            f"{self.api}/db/{team}/{dbid}?verbose=true",
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
 
     def get_databases(self) -> List[dict]:
         """

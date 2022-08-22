@@ -110,6 +110,17 @@ def test_add_get_remove_org(docker_url):
         client.get_organization("testOrg")
 
 
+def test_get_database(docker_url):
+    client = Client(docker_url, user_agent=test_user_agent, team="admin")
+    client.connect()
+    db_name = "testDB" + str(random())
+    client.create_database(db_name, team="admin")
+    db = client.get_database(db_name)
+    assert db['name'] == db_name
+    db_with_team = client.get_database(db_name, team='admin')
+    assert db_with_team['name'] == db_name
+
+
 def test_add_get_remove_user(docker_url):
     # create client
     client = Client(docker_url, user_agent=test_user_agent)
