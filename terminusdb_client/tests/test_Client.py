@@ -167,7 +167,8 @@ def test_crazy_branch(mocked_requests, mocked_requests2, mocked_requests3):
 
 
 @mock.patch("requests.get", side_effect=mocked_request_success)
-def test_get_database(mocked_requests):
+@mock.patch("requests.post", side_effect=mocked_request_success)
+def test_get_database(mocked_requests, mocked_requests2):
     client = Client("http://localhost:6363")
     client.connect(user="admin", team="admin", key="root")
     db_name = "testDB" + str(random.randrange(100000))
