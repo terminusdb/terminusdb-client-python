@@ -92,6 +92,22 @@ def test_happy_crazy_path(docker_url):
     assert client.db is None
     assert "test happy path" not in client.list_databases()
 
+def test_add_get_remove_org(docker_url):
+    # create client
+    client = Client(docker_url, user_agent=test_user_agent)
+    assert not client._connected
+    # test connect
+    client.connect()
+    assert client._connected
+    # test create db
+    client.create_organization("testOrg")
+    print("YOLOOO")
+    org = client.get_organization("testOrg")
+    assert org['name'] == 'testOrg'
+    client.delete_organization("testOrg")
+    with pytest.raises(DatabaseError):
+        # The org shouldn't exist anymore
+        client.get_organization("testOrg")
 
 def test_add_get_remove_user(docker_url):
     # create client
