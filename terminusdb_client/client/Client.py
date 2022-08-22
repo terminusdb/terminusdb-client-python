@@ -391,6 +391,53 @@ class Client:
                 "No database is connected. Please either connect to a database or create a new database."
             )
 
+    def log(self,
+            team: Optional[str] = None,
+            db: Optional[str] = None,
+            start: int = 0,
+            count: int = -1):
+        """Get commit history of a database
+        Parameters
+        ----------
+        team: str, optional
+             The team from which the database is. Defaults to the class property.
+        db: str, optional
+             The database. Defaults to the class property.
+        start: int, optional
+             Commit index to start from. Defaults to 0.
+        count: int, optional
+             Amount of commits to get. Defaults to -1 which gets all.
+
+        Returns
+        -------
+        list
+
+             List of the following commit objects:
+               {
+                "@id":"InitialCommit/hpl18q42dbnab4vzq8me4bg1xn8p2a0",
+                "@type":"InitialCommit",
+                "author":"system",
+                "identifier":"hpl18q42dbnab4vzq8me4bg1xn8p2a0",
+                "message":"create initial schema",
+                "schema":"layer_data:Layer_4234adfe377fa9563a17ad764ac37f5dcb14de13668ea725ef0748248229a91b",
+                "timestamp":1660919664.9129035
+               }
+        """
+        self._check_connection(check_db=(not team or not db))
+        team = team if team else self.team
+        db = db if db else self.db
+        result = requests.get(
+            f"{self.api}/log/{team}/{db}",
+            params={'start': start, 'count': count},
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        commits = json.loads(_finish_response(result))
+        for commit in commits:
+            commit['timestamp'] = datetime.fromtimestamp(commit['timestamp'])
+            commit['commit'] = commit['identifier']  # For backwards compat.
+        return commits
+
     def get_commit_history(self, max_history: int = 500) -> list:
         """Get the whole commit history.
         Commit history - Commit id, author of the commit, commit message and the commit time, in the current branch from the current commit, ordered backwards in time, will be returned in a dictionary in the follow format:
@@ -403,7 +450,7 @@ class Client:
         Parameters
         ----------
         max_history: int, optional
-            maximum number of commit that would return, counting backwards from your current commit. Default is set to 500. It need to be nop-negitive, if input is 0 it will still give the last commit.
+            maximum number of commit that would return, counting backwards from your current commit. Default is set to 500. It needs to be nop-negative, if input is 0 it will still give the last commit.
 
         Example
         -------
@@ -429,70 +476,21 @@ class Client:
         """
         if max_history < 0:
             raise ValueError("max_history needs to be non-negative.")
-        if max_history > 1:
-            limit_history = max_history - 1
-        else:
-            limit_history = 1
-        woql_query = (
-            WOQLQuery()
-            .using("_commits")
-            .limit(limit_history)
-            .triple("v:branch", "name", WOQLQuery().string(self.branch))
-            .triple("v:branch", "head", "v:commit")
-            .path("v:commit", "parent*", "v:target_commit")
-            .triple("v:target_commit", "identifier", "v:cid")
-            .triple("v:target_commit", "author", "v:author")
-            .triple("v:target_commit", "message", "v:message")
-            .triple("v:target_commit", "timestamp", "v:timestamp")
-        )
-        result = self.query(woql_query).get("bindings")
-        if not result:
-            return result
-        else:
-            result_list = []
-            for result_item in result:
-                result_list.append(
-                    {
-                        "commit": result_item["cid"]["@value"],
-                        "author": result_item["author"]["@value"],
-                        "message": result_item["message"]["@value"],
-                        "timestamp": datetime.fromtimestamp(
-                            int(result_item["timestamp"]["@value"])
-                        ),
-                    }
-                )
-            return result_list
+        return self.log(count=max_history)
 
     def _get_current_commit(self):
-        woql_query = (
-            WOQLQuery()
-            .using("_commits")
-            .triple("v:branch", "name", WOQLQuery().string(self.branch))
-            .triple("v:branch", "head", "v:commit")
-            .triple("v:commit", "identifier", "v:cid")
-        )
-        result = self.query(woql_query)
-        if not result:
-            return None
-        current_commit = result.get("bindings")[0].get("cid").get("@value")
-        return current_commit
+        descriptor = self.db
+        if self.branch:
+            descriptor = f'{descriptor}/local/branch/{self.branch}'
+        commit = self.log(team=self.team, db=descriptor, count=1)[0]
+        return commit['identifier']
 
     def _get_target_commit(self, step):
-        woql_query = (
-            WOQLQuery()
-            .using("_commits")
-            .path(
-                "v:commit",
-                f"parent{{{step},{step}}}",
-                "v:target_commit",
-            )
-            .triple("v:branch", "name", WOQLQuery().string(self.branch))
-            .triple("v:branch", "head", "v:commit")
-            .triple("v:target_commit", "identifier", "v:cid")
-        )
-        result = self.query(woql_query)
-        target_commit = result.get("bindings")[0].get("cid").get("@value")
-        return target_commit
+        descriptor = self.db
+        if self.branch:
+            descriptor = f'{descriptor}/local/branch/{self.branch}'
+        commit = self.log(team=self.team, db=descriptor, count=1, start=step)[0]
+        return commit['identifier']
 
     def get_all_branches(self, get_data_version=False):
         """Get all the branches available in the database."""
