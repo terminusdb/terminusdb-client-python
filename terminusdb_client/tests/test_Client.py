@@ -166,6 +166,20 @@ def test_crazy_branch(mocked_requests, mocked_requests2, mocked_requests3):
     )
 
 
+@mock.patch("requests.get", side_effect=mocked_request_success)
+def test_get_database(mocked_requests, mocked_requests2):
+    client = Client("http://localhost:6363")
+    client.connect(user="admin", team="admin", key="root")
+    db_name = "testDB" + str(random.randrange(100000))
+    client.create_database(db_name)
+    client.get_database(db_name)
+    requests.get.assert_called_with(
+        f"http://localhost:6363/api/db/admin/{db_name}?verbose=true",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+    )
+
+
 @pytest.mark.skip(reason="temporary not avaliable")
 @mock.patch("requests.head", side_effect=mocked_request_success)
 @mock.patch("requests.get", side_effect=mocked_request_success)
