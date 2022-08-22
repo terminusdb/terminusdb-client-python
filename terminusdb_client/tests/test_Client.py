@@ -3,7 +3,9 @@
 import unittest.mock as mock
 
 import pytest
+import random
 import requests
+
 
 from terminusdb_client.client import Client
 from terminusdb_client.errors import InterfaceError
@@ -374,4 +376,306 @@ def test_delete_document(
             "graph_type": "instance",
             "message": f"Commit via python client {__version__}",
         },
+    )
+
+
+@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch("requests.post", side_effect=mocked_request_success)
+def test_add_user(mocked_requests, mocked_requests2):
+    client = Client(
+        "http://localhost:6363", user="admin", key="root", team="admin"
+    )
+    client.connect()
+
+    user = "Gavin" + str(random.randrange(100000))
+    client.add_user(user, "somePassword")
+
+    requests.post.assert_called_with(
+        "http://localhost:6363/api/users",
+        auth=("admin", "root"),
+        json={"name": user, "password": "somePassword"},
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+    )
+
+
+@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch("requests.post", side_effect=mocked_request_success)
+@mock.patch("requests.delete", side_effect=mocked_request_success)
+def test_delete_user(mocked_requests, mocked_requests2, mocked_requests3):
+    client = Client(
+        "http://localhost:6363", user="admin", key="root", team="admin"
+    )
+    client.connect()
+
+    user = "Gavin" + str(random.randrange(100000))
+    client.add_user(user, "somePassword")
+    client.delete_user(user)
+
+    requests.delete.assert_called_with(
+        f"http://localhost:6363/api/users/{user}",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+    )
+
+
+@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch("requests.post", side_effect=mocked_request_success)
+@mock.patch("requests.delete", side_effect=mocked_request_success)
+def test_delete_organization(mocked_requests, mocked_requests2, mocked_requests3):
+    client = Client(
+        "http://localhost:6363", user="admin", key="root", team="admin"
+    )
+    client.connect()
+
+    org = "RandomOrg" + str(random.randrange(100000))
+    client.create_organization(org)
+    client.delete_organization(org)
+
+    requests.delete.assert_called_with(
+        f"http://localhost:6363/api/organizations/{org}",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+    )
+
+
+@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch("requests.post", side_effect=mocked_request_success)
+@mock.patch("requests.put", side_effect=mocked_request_success)
+def test_change_user_password(mocked_requests, mocked_requests2, mocked_requests3):
+    client = Client(
+        "http://localhost:6363", user="admin", key="root", team="admin"
+    )
+    client.connect()
+
+    user = "Gavin" + str(random.randrange(100000))
+    client.add_user(user, "somePassword")
+    client.change_user_password(user, "newPassword")
+
+    requests.put.assert_called_with(
+        "http://localhost:6363/api/users",
+        auth=("admin", "root"),
+        json={"name": user, "password": "newPassword"},
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+    )
+
+
+@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch("requests.post", side_effect=mocked_request_success)
+def test_create_organization(mocked_requests, mocked_requests2):
+    client = Client(
+        "http://localhost:6363", user="admin", key="root", team="admin"
+    )
+    client.connect()
+
+    org = "RandomOrg" + str(random.randrange(100000))
+    client.create_organization(org)
+
+    requests.post.assert_called_with(
+        f"http://localhost:6363/api/organizations/{org}",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+    )
+
+
+@mock.patch("requests.get", side_effect=mocked_request_success)
+def test_get_organization_users(mocked_requests):
+    client = Client(
+        "http://localhost:6363", user="admin", key="root", team="admin"
+    )
+    client.connect()
+    client.get_organization_users("admin")
+    requests.get.assert_called_with(
+        "http://localhost:6363/api/organizations/admin/users",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+    )
+
+
+@mock.patch("requests.get", side_effect=mocked_request_success)
+def test_get_organization_user(mocked_requests):
+    client = Client(
+        "http://localhost:6363", user="admin", key="root", team="admin"
+    )
+    client.connect()
+    client.get_organization_user("admin", "admin")
+    requests.get.assert_called_with(
+        "http://localhost:6363/api/organizations/admin/users/admin",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+    )
+
+
+@mock.patch("requests.get", side_effect=mocked_request_success)
+def test_get_organizations(mocked_requests):
+    client = Client(
+        "http://localhost:6363", user="admin", key="root", team="admin"
+    )
+    client.connect()
+    client.get_organizations()
+    requests.get.assert_called_with(
+        "http://localhost:6363/api/organizations",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+    )
+
+
+@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch("requests.post", side_effect=mocked_request_success)
+def test_capabilities_change(mocked_requests, mocked_requests2):
+    client = Client(
+        "http://localhost:6363", user="admin", key="root", team="admin"
+    )
+    client.connect()
+    capability_change = {
+        "operation": "revoke",
+        "scope": "UserDatabase/f5a0ef94469b32e1aee321678436c7dfd5a96d9c476672b3282ae89a45b5200e",
+        "user": "User/admin",
+        "roles": [
+            "Role/consumer",
+            "Role/admin"
+        ]
+    }
+    try:
+        client.change_capabilities(capability_change)
+    except InterfaceError:
+        pass
+    requests.post.assert_called_with(
+        "http://localhost:6363/api/capabilities",
+        auth=("admin", "root"),
+        json=capability_change,
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+    )
+
+
+@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch("requests.post", side_effect=mocked_request_success)
+def test_add_role(mocked_requests, mocked_requests2):
+    client = Client(
+        "http://localhost:6363", user="admin", key="root", team="admin"
+    )
+    client.connect()
+    role = {
+        "name": "Grand Pubah",
+        "action": [
+            "branch",
+            "class_frame",
+            "clone",
+            "commit_read_access",
+            "commit_write_access",
+            "create_database",
+            "delete_database",
+            "fetch",
+            "instance_read_access",
+            "instance_write_access",
+            "manage_capabilities",
+            "meta_read_access",
+            "meta_write_access",
+            "push",
+            "rebase",
+            "schema_read_access",
+            "schema_write_access"
+        ]
+    }
+    try:
+        client.add_role(role)
+    except InterfaceError:
+        pass
+    requests.post.assert_called_with(
+        "http://localhost:6363/api/roles",
+        auth=("admin", "root"),
+        json=role,
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+    )
+
+
+@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch("requests.post", side_effect=mocked_request_success)
+@mock.patch("requests.put", side_effect=mocked_request_success)
+def test_change_role(mocked_requests, mocked_requests2, mocked_requests3):
+    client = Client(
+        "http://localhost:6363", user="admin", key="root", team="admin"
+    )
+    client.connect()
+    role = {
+        "name": "Grand Pubahz",
+        "action": [
+            "branch",
+            "class_frame",
+            "clone",
+            "commit_read_access",
+            "commit_write_access",
+            "create_database",
+            "delete_database",
+            "fetch",
+            "instance_read_access",
+            "instance_write_access",
+            "manage_capabilities",
+            "meta_read_access",
+            "meta_write_access",
+            "push",
+            "rebase",
+            "schema_read_access",
+            "schema_write_access"
+        ]
+    }
+    try:
+        client.add_role(role)
+        del role['action'][2]  # Delete clone as action
+        client.change_role(role)
+    except InterfaceError:
+        pass
+    requests.put.assert_called_with(
+        "http://localhost:6363/api/roles",
+        auth=("admin", "root"),
+        json=role,
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+    )
+
+
+@mock.patch("requests.get", side_effect=mocked_request_success)
+def test_get_roles(mocked_requests):
+    client = Client(
+        "http://localhost:6363", user="admin", key="root", team="admin"
+    )
+    client.connect()
+    try:
+        client.get_available_roles()
+    except InterfaceError:
+        pass
+    requests.get.assert_called_with(
+        "http://localhost:6363/api/roles",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+    )
+
+
+@mock.patch("requests.get", side_effect=mocked_request_success)
+def test_get_users(mocked_requests):
+    client = Client(
+        "http://localhost:6363", user="admin", key="root", team="admin"
+    )
+    client.connect()
+    try:
+        client.get_users()
+    except InterfaceError:
+        pass
+    requests.get.assert_called_with(
+        "http://localhost:6363/api/users",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+    )
+
+
+@mock.patch("requests.get", side_effect=mocked_request_success)
+def test_get_user(mocked_requests):
+    client = Client(
+        "http://localhost:6363", user="admin", key="root", team="admin"
+    )
+    client.connect()
+    user = "Gavin" + str(random.randrange(100000))
+    client.get_user(user)
+    requests.get.assert_called_with(
+        f"http://localhost:6363/api/users/{user}",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )

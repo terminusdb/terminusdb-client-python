@@ -6,7 +6,7 @@ from random import random
 
 import pytest
 
-from terminusdb_client.errors import InterfaceError
+from terminusdb_client.errors import DatabaseError, InterfaceError
 from terminusdb_client.client.Client import Patch, Client
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
@@ -91,6 +91,39 @@ def test_happy_crazy_path(docker_url):
     client.delete_database("test happy path", "admin")
     assert client.db is None
     assert "test happy path" not in client.list_databases()
+
+
+def test_add_get_remove_org(docker_url):
+    # create client
+    client = Client(docker_url, user_agent=test_user_agent)
+    assert not client._connected
+    # test connect
+    client.connect()
+    assert client._connected
+    # test create db
+    client.create_organization("testOrg")
+    org = client.get_organization("testOrg")
+    assert org['name'] == 'testOrg'
+    client.delete_organization("testOrg")
+    with pytest.raises(DatabaseError):
+        # The org shouldn't exist anymore
+        client.get_organization("testOrg")
+
+
+def test_add_get_remove_user(docker_url):
+    # create client
+    client = Client(docker_url, user_agent=test_user_agent)
+    assert not client._connected
+    # test connect
+    client.connect()
+    assert client._connected
+    # test create db
+    client.add_user("test", "randomPassword")
+    user = client.get_user("test")
+    assert user['name'] == 'test'
+    client.delete_user("test")
+    with pytest.raises(DatabaseError):
+        user = client.get_user("test")
 
 
 def test_diff_ops(docker_url, test_schema):

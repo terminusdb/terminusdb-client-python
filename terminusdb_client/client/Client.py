@@ -329,7 +329,7 @@ class Client:
 
         Examples
         -------
-        >>> client = Client("https://127.0.0.1:6363")
+        >>> client = Client("http://127.0.0.1:6363")
         >>> client.connect(key="root", team="admin", user="admin", db="example_db")
         """
 
@@ -408,7 +408,7 @@ class Client:
         Example
         -------
         >>> from terminusdb_client import Client
-        >>> client = Client("https://127.0.0.1:6363"
+        >>> client = Client("http://127.0.0.1:6363"
         >>> client.connect(db="bank_balance_example")
         >>> client.get_commit_history()
         [{'commit': 's90wike9v5xibmrb661emxjs8k7ynwc', 'author': 'admin', 'message': 'Adding Jane', 'timestamp': datetime.da
@@ -536,7 +536,7 @@ class Client:
 
         Examples
         --------
-        >>> client = Client("https://127.0.0.1:6363/")
+        >>> client = Client("http://127.0.0.1:6363/")
         >>> clone = client.copy()
         >>> assert client is not clone
         """
@@ -559,7 +559,7 @@ class Client:
 
         Examples
         --------
-        >>> client = Client("https://127.0.0.1:6363")
+        >>> client = Client("http://127.0.0.1:6363")
         >>> client.set_db("database1")
         'database1'
         """
@@ -596,7 +596,7 @@ class Client:
 
         Examples
         --------
-        >>> client = Client("https://127.0.0.1:6363")
+        >>> client = Client("http://127.0.0.1:6363")
         >>> client.resource(ResourceType.DB)
         '<team>/<db>/'
         >>> client.resource(ResourceType.META)
@@ -670,7 +670,7 @@ class Client:
 
         Examples
         --------
-        >>> client = Client("https://127.0.0.1:6363/")
+        >>> client = Client("http://127.0.0.1:6363/")
         >>> client.create_database("someDB", "admin", "Database Label", "My Description")
         """
 
@@ -733,7 +733,7 @@ class Client:
 
         Examples
         -------
-        >>> client = Client("https://127.0.0.1:6363/")
+        >>> client = Client("http://127.0.0.1:6363/")
         >>> client.delete_database("<database>", "<team>")
         """
 
@@ -1681,7 +1681,7 @@ class Client:
 
         Examples
         --------
-        >>> client = Client("https://127.0.0.1:6363/")
+        >>> client = Client("http://127.0.0.1:6363/")
         >>> client.pull()
         """
         self._check_connection()
@@ -1825,7 +1825,7 @@ class Client:
 
         Examples
         --------
-        >>> client = Client("https://127.0.0.1:6363/")
+        >>> client = Client("http://127.0.0.1:6363/")
         >>> client.rebase("the_branch")
         """
         self._check_connection()
@@ -1881,7 +1881,7 @@ class Client:
 
         Examples
         --------
-        >>> client = Client("https://127.0.0.1:6363/")
+        >>> client = Client("http://127.0.0.1:6363/")
         >>> client.reset('234980523ffaf93')
         >>> client.reset('admin/database/local/commit/234980523ffaf93', use_path=True)
         """
@@ -1932,7 +1932,7 @@ class Client:
 
         Examples
         --------
-        >>> client = Client("https://127.0.0.1:6363/")
+        >>> client = Client("http://127.0.0.1:6363/")
         >>> client.optimize('admin/database') # optimise database branch (here main)
         >>> client.optimize('admin/database/_meta') # optimise the repository graph (actually creates a squashed flat layer)
         >>> client.optimize('admin/database/local/_commits') # commit graph is optimised
@@ -1980,7 +1980,7 @@ class Client:
 
         Examples
         --------
-        >>> client = Client("https://127.0.0.1:6363/")
+        >>> client = Client("http://127.0.0.1:6363/")
         >>> client.connect(user="admin", key="root", team="admin", db="some_db")
         >>> client.squash('This is a squash commit message!')
         """
@@ -2045,7 +2045,7 @@ class Client:
 
         Examples
         --------
-        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client = WOQLClient("http://127.0.0.1:6363/")
         >>> client.connect(user="admin", key="root", team="admin", db="some_db")
         >>> result = client.diff({ "@id" : "Person/Jane", "@type" : "Person", "name" : "Jane"}, { "@id" : "Person/Jane", "@type" : "Person", "name" : "Janine"})
         >>> result.to_json = '{ "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'"""
@@ -2109,7 +2109,7 @@ class Client:
 
         Examples
         --------
-        >>> client = WOQLClient("https://127.0.0.1:6363/")
+        >>> client = WOQLClient("http://127.0.0.1:6363/")
         >>> client.connect(user="admin", key="root", team="admin", db="some_db")
         >>> patch_obj = Patch(json='{"name" : { "@op" : "ValueSwap", "@before" : "Jane", "@after": "Janine" }}')
         >>> result = client.patch({ "@id" : "Person/Jane", "@type" : Person", "name" : "Jane"}, patch_obj)
@@ -2161,7 +2161,7 @@ class Client:
 
         Examples
         --------
-        >>> client = Client("https://127.0.0.1:6363/")
+        >>> client = Client("http://127.0.0.1:6363/")
         >>> client.clonedb("http://terminusdb.com/some_user/test_db", "my_test_db")
         """
         self._check_connection()
@@ -2197,7 +2197,7 @@ class Client:
 
         Examples
         --------
-        >>> client = Client("https://127.0.0.1:6363/")
+        >>> client = Client("http://127.0.0.1:6363/")
         >>> client._generate_commit("<message>", "<author>")
         {'author': '<author>', 'message': '<message>'}
         """
@@ -2222,6 +2222,488 @@ class Client:
         else:
             raise RuntimeError("Client not connected.")
         # TODO: remote_auth
+
+    def create_organization(self, org: str) -> Optional[dict]:
+        """
+        Add a new organization
+
+        Parameters
+        ----------
+        org : str
+            The id of the organization
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if failed
+        """
+        self._check_connection(check_db=False)
+        result = requests.post(
+            f"{self._organization_url()}/{org}",
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def get_organization_users(self, org: str) -> Optional[dict]:
+        """
+        Returns a list of users in an organization.
+
+        Parameters
+        ----------
+        org: str
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if not found
+
+        """
+        self._check_connection(check_db=False)
+        result = requests.get(
+            f"{self._organization_url()}/{org}/users",
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def get_organization_user(self, org: str, username: str) -> Optional[dict]:
+        """
+        Returns user info related to an organization.
+
+        Parameters
+        ----------
+        org: str
+        username: str
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if not found
+
+        """
+        self._check_connection(check_db=False)
+        result = requests.get(
+            f"{self._organization_url()}/{org}/users/{username}",
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def get_organization_user_databases(self, org: str, username: str) -> Optional[dict]:
+        """
+        Returns the databases available to a user which are inside an organization
+
+        Parameters
+        ----------
+        org: str
+        username: str
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if not found
+
+        """
+        self._check_connection(check_db=False)
+        result = requests.get(
+            f"{self._organization_url()}/{org}/users/{username}/databases",
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def get_organizations(self) -> Optional[dict]:
+        """
+        Returns a list of organizations in the database.
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if not found
+
+        """
+        self._check_connection(check_db=False)
+        result = requests.get(
+            self._organization_url(),
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def get_organization(self, org: str) -> Optional[dict]:
+        """
+        Returns a specific organization
+
+        Parameters
+        ----------
+        org : str
+            The id of the organization
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if not found
+        """
+        self._check_connection(check_db=False)
+        result = requests.get(
+            f"{self._organization_url()}/{org}",
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def delete_organization(self, org: str) -> Optional[dict]:
+        """
+        Deletes a specific organization
+
+        Parameters
+        ----------
+        org : str
+            The id of the organization
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if request failed
+        """
+        self._check_connection(check_db=False)
+        result = requests.delete(
+            f"{self._organization_url()}/{org}",
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def change_capabilities(self, capability_change: dict) -> Optional[dict]:
+        """
+        Change the capabilities of a certain user
+
+        Parameters
+        ----------
+        capability_change: dict
+            Dict for the capability change request.
+
+            Example:
+            {
+             "operation": "revoke",
+             "scope": "UserDatabase/f5a0ef94469b32e1aee321678436c7dfd5a96d9c476672b3282ae89a45b5200e",
+             "user": "User/admin",
+             "roles": [
+                 "Role/consumer",
+                 "Role/admin"
+              ]
+            }
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if request failed
+
+        """
+        self._check_connection(check_db=False)
+        result = requests.post(
+            f"{self._capabilities_url()}",
+            headers=self._default_headers,
+            json=capability_change,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def add_role(self, role: dict) -> Optional[dict]:
+        """
+        Add a new role
+
+        Parameters
+        ----------
+        role : dict
+            The role dict
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if failed
+
+        Examples
+        -------
+        >>> client = Client("http://127.0.0.1:6363")
+        >>> client.connect(key="root", team="admin", user="admin", db="example_db")
+        >>> role = {
+            "name": "Grand Pubah",
+            "action": [
+                "branch",
+                "class_frame",
+                "clone",
+                "commit_read_access",
+                "commit_write_access",
+                "create_database",
+                "delete_database",
+                "fetch",
+                "instance_read_access",
+                "instance_write_access",
+                "manage_capabilities",
+                "meta_read_access",
+                "meta_write_access",
+                "push",
+                "rebase",
+                "schema_read_access",
+                "schema_write_access"
+              ]
+          }
+        >>> client.add_role(role)
+        """
+        self._check_connection(check_db=False)
+        result = requests.post(
+            f"{self._roles_url()}",
+            headers=self._default_headers,
+            json=role,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def change_role(self, role: dict) -> Optional[dict]:
+        """
+        Change role actions for a particular role
+
+        Parameters
+        ----------
+        role : dict
+            Role dict
+
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if failed
+
+        Examples
+        -------
+        >>> client = Client("http://127.0.0.1:6363")
+        >>> client.connect(key="root", team="admin", user="admin", db="example_db")
+        >>> role = {
+            "name": "Grand Pubah",
+            "action": [
+                "branch",
+                "class_frame",
+                "clone",
+                "commit_read_access",
+                "commit_write_access",
+                "create_database",
+                "delete_database",
+                "fetch",
+                "instance_read_access",
+                "instance_write_access",
+                "manage_capabilities",
+                "meta_read_access",
+                "meta_write_access",
+                "push",
+                "rebase",
+                "schema_read_access",
+                "schema_write_access"
+              ]
+          }
+        >>> client.change_role(role)
+        """
+        self._check_connection(check_db=False)
+        result = requests.put(
+            f"{self._roles_url()}",
+            headers=self._default_headers,
+            json=role,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def get_available_roles(self) -> Optional[dict]:
+        """
+        Get the available roles for the current authenticated user
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if failed
+        """
+        self._check_connection(check_db=False)
+        result = requests.get(
+            f"{self._roles_url()}",
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def add_user(self, username: str, password: str) -> Optional[dict]:
+        """
+        Add a new user
+
+        Parameters
+        ----------
+        username : str
+            The username of the user
+        password: str
+            The user's password
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if failed
+        """
+        self._check_connection(check_db=False)
+        result = requests.post(
+            f"{self._users_url()}",
+            headers=self._default_headers,
+            json={"name": username, "password": password},
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def get_user(self, username: str) -> Optional[dict]:
+        """
+        Get a user
+
+        Parameters
+        ----------
+        username : str
+            The username of the user
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if failed
+        """
+        self._check_connection(check_db=False)
+        result = requests.get(
+            f"{self._users_url()}/{username}",
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def get_users(self) -> Optional[dict]:
+        """
+        Get all users
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if failed
+        """
+        self._check_connection(check_db=False)
+        result = requests.get(
+            f"{self._users_url()}",
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def delete_user(self, username: str) -> Optional[dict]:
+        """
+        Delete a user
+
+        Parameters
+        ----------
+        username : str
+            The username of the user
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if failed
+        """
+        self._check_connection(check_db=False)
+        result = requests.delete(
+            f"{self._users_url()}/{username}",
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
+    def change_user_password(self, username: str, password: str) -> Optional[dict]:
+        """
+        Change user's password
+
+        Parameters
+        ----------
+        username : str
+            The username of the user
+        password: str
+            The new password
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        dict or None if failed
+        """
+        self._check_connection(check_db=False)
+        result = requests.put(
+            f"{self._users_url()}",
+            headers=self._default_headers,
+            json={"name": username, "password": password},
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
 
     def get_database(self, dbid: str) -> Optional[dict]:
         """
@@ -2324,6 +2806,18 @@ class Client:
         if self._db == "_system":
             return self._db_base("schema")
         return self._branch_base("schema")
+
+    def _capabilities_url(self):
+        return f"{self.api}/capabilities"
+
+    def _organization_url(self):
+        return f"{self.api}/organizations"
+
+    def _users_url(self):
+        return f"{self.api}/users"
+
+    def _roles_url(self):
+        return f"{self.api}/roles"
 
     def _documents_url(self):
         if self._db == "_system":
