@@ -2223,7 +2223,7 @@ class Client:
             raise RuntimeError("Client not connected.")
         # TODO: remote_auth
 
-    def add_organization(self, org: str) -> Optional[dict]:
+    def create_organization(self, org: str) -> Optional[dict]:
         """
         Add a new organization
 

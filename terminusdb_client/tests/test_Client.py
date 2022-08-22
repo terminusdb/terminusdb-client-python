@@ -428,7 +428,7 @@ def test_delete_organization(mocked_requests, mocked_requests2, mocked_requests3
     client.connect()
 
     org = "RandomOrg" + str(random.randrange(100000))
-    client.add_organization(org)
+    client.create_organization(org)
     client.delete_organization(org)
 
     requests.delete.assert_called_with(
@@ -461,14 +461,14 @@ def test_change_user_password(mocked_requests, mocked_requests2, mocked_requests
 
 @mock.patch("requests.get", side_effect=mocked_request_success)
 @mock.patch("requests.post", side_effect=mocked_request_success)
-def test_add_organization(mocked_requests, mocked_requests2):
+def test_create_organization(mocked_requests, mocked_requests2):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
     )
     client.connect()
 
     org = "RandomOrg" + str(random.randrange(100000))
-    client.add_organization(org)
+    client.create_organization(org)
 
     requests.post.assert_called_with(
         f"http://localhost:6363/api/organizations/{org}",
