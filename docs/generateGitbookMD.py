@@ -25,8 +25,7 @@ f_input = ['Errors_and_Exceptions',
     'woqlClient', 
     'woqlDataframe', 
     'woqlQuery', 
-    'woqlSchema', 
-    'woqlView'
+    'woqlSchema',
 ]
 
 aPyFile = []
