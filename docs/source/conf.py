@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath("../../"))
 # -- Project information -----------------------------------------------------
 
 project = "TerminusDB Client"
-copyright = "2020, TerminusDB group"
+copyright = "2022, TerminusDB group"
 author = "TerminusDB group"
 
 # The short X.Y version.

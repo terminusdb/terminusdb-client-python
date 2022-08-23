@@ -1,20 +1,16 @@
-.. TerminusDB Client documentation master file, created by
-   sphinx-quickstart on Tue Jan 21 16:42:57 2020.
+.. terminusdb_client documentation master file, created by
+   sphinx-quickstart on Tue Aug 23 15:24:49 2022.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-TerminusDB Client's documentation
-======================================
+Welcome to terminusdb_client's documentation!
+=============================================
 
 .. toctree::
    :maxdepth: 4
    :caption: Contents:
 
-   installation
-   modules
-   Scaffolding_CLI_Tool
-   tutorials
-
+   terminusdb_client
 
 
 Indices and tables
