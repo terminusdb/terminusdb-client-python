@@ -1,5 +1,28 @@
 # TerminusDB Python Client Release Notes
 
+## v10.1.4
+
+### Bug Fixes
+
+- Upgrade package dependencies to solve security vulnerability
+- Fix slow get_database function
+
+### New
+
+- Add log function to view commits
+- Add diff_version to diff different branches or commits
+- Add apply function to apply a branch/commit on top of another (a bit like git cherry-pick)
+- Add ability to insert raw json documents
+- Add user management functions
+- Allow embedded objects to be submitted (ca1e0bf4e2974cc5a76b8e8065adc591b1d58a21)
+
+
+### Deprecations
+
+- Removed WOQLView, since it was not maintained
+- We renamed WOQLClient to Client but retained backwards compatiblity
+
+
 ## v10.1.1
 
 ### Bug Fixes / Improvements
