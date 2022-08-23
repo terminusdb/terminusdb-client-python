@@ -20,15 +20,6 @@ import os
 
 f_dir = "./build/markdown/"
 
-f_input = ['Errors_and_Exceptions', 
-    'modules', 
-    'Scaffolding_CLI_Tool', 
-    'woqlClient', 
-    'woqlDataframe', 
-    'woqlQuery', 
-    'woqlSchema',
-]
-
 aPyFile = []
 f_md = None
 
@@ -148,12 +139,13 @@ if not os.path.exists(path):
         print(error)
 
 # Loop through each file for conversion
-for f in glob.glob('./build/markdown/*.md'):
-    print(f)
-    file = open(f, "r")
+for f in glob.glob(f"{f_dir}*.md"):
+    file = open(f,"r")
     file_data = file.read()
 
-    f_md = open(f, "w")
+    f_md = open(path+"/"+f.split("/")[3], "w")
+
+    f = f_dir+f
 
     process_data = ""
     if re.search("Scaffolding", f): 
