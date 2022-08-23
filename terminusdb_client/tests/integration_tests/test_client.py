@@ -119,7 +119,7 @@ def test_diff_object(docker_url):
     assert diff == {'test': {'@before': 'wew', '@after': 'wow', '@op': 'SwapValue'}}
 
 
-def test_diff_version(docker_url):
+def test_diff_apply_version(docker_url):
     client = Client(docker_url, user_agent=test_user_agent)
     client.connect()
     db_name = "philosophers" + str(random())
@@ -146,6 +146,13 @@ def test_diff_version(docker_url):
     assert len(diff) == 2
     assert diff[0]['@insert']['name'] == 'Plato'
     assert diff[1]['@insert']['name'] == 'Aristotle'
+
+    # Apply the differences to main with apply
+    client.apply("main", "changes", branch='main')
+
+    # Diff again
+    diff_again = client.diff_version("main", "changes")
+    assert len(diff_again) == 0
 
 
 def test_log(docker_url):

@@ -2012,6 +2012,40 @@ class Client:
             new_doc = self._conv_to_dict(document)
         return new_doc
 
+    def apply(self,
+              before_version,
+              after_version,
+              branch=None,
+              message=None,
+              author=None):
+        """Diff two different commits and apply changes on branch
+
+        Parameters
+        ----------
+        before_version : string
+            Before branch/commit to compare
+        after_object : string
+            After branch/commit to compare
+        branch : string
+            Branch to apply to. Optional.
+        """
+        self._check_connection()
+        branch = branch if branch else self.branch
+        return json.loads(
+            _finish_response(
+                requests.post(
+                    self._apply_url(branch=branch),
+                    headers=self._default_headers,
+                    json={
+                        "commit_info": self._generate_commit(message, author),
+                        "before_commit": before_version,
+                        "after_commit": after_version,
+                    },
+                    auth=self._auth(),
+                )
+            )
+        )
+
     def diff_object(self, before_object, after_object):
         """Diff two different objects.
 
@@ -2836,7 +2870,7 @@ class Client:
     def _repo_base(self, action: str):
         return self._db_base(action) + f"/{self._repo}"
 
-    def _branch_base(self, action: str):
+    def _branch_base(self, action: str, branch: Optional[str] = None):
         base = self._repo_base(action)
         if self._repo == "_meta":
             return base
@@ -2844,6 +2878,8 @@ class Client:
             return base + f"/{self._branch}"
         elif self.ref:
             return base + f"/commit/{self._ref}"
+        elif branch:
+            return base + f"/branch/{branch}"
         else:
             return base + f"/branch/{self._branch}"
         return base
@@ -2915,6 +2951,9 @@ class Client:
 
     def _diff_url(self):
         return self._branch_base("diff")
+
+    def _apply_url(self, branch: Optional[str] = None):
+        return self._branch_base("apply", branch)
 
     def _patch_url(self):
         return self._branch_base("patch")
