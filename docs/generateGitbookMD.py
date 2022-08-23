@@ -14,6 +14,7 @@
 #  * https://terminusdb.com/docs/index/terminusx-db/reference-guides/python-client-reference
 #  * 
 
+import glob
 import re
 import os 
 
@@ -147,13 +148,12 @@ if not os.path.exists(path):
         print(error)
 
 # Loop through each file for conversion
-for f in f_input:
-    file = open(f_dir+f+'.md',"r")
+for f in glob.glob('./build/markdown/*.md'):
+    print(f)
+    file = open(f, "r")
     file_data = file.read()
 
-    f_md = open(path+"/"+f+'.md', "w")
-
-    f = f_dir+f+'.md'
+    f_md = open(f, "w")
 
     process_data = ""
     if re.search("Scaffolding", f): 

@@ -24,7 +24,6 @@ jobs:
         cd docs
         python -m pip install -r requirements.txt
         make markdown
-        python generateGitbookMD.py
     - name: Set destination BRANCH_NAME for docs repo
       run: echo "BRANCH_NAME=Python-Reference-Updates-$(date +%s)" >> $GITHUB_ENV
     - name: Create pull request in terminusdb/terminusdb-docs
@@ -32,7 +31,7 @@ jobs:
       env:
         API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
-        source_folder: 'docs/build/markdown/gitbook-md/.'
+        source_folder: 'docs/build/markdown/.'
         destination_repo: 'terminusdb/terminusdb-docs'
         destination_folder: 'index/terminusx-db/reference-guides/python-client-reference'
         destination_base_branch: 'main'
