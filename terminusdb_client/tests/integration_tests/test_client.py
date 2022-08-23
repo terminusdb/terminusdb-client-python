@@ -110,6 +110,62 @@ def test_add_get_remove_org(docker_url):
         client.get_organization("testOrg")
 
 
+def test_diff_object(docker_url):
+    # create client
+    client = Client(docker_url, user_agent=test_user_agent)
+    # test create db
+    client.connect()
+    diff = client.diff_object({'test': 'wew'}, {'test': 'wow'})
+    assert diff == {'test': {'@before': 'wew', '@after': 'wow', '@op': 'SwapValue'}}
+
+
+def test_diff_apply_version(docker_url):
+    client = Client(docker_url, user_agent=test_user_agent)
+    client.connect()
+    db_name = "philosophers" + str(random())
+    client.create_database(db_name)
+    client.connect(db=db_name)
+    # Add a philosopher schema
+    schema = {"@type": "Class",
+              "@id": "Philosopher",
+              "name": "xsd:string"
+              }
+    # Add schema and Socrates
+    client.insert_document(schema, graph_type="schema")
+    client.insert_document({"name": "Socrates"})
+
+    # Create new branch and switch to it
+    client.create_branch("changes")
+    client.branch = "changes"
+
+    # Add more philosophers
+    client.insert_document({"name": "Plato"})
+    client.insert_document({"name": "Aristotle"})
+
+    diff = client.diff_version("main", "changes")
+    assert len(diff) == 2
+    assert diff[0]['@insert']['name'] == 'Plato'
+    assert diff[1]['@insert']['name'] == 'Aristotle'
+
+    # Apply the differences to main with apply
+    client.apply("main", "changes", branch='main')
+
+    # Diff again
+    diff_again = client.diff_version("main", "changes")
+    assert len(diff_again) == 0
+
+
+def test_log(docker_url):
+    # create client
+    client = Client(docker_url, user_agent=test_user_agent)
+    # test create db
+    client.connect()
+    db_name = "testDB" + str(random())
+    client.create_database(db_name, team="admin")
+    log = client.log(team="admin", db=db_name)
+    assert log[0]['@type'] == 'InitialCommit'
+
+
 def test_get_database(docker_url):
     client = Client(docker_url, user_agent=test_user_agent, team="admin")
     client.connect()

@@ -391,6 +391,53 @@ class Client:
                 "No database is connected. Please either connect to a database or create a new database."
             )
 
+    def log(self,
+            team: Optional[str] = None,
+            db: Optional[str] = None,
+            start: int = 0,
+            count: int = -1):
+        """Get commit history of a database
+        Parameters
+        ----------
+        team: str, optional
+             The team from which the database is. Defaults to the class property.
+        db: str, optional
+             The database. Defaults to the class property.
+        start: int, optional
+             Commit index to start from. Defaults to 0.
+        count: int, optional
+             Amount of commits to get. Defaults to -1 which gets all.
+
+        Returns
+        -------
+        list
+
+             List of the following commit objects:
+               {
+                "@id":"InitialCommit/hpl18q42dbnab4vzq8me4bg1xn8p2a0",
+                "@type":"InitialCommit",
+                "author":"system",
+                "identifier":"hpl18q42dbnab4vzq8me4bg1xn8p2a0",
+                "message":"create initial schema",
+                "schema":"layer_data:Layer_4234adfe377fa9563a17ad764ac37f5dcb14de13668ea725ef0748248229a91b",
+                "timestamp":1660919664.9129035
+               }
+        """
+        self._check_connection(check_db=(not team or not db))
+        team = team if team else self.team
+        db = db if db else self.db
+        result = requests.get(
+            f"{self.api}/log/{team}/{db}",
+            params={'start': start, 'count': count},
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        commits = json.loads(_finish_response(result))
+        for commit in commits:
+            commit['timestamp'] = datetime.fromtimestamp(commit['timestamp'])
+            commit['commit'] = commit['identifier']  # For backwards compat.
+        return commits
+
     def get_commit_history(self, max_history: int = 500) -> list:
         """Get the whole commit history.
         Commit history - Commit id, author of the commit, commit message and the commit time, in the current branch from the current commit, ordered backwards in time, will be returned in a dictionary in the follow format:
@@ -403,7 +450,7 @@ class Client:
         Parameters
         ----------
         max_history: int, optional
-            maximum number of commit that would return, counting backwards from your current commit. Default is set to 500. It need to be nop-negitive, if input is 0 it will still give the last commit.
+            maximum number of commit that would return, counting backwards from your current commit. Default is set to 500. It needs to be nop-negative, if input is 0 it will still give the last commit.
 
         Example
         -------
@@ -429,70 +476,21 @@ class Client:
         """
         if max_history < 0:
             raise ValueError("max_history needs to be non-negative.")
-        if max_history > 1:
-            limit_history = max_history - 1
-        else:
-            limit_history = 1
-        woql_query = (
-            WOQLQuery()
-            .using("_commits")
-            .limit(limit_history)
-            .triple("v:branch", "name", WOQLQuery().string(self.branch))
-            .triple("v:branch", "head", "v:commit")
-            .path("v:commit", "parent*", "v:target_commit")
-            .triple("v:target_commit", "identifier", "v:cid")
-            .triple("v:target_commit", "author", "v:author")
-            .triple("v:target_commit", "message", "v:message")
-            .triple("v:target_commit", "timestamp", "v:timestamp")
-        )
-        result = self.query(woql_query).get("bindings")
-        if not result:
-            return result
-        else:
-            result_list = []
-            for result_item in result:
-                result_list.append(
-                    {
-                        "commit": result_item["cid"]["@value"],
-                        "author": result_item["author"]["@value"],
-                        "message": result_item["message"]["@value"],
-                        "timestamp": datetime.fromtimestamp(
-                            int(result_item["timestamp"]["@value"])
-                        ),
-                    }
-                )
-            return result_list
+        return self.log(count=max_history)
 
     def _get_current_commit(self):
-        woql_query = (
-            WOQLQuery()
-            .using("_commits")
-            .triple("v:branch", "name", WOQLQuery().string(self.branch))
-            .triple("v:branch", "head", "v:commit")
-            .triple("v:commit", "identifier", "v:cid")
-        )
-        result = self.query(woql_query)
-        if not result:
-            return None
-        current_commit = result.get("bindings")[0].get("cid").get("@value")
-        return current_commit
+        descriptor = self.db
+        if self.branch:
+            descriptor = f'{descriptor}/local/branch/{self.branch}'
+        commit = self.log(team=self.team, db=descriptor, count=1)[0]
+        return commit['identifier']
 
     def _get_target_commit(self, step):
-        woql_query = (
-            WOQLQuery()
-            .using("_commits")
-            .path(
-                "v:commit",
-                f"parent{{{step},{step}}}",
-                "v:target_commit",
-            )
-            .triple("v:branch", "name", WOQLQuery().string(self.branch))
-            .triple("v:branch", "head", "v:commit")
-            .triple("v:target_commit", "identifier", "v:cid")
-        )
-        result = self.query(woql_query)
-        target_commit = result.get("bindings")[0].get("cid").get("@value")
-        return target_commit
+        descriptor = self.db
+        if self.branch:
+            descriptor = f'{descriptor}/local/branch/{self.branch}'
+        commit = self.log(team=self.team, db=descriptor, count=1, start=step)[0]
+        return commit['identifier']
 
     def get_all_branches(self, get_data_version=False):
         """Get all the branches available in the database."""
@@ -2014,6 +2012,86 @@ class Client:
             new_doc = self._conv_to_dict(document)
         return new_doc
 
+    def apply(self,
+              before_version,
+              after_version,
+              branch=None,
+              message=None,
+              author=None):
+        """Diff two different commits and apply changes on branch
+
+        Parameters
+        ----------
+        before_version : string
+            Before branch/commit to compare
+        after_object : string
+            After branch/commit to compare
+        branch : string
+            Branch to apply to. Optional.
+        """
+        self._check_connection()
+        branch = branch if branch else self.branch
+        return json.loads(
+            _finish_response(
+                requests.post(
+                    self._apply_url(branch=branch),
+                    headers=self._default_headers,
+                    json={
+                        "commit_info": self._generate_commit(message, author),
+                        "before_commit": before_version,
+                        "after_commit": after_version,
+                    },
+                    auth=self._auth(),
+                )
+            )
+        )
+
+    def diff_object(self, before_object, after_object):
+        """Diff two different objects.
+
+        Parameters
+        ----------
+        before_object : string
+            Before object to compare
+        after_object : string
+            After object to compare
+        """
+        self._check_connection(check_db=False)
+        return json.loads(
+            _finish_response(
+                requests.post(
+                    self._diff_url(),
+                    headers=self._default_headers,
+                    json={'before': before_object,
+                          'after': after_object},
+                    auth=self._auth(),
+                )
+            )
+        )
+
+    def diff_version(self, before_version, after_version):
+        """Diff two different versions. Can either be a branch or a commit
+
+        Parameters
+        ----------
+        before_version : string
+            Commit or branch of the before version to compare
+        after_version : string
+            Commit or branch of the after version to compare
+        """
+        self._check_connection(check_db=False)
+        return json.loads(
+            _finish_response(
+                requests.post(
+                    self._diff_url(),
+                    headers=self._default_headers,
+                    json={'before_data_version': before_version,
+                          'after_data_version': after_version},
+                    auth=self._auth(),
+                )
+            )
+        )
+
     def diff(
         self,
         before: Union[
@@ -2034,7 +2112,9 @@ class Client:
         ],
         document_id: Union[str, None] = None,
     ):
-        """Perform diff on 2 set of document(s), result in a Patch object.
+        """DEPRECATED
+
+        Perform diff on 2 set of document(s), result in a Patch object.
 
         Do not connect when using public API.
 
@@ -2790,7 +2870,7 @@ class Client:
     def _repo_base(self, action: str):
         return self._db_base(action) + f"/{self._repo}"
 
-    def _branch_base(self, action: str):
+    def _branch_base(self, action: str, branch: Optional[str] = None):
         base = self._repo_base(action)
         if self._repo == "_meta":
             return base
@@ -2798,6 +2878,8 @@ class Client:
             return base + f"/{self._branch}"
         elif self.ref:
             return base + f"/commit/{self._ref}"
+        elif branch:
+            return base + f"/branch/{branch}"
         else:
             return base + f"/branch/{self._branch}"
         return base
@@ -2869,6 +2951,9 @@ class Client:
 
     def _diff_url(self):
         return self._branch_base("diff")
+
+    def _apply_url(self, branch: Optional[str] = None):
+        return self._branch_base("apply", branch)
 
     def _patch_url(self):
         return self._branch_base("patch")
