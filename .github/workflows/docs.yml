@@ -30,7 +30,7 @@ jobs:
       env:
         API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
-        source_folder: 'docs/build/markdown/.'
+        source_folder: 'docs/build/markdown/gitbook-md/.'
         destination_repo: 'terminusdb/terminusdb-docs'
         destination_folder: 'index/terminusx-db/reference-guides/python-client-reference'
         destination_base_branch: 'main'
