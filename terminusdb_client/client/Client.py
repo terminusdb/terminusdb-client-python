@@ -2012,6 +2012,52 @@ class Client:
             new_doc = self._conv_to_dict(document)
         return new_doc
 
+    def diff_object(self, before_object, after_object):
+        """Diff two different objects.
+
+        Parameters
+        ----------
+        before_object : string
+            Before object to compare
+        after_object : string
+            After object to compare
+        """
+        self._check_connection(check_db=False)
+        return json.loads(
+            _finish_response(
+                requests.post(
+                    self._diff_url(),
+                    headers=self._default_headers,
+                    json={'before': before_object,
+                          'after': after_object},
+                    auth=self._auth(),
+                )
+            )
+        )
+
+    def diff_version(self, before_version, after_version):
+        """Diff two different versions. Can either be a branch or a commit
+
+        Parameters
+        ----------
+        before_version : string
+            Commit or branch of the before version to compare
+        after_version : string
+            Commit or branch of the after version to compare
+        """
+        self._check_connection(check_db=False)
+        return json.loads(
+            _finish_response(
+                requests.post(
+                    self._diff_url(),
+                    headers=self._default_headers,
+                    json={'before_data_version': before_version,
+                          'after_data_version': after_version},
+                    auth=self._auth(),
+                )
+            )
+        )
+
     def diff(
         self,
         before: Union[
@@ -2032,7 +2078,9 @@ class Client:
         ],
         document_id: Union[str, None] = None,
     ):
-        """Perform diff on 2 set of document(s), result in a Patch object.
+        """DEPRECATED
+
+        Perform diff on 2 set of document(s), result in a Patch object.
 
         Do not connect when using public API.
 
