@@ -178,6 +178,20 @@ class WOQLQuery:
         """
         return WOQLQuery().woql_or(self, other)
 
+    def __invert__(self):
+        """Creates a logical Not with the argument passed, for WOQLQueries.
+
+        Parameters
+        ----------
+        other : WOQLQuery object
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        return WOQLQuery().woql_not(self)
+
     def _add_sub_query(self, sub_query=None):
         """Internal library function which adds a subquery and sets the cursor"""
         if sub_query:
