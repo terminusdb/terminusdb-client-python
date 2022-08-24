@@ -1271,6 +1271,19 @@ class WOQLQuery:
         # return self._updated()
 
     def update_document(self, docjson, json_or_iri=None):
+        """Update a document in the database
+
+        Parameters
+        ----------
+        docjson : JSON
+            object to be updated
+        json_or_iri : str
+            the output ID, or a JSON to compare the ID against
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         if docjson and docjson == "args":
             return ["document"]
         if self._cursor.get("@type"):
@@ -1286,6 +1299,19 @@ class WOQLQuery:
         return self._updated()
 
     def insert_document(self, docjson, json_or_iri=None):
+        """Insert a document into the database
+
+        Parameters
+        ----------
+        docjson : JSON
+            object to be inserted
+        json_or_iri : str
+            the output ID, or a JSON to compare the ID against
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         if docjson and docjson == "args":
             return ["document"]
         if self._cursor.get("@type"):
@@ -1315,6 +1341,19 @@ class WOQLQuery:
         # return self._updated()
 
     def delete_document(self, json_or_iri):
+        """Delete a document into the database
+
+        Parameters
+        ----------
+        docjson : JSON
+            object to be deleted
+        json_or_iri : str
+            the output ID, or a JSON to compare the ID against
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         if json_or_iri and json_or_iri == "args":
             return ["document"]
         if self._cursor.get("@type"):
@@ -1339,6 +1378,25 @@ class WOQLQuery:
         # return self
 
     def read_document(self, iri, output_var):
+        """Read a document from the database
+
+        Parameters
+        ----------
+        iri : str
+            object to be deleted
+        output_var : str
+            the document as JSON
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        Example
+        -------
+        >>> query = (WOQLQuery().triple('v:TermId', 'rdf:type', '@schema:Term') &
+                     WOQLQuery().triple('v:TermCountId','term','v:TermId') &
+                     WOQLQuery().triple('v:DocumentId', 'terms', 'v:TermCountId') &
+                     WOQLQuery().read_document('v:TermId','v:TermDoc'))
+        """
         if iri and iri == "args":
             return ["document"]
         if self._cursor.get("@type"):
@@ -1953,6 +2011,21 @@ class WOQLQuery:
         return self
 
     def like(self, left, right, dist):
+        """Matches left string to right string with a distance
+
+        Parameters
+        ----------
+        left : str
+            first string to compare
+        right : str
+            second string to compare
+        dist : str
+            Hamming distance between left and right
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         if left and left == "args":
             return ["left", "right", "similarity"]
         if self._cursor.get("@type"):
@@ -2137,6 +2210,20 @@ class WOQLQuery:
         return self
 
     def upper(self, left, right):
+        """Changes a string to upper-case - input is in left, output in right
+
+        Parameters
+        ----------
+        left : str
+            input string
+        right : str
+            stores output
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         if left and left == "args":
             return ["left", "right"]
         if self._cursor.get("@type"):
