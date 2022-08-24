@@ -2504,8 +2504,8 @@ class WOQLQuery:
 
     def regexp(self, pattern, reg_str, reg_list):
         """Regular Expression Call
-        p is a regex pattern (.*) using normal regular expression syntax, the only unusual thing is that special characters have to be escaped twice, s is the string to be matched and m is a list of matches:
-        e.g. WOQL.regexp("(.).*", "hello", ["v:All", "v:Sub"])
+        pattern is a regex pattern (.*) using normal regular expression syntax, the only unusual thing is that special characters have to be escaped twice, s is the string to be matched and m is a list of matches:
+        e.g. WOQLQuery().regexp("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
@@ -2532,6 +2532,21 @@ class WOQLQuery:
         return self
 
     def length(self, var_list, var_len):
+        """Length
+        Calculates the length of a list
+
+        Parameters
+        ----------
+        var_list : list
+            list of elements
+        var_len : num
+            number of eleemnts
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         if var_list and var_list == "args":
             return ["list", "length"]
         if self._cursor.get("@type"):
