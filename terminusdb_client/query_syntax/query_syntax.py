@@ -1,4 +1,4 @@
-from ..woqlquery import WOQLQuery, Var, Doc
+from ..woqlquery import WOQLQuery, Var, Doc # noqa
 import re
 import sys
 
