@@ -3093,3 +3093,19 @@ class WOQLQuery:
         if len(vars_tuple) == 1:
             vars_tuple = vars_tuple[0]
         return vars_tuple
+
+    def variables(self, *args):
+        """Generate variables to be used in WOQLQueries
+        Parameters
+        ----------
+        args
+            string arguments
+        Returns
+        -------
+        tuple/string
+            args prefixed with "v:"
+        """
+        vars_tuple = tuple(Var(arg) for arg in args)
+        if len(vars_tuple) == 1:
+            vars_tuple = vars_tuple[0]
+        return vars_tuple

@@ -13,15 +13,15 @@ for attribute in dir(WOQLQuery()):
                                         or attribute in __ALLOWED)
             and not attribute in __BARRED):
 
-        _woql_obj_fun = getattr(WOQLQuery(), attribute)
-
         __exported.append(attribute)
 
-        def __create_a_function(function, *args, **kwargs):
+        def __create_a_function():
+            obj = WOQLQuery()
+            func = getattr(obj,attribute)
             def __woql_fun(*args, **kwargs):
-                return function(*args, **kwargs)
+                return func(*args, **kwargs)
             return __woql_fun
 
-        setattr(__module, attribute, __create_a_function(_woql_obj_fun))
+        setattr(__module, attribute, __create_a_function())
 
 __all__ = __exported
