@@ -7,12 +7,11 @@ __module = sys.modules[__name__]
 __exported = ['Var', 'Doc']
 
 for attribute in dir(WOQLQuery()):
-    if isinstance(attribute, str) and re.match('^[^_].*', attribute):
-        _woql_obj_fun = getattr(WOQLQuery(), attribute)
+    if (isinstance(attribute, str)
+        and re.match('^[^_].*', attribute)
+        and not attribute == 're'):
 
-        # This is far too common
-        if attribute == 're':
-            attribute = 'regexp'
+        _woql_obj_fun = getattr(WOQLQuery(), attribute)
 
         __exported.append(attribute)
 
