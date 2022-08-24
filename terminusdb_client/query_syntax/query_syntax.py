@@ -1,15 +1,20 @@
 from ..woqlquery import WOQLQuery, Var, Doc
-import re as regexp
+import re
 import sys
 
 __module = sys.modules[__name__]
 
-__exported = [Var, Doc]
+__exported = ['Var', 'Doc']
 
 for attribute in dir(WOQLQuery()):
-    if isinstance(attribute, str) and regexp.match('^[^_].*', attribute):
-        __exported.append(attribute)
+    if isinstance(attribute, str) and re.match('^[^_].*', attribute):
         _woql_obj_fun = getattr(WOQLQuery(), attribute)
+
+        # This is far too common
+        if attribute == 're':
+            attribute = 'regexp'
+
+        __exported.append(attribute)
 
         def __create_a_function(function, *args, **kwargs):
             def __woql_fun(*args, **kwargs):
