@@ -1254,8 +1254,7 @@ class WOQLQuery:
 
     def update_object(self, docjson):
         warnings.warn(
-            "update_object() is deprecated; use update_document()",
-            warnings.DeprecationWarning,
+            DeprecationWarning("update_object() is deprecated; use update_document()")
         )
         return self.update_document(docjson)
         # if docjson and docjson == "args":
@@ -1328,17 +1327,9 @@ class WOQLQuery:
 
     def delete_object(self, json_or_iri):
         warnings.warn(
-            "delete_object() is deprecated; use delete_document()",
-            warnings.DeprecationWarning,
+            DeprecationWarning("delete_object() is deprecated; use delete_document()")
         )
         return self.delete_document(json_or_iri)
-        # if json_or_iri and json_or_iri == "args":
-        #     return ["document"]
-        # if self._cursor.get("@type"):
-        #     self._wrap_cursor_with_and()
-        # self._cursor["@type"] = "DeleteObject"
-        # self._cursor["document_uri"] = self._clean_node_value(json_or_iri)
-        # return self._updated()
 
     def delete_document(self, json_or_iri):
         """Delete a document into the database
@@ -1364,8 +1355,7 @@ class WOQLQuery:
 
     def read_object(self, iri, output_var):
         warnings.warn(
-            "read_object() is deprecated; use read_document()",
-            warnings.DeprecationWarning,
+            DeprecationWarning("read_object() is deprecated; use read_document()")
         )
         return self.read_document(iri, output_var)
         # if iri and iri == "args":
@@ -2507,9 +2497,15 @@ class WOQLQuery:
         return self._add_sub_query(query)
 
     def re(self, pattern, reg_str, reg_list):
+        warnings.warn(
+            DeprecationWarning("re() is deprecated; use regexp()")
+        )
+        return self.re(pattern, reg_str, reg_list)
+
+    def regexp(self, pattern, reg_str, reg_list):
         """Regular Expression Call
         p is a regex pattern (.*) using normal regular expression syntax, the only unusual thing is that special characters have to be escaped twice, s is the string to be matched and m is a list of matches:
-        e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
+        e.g. WOQL.regexp("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
