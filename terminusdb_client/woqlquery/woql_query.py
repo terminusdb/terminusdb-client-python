@@ -2500,7 +2500,7 @@ class WOQLQuery:
         warnings.warn(
             DeprecationWarning("re() is deprecated; use regexp()")
         )
-        return self.re(pattern, reg_str, reg_list)
+        return self.regexp(pattern, reg_str, reg_list)
 
     def regexp(self, pattern, reg_str, reg_list):
         """Regular Expression Call
