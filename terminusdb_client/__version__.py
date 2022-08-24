@@ -1,7 +1,7 @@
 __title__ = "woqlClient"
 __description__ = "woqlClient library for accessing the Terminus DB API"
 __url__ = ""
-__version__ = "10.1.4"
+__version__ = "10.1.5"
 __build__ = 00
 __author__ = "TerminusDB group"
 __author_email__ = "team@terminusdb.com"

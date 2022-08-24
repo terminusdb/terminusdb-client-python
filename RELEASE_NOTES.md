@@ -1,5 +1,18 @@
 # TerminusDB Python Client Release Notes
 
+## v10.1.5
+
+### New
+
+- Add has_databse function to check for the existence of a database
+
+### Deprecations
+
+- We now return an exception when a database does not exist when
+  calling `get_database` on a database that does not exist. Be
+  sure to check for a database using has_database instead or
+  catch the appropiate exception.
+
 ## v10.1.4
 
 ### Bug Fixes
