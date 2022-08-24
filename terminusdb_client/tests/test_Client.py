@@ -181,6 +181,20 @@ def test_get_database(mocked_requests, mocked_requests2):
     )
 
 
+@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch("requests.head", side_effect=mocked_request_success)
+def test_has_database(mocked_requests, mocked_requests2):
+    client = Client("http://localhost:6363")
+    client.connect(user="admin", team="admin", key="root")
+    db_name = "testDB" + str(random.randrange(100000))
+    client.has_database(db_name)
+    requests.head.assert_called_with(
+        f"http://localhost:6363/api/db/admin/{db_name}",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+    )
+
+
 @pytest.mark.skip(reason="temporary not avaliable")
 @mock.patch("requests.head", side_effect=mocked_request_success)
 @mock.patch("requests.get", side_effect=mocked_request_success)

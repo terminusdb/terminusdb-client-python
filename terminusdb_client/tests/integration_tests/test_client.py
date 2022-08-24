@@ -175,6 +175,17 @@ def test_get_database(docker_url):
     assert db['name'] == db_name
     db_with_team = client.get_database(db_name, team='admin')
     assert db_with_team['name'] == db_name
+    with pytest.raises(DatabaseError):
+        client.get_database("DOES_NOT_EXISTDB")
+
+
+def test_has_database(docker_url):
+    client = Client(docker_url, user_agent=test_user_agent, team="admin")
+    client.connect()
+    db_name = "testDB" + str(random())
+    client.create_database(db_name, team="admin")
+    assert client.has_database(db_name)
+    assert not client.has_database("DOES_NOT_EXISTDB")
 
 
 def test_add_get_remove_user(docker_url):
