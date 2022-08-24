@@ -2799,10 +2799,12 @@ class Client:
         ------
         InterfaceError
             if the client does not connect to a server
+        DatabaseError
+            if the database can't be found
 
         Returns
         -------
-        dict or None if not found
+        dict
         """
         self._check_connection(check_db=False)
         team = team if team else self.team
@@ -2812,6 +2814,35 @@ class Client:
             auth=self._auth(),
         )
         return json.loads(_finish_response(result))
+
+    def has_database(self, dbid: str, team: Optional[str] = None) -> bool:
+        """
+        Check whether a database exists
+
+        Parameters
+        ----------
+        dbid : str
+            The id of the database
+        team : str
+            The organization of the database (default self.team)
+
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a server
+
+        Returns
+        -------
+        True or False if not found
+        """
+        self._check_connection(check_db=False)
+        team = team if team else self.team
+        r = requests.head(
+            f"{self.api}/db/{team}/{dbid}",
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        return r.status_code == 200
 
     def get_databases(self) -> List[dict]:
         """
