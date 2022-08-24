@@ -2,12 +2,16 @@ from ..woqlquery import WOQLQuery, Var, Doc # noqa
 import re
 import sys
 
+__BARRED = ['re','vars']
+__ALLOWED = ['__and__','__or__','__add__']
 __module = sys.modules[__name__]
 
 __exported = ['Var', 'Doc']
 
 for attribute in dir(WOQLQuery()):
-    if (isinstance(attribute, str) and re.match('^[^_].*', attribute) and not attribute == 're'):
+    if (isinstance(attribute, str) and (re.match('^[^_].*', attribute)
+                                        or attribute in __ALLOWED)
+            and not attribute in __BARRED):
 
         _woql_obj_fun = getattr(WOQLQuery(), attribute)
 
