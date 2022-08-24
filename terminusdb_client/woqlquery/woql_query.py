@@ -695,6 +695,18 @@ class WOQLQuery:
             self._cursor = self._cursor["and"][1]
 
     def using(self, collection, subq=None):
+        """Use a specific data product for the enclosed query
+
+        Parameters
+        ----------
+        collection : str
+            the name of the data product
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+
         if collection and collection == "args":
             return ["collection", "query"]
         if self._cursor.get("@type"):
