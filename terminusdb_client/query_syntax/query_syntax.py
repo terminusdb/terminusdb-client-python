@@ -4,13 +4,13 @@ import sys
 
 __module = sys.modules[__name__]
 
-__exported = []
+__exported = [Var, Doc]
 
 for attribute in dir(WOQLQuery()):
-    if isinstance(attribute,str) and regexp.match('^[^_].*', attribute):
-        print(attribute)
+    if isinstance(attribute, str) and regexp.match('^[^_].*', attribute):
         __exported.append(attribute)
-        _woql_obj_fun = getattr(WOQLQuery(),attribute)
+        _woql_obj_fun = getattr(WOQLQuery(), attribute)
+
         def __create_a_function(function, *args, **kwargs):
             def __woql_fun(*args, **kwargs):
                 return function(*args, **kwargs)
