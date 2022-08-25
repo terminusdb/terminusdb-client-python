@@ -1,1 +1,1 @@
-from .woql_query import WOQLQuery  # noqa
+from .woql_query import WOQLQuery, Var, Doc  # noqa

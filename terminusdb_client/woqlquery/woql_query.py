@@ -178,6 +178,20 @@ class WOQLQuery:
         """
         return WOQLQuery().woql_or(self, other)
 
+    def __invert__(self):
+        """Creates a logical Not with the argument passed, for WOQLQueries.
+
+        Parameters
+        ----------
+        other : WOQLQuery object
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        return WOQLQuery().woql_not(self)
+
     def _add_sub_query(self, sub_query=None):
         """Internal library function which adds a subquery and sets the cursor"""
         if sub_query:
@@ -695,6 +709,18 @@ class WOQLQuery:
             self._cursor = self._cursor["and"][1]
 
     def using(self, collection, subq=None):
+        """Use a specific data product for the enclosed query
+
+        Parameters
+        ----------
+        collection : str
+            the name of the data product
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+
         if collection and collection == "args":
             return ["collection", "query"]
         if self._cursor.get("@type"):
@@ -1242,8 +1268,7 @@ class WOQLQuery:
 
     def update_object(self, docjson):
         warnings.warn(
-            "update_object() is deprecated; use update_document()",
-            warnings.DeprecationWarning,
+            DeprecationWarning("update_object() is deprecated; use update_document()")
         )
         return self.update_document(docjson)
         # if docjson and docjson == "args":
@@ -1259,6 +1284,19 @@ class WOQLQuery:
         # return self._updated()
 
     def update_document(self, docjson, json_or_iri=None):
+        """Update a document in the database
+
+        Parameters
+        ----------
+        docjson : JSON
+            object to be updated
+        json_or_iri : str
+            the output ID, or a JSON to compare the ID against
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         if docjson and docjson == "args":
             return ["document"]
         if self._cursor.get("@type"):
@@ -1274,6 +1312,19 @@ class WOQLQuery:
         return self._updated()
 
     def insert_document(self, docjson, json_or_iri=None):
+        """Insert a document into the database
+
+        Parameters
+        ----------
+        docjson : JSON
+            object to be inserted
+        json_or_iri : str
+            the output ID, or a JSON to compare the ID against
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         if docjson and docjson == "args":
             return ["document"]
         if self._cursor.get("@type"):
@@ -1290,19 +1341,24 @@ class WOQLQuery:
 
     def delete_object(self, json_or_iri):
         warnings.warn(
-            "delete_object() is deprecated; use delete_document()",
-            warnings.DeprecationWarning,
+            DeprecationWarning("delete_object() is deprecated; use delete_document()")
         )
         return self.delete_document(json_or_iri)
-        # if json_or_iri and json_or_iri == "args":
-        #     return ["document"]
-        # if self._cursor.get("@type"):
-        #     self._wrap_cursor_with_and()
-        # self._cursor["@type"] = "DeleteObject"
-        # self._cursor["document_uri"] = self._clean_node_value(json_or_iri)
-        # return self._updated()
 
     def delete_document(self, json_or_iri):
+        """Delete a document into the database
+
+        Parameters
+        ----------
+        docjson : JSON
+            object to be deleted
+        json_or_iri : str
+            the output ID, or a JSON to compare the ID against
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         if json_or_iri and json_or_iri == "args":
             return ["document"]
         if self._cursor.get("@type"):
@@ -1313,8 +1369,7 @@ class WOQLQuery:
 
     def read_object(self, iri, output_var):
         warnings.warn(
-            "read_object() is deprecated; use read_document()",
-            warnings.DeprecationWarning,
+            DeprecationWarning("read_object() is deprecated; use read_document()")
         )
         return self.read_document(iri, output_var)
         # if iri and iri == "args":
@@ -1327,6 +1382,25 @@ class WOQLQuery:
         # return self
 
     def read_document(self, iri, output_var):
+        """Read a document from the database
+
+        Parameters
+        ----------
+        iri : str
+            object to be deleted
+        output_var : str
+            the document as JSON
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        Example
+        -------
+        >>> query = (WOQLQuery().triple('v:TermId', 'rdf:type', '@schema:Term') &
+                     WOQLQuery().triple('v:TermCountId','term','v:TermId') &
+                     WOQLQuery().triple('v:DocumentId', 'terms', 'v:TermCountId') &
+                     WOQLQuery().read_document('v:TermId','v:TermDoc'))
+        """
         if iri and iri == "args":
             return ["document"]
         if self._cursor.get("@type"):
@@ -1941,6 +2015,21 @@ class WOQLQuery:
         return self
 
     def like(self, left, right, dist):
+        """Matches left string to right string with a distance
+
+        Parameters
+        ----------
+        left : str
+            first string to compare
+        right : str
+            second string to compare
+        dist : str
+            Hamming distance between left and right
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         if left and left == "args":
             return ["left", "right", "similarity"]
         if self._cursor.get("@type"):
@@ -2125,6 +2214,20 @@ class WOQLQuery:
         return self
 
     def upper(self, left, right):
+        """Changes a string to upper-case - input is in left, output in right
+
+        Parameters
+        ----------
+        left : str
+            input string
+        right : str
+            stores output
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         if left and left == "args":
             return ["left", "right"]
         if self._cursor.get("@type"):
@@ -2408,9 +2511,15 @@ class WOQLQuery:
         return self._add_sub_query(query)
 
     def re(self, pattern, reg_str, reg_list):
+        warnings.warn(
+            DeprecationWarning("re() is deprecated; use regexp()")
+        )
+        return self.regexp(pattern, reg_str, reg_list)
+
+    def regexp(self, pattern, reg_str, reg_list):
         """Regular Expression Call
-        p is a regex pattern (.*) using normal regular expression syntax, the only unusual thing is that special characters have to be escaped twice, s is the string to be matched and m is a list of matches:
-        e.g. WOQL.re("(.).*", "hello", ["v:All", "v:Sub"])
+        pattern is a regex pattern (.*) using normal regular expression syntax, the only unusual thing is that special characters have to be escaped twice, s is the string to be matched and m is a list of matches:
+        e.g. WOQLQuery().regexp("(.).*", "hello", ["v:All", "v:Sub"])
 
         Parameters
         ----------
@@ -2437,6 +2546,21 @@ class WOQLQuery:
         return self
 
     def length(self, var_list, var_len):
+        """Length
+        Calculates the length of a list
+
+        Parameters
+        ----------
+        var_list : list
+            list of elements
+        var_len : num
+            number of eleemnts
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         if var_list and var_list == "args":
             return ["list", "length"]
         if self._cursor.get("@type"):
@@ -2969,6 +3093,22 @@ class WOQLQuery:
         return self
 
     def vars(self, *args):
+        """Generate variables to be used in WOQLQueries
+        Parameters
+        ----------
+        args
+            string arguments
+        Returns
+        -------
+        tuple/string
+            args prefixed with "v:"
+        """
+        vars_tuple = tuple(Var(arg) for arg in args)
+        if len(vars_tuple) == 1:
+            vars_tuple = vars_tuple[0]
+        return vars_tuple
+
+    def variables(self, *args):
         """Generate variables to be used in WOQLQueries
         Parameters
         ----------
