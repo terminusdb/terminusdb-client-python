@@ -26,9 +26,7 @@ graph all through a simple document API.
 [terminusdb-docs]: https://terminusdb.com/docs/
 [terminusdb-repo]: https://github.com/terminusdb/terminusdb
 
-**TerminusX** is a self-service data platform that allows you to build, deploy,
-execute, monitor, and share versioned data products. It is built on TerminusDB.
-TerminusX is in public beta and you can [sign up now][dashboard].
+**TerminusX** is TerminusDB as a service. SOC 2 certified hosting. Build your beta and get to market fast. Scale up and deploy your own instance. [Sign up now][dashboard].
 
 [dashboard]: https://dashboard.terminusdb.com/
 
