@@ -36,3 +36,10 @@ PyYAML = "<6.0"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[[tool.pydoc-markdown.loaders]]
+type = "python"
+search_path = [ "./terminusdb_client" ]
+
+[tool.pydoc-markdown.renderer]
+type = "gitbook"

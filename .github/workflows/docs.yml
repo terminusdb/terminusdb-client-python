@@ -5,8 +5,6 @@ name: Generate docs and Create PR on docs repo
 
 on:
   push:
-    tags:
-      - v*
 
 jobs:
   make_docs:
@@ -20,10 +18,15 @@ jobs:
         python-version: '3.x'
     - name: Generate docs
       run: |
+        git clone --single-branch --branch add_gitbook https://github.com/terminusdb/pydoc-markdown.git
         python -m pip install --upgrade pip
+        pip install ./pydoc-markdown
+        pydoc-markdown
         cd docs
         python -m pip install -r requirements.txt
         make markdown
+        python generateGitbookMD.py
+        cp -r reference/* build/markdown/gitbook-md/
     - name: Set destination BRANCH_NAME for docs repo
       run: echo "BRANCH_NAME=Python-Reference-Updates-$(date +%s)" >> $GITHUB_ENV
     - name: Create pull request in terminusdb/terminusdb-docs
@@ -31,9 +34,9 @@ jobs:
       env:
         API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
-        source_folder: 'docs/build/markdown/.'
+        source_folder: 'docs/build/markdown/gitbook-md'
         destination_repo: 'terminusdb/terminusdb-docs'
-        destination_folder: 'index/terminusx-db/reference-guides/python-client-reference'
+        destination_folder: 'guides/reference-guides/python-client-reference'
         destination_base_branch: 'main'
         destination_head_branch: ${{ env.BRANCH_NAME }}
         user_email: 'robin@terminusdb.com'

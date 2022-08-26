@@ -1492,7 +1492,7 @@ class Client:
         graph_type : str
             Graph type, either "instance" or "schema".
 
-        returns
+        Returns
         -------
         Bool
             if the document exist
@@ -1511,7 +1511,7 @@ class Client:
         class_name: str
             Name of the class
 
-        returns
+        Returns
         -------
         dict
             Dictionary containing information
