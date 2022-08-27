@@ -328,7 +328,7 @@ class Client:
             Extra configuration options.
 
         Examples
-        -------
+        --------
         >>> client = Client("http://127.0.0.1:6363")
         >>> client.connect(key="root", team="admin", user="admin", db="example_db")
         """
@@ -413,6 +413,7 @@ class Client:
         list
 
              List of the following commit objects:
+             ```
                {
                 "@id":"InitialCommit/hpl18q42dbnab4vzq8me4bg1xn8p2a0",
                 "@type":"InitialCommit",
@@ -422,6 +423,7 @@ class Client:
                 "schema":"layer_data:Layer_4234adfe377fa9563a17ad764ac37f5dcb14de13668ea725ef0748248229a91b",
                 "timestamp":1660919664.9129035
                }
+             ```
         """
         self._check_connection(check_db=(not team or not db))
         team = team if team else self.team
@@ -441,11 +443,14 @@ class Client:
     def get_commit_history(self, max_history: int = 500) -> list:
         """Get the whole commit history.
         Commit history - Commit id, author of the commit, commit message and the commit time, in the current branch from the current commit, ordered backwards in time, will be returned in a dictionary in the follow format:
-        {"commit_id":
-        {"author": "commit_author",
-        "message": "commit_message",
-        "timestamp: <datetime object of the timestamp>" }
+        ```
+        { "commit_id":
+             { "author": "commit_author",
+               "message": "commit_message",
+               "timestamp: <datetime object of the timestamp>"
+             }
         }
+        ```
 
         Parameters
         ----------
@@ -730,7 +735,7 @@ class Client:
             if the client does not connect to a server.
 
         Examples
-        -------
+        --------
         >>> client = Client("http://127.0.0.1:6363/")
         >>> client.delete_database("<database>", "<team>")
         """
@@ -1487,7 +1492,7 @@ class Client:
         graph_type : str
             Graph type, either "instance" or "schema".
 
-        returns
+        Returns
         -------
         Bool
             if the document exist
@@ -1506,7 +1511,7 @@ class Client:
         class_name: str
             Name of the class
 
-        returns
+        Returns
         -------
         dict
             Dictionary containing information
@@ -1553,7 +1558,7 @@ class Client:
             if the client does not connect to a database
 
         Examples
-        -------
+        --------
         >>> Client(server="http://localhost:6363").query(woql, "updating graph")
 
         Returns
@@ -1755,7 +1760,7 @@ class Client:
             if the client does not connect to a database
 
         Examples
-        -------
+        --------
         >>> Client(server="http://localhost:6363").push(remote="origin", remote_branch = "main", author = "admin", message = "commit message"})
 
         Returns
@@ -2541,7 +2546,7 @@ class Client:
         dict or None if failed
 
         Examples
-        -------
+        --------
         >>> client = Client("http://127.0.0.1:6363")
         >>> client.connect(key="root", team="admin", user="admin", db="example_db")
         >>> role = {
@@ -2597,7 +2602,7 @@ class Client:
         dict or None if failed
 
         Examples
-        -------
+        --------
         >>> client = Client("http://127.0.0.1:6363")
         >>> client.connect(key="root", team="admin", user="admin", db="example_db")
         >>> role = {
