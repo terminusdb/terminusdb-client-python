@@ -788,10 +788,6 @@ class Client:
         -------
         str
         """
-
-        ### TODO: make triples works again
-        raise InterfaceError("get_triples is temporary not avaliable in this version")
-
         self._check_connection()
         self._validate_graph_type(graph_type)
         result = requests.get(

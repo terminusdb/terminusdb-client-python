@@ -166,6 +166,23 @@ def test_log(docker_url):
     assert log[0]['@type'] == 'InitialCommit'
 
 
+def test_get_triples(docker_url):
+    client = Client(docker_url, user_agent=test_user_agent, team="admin")
+    client.connect()
+    db_name = "testDB" + str(random())
+    client.create_database(db_name, team="admin")
+    client.connect(db=db_name)
+    # Add a philosopher schema
+    schema = {"@type": "Class",
+              "@id": "Philosopher",
+              "name": "xsd:string"
+              }
+    # Add schema and Socrates
+    client.insert_document(schema, graph_type="schema")
+    schema_triples = client.get_triples(graph_type='schema')
+    assert "<schema#Philosopher>\n  a sys:Class ;\n  <schema#name> xsd:string ." in schema_triples
+
+
 def test_get_database(docker_url):
     client = Client(docker_url, user_agent=test_user_agent, team="admin")
     client.connect()
