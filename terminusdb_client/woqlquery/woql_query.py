@@ -7,16 +7,6 @@ import warnings
 
 from .woql_core import _copy_dict, _path_tokenize, _path_tokens_to_json
 
-# pp = pprint.PrettyPrinter(indent=4)
-
-# BLOCK_SCOPE = [
-#     "select",
-#     "from",
-#     "start",
-#     "when",
-#     "opt",
-#     "limit",
-# ]
 UPDATE_OPERATORS = [
     "AddTriple",
     "DeleteTriple",
