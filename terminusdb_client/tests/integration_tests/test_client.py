@@ -204,8 +204,8 @@ def test_update_triples(docker_url):
 
 <terminusdb://context>
   a sys:Context ;
-  sys:base "terminusdb:///data/" ;
-  sys:schema "terminusdb:///schema#" .
+  sys:base "terminusdb:///data/"^^xsd:string ;
+  sys:schema "terminusdb:///schema#"^^xsd:string .
 """
     client = Client(docker_url, user_agent=test_user_agent, team="admin")
     client.connect()
@@ -214,7 +214,7 @@ def test_update_triples(docker_url):
     client.connect(db=db_name)
     client.update_triples(graph_type='schema', content=ttl, commit_msg="Update triples")
     client.insert_document({"name": "Socrates"})
-    assert len(client.get_all_documents()) == 1
+    assert len(list(client.get_all_documents())) == 1
 
 
 def test_get_database(docker_url):
