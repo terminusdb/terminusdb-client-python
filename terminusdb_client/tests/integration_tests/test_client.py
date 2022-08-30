@@ -385,33 +385,34 @@ def test_diff_ops(docker_url, test_schema):
     my_schema = test_schema.copy()
     my_schema.object.pop("Employee")
     assert my_schema.to_dict() != test_schema.to_dict()
-    result = client.diff(test_schema, my_schema)
-    assert result.content == {
-        "@op": "CopyList",
-        "@rest": {
-            "@after": [],
-            "@before": [
-                {
-                    "@id": "Employee",
-                    "@inherits": ["Person"],
-                    "@key": {"@type": "Random"},
-                    "@type": "Class",
-                    "address_of": "Address",
-                    "age": "xsd:integer",
-                    "contact_number": {"@class": "xsd:string", "@type": "Optional"},
-                    "friend_of": {"@class": "Person", "@type": "Set"},
-                    "managed_by": "Employee",
-                    "member_of": "Team",
-                    "name": "xsd:string",
-                    "permisstion": {"@class": "Role", "@type": "Set"},
-                }
-            ],
-            "@op": "SwapList",
-            "@rest": {"@op": "KeepList"},
-        },
-        "@to": 4,
-    }
-    assert client.patch(test_schema, result) == my_schema.to_dict()
+    ## Temporary switch off schema diff
+    # result = client.diff(test_schema, my_schema)
+    # assert result.content == {
+    #     "@op": "CopyList",
+    #     "@rest": {
+    #         "@after": [],
+    #         "@before": [
+    #             {
+    #                 "@id": "Employee",
+    #                 "@inherits": ["Person"],
+    #                 "@key": {"@type": "Random"},
+    #                 "@type": "Class",
+    #                 "address_of": "Address",
+    #                 "age": "xsd:integer",
+    #                 "contact_number": {"@class": "xsd:string", "@type": "Optional"},
+    #                 "friend_of": {"@class": "Person", "@type": "Set"},
+    #                 "managed_by": "Employee",
+    #                 "member_of": "Team",
+    #                 "name": "xsd:string",
+    #                 "permisstion": {"@class": "Role", "@type": "Set"},
+    #             }
+    #         ],
+    #         "@op": "SwapList",
+    #         "@rest": {"@op": "KeepList"},
+    #     },
+    #     "@to": 4,
+    # }
+    # assert client.patch(test_schema, result) == my_schema.to_dict()
 
 
 @pytest.mark.skipif(
