@@ -10,8 +10,6 @@ from terminusdb_client.errors import DatabaseError, InterfaceError
 from terminusdb_client.client.Client import Patch, Client
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
-# from terminusdb_client.woqlquery.woql_query import WOQLQuery
-
 test_user_agent = "terminusdb-client-python-tests"
 
 
@@ -524,67 +522,3 @@ def test_terminusx_crazy_path(terminusx_token):
     client.delete_database(testdb, "TerminusDBTest")
     assert client.db is None
     assert testdb not in client.list_databases()
-
-
-#
-# def _generate_csv(option):
-#     if option == 1:
-#         file_path = "employee_file.csv"
-#         with open(file_path, mode="w") as employee_file:
-#             employee_writer = csv.writer(
-#                 employee_file, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL
-#             )
-#             employee_writer.writerow(["John Smith", "Accounting", "November"])
-#             employee_writer.writerow(["Erica Meyers", "IT", "March"])
-#         return file_path
-#     else:
-#         file_path = "employee_file.csv"
-#         with open(file_path, mode="w") as employee_file:
-#             employee_writer = csv.writer(
-#                 employee_file, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL
-#             )
-#             employee_writer.writerow(["Cow Duck", "Marketing", "April"])
-#         return file_path
-#
-#
-# def _file_clean_up(filename):
-#     if os.path.exists(filename):
-#         os.remove(filename)
-#
-#
-# def test_csv_handeling(docker_url):
-#     client = Client(docker_url)
-#     assert not client._connected
-#     # test connect
-#     client.connect()
-#     assert client._connected
-#     # test create db
-#     client.create_database("test_csv")
-#     client._get_current_commit()
-#     assert client._db == "test_csv"
-#     assert "test_csv" in client.list_databases()
-#     csv_file_path = _generate_csv(1)  # create testing csv
-#     try:
-#         client.insert_csv(csv_file_path)
-#         client.get_csv(csv_file_path, csv_output_name="new_" + csv_file_path)
-#         assert filecmp.cmp(csv_file_path, "new_" + csv_file_path)
-#         csv_file_path = _generate_csv(2)
-#         client.update_csv(csv_file_path)
-#         client.get_csv(csv_file_path, csv_output_name="update_" + csv_file_path)
-#         assert not filecmp.cmp("new_" + csv_file_path, "update_" + csv_file_path)
-#     finally:
-#         _file_clean_up(csv_file_path)
-#         _file_clean_up("new_" + csv_file_path)
-#         _file_clean_up("update_" + csv_file_path)
-#
-
-# def test_create_graph(docker_url):
-#     client = Client(docker_url)
-#     assert not client._connected
-#     # test connect
-#     client.connect()
-#     assert client._connected
-#     # test create db
-#     client.create_database("test_graph")
-#     client.create_graph("instance", "test-one-more-graph", "create test graph")
-#     client.delete_graph("instance", "test-one-more-graph", "delete test graph")
