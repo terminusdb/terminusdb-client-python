@@ -264,6 +264,18 @@ def test_get_database(docker_url):
         client.get_database("DOES_NOT_EXISTDB")
 
 
+def test_has_doc(docker_url):
+    client = Client(docker_url, user_agent=test_user_agent, team="admin")
+    client.connect()
+    db_name = "testDB" + str(random())
+    client.create_database(db_name, team="admin")
+    client.connect(db=db_name)
+    assert not client.has_doc("THIS_DOCUMENT_DOES_NOT_EXIST")
+    client.insert_document({"test": "test"}, raw_json=True)
+    doc_id = list(client.get_all_documents())[0]["@id"]
+    assert client.has_doc(doc_id)
+
+
 def test_has_database(docker_url):
     client = Client(docker_url, user_agent=test_user_agent, team="admin")
     client.connect()

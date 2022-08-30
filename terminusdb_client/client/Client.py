@@ -1481,6 +1481,11 @@ class Client:
         graph_type : str
             Graph type, either "instance" or "schema".
 
+        Raises
+        ------
+        InterfaceError
+            if the client does not connect to a database
+
         Returns
         -------
         Bool
@@ -1488,9 +1493,21 @@ class Client:
         """
         self._validate_graph_type(graph_type)
         self._check_connection()
-        all_existing_obj = self.get_all_documents(graph_type=graph_type)
-        all_existing_id = [x.get("@id") for x in all_existing_obj]
-        return doc_id in all_existing_id
+
+        response = requests.get(
+            self._documents_url(),
+            headers=self._default_headers,
+            json={"id": doc_id, "graph_type": graph_type},
+            auth=self._auth(),
+        )
+        try:
+            _finish_response(response)
+            return True
+        except DatabaseError as exception:
+            body = exception.error_obj
+            if exception.status_code == 404 and "api:error" in body and body["api:error"]["@type"] == "api:DocumentNotFound":
+                return False
+            raise exception
 
     def get_class_frame(self, class_name):
         """Get the frame of the class of class_name. Provide information about all the avaliable properties of that class.
