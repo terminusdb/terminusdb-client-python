@@ -166,6 +166,91 @@ def test_log(docker_url):
     assert log[0]['@type'] == 'InitialCommit'
 
 
+def test_get_triples(docker_url):
+    client = Client(docker_url, user_agent=test_user_agent, team="admin")
+    client.connect()
+    db_name = "testDB" + str(random())
+    client.create_database(db_name, team="admin")
+    client.connect(db=db_name)
+    # Add a philosopher schema
+    schema = {"@type": "Class",
+              "@id": "Philosopher",
+              "name": "xsd:string"
+              }
+    # Add schema and Socrates
+    client.insert_document(schema, graph_type="schema")
+    schema_triples = client.get_triples(graph_type='schema')
+    assert "<schema#Philosopher>\n  a sys:Class ;\n  <schema#name> xsd:string ." in schema_triples
+
+
+def test_update_triples(docker_url):
+    ttl = """
+@base <terminusdb:///schema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix woql: <http://terminusdb.com/schema/woql#> .
+@prefix json: <http://terminusdb.com/schema/json#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix xdd: <http://terminusdb.com/schema/xdd#> .
+@prefix vio: <http://terminusdb.com/schema/vio#> .
+@prefix sys: <http://terminusdb.com/schema/sys#> .
+@prefix api: <http://terminusdb.com/schema/api#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix doc: <data/> .
+
+<schema#Philosopher>
+  a sys:Class ;
+  <schema#name> xsd:string .
+
+<terminusdb://context>
+  a sys:Context ;
+  sys:base "terminusdb:///data/"^^xsd:string ;
+  sys:schema "terminusdb:///schema#"^^xsd:string .
+"""
+    client = Client(docker_url, user_agent=test_user_agent, team="admin")
+    client.connect()
+    db_name = "testDB" + str(random())
+    client.create_database(db_name, team="admin")
+    client.connect(db=db_name)
+    client.update_triples(graph_type='schema', content=ttl, commit_msg="Update triples")
+    client.insert_document({"name": "Socrates"})
+    assert len(list(client.get_all_documents())) == 1
+
+
+def test_insert_triples(docker_url):
+    ttl = """
+@base <terminusdb:///schema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix woql: <http://terminusdb.com/schema/woql#> .
+@prefix json: <http://terminusdb.com/schema/json#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix xdd: <http://terminusdb.com/schema/xdd#> .
+@prefix vio: <http://terminusdb.com/schema/vio#> .
+@prefix sys: <http://terminusdb.com/schema/sys#> .
+@prefix api: <http://terminusdb.com/schema/api#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix doc: <data/> .
+
+<schema#Philosopher>
+  a sys:Class ;
+  <schema#name> xsd:string .
+
+<terminusdb://context>
+  a sys:Context ;
+  sys:base "terminusdb:///data/"^^xsd:string ;
+  sys:schema "terminusdb:///schema#"^^xsd:string .
+"""
+    client = Client(docker_url, user_agent=test_user_agent, team="admin")
+    client.connect()
+    db_name = "testDB" + str(random())
+    client.create_database(db_name, team="admin")
+    client.connect(db=db_name)
+    client.insert_triples(graph_type='schema', content=ttl, commit_msg="Insert triples")
+    client.insert_document({"name": "Socrates"})
+    assert len(list(client.get_all_documents())) == 1
+
+
 def test_get_database(docker_url):
     client = Client(docker_url, user_agent=test_user_agent, team="admin")
     client.connect()

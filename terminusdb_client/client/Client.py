@@ -788,10 +788,6 @@ class Client:
         -------
         str
         """
-
-        ### TODO: make triples works again
-        raise InterfaceError("get_triples is temporary not avaliable in this version")
-
         self._check_connection()
         self._validate_graph_type(graph_type)
         result = requests.get(
@@ -801,15 +797,16 @@ class Client:
         )
         return json.loads(_finish_response(result))
 
-    def update_triples(self, graph_type: str, turtle, commit_msg: str) -> None:
-        """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
+    def update_triples(self, graph_type: str, content: str, commit_msg: str) -> None:
+        """Updates the contents of the specified graph with the triples encoded in turtle format.
+           Replaces the entire graph contents
 
         Parameters
         ----------
         graph_type : str
             Graph type, either "instance" or "schema".
-        turtle
-            Valid set of triples in Turtle format.
+        content
+            Valid set of triples in Turtle or Trig format.
         commit_msg : str
             Commit message.
 
@@ -818,25 +815,21 @@ class Client:
         InterfaceError
             if the client does not connect to a database
         """
-        ### TODO: make triples works again
-        raise InterfaceError(
-            "update_triples is temporary not avaliable in this version"
-        )
-
         self._check_connection()
         self._validate_graph_type(graph_type)
-        params = {"commit_info": self._generate_commit(commit_msg)}
-        params["turtle"] = turtle
+        params = {"commit_info": self._generate_commit(commit_msg),
+                  "turtle": content,
+                  }
         result = requests.post(
             self._triples_url(graph_type),
             headers=self._default_headers,
-            params=params,
+            json=params,
             auth=self._auth(),
         )
         return json.loads(_finish_response(result))
 
     def insert_triples(
-        self, graph_type: str, turtle, commit_msg: Optional[str] = None
+        self, graph_type: str, content: str, commit_msg: Optional[str] = None
     ) -> None:
         """Inserts into the specified graph with the triples encoded in turtle format.
 
@@ -844,8 +837,8 @@ class Client:
         ----------
         graph_type : str
             Graph type, either "instance" or "schema".
-        turtle
-            Valid set of triples in Turtle format.
+        content
+            Valid set of triples in Turtle or Trig format.
         commit_msg : str
             Commit message.
 
@@ -854,19 +847,15 @@ class Client:
         InterfaceError
             if the client does not connect to a database
         """
-        ### TODO: make triples works again
-        raise InterfaceError(
-            "insert_triples is temporary not avaliable in this version"
-        )
-
         self._check_connection()
         self._validate_graph_type(graph_type)
-        params = {"commit_info": self._generate_commit(commit_msg)}
-        params["turtle"] = turtle
+        params = {"commit_info": self._generate_commit(commit_msg),
+                  "turtle": content
+                  }
         result = requests.put(
             self._triples_url(graph_type),
             headers=self._default_headers,
-            params=params,
+            json=params,
             auth=self._auth(),
         )
         return json.loads(_finish_response(result))
