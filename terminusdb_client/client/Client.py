@@ -1503,8 +1503,11 @@ class Client:
         try:
             _finish_response(response)
             return True
-        except DatabaseError:
-            return False
+        except DatabaseError as exception:
+            body = exception.error_obj
+            if exception.status_code == 404 and "api:error" in body and body["api:error"]["@type"] == "api:DocumentNotFound":
+                return False
+            raise exception
 
     def get_class_frame(self, class_name):
         """Get the frame of the class of class_name. Provide information about all the avaliable properties of that class.
