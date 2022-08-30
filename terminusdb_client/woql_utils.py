@@ -1,5 +1,4 @@
 import json
-import urllib.parse
 from datetime import datetime
 
 from .errors import DatabaseError
