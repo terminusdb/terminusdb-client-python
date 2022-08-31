@@ -279,13 +279,25 @@ def test_get_organization_user_databases(docker_url):
     client.connect()
     db_name = "testDB" + str(random())
     db_name2 = "testDB" + str(random())
-    client.create_database(db_name, team="admin")
-    client.create_database(db_name2, team="admin")
-    databases = client.get_organization_user_databases("admin", "admin")
-    assert len(databases) == 3
-    assert databases[0]['name'] == "_system"
-    assert databases[1]['name'] == db_name
-    assert databases[2]['name'] == db_name2
+    org_name = "testOrg235091"
+    # Add DB in admin org to make sure they don't appear in other team
+    client.create_database(db_name + "admin", team="admin")
+    client.create_organization(org_name)
+    client.create_database(db_name, team=org_name)
+    client.create_database(db_name2, team=org_name)
+    capability_change = {
+        "operation": "grant",
+        "scope": f"Organization/{org_name}",
+        "user": "User/admin",
+        "roles": [
+            "Role/admin"
+        ]
+    }
+    client.change_capabilities(capability_change)
+    databases = client.get_organization_user_databases(org=org_name, username="admin")
+    assert len(databases) == 2
+    assert databases[0]['name'] == db_name
+    assert databases[1]['name'] == db_name2
 
 
 def test_has_database(docker_url):
