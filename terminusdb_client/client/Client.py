@@ -51,17 +51,6 @@ class APITokenAuth(requests.auth.AuthBase):
         return r
 
 
-class ResourceType(Enum):
-    """Enum for the different TerminusDB resources"""
-
-    DB = 1
-    META = 2
-    REPO = 3
-    COMMITS = 4
-    REF = 5
-    BRANCH = 6
-
-
 class Patch:
     def __init__(self, json=None):
         if json:
