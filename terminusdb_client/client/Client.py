@@ -8,7 +8,6 @@ import urllib.parse as urlparse
 import warnings
 from collections.abc import Iterable
 from datetime import datetime
-from enum import Enum
 from typing import Any, Dict, List, Optional, Union
 
 import requests

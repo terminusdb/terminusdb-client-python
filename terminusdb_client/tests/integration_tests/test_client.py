@@ -282,6 +282,7 @@ def test_has_database(docker_url):
     assert client.has_database(db_name)
     assert not client.has_database("DOES_NOT_EXISTDB")
 
+
 def test_optimize(docker_url):
     client = Client(docker_url, user_agent=test_user_agent, team="admin")
     client.connect()
@@ -291,6 +292,7 @@ def test_optimize(docker_url):
     for x in range(0, 10):
         client.insert_document({"name": f"Philosopher{x}"}, raw_json=True)
     client.optimize(f"admin/{db_name}")
+
 
 def test_add_get_remove_user(docker_url):
     # create client
