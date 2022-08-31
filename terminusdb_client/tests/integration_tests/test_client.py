@@ -274,6 +274,20 @@ def test_has_doc(docker_url):
     assert client.has_doc(doc_id)
 
 
+def test_get_organization_user_databases(docker_url):
+    client = Client(docker_url, user_agent=test_user_agent, team="admin")
+    client.connect()
+    db_name = "testDB" + str(random())
+    db_name2 = "testDB" + str(random())
+    client.create_database(db_name, team="admin")
+    client.create_database(db_name2, team="admin")
+    databases = client.get_organization_user_databases("admin", "admin")
+    assert len(databases) == 3
+    assert databases[0]['name'] == "_system"
+    assert databases[1]['name'] == db_name
+    assert databases[2]['name'] == db_name2
+
+
 def test_has_database(docker_url):
     client = Client(docker_url, user_agent=test_user_agent, team="admin")
     client.connect()
