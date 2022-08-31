@@ -582,48 +582,6 @@ class Client:
             repo=self.repo,
         )
 
-    def resource(self, ttype: ResourceType, val: Optional[str] = None) -> str:
-        """Create a resource identifier string based on the current config.
-
-        Parameters
-        ----------
-        ttype : ResourceType
-            Type of resource.
-        val : str, optional
-            Branch or commit identifier.
-
-        Returns
-        -------
-        str
-            The constructed resource string.
-
-        Examples
-        --------
-        >>> client = Client("http://127.0.0.1:6363")
-        >>> client.resource(ResourceType.DB)
-        '<team>/<db>/'
-        >>> client.resource(ResourceType.META)
-        '<team>/<db>/_meta'
-        >>> client.resource(ResourceType.COMMITS)
-        '<team>/<db>/<repo>/_commits'
-        >>> client.resource(ResourceType.REF, "<reference>")
-        '<team>/<db>/<repo>/commit/<reference>'
-        >>> client.resource(ResourceType.BRANCH, "<branch>")
-        '<team>/<db>/<repo>/branch/<branch>'
-        """
-        base = self.team + "/" + self.db + "/"
-        ref_value = val if val else self.ref
-        branch_value = val if val else self.branch
-        urls = {
-            ResourceType.DB: base,
-            ResourceType.META: f"{base}_meta",
-            ResourceType.REPO: f"{base}{self.repo}/_meta",
-            ResourceType.COMMITS: f"{base}{self.repo}/_commits",
-            ResourceType.REF: f"{base}{self.repo}/commit/{ref_value}",
-            ResourceType.BRANCH: f"{base}{self.repo}/{branch_value}",
-        }
-        return urls[ttype]
-
     def _get_prefixes(self):
         """Get the prefixes for a given database"""
         self._check_connection()
