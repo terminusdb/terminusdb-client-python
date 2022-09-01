@@ -15,17 +15,6 @@ from ..__version__ import __version__
 from .conftest import mocked_request_insert_delete, mocked_request_success
 from .woqljson.woqlStarJson import WoqlStar
 
-# def mock_func_with_1arg(_):
-#     return True
-#
-#
-# def mock_func_with_2arg(first, second):
-#     return True
-#
-#
-# def mock_func_no_arg():
-#     return True
-
 
 @mock.patch("requests.get", side_effect=mocked_request_success)
 def test_connection(mocked_requests):
