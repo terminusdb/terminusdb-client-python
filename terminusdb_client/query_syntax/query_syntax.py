@@ -1,11 +1,11 @@
-from ..woqlquery import WOQLQuery, Var, Doc # noqa
+from ..woqlquery import WOQLQuery, Var, Vars, Doc # noqa
 import re
 import sys
 
 __BARRED = ['re', 'vars']
 __ALLOWED = ['__and__', '__or__', '__add__']
 __module = sys.modules[__name__]
-__exported = ['Var', 'Doc']
+__exported = ['Var', 'Vars', 'Doc']
 
 
 def __create_a_function(attribute):
