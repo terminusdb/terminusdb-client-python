@@ -10,7 +10,7 @@ from numpydoc.docscrape import ClassDoc
 from typeguard import check_type
 
 from .. import woql_type as wt
-from ..client.Client import Client, GraphType
+from ..client import Client, GraphType
 from ..woql_type import to_woql_type
 
 
