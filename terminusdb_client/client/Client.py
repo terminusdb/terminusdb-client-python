@@ -1262,7 +1262,7 @@ class Client:
         compress: Union[str, int] = 1024,
         create: bool = False,
         raw_json: bool = False,
-    ) -> None:
+    ) -> dict:
         """Updates the specified document(s)
 
         Parameters
