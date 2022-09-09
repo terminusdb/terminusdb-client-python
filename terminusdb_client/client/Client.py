@@ -15,6 +15,7 @@ import requests
 
 from ..__version__ import __version__
 from ..errors import DatabaseError, InterfaceError
+from ..schema import Schema
 from ..woql_utils import (
     _clean_dict,
     _dt_dict,
