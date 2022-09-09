@@ -20,6 +20,7 @@ from ..woql_utils import (
     _dt_list,
     _finish_response,
     _result2stream,
+    _args_as_payload,
 )
 from ..woqlquery.woql_query import WOQLQuery
 
@@ -1012,37 +1013,9 @@ class Client:
         iterable
             Stream of dictionaries
         """
-        self._validate_graph_type(graph_type)
-
-        add_args = ["prefixed", "unfold"]
-        self._check_connection()
-        payload = {"type": doc_type, "graph_type": graph_type}
-        payload["skip"] = skip
-        if count is not None:
-            payload["count"] = count
-        for the_arg in add_args:
-            if the_arg in kwargs:
-                payload[the_arg] = kwargs[the_arg]
-        result = requests.get(
-            self._documents_url(),
-            headers=self._default_headers,
-            params=payload,
-            auth=self._auth(),
-        )
-
-        if get_data_version:
-            result, version = _finish_response(result, get_data_version)
-            return_obj = _result2stream(result)
-            if as_list:
-                return list(return_obj), version
-            else:
-                return return_obj, version
-
-        return_obj = _result2stream(_finish_response(result))
-        if as_list:
-            return list(return_obj)
-        else:
-            return return_obj
+        return self.get_all_documents(graph_type, skip, count,
+                                      as_list, get_data_version,
+                                      doc_type=doc_type, **kwargs)
 
     def get_all_documents(
         self,
@@ -1051,6 +1024,7 @@ class Client:
         count: Optional[int] = None,
         as_list: bool = False,
         get_data_version: bool = False,
+        doc_type: Optional[str] = None,
         **kwargs,
     ) -> Union[Iterable, list, tuple]:
         """Retrieves all avalibale the documents
@@ -1084,10 +1058,11 @@ class Client:
 
         add_args = ["prefixed", "unfold"]
         self._check_connection()
-        payload = {"graph_type": graph_type}
-        payload["skip"] = skip
-        if count is not None:
-            payload["count"] = count
+        payload = _args_as_payload({"graph_type": graph_type,
+                                    "skip": skip,
+                                    "type": doc_type,
+                                    "count": count,}
+                                   )
         for the_arg in add_args:
             if the_arg in kwargs:
                 payload[the_arg] = kwargs[the_arg]
