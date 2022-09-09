@@ -409,6 +409,28 @@ class Client:
             )
         )
 
+    def ok(self) -> bool:
+        """Check whether the TerminusDB server is still OK.
+           Status is not OK when this function returns false
+           or throws an exception (mostly ConnectTimeout)
+
+        Raises
+        ------
+        Exception
+            When a connection can't be made by the requests library
+
+        Returns
+        -------
+        bool
+        """
+        req = requests.get(
+            self.api + "/ok",
+            headers=self._default_headers,
+            auth=self._auth(),
+            timeout=6
+        )
+        return req.status == 200
+
     def log(self,
             team: Optional[str] = None,
             db: Optional[str] = None,

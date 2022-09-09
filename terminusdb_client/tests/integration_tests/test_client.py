@@ -13,6 +13,17 @@ from terminusdb_client.woqlquery.woql_query import WOQLQuery
 test_user_agent = "terminusdb-client-python-tests"
 
 
+def test_not_ok():
+    client = Client('http://localhost:6363')
+    with pytest.raises(Exception):
+        client.ok()
+
+
+def test_ok(docker_url):
+    client = Client(docker_url)
+    assert(client.ok())
+
+
 def test_happy_path(docker_url):
     # create client
     client = Client(docker_url)
