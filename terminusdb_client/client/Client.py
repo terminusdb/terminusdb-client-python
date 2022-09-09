@@ -8,6 +8,7 @@ import urllib.parse as urlparse
 import warnings
 from collections.abc import Iterable
 from datetime import datetime
+from enum import Enum
 from typing import Any, Dict, List, Optional, Union
 
 import requests
@@ -118,6 +119,12 @@ class Patch:
 
     def copy(self):
         return copy.deepcopy(self)
+
+
+class GraphType(str, Enum):
+    """Type of graph"""
+    INSTANCE = 'instance'
+    SCHEMA = 'schema'
 
 
 class Client:
@@ -765,17 +772,13 @@ class Client:
         )
         self.db = None
 
-    def _validate_graph_type(self, graph_type):
-        if graph_type not in ["instance", "schema"]:
-            raise ValueError("graph_type can only be 'instance' or 'schema'")
-
-    def get_triples(self, graph_type: str) -> str:
+    def get_triples(self, graph_type: GraphType) -> str:
         """Retrieves the contents of the specified graph as triples encoded in turtle format
 
         Parameters
         ----------
-        graph_type : str
-            Graph type, either "instance" or "schema".
+        graph_type : GraphType
+            Graph type, either GraphType.INSTANCE or GraphType.SCHEMA.
 
         Raises
         ------
@@ -787,7 +790,6 @@ class Client:
         str
         """
         self._check_connection()
-        self._validate_graph_type(graph_type)
         result = requests.get(
             self._triples_url(graph_type),
             headers=self._default_headers,
@@ -795,14 +797,14 @@ class Client:
         )
         return json.loads(_finish_response(result))
 
-    def update_triples(self, graph_type: str, content: str, commit_msg: str) -> None:
+    def update_triples(self, graph_type: GraphType, content: str, commit_msg: str) -> None:
         """Updates the contents of the specified graph with the triples encoded in turtle format.
            Replaces the entire graph contents
 
         Parameters
         ----------
-        graph_type : str
-            Graph type, either "instance" or "schema".
+        graph_type : GraphType
+            Graph type, either GraphType.INSTANCE or GraphType.SCHEMA.
         content
             Valid set of triples in Turtle or Trig format.
         commit_msg : str
@@ -814,7 +816,6 @@ class Client:
             if the client does not connect to a database
         """
         self._check_connection()
-        self._validate_graph_type(graph_type)
         params = {"commit_info": self._generate_commit(commit_msg),
                   "turtle": content,
                   }
@@ -827,14 +828,14 @@ class Client:
         return json.loads(_finish_response(result))
 
     def insert_triples(
-        self, graph_type: str, content: str, commit_msg: Optional[str] = None
+        self, graph_type: GraphType, content: str, commit_msg: Optional[str] = None
     ) -> None:
         """Inserts into the specified graph with the triples encoded in turtle format.
 
         Parameters
         ----------
-        graph_type : str
-            Graph type, either "instance" or "schema".
+        graph_type : GraphType
+            Graph type, either GraphType.INSTANCE or GraphType.SCHEMA.
         content
             Valid set of triples in Turtle or Trig format.
         commit_msg : str
@@ -846,7 +847,6 @@ class Client:
             if the client does not connect to a database
         """
         self._check_connection()
-        self._validate_graph_type(graph_type)
         params = {"commit_info": self._generate_commit(commit_msg),
                   "turtle": content
                   }
@@ -861,7 +861,7 @@ class Client:
     def query_document(
         self,
         document_template: dict,
-        graph_type: str = "instance",
+        graph_type: GraphType = GraphType.INSTANCE,
         skip: int = 0,
         count: Optional[int] = None,
         as_list: bool = False,
@@ -874,8 +874,8 @@ class Client:
         ----------
         document_template : dict
             Template for the document that is being retrived
-        graph_type : str, optional
-            Graph type, either "instance" or "schema".
+        graph_type : GraphType
+            Graph type, either GraphType.INSTANCE or GraphType.SCHEMA.
         as_list: bool
             If the result returned as list rather than an iterator.
         get_data_version: bool
@@ -890,7 +890,6 @@ class Client:
         -------
         Iterable
         """
-        self._validate_graph_type(graph_type)
         self._check_connection()
 
         payload = {"query": document_template, "graph_type": graph_type}
@@ -926,7 +925,7 @@ class Client:
     def get_document(
         self,
         iri_id: str,
-        graph_type: str = "instance",
+        graph_type: GraphType = GraphType.INSTANCE,
         get_data_version: bool = False,
         **kwargs,
     ) -> dict:
@@ -936,8 +935,8 @@ class Client:
         ----------
         iri_id : str
             Iri id for the docuemnt that is retriving
-        graph_type : str, optional
-            Graph type, either "instance" or "schema".
+        graph_type : GraphType
+            Graph type, either GraphType.INSTANCE or GraphType.SCHEMA.
         get_data_version: bool
             If the data version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.
         kwargs:
@@ -952,8 +951,6 @@ class Client:
         -------
         dict
         """
-        self._validate_graph_type(graph_type)
-
         add_args = ["prefixed", "minimized", "unfold"]
         self._check_connection()
         payload = {"id": iri_id, "graph_type": graph_type}
@@ -977,7 +974,7 @@ class Client:
     def get_documents_by_type(
         self,
         doc_type: str,
-        graph_type: str = "instance",
+        graph_type: GraphType = GraphType.INSTANCE,
         skip: int = 0,
         count: Optional[int] = None,
         as_list: bool = False,
@@ -990,8 +987,8 @@ class Client:
         ----------
         doc_type : str
             Specific type for the docuemnts that is retriving
-        graph_type : str, optional
-            Graph type, either "instance" or "schema".
+        graph_type : GraphType, optional
+            Graph type, either GraphType.INSTANCE or GraphType.SCHEMA.
         skip: int
             The starting posiion of the returning results, default to be 0
         count: int or None
@@ -1019,7 +1016,7 @@ class Client:
 
     def get_all_documents(
         self,
-        graph_type: str = "instance",
+        graph_type: GraphType = GraphType.INSTANCE,
         skip: int = 0,
         count: Optional[int] = None,
         as_list: bool = False,
@@ -1031,8 +1028,8 @@ class Client:
 
         Parameters
         ----------
-        graph_type : str, optional
-            Graph type, either "instance" or "schema".
+        graph_type : GraphType, optional
+            Graph type, either GraphType.INSTANCE or GraphType.SCHEMA.
         skip: int
             The starting posiion of the returning results, default to be 0
         count: int or None
@@ -1054,8 +1051,6 @@ class Client:
         iterable
             Stream of dictionaries
         """
-        self._validate_graph_type(graph_type)
-
         add_args = ["prefixed", "unfold"]
         self._check_connection()
         payload = _args_as_payload({"graph_type": graph_type,
@@ -1166,7 +1161,7 @@ class Client:
             "DocumentTemplate",  # noqa:F821
             List["DocumentTemplate"],  # noqa:F821
         ],
-        graph_type: str = "instance",
+        graph_type: GraphType = GraphType.INSTANCE,
         full_replace: bool = False,
         commit_msg: Optional[str] = None,
         last_data_version: Optional[str] = None,
@@ -1179,8 +1174,8 @@ class Client:
         ----------
         document: dict or list of dict
             Document(s) to be inserted.
-        graph_type : str
-            Graph type, either "inference", "instance" or "schema".
+        graph_type : GraphType
+            Graph type, either GraphType.INSTANCE or GraphType.SCHEMA.
         full_replace:: bool
             If True then the whole graph will be replaced. WARNING: you should also supply the context object as the first element in the list of documents  if using this option.
         commit_msg : str
@@ -1202,7 +1197,6 @@ class Client:
         list
             list of ids of the inseted docuemnts
         """
-        self._validate_graph_type(graph_type)
         self._check_connection()
         params = self._generate_commit(commit_msg)
         params["graph_type"] = graph_type
@@ -1273,7 +1267,7 @@ class Client:
             "DocumentTemplate",  # noqa:F821
             List["DocumentTemplate"],  # noqa:F821
         ],
-        graph_type: str = "instance",
+        graph_type: GraphType = GraphType.INSTANCE,
         commit_msg: Optional[str] = None,
         last_data_version: Optional[str] = None,
         compress: Union[str, int] = 1024,
@@ -1286,8 +1280,8 @@ class Client:
         ----------
         document: dict or list of dict
             Document(s) to be updated.
-        graph_type : str
-            Graph type, either "instance" or "schema".
+        graph_type : GraphType
+            Graph type, either GraphType.INSTANCE or GraphType.SCHEMA.
         commit_msg : str
             Commit message.
         last_data_version : str
@@ -1304,7 +1298,6 @@ class Client:
         InterfaceError
             if the client does not connect to a database
         """
-        self._validate_graph_type(graph_type)
         self._check_connection()
         params = self._generate_commit(commit_msg)
         params["graph_type"] = graph_type
@@ -1356,7 +1349,7 @@ class Client:
             "DocumentTemplate",  # noqa:F821
             List["DocumentTemplate"],  # noqa:F821
         ],
-        graph_type: str = "instance",
+        graph_type: GraphType = GraphType.INSTANCE,
         commit_msg: Optional[str] = None,
         last_data_version: Optional[str] = None,
         compress: Union[str, int] = 1024,
@@ -1367,8 +1360,8 @@ class Client:
         ----------
         document: dict or list of dict
             Document(s) to be updated.
-        graph_type : str
-            Graph type, either "instance" or "schema".
+        graph_type : GraphType
+            Graph type, either GraphType.INSTANCE or GraphType.SCHEMA.
         commit_msg : str
             Commit message.
         last_data_version : str
@@ -1388,7 +1381,7 @@ class Client:
     def delete_document(
         self,
         document: Union[str, list, dict, Iterable],
-        graph_type: str = "instance",
+        graph_type: GraphType = GraphType.INSTANCE,
         commit_msg: Optional[str] = None,
         last_data_version: Optional[str] = None,
     ) -> None:
@@ -1398,8 +1391,8 @@ class Client:
         ----------
         document: str or list of str
             Document(s) (as dictionary or DocumentTemplate objects) or id(s) of document(s) to be updated.
-        graph_type : str
-            Graph type, either "instance" or "schema".
+        graph_type : GraphType
+            Graph type, either GraphType.INSTANCE or GraphType.SCHEMA.
         commit_msg : str
             Commit message.
         last_data_version : str
@@ -1410,7 +1403,6 @@ class Client:
         InterfaceError
             if the client does not connect to a database
         """
-        self._validate_graph_type(graph_type)
         self._check_connection()
         doc_id = []
         if not isinstance(document, (str, list, dict)) and hasattr(
@@ -1443,15 +1435,15 @@ class Client:
             )
         )
 
-    def has_doc(self, doc_id: str, graph_type: str = "instance") -> bool:
+    def has_doc(self, doc_id: str, graph_type: GraphType = GraphType.INSTANCE) -> bool:
         """Check if a certain document exist in a database
 
         Parameters
         ----------
         doc_id: str
             Id of document to be checked.
-        graph_type : str
-            Graph type, either "instance" or "schema".
+        graph_type : GraphType
+            Graph type, either GraphType.INSTANCE or GraphType.SCHEMA.
 
         Raises
         ------
@@ -1463,7 +1455,6 @@ class Client:
         Bool
             if the document exist
         """
-        self._validate_graph_type(graph_type)
         self._check_connection()
 
         response = requests.get(
@@ -2927,7 +2918,7 @@ class Client:
             base_url = self._branch_base("document")
         return base_url
 
-    def _triples_url(self, graph_type="instance"):
+    def _triples_url(self, graph_type: GraphType = GraphType.INSTANCE):
         if self._db == "_system":
             base_url = self._db_base("triples")
         else:

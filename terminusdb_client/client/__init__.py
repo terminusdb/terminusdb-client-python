@@ -1,1 +1,1 @@
-from .Client import Patch, Client  # noqa
+from .Client import GraphType, Patch, Client  # noqa
