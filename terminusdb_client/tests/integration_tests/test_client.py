@@ -21,7 +21,7 @@ def test_not_ok():
 
 def test_ok(docker_url):
     client = Client(docker_url)
-    assert(client.ok())
+    assert client.ok()
 
 
 def test_happy_path(docker_url):
