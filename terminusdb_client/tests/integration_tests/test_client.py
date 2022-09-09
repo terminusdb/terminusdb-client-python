@@ -7,7 +7,7 @@ from random import random
 import pytest
 
 from terminusdb_client.errors import DatabaseError, InterfaceError
-from terminusdb_client.client.Client import Patch, Client
+from terminusdb_client import GraphType, Patch, Client
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 test_user_agent = "terminusdb-client-python-tests"
@@ -126,6 +126,22 @@ def test_diff_object(docker_url):
     client.connect()
     diff = client.diff_object({'test': 'wew'}, {'test': 'wow'})
     assert diff == {'test': {'@before': 'wew', '@after': 'wow', '@op': 'SwapValue'}}
+
+
+def test_class_frame(docker_url):
+    client = Client(docker_url, user_agent=test_user_agent)
+    client.connect()
+    db_name = "philosophers" + str(random())
+    client.create_database(db_name)
+    client.connect(db=db_name)
+    # Add a philosopher schema
+    schema = {"@type": "Class",
+              "@id": "Philosopher",
+              "name": "xsd:string"
+              }
+    # Add schema and Socrates
+    client.insert_document(schema, graph_type=GraphType.SCHEMA)
+    assert client.get_class_frame("Philosopher") == {'@type': 'Class', 'name': 'xsd:string'}
 
 
 def test_diff_apply_version(docker_url):
