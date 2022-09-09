@@ -426,7 +426,6 @@ class Client:
         req = requests.get(
             self.api + "/ok",
             headers=self._default_headers,
-            auth=self._auth(),
             timeout=6
         )
         return req.status == 200
