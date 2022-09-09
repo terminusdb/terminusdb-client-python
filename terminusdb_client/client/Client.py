@@ -1061,8 +1061,8 @@ class Client:
         payload = _args_as_payload({"graph_type": graph_type,
                                     "skip": skip,
                                     "type": doc_type,
-                                    "count": count,}
-                                   )
+                                    "count": count,
+                                    })
         for the_arg in add_args:
             if the_arg in kwargs:
                 payload[the_arg] = kwargs[the_arg]

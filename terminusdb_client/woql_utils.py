@@ -19,8 +19,10 @@ def _result2stream(result):
             idx += 1
         yield data
 
+
 def _args_as_payload(args: dict) -> dict:
-    return { k: v for k,v in args.items() if v }
+    return {k: v for k, v in args.items() if v}
+
 
 def _finish_response(request_response, get_version=False):
     """Get the response text
