@@ -1109,17 +1109,6 @@ class Client:
         else:
             raise ValueError("Object cannot convert to dictionary")
 
-    def _ref_extract(self, target_key, search_item):
-        if hasattr(search_item, "items"):
-            for key, value in search_item.items():
-                if key == target_key:
-                    yield value
-                if isinstance(value, dict):
-                    yield from self._ref_extract(target_key, value)
-                elif isinstance(value, list):
-                    for item in value:
-                        yield from self._ref_extract(target_key, item)
-
     def _unseen(self, seen):
         unseen = []
         for key in self._references:
