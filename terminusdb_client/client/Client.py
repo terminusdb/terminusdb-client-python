@@ -158,7 +158,7 @@ class Client:
         user_agent: str = f"terminusdb-client-python/{__version__}",
         **kwargs,
     ) -> None:
-        r"""The WOQLClient constructor.
+        r"""The Client constructor.
 
         Parameters
         ----------
@@ -1116,7 +1116,7 @@ class Client:
             for item in document:
                 if hasattr(item, "to_dict") and graph_type != "schema":
                     raise InterfaceError(
-                        "Inserting WOQLSchema object into non-schema graph."
+                        "Inserting Schema object into non-schema graph."
                     )
                 item_dict = self._conv_to_dict(item)
                 if hasattr(item, "_capture"):
@@ -2082,7 +2082,7 @@ class Client:
 
         Examples
         --------
-        >>> client = WOQLClient("http://127.0.0.1:6363/")
+        >>> client = Client("http://127.0.0.1:6363/")
         >>> client.connect(user="admin", key="root", team="admin", db="some_db")
         >>> result = client.diff({ "@id" : "Person/Jane", "@type" : "Person", "name" : "Jane"}, { "@id" : "Person/Jane", "@type" : "Person", "name" : "Janine"})
         >>> result.to_json = '{ "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'"""
@@ -2146,7 +2146,7 @@ class Client:
 
         Examples
         --------
-        >>> client = WOQLClient("http://127.0.0.1:6363/")
+        >>> client = Client("http://127.0.0.1:6363/")
         >>> client.connect(user="admin", key="root", team="admin", db="some_db")
         >>> patch_obj = Patch(json='{"name" : { "@op" : "ValueSwap", "@before" : "Jane", "@after": "Janine" }}')
         >>> result = client.patch({ "@id" : "Person/Jane", "@type" : Person", "name" : "Jane"}, patch_obj)
