@@ -15,7 +15,7 @@ test_user_agent = "terminusdb-client-python-tests"
 
 def test_not_ok():
     client = Client('http://localhost:6363')
-    with pytest.raises(Exception):
+    with pytest.raises(Exception) as _:
         client.ok()
 
 
