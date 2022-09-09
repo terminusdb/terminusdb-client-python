@@ -10,7 +10,7 @@ from numpydoc.docscrape import ClassDoc
 from typeguard import check_type
 
 from .. import woql_type as wt
-from ..client.Client import Client
+from ..client.Client import Client, GraphType
 from ..woql_type import to_woql_type
 
 
@@ -666,13 +666,13 @@ class Schema:
             commit_msg = "Schema object insert/ update by Python client."
         if full_replace:
             client.insert_document(
-                self, commit_msg=commit_msg, graph_type="schema", full_replace=True
+                self, commit_msg=commit_msg, graph_type=GraphType.SCHEMA, full_replace=True
             )
         else:
             client.update_document(
                 self,
                 commit_msg=commit_msg,
-                graph_type="schema",
+                graph_type=GraphType.SCHEMA,
             )
 
     def from_db(self, client: Client, select: Optional[List[str]] = None):
@@ -685,7 +685,7 @@ class Schema:
         select: list of str, optional
             The classes (and depended classes) that will be imported, default to None which will import all classes
         """
-        all_existing_class_raw = client.get_all_documents(graph_type="schema")
+        all_existing_class_raw = client.get_all_documents(graph_type=GraphType.SCHEMA)
         # clean up and update all_existing_classes
         for item in all_existing_class_raw:
             item_id = item.get("@id")
