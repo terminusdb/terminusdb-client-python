@@ -336,15 +336,7 @@ class Client:
         self._connected = True
 
         try:
-            self._db_info = json.loads(
-                _finish_response(
-                    requests.get(
-                        self.api + "/info",
-                        headers=self._default_headers,
-                        auth=self._auth(),
-                    )
-                )
-            )
+            self._db_info = self.info()
         except Exception as error:
             raise InterfaceError(
                 f"Cannot connect to server, please make sure TerminusDB is running at {self.server_url} and the authentication details are correct. Details: {str(error)}"
@@ -378,6 +370,44 @@ class Client:
             raise InterfaceError(
                 "No database is connected. Please either connect to a database or create a new database."
             )
+
+    def info(self) -> dict:
+        """Get info of a TerminusDB database server
+
+        Returns
+        -------
+        dict
+
+             Dict with version information:
+             ```
+             {
+               "@type": "api:InfoResponse",
+               "api:info": {
+                 "authority": "anonymous",
+                 "storage": {
+                   "version": "1"
+                 },
+                 "terminusdb": {
+                   "git_hash": "53acb38f9aedeec6c524f5679965488788e6ccf5",
+                   "version": "10.1.5"
+                 },
+                 "terminusdb_store": {
+                   "version": "0.19.8"
+                 }
+               },
+               "api:status": "api:success"
+             }
+             ```
+        """
+        return json.loads(
+            _finish_response(
+                requests.get(
+                    self.api + "/info",
+                    headers=self._default_headers,
+                    auth=self._auth(),
+                )
+            )
+        )
 
     def log(self,
             team: Optional[str] = None,
