@@ -428,7 +428,7 @@ class Client:
             headers=self._default_headers,
             timeout=6
         )
-        return req.status == 200
+        return req.status_code == 200
 
     def log(self,
             team: Optional[str] = None,
