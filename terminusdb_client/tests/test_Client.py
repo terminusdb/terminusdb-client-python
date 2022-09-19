@@ -7,7 +7,7 @@ import random
 import requests
 
 
-from terminusdb_client.client import Client
+from terminusdb_client.client import Client, GraphType
 from terminusdb_client.errors import InterfaceError
 from terminusdb_client.woqlschema import WOQLSchema
 
@@ -192,6 +192,22 @@ def test_get_triples(mocked_requests, mocked_requests2):
     client.connect(user="admin", team="admin", key="root", db="myDBName")
 
     client.get_triples("instance")
+
+    requests.get.assert_called_with(
+        "http://localhost:6363/api/triples/admin/myDBName/local/branch/main/instance",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+    )
+
+
+@pytest.mark.skip(reason="temporary not avaliable")
+@mock.patch("requests.head", side_effect=mocked_request_success)
+@mock.patch("requests.get", side_effect=mocked_request_success)
+def test_get_triples_with_enum(mocked_requests, mocked_requests2):
+    client = Client("http://localhost:6363")
+    client.connect(user="admin", team="admin", key="root", db="myDBName")
+
+    client.get_triples(GraphType.INSTANCE)
 
     requests.get.assert_called_with(
         "http://localhost:6363/api/triples/admin/myDBName/local/branch/main/instance",
