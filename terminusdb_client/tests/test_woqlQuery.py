@@ -249,13 +249,13 @@ class TestWoqlQueries:
         assert woql_object1.to_dict() == woql_object2.to_dict()
 
     def test_cast_method_datetime(self):
-        value = dt.datetime(2022,10,19,14,17,12)
+        value = dt.datetime(2022, 10, 19, 14, 17, 12)
         json_datetime = WOQLQuery().datetime(value)
         json_datetime2 = WOQLQuery().literal("2022-10-19T14:17:12", "dateTime")
         assert json_datetime == json_datetime2
-    
+
     def test_cast_method_date(self):
-        value = dt.date(2022,10,19)
+        value = dt.date(2022, 10, 19)
         json_datetime = WOQLQuery().date(value)
         json_datetime2 = WOQLQuery().literal("2022-10-19", "date")
         assert json_datetime == json_datetime2
