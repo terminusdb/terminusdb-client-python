@@ -1185,7 +1185,6 @@ class WOQLQuery:
         else:
             raise ValueError("Input need to be either string or a date object.")
 
-
     def literal(self, input_val, input_type):
         if ":" not in input_type:
             input_type = "xsd:" + input_type
