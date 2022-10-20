@@ -1,4 +1,5 @@
 import pprint
+import datetime as dt
 
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
@@ -246,6 +247,23 @@ class TestWoqlQueries:
             WOQLQuery().literal("1", "integer"), "xsd:integer", "v:Duration_Cast"
         )
         assert woql_object1.to_dict() == woql_object2.to_dict()
+
+    def test_cast_method_datetime(self):
+        value = dt.datetime(2022,10,19,14,17,12)
+        json_datetime = WOQLQuery().datetime(value)
+        json_datetime2 = WOQLQuery().literal("2022-10-19T14:17:12", "dateTime")
+        assert json_datetime == json_datetime2
+    
+    def test_cast_method_date(self):
+        value = dt.date(2022,10,19)
+        json_datetime = WOQLQuery().date(value)
+        json_datetime2 = WOQLQuery().literal("2022-10-19", "date")
+        assert json_datetime == json_datetime2
+
+    def test_cast_method_boolean(self):
+        json_datetime = WOQLQuery().boolean(True)
+        json_datetime2 = WOQLQuery().literal(True, "boolean")
+        assert json_datetime == json_datetime2
 
     def test_cast_method_object(self):
         woql_object1 = WOQLQuery().cast(
