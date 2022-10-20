@@ -1153,7 +1153,7 @@ class WOQLQuery:
         Parameters
         ----------
         input_obj : str
-            the given input dateTime object
+            the given input dateTime object or a datetime string format YYYY-MM-DDThh-mm-ssZ
 
         Returns
         -------
@@ -1165,6 +1165,25 @@ class WOQLQuery:
             return {"@type": "xsd:dateTime", "@value": input_obj}
         else:
             raise ValueError("Input need to be either string or a datetime object.")
+
+    def date(self, input_obj):
+        """Transforms the given date object into the proper json-ld form
+
+        Parameters
+        ----------
+        input_obj : str
+            the given input date object or a date string format YYYY-MM-DD
+
+        Returns
+        -------
+        dict
+        """
+        if isinstance(input_obj, dt.date):
+            return {"@type": "xsd:date", "@value": input_obj.isoformat()}
+        elif isinstance(input_obj, str):
+            return {"@type": "xsd:date", "@value": input_obj}
+        else:
+            raise ValueError("Input need to be either string or a date object.")
 
     def literal(self, input_val, input_type):
         if ":" not in input_type:
