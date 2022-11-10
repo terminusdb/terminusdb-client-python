@@ -1,5 +1,24 @@
 # TerminusDB Python Client Release Notes
 
+## v10.2.0
+
+### New
+
+- Implement info endpoint
+- Implement OK endpoint
+- Add proper date type to WOQLQuery
+
+### Bug fixes
+
+- Fix get_triples functions
+- Fix update_triples functions
+- Fix add_triples functions
+- Fix has_doc function (greatly improves performance)
+
+### Deprecations
+
+- We drop 3.7 support and upgraded pandas because of a security issue
+
 ## v10.1.5
 
 ### New
