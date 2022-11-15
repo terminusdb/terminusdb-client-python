@@ -1257,7 +1257,7 @@ class WOQLQuery:
         if not substring:
             substring = length
             length = len(substring) + before
-        if not string or not substring or type(substring) != type:
+        if not string or not substring or type(substring) != str:
             raise ValueError(
                 "Substr - the first and last parameters must be strings representing the full and substring variables / literals"
             )
