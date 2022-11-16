@@ -44,7 +44,7 @@ jobs:
         tox -e deps
     - name: Test with pytest
       run: |
-        [[ "$GITHUB_REPOSITORY" == "terminusdb/terminusdb-client-python" ]] && export TERMINUSX_TOKEN='${{ secrets.TERMINUSX_TOKEN_DEV }}'
+        [[ "$GITHUB_REPOSITORY" == "terminusdb/terminusdb-client-python" && "$GITHUB_EVENT_NAME" == "push" ]] && export TERMINUSX_TOKEN='${{ secrets.TERMINUSX_TOKEN_DEV }}'
         tox -e test
     - name: Coverage report
       uses: codecov/codecov-action@v2
