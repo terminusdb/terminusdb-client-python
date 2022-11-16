@@ -43,7 +43,7 @@ jobs:
         python -m pip install tox
         tox -e deps
     - name: Set TerminusX token if commit is from our repo
-      if: github.repository == 'terminusdb/terminusdb'
+      if: github.repository == 'terminusdb/terminusdb-client-python'
       run: |
         export TERMINUSX_TOKEN='${{ secrets.TERMINUSX_TOKEN_DEV }}'
     - name: Test with pytest
