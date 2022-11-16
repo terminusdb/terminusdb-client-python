@@ -144,6 +144,26 @@ def test_class_frame(docker_url):
     assert client.get_class_frame("Philosopher") == {'@type': 'Class', 'name': 'xsd:string'}
 
 
+def test_woql_substr(docker_url):
+    client = Client(docker_url, user_agent=test_user_agent)
+    client.connect()
+    db_name = "philosophers" + str(random())
+    client.create_database(db_name)
+    client.connect(db=db_name)
+    # Add a philosopher schema
+    schema = {"@type": "Class",
+              "@id": "Philosopher",
+              "name": "xsd:string"
+              }
+    # Add schema and Socrates
+    client.insert_document(schema, graph_type="schema")
+    client.insert_document({"name": "Socrates"})
+    result = client.query(
+        WOQLQuery().triple('v:Philosopher', '@schema:name', 'v:Name')
+        .substr('v:Name', 3, 'v:Substring', 0, 'v:After'))
+    assert result['bindings'][0]['Substring']['@value'] == 'Soc'
+
+
 def test_diff_apply_version(docker_url):
     client = Client(docker_url, user_agent=test_user_agent)
     client.connect()
