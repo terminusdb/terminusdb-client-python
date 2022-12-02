@@ -5,7 +5,7 @@
 ---
 
 [![Discord](https://img.shields.io/discord/689805612053168129?label=Discord&logo=Discord&style=plastic)](https://discord.gg/yTJKAma)
-[![Discourse](https://img.shields.io/discourse/topics?color=yellow&logo=Discourse&server=https%3A%2F%2Fdiscuss.terminusdb.com%2F&style=plastic)](https://discuss.terminusdb.com/)
+[![Reddit](https://img.shields.io/reddit/subreddit-subscribers/TerminusDB?style=social)](https://www.reddit.com/r/TerminusDB/)
 [![Twitter](https://img.shields.io/twitter/follow/terminusdb?color=skyblue&label=Follow%20on%20Twitter&logo=twitter&style=flat)](https://twitter.com/TerminusDB)
 
 [![release version](https://img.shields.io/pypi/v/terminusdb-client.svg?logo=pypi)](https://pypi.python.org/pypi/terminusdb-client/)
@@ -37,7 +37,7 @@ graph all through a simple document API.
 
 ## Release Notes and Previous Versions
 
-TerminusDB Client v10.0 works with TerminusDB v10.0 and TerminusX. Please check [RELEASE_NOTES.md](RELEASE_NOTES.md) to find out what has changed.
+TerminusDB Client v10.0 works with TerminusDB v10.0 and TerminusX. Please check the [Release Notes](RELEASE_NOTES.md) to find out what has changed.
 
 ## Installation
 -  TerminusDB Client can be downloaded form PyPI using pip:
@@ -245,12 +245,12 @@ The output files are under `docs/build/html`, open `index.html` in your browser 
 
 If you encounter any issues, please [report them](https://github.com/terminusdb/terminusdb-client-python/issues) with your os and environment setup, the version that you are using and a simple reproducible case.
 
-If you have other questions, you can ask in our community [forum](https://community.terminusdb.com/) or [Discord server](https://discord.gg/Gvdqw97).
+If you have other questions, you can ask in our community [community Subreddit](https://www.reddit.com/r/TerminusDB/) or [Discord server](https://discord.gg/Gvdqw97).
 
 ## Community
 
 Come visit us on our [discord server](https://discord.gg/yTJKAma)
-or our [forum](https://discuss.terminusdb.com). We are also on [twitter](https://twitter.com/TerminusDB)
+or our [community Subreddit](https://www.reddit.com/r/TerminusDB/). We are also on [twitter](https://twitter.com/TerminusDB)
 <img align="right" src="https://assets.terminusdb.com/images/TerminusDB%20color%20mascot.png" width="256px"/>
 
 ## Contribute
