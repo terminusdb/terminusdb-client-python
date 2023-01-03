@@ -46,12 +46,12 @@ def test_happy_path(docker_url):
     # test adding something
     client.query(WOQLQuery().add_quad("a", "rdf:type", "sys:Class", "schema"))
     first_commit = client._get_current_commit()
-    first_obj = client.query(WOQLQuery().star())
+    first_obj = client.query(WOQLQuery().star(graph="schema"))
     assert first_commit != init_commit
     assert len(client.get_commit_history()) == 1
     client.query(WOQLQuery().add_quad("b", "rdf:type", "sys:Class", "schema"))
     commit_history = client.get_commit_history()
-    more_obj = client.query(WOQLQuery().star())
+    more_obj = client.query(WOQLQuery().star(graph="schema"))
     assert first_obj != more_obj
     assert client._get_target_commit(1) == first_commit
     assert len(client.get_commit_history()) == 2
