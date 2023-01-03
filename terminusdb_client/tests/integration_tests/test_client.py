@@ -59,7 +59,7 @@ def test_happy_path(docker_url):
     client.reset(commit_history[-1]["commit"], soft=True)
     assert len(client.get_commit_history()) == 2
     assert client._ref == commit_history[-1]["commit"]
-    assert client.query(WOQLQuery().star()) == first_obj
+    assert client.query(WOQLQuery().star(graph="schema")) == first_obj
     client.reset(commit_history[-1]["commit"])
     assert len(client.get_commit_history()) == 1
     assert client._get_current_commit() == first_commit
