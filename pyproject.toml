@@ -30,7 +30,7 @@ tox = "*"
 interrogate = "*"
 docker-compose = "*"
 pre-commit = "*"
-shed = "~0.9.0"
+shed = "*"
 PyYAML = "<6.0"
 
 [build-system]
