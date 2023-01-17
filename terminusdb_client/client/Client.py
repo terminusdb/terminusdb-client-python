@@ -1221,7 +1221,6 @@ class Client:
                 new_doc.pop(0)
 
         json_string = json.dumps(new_doc).encode("utf-8")
-        print(json_string)
         if compress != "never" and len(json_string) > compress:
             headers.update(
                 {"Content-Encoding": "gzip", "Content-Type": "application/json"}
