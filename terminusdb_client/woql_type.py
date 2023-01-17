@@ -5,7 +5,7 @@ from typing import ForwardRef, List, Optional, Set, Union
 CONVERT_TYPE = {
     str: "xsd:string",
     bool: "xsd:boolean",
-    float: "xsd:decimal",
+    float: "xsd:double",
     int: "xsd:integer",
     dt.datetime: "xsd:dateTime",
     dt.date: "xsd:date",

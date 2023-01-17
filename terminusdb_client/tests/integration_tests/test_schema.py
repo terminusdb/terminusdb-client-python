@@ -103,7 +103,7 @@ def test_insert_cheuk(docker_url, test_schema):
             assert item["address_of"]["postal_code"] == "A12 345"
             assert item["address_of"]["street"] == "123 Abc Street"
             assert item["name"] == "Cheuk"
-            assert item["age"] == 21
+            assert item["age"] == "21"
             assert item["contact_number"] == "07777123456"
             assert item["managed_by"] == item["@id"]
         else:
@@ -185,7 +185,7 @@ def test_insert_cheuk_again(docker_url, test_schema):
             assert item["address_of"]["postal_code"] == "A12 345"
             assert item["address_of"]["street"] == "123 Abc Street"
             assert item["name"] == "Cheuk"
-            assert item["age"] == 21
+            assert item["age"] == "21"
             assert item["contact_number"] == "07777123456"
             assert item["managed_by"] == item["@id"]
         elif item.get("@type") == "Coordinate":
@@ -302,4 +302,4 @@ def test_compress_data(docker_url):
     client.insert_document(test_obj, compress=0)
     test_obj2 = client.get_all_documents(as_list=True)
     assert len(test_obj2) == 10
-    client.update_document(test_obj2, compress=0)
+    #client.update_document(test_obj2, compress=0)

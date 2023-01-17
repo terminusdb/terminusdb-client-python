@@ -190,6 +190,11 @@ class DocumentTemplate(metaclass=TerminusClass):
     def __setattr__(self, name, value):
         if name[0] != "_" and value is not None:
             correct_type = self._annotations.get(name)
+            if correct_type == int:
+                try:
+                    value = int(value)
+                except ValueError:
+                    raise TypeError(f"Unable to cast as int: {value}")
             _check_mismatch_type(name, value, correct_type)
         if (
             self._id
