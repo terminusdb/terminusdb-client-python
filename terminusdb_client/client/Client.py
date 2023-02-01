@@ -340,7 +340,7 @@ class Client:
         self.branch = branch
         self.ref = ref
         self.repo = repo
-
+        self._session = requests.Session()
         self._connected = True
 
         try:
@@ -352,7 +352,7 @@ class Client:
         if self.db is not None:
             try:
                 _finish_response(
-                    requests.head(
+                    self._session.head(
                         self._db_url(),
                         headers=self._default_headers,
                         params={"exists": "true"},
@@ -409,7 +409,7 @@ class Client:
         """
         return json.loads(
             _finish_response(
-                requests.get(
+                self._session.get(
                     self.api + "/info",
                     headers=self._default_headers,
                     auth=self._auth(),
@@ -431,7 +431,7 @@ class Client:
         -------
         bool
         """
-        req = requests.get(
+        req = self._session.get(
             self.api + "/ok",
             headers=self._default_headers,
             timeout=6
@@ -475,7 +475,7 @@ class Client:
         self._check_connection(check_db=(not team or not db))
         team = team if team else self.team
         db = db if db else self.db
-        result = requests.get(
+        result = self._session.get(
             f"{self.api}/log/{team}/{db}",
             params={'start': start, 'count': count},
             headers=self._default_headers,
@@ -550,7 +550,7 @@ class Client:
         api_url = self._documents_url().split("/")
         api_url = api_url[:-2]
         api_url = "/".join(api_url) + "/_commits"
-        result = requests.get(
+        result = self._session.get(
             api_url,
             headers=self._default_headers,
             params={"type": "Branch"},
@@ -632,7 +632,7 @@ class Client:
     def _get_prefixes(self):
         """Get the prefixes for a given database"""
         self._check_connection()
-        result = requests.get(
+        result = self._session.get(
             self._db_base("prefixes"),
             headers=self._default_headers,
             auth=self._auth(),
@@ -705,7 +705,7 @@ class Client:
         self.db = dbid
 
         _finish_response(
-            requests.post(
+            self._session.post(
                 self._db_url(),
                 headers=self._default_headers,
                 json=details,
@@ -763,7 +763,7 @@ class Client:
         if force:
             payload["force"] = "true"
         _finish_response(
-            requests.delete(
+            self._session.delete(
                 self._db_url(),
                 headers=self._default_headers,
                 auth=self._auth(),
@@ -790,7 +790,7 @@ class Client:
         str
         """
         self._check_connection()
-        result = requests.get(
+        result = self._session.get(
             self._triples_url(graph_type),
             headers=self._default_headers,
             auth=self._auth(),
@@ -819,7 +819,7 @@ class Client:
         params = {"commit_info": self._generate_commit(commit_msg),
                   "turtle": content,
                   }
-        result = requests.post(
+        result = self._session.post(
             self._triples_url(graph_type),
             headers=self._default_headers,
             json=params,
@@ -850,7 +850,7 @@ class Client:
         params = {"commit_info": self._generate_commit(commit_msg),
                   "turtle": content
                   }
-        result = requests.put(
+        result = self._session.put(
             self._triples_url(graph_type),
             headers=self._default_headers,
             json=params,
@@ -902,7 +902,7 @@ class Client:
                 payload[the_arg] = kwargs[the_arg]
         headers = self._default_headers.copy()
         headers["X-HTTP-Method-Override"] = "GET"
-        result = requests.post(
+        result = self._session.post(
             self._documents_url(),
             headers=headers,
             json=payload,
@@ -958,7 +958,7 @@ class Client:
             if the_arg in kwargs:
                 payload[the_arg] = kwargs[the_arg]
 
-        result = requests.get(
+        result = self._session.get(
             self._documents_url(),
             headers=self._default_headers,
             params=payload,
@@ -1061,7 +1061,7 @@ class Client:
         for the_arg in add_args:
             if the_arg in kwargs:
                 payload[the_arg] = kwargs[the_arg]
-        result = requests.get(
+        result = self._session.get(
             self._documents_url(),
             headers=self._default_headers,
             params=payload,
@@ -1225,7 +1225,7 @@ class Client:
             headers.update(
                 {"Content-Encoding": "gzip", "Content-Type": "application/json"}
             )
-            result = requests.post(
+            result = self._session.post(
                 self._documents_url(),
                 headers=headers,
                 params=params,
@@ -1233,7 +1233,7 @@ class Client:
                 auth=self._auth(),
             )
         else:
-            result = requests.post(
+            result = self._session.post(
                 self._documents_url(),
                 headers=headers,
                 params=params,
@@ -1307,7 +1307,7 @@ class Client:
             headers.update(
                 {"Content-Encoding": "gzip", "Content-Type": "application/json"}
             )
-            result = requests.put(
+            result = self._session.put(
                 self._documents_url(),
                 headers=headers,
                 params=params,
@@ -1315,7 +1315,7 @@ class Client:
                 auth=self._auth(),
             )
         else:
-            result = requests.put(
+            result = self._session.put(
                 self._documents_url(),
                 headers=headers,
                 params=params,
@@ -1415,7 +1415,7 @@ class Client:
             headers["TerminusDB-Data-Version"] = last_data_version
 
         _finish_response(
-            requests.delete(
+            self._session.delete(
                 self._documents_url(),
                 headers=headers,
                 params=params,
@@ -1446,7 +1446,7 @@ class Client:
         """
         self._check_connection()
 
-        response = requests.get(
+        response = self._session.get(
             self._documents_url(),
             headers=self._default_headers,
             json={"id": doc_id, "graph_type": graph_type},
@@ -1476,7 +1476,7 @@ class Client:
         """
         self._check_connection()
         opts = {"type": class_name}
-        result = requests.get(
+        result = self._session.get(
             self._class_frame_url(),
             headers=self._default_headers,
             params=opts,
@@ -1535,7 +1535,7 @@ class Client:
         if last_data_version is not None:
             headers["TerminusDB-Data-Version"] = last_data_version
 
-        result = requests.post(
+        result = self._session.post(
             self._query_url(),
             headers=headers,
             json=query_obj,
@@ -1580,7 +1580,7 @@ class Client:
             }
 
         _finish_response(
-            requests.post(
+            self._session.post(
                 self._branch_url(new_branch_id),
                 headers=self._default_headers,
                 json=source,
@@ -1604,7 +1604,7 @@ class Client:
         self._check_connection()
 
         _finish_response(
-            requests.delete(
+            self._session.delete(
                 self._branch_url(branch_id),
                 headers=self._default_headers,
                 auth=self._auth(),
@@ -1661,7 +1661,7 @@ class Client:
             "message": message,
         }
 
-        result = requests.post(
+        result = self._session.post(
             self._pull_url(),
             headers=self._default_headers,
             json=rc_args,
@@ -1684,7 +1684,7 @@ class Client:
             if the client does not connect to a database"""
         self._check_connection()
 
-        result = requests.post(
+        result = self._session.post(
             self._fetch_url(remote_id),
             headers=self._default_headers,
             auth=self._auth(),
@@ -1741,7 +1741,7 @@ class Client:
             "message": message,
         }
 
-        result = requests.post(
+        result = self._session.post(
             self._push_url(),
             headers=self._default_headers,
             json=rc_args,
@@ -1808,7 +1808,7 @@ class Client:
             message = f"Rebase from {rebase_source} by Python client {__version__}"
         rc_args = {"rebase_from": rebase_source, "author": author, "message": message}
 
-        result = requests.post(
+        result = self._session.post(
             self._rebase_url(),
             headers=self._default_headers,
             json=rc_args,
@@ -1866,7 +1866,7 @@ class Client:
             commit_path = f"{self.team}/{self.db}/{self.repo}/commit/{commit}"
 
         _finish_response(
-            requests.post(
+            self._session.post(
                 self._reset_url(),
                 headers=self._default_headers,
                 json={"commit_descriptor": commit_path},
@@ -1901,7 +1901,7 @@ class Client:
         self._check_connection()
 
         _finish_response(
-            requests.post(
+            self._session.post(
                 self._optimize_url(path),
                 headers=self._default_headers,
                 auth=self._auth(),
@@ -1947,7 +1947,7 @@ class Client:
         """
         self._check_connection()
 
-        result = requests.post(
+        result = self._session.post(
             self._squash_url(),
             headers=self._default_headers,
             json={"commit_info": self._generate_commit(message, author)},
@@ -1996,7 +1996,7 @@ class Client:
         branch = branch if branch else self.branch
         return json.loads(
             _finish_response(
-                requests.post(
+                self._session.post(
                     self._apply_url(branch=branch),
                     headers=self._default_headers,
                     json={
@@ -2022,7 +2022,7 @@ class Client:
         self._check_connection(check_db=False)
         return json.loads(
             _finish_response(
-                requests.post(
+                self._session.post(
                     self._diff_url(),
                     headers=self._default_headers,
                     json={'before': before_object,
@@ -2045,7 +2045,7 @@ class Client:
         self._check_connection(check_db=False)
         return json.loads(
             _finish_response(
-                requests.post(
+                self._session.post(
                     self._diff_url(),
                     headers=self._default_headers,
                     json={'before_data_version': before_version,
@@ -2113,7 +2113,7 @@ class Client:
                 )
         if self._connected:
             result = _finish_response(
-                requests.post(
+                self._session.post(
                     self._diff_url(),
                     headers=self._default_headers,
                     json=request_dict,
@@ -2122,7 +2122,7 @@ class Client:
             )
         else:
             result = _finish_response(
-                requests.post(
+                self._session.post(
                     self.server_url,
                     headers=self._default_headers,
                     json=request_dict,
@@ -2166,7 +2166,7 @@ class Client:
 
         if self._connected:
             result = _finish_response(
-                requests.post(
+                self._session.post(
                     self._patch_url(),
                     headers=self._default_headers,
                     json=request_dict,
@@ -2175,7 +2175,7 @@ class Client:
             )
         else:
             result = _finish_response(
-                requests.post(
+                self._session.post(
                     self.server_url,
                     headers=self._default_headers,
                     json=request_dict,
@@ -2213,7 +2213,7 @@ class Client:
         rc_args = {"remote_url": clone_source, "label": newid, "comment": description}
 
         _finish_response(
-            requests.post(
+            self._session.post(
                 self._clone_url(newid),
                 headers=self._default_headers,
                 json=rc_args,
@@ -2285,7 +2285,7 @@ class Client:
         dict or None if failed
         """
         self._check_connection(check_db=False)
-        result = requests.post(
+        result = self._session.post(
             f"{self._organization_url()}/{org}",
             headers=self._default_headers,
             auth=self._auth(),
@@ -2311,7 +2311,7 @@ class Client:
 
         """
         self._check_connection(check_db=False)
-        result = requests.get(
+        result = self._session.get(
             f"{self._organization_url()}/{org}/users",
             headers=self._default_headers,
             auth=self._auth(),
@@ -2338,7 +2338,7 @@ class Client:
 
         """
         self._check_connection(check_db=False)
-        result = requests.get(
+        result = self._session.get(
             f"{self._organization_url()}/{org}/users/{username}",
             headers=self._default_headers,
             auth=self._auth(),
@@ -2365,7 +2365,7 @@ class Client:
 
         """
         self._check_connection(check_db=False)
-        result = requests.get(
+        result = self._session.get(
             f"{self._organization_url()}/{org}/users/{username}/databases",
             headers=self._default_headers,
             auth=self._auth(),
@@ -2387,7 +2387,7 @@ class Client:
 
         """
         self._check_connection(check_db=False)
-        result = requests.get(
+        result = self._session.get(
             self._organization_url(),
             headers=self._default_headers,
             auth=self._auth(),
@@ -2413,7 +2413,7 @@ class Client:
         dict or None if not found
         """
         self._check_connection(check_db=False)
-        result = requests.get(
+        result = self._session.get(
             f"{self._organization_url()}/{org}",
             headers=self._default_headers,
             auth=self._auth(),
@@ -2439,7 +2439,7 @@ class Client:
         dict or None if request failed
         """
         self._check_connection(check_db=False)
-        result = requests.delete(
+        result = self._session.delete(
             f"{self._organization_url()}/{org}",
             headers=self._default_headers,
             auth=self._auth(),
@@ -2477,7 +2477,7 @@ class Client:
 
         """
         self._check_connection(check_db=False)
-        result = requests.post(
+        result = self._session.post(
             f"{self._capabilities_url()}",
             headers=self._default_headers,
             json=capability_change,
@@ -2532,7 +2532,7 @@ class Client:
         >>> client.add_role(role)
         """
         self._check_connection(check_db=False)
-        result = requests.post(
+        result = self._session.post(
             f"{self._roles_url()}",
             headers=self._default_headers,
             json=role,
@@ -2588,7 +2588,7 @@ class Client:
         >>> client.change_role(role)
         """
         self._check_connection(check_db=False)
-        result = requests.put(
+        result = self._session.put(
             f"{self._roles_url()}",
             headers=self._default_headers,
             json=role,
@@ -2610,7 +2610,7 @@ class Client:
         dict or None if failed
         """
         self._check_connection(check_db=False)
-        result = requests.get(
+        result = self._session.get(
             f"{self._roles_url()}",
             headers=self._default_headers,
             auth=self._auth(),
@@ -2638,7 +2638,7 @@ class Client:
         dict or None if failed
         """
         self._check_connection(check_db=False)
-        result = requests.post(
+        result = self._session.post(
             f"{self._users_url()}",
             headers=self._default_headers,
             json={"name": username, "password": password},
@@ -2665,7 +2665,7 @@ class Client:
         dict or None if failed
         """
         self._check_connection(check_db=False)
-        result = requests.get(
+        result = self._session.get(
             f"{self._users_url()}/{username}",
             headers=self._default_headers,
             auth=self._auth(),
@@ -2686,7 +2686,7 @@ class Client:
         dict or None if failed
         """
         self._check_connection(check_db=False)
-        result = requests.get(
+        result = self._session.get(
             f"{self._users_url()}",
             headers=self._default_headers,
             auth=self._auth(),
@@ -2712,7 +2712,7 @@ class Client:
         dict or None if failed
         """
         self._check_connection(check_db=False)
-        result = requests.delete(
+        result = self._session.delete(
             f"{self._users_url()}/{username}",
             headers=self._default_headers,
             auth=self._auth(),
@@ -2740,7 +2740,7 @@ class Client:
         dict or None if failed
         """
         self._check_connection(check_db=False)
-        result = requests.put(
+        result = self._session.put(
             f"{self._users_url()}",
             headers=self._default_headers,
             json={"name": username, "password": password},
@@ -2771,7 +2771,7 @@ class Client:
         """
         self._check_connection(check_db=False)
         team = team if team else self.team
-        result = requests.get(
+        result = self._session.get(
             f"{self.api}/db/{team}/{dbid}?verbose=true",
             headers=self._default_headers,
             auth=self._auth(),
@@ -2800,7 +2800,7 @@ class Client:
         """
         self._check_connection(check_db=False)
         team = team if team else self.team
-        r = requests.head(
+        r = self._session.head(
             f"{self.api}/db/{team}/{dbid}",
             headers=self._default_headers,
             auth=self._auth(),
@@ -2822,7 +2822,7 @@ class Client:
         """
         self._check_connection(check_db=False)
 
-        result = requests.get(
+        result = self._session.get(
             self.api + "/",
             headers=self._default_headers,
             auth=self._auth(),
