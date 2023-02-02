@@ -48,7 +48,7 @@ class APITokenAuth(requests.auth.AuthBase):
         self._token = token
 
     def __call__(self, r):
-        r.headers["API_TOKEN"] = f"{self._token}"
+        r.headers["Authorization"] = f"Token {self._token}"
         return r
 
 
