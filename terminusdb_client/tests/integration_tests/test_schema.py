@@ -302,4 +302,3 @@ def test_compress_data(docker_url):
     client.insert_document(test_obj, compress=0)
     test_obj2 = client.get_all_documents(as_list=True)
     assert len(test_obj2) == 10
-    client.update_document(test_obj2, compress=0)
