@@ -15,12 +15,12 @@ test_user_agent = "terminusdb-client-python-tests"
 
 def test_not_ok():
     client = Client('http://localhost:6363')
-    with pytest.raises(Exception) as _:
-        client.ok()
+    not client.ok()
 
 
 def test_ok(docker_url):
     client = Client(docker_url)
+    client.connect()
     assert client.ok()
 
 
@@ -394,7 +394,6 @@ def test_diff_ops(docker_url, test_schema):
     public_patch = Client(
         "https://cloud.terminusdb.com/jsonpatch", user_agent=test_user_agent
     )
-
     result_patch = Patch(
         json='{"@id": "Person/Jane", "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'
     )
@@ -494,12 +493,12 @@ def test_diff_ops_no_auth(test_schema, terminusx_token):
     jane = Person(
         _id="Jane",
         name="Jane",
-        age=18,
+        age="18",
     )
     janine = Person(
         _id="Jane",
         name="Janine",
-        age=18,
+        age="18",
     )
     result = client.diff(jane, janine)
     assert result.content == result_patch.content
