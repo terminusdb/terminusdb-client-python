@@ -382,7 +382,7 @@ def test_add_get_remove_user(docker_url):
     with pytest.raises(DatabaseError):
         user = client.get_user("test")
 
-# @pytest.mark.skip(reason="temporary not avaliable")
+
 def test_diff_ops(docker_url, test_schema):
     # create client and db
     client = Client(docker_url, user_agent=test_user_agent)
