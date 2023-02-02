@@ -431,6 +431,8 @@ class Client:
         -------
         bool
         """
+        if not self._connected:
+            return self._connected
         req = self._session.get(
             self.api + "/ok",
             headers=self._default_headers,
@@ -2122,7 +2124,7 @@ class Client:
             )
         else:
             result = _finish_response(
-                self._session.post(
+                requests.post(
                     self.server_url,
                     headers=self._default_headers,
                     json=request_dict,
@@ -2175,7 +2177,7 @@ class Client:
             )
         else:
             result = _finish_response(
-                self._session.post(
+                requests.post(
                     self.server_url,
                     headers=self._default_headers,
                     json=request_dict,

@@ -1218,14 +1218,14 @@ six = ">=1.5.2"
 
 [[package]]
 name = "pre-commit"
-version = "3.0.2"
+version = "3.0.3"
 description = "A framework for managing and maintaining multi-language pre-commit hooks."
 category = "dev"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pre_commit-3.0.2-py2.py3-none-any.whl", hash = "sha256:f448d5224c70e196a6c6f87961d2333dfdc49988ebbf660477f9efe991c03597"},
-    {file = "pre_commit-3.0.2.tar.gz", hash = "sha256:aa97fa71e7ab48225538e1e91a6b26e483029e6de64824f04760c32557bc91d7"},
+    {file = "pre_commit-3.0.3-py2.py3-none-any.whl", hash = "sha256:83e2e8cc5cbb3691cff9474494816918d865120768aa36c9eda6185126667d21"},
+    {file = "pre_commit-3.0.3.tar.gz", hash = "sha256:4187e74fda38f0f700256fb2f757774385503b04292047d0899fc913207f314b"},
 ]
 
 [package.dependencies]
@@ -1575,14 +1575,14 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
 name = "setuptools"
-version = "67.0.0"
+version = "67.1.0"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "setuptools-67.0.0-py3-none-any.whl", hash = "sha256:9d790961ba6219e9ff7d9557622d2fe136816a264dd01d5997cfc057d804853d"},
-    {file = "setuptools-67.0.0.tar.gz", hash = "sha256:883131c5b6efa70b9101c7ef30b2b7b780a4283d5fc1616383cdf22c83cbefe6"},
+    {file = "setuptools-67.1.0-py3-none-any.whl", hash = "sha256:a7687c12b444eaac951ea87a9627c4f904ac757e7abdc5aac32833234af90378"},
+    {file = "setuptools-67.1.0.tar.gz", hash = "sha256:e261cdf010c11a41cb5cb5f1bf3338a7433832029f559a6a7614bd42a967c300"},
 ]
 
 [package.extras]
@@ -1592,19 +1592,19 @@ testing-integration = ["build[virtualenv]", "filelock (>=3.4.0)", "jaraco.envs (
 
 [[package]]
 name = "shed"
-version = "0.10.8"
+version = "0.10.9"
 description = "`shed` canonicalises Python code."
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "shed-0.10.8-py3-none-any.whl", hash = "sha256:5625a41842ef433bc1ddf1360d039cbeb205d5dcb33b706515ec410f865b4551"},
-    {file = "shed-0.10.8.tar.gz", hash = "sha256:06030eb5ecb7708cc81628f61493725b46614b6d80444352bcead27c5f0da47d"},
+    {file = "shed-0.10.9-py3-none-any.whl", hash = "sha256:ca2c4863abba47df2463fed51bca1cc81b4380b0fb07e18ccc207506ea5ef03b"},
+    {file = "shed-0.10.9.tar.gz", hash = "sha256:586409073267c0b74ec82526d0bcd1f9e857f785d9f1f07e6c3f3f1091e82712"},
 ]
 
 [package.dependencies]
 autoflake = ">=1.4"
-black = ">=22.8.0"
+black = ">=23.1.0"
 com2ann = {version = ">=0.3.0", markers = "python_version >= \"3.8\""}
 isort = ">=5.10.1"
 libcst = ">=0.4.7"

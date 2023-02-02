@@ -16,37 +16,33 @@ from .conftest import mocked_request_insert_delete, mocked_request_success
 from .woqljson.woqlStarJson import WoqlStar
 
 
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 def test_connection(mocked_requests):
-    woql_client = Client("http://localhost:6363")
+    client = Client("http://localhost:6363")
 
-    # before connect it connection is empty
+    client.connect(key="root", team="admin", user="admin")
 
-    woql_client.connect(key="root", team="admin", user="admin")
-
-    requests.get.assert_called_once_with(
+    client._session.get.assert_called_once_with(
         "http://localhost:6363/api/info",
         auth=("admin", "root"),
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
 
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 def test_user_agent_set(mocked_requests):
     client = Client("http://localhost:6363", user_agent="test_user_agent")
 
-    # before connect it connection is empty
-
     client.connect(key="root", team="admin", user="admin")
 
-    requests.get.assert_called_once_with(
+    client._session.get.assert_called_once_with(
         "http://localhost:6363/api/info",
         auth=("admin", "root"),
         headers={"user-agent": "test_user_agent"},
     )
 
 
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 def test_connected_flag(mocked_requests):
     client = Client("http://localhost:6363")
     assert not client._connected
@@ -56,8 +52,8 @@ def test_connected_flag(mocked_requests):
     assert not client._connected
 
 
-@mock.patch("requests.post", side_effect=mocked_request_success)
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'post', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 def test_create_database(mocked_requests, mocked_requests2):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
@@ -73,7 +69,7 @@ def test_create_database(mocked_requests, mocked_requests2):
         include_schema=False,
     )
 
-    requests.post.assert_called_once_with(
+    client._session.post.assert_called_once_with(
         "http://localhost:6363/api/db/admin/myFirstTerminusDB",
         auth=("admin", "root"),
         json={"label": "my first db", "comment": "my first db comment"},
@@ -81,8 +77,8 @@ def test_create_database(mocked_requests, mocked_requests2):
     )
 
 
-@mock.patch("requests.post", side_effect=mocked_request_success)
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'post', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 # @mock.patch("terminusdb_client.woqlclient.woqlClient.WOQLClient.create_graph")
 def test_create_database_with_schema(mocked_requests, mocked_requests2):
     client = Client("http://localhost:6363")
@@ -94,7 +90,7 @@ def test_create_database_with_schema(mocked_requests, mocked_requests2):
         description="my first db comment",
         include_schema=True,
     )
-    requests.post.assert_called_once_with(
+    client._session.post.assert_called_once_with(
         "http://localhost:6363/api/db/admin/myFirstTerminusDB",
         auth=("admin", "root"),
         json={"label": "my first db", "comment": "my first db comment", "schema": True},
@@ -102,8 +98,8 @@ def test_create_database_with_schema(mocked_requests, mocked_requests2):
     )
 
 
-@mock.patch("requests.post", side_effect=mocked_request_success)
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'post', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 def test_create_database_and_change_team(mocked_requests, mocked_requests2):
     client = Client("http://localhost:6363")
     client.connect(user="admin", team="admin", key="root")
@@ -115,7 +111,7 @@ def test_create_database_and_change_team(mocked_requests, mocked_requests2):
         include_schema=False,
     )
 
-    requests.post.assert_called_once_with(
+    client._session.post.assert_called_once_with(
         "http://localhost:6363/api/db/my_new_team/myFirstTerminusDB",
         auth=("admin", "root"),
         json={"label": "my first db", "comment": "my first db comment"},
@@ -123,15 +119,15 @@ def test_create_database_and_change_team(mocked_requests, mocked_requests2):
     )
 
 
-@mock.patch("requests.head", side_effect=mocked_request_success)
-@mock.patch("requests.get", side_effect=mocked_request_success)
-@mock.patch("requests.post", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'head', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'post', side_effect=mocked_request_success)
 def test_branch(mocked_requests, mocked_requests2, mocked_requests3):
     client = Client("http://localhost:6363")
     client.connect(user="admin", team="admin", key="root", db="myDBName")
     client.create_branch("my_new_branch")
 
-    requests.post.assert_called_once_with(
+    client._session.post.assert_called_once_with(
         "http://localhost:6363/api/branch/admin/myDBName/local/branch/my_new_branch",
         auth=("admin", "root"),
         json={"origin": "admin/myDBName/local/branch/main"},
@@ -139,15 +135,15 @@ def test_branch(mocked_requests, mocked_requests2, mocked_requests3):
     )
 
 
-@mock.patch("requests.head", side_effect=mocked_request_success)
-@mock.patch("requests.get", side_effect=mocked_request_success)
-@mock.patch("requests.post", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'head', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'post', side_effect=mocked_request_success)
 def test_crazy_branch(mocked_requests, mocked_requests2, mocked_requests3):
     client = Client("http://localhost:6363")
     client.connect(user="admin", team="amazing admin", key="root", db="my DB")
     client.create_branch("my new branch")
 
-    requests.post.assert_called_once_with(
+    client._session.post.assert_called_once_with(
         "http://localhost:6363/api/branch/amazing%20admin/my%20DB/local/branch/my%20new%20branch",
         auth=("admin", "root"),
         json={"origin": "amazing admin/my DB/local/branch/main"},
@@ -155,29 +151,29 @@ def test_crazy_branch(mocked_requests, mocked_requests2, mocked_requests3):
     )
 
 
-@mock.patch("requests.get", side_effect=mocked_request_success)
-@mock.patch("requests.post", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'post', side_effect=mocked_request_success)
 def test_get_database(mocked_requests, mocked_requests2):
     client = Client("http://localhost:6363")
     client.connect(user="admin", team="admin", key="root")
     db_name = "testDB" + str(random.randrange(100000))
     client.create_database(db_name)
     client.get_database(db_name)
-    requests.get.assert_called_with(
+    client._session.get.assert_called_with(
         f"http://localhost:6363/api/db/admin/{db_name}?verbose=true",
         auth=("admin", "root"),
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
 
-@mock.patch("requests.get", side_effect=mocked_request_success)
-@mock.patch("requests.head", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'head', side_effect=mocked_request_success)
 def test_has_database(mocked_requests, mocked_requests2):
     client = Client("http://localhost:6363")
     client.connect(user="admin", team="admin", key="root")
     db_name = "testDB" + str(random.randrange(100000))
     client.has_database(db_name)
-    requests.head.assert_called_with(
+    client._session.head.assert_called_with(
         f"http://localhost:6363/api/db/admin/{db_name}",
         auth=("admin", "root"),
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
@@ -185,15 +181,15 @@ def test_has_database(mocked_requests, mocked_requests2):
 
 
 @pytest.mark.skip(reason="temporary not avaliable")
-@mock.patch("requests.head", side_effect=mocked_request_success)
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'head', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 def test_get_triples(mocked_requests, mocked_requests2):
     client = Client("http://localhost:6363")
     client.connect(user="admin", team="admin", key="root", db="myDBName")
 
     client.get_triples("instance")
 
-    requests.get.assert_called_with(
+    client._session.get.assert_called_with(
         "http://localhost:6363/api/triples/admin/myDBName/local/branch/main/instance",
         auth=("admin", "root"),
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
@@ -201,24 +197,24 @@ def test_get_triples(mocked_requests, mocked_requests2):
 
 
 @pytest.mark.skip(reason="temporary not avaliable")
-@mock.patch("requests.head", side_effect=mocked_request_success)
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'head', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 def test_get_triples_with_enum(mocked_requests, mocked_requests2):
     client = Client("http://localhost:6363")
     client.connect(user="admin", team="admin", key="root", db="myDBName")
 
     client.get_triples(GraphType.INSTANCE)
 
-    requests.get.assert_called_with(
+    client._session.get.assert_called_with(
         "http://localhost:6363/api/triples/admin/myDBName/local/branch/main/instance",
         auth=("admin", "root"),
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
 
-@mock.patch("requests.post", side_effect=mocked_request_insert_delete)
-@mock.patch("requests.head", side_effect=mocked_request_success)
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'post', side_effect=mocked_request_insert_delete)
+@mock.patch.object(requests.Session, 'head', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 def test_query(mocked_requests, mocked_requests2, mocked_requests3):
     client = Client("http://localhost:6363")
     client.connect(user="admin", team="admin", key="root", db="myDBName")
@@ -227,7 +223,7 @@ def test_query(mocked_requests, mocked_requests2, mocked_requests3):
 
     client.query(WoqlStar, commit_msg="commit msg")
 
-    requests.post.assert_called_once_with(
+    client._session.post.assert_called_once_with(
         "http://localhost:6363/api/woql/admin/myDBName/local/branch/main",
         auth=("admin", "root"),
         json={
@@ -241,7 +237,7 @@ def test_query(mocked_requests, mocked_requests2, mocked_requests3):
     )
 
 
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 def test_query_nodb(mocked_requests):
     client = Client("http://localhost:6363")
     client.connect(user="admin", team="admin", key="root")
@@ -249,9 +245,9 @@ def test_query_nodb(mocked_requests):
         client.query(WoqlStar)
 
 
-@mock.patch("requests.head", side_effect=mocked_request_success)
-@mock.patch("requests.get", side_effect=mocked_request_success)
-@mock.patch("requests.post", side_effect=mocked_request_insert_delete)
+@mock.patch.object(requests.Session, 'head', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'post', side_effect=mocked_request_insert_delete)
 def test_query_commit_made(mocked_execute, mocked_requests, mocked_requests2):
     client = Client("http://localhost:6363")
     client.connect(user="admin", team="admin", key="root", db="myDBName")
@@ -259,8 +255,8 @@ def test_query_commit_made(mocked_execute, mocked_requests, mocked_requests2):
     assert result == "Commit successfully made."
 
 
-@mock.patch("requests.post", side_effect=mocked_request_success)
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'post', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 def test_delete_database(mocked_requests, mocked_requests2):
     client = Client("http://localhost:6363")
     client.connect(user="admin", key="root", team="admin")
@@ -277,7 +273,7 @@ def test_delete_database(mocked_requests, mocked_requests2):
         client.delete_database()
 
 
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 def test_rollback(mocked_requests):
     client = Client("http://localhost:6363")
     client.connect(user="admin", team="admin", key="root")
@@ -291,7 +287,7 @@ def test_copy_client():
     assert id(client) != copy_client
 
 
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 def test_basic_auth(mocked_requests):
     client = Client("http://localhost:6363")
     client.connect(user="admin", team="admin", key="root")
@@ -300,7 +296,7 @@ def test_basic_auth(mocked_requests):
     assert client.user == "admin"
 
 
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 def test_remote_auth(mocked_requests):
     client = Client("http://localhost:6363")
     auth_setting = {"type": "jwt", "user": "admin", "key": "<token>"}
@@ -311,8 +307,8 @@ def test_remote_auth(mocked_requests):
     assert result == auth_setting
 
 
-@mock.patch("requests.head", side_effect=mocked_request_success)
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'head', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 def test_set_db(mocked_requests, mocked_requests2):
     client = Client("http://localhost:6363")
     with pytest.raises(InterfaceError):
@@ -323,8 +319,8 @@ def test_set_db(mocked_requests, mocked_requests2):
     assert client.repo == "local"
 
 
-@mock.patch("requests.head", side_effect=mocked_request_success)
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'head', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 def test_full_replace_fail(mocked_requests, mocked_requests2):
     client = Client("http://localhost:6363")
     client.connect(db="myDBName")
@@ -334,8 +330,8 @@ def test_full_replace_fail(mocked_requests, mocked_requests2):
         )
 
 
-@mock.patch("requests.head", side_effect=mocked_request_success)
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'head', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 def test_insert_woqlschema_fail(mocked_requests, mocked_requests2):
     client = Client("http://localhost:6363")
     client.connect(db="myDBName")
@@ -343,9 +339,9 @@ def test_insert_woqlschema_fail(mocked_requests, mocked_requests2):
         client.insert_document(WOQLSchema(), graph_type="instance")
 
 
-@mock.patch("requests.head", side_effect=mocked_request_success)
-@mock.patch("requests.delete", side_effect=mocked_request_success)
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'head', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'delete', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 def test_delete_document(
     mocked_requests, mocked_requests2, mocked_requests3, test_schema
 ):
@@ -356,7 +352,7 @@ def test_delete_document(
 
     client.delete_document(["id1", "id2"])
 
-    requests.delete.assert_called_with(
+    client._session.delete.assert_called_with(
         "http://localhost:6363/api/document/admin/myDBName/local/branch/main",
         auth=("admin", "root"),
         json=["id1", "id2"],
@@ -370,7 +366,7 @@ def test_delete_document(
 
     client.delete_document("id1")
 
-    requests.delete.assert_called_with(
+    client._session.delete.assert_called_with(
         "http://localhost:6363/api/document/admin/myDBName/local/branch/main",
         auth=("admin", "root"),
         json=["id1"],
@@ -386,7 +382,7 @@ def test_delete_document(
     home = Coordinate(_id="Coordinate/home", x=123.431, y=342.435)
     client.delete_document(home)
 
-    requests.delete.assert_called_with(
+    client._session.delete.assert_called_with(
         "http://localhost:6363/api/document/admin/myDBName/local/branch/main",
         auth=("admin", "root"),
         json=["Coordinate/home"],
@@ -400,7 +396,7 @@ def test_delete_document(
 
     client.delete_document(home._obj_to_dict())
 
-    requests.delete.assert_called_with(
+    client._session.delete.assert_called_with(
         "http://localhost:6363/api/document/admin/myDBName/local/branch/main",
         auth=("admin", "root"),
         json=["Coordinate/home"],
@@ -413,8 +409,8 @@ def test_delete_document(
     )
 
 
-@mock.patch("requests.get", side_effect=mocked_request_success)
-@mock.patch("requests.post", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'post', side_effect=mocked_request_success)
 def test_add_user(mocked_requests, mocked_requests2):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
@@ -424,7 +420,7 @@ def test_add_user(mocked_requests, mocked_requests2):
     user = "Gavin" + str(random.randrange(100000))
     client.add_user(user, "somePassword")
 
-    requests.post.assert_called_with(
+    client._session.post.assert_called_with(
         "http://localhost:6363/api/users",
         auth=("admin", "root"),
         json={"name": user, "password": "somePassword"},
@@ -432,9 +428,9 @@ def test_add_user(mocked_requests, mocked_requests2):
     )
 
 
-@mock.patch("requests.get", side_effect=mocked_request_success)
-@mock.patch("requests.post", side_effect=mocked_request_success)
-@mock.patch("requests.delete", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'post', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'delete', side_effect=mocked_request_success)
 def test_delete_user(mocked_requests, mocked_requests2, mocked_requests3):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
@@ -445,16 +441,16 @@ def test_delete_user(mocked_requests, mocked_requests2, mocked_requests3):
     client.add_user(user, "somePassword")
     client.delete_user(user)
 
-    requests.delete.assert_called_with(
+    client._session.delete.assert_called_with(
         f"http://localhost:6363/api/users/{user}",
         auth=("admin", "root"),
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
 
-@mock.patch("requests.get", side_effect=mocked_request_success)
-@mock.patch("requests.post", side_effect=mocked_request_success)
-@mock.patch("requests.delete", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'post', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'delete', side_effect=mocked_request_success)
 def test_delete_organization(mocked_requests, mocked_requests2, mocked_requests3):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
@@ -465,16 +461,16 @@ def test_delete_organization(mocked_requests, mocked_requests2, mocked_requests3
     client.create_organization(org)
     client.delete_organization(org)
 
-    requests.delete.assert_called_with(
+    client._session.delete.assert_called_with(
         f"http://localhost:6363/api/organizations/{org}",
         auth=("admin", "root"),
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
 
-@mock.patch("requests.get", side_effect=mocked_request_success)
-@mock.patch("requests.post", side_effect=mocked_request_success)
-@mock.patch("requests.put", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'post', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'put', side_effect=mocked_request_success)
 def test_change_user_password(mocked_requests, mocked_requests2, mocked_requests3):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
@@ -485,7 +481,7 @@ def test_change_user_password(mocked_requests, mocked_requests2, mocked_requests
     client.add_user(user, "somePassword")
     client.change_user_password(user, "newPassword")
 
-    requests.put.assert_called_with(
+    client._session.put.assert_called_with(
         "http://localhost:6363/api/users",
         auth=("admin", "root"),
         json={"name": user, "password": "newPassword"},
@@ -493,8 +489,8 @@ def test_change_user_password(mocked_requests, mocked_requests2, mocked_requests
     )
 
 
-@mock.patch("requests.get", side_effect=mocked_request_success)
-@mock.patch("requests.post", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'post', side_effect=mocked_request_success)
 def test_create_organization(mocked_requests, mocked_requests2):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
@@ -504,57 +500,57 @@ def test_create_organization(mocked_requests, mocked_requests2):
     org = "RandomOrg" + str(random.randrange(100000))
     client.create_organization(org)
 
-    requests.post.assert_called_with(
+    client._session.post.assert_called_with(
         f"http://localhost:6363/api/organizations/{org}",
         auth=("admin", "root"),
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
 
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 def test_get_organization_users(mocked_requests):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
     )
     client.connect()
     client.get_organization_users("admin")
-    requests.get.assert_called_with(
+    client._session.get.assert_called_with(
         "http://localhost:6363/api/organizations/admin/users",
         auth=("admin", "root"),
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
 
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 def test_get_organization_user(mocked_requests):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
     )
     client.connect()
     client.get_organization_user("admin", "admin")
-    requests.get.assert_called_with(
+    client._session.get.assert_called_with(
         "http://localhost:6363/api/organizations/admin/users/admin",
         auth=("admin", "root"),
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
 
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 def test_get_organizations(mocked_requests):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
     )
     client.connect()
     client.get_organizations()
-    requests.get.assert_called_with(
+    client._session.get.assert_called_with(
         "http://localhost:6363/api/organizations",
         auth=("admin", "root"),
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
 
-@mock.patch("requests.get", side_effect=mocked_request_success)
-@mock.patch("requests.post", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'post', side_effect=mocked_request_success)
 def test_capabilities_change(mocked_requests, mocked_requests2):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
@@ -573,7 +569,7 @@ def test_capabilities_change(mocked_requests, mocked_requests2):
         client.change_capabilities(capability_change)
     except InterfaceError:
         pass
-    requests.post.assert_called_with(
+    client._session.post.assert_called_with(
         "http://localhost:6363/api/capabilities",
         auth=("admin", "root"),
         json=capability_change,
@@ -581,8 +577,8 @@ def test_capabilities_change(mocked_requests, mocked_requests2):
     )
 
 
-@mock.patch("requests.get", side_effect=mocked_request_success)
-@mock.patch("requests.post", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'post', side_effect=mocked_request_success)
 def test_add_role(mocked_requests, mocked_requests2):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
@@ -614,7 +610,7 @@ def test_add_role(mocked_requests, mocked_requests2):
         client.add_role(role)
     except InterfaceError:
         pass
-    requests.post.assert_called_with(
+    client._session.post.assert_called_with(
         "http://localhost:6363/api/roles",
         auth=("admin", "root"),
         json=role,
@@ -622,9 +618,9 @@ def test_add_role(mocked_requests, mocked_requests2):
     )
 
 
-@mock.patch("requests.get", side_effect=mocked_request_success)
-@mock.patch("requests.post", side_effect=mocked_request_success)
-@mock.patch("requests.put", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'post', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'put', side_effect=mocked_request_success)
 def test_change_role(mocked_requests, mocked_requests2, mocked_requests3):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
@@ -658,7 +654,7 @@ def test_change_role(mocked_requests, mocked_requests2, mocked_requests3):
         client.change_role(role)
     except InterfaceError:
         pass
-    requests.put.assert_called_with(
+    client._session.put.assert_called_with(
         "http://localhost:6363/api/roles",
         auth=("admin", "root"),
         json=role,
@@ -666,7 +662,7 @@ def test_change_role(mocked_requests, mocked_requests2, mocked_requests3):
     )
 
 
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 def test_get_roles(mocked_requests):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
@@ -676,14 +672,14 @@ def test_get_roles(mocked_requests):
         client.get_available_roles()
     except InterfaceError:
         pass
-    requests.get.assert_called_with(
+    client._session.get.assert_called_with(
         "http://localhost:6363/api/roles",
         auth=("admin", "root"),
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
 
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 def test_get_users(mocked_requests):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
@@ -693,14 +689,14 @@ def test_get_users(mocked_requests):
         client.get_users()
     except InterfaceError:
         pass
-    requests.get.assert_called_with(
+    client._session.get.assert_called_with(
         "http://localhost:6363/api/users",
         auth=("admin", "root"),
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
 
-@mock.patch("requests.get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
 def test_get_user(mocked_requests):
     client = Client(
         "http://localhost:6363", user="admin", key="root", team="admin"
@@ -708,7 +704,7 @@ def test_get_user(mocked_requests):
     client.connect()
     user = "Gavin" + str(random.randrange(100000))
     client.get_user(user)
-    requests.get.assert_called_with(
+    client._session.get.assert_called_with(
         f"http://localhost:6363/api/users/{user}",
         auth=("admin", "root"),
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},

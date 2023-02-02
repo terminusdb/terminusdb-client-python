@@ -300,10 +300,10 @@ def test_datetime():
     assert new_obj.duration == delta
 
 
-@mock.patch("requests.head", side_effect=mocked_request_success)
-@mock.patch("requests.get", side_effect=mocked_request_success)
-@mock.patch("requests.post", side_effect=mocked_request_success)
-@mock.patch("requests.put", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'head', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'post', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'put', side_effect=mocked_request_success)
 def test_compress_data(patched, patched2, patched3, patched4):
     datetime_obj = dt.datetime(2019, 5, 18, 15, 17, 8, 132263)
     delta = dt.timedelta(
@@ -319,7 +319,7 @@ def test_compress_data(patched, patched2, patched3, patched4):
     client = Client("http://127.0.0.1:6366")
     client.connect(db="test_compress_data")
     client.insert_document(test_obj, compress=0)
-    requests.post.assert_called_once_with(
+    client._session.post.assert_called_once_with(
         "http://127.0.0.1:6366/api/document/admin/test_compress_data/local/branch/main",
         auth=("admin", "root"),
         headers={
@@ -336,9 +336,9 @@ def test_compress_data(patched, patched2, patched3, patched4):
         },
         data=ANY,
     )
-    requests.post.reset_mock()
+    client._session.post.reset_mock()
     client.insert_document(test_obj, compress="never")
-    requests.post.assert_called_once_with(
+    client._session.post.assert_called_once_with(
         "http://127.0.0.1:6366/api/document/admin/test_compress_data/local/branch/main",
         auth=("admin", "root"),
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
@@ -352,7 +352,7 @@ def test_compress_data(patched, patched2, patched3, patched4):
         json=ANY,
     )
     client.replace_document(test_obj, compress=0)
-    requests.put.assert_called_once_with(
+    client._session.put.assert_called_once_with(
         "http://127.0.0.1:6366/api/document/admin/test_compress_data/local/branch/main",
         auth=("admin", "root"),
         headers={
@@ -369,9 +369,9 @@ def test_compress_data(patched, patched2, patched3, patched4):
         },
         data=ANY,
     )
-    requests.put.reset_mock()
+    client._session.put.reset_mock()
     client.replace_document(test_obj, compress="never")
-    requests.put.assert_called_once_with(
+    client._session.put.assert_called_once_with(
         "http://127.0.0.1:6366/api/document/admin/test_compress_data/local/branch/main",
         auth=("admin", "root"),
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
