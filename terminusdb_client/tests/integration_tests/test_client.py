@@ -509,7 +509,7 @@ def test_diff_ops_no_auth(test_schema, terminusx_token):
         "@id": "Person/Jane",
         "@type": "Person",
         "name": "Janine",
-        "age": "18",
+        "age": 18,
     }
     my_schema = test_schema.copy()
     my_schema.object.pop("Employee")
