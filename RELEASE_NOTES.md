@@ -1,5 +1,11 @@
 # TerminusDB Python Client Release Notes
 
+## v10.2.1
+
+### Bug fixes
+
+- Fix integer marshalling in schema with TerminusDB 11
+
 ## v10.2.0
 
 ### New
