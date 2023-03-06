@@ -67,6 +67,8 @@ def _check_mismatch_type(prop, prop_value, prop_type):
                 f"Property {prop} should be of type {prop_type_id} but got value of type {prop_value_id}"
             )
     else:
+        if prop_type == int:
+            prop_value = int(prop_value)
         check_type(prop, prop_value, prop_type)
 
 
