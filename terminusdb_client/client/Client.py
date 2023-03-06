@@ -757,7 +757,8 @@ class Client:
         self.db = dbid
         if team is None:
             warnings.warn(
-                f"Delete Database Warning: You have not specify the team, assuming {self.team}/{self.db}"
+                f"Delete Database Warning: You have not specify the team, assuming {self.team}/{self.db}",
+                stacklevel=2,
             )
         else:
             self.team = team
@@ -1218,7 +1219,8 @@ class Client:
         else:
             if new_doc[0].get("@type") == "@context":
                 warnings.warn(
-                    "To replace context, need to use `full_replace` or `replace_document`, skipping context object now."
+                    "To replace context, need to use `full_replace` or `replace_document`, skipping context object now.",
+                    stacklevel=2,
                 )
                 new_doc.pop(0)
 
