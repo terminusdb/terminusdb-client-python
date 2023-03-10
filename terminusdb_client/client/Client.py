@@ -2187,6 +2187,50 @@ class Client:
             )
         return json.loads(result)
 
+    def patch_resource(
+        self,
+        patch: Patch,
+        branch=None,
+        message=None,
+        author=None,
+        match_final_state=True,
+    ):
+        """Apply the patch object to the given resource
+
+        Do not connect when using public API.
+
+        Returns
+        -------
+        dict
+            After object
+
+        Examples
+        --------
+        >>> client = Client("http://127.0.0.1:6363/")
+        >>> client.connect(user="admin", key="root", team="admin", db="some_db")
+        >>> patch_obj = Patch(json='{"name" : { "@op" : "ValueSwap", "@before" : "Jane", "@after": "Janine" }}')
+        >>> result = client.patch_resource(patch_obj,branch="main")
+        >>> print(result)
+        '["Person/Jane"]'"""
+        commit_info = self._generate_commit(message, author)
+        request_dict = {
+            "patch": patch.content,
+            "message" : commit_info["message"],
+            "author" : commit_info["author"],
+            "match_final_state" : match_final_state
+        }
+        patch_url = self._branch_base("patch", branch)
+
+        result = _finish_response(
+            self._session.post(
+                patch_url,
+                headers=self._default_headers,
+                json=request_dict,
+                auth=self._auth(),
+            )
+        )
+        return json.loads(result)
+
     def clonedb(
         self, clone_source: str, newid: str, description: Optional[str] = None
     ) -> None:
