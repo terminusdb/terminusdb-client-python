@@ -402,8 +402,7 @@ def test_patch(docker_url):
     client.insert_document(instance)
 
     patch = Patch(
-        json='{"@id": "Person/Jane",
-               "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'
+        json='{"@id": "Person/Jane", "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'
     )
 
     client.patch(patch)
