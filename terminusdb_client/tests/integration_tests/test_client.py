@@ -388,16 +388,12 @@ def test_patch(docker_url):
     client = Client(docker_url, user_agent=test_user_agent)
     client.connect()
     client.create_database("patch")
-    schema = [
-        { "@id" : "Person",
-          "@type" : "Class",
-          "name" : "xsd:string" }
-    ]
-    instance = [
-        { "@type" : "Person",
-          "@id" : "Person/Jane",
-          "name" : "Jane" }
-    ]
+    schema = [{"@id" : "Person",
+               "@type" : "Class",
+               "name" : "xsd:string"}]
+    instance = [{"@type" : "Person",
+                 "@id" : "Person/Jane",
+                 "name" : "Jane"}]
     client.insert_document(schema, graph_type="schema")
     client.insert_document(instance)
 
@@ -407,10 +403,11 @@ def test_patch(docker_url):
 
     client.patch(patch)
     doc = client.get_document('Person/Jane')
-    assert doc == { "@type" : "Person",
-                    "@id" : "Person/Jane",
-                    "name" : "Janine" }
+    assert doc == {"@type" : "Person",
+                   "@id" : "Person/Jane",
+                   "name" : "Janine"}
     client.delete_database("patch", "admin")
+
 
 def test_diff_ops(docker_url, test_schema):
     # create client and db
