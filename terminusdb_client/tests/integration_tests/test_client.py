@@ -401,7 +401,7 @@ def test_patch(docker_url):
         json='{"@id": "Person/Jane", "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'
     )
 
-    client.patch(patch)
+    client.patch_resource(patch)
     doc = client.get_document('Person/Jane')
     assert doc == {"@type" : "Person",
                    "@id" : "Person/Jane",
