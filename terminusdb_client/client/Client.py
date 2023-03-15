@@ -2998,7 +2998,7 @@ class Client:
         return self._branch_base("apply", branch)
 
     def _patch_url(self):
-        return self._branch_base("patch")
+        return f"{self.api}/patch"
 
     def _push_url(self):
         return self._branch_base("push")

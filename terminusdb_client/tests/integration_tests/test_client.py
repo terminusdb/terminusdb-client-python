@@ -385,8 +385,8 @@ def test_add_get_remove_user(docker_url):
 
 def test_patch(docker_url):
     # create client
-    client = Client(docker_url, user_agent=test_user_agent, team="admin", user="admin")
-    client.connect()
+    client = Client(docker_url, user_agent=test_user_agent)
+    client.connect(user="admin", team="admin")
     client.create_database("patch")
     schema = [{"@id" : "Person",
                "@type" : "Class",
@@ -412,7 +412,7 @@ def test_patch(docker_url):
 def test_diff_ops(docker_url, test_schema):
     # create client and db
     client = Client(docker_url, user_agent=test_user_agent)
-    client.connect()
+    client.connect(user="admin", team="admin")
     client.create_database("test_diff_ops")
     public_diff = Client(
         "https://cloud.terminusdb.com/jsondiff", user_agent=test_user_agent
