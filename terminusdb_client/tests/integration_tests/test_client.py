@@ -385,7 +385,7 @@ def test_add_get_remove_user(docker_url):
 
 def test_patch(docker_url):
     # create client
-    client = Client(docker_url, user_agent=test_user_agent)
+    client = Client(docker_url, user_agent=test_user_agent, team="admin", user="admin")
     client.connect()
     client.create_database("patch")
     schema = [{"@id" : "Person",
