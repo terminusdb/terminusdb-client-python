@@ -383,10 +383,36 @@ def test_add_get_remove_user(docker_url):
         user = client.get_user("test")
 
 
+def test_patch(docker_url):
+    # create client
+    client = Client(docker_url, user_agent=test_user_agent)
+    client.connect(user="admin", team="admin")
+    client.create_database("patch")
+    schema = [{"@id" : "Person",
+               "@type" : "Class",
+               "name" : "xsd:string"}]
+    instance = [{"@type" : "Person",
+                 "@id" : "Person/Jane",
+                 "name" : "Jane"}]
+    client.insert_document(schema, graph_type="schema")
+    client.insert_document(instance)
+
+    patch = Patch(
+        json='{"@id": "Person/Jane", "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'
+    )
+
+    client.patch_resource(patch)
+    doc = client.get_document('Person/Jane')
+    assert doc == {"@type" : "Person",
+                   "@id" : "Person/Jane",
+                   "name" : "Janine"}
+    client.delete_database("patch", "admin")
+
+
 def test_diff_ops(docker_url, test_schema):
     # create client and db
     client = Client(docker_url, user_agent=test_user_agent)
-    client.connect()
+    client.connect(user="admin", team="admin")
     client.create_database("test_diff_ops")
     public_diff = Client(
         "https://cloud.terminusdb.com/jsondiff", user_agent=test_user_agent
