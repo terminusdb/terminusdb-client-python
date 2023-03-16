@@ -205,7 +205,7 @@ class DocumentTemplate(metaclass=TerminusClass):
             and name in self._key._keys
         ):
             raise ValueError(
-                f"{name} has been used to generated id hance cannot be changed."
+                f"{name} has been used to generated id, hence cannot be changed."
             )
         super().__setattr__(name, value)
 

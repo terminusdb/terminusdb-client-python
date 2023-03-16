@@ -155,7 +155,7 @@ def test_insert_cheuk_again(docker_url, test_schema):
         uk.name = "United Kingdom of Great Britain and Northern Ireland"
         assert (
             str(error.value)
-            == "name has been used to generated id hance cannot be changed."
+            == "name has been used to generated id, hence cannot be changed."
         )
 
     cheuk = Employee()
