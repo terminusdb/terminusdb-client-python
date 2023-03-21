@@ -203,9 +203,10 @@ class DocumentTemplate(metaclass=TerminusClass):
             and hasattr(self, "_key")
             and hasattr(self._key, "_keys")
             and name in self._key._keys
+            and value != getattr(self, name)
         ):
             raise ValueError(
-                f"{name} has been used to generated id hance cannot be changed."
+                f"{name} has been used to generate the id, hence cannot be changed."
             )
         super().__setattr__(name, value)
 

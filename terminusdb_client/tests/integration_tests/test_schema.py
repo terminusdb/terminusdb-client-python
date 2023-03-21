@@ -155,7 +155,7 @@ def test_insert_cheuk_again(docker_url, test_schema):
         uk.name = "United Kingdom of Great Britain and Northern Ireland"
         assert (
             str(error.value)
-            == "name has been used to generated id hance cannot be changed."
+            == "name has been used to generate the id, hence cannot be changed."
         )
 
     cheuk = Employee()
@@ -302,3 +302,37 @@ def test_compress_data(docker_url):
     client.insert_document(test_obj, compress=0)
     test_obj2 = client.get_all_documents(as_list=True)
     assert len(test_obj2) == 10
+
+
+def test_repeated_object_load(docker_url, test_schema):
+    schema = test_schema
+    client = Client(docker_url, user_agent=test_user_agent)
+    client.connect()
+    client.create_database("test_repeated_load")
+    client.insert_document(
+        schema, commit_msg="I am checking in the schema", graph_type="schema"
+    )
+    [country_id] = client.insert_document({"@type" : "Country",
+                                           "name" : "Romania",
+                                           "perimeter" : []})
+    obj = client.get_document(country_id)
+    schema.import_objects(obj)
+    obj2 = client.get_document(country_id)
+    schema.import_objects(obj2)
+
+
+def test_key_change_raises_exception(docker_url, test_schema):
+    schema = test_schema
+    client = Client(docker_url, user_agent=test_user_agent)
+    client.connect()
+    client.create_database("test_repeated_load_fails")
+    client.insert_document(
+        schema, commit_msg="I am checking in the schema", graph_type="schema"
+    )
+    [country_id] = client.insert_document({"@type" : "Country",
+                                           "name" : "Romania",
+                                           "perimeter" : []})
+    obj = client.get_document(country_id)
+    local_obj = schema.import_objects(obj)
+    with pytest.raises(ValueError, match=r"name has been used to generate the id, hence cannot be changed."):
+        local_obj.name = "France"
