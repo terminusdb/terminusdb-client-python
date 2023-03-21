@@ -281,7 +281,7 @@ class Client:
         self,
         team: str = "admin",
         db: Optional[str] = None,
-        remote_auth: str = None,
+        remote_auth: Optional[str] = None,
         use_token: bool = False,
         jwt_token: Optional[str] = None,
         api_token: Optional[str] = None,
@@ -331,7 +331,7 @@ class Client:
 
         self.team = team
         self.db = db
-        self._remote_auth = remote_auth
+        self._remote_auth_string = remote_auth
         self._key = key
         self.user = user
         self._use_token = use_token
@@ -1674,7 +1674,9 @@ class Client:
 
         return json.loads(_finish_response(result))
 
-    def fetch(self, remote_id: str) -> dict:
+    def fetch(self, remote_id: str,
+              remote_auth: Optional[str] = None,
+              ) -> dict:
         """Fatch the brach from a remote
 
         Parameters
@@ -1702,6 +1704,7 @@ class Client:
         remote_branch: Optional[str] = None,
         message: Optional[str] = None,
         author: Optional[str] = None,
+        remote_auth: Optional[str] = None,
     ) -> dict:
         """Push changes from a branch to a remote repo
 
@@ -1715,6 +1718,8 @@ class Client:
             optional commit message
         author: str, optional
             option to overide the author of the operation
+        remote_auth: str, optional
+            optional remote authorization (uses client remote auth otherwise)
 
         Raises
         ------
@@ -1744,10 +1749,12 @@ class Client:
             "author": author,
             "message": message,
         }
+        headers = { 'Authorization-Remote' : remote_auth if remote_auth else self._remote_auth() }
+        headers.update(self._default_headers)
 
         result = self._session.post(
             self._push_url(),
-            headers=self._default_headers,
+            headers=headers,
             json=rc_args,
             auth=self._auth(),
         )
@@ -2232,7 +2239,8 @@ class Client:
         return json.loads(result)
 
     def clonedb(
-        self, clone_source: str, newid: str, description: Optional[str] = None
+            self, clone_source: str, newid: str, description: Optional[str] = None,
+            remote_auth: Optional[str]
     ) -> None:
         """Clone a remote repository and create a local copy.
 
@@ -2244,6 +2252,8 @@ class Client:
             Identifier of the new repository to create.
         Description : str, optional
             Optional description about the cloned database.
+        remote_auth : str, optional
+            Optional remote authorization (uses client remote auth otherwise)
 
         Raises
         ------
@@ -2258,12 +2268,15 @@ class Client:
         self._check_connection()
         if description is None:
             description = f"New database {newid}"
+
+        headers = { 'Authorization-Remote' : remote_auth if remote_auth else self._remote_auth() }
+        headers.update(self._default_headers)
         rc_args = {"remote_url": clone_source, "label": newid, "comment": description}
 
         _finish_response(
             self._session.post(
                 self._clone_url(newid),
-                headers=self._default_headers,
+                headers=headers,
                 json=rc_args,
                 auth=self._auth(),
             )
@@ -2312,7 +2325,13 @@ class Client:
             return APITokenAuth(os.environ["TERMINUSDB_ACCESS_TOKEN"])
         else:
             raise RuntimeError("Client not connected.")
-        # TODO: remote_auth
+
+    def _remote_auth(self):
+        if self._remote_auth:
+            return self._remote_auth
+        else:
+            token = os.environ["TERMINUSDB_REMOTE_ACCESS_TOKEN"]
+            return f"Token {token}"
 
     def create_organization(self, org: str) -> Optional[dict]:
         """
