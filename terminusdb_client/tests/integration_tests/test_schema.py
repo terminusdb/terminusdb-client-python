@@ -303,6 +303,7 @@ def test_compress_data(docker_url):
     test_obj2 = client.get_all_documents(as_list=True)
     assert len(test_obj2) == 10
 
+
 def test_repeated_object_load(docker_url, test_schema):
     schema = test_schema
     client = Client(docker_url, user_agent=test_user_agent)
@@ -315,9 +316,10 @@ def test_repeated_object_load(docker_url, test_schema):
                                            "name" : "Romania",
                                            "perimeter" : []})
     obj = client.get_document(country_id)
-    local_obj = schema.import_objects(obj)
+    schema.import_objects(obj)
     obj2 = client.get_document(country_id)
-    local_obj2 = schema.import_objects(obj2)
+    schema.import_objects(obj2)
+
 
 def test_key_change_raises_exception(docker_url, test_schema):
     schema = test_schema
