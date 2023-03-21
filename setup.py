@@ -23,13 +23,13 @@ for old_str, new_str in replace_pairs.items():
 
 # ---
 
-requires = ["requests", "numpydoc", "click<9.0,>=7.0", "shed", "typeguard", "tqdm"]
+requires = ["requests", "numpydoc", "click<9.0,>=7.0", "shed", "typeguard~2.13.3", "tqdm"]
 
 extras_require = {"dataframe": ["numpy >= 1.13.0", "pandas >= 0.23.0"]}
 
 setuptools.setup(
     name="terminusdb-client",
-    version="10.2.0",
+    version="10.2.1",
     author="TerminusDB group",
     author_email="terminusdatabase@gmail.com",
     description="Python client for Terminus DB",

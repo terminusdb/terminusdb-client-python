@@ -1277,7 +1277,8 @@ class WOQLQuery:
 
     def update_object(self, docjson):
         warnings.warn(
-            DeprecationWarning("update_object() is deprecated; use update_document()")
+            DeprecationWarning("update_object() is deprecated; use update_document()"),
+            stacklevel=2,
         )
         return self.update_document(docjson)
         # if docjson and docjson == "args":
@@ -1350,7 +1351,8 @@ class WOQLQuery:
 
     def delete_object(self, json_or_iri):
         warnings.warn(
-            DeprecationWarning("delete_object() is deprecated; use delete_document()")
+            DeprecationWarning("delete_object() is deprecated; use delete_document()"),
+            stacklevel=2,
         )
         return self.delete_document(json_or_iri)
 
@@ -1378,7 +1380,8 @@ class WOQLQuery:
 
     def read_object(self, iri, output_var):
         warnings.warn(
-            DeprecationWarning("read_object() is deprecated; use read_document()")
+            DeprecationWarning("read_object() is deprecated; use read_document()"),
+            stacklevel=2,
         )
         return self.read_document(iri, output_var)
         # if iri and iri == "args":
@@ -2521,7 +2524,8 @@ class WOQLQuery:
 
     def re(self, pattern, reg_str, reg_list):
         warnings.warn(
-            DeprecationWarning("re() is deprecated; use regexp()")
+            DeprecationWarning("re() is deprecated; use regexp()"),
+            stacklevel=2,
         )
         return self.regexp(pattern, reg_str, reg_list)
 
