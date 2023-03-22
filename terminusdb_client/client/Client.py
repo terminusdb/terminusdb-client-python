@@ -1749,7 +1749,7 @@ class Client:
             "author": author,
             "message": message,
         }
-        headers = { 'Authorization-Remote' : remote_auth if remote_auth else self._remote_auth() }
+        headers = {'Authorization-Remote' : remote_auth if remote_auth else self._remote_auth()}
         headers.update(self._default_headers)
 
         result = self._session.post(
@@ -2240,7 +2240,7 @@ class Client:
 
     def clonedb(
             self, clone_source: str, newid: str, description: Optional[str] = None,
-            remote_auth: Optional[str]
+            remote_auth: Optional[str] = None
     ) -> None:
         """Clone a remote repository and create a local copy.
 
@@ -2269,7 +2269,7 @@ class Client:
         if description is None:
             description = f"New database {newid}"
 
-        headers = { 'Authorization-Remote' : remote_auth if remote_auth else self._remote_auth() }
+        headers = {'Authorization-Remote' : remote_auth if remote_auth else self._remote_auth()}
         headers.update(self._default_headers)
         rc_args = {"remote_url": clone_source, "label": newid, "comment": description}
 
