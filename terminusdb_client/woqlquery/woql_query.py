@@ -933,7 +933,7 @@ class WOQLQuery:
         obj : str
             Object, can be variable or node or value
         opt : bool
-            weather or not this triple is optional, default to be False
+            whether or not this triple is optional, default to be False
 
         Returns
         -------
