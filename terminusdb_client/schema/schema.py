@@ -85,7 +85,7 @@ def _check_missing_prop(doc_obj: "DocumentTemplate"):
                 if not hasattr(doc_obj, prop):
                     raise ValueError(f"{doc_obj} missing property: {prop}")
                 else:
-                    prop_value = eval(f"doc_obj.{prop}")  # noqa: S307
+                    prop_value = getattr(doc_obj, prop)
                     _check_mismatch_type(prop, prop_value, prop_type)
                     # raise TypeError(f"Property of {doc_obj} missing should be type {prop_type} but got {prop_value} which is {type(prop_value)}")
 
