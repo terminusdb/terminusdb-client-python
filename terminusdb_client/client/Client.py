@@ -624,7 +624,7 @@ class Client:
         return self.connect(
             team=team,
             db=dbid,
-            remote_auth=self._remote_auth,
+            remote_auth=self._remote_auth_dict,
             key=self._key,
             user=self.user,
             branch=self.branch,
