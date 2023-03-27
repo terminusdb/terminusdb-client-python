@@ -303,7 +303,7 @@ def test_remote_auth(mocked_requests):
     client.connect(
         user="admin", team="admin", key="root", remote_auth=auth_setting
     )
-    result = client._remote_auth
+    result = client._remote_auth_dict
     assert result == auth_setting
 
 
