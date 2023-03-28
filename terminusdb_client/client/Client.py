@@ -335,7 +335,10 @@ class Client:
         self._remote_auth_dict = remote_auth
         self._key = key
         self.user = user
-        self._use_token = use_token
+        if api_token:
+            self._use_token = True
+        else:
+            self._use_token = use_token
         self._jwt_token = jwt_token
         self._api_token = api_token
         self.branch = branch
