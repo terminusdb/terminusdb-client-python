@@ -270,13 +270,9 @@ class Client:
         return self._ref
 
     @ref.setter
-    def ref(self, value):
-        if isinstance(value, str):
-            value = value.lower()
-        if value in ["local", "remote", None]:
-            self._ref = value
-        else:
-            raise ValueError("ref can only be 'local' or 'remote'")
+    def ref(self, value: str):
+        value = value.lower()
+        self._ref = value
 
     def connect(
         self,
@@ -2270,7 +2266,7 @@ class Client:
         >>> client = Client("http://127.0.0.1:6363/")
         >>> client.clonedb("http://terminusdb.com/some_user/test_db", "my_test_db")
         """
-        self._check_connection()
+        self._check_connection(check_db=False)
         if description is None:
             description = f"New database {newid}"
 
