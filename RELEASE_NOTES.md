@@ -1,5 +1,16 @@
 # TerminusDB Python Client Release Notes
 
+## v10.2.2
+
+### New
+
+- Add patch endpoint
+
+### Bug fixes
+
+- Fix error when checking types
+- Fix repeating load of object with key bug
+
 ## v10.2.1
 
 ### Bug fixes
