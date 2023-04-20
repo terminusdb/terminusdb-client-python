@@ -937,7 +937,7 @@ class Client:
         Parameters
         ----------
         iri_id : str
-            Iri id for the docuemnt that is retriving
+            Iri id for the document that is to be retrieved
         graph_type : GraphType
             Graph type, either GraphType.INSTANCE or GraphType.SCHEMA.
         get_data_version: bool
