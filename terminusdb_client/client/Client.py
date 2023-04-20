@@ -1,5 +1,6 @@
 """Client.py
 Client is the Python public API for TerminusDB"""
+import base64
 import copy
 import gzip
 import json
@@ -269,19 +270,16 @@ class Client:
         return self._ref
 
     @ref.setter
-    def ref(self, value):
-        if isinstance(value, str):
+    def ref(self, value: Optional[str]):
+        if value is not None:
             value = value.lower()
-        if value in ["local", "remote", None]:
-            self._ref = value
-        else:
-            raise ValueError("ref can only be 'local' or 'remote'")
+        self._ref = value
 
     def connect(
         self,
         team: str = "admin",
         db: Optional[str] = None,
-        remote_auth: str = None,
+        remote_auth: Optional[dict] = None,
         use_token: bool = False,
         jwt_token: Optional[str] = None,
         api_token: Optional[str] = None,
@@ -302,7 +300,7 @@ class Client:
             Name of the team, default to be "admin"
         db: optional, str
             Name of the database connected
-        remote_auth: optional, str
+        remote_auth: optional, dict
             Remote Auth setting
         key: optional, str
             API key for connecting, default to be "root"
@@ -331,10 +329,13 @@ class Client:
 
         self.team = team
         self.db = db
-        self._remote_auth = remote_auth
+        self._remote_auth_dict = remote_auth
         self._key = key
         self.user = user
-        self._use_token = use_token
+        if api_token:
+            self._use_token = True
+        else:
+            self._use_token = use_token
         self._jwt_token = jwt_token
         self._api_token = api_token
         self.branch = branch
@@ -623,7 +624,7 @@ class Client:
         return self.connect(
             team=team,
             db=dbid,
-            remote_auth=self._remote_auth,
+            remote_auth=self._remote_auth_dict,
             key=self._key,
             user=self.user,
             branch=self.branch,
@@ -1674,7 +1675,9 @@ class Client:
 
         return json.loads(_finish_response(result))
 
-    def fetch(self, remote_id: str) -> dict:
+    def fetch(self, remote_id: str,
+              remote_auth: Optional[dict] = None,
+              ) -> dict:
         """Fatch the brach from a remote
 
         Parameters
@@ -1702,6 +1705,7 @@ class Client:
         remote_branch: Optional[str] = None,
         message: Optional[str] = None,
         author: Optional[str] = None,
+        remote_auth: Optional[dict] = None,
     ) -> dict:
         """Push changes from a branch to a remote repo
 
@@ -1715,6 +1719,8 @@ class Client:
             optional commit message
         author: str, optional
             option to overide the author of the operation
+        remote_auth: dict, optional
+            optional remote authorization (uses client remote auth otherwise)
 
         Raises
         ------
@@ -1744,10 +1750,13 @@ class Client:
             "author": author,
             "message": message,
         }
+        if self._remote_auth_dict or remote_auth:
+            headers = {'Authorization-Remote' : self._generate_remote_header(remote_auth) if remote_auth else self._remote_auth()}
+        headers.update(self._default_headers)
 
         result = self._session.post(
             self._push_url(),
-            headers=self._default_headers,
+            headers=headers,
             json=rc_args,
             auth=self._auth(),
         )
@@ -2232,7 +2241,8 @@ class Client:
         return json.loads(result)
 
     def clonedb(
-        self, clone_source: str, newid: str, description: Optional[str] = None
+            self, clone_source: str, newid: str, description: Optional[str] = None,
+            remote_auth: Optional[dict] = None
     ) -> None:
         """Clone a remote repository and create a local copy.
 
@@ -2244,6 +2254,8 @@ class Client:
             Identifier of the new repository to create.
         Description : str, optional
             Optional description about the cloned database.
+        remote_auth : str, optional
+            Optional remote authorization (uses client remote auth otherwise)
 
         Raises
         ------
@@ -2255,15 +2267,19 @@ class Client:
         >>> client = Client("http://127.0.0.1:6363/")
         >>> client.clonedb("http://terminusdb.com/some_user/test_db", "my_test_db")
         """
-        self._check_connection()
+        self._check_connection(check_db=False)
         if description is None:
             description = f"New database {newid}"
+
+        if self._remote_auth_dict or remote_auth:
+            headers = {'Authorization-Remote' : self._generate_remote_header(remote_auth) if remote_auth else self._remote_auth()}
+        headers.update(self._default_headers)
         rc_args = {"remote_url": clone_source, "label": newid, "comment": description}
 
         _finish_response(
             self._session.post(
                 self._clone_url(newid),
-                headers=self._default_headers,
+                headers=headers,
                 json=rc_args,
                 auth=self._auth(),
             )
@@ -2312,7 +2328,25 @@ class Client:
             return APITokenAuth(os.environ["TERMINUSDB_ACCESS_TOKEN"])
         else:
             raise RuntimeError("Client not connected.")
-        # TODO: remote_auth
+
+    def _remote_auth(self):
+        if self._remote_auth_dict:
+            return self._generate_remote_header(self._remote_auth_dict)
+        elif "TERMINUSDB_REMOTE_ACCESS_TOKEN" in os.environ:
+            token = os.environ["TERMINUSDB_REMOTE_ACCESS_TOKEN"]
+            return f"Token {token}"
+
+    def _generate_remote_header(self, remote_auth: dict):
+        key_type = remote_auth['type']
+        key = remote_auth['key']
+        if key_type == 'http_basic':
+            username = remote_auth['username']
+            http_basic_creds = base64.b64encode(f"{username}:{key}".encode('utf-8'))
+            return f"Basic {http_basic_creds}"
+        elif key_type == 'token':
+            return f"Token {key}"
+        # JWT is the only key type remaining
+        return f"Bearer {key}"
 
     def create_organization(self, org: str) -> Optional[dict]:
         """
