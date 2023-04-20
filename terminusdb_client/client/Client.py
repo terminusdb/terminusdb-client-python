@@ -270,8 +270,9 @@ class Client:
         return self._ref
 
     @ref.setter
-    def ref(self, value: str):
-        value = value.lower()
+    def ref(self, value: Optional[str]):
+        if value is not None:
+            value = value.lower()
         self._ref = value
 
     def connect(
