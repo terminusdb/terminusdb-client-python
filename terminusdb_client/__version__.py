@@ -5,5 +5,5 @@ __version__ = "10.2.2"
 __build__ = 00
 __author__ = "TerminusDB group"
 __author_email__ = "team@terminusdb.com"
-__license__ = "GNU General Public License v3 (GPLv3)"
+__license__ = "Apache 2.0"
 __copyright__ = "Copyright 2019 datachemist"
