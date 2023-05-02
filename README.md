@@ -1,6 +1,6 @@
 [![TerminusDB Python Client](https://assets.terminusdb.com/readmes/terminusdb-client-python/header.gif)][terminusdb-client-python-docs]
 
-[terminusdb-client-python-docs]: https://terminusdb.github.io/terminusdb-client-python/
+[terminusdb-client-python-docs]: https://terminusdb.com/docs/guides/reference-guides/python-client-reference
 
 ---
 
@@ -12,11 +12,11 @@
 [![downloads](https://img.shields.io/pypi/dm/terminusdb-client.svg?logo=pypi)](https://pypi.python.org/pypi/terminusdb-client/)
 
 [![build status](https://img.shields.io/github/workflow/status/terminusdb/terminusdb-client-python/Python%20package?logo=github)](https://github.com/terminusdb/terminusdb-client-python/actions)
-[![documentation](https://img.shields.io/github/deployments/terminusdb/terminusdb-client-python/github-pages?label=documentation&logo=github)](https://terminusdb.github.io/terminusdb-client-python/)
+[![documentation](https://img.shields.io/github/deployments/terminusdb/terminusdb-client-python/github-pages?label=documentation&logo=github)](https://terminusdb.com/docs/guides/reference-guides/python-client-reference)
 [![code coverage](https://codecov.io/gh/terminusdb/terminusdb-client-python/branch/main/graph/badge.svg?token=BclAUaOPnQ)](https://codecov.io/gh/terminusdb/terminusdb-client-python)
 [![license](https://img.shields.io/github/license/terminusdb/terminusdb-client-python?color=pink&logo=apache)](https://github.com/terminusdb/terminusdb-client-python/blob/main/LICENSE)
 
-> Python client for TerminusDB and TerminusX.
+> Python client for TerminusDB and TerminusCMS.
 
 [**TerminusDB**][terminusdb] is an [open-source][terminusdb-repo] graph database
 and document store. It allows you to link JSON documents in a powerful knowledge
@@ -26,7 +26,7 @@ graph all through a simple document API.
 [terminusdb-docs]: https://terminusdb.com/docs/
 [terminusdb-repo]: https://github.com/terminusdb/terminusdb
 
-**TerminusX** is TerminusDB as a service. SOC 2 certified hosting. Build your beta and get to market fast. Scale up and deploy your own instance. [Sign up now][dashboard].
+[**TerminusCMS**](https://terminusdb.com/terminuscms/) is a hosted headless content management system. It is built upon TerminusDB and is a developer focused data management platform for complex data and content infrastructure. [Sign up and clone a demo project to see how it works][dashboard].
 
 [dashboard]: https://dashboard.terminusdb.com/
 
@@ -37,7 +37,7 @@ graph all through a simple document API.
 
 ## Release Notes and Previous Versions
 
-TerminusDB Client v10.0 works with TerminusDB v10.0 and TerminusX. Please check the [Release Notes](RELEASE_NOTES.md) to find out what has changed.
+TerminusDB Client v10.0 works with TerminusDB v10.0 and TerminusCMS. Please check the [Release Notes](RELEASE_NOTES.md) to find out what has changed.
 
 ## Installation
 -  TerminusDB Client can be downloaded form PyPI using pip:
@@ -76,9 +76,9 @@ client = Client("http://127.0.0.1:6363/")
 client.connect()
 ```
 
-Connect to TerminusX
+Connect to TerminusCMS
 
-*check documentation for TerminusX about how to add the API token to the environment variable*
+*check documentation for TerminusCMS about how to add the [API token](https://terminusdb.com/docs/terminuscms/get-api-key) to the environment variable*
 
 
 ```Python
@@ -185,11 +185,11 @@ Do you want to delete 'mydb'? WARNING: This opertation is non-reversible. [y/N]:
 mydb deleted.
 ```
 
-### Please check the [full Documentation](https://terminusdb.github.io/terminusdb-client-python/) for more information.
+### Please check the [full Documentation](https://terminusdb.com/docs/guides/reference-guides/python-client-reference) for more information.
 
-## Tutorials
+## Guides & Tutorials
 
-There is a [list of examples](https://terminusdb.github.io/terminusdb-client-python/tutorials.html) that uses the Python client in our [tutorial repo](https://github.com/terminusdb/terminus-tutorials/). As a start, we would recommend having a look at [create TerminusDB graph with Python client using Jupyter notebook](https://github.com/terminusdb/terminusdb-tutorials/blob/master/bike-tutorial/python/Create%20TerminusDB%20Graph%20with%20Python%20Client.ipynb)
+Visit our documentation for a range of short how to guides, [how-to use the Python Client](https://terminusdb.com/docs/guides/how-to-guides/use-the-python-client) and [how to use the collaboration features with the Python Client](https://terminusdb.com/docs/guides/how-to-guides/use-collaboration-features/with-the-python-client). Alternatively, undertake the  [Getting Started with the Python Client Tutorial Series.](https://github.com/terminusdb/terminusdb-tutorials/blob/main/getting_started/python-client/README.md).
 
 ## Testing
 
