@@ -28,5 +28,5 @@ jobs:
       run: |
         curl -H 'Authorization: Token ${{ secrets.TERMINUSCMS_TOKEN}}' \
              -H 'Content-Type: application/json' \
-            '${{ secrets.TERMINUSCMS_URL}}' -d @./docs.json
+            '${{ secrets.TERMINUSCMS_URL}}?author=Github&message=Adding docs' -d @./docs.json
 
