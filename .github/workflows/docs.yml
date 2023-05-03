@@ -19,9 +19,11 @@ jobs:
       with:
         python-version: '3.x'
     - name: Install requirements
-      run: pip install -r requirements.txt
+      run: |
+        pip install poetry
+        poetry install
     - name: Generate docs JSON
-      run: python3 .github/insert_docs.py > docs.json
+      run: poetry run python .github/insert_docs.py > docs.json
     - name: Upload to TerminusCMS
       run: |
         curl -H 'Authorization: Token ${{ secrets.TERMINUSCMS_TOKEN}}' \
