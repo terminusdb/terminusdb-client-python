@@ -1,4 +1,4 @@
-requests
+requests<2.29.2
 numpy >= 1.13.0
 pandas >= 0.23.0
 pytest>=3
