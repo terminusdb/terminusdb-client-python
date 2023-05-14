@@ -478,8 +478,9 @@ class Client:
         self._check_connection(check_db=(not team or not db))
         team = team if team else self.team
         db = db if db else self.db
+        branch = self.branch
         result = self._session.get(
-            f"{self.api}/log/{team}/{db}",
+            f"{self.api}/log/{team}/{db}/local/branch/{branch}",
             params={'start': start, 'count': count},
             headers=self._default_headers,
             auth=self._auth(),
