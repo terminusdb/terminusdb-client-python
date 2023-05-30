@@ -1,5 +1,17 @@
 # TerminusDB Python Client Release Notes
 
+## v10.2.3
+
+### New
+
+- Add remote auth
+
+### Bug fixes
+
+- Fix incorrect mapping of sys:JSON type to
+  Python class
+- Fix failing requests integration test
+
 ## v10.2.2
 
 ### New
