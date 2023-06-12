@@ -1,5 +1,5 @@
-__title__ = "woqlClient"
-__description__ = "woqlClient library for accessing the Terminus DB API"
+__title__ = "terminusdb-client"
+__description__ = "TerminusDB client library for accessing the Terminus DB API"
 __url__ = ""
 __version__ = "10.2.3"
 __build__ = 00
