@@ -21,6 +21,7 @@ for name, obj in inspect.getmembers(terminusdb_client):
                 if callable(func) and func.__doc__:
                     docstring_function = FunctionDoc(func)
                     parameters = [parameter_to_document(x) for x in docstring_function['Parameters']]
+                    examples = '\n'.join(docstring_function['Examples'])
                     if len(docstring_function['Returns']) > 0:
                         ret = docstring_function['Returns'][0] # Functions always have one return
                         returns = {'@type': 'Returns', 'name': '', 'type': ret.type}
@@ -32,6 +33,7 @@ for name, obj in inspect.getmembers(terminusdb_client):
                                     'name': func.__name__,
                                     'parameters': parameters,
                                     'returns': returns,
+                                    'examples': [examples] if examples != "" else None,
                                     'summary': "\n".join(docstring_function['Summary'])}
                     functions.append(function_obj)
             class_obj = {'@type': 'Class', 'name': name, 'summary': "\n".join(docstring_class['Summary']), 'memberVariables': class_params, 'memberFunctions': functions}
