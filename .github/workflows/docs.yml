@@ -21,7 +21,7 @@ jobs:
     - name: Install requirements
       run: |
         pip install poetry
-        poetry install
+        poetry install -n
     - name: Generate docs JSON
       run: poetry run python .github/insert_docs.py > docs.json
     - name: Upload to TerminusCMS
