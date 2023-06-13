@@ -2158,6 +2158,13 @@ class Client:
 
         Do not connect when using public API.
 
+        Parameters
+        ----------
+        before : dict
+            Object before to patch
+        patch : Patch
+            Patch object to apply to the dict
+
         Returns
         -------
         dict
