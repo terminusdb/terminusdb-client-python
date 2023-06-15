@@ -1,6 +1,6 @@
 [![TerminusDB Python Client](https://assets.terminusdb.com/readmes/terminusdb-client-python/header.gif)][terminusdb-client-python-docs]
 
-[terminusdb-client-python-docs]: https://terminusdb.com/docs/guides/reference-guides/python-client-reference
+[terminusdb-client-python-docs]: https://terminusdb.com/docs/python
 
 ---
 
@@ -12,7 +12,7 @@
 [![downloads](https://img.shields.io/pypi/dm/terminusdb-client.svg?logo=pypi)](https://pypi.python.org/pypi/terminusdb-client/)
 
 [![build status](https://img.shields.io/github/workflow/status/terminusdb/terminusdb-client-python/Python%20package?logo=github)](https://github.com/terminusdb/terminusdb-client-python/actions)
-[![documentation](https://img.shields.io/github/deployments/terminusdb/terminusdb-client-python/github-pages?label=documentation&logo=github)](https://terminusdb.com/docs/guides/reference-guides/python-client-reference)
+[![documentation](https://img.shields.io/github/deployments/terminusdb/terminusdb-client-python/github-pages?label=documentation&logo=github)](https://terminusdb.com/docs/python)
 [![code coverage](https://codecov.io/gh/terminusdb/terminusdb-client-python/branch/main/graph/badge.svg?token=BclAUaOPnQ)](https://codecov.io/gh/terminusdb/terminusdb-client-python)
 [![license](https://img.shields.io/github/license/terminusdb/terminusdb-client-python?color=pink&logo=apache)](https://github.com/terminusdb/terminusdb-client-python/blob/main/LICENSE)
 
@@ -26,7 +26,7 @@ graph all through a simple document API.
 [terminusdb-docs]: https://terminusdb.com/docs/
 [terminusdb-repo]: https://github.com/terminusdb/terminusdb
 
-[**TerminusCMS**](https://terminusdb.com/terminuscms/) is a hosted headless content management system. It is built upon TerminusDB and is a developer focused data management platform for complex data and content infrastructure. [Sign up and clone a demo project to see how it works][dashboard].
+[**TerminusCMS**](https://terminusdb.com/terminuscms/) is a hosted headless content management system. It is built upon TerminusDB and is a developer-focused data management platform for complex data and content infrastructure. [Sign up and clone a demo project to see how it works][dashboard].
 
 [dashboard]: https://dashboard.terminusdb.com/
 
@@ -40,16 +40,16 @@ graph all through a simple document API.
 TerminusDB Client v10.0 works with TerminusDB v10.0 and TerminusCMS. Please check the [Release Notes](RELEASE_NOTES.md) to find out what has changed.
 
 ## Installation
--  TerminusDB Client can be downloaded form PyPI using pip:
+-  TerminusDB Client can be downloaded from PyPI using pip:
 `python -m pip install terminusdb-client`
 
 This only includes the core Python Client (Client) and WOQLQuery.
 
-If you want to use woqlDataframe or the import and export csv function in Scaffolding CLI tool:
+If you want to use woqlDataframe or the import and export CSV function in the Scaffolding CLI tool:
 
 `python -m pip install terminusdb-client[dataframe]`
 
-*if you are installing form `zsh` you have to quote the argument like this:*
+*if you are installing from `zsh` you have to quote the argument like this:*
 
 `python -m pip install 'terminusdb-client[dataframe]'`
 
@@ -78,7 +78,7 @@ client.connect()
 
 Connect to TerminusCMS
 
-*check documentation for TerminusCMS about how to add the [API token](https://terminusdb.com/docs/terminuscms/get-api-key) to the environment variable*
+*check the documentation for TerminusCMS about how to add the [API token](https://terminusdb.com/docs/how-to-connect-terminuscms) to the environment variable*
 
 
 ```Python
@@ -112,7 +112,7 @@ class Pet(DocumentTemplate):
 my_schema.commit(client)
 ```
 
-#### Create and insert doucments
+#### Create and insert documents
 
 ```Python
 my_dog = Pet(name="Honda", species="Huskey", age=3, weight=21.1)
@@ -155,7 +155,7 @@ Start a project in the directory
 ```bash
 $ tdbpy startproject
 Please enter a project name (this will also be the database name): mydb
-Please enter a endpoint location (press enter to use localhost default) [http://127.0.0.1:6363/]:
+Please enter an endpoint location (press enter to use localhost default) [http://127.0.0.1:6363/]:
 config.json and schema.py created, please customize them to start your project.
 ```
 
@@ -181,7 +181,7 @@ Delete the database
 
 ```bash
 $ tdbpy deletedb
-Do you want to delete 'mydb'? WARNING: This opertation is non-reversible. [y/N]: y
+Do you want to delete 'mydb'? WARNING: This operation is non-reversible. [y/N]: y
 mydb deleted.
 ```
 
@@ -189,7 +189,7 @@ mydb deleted.
 
 ## Guides & Tutorials
 
-Visit our documentation for a range of short how to guides, [how-to use the Python Client](https://terminusdb.com/docs/guides/how-to-guides/use-the-python-client) and [how to use the collaboration features with the Python Client](https://terminusdb.com/docs/guides/how-to-guides/use-collaboration-features/with-the-python-client). Alternatively, undertake the  [Getting Started with the Python Client Tutorial Series.](https://github.com/terminusdb/terminusdb-tutorials/blob/main/getting_started/python-client/README.md).
+Visit our documentation for a range of short how-to guides, [how-to use the Python Client](https://terminusdb.com/docs/use-the-python-client) and [how to use the collaboration features with the Python Client](https://terminusdb.com/docs/collaboration-with-python-client). Alternatively, undertake the  [Getting Started with the Python Client Tutorial Series.](https://github.com/terminusdb/terminusdb-tutorials/blob/main/getting_started/python-client/README.md).
 
 ## Testing
 
@@ -229,7 +229,7 @@ Documentation specifically on the latest version of the Python Client can be fou
 $ make init
 ```
 
-3. Change directory to docs
+3. Change the directory to docs
 ```sh
 $ cd docs/
 ```
@@ -250,7 +250,7 @@ If you have other questions, you can ask in our community [community Subreddit](
 ## Community
 
 Come visit us on our [discord server](https://discord.gg/yTJKAma)
-or our [community Subreddit](https://www.reddit.com/r/TerminusDB/). We are also on [twitter](https://twitter.com/TerminusDB)
+or our [community Subreddit](https://www.reddit.com/r/TerminusDB/). We are also on [Twitter](https://twitter.com/TerminusDB)
 <img align="right" src="https://assets.terminusdb.com/images/TerminusDB%20color%20mascot.png" width="256px"/>
 
 ## Contribute
