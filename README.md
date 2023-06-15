@@ -185,7 +185,7 @@ Do you want to delete 'mydb'? WARNING: This operation is non-reversible. [y/N]: 
 mydb deleted.
 ```
 
-### Please check the [full Documentation](https://terminusdb.com/docs/guides/reference-guides/python-client-reference) for more information.
+### Please check the [full Documentation](https://terminusdb.com/docs/python) for more information.
 
 ## Guides & Tutorials
 
