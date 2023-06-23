@@ -5,8 +5,9 @@ name: Generate docs and Create PR on docs repo
 
 on:
   push:
-#    tags:
-#      - v*
+    tags:
+      - v*
+  workflow_dispatch:
 
 jobs:
   make_docs:
