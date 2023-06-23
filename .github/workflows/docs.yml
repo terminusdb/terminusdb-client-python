@@ -7,6 +7,7 @@ on:
   push:
     tags:
       - v*
+  workflow_dispatch:
 
 jobs:
   make_docs:
@@ -18,29 +19,15 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.x'
-    - name: Generate docs
+    - name: Install requirements
       run: |
-        git clone --single-branch --branch add_gitbook https://github.com/terminusdb/pydoc-markdown.git
-        python -m pip install --upgrade pip
-        pip install ./pydoc-markdown
-        pydoc-markdown
-        cd docs
-        python -m pip install -r requirements.txt
-        make markdown
-        python generateGitbookMD.py
-        cp -r reference/* build/markdown/gitbook-md/
-    - name: Set destination BRANCH_NAME for docs repo
-      run: echo "BRANCH_NAME=Python-Reference-Updates-$(date +%s)" >> $GITHUB_ENV
-    - name: Create pull request in terminusdb/terminusdb-docs
-      uses: paygoc6/action-pull-request-another-repo@v1.0.1
-      env:
-        API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
-      with:
-        source_folder: 'docs/build/markdown/gitbook-md'
-        destination_repo: 'terminusdb/terminusdb-docs'
-        destination_folder: 'guides/reference-guides/python-client-reference'
-        destination_base_branch: 'main'
-        destination_head_branch: ${{ env.BRANCH_NAME }}
-        user_email: 'robin@terminusdb.com'
-        user_name: 'rrooij'
-        pull_request_reviewers: 'GavinMendelGleason'
+        pip install poetry
+        poetry install -n
+    - name: Generate docs JSON
+      run: poetry run python .github/insert_docs.py > docs.json
+    - name: Upload to TerminusCMS
+      run: |
+        curl -H 'Authorization: Token ${{ secrets.TERMINUSCMS_TOKEN}}' \
+             -H 'Content-Type: application/json' \
+            '${{ secrets.TERMINUSCMS_URL}}' -d @./docs.json
+
