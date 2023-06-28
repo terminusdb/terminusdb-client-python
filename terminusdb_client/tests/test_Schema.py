@@ -206,6 +206,27 @@ def test_embedded_object(test_schema):
     assert (len(result) == 2)
 
 
+def test_person_sys_json():
+    schema_json = {
+        "@id": "PersonJSONTest",
+        "@key": {
+            "@type": "Random"
+        },
+        "@type": "Class",
+        "metadata": {
+            "@class": "sys:JSON",
+            "@type": "Optional"
+        }
+    }
+    schema = Schema()
+    test_result = schema._construct_class(schema_json)
+    result = {'@id': 'PersonJSONTest',
+              '@key': {'@type': 'Random'},
+              '@type': 'Class',
+              'metadata': {'@class': 'sys:JSON', '@type': 'Optional'}}
+    assert test_result._to_dict() == result
+
+
 def test_id_and_capture(test_schema):
     my_schema = test_schema
     Person = my_schema.object.get("Person")

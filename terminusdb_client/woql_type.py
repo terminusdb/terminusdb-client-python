@@ -7,6 +7,7 @@ CONVERT_TYPE = {
     bool: "xsd:boolean",
     float: "xsd:double",
     int: "xsd:integer",
+    dict: "sys:JSON",
     dt.datetime: "xsd:dateTime",
     dt.date: "xsd:date",
     dt.time: "xsd:time",

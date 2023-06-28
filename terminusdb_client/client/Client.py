@@ -133,21 +133,21 @@ class Client:
 
     Attributes
     ----------
-    server_url: str
+    server_url : str
         URL of the server that this client connected.
-    api: str
+    api : str
         API endpoint for this client.
-    team: str
+    team : str
         Team that this client is using. "admin" for local dbs.
-    db: str
+    db : str
         Database that this client is connected to.
-    user: str
+    user : str
         TerminiusDB user that this client is using. "admin" for local dbs.
-    branch: str
+    branch : str
         Branch of the database that this client is connected to. Default to "main".
-    ref: str, None
+    ref : str, None
         Ref setting for the client. Default to None.
-    repo: str
+    repo : str
         Repo identifier of the database that this client is connected to. Default to "local".
     """
 
@@ -173,9 +173,9 @@ class Client:
         ----------
         server_url : str
             URL of the server that this client will connect to.
-        user_agent: optional, str
+        user_agent : optional, str
             User agent header when making requests. Defaults to terminusdb-client-python with the version appended.
-        \**kwargs
+        **kwargs
             Extra configuration options
 
         """
@@ -296,29 +296,29 @@ class Client:
 
         Parameters
         ----------
-        team: str
+        team : str
             Name of the team, default to be "admin"
-        db: optional, str
+        db : optional, str
             Name of the database connected
-        remote_auth: optional, dict
+        remote_auth : optional, dict
             Remote Auth setting
-        key: optional, str
+        key : optional, str
             API key for connecting, default to be "root"
-        user: optional, str
+        user : optional, str
             Name of the user, default to be "admin"
-        use_token: bool
+        use_token : bool
             Use token to connect. If both `jwt_token` and `api_token` is not provided (None), then it will use the ENV variable TERMINUSDB_ACCESS_TOKEN to connect as the API token
-        jwt_token: optional, str
+        jwt_token : optional, str
             The Bearer JWT token to connect. Default to be None.
-        api_token: optional, strs
+        api_token : optional, strs
             The API token to connect. Default to be None.
-        branch: optional, str
+        branch : optional, str
             Branch to be connected, default to be "main"
-        ref: optional, str
+        ref : optional, str
             Ref setting
-        repo: optional, str
+        repo : optional, str
             Local or remote repo, default to be "local"
-        \**kwargs
+        **kwargs
             Extra configuration options.
 
         Examples
@@ -449,13 +449,13 @@ class Client:
         """Get commit history of a database
         Parameters
         ----------
-        team: str, optional
+        team : str, optional
              The team from which the database is. Defaults to the class property.
-        db: str, optional
+        db : str, optional
              The database. Defaults to the class property.
-        start: int, optional
+        start : int, optional
              Commit index to start from. Defaults to 0.
-        count: int, optional
+        count : int, optional
              Amount of commits to get. Defaults to -1 which gets all.
 
         Returns
@@ -505,7 +505,7 @@ class Client:
 
         Parameters
         ----------
-        max_history: int, optional
+        max_history : int, optional
             maximum number of commit that would return, counting backwards from your current commit. Default is set to 500. It needs to be nop-negative, if input is 0 it will still give the last commit.
 
         Example
@@ -734,7 +734,7 @@ class Client:
             ID of the database to delete
         team : str, optional
             the team in which the database resides (defaults to "admin")
-        force: bool
+        force : bool
 
         Raises
         ------
@@ -881,9 +881,9 @@ class Client:
             Template for the document that is being retrived
         graph_type : GraphType
             Graph type, either GraphType.INSTANCE or GraphType.SCHEMA.
-        as_list: bool
+        as_list : bool
             If the result returned as list rather than an iterator.
-        get_data_version: bool
+        get_data_version : bool
             If the data version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.
 
         Raises
@@ -942,9 +942,9 @@ class Client:
             Iri id for the document that is to be retrieved
         graph_type : GraphType
             Graph type, either GraphType.INSTANCE or GraphType.SCHEMA.
-        get_data_version: bool
+        get_data_version : bool
             If the data version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.
-        kwargs:
+        kwargs :
             Additional boolean flags for retriving. Currently avaliable: "prefixed", "minimized", "unfold"
 
         Raises
@@ -994,15 +994,15 @@ class Client:
             Specific type for the docuemnts that is retriving
         graph_type : GraphType, optional
             Graph type, either GraphType.INSTANCE or GraphType.SCHEMA.
-        skip: int
+        skip : int
             The starting posiion of the returning results, default to be 0
-        count: int or None
+        count : int or None
             The maximum number of returned result, if None (default) it will return all of the avalible result.
-        as_list: bool
+        as_list : bool
             If the result returned as list rather than an iterator.
-        get_data_version: bool
+        get_data_version : bool
             If the version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.
-        kwargs:
+        kwargs :
             Additional boolean flags for retriving. Currently avaliable: "prefixed", "unfold"
 
         Raises
@@ -1035,15 +1035,15 @@ class Client:
         ----------
         graph_type : GraphType, optional
             Graph type, either GraphType.INSTANCE or GraphType.SCHEMA.
-        skip: int
+        skip : int
             The starting posiion of the returning results, default to be 0
-        count: int or None
+        count : int or None
             The maximum number of returned result, if None (default) it will return all of the avalible result.
-        as_list: bool
+        as_list : bool
             If the result returned as list rather than an iterator.
-        get_data_version: bool
+        get_data_version : bool
             If the version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.
-        kwargs:
+        kwargs :
             Additional boolean flags for retriving. Currently avaliable: "prefixed", "unfold"
 
         Raises
@@ -1166,11 +1166,11 @@ class Client:
 
         Parameters
         ----------
-        document: dict or list of dict
+        document : dict or list of dict
             Document(s) to be inserted.
         graph_type : GraphType
             Graph type, either GraphType.INSTANCE or GraphType.SCHEMA.
-        full_replace:: bool
+        full_replace : bool
             If True then the whole graph will be replaced. WARNING: you should also supply the context object as the first element in the list of documents  if using this option.
         commit_msg : str
             Commit message.
@@ -1273,7 +1273,7 @@ class Client:
 
         Parameters
         ----------
-        document: dict or list of dict
+        document : dict or list of dict
             Document(s) to be updated.
         graph_type : GraphType
             Graph type, either GraphType.INSTANCE or GraphType.SCHEMA.
@@ -1353,7 +1353,7 @@ class Client:
 
         Parameters
         ----------
-        document: dict or list of dict
+        document : dict or list of dict
             Document(s) to be updated.
         graph_type : GraphType
             Graph type, either GraphType.INSTANCE or GraphType.SCHEMA.
@@ -1384,7 +1384,7 @@ class Client:
 
         Parameters
         ----------
-        document: str or list of str
+        document : str or list of str
             Document(s) (as dictionary or DocumentTemplate objects) or id(s) of document(s) to be updated.
         graph_type : GraphType
             Graph type, either GraphType.INSTANCE or GraphType.SCHEMA.
@@ -1435,7 +1435,7 @@ class Client:
 
         Parameters
         ----------
-        doc_id: str
+        doc_id : str
             Id of document to be checked.
         graph_type : GraphType
             Graph type, either GraphType.INSTANCE or GraphType.SCHEMA.
@@ -1472,7 +1472,7 @@ class Client:
 
         Parameters
         ----------
-        class_name: str
+        class_name : str
             Name of the class
 
         Returns
@@ -1509,11 +1509,11 @@ class Client:
             A woql query as an object or dict
         commit_mg : str
             A message that will be written to the commit log to describe the change
-        get_data_version: bool
+        get_data_version : bool
             If the data version of the query result(s) should be obtained. If True, the method return the result and the version as a tuple.
         last_data_version : str
             Last version before the update, used to check if the document has been changed unknowingly
-        file_dict: **deprecated**
+        file_dict : **deprecated**
             File dictionary to be associated with post name => filename, for multipart POST
 
         Raises
@@ -1628,13 +1628,13 @@ class Client:
 
         Parameters
         ----------
-        remote: str
+        remote : str
             remote to pull from, default "origin"
-        remote_branch: str, optional
+        remote_branch : str, optional
             remote branch to pull from, default to be your current barnch
-        message: str, optional
+        message : str, optional
             optional commit message
-        author: str, optional
+        author : str, optional
             option to overide the author of the operation
 
         Raises
@@ -1683,7 +1683,7 @@ class Client:
 
         Parameters
         ----------
-        remote_id: str
+        remote_id : str
             id of the remote
 
         Raises
@@ -1712,15 +1712,15 @@ class Client:
 
         Parameters
         ----------
-        remote: str
+        remote : str
             remote to push to, default "origin"
-        remote_branch: str, optional
+        remote_branch : str, optional
             remote branch to push to, default to be your current barnch
-        message: str, optional
+        message : str, optional
             optional commit message
-        author: str, optional
+        author : str, optional
             option to overide the author of the operation
-        remote_auth: dict, optional
+        remote_auth : dict, optional
             optional remote authorization (uses client remote auth otherwise)
 
         Raises
@@ -1847,9 +1847,9 @@ class Client:
 
         Parameters
         ----------
-        commit: string
+        commit : string
             Commit id or path to the commit (if use_path is True), for instance '234980523ffaf93' or 'admin/database/local/commit/234980523ffaf93'. If not provided, it will reset to the newest commit (useful when need to go back after a soft reset).
-        soft: bool
+        soft : bool
             Flag indicating if the reset if soft, that is referencing to a previous commit instead of resetting to a previous commit in the backend and wipping newer commits.
         use_path : bool
             Wheather or not the commit given is an id or path. Default using id and use_path is False.
@@ -2159,6 +2159,13 @@ class Client:
 
         Do not connect when using public API.
 
+        Parameters
+        ----------
+        before : dict
+            Object before to patch
+        patch : Patch
+            Patch object to apply to the dict
+
         Returns
         -------
         dict
@@ -2381,7 +2388,7 @@ class Client:
 
         Parameters
         ----------
-        org: str
+        org : str
 
         Raises
         ------
@@ -2407,8 +2414,8 @@ class Client:
 
         Parameters
         ----------
-        org: str
-        username: str
+        org : str
+        username : str
 
         Raises
         ------
@@ -2434,8 +2441,8 @@ class Client:
 
         Parameters
         ----------
-        org: str
-        username: str
+        org : str
+        username : str
 
         Raises
         ------
@@ -2535,7 +2542,7 @@ class Client:
 
         Parameters
         ----------
-        capability_change: dict
+        capability_change : dict
             Dict for the capability change request.
 
             Example:
@@ -2708,7 +2715,7 @@ class Client:
         ----------
         username : str
             The username of the user
-        password: str
+        password : str
             The user's password
 
         Raises
@@ -2810,7 +2817,7 @@ class Client:
         ----------
         username : str
             The username of the user
-        password: str
+        password : str
             The new password
 
         Raises
