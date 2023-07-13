@@ -1,17 +1,80 @@
 import datetime as dt
 from enum import Enum
-from typing import ForwardRef, List, Optional, Set, Union
+from typing import ForwardRef, List, Optional, Set, Union, NewType
+
+anyURI = NewType('anyURI', str)  # noqa: N816
+anySimpleType = NewType('anySimpleType', str)  # noqa: N816
+decimal = NewType('decimal', str)
+dateTimeStamp = NewType('dateTimeStamp', dt.datetime)  # noqa: N816
+gYear = NewType('gYear', str)  # noqa: N816
+gMonth = NewType('gMonth', str)  # noqa: N816
+gDay = NewType('gDay', str)  # noqa: N816
+gYearMonth = NewType('gYearMonth', str)  # noqa: N816
+yearMonthDuration = NewType('yearMonthDuration', str)  # noqa: N816
+dayTimeDuration = NewType('dayTimeDuration', str)  # noqa: N816
+byte = NewType('byte', int)
+short = NewType('short', int)
+long = NewType('long', int)
+unsignedByte = NewType('unsignedByte', int)  # noqa: N816
+unsignedShort = NewType('unsignedShort', int)  # noqa: N816
+unsignedInt = NewType('unsignedInt', int)  # noqa: N816
+unsignedLong = NewType('unsignedLong', int)  # noqa: N816
+positiveInteger = NewType('positiveInteger', int)  # noqa: N816
+negativeInteger = NewType('negativeInteger', int)  # noqa: N816
+nonPositiveInteger = NewType('nonPositiveInteger', int)  # noqa: N816
+nonNegativeInteger = NewType('nonNegativeInteger', int)  # noqa: N816
+base64Binary = NewType('base64Binary', str)  # noqa: N816
+hexBinary = NewType('hexBinary', str)  # noqa: N816
+anyURI = NewType('anyURI', str)  # noqa: N816
+language = NewType('language', str)
+normalizedString = NewType('normalizedString', str)  # noqa: N816
+token = NewType('token', str)
+NMTOKEN = NewType('NMTOKEN', str)
+Name = NewType('Name', str)
+NCName = NewType('NCName', str)
 
 CONVERT_TYPE = {
     str: "xsd:string",
     bool: "xsd:boolean",
     float: "xsd:double",
     int: "xsd:integer",
+    long: "xsd:long",
     dict: "sys:JSON",
+    gYear: "xsd:gYear",
     dt.datetime: "xsd:dateTime",
     dt.date: "xsd:date",
     dt.time: "xsd:time",
     dt.timedelta: "xsd:duration",
+    anyURI : "xsd:anyURI",
+    anySimpleType : "xsd:anySimpleType",
+    decimal : "xsd:decimal",
+    dateTimeStamp : "xsd:dateTimeStamp",
+    gYear : "xsd:gYear",
+    gMonth : "xsd:gMonth",
+    gDay : "xsd:gDay",
+    gYearMonth : "xsd:gYearMonth",
+    yearMonthDuration : "xsd:yearMonthDuration",
+    dayTimeDuration : "xsd:dayTimeDuration",
+    byte : "xsd:byte",
+    short : "xsd:short",
+    long : "xsd:long",
+    unsignedByte : "xsd:unsignedByte",
+    unsignedShort : "xsd:unsignedShort",
+    unsignedInt : "xsd:unsignedInt",
+    unsignedLong : "xsd:unsignedLong",
+    positiveInteger : "xsd:positiveInteger",
+    negativeInteger : "xsd:negativeInteger",
+    nonPositiveInteger : "xsd:nonPositiveInteger",
+    nonNegativeInteger : "xsd:nonNegativeInteger",
+    base64Binary : "xsd:base64Binary",
+    hexBinary : "xsd:hexBinary",
+    anyURI : "xsd:anyURI",
+    language : "xsd:language",
+    normalizedString : "xsd:normalizedString",
+    token : "xsd:token",
+    NMTOKEN : "xsd:NMTOKEN",
+    Name : "xsd:Name",
+    NCName : "xsd:NCName",
 }
 
 

@@ -11,7 +11,38 @@ from typeguard import check_type
 
 from .. import woql_type as wt
 from ..client import Client, GraphType
-from ..woql_type import to_woql_type
+from ..woql_type import (  # noqa: F401
+    to_woql_type,
+    anySimpleType,
+    decimal,
+    dateTimeStamp,
+    gYear,
+    gMonth,
+    gDay,
+    gYearMonth,
+    yearMonthDuration,
+    dayTimeDuration,
+    byte,
+    short,
+    long,
+    unsignedByte,
+    unsignedShort,
+    unsignedInt,
+    unsignedLong,
+    positiveInteger,
+    negativeInteger,
+    nonPositiveInteger,
+    nonNegativeInteger,
+    base64Binary,
+    hexBinary,
+    anyURI,
+    language,
+    normalizedString,
+    token,
+    NMTOKEN,
+    Name,
+    NCName,
+)
 
 
 class TerminusKey:
