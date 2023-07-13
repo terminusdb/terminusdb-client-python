@@ -13,36 +13,36 @@ from .. import woql_type as wt
 from ..client import Client, GraphType
 from ..woql_type import (
     to_woql_type,
-    anySimpleType,  # noqa: F401
-    decimal,  # noqa: F401
-    dateTimeStamp,  # noqa: F401
-    gYear,  # noqa: F401
-    gMonth,  # noqa: F401
-    gDay,  # noqa: F401
-    gYearMonth,  # noqa: F401
-    yearMonthDuration,  # noqa: F401
-    dayTimeDuration,  # noqa: F401
-    byte,  # noqa: F401
-    short,  # noqa: F401
-    long,  # noqa: F401
-    unsignedByte,  # noqa: F401
-    unsignedShort,  # noqa: F401
-    unsignedInt,  # noqa: F401
-    unsignedLong,  # noqa: F401
-    positiveInteger,  # noqa: F401
-    negativeInteger,  # noqa: F401
-    nonPositiveInteger,  # noqa: F401
-    nonNegativeInteger,  # noqa: F401
-    base64Binary,  # noqa: F401
-    hexBinary,  # noqa: F401
-    anyURI,  # noqa: F401
-    language,  # noqa: F401
-    normalizedString,  # noqa: F401
-    token,  # noqa: F401
-    NMTOKEN,  # noqa: F401
-    Name,  # noqa: F401
-    NCName,  # noqa: F401
-)
+    anySimpleType,
+    decimal,
+    dateTimeStamp,
+    gYear,
+    gMonth,
+    gDay,
+    gYearMonth,
+    yearMonthDuration,
+    dayTimeDuration,
+    byte,
+    short,
+    long,
+    unsignedByte,
+    unsignedShort,
+    unsignedInt,
+    unsignedLong,
+    positiveInteger,
+    negativeInteger,
+    nonPositiveInteger,
+    nonNegativeInteger,
+    base64Binary,
+    hexBinary,
+    anyURI,
+    language,
+    normalizedString,
+    token,
+    NMTOKEN,
+    Name,
+    NCName,
+)  # noqa: F401
 
 
 class TerminusKey:
