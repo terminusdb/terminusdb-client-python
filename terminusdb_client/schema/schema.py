@@ -794,7 +794,7 @@ class Schema:
                     return self.object[enum_name]._to_dict()
             # it's a List
             elif prop["type"] == "array":
-                prop_type = convert_property(prop["items"])
+                prop_type = convert_property(prop_name, prop["items"])
                 return {"@type": "List", "@class": prop_type}
             elif isinstance(prop["type"], list):
                 prop_type = prop["type"]
