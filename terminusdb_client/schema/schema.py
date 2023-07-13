@@ -11,7 +11,7 @@ from typeguard import check_type
 
 from .. import woql_type as wt
 from ..client import Client, GraphType
-from ..woql_type import (
+from ..woql_type import (  # noqa: F401
     to_woql_type,
     anySimpleType,
     decimal,
@@ -42,7 +42,7 @@ from ..woql_type import (
     NMTOKEN,
     Name,
     NCName,
-)  # noqa: F401
+)
 
 
 class TerminusKey:
