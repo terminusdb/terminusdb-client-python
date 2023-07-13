@@ -2,32 +2,32 @@ import datetime as dt
 from enum import Enum
 from typing import ForwardRef, List, Optional, Set, Union, NewType
 
-anyURI = NewType('anyURI', str)
-anySimpleType = NewType('anySimpleType', str)
+anyURI = NewType('anyURI', str) # noqa: N816
+anySimpleType = NewType('anySimpleType', str) # noqa: N816
 decimal = NewType('decimal', str)
-dateTimeStamp = NewType('dateTimeStamp', dt.datetime)
-gYear = NewType('gYear', str)
-gMonth = NewType('gMonth', str)
-gDay = NewType('gDay', str)
-gYearMonth = NewType('gYearMonth', str)
-yearMonthDuration = NewType('yearMonthDuration', str)
-dayTimeDuration = NewType('dayTimeDuration', str)
+dateTimeStamp = NewType('dateTimeStamp', dt.datetime) # noqa: N816
+gYear = NewType('gYear', str) # noqa: N816
+gMonth = NewType('gMonth', str) # noqa: N816
+gDay = NewType('gDay', str) # noqa: N816
+gYearMonth = NewType('gYearMonth', str) # noqa: N816
+yearMonthDuration = NewType('yearMonthDuration', str) # noqa: N816
+dayTimeDuration = NewType('dayTimeDuration', str) # noqa: N816
 byte = NewType('byte', int)
 short = NewType('short', int)
 long = NewType('long', int)
-unsignedByte = NewType('unsignedByte', int)
-unsignedShort = NewType('unsignedShort', int)
-unsignedInt = NewType('unsignedInt', int)
-unsignedLong = NewType('unsignedLong', int)
-positiveInteger = NewType('positiveInteger', int)
-negativeInteger = NewType('negativeInteger', int)
-nonPositiveInteger = NewType('nonPositiveInteger', int)
-nonNegativeInteger = NewType('nonNegativeInteger', int)
-base64Binary =  NewType('base64Binary', str)
-hexBinary = NewType('hexBinary', str)
-anyURI = NewType('anyURI', str)
+unsignedByte = NewType('unsignedByte', int) # noqa: N816
+unsignedShort = NewType('unsignedShort', int) # noqa: N816
+unsignedInt = NewType('unsignedInt', int) # noqa: N816
+unsignedLong = NewType('unsignedLong', int) # noqa: N816
+positiveInteger = NewType('positiveInteger', int) # noqa: N816
+negativeInteger = NewType('negativeInteger', int) # noqa: N816
+nonPositiveInteger = NewType('nonPositiveInteger', int) # noqa: N816
+nonNegativeInteger = NewType('nonNegativeInteger', int) # noqa: N816
+base64Binary =  NewType('base64Binary', str) # noqa: N816
+hexBinary = NewType('hexBinary', str) # noqa: N816
+anyURI = NewType('anyURI', str) # noqa: N816
 language = NewType('language', str)
-normalizedString = NewType('normalizedString', str)
+normalizedString = NewType('normalizedString', str) # noqa: N816
 token = NewType('token', str)
 NMTOKEN = NewType('NMTOKEN', str)
 Name = NewType('Name', str)
@@ -66,7 +66,7 @@ CONVERT_TYPE = {
     negativeInteger : "xsd:negativeInteger",
     nonPositiveInteger : "xsd:nonPositiveInteger",
     nonNegativeInteger : "xsd:nonNegativeInteger",
-    base64Binary :  "xsd:base64Binary",
+    base64Binary : "xsd:base64Binary",
     hexBinary : "xsd:hexBinary",
     anyURI : "xsd:anyURI",
     language : "xsd:language",
