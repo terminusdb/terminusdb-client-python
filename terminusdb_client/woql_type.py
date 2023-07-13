@@ -1,17 +1,80 @@
 import datetime as dt
 from enum import Enum
-from typing import ForwardRef, List, Optional, Set, Union
+from typing import ForwardRef, List, Optional, Set, Union, NewType
+
+anyURI = NewType('anyURI', str)
+anySimpleType = NewType('anySimpleType', str)
+decimal = NewType('decimal', str)
+dateTimeStamp = NewType('dateTimeStamp', dt.datetime)
+gYear = NewType('gYear', str)
+gMonth = NewType('gMonth', str)
+gDay = NewType('gDay', str)
+gYearMonth = NewType('gYearMonth', str)
+yearMonthDuration = NewType('yearMonthDuration', str)
+dayTimeDuration = NewType('dayTimeDuration', str)
+byte = NewType('byte', int)
+short = NewType('short', int)
+long = NewType('long', int)
+unsignedByte = NewType('unsignedByte', int)
+unsignedShort = NewType('unsignedShort', int)
+unsignedInt = NewType('unsignedInt', int)
+unsignedLong = NewType('unsignedLong', int)
+positiveInteger = NewType('positiveInteger', int)
+negativeInteger = NewType('negativeInteger', int)
+nonPositiveInteger = NewType('nonPositiveInteger', int)
+nonNegativeInteger = NewType('nonNegativeInteger', int)
+base64Binary =  NewType('base64Binary', str)
+hexBinary = NewType('hexBinary', str)
+anyURI = NewType('anyURI', str)
+language = NewType('language', str)
+normalizedString = NewType('normalizedString', str)
+token = NewType('token', str)
+NMTOKEN = NewType('NMTOKEN', str)
+Name = NewType('Name', str)
+NCName = NewType('NCName', str)
 
 CONVERT_TYPE = {
     str: "xsd:string",
     bool: "xsd:boolean",
     float: "xsd:double",
     int: "xsd:integer",
+    long: "xsd:long",
     dict: "sys:JSON",
+    gYear: "xsd:gYear",
     dt.datetime: "xsd:dateTime",
     dt.date: "xsd:date",
     dt.time: "xsd:time",
     dt.timedelta: "xsd:duration",
+    anyURI : "xsd:anyURI",
+    anySimpleType : "xsd:anySimpleType",
+    decimal : "xsd:decimal",
+    dateTimeStamp : "xsd:dateTimeStamp",
+    gYear : "xsd:gYear",
+    gMonth : "xsd:gMonth",
+    gDay : "xsd:gDay",
+    gYearMonth : "xsd:gYearMonth",
+    yearMonthDuration : "xsd:yearMonthDuration",
+    dayTimeDuration : "xsd:dayTimeDuration",
+    byte : "xsd:byte",
+    short : "xsd:short",
+    long : "xsd:long",
+    unsignedByte : "xsd:unsignedByte",
+    unsignedShort : "xsd:unsignedShort",
+    unsignedInt : "xsd:unsignedInt",
+    unsignedLong : "xsd:unsignedLong",
+    positiveInteger : "xsd:positiveInteger",
+    negativeInteger : "xsd:negativeInteger",
+    nonPositiveInteger : "xsd:nonPositiveInteger",
+    nonNegativeInteger : "xsd:nonNegativeInteger",
+    base64Binary :  "xsd:base64Binary",
+    hexBinary : "xsd:hexBinary",
+    anyURI : "xsd:anyURI",
+    language : "xsd:language",
+    normalizedString : "xsd:normalizedString",
+    token : "xsd:token",
+    NMTOKEN : "xsd:NMTOKEN",
+    Name : "xsd:Name",
+    NCName : "xsd:NCName",
 }
 
 
