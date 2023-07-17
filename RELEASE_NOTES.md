@@ -1,5 +1,12 @@
 # TerminusDB Python Client Release Notes
 
+## v10.2.4
+
+### Bug fixes
+
+- Fix bug in prop conversion for lists from JSON schema
+- Complete XSD types for tdbpy
+
 ## v10.2.3
 
 ### New
