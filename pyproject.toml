@@ -6,7 +6,7 @@ authors = ["TerminusDB group"]
 license = "Apache Software License"
 
 [tool.poetry.dependencies]
-python = ">=3.8.0,<3.11"
+python = ">=3.8.0,<3.12"
 requests = "<2.29.2"
 numpy = ">= 1.13.0"
 numpydoc = "*"
@@ -41,12 +41,16 @@ type = "gitbook"
 addopts = [
     "-p no:warnings",
     "--doctest-modules",
+    "--import-mode=importlib",
 ]
 doctest_optionflags = [
    "NORMALIZE_WHITESPACE",
    "ELLIPSIS"
 ]
 junit_family="legacy"
+testpaths = [
+   "terminusdb_client/tests/",
+]
 
 [tool.isort]
 profile = "black"
