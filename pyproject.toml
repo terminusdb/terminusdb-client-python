@@ -7,7 +7,7 @@ license = "Apache Software License"
 
 [tool.poetry.dependencies]
 python = ">=3.8.0,<3.12"
-requests = "<2.29.2"
+requests = "^2.31.0"
 numpy = ">= 1.13.0"
 numpydoc = "*"
 pandas = ">= 0.23.0"
