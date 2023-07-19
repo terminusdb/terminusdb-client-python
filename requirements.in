@@ -6,4 +6,4 @@ pytest-cov
 pytest-mock
 pytest-xdist
 docker-compose
-pyyaml==6.0
+pyyaml==1.3.0
