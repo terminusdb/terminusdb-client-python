@@ -368,6 +368,25 @@ class DocumentTemplate(metaclass=TerminusClass):
                             result[item] = wt.datetime_to_woql(the_item)
         return (result, references)
 
+# starting in python 3.11, enums can't really be defined with
+# non-unique values anymore. Since that is an established pattern for
+# us, we have to put some effort into making those enum values unique.
+def transform_enum_dict(d):
+    "Ensure that all enums in a definition have a unique value by transforming those that have no value set to have their stringified name as a value"
+    new_dict = {}
+    for key,value in d.items():
+        if not key.startswith("__") and not value:
+            value = str(key)
+            # remove this value from the undocumented member names list
+            if type(d._member_names) == list:
+                d._member_names.remove(key)
+            else:
+                d._member_names.pop(key)
+            new_dict[key] = value
+
+    for key,value in new_dict.items():
+        d.pop(key)
+        d[key] = value
 
 class EnumMetaTemplate(EnumMeta):
     def __new__(
@@ -382,13 +401,26 @@ class EnumMetaTemplate(EnumMeta):
     ):
         if "_schema" in classdict:
             schema = classdict.pop("_schema")
-            classdict._member_names.remove("_schema")
+
+            # _member_names is a field maintained in the enum dict
+            # that keeps track of fields to prevent
+            # duplicates. Unfortunately, since we're messing with
+            # definitions here, we'll have to reach into internals
+            # like this to keep things working well.
+            # There is probably a better way to do this.
+            if type(classdict._member_names) == list:
+                classdict._member_names.remove("_schema")
+            else:
+                classdict._member_names.pop("_schema")
+
+            transform_enum_dict(classdict)
             new_cls = super().__new__(metacls, cls, bases, classdict)
             new_cls._schema = schema
             if not hasattr(schema, "object"):
                 schema.object = {}
             schema.object[cls] = new_cls
         else:
+            transform_enum_dict(classdict)
             new_cls = super().__new__(metacls, cls, bases, classdict)
         globals()[cls] = new_cls
         return new_cls
