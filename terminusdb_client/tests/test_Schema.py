@@ -460,6 +460,7 @@ class AnEnum(EnumTemplate):
     Bar = ()
     Baz = ()
 
+
 def test_simple_enum():
     assert AnEnum.Foo.name == "Foo"
     assert AnEnum.Foo.value == "Foo"

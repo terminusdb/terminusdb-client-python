@@ -368,13 +368,14 @@ class DocumentTemplate(metaclass=TerminusClass):
                             result[item] = wt.datetime_to_woql(the_item)
         return (result, references)
 
+
 # starting in python 3.11, enums can't really be defined with
 # non-unique values anymore. Since that is an established pattern for
 # us, we have to put some effort into making those enum values unique.
 def transform_enum_dict(d):
     "Ensure that all enums in a definition have a unique value by transforming those that have no value set to have their stringified name as a value"
     new_dict = {}
-    for key,value in d.items():
+    for key, value in d.items():
         if not key.startswith("__") and not value:
             value = str(key)
             # remove this value from the undocumented member names list
@@ -384,9 +385,10 @@ def transform_enum_dict(d):
                 d._member_names.pop(key)
             new_dict[key] = value
 
-    for key,value in new_dict.items():
+    for key, value in new_dict.items():
         d.pop(key)
         d[key] = value
+
 
 class EnumMetaTemplate(EnumMeta):
     def __new__(
