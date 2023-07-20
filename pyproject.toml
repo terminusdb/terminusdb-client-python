@@ -14,7 +14,6 @@ pandas = ">= 0.23.0"
 typeguard = "~2.13.3"
 tqdm = "*"
 click = ">=8.0"
-shed = "*"
 
 [tool.poetry.dev-dependencies]
 pytest = ">= 3"
@@ -22,6 +21,7 @@ pytest-cov = "*"
 pytest-mock = "*"
 pytest-xdist = "*"
 flake8 = "*"
+shed = "*"
 
 [tool.poetry.scripts]
 tdbpy = "terminusdb_client.scripts.scripts:tdbpy"
