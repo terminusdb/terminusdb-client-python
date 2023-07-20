@@ -6,31 +6,25 @@ authors = ["TerminusDB group"]
 license = "Apache Software License"
 
 [tool.poetry.dependencies]
-python = ">=3.8.0,<4.0"
-requests = "<2.29.2"
-shed = "*"
+python = ">=3.8.0,<3.12"
+requests = "^2.31.0"
+numpy = ">= 1.13.0"
 numpydoc = "*"
+pandas = ">= 0.23.0"
 typeguard = "~2.13.3"
 tqdm = "*"
 click = ">=8.0"
+shed = "*"
 
 [tool.poetry.dev-dependencies]
-pytest = "*"
-pytest-mock = "*"
-flake8 = "*"
+pytest = ">= 3"
 pytest-cov = "*"
-bumpversion = "*"
-sphinx = "*"
-sphinx_rtd_theme = "*"
-sphinxcontrib-napoleon = "*"
-sphinx_autodoc_typehints = "*"
-sphinx_click = "*"
-pandas = "~1.4.0"
-tox = "*"
-interrogate = "*"
-pre-commit = "*"
-shed = "*"
-PyYAML = "<6.0"
+pytest-mock = "*"
+pytest-xdist = "*"
+flake8 = "*"
+
+[tool.poetry.scripts]
+tdbpy = "terminusdb_client.scripts.scripts:tdbpy"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -42,3 +36,26 @@ search_path = [ "./terminusdb_client" ]
 
 [tool.pydoc-markdown.renderer]
 type = "gitbook"
+
+[tool.pytest.ini_options]
+addopts = [
+    "-p no:warnings",
+    "--doctest-modules",
+    "--import-mode=importlib",
+]
+doctest_optionflags = [
+   "NORMALIZE_WHITESPACE",
+   "ELLIPSIS"
+]
+junit_family="legacy"
+testpaths = [
+   "terminusdb_client/tests/",
+]
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+combine_as_imports = true
+line_length = 88

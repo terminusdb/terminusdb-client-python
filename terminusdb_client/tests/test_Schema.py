@@ -9,6 +9,7 @@ import requests
 from terminusdb_client.client import Client
 from terminusdb_client.schema.schema import (
     DocumentTemplate,
+    EnumTemplate,
     Schema,
     _check_cycling,
 )
@@ -450,3 +451,16 @@ def test_from_json_schema():
 #     other_schema.delete_property(Title)
 #     assert other_schema.all_obj() == {Employee, Address, Team}
 #     assert other_schema.all_prop() == {AddressOf, PostCode, Country}
+
+
+class AnEnum(EnumTemplate):
+    "An enum"
+    _schema = Schema()
+    Foo = ()
+    Bar = ()
+    Baz = ()
+
+
+def test_simple_enum():
+    assert AnEnum.Foo.name == "Foo"
+    assert AnEnum.Foo.value == "Foo"
