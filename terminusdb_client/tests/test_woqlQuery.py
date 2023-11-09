@@ -1,7 +1,7 @@
 import pprint
 import datetime as dt
 
-from terminusdb_client.woqlquery.woql_query import WOQLQuery
+from terminusdb_client.woqlquery.woql_query import WOQLQuery, Doc, Var
 
 from .ans_cardinality import *  # noqa
 from .ans_doctype import *  # noqa
@@ -707,3 +707,28 @@ class TestTripleBuilderChainer:
             },
             "value": {"@type": "Value", "node": "value"},
         }
+
+    def test_doc(self):
+        result = WOQLQuery().insert_document(
+            Doc({"@type": "Car", "wheels": 4})
+        )
+        assert result.to_dict() == {'@type': 'InsertDocument', 'document': {'@type': 'Value', 'dictionary': {'@type': 'DictionaryTemplate', 'data': [{'@type': 'FieldValuePair', 'field': '@type', 'value': {'@type': 'Value', 'data': {'@type': 'xsd:string', '@value': 'Car'}}}, {'@type': 'FieldValuePair', 'field': 'wheels', 'value': {'@type': 'Value', 'data': {'@type': 'xsd:integer', '@value': 4}}}]}}}
+
+    def test_var(self):
+        result = WOQLQuery().insert_document(
+            Doc({"@type": "Car", "wheels": Var("v")})
+        )
+
+        assert result.to_dict() == {
+            '@type': 'InsertDocument',
+            'document': {'@type': 'Value',
+                         'dictionary': {'@type': 'DictionaryTemplate',
+                                        'data': [{'@type': 'FieldValuePair',
+                                                  'field': '@type',
+                                                  'value': {'@type': 'Value',
+                                                            'data': {'@type': 'xsd:string',
+                                                                     '@value': 'Car'}}},
+                                                 {'@type': 'FieldValuePair',
+                                                  'field': 'wheels',
+                                                  'value': {'@type': 'Value',
+                                                            'variable': 'v'}}]}}}
