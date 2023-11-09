@@ -710,13 +710,13 @@ class TestTripleBuilderChainer:
 
     def test_doc(self):
         result = WOQLQuery().insert_document(
-            Doc({"@type":"Car", "wheels":4})
+            Doc({"@type": "Car", "wheels": 4})
         )
         assert result.to_dict() == {'@type': 'InsertDocument', 'document': {'@type': 'Value', 'dictionary': {'@type': 'DictionaryTemplate', 'data': [{'@type': 'FieldValuePair', 'field': '@type', 'value': {'@type': 'Value', 'data': {'@type': 'xsd:string', '@value': 'Car'}}}, {'@type': 'FieldValuePair', 'field': 'wheels', 'value': {'@type': 'Value', 'data': {'@type': 'xsd:integer', '@value': 4}}}]}}}
 
     def test_var(self):
         result = WOQLQuery().insert_document(
-            Doc({"@type":"Car", "wheels": Var("v")})
+            Doc({"@type": "Car", "wheels": Var("v")})
         )
 
         assert result.to_dict() == {

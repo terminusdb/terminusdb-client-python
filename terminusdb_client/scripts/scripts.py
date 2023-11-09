@@ -160,7 +160,7 @@ def _create_script(obj_list):
             else:
                 self.parent = parent
             if script is None:
-                if type(parent) == str or len(parent) == 1:
+                if isinstance(parent, str) or len(parent) == 1:
                     self.script = f"class {name}({parent}):\n"
                 elif len(parent) > 1:
                     self.script = f"class {name}({', '.join(parent)}):\n"
@@ -266,7 +266,7 @@ def _create_script(obj_list):
         if obj.parent is None:
             print_script += obj.script
             printed.append(obj.name)
-        elif type(obj.parent) == str and obj.parent in printed:
+        elif isinstance(obj.parent, str) and obj.parent in printed:
             print_script += obj.script
             printed.append(obj.name)
         else:

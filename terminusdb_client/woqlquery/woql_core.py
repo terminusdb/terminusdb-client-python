@@ -1,6 +1,7 @@
 # helper functions for WOQLCore
 import re
 
+
 def _split_at(op, tokens):
     results = []
     stack = []

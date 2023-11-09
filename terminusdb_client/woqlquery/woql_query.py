@@ -53,6 +53,7 @@ class Var:
         return {"@type": "Value",
                 "variable": self.name}
 
+
 class Doc:
     def __init__(self, dictionary):
         self.dictionary = dictionary
@@ -369,9 +370,9 @@ class WOQLQuery:
     def _clean_predicate(self, predicate):
         """Transforms whatever is passed in as the predicate (id or variable) into the appropriate json-ld form"""
         pred = False
-        if type(predicate) is dict:
+        if isinstance(predicate, dict):
             return predicate
-        if type(predicate) != str:
+        if isinstance(predicate, str):
             raise ValueError("Predicate must be a URI string")
             return str(predicate)
         if ":" in predicate:
@@ -723,7 +724,7 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Using"
-        if not collection or type(collection) != str:
+        if not collection or not isinstance(collection, str):
             raise ValueError(
                 "The first parameter to using must be a Collection ID (string)"
             )
@@ -895,7 +896,7 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "From"
-        if not graph or type(graph) != str:
+        if not graph or not isinstance(graph, str):
             raise ValueError(
                 "The first parameter to from must be a Graph Filter Expression (string)"
             )
@@ -921,7 +922,7 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Into"
-        if not graph_descriptor or type(graph_descriptor) != str:
+        if not graph_descriptor or not isinstance(graph_descriptor, str):
             raise ValueError(
                 "The first parameter to from must be a Graph Filter Expression (string)"
             )
@@ -1264,7 +1265,7 @@ class WOQLQuery:
         if not substring:
             substring = length
             length = len(substring) + before
-        if not string or not substring or type(substring) != str:
+        if not string or not substring or not isinstance(substring, str):
             raise ValueError(
                 "Substr - the first and last parameters must be strings representing the full and substring variables / literals"
             )

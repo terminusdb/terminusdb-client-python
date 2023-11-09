@@ -379,7 +379,7 @@ def transform_enum_dict(d):
         if not key.startswith("__") and not value:
             value = str(key)
             # remove this value from the undocumented member names list
-            if type(d._member_names) == list:
+            if isinstance(d._member_names, list):
                 d._member_names.remove(key)
             else:
                 d._member_names.pop(key)
@@ -410,7 +410,7 @@ class EnumMetaTemplate(EnumMeta):
             # definitions here, we'll have to reach into internals
             # like this to keep things working well.
             # There is probably a better way to do this.
-            if type(classdict._member_names) == list:
+            if isinstance(classdict._member_names, list):
                 classdict._member_names.remove("_schema")
             else:
                 classdict._member_names.pop("_schema")
