@@ -372,7 +372,7 @@ class WOQLQuery:
         pred = False
         if isinstance(predicate, dict):
             return predicate
-        if isinstance(predicate, str):
+        if not isinstance(predicate, str):
             raise ValueError("Predicate must be a URI string")
             return str(predicate)
         if ":" in predicate:
