@@ -49,6 +49,9 @@ class Var:
     def __str__(self):
         return self.name
 
+    def to_dict(self):
+        return {"@type": "Value",
+                "variable": self.name}
 
 class Doc:
     def __init__(self, dictionary):
@@ -57,6 +60,9 @@ class Doc:
 
     def __str__(self):
         return str(self.dictionary)
+
+    def to_dict(self):
+        return self.encoded
 
     def _convert(self, obj):
         if type(obj) is str:
@@ -584,6 +590,7 @@ class WOQLQuery:
             self.from_dict(json.loads(input_json))
             return self
         else:
+            print(self.to_dict())
             return json.dumps(self.to_dict(), sort_keys=True)
 
     def to_dict(self):
