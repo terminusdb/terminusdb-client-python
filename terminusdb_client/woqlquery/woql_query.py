@@ -591,7 +591,6 @@ class WOQLQuery:
             self.from_dict(json.loads(input_json))
             return self
         else:
-            print(self.to_dict())
             return json.dumps(self.to_dict(), sort_keys=True)
 
     def to_dict(self):
