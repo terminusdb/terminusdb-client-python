@@ -72,7 +72,7 @@ def test_create_database(mocked_requests, mocked_requests2):
     client._session.post.assert_called_once_with(
         "http://localhost:6363/api/db/admin/myFirstTerminusDB",
         auth=("admin", "root"),
-        json={"label": "my first db", "comment": "my first db comment"},
+        json={"label": "my first db", "comment": "my first db comment", "schema": False},
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 
@@ -114,7 +114,7 @@ def test_create_database_and_change_team(mocked_requests, mocked_requests2):
     client._session.post.assert_called_once_with(
         "http://localhost:6363/api/db/my_new_team/myFirstTerminusDB",
         auth=("admin", "root"),
-        json={"label": "my first db", "comment": "my first db comment"},
+        json={"label": "my first db", "comment": "my first db comment", "schema": False},
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
 

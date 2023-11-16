@@ -698,6 +698,8 @@ class Client:
             details["comment"] = ""
         if include_schema:
             details["schema"] = True
+        else:
+            details["schema"] = False
         if prefixes:
             details["prefixes"] = prefixes
         if team is None:
