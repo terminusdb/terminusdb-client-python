@@ -1,5 +1,17 @@
 # TerminusDB Python Client Release Notes
 
+## v10.2.6
+
+### Bug fixes
+
+- Fix schema parameter to database construction
+
+## v10.2.5
+
+### Bug fixes
+
+- fix serialization of dictionaries
+
 ## v10.2.4
 
 ### Bug fixes
