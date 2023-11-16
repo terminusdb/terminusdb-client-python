@@ -4,6 +4,7 @@ version = "10.2.6"
 description = "Python client for Terminus DB"
 authors = ["TerminusDB group"]
 license = "Apache Software License"
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.8.0,<3.12"
