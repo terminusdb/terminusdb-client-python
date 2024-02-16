@@ -54,6 +54,12 @@ class Var:
                 "variable": self.name}
 
 
+class Vars:
+    def __init__(self, *args):
+        for arg in args:
+            setattr(self, arg, Var(arg))
+
+
 class Doc:
     def __init__(self, dictionary):
         self.dictionary = dictionary
