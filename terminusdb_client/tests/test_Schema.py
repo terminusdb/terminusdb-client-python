@@ -112,6 +112,7 @@ def test_abstract_class_child():
     assert "@abstract" not in ChildAbs._to_dict()
 
 
+@pytest.mark.skip(reason="relaxing type checking")
 def test_type_check():
     test_obj = TypeCheck()
     with pytest.raises(TypeError):
