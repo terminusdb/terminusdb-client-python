@@ -30,10 +30,11 @@ from ..woqlquery.woql_query import WOQLQuery
 # license Apache Version 2
 # summary Python module for accessing the Terminus DB API
 
+
 class WoqlResult:
     """Iterator for streaming WOQL results."""
     def __init__(self, lines):
-        preface = json.loads(next(lines))
+        preface=json.loads(next(lines))
         if not ('@type' in preface and preface['@type'] == 'PrefaceRecord'):
             raise DatabaseError(response=preface)
         self.preface=preface
