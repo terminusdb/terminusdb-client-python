@@ -24,7 +24,7 @@ def _args_as_payload(args: dict) -> dict:
     return {k: v for k, v in args.items() if v}
 
 
-def _finish_response(request_response, get_version=False):
+def _finish_response(request_response, get_version=False, streaming=False):
     """Get the response text
 
     Parameters
@@ -43,11 +43,14 @@ def _finish_response(request_response, get_version=False):
 
     """
     if request_response.status_code == 200:
-        if get_version:
+        if get_version and not streaming:
             return request_response.text, request_response.headers.get(
                 "Terminusdb-Data-Version"
             )
-        return request_response.text  # if not a json it raises an error
+        if streaming:
+            return request_response.iter_lines()
+        else:
+            return request_response.text  # if not a json it raises an error
     elif request_response.status_code > 399 and request_response.status_code < 599:
         raise DatabaseError(request_response)
 

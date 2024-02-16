@@ -31,6 +31,36 @@ from ..woqlquery.woql_query import WOQLQuery
 # summary Python module for accessing the Terminus DB API
 
 
+class WoqlResult:
+    """Iterator for streaming WOQL results."""
+    def __init__(self, lines):
+        preface = json.loads(next(lines))
+        if not ('@type' in preface and preface['@type'] == 'PrefaceRecord'):
+            raise DatabaseError(response=preface)
+        self.preface = preface
+        self.postscript = {}
+        self.lines = lines
+
+    def _check_error(self, document):
+        if ('@type' in document):
+            if document['@type'] == 'Binding':
+                return document
+            if document['@type'] == 'PostscriptRecord':
+                self.postscript = document
+                raise StopIteration()
+
+        raise DatabaseError(response=document)
+
+    def variable_names(self):
+        return self.preface['names']
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        return self._check_error(json.loads(next(self.lines)))
+
+
 class JWTAuth(requests.auth.AuthBase):
     """Class for JWT Authentication in requests"""
 
@@ -1500,8 +1530,9 @@ class Client:
         commit_msg: Optional[str] = None,
         get_data_version: bool = False,
         last_data_version: Optional[str] = None,
+        streaming: bool = False,
         # file_dict: Optional[dict] = None,
-    ) -> Union[dict, str]:
+    ) -> Union[dict, str, WoqlResult]:
         """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
 
         Parameters
@@ -1537,6 +1568,7 @@ class Client:
         else:
             request_woql_query = woql_query
         query_obj["query"] = request_woql_query
+        query_obj["streaming"] = streaming
 
         headers = self._default_headers.copy()
         if last_data_version is not None:
@@ -1547,7 +1579,12 @@ class Client:
             headers=headers,
             json=query_obj,
             auth=self._auth(),
+            stream=streaming
         )
+
+        if streaming:
+            return WoqlResult(lines=_finish_response(result, streaming=True))
+
         if get_data_version:
             result, version = _finish_response(result, get_data_version)
             result = json.loads(result)

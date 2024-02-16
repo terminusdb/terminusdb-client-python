@@ -234,6 +234,7 @@ def test_query(mocked_requests, mocked_requests2, mocked_requests3):
             "query": WoqlStar,
         },
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+        stream=False
     )
 
 

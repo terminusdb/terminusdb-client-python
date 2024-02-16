@@ -367,21 +367,22 @@ class WOQLQuery:
             return self._expand_node_variable(obj)
         raise ValueError("Subject must be a URI string")
 
-    def _clean_predicate(self, predicate):
+    def _clean_predicate(self, obj):
         """Transforms whatever is passed in as the predicate (id or variable) into the appropriate json-ld form"""
         pred = False
-        if isinstance(predicate, dict):
-            return predicate
-        if not isinstance(predicate, str):
-            raise ValueError("Predicate must be a URI string")
-            return str(predicate)
-        if ":" in predicate:
-            pred = predicate
-        elif self._vocab and (predicate in self._vocab):
-            pred = self._vocab[predicate]
-        else:
-            pred = predicate
-        return self._expand_node_variable(pred)
+        if type(obj) is dict:
+            return obj
+        elif type(obj) is str:
+            if ":" in obj:
+                pred = obj
+            elif self._vocab and (obj in self._vocab):
+                pred = self._vocab[obj]
+            else:
+                pred = obj
+            return self._expand_node_variable(pred)
+        elif isinstance(obj, Var):
+            return self._expand_node_variable(obj)
+        raise ValueError("Predicate must be a URI string")
 
     def _clean_path_predicate(self, predicate=None):
         pred = False
