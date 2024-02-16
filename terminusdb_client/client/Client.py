@@ -34,12 +34,12 @@ from ..woqlquery.woql_query import WOQLQuery
 class WoqlResult:
     """Iterator for streaming WOQL results."""
     def __init__(self, lines):
-        preface=json.loads(next(lines))
+        preface = json.loads(next(lines))
         if not ('@type' in preface and preface['@type'] == 'PrefaceRecord'):
             raise DatabaseError(response=preface)
-        self.preface=preface
-        self.postscript={}
-        self.lines=lines
+        self.preface = preface
+        self.postscript = {}
+        self.lines = lines
 
     def _check_error(self, document):
         if ('@type' in document):
@@ -59,6 +59,7 @@ class WoqlResult:
 
     def __next__(self):
         return self._check_error(json.loads(next(self.lines)))
+
 
 class JWTAuth(requests.auth.AuthBase):
     """Class for JWT Authentication in requests"""

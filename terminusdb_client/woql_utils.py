@@ -3,6 +3,7 @@ from datetime import datetime
 
 from .errors import DatabaseError
 
+
 def _result2stream(result):
     """turning JSON string into a interable that give you a stream of dictionary"""
     decoder = json.JSONDecoder()
