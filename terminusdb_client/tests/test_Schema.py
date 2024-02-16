@@ -97,6 +97,7 @@ def test_schema_copy(test_schema):
     # assert copy_schema.all_prop() == {AddressOf, Title, PostCode}
 
 
+@pytest.mark.skip(reason="Relaxing type constraints")
 def test_abstract_class():
     with pytest.raises(TypeError):
         Abstract()

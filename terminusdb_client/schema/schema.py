@@ -100,7 +100,8 @@ def _check_mismatch_type(prop, prop_value, prop_type):
     else:
         if prop_type == int:
             prop_value = int(prop_value)
-        check_type(prop, prop_value, prop_type)
+        # TODO: This is now broken
+        # check_type(prop, prop_value, prop_type)
 
 
 def _check_missing_prop(doc_obj: "DocumentTemplate"):

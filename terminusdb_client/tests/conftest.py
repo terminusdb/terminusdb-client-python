@@ -7,7 +7,7 @@ from terminusdb_client.woqlschema.woql_schema import (
     EnumTemplate,
     LexicalKey,
     TaggedUnion,
-    WOQLSchema,
+    Schema,
 )
 
 
@@ -15,7 +15,7 @@ def pytest_addoption(parser):
     parser.addoption("--docker-compose", action="store", default=None)
 
 
-my_schema = WOQLSchema()
+my_schema = Schema()
 
 
 class Coordinate(DocumentTemplate):
