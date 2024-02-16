@@ -121,8 +121,8 @@ def test_type_check():
 
 def test_inheritance(test_schema):
     my_schema = test_schema
-    Person = my_schema.object.get("Person")
-    Employee = my_schema.object.get("Employee")
+    Person = test_schema.object.get("Person")
+    Employee = test_schema.object.get("Employee")
     for item in Person._annotations:
         if item not in Employee._annotations:
             raise AssertionError(f"{item} not inherted")
