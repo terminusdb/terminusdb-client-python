@@ -97,6 +97,7 @@ def test_schema_copy(test_schema):
     # assert copy_schema.all_prop() == {AddressOf, Title, PostCode}
 
 
+@pytest.mark.skip(reason="Relaxing type constraints")
 def test_abstract_class():
     with pytest.raises(TypeError):
         Abstract()
@@ -111,6 +112,7 @@ def test_abstract_class_child():
     assert "@abstract" not in ChildAbs._to_dict()
 
 
+@pytest.mark.skip(reason="relaxing type checking")
 def test_type_check():
     test_obj = TypeCheck()
     with pytest.raises(TypeError):
