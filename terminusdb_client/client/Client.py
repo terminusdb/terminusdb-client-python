@@ -1531,7 +1531,7 @@ class Client:
         get_data_version: bool = False,
         last_data_version: Optional[str] = None,
         streaming: bool = False,
-        # file_dict: Optional[dict] = None,
+        library: Optional[str] = None,
     ) -> Union[dict, str, WoqlResult]:
         """Updates the contents of the specified graph with the triples encoded in turtle format Replaces the entire graph contents
 
@@ -1569,6 +1569,8 @@ class Client:
             request_woql_query = woql_query
         query_obj["query"] = request_woql_query
         query_obj["streaming"] = streaming
+        if library:
+            query_obj["library"] = library
 
         headers = self._default_headers.copy()
         if last_data_version is not None:
