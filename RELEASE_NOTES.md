@@ -1,5 +1,16 @@
 # TerminusDB Python Client Release Notes
 
+## v11.1.0
+
+- Add support for python 3.12 and deprecate python 3.8 (end of life)
+- Aligned with TerminusDB 11.1 overall and general preparation for v11.2.0
+
+### Bug fixes and maintenance
+
+- Fix schema parameter to database construction
+- Update minimum Python version to 3.9 for urllib3 2.5.0 compatibility
+- Include latest security updates
+
 ## v10.2.6
 
 ### Bug fixes

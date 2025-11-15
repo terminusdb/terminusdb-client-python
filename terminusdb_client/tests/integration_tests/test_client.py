@@ -332,6 +332,14 @@ def test_get_organization_user_databases(docker_url):
     client.create_organization(org_name)
     client.create_database(db_name, team=org_name)
     client.create_database(db_name2, team=org_name)
+
+    # BEFORE grant: verify our specific databases are NOT accessible to admin user
+    databases_before = client.get_organization_user_databases(org=org_name, username="admin")
+    db_names_before = {db['name'] for db in databases_before}
+    assert db_name not in db_names_before, f"{db_name} should not be accessible before capability grant"
+    assert db_name2 not in db_names_before, f"{db_name2} should not be accessible before capability grant"
+
+    # Grant capabilities to admin user for the organization
     capability_change = {
         "operation": "grant",
         "scope": f"Organization/{org_name}",
@@ -341,10 +349,15 @@ def test_get_organization_user_databases(docker_url):
         ]
     }
     client.change_capabilities(capability_change)
-    databases = client.get_organization_user_databases(org=org_name, username="admin")
-    assert len(databases) == 2
-    assert databases[0]['name'] == db_name
-    assert databases[1]['name'] == db_name2
+
+    # AFTER grant: verify our specific databases ARE accessible to admin user
+    databases_after = client.get_organization_user_databases(org=org_name, username="admin")
+    db_names_after = {db['name'] for db in databases_after}
+    # Check both our databases are now accessible (order not guaranteed)
+    assert db_name in db_names_after, f"{db_name} should be accessible after capability grant"
+    assert db_name2 in db_names_after, f"{db_name2} should be accessible after capability grant"
+    # Verify admin team database does NOT appear in organization results
+    assert db_name + "admin" not in db_names_after, f"{db_name}admin should not appear in {org_name} results"
 
 
 def test_has_database(docker_url):
@@ -476,6 +489,7 @@ def test_diff_ops(docker_url, test_schema):
     assert my_schema.to_dict() != test_schema.to_dict()
 
 
+@pytest.mark.skip(reason="Cloud infrastructure no longer operational")
 @pytest.mark.skipif(
     os.environ.get("TERMINUSX_TOKEN") is None, reason="TerminusX token does not exist"
 )
@@ -547,6 +561,7 @@ def test_jwt(docker_url_jwt):
     assert "test_happy_path" not in client.list_databases()
 
 
+@pytest.mark.skip(reason="Cloud infrastructure no longer operational")
 @pytest.mark.skipif(
     os.environ.get("TERMINUSX_TOKEN") is None, reason="TerminusX token does not exist"
 )
@@ -567,6 +582,7 @@ def test_terminusx(terminusx_token):
     assert testdb not in client.list_databases()
 
 
+@pytest.mark.skip(reason="Cloud infrastructure no longer operational")
 @pytest.mark.skipif(
     os.environ.get("TERMINUSX_TOKEN") is None, reason="TerminusX token does not exist"
 )

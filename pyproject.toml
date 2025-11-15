@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "terminusdb-client"
-version = "10.2.6"
+version = "11.1.0"
 description = "Python client for Terminus DB"
 authors = ["TerminusDB group"]
 license = "Apache Software License"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.8.0,<3.12"
+python = ">=3.9.0,<3.13"
 requests = "^2.31.0"
 numpy = ">= 1.13.0"
 numpydoc = "*"
