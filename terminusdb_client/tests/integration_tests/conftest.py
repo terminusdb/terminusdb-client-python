@@ -5,7 +5,38 @@ import time
 import pytest
 import requests
 
-MAX_CONTAINER_STARTUP_TIME = 30
+MAX_CONTAINER_STARTUP_TIME = 120  # Increased from 30 to 120 seconds for slower systems
+
+
+# Check if a local TerminusDB test server is already running
+def is_local_server_running():
+    """Check if local TerminusDB server is running at http://127.0.0.1:6363"""
+    try:
+        response = requests.get("http://127.0.0.1:6363", timeout=2)
+        # Server responds with 404 for root path, which means it's running
+        return response.status_code in [200, 404]
+    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+        return False
+
+
+def is_docker_server_running():
+    """Check if Docker TerminusDB server is already running at http://127.0.0.1:6366"""
+    try:
+        response = requests.get("http://127.0.0.1:6366", timeout=2)
+        # Server responds with 404 for root path, which means it's running
+        return response.status_code in [200, 404]
+    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+        return False
+
+
+def is_jwt_server_running():
+    """Check if JWT Docker TerminusDB server is already running at http://127.0.0.1:6367"""
+    try:
+        response = requests.get("http://127.0.0.1:6367", timeout=2)
+        # Server responds with 404 for root path, which means it's running
+        return response.status_code in [200, 404]
+    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+        return False
 
 
 def is_docker_installed():
@@ -39,6 +70,13 @@ def docker_url_jwt(pytestconfig):
     # we are using subprocess in case we need to access some of the outputs
     # most likely
     jwt_token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InRlc3RrZXkifQ.eyJodHRwOi8vdGVybWludXNkYi5jb20vc2NoZW1hL3N5c3RlbSNhZ2VudF9uYW1lIjoiYWRtaW4iLCJodHRwOi8vdGVybWludXNkYi5jb20vc2NoZW1hL3N5c3RlbSN1c2VyX2lkZW50aWZpZXIiOiJhZG1pbkB1c2VyLmNvbSIsImlzcyI6Imh0dHBzOi8vdGVybWludXNodWIuZXUuYXV0aDAuY29tLyIsInN1YiI6ImFkbWluIiwiYXVkIjpbImh0dHBzOi8vdGVybWludXNodWIvcmVnaXN0ZXJVc2VyIiwiaHR0cHM6Ly90ZXJtaW51c2h1Yi5ldS5hdXRoMC5jb20vdXNlcmluZm8iXSwiaWF0IjoxNTkzNzY5MTgzLCJhenAiOiJNSkpuZEdwMHpVZE03bzNQT1RRUG1SSkltWTJobzBhaSIsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwifQ.Ru03Bi6vSIQ57bC41n6fClSdxlb61m0xX6Q34Yh91gql0_CyfYRWTuqzqPMFoCefe53hPC5E-eoSFdID_u6w1ih_pH-lTTqus9OWgi07Qou3QNs8UZBLiM4pgLqcBKs0N058jfg4y6h9GjIBGVhX9Ni2ez3JGNcz1_U45BhnreE"
+
+    # Check if JWT server is already running (port 6367)
+    if is_jwt_server_running():
+        print("\n✓ Using existing JWT Docker TerminusDB server at http://127.0.0.1:6367")
+        yield ("http://127.0.0.1:6367", jwt_token)
+        return  # Don't clean up - server was already running
+
     pytestconfig.getoption("docker_compose")
     output = subprocess.run(
         [
@@ -79,7 +117,8 @@ def docker_url_jwt(pytestconfig):
         if service.stdout == b"terminusdb-server\n":
             try:
                 response = requests.get(test_url)
-                assert response.status_code == 200
+                # Server responds with 404 for root path, which means it's running
+                assert response.status_code in [200, 404]
                 break
             except (requests.exceptions.ConnectionError, AssertionError):
                 pass
@@ -89,7 +128,7 @@ def docker_url_jwt(pytestconfig):
 
         if seconds_waited > MAX_CONTAINER_STARTUP_TIME:
             clean_up_container()
-            raise RuntimeError("Container was to slow to startup")
+            raise RuntimeError(f"JWT Container was too slow to startup (waited {MAX_CONTAINER_STARTUP_TIME}s)")
 
     yield (test_url, jwt_token)
     clean_up_container()
@@ -97,8 +136,29 @@ def docker_url_jwt(pytestconfig):
 
 @pytest.fixture(scope="module")
 def docker_url(pytestconfig):
-    # we are using subprocess in case we need to access some of the outputs
-    # most likely
+    """
+    Provides a TerminusDB server URL for integration tests.
+    Prefers local test server if running, otherwise starts Docker container.
+
+    NOTE: This fixture returns just the URL. Tests expect AUTOLOGIN mode (no authentication).
+    If using local server with authentication, use TERMINUSDB_AUTOLOGIN=true when starting it.
+    """
+    # Check if local test server is already running (port 6363)
+    if is_local_server_running():
+        print("\n✓ Using existing local TerminusDB test server at http://127.0.0.1:6363")
+        print("⚠️  WARNING: Local server should be started with TERMINUSDB_AUTOLOGIN=true")
+        print("   Or use: TERMINUSDB_SERVER_AUTOLOGIN=true ./tests/terminusdb-test-server.sh restart")
+        yield "http://127.0.0.1:6363"
+        return  # Don't clean up - server was already running
+
+    # Check if Docker container is already running (port 6366)
+    if is_docker_server_running():
+        print("\n✓ Using existing Docker TerminusDB server at http://127.0.0.1:6366")
+        yield "http://127.0.0.1:6366"
+        return  # Don't clean up - server was already running
+
+    # No server found, start Docker container
+    print("\n⚠ No server found, starting Docker container with AUTOLOGIN...")
     pytestconfig.getoption("docker_compose")
     output = subprocess.run(
         [
@@ -138,7 +198,9 @@ def docker_url(pytestconfig):
         if service.stdout == b"terminusdb-server\n":
             try:
                 response = requests.get(test_url)
-                assert response.status_code == 200
+                # Server responds with 404 for root path, which means it's running
+                assert response.status_code in [200, 404]
+                print(f"✓ Docker container started successfully after {seconds_waited}s")
                 break
             except (requests.exceptions.ConnectionError, AssertionError):
                 pass
@@ -148,7 +210,7 @@ def docker_url(pytestconfig):
 
         if seconds_waited > MAX_CONTAINER_STARTUP_TIME:
             clean_up_container()
-            raise RuntimeError("Container was to slow to startup")
+            raise RuntimeError(f"Container was too slow to startup (waited {MAX_CONTAINER_STARTUP_TIME}s)")
 
     yield test_url
     clean_up_container()
