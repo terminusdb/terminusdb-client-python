@@ -79,7 +79,8 @@ def docker_url_jwt(pytestconfig):
     pytestconfig.getoption("docker_compose")
     output = subprocess.run(
         [
-            "docker-compose",
+            "docker",
+            "compose",
             "--file",
             os.path.dirname(os.path.realpath(__file__))
             + "/test-docker-compose-jwt.yml",
@@ -98,7 +99,8 @@ def docker_url_jwt(pytestconfig):
     while not is_server_started:
         service = subprocess.run(
             [
-                "docker-compose",
+                "docker",
+                "compose",
                 "--file",
                 os.path.dirname(os.path.realpath(__file__))
                 + "/test-docker-compose-jwt.yml",
@@ -159,7 +161,8 @@ def docker_url(pytestconfig):
     pytestconfig.getoption("docker_compose")
     output = subprocess.run(
         [
-            "docker-compose",
+            "docker",
+            "compose",
             "--file",
             os.path.dirname(os.path.realpath(__file__)) + "/test-docker-compose.yml",
             "up",
@@ -177,7 +180,8 @@ def docker_url(pytestconfig):
     while not is_server_started:
         service = subprocess.run(
             [
-                "docker-compose",
+                "docker",
+                "compose",
                 "--file",
                 os.path.dirname(os.path.realpath(__file__))
                 + "/test-docker-compose.yml",
@@ -214,7 +218,8 @@ def docker_url(pytestconfig):
 def clean_up_container():
     subprocess.run(
         [
-            "docker-compose",
+            "docker",
+            "compose",
             "--file",
             os.path.dirname(os.path.realpath(__file__)) + "/test-docker-compose.yml",
             "down",
@@ -223,7 +228,8 @@ def clean_up_container():
     )
     subprocess.run(
         [
-            "docker-compose",
+            "docker",
+            "compose",
             "--file",
             os.path.dirname(os.path.realpath(__file__)) + "/test-docker-compose.yml",
             "rm",
@@ -235,7 +241,8 @@ def clean_up_container():
     )
     subprocess.run(
         [
-            "docker-compose",
+            "docker",
+            "compose",
             "--file",
             os.path.dirname(os.path.realpath(__file__))
             + "/test-docker-compose-jwt.yml",
@@ -245,7 +252,8 @@ def clean_up_container():
     )
     subprocess.run(
         [
-            "docker-compose",
+            "docker",
+            "compose",
             "--file",
             os.path.dirname(os.path.realpath(__file__))
             + "/test-docker-compose-jwt.yml",
@@ -256,8 +264,8 @@ def clean_up_container():
         ],
         check=True,
     )
-    subprocess.run(["docker-compose", "down"])
-    subprocess.run(["docker-compose", "rm", "--force", "--stop", "-v"])
+    subprocess.run(["docker", "compose", "down"])
+    subprocess.run(["docker", "compose", "rm", "--force", "--stop", "-v"])
 
 
 @pytest.fixture(scope="module")

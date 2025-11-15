@@ -1016,7 +1016,7 @@ class WOQLQuery:
             return self.opt().triple(sub, pred, obj)
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
-        self._cursor["@type"] = "RemovedTriple"
+        self._cursor["@type"] = "DeletedTriple"
         self._cursor["subject"] = self._clean_subject(sub)
         self._cursor["predicate"] = self._clean_predicate(pred)
         self._cursor["object"] = self._clean_object(obj)

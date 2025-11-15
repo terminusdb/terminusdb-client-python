@@ -1717,7 +1717,7 @@ class Client:
     def fetch(self, remote_id: str,
               remote_auth: Optional[dict] = None,
               ) -> dict:
-        """Fatch the brach from a remote
+        """Fetch the branch from a remote repo
 
         Parameters
         ----------
@@ -2932,6 +2932,7 @@ class Client:
             f"{self.api}/db/{team}/{dbid}",
             headers=self._default_headers,
             auth=self._auth(),
+            allow_redirects=True,
         )
         return r.status_code == 200
 
