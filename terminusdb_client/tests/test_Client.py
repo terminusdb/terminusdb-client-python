@@ -177,6 +177,7 @@ def test_has_database(mocked_requests, mocked_requests2):
         f"http://localhost:6363/api/db/admin/{db_name}",
         auth=("admin", "root"),
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+        allow_redirects=True,
     )
 
 
