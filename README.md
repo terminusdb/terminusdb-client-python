@@ -12,7 +12,7 @@
 [![downloads](https://img.shields.io/pypi/dm/terminusdb-client.svg?logo=pypi)](https://pypi.python.org/pypi/terminusdb-client/)
 
 [![build status](https://img.shields.io/github/workflow/status/terminusdb/terminusdb-client-python/Python%20package?logo=github)](https://github.com/terminusdb/terminusdb-client-python/actions)
-[![documentation](https://img.shields.io/github/deployments/terminusdb/terminusdb-client-python/github-pages?label=documentation&logo=github)](https://terminusdb.com/docs/python)
+[![documentation](https://img.shields.io/github/deployments/terminusdb/terminusdb-client-python/github-pages?label=documentation&logo=github)](https://terminusdb.org/docs/python)
 [![code coverage](https://codecov.io/gh/terminusdb/terminusdb-client-python/branch/main/graph/badge.svg?token=BclAUaOPnQ)](https://codecov.io/gh/terminusdb/terminusdb-client-python)
 [![license](https://img.shields.io/github/license/terminusdb/terminusdb-client-python?color=pink&logo=apache)](https://github.com/terminusdb/terminusdb-client-python/blob/main/LICENSE)
 
@@ -20,24 +20,20 @@
 
 [**TerminusDB**][terminusdb] is an [open-source][terminusdb-repo] graph database
 and document store. It allows you to link JSON documents in a powerful knowledge
-graph all through a simple document API.
+graph all through a simple document API, with full git-for-data version control.
 
-[terminusdb]: https://terminusdb.com/
-[terminusdb-docs]: https://terminusdb.com/docs/
+[terminusdb]: https://terminusdb.org/
+[terminusdb-docs]: https://terminusdb.org/docs/
 [terminusdb-repo]: https://github.com/terminusdb/terminusdb
-
-[**TerminusCMS**](https://terminusdb.com/terminuscms/) is a hosted headless content management system. It is built upon TerminusDB and is a developer-focused data management platform for complex data and content infrastructure. [Sign up and clone a demo project to see how it works][dashboard].
-
-[dashboard]: https://dashboard.terminusdb.com/
 
 ## Requirements
 
-- [TerminusDB v10.0](https://github.com/terminusdb/terminusdb-server)
+- [TerminusDB v11.1](https://github.com/terminusdb/terminusdb-server)
 - [Python >=3.8](https://www.python.org/downloads)
 
 ## Release Notes and Previous Versions
 
-TerminusDB Client v10.0 works with TerminusDB v10.0 and TerminusCMS. Please check the [Release Notes](RELEASE_NOTES.md) to find out what has changed.
+TerminusDB Client v11.1 works with TerminusDB v11.1 and the [DFRNT cloud service](https://dfrnt.com). Please check the [Release Notes](RELEASE_NOTES.md) to find out what has changed.
 
 ## Installation
 -  TerminusDB Client can be downloaded from PyPI using pip:
@@ -76,16 +72,16 @@ client = Client("http://127.0.0.1:6363/")
 client.connect()
 ```
 
-Connect to TerminusCMS
+Connect to TerminusDB in the cloud
 
-*check the documentation for TerminusCMS about how to add the [API token](https://terminusdb.com/docs/how-to-connect-terminuscms) to the environment variable*
+*check the documentation on the DFRNT support page about how to add your [API token](https://support.dfrnt.com/portal/en/kb/articles/api) to the environment variable*
 
 
 ```Python
 from terminusdb_client import Client
 
 team="MyTeam"
-client = Client(f"https://dashboard.terminusdb.com/{team}/")
+client = Client(f"https://studio.dfrnt.com/api/hosted/{team}/")
 client.connect(team="MyTeam", use_token=True)
 ```
 
@@ -185,11 +181,11 @@ Do you want to delete 'mydb'? WARNING: This operation is non-reversible. [y/N]: 
 mydb deleted.
 ```
 
-### Please check the [full Documentation](https://terminusdb.com/docs/python) for more information.
+### Please check the [full Documentation](https://terminusdb.org/docs/python) for more information.
 
 ## Guides & Tutorials
 
-Visit our documentation for a range of short how-to guides, [how-to use the Python Client](https://terminusdb.com/docs/use-the-python-client) and [how to use the collaboration features with the Python Client](https://terminusdb.com/docs/collaboration-with-python-client). Alternatively, undertake the  [Getting Started with the Python Client Tutorial Series.](https://github.com/terminusdb/terminusdb-tutorials/blob/main/getting_started/python-client/README.md).
+Visit our documentation for a range of short how-to guides, [how-to use the Python Client](https://terminusdb.org/docs/use-the-python-client) and [how to use the collaboration features with the Python Client](https://terminusdb.org/docs/collaboration-with-python-client). Alternatively, undertake the  [Getting Started with the Python Client Tutorial Series.](https://github.com/terminusdb/terminusdb-tutorials/blob/main/getting_started/python-client/README.md).
 
 ## Testing
 
