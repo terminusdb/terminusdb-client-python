@@ -27,18 +27,14 @@ WOQL_UNIQUE_JSON = {
     },
 }
 
-WOQL_RANDOM_IDGEN_JSON = {
+WOQL_RANDOM_KEY_JSON = {
     "@type": "RandomKey",
     "base": {
         "@type": "DataValue",
-        "data": {"@type": "xsd:string", "@value": "Station"},
-    },
-    "key_list": {
-        "@type": "DataValue",
-        "variable": "Start_ID",
+        "data": {"@type": "xsd:string", "@value": "Person/"},
     },
     "uri": {
         "@type": "NodeValue",
-        "variable": "Start_Station_URL",
+        "variable": "Person_ID",
     },
 }

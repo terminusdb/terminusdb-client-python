@@ -15,7 +15,7 @@ from .woqljson.woqlCastJson import WOQL_CAST_JSON
 from .woqljson.woqlConcatJson import WOQL_CONCAT_JSON
 from .woqljson.woqlIdgenJson import (
     WOQL_IDGEN_JSON,
-    WOQL_RANDOM_IDGEN_JSON,
+    WOQL_RANDOM_KEY_JSON,
     WOQL_UNIQUE_JSON,
 )
 from .woqljson.woqlJoinSplitJson import WOQL_JOIN_SPLIT_JSON
@@ -214,11 +214,9 @@ class TestWoqlQueries:
         woql_object = WOQLQuery().idgen("Station", "v:Start_ID", "v:Start_Station_URL")
         assert woql_object.to_dict() == WOQL_IDGEN_JSON
 
-    def test_random_idgen_method(self):
-        woql_object = WOQLQuery().random_idgen(
-            "Station", "v:Start_ID", "v:Start_Station_URL"
-        )
-        assert woql_object.to_dict() == WOQL_RANDOM_IDGEN_JSON
+    def test_idgen_random_method(self):
+        woql_object = WOQLQuery().idgen_random("Person/", "v:Person_ID")
+        assert woql_object.to_dict() == WOQL_RANDOM_KEY_JSON
 
     def test_typecast_method(self):
         woql_object = WOQLQuery().typecast(

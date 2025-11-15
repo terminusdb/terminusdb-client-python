@@ -2207,35 +2207,36 @@ class WOQLQuery:
         self._cursor["uri"] = self._clean_node_value(output_var)
         return self
 
-    def random_idgen(self, prefix, key_list, uri):
-        """Randomly generates an ID and appends to the end of the key_list.
+    def idgen_random(self, prefix, uri):
+        """Generates a unique ID with cryptographically secure random suffix.
+
+        Uses base64 encoding to generate 16-character random IDs that are
+        guaranteed to be unique across executions. Matches the server's
+        idgen_random/2 predicate and maintains consistency with the JavaScript client.
 
         Parameters
         ----------
         prefix : str
-            prefix for the id
-        key_list : str
-            variable to generate id for
+            A prefix for the IDs to be generated (e.g. "Person/")
         uri : str
-            the variable to hold the id
+            Variable name or output target for the generated ID
 
         Returns
         -------
         WOQLQuery object
-            query object that can be chained and/or execute
+            query object that can be chained and/or executed
 
         Examples
         -------
-        >>> WOQLQuery().random_idgen("https://base.url",["page","1"],"v:obj_id").execute(client)
-        {'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': ['obj_id'], 'bindings': [{'obj_id': 'http://base.url_page_1_rv1mfa59ekisdutnxx6zdt2fkockgah'}], 'deletes': 0, 'inserts': 0, 'transaction_retry_count': 0}
+        >>> WOQLQuery().idgen_random("Person/", "v:person_id").execute(client)
+        {'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': ['person_id'], 'bindings': [{'person_id': 'Person/aB3dEf9GhI2jK4lM'}], 'deletes': 0, 'inserts': 0, 'transaction_retry_count': 0}
         """
         if prefix and prefix == "args":
-            return ["base", "key_list", "uri"]
+            return ["base", "uri"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "RandomKey"
         self._cursor["base"] = self._clean_data_value(prefix)
-        self._cursor["key_list"] = self._data_list(key_list)
         self._cursor["uri"] = self._clean_node_value(uri)
         return self
 
