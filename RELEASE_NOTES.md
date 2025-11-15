@@ -1,5 +1,14 @@
 # TerminusDB Python Client Release Notes
 
+## v11.1.0
+
+- Add support for python 3.12
+- Aligned with TerminusDB 11.1 overall and general preparation for v11.2.0
+
+### Bug fixes
+
+- Fix schema parameter to database construction
+
 ## v10.2.6
 
 ### Bug fixes
