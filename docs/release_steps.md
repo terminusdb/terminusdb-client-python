@@ -8,6 +8,8 @@
 
 ### Bump version (updates files + creates tag)
 
+To not create a tag, use `--no-tag`.
+
 ```bash
 bumpversion [patch|minor|major]
 ```
@@ -15,7 +17,6 @@ bumpversion [patch|minor|major]
 ### Create and push tag (triggers automated PyPI deployment)
 
 ```bash
-git tag -a vX.Y.Z -m "Version X.Y.Z"
 git push origin main --tags
 ```
 
