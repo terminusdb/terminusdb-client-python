@@ -103,7 +103,7 @@ def test_insert_cheuk(docker_url, test_schema):
             assert item["address_of"]["postal_code"] == "A12 345"
             assert item["address_of"]["street"] == "123 Abc Street"
             assert item["name"] == "Cheuk"
-            assert item["age"] == "21"
+            assert item["age"] == 21
             assert item["contact_number"] == "07777123456"
             assert item["managed_by"] == item["@id"]
         else:
@@ -185,7 +185,7 @@ def test_insert_cheuk_again(docker_url, test_schema):
             assert item["address_of"]["postal_code"] == "A12 345"
             assert item["address_of"]["street"] == "123 Abc Street"
             assert item["name"] == "Cheuk"
-            assert item["age"] == "21"
+            assert item["age"] == 21
             assert item["contact_number"] == "07777123456"
             assert item["managed_by"] == item["@id"]
         elif item.get("@type") == "Coordinate":
