@@ -18,7 +18,7 @@ def test_main_has_tdbpy():
 def test_main_execution():
     """Test that __main__ calls tdbpy when executed."""
     mock_tdbpy = MagicMock()
-    
+
     with patch('terminusdb_client.scripts.__main__.tdbpy', mock_tdbpy):
         # Simulate running as main module
         with patch.object(sys, 'argv', ['__main__.py']):

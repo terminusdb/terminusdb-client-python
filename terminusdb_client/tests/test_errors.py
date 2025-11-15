@@ -22,7 +22,7 @@ def test_interface_error():
     """Test InterfaceError with message."""
     message = "Database interface error occurred"
     error = InterfaceError(message)
-    
+
     assert isinstance(error, Error)
     assert error.message == message
 
@@ -31,7 +31,7 @@ def test_interface_error_string_representation():
     """Test InterfaceError has message attribute."""
     message = "Connection failed"
     error = InterfaceError(message)
-    
+
     assert hasattr(error, 'message')
     assert error.message == message
 
@@ -41,9 +41,9 @@ def test_database_error_with_empty_response():
     mock_response = Mock()
     mock_response.text = ""
     mock_response.status_code = 500
-    
+
     error = DatabaseError(mock_response)
-    
+
     assert "Unknown Error" in error.message
     assert error.status_code == 500
 
@@ -58,9 +58,9 @@ def test_database_error_with_json_api_message():
         "details": "Additional context"
     }
     mock_response.status_code = 400
-    
+
     error = DatabaseError(mock_response)
-    
+
     assert "Database operation failed" in error.message
     assert error.status_code == 400
     assert error.error_obj == mock_response.json()
@@ -77,9 +77,9 @@ def test_database_error_with_vio_message():
         }
     }
     mock_response.status_code = 422
-    
+
     error = DatabaseError(mock_response)
-    
+
     assert "Validation failed" in error.message
     assert error.status_code == 422
 
@@ -93,9 +93,9 @@ def test_database_error_with_unknown_json():
         "unknown_field": "some value"
     }
     mock_response.status_code = 500
-    
+
     error = DatabaseError(mock_response)
-    
+
     assert "Unknown Error" in error.message
     assert error.status_code == 500
 
@@ -106,9 +106,9 @@ def test_database_error_with_non_json_response():
     mock_response.text = "Plain text error message"
     mock_response.headers = {"content-type": "text/plain"}
     mock_response.status_code = 503
-    
+
     error = DatabaseError(mock_response)
-    
+
     assert error.message == "Plain text error message"
     assert error.error_obj is None
     assert error.status_code == 503
@@ -120,9 +120,9 @@ def test_database_error_string_representation():
     mock_response.text = "Error message"
     mock_response.headers = {"content-type": "text/plain"}
     mock_response.status_code = 500
-    
+
     error = DatabaseError(mock_response)
-    
+
     assert str(error) == error.message
 
 
@@ -132,9 +132,9 @@ def test_operational_error():
     mock_response.text = "Operational error"
     mock_response.headers = {"content-type": "text/plain"}
     mock_response.status_code = 500
-    
+
     error = OperationalError(mock_response)
-    
+
     assert isinstance(error, DatabaseError)
     assert isinstance(error, Error)
     assert error.message == "Operational error"
@@ -146,9 +146,9 @@ def test_access_denied_error():
     mock_response.text = "Access denied"
     mock_response.headers = {"content-type": "text/plain"}
     mock_response.status_code = 403
-    
+
     error = AccessDeniedError(mock_response)
-    
+
     assert isinstance(error, DatabaseError)
     assert isinstance(error, Error)
     assert error.message == "Access denied"
@@ -166,7 +166,7 @@ def test_api_error_class_exists():
 def test_invalid_uri_error():
     """Test InvalidURIError can be instantiated."""
     error = InvalidURIError()
-    
+
     assert isinstance(error, Error)
     assert isinstance(error, Exception)
 
@@ -175,7 +175,7 @@ def test_invalid_uri_error_is_simple_error():
     """Test InvalidURIError is a simple pass-through error."""
     # InvalidURIError is a simple pass class, no custom __init__
     error = InvalidURIError()
-    
+
     assert isinstance(error, Error)
     assert isinstance(error, Exception)
 
@@ -191,9 +191,9 @@ def test_database_error_json_formatting():
     }
     mock_response.json.return_value = error_data
     mock_response.status_code = 400
-    
+
     error = DatabaseError(mock_response)
-    
+
     # Check that formatted JSON is in the message
     formatted = json.dumps(error_data, indent=4, sort_keys=True)
     assert formatted in error.message
@@ -206,7 +206,7 @@ def test_all_error_classes_are_exceptions():
         InterfaceError("test"),
         InvalidURIError()
     ]
-    
+
     for error in errors:
         assert isinstance(error, Exception)
 
@@ -217,18 +217,18 @@ def test_error_inheritance_chain():
     mock_response.text = "test"
     mock_response.headers = {"content-type": "text/plain"}
     mock_response.status_code = 500
-    
+
     operational = OperationalError(mock_response)
     access_denied = AccessDeniedError(mock_response)
-    
+
     # All should be DatabaseError
     assert isinstance(operational, DatabaseError)
     assert isinstance(access_denied, DatabaseError)
-    
+
     # All should be Error
     assert isinstance(operational, Error)
     assert isinstance(access_denied, Error)
-    
+
     # All should be Exception
     assert isinstance(operational, Exception)
     assert isinstance(access_denied, Exception)

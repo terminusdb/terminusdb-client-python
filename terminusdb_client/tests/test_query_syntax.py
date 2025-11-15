@@ -1,6 +1,5 @@
 """Tests for query_syntax/query_syntax.py module."""
 from terminusdb_client.query_syntax import query_syntax
-from terminusdb_client.woqlquery import WOQLQuery
 
 
 def test_query_syntax_exports_var():
@@ -39,7 +38,7 @@ def test_dynamic_function_creation():
     """Test that functions are dynamically created from WOQLQuery."""
     # Check that some common WOQLQuery methods are available
     woql_methods = ['triple', 'select', 'limit']
-    
+
     for method in woql_methods:
         assert hasattr(query_syntax, method), f"{method} should be available"
         assert method in query_syntax.__all__, f"{method} should be in __all__"
