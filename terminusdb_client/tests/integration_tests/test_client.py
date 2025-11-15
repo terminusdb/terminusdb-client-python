@@ -414,12 +414,8 @@ def test_diff_ops(docker_url, test_schema):
     client = Client(docker_url, user_agent=test_user_agent)
     client.connect(user="admin", team="admin")
     client.create_database("test_diff_ops")
-    public_diff = Client(
-        "https://cloud.terminusdb.com/jsondiff", user_agent=test_user_agent
-    )
-    public_patch = Client(
-        "https://cloud.terminusdb.com/jsonpatch", user_agent=test_user_agent
-    )
+    # NOTE: Public API endpoints (jsondiff/jsonpatch) no longer exist
+    # Testing authenticated diff/patch only
     result_patch = Patch(
         json='{"@id": "Person/Jane", "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'
     )
@@ -427,12 +423,7 @@ def test_diff_ops(docker_url, test_schema):
         {"@id": "Person/Jane", "@type": "Person", "name": "Jane"},
         {"@id": "Person/Jane", "@type": "Person", "name": "Janine"},
     )
-    public_result = public_diff.diff(
-        {"@id": "Person/Jane", "@type": "Person", "name": "Jane"},
-        {"@id": "Person/Jane", "@type": "Person", "name": "Janine"},
-    )
     assert result.content == result_patch.content
-    assert public_result.content == result_patch.content
 
     Person = test_schema.object.get("Person")
     jane = Person(
@@ -446,7 +437,6 @@ def test_diff_ops(docker_url, test_schema):
         age=18,
     )
     result = client.diff(jane, janine)
-    public_result = public_diff.diff(jane, janine)
     # test commit_id and data_version with after obj
     test_schema.commit(client)
     jane_id = client.insert_document(jane)[0]
@@ -466,7 +456,6 @@ def test_diff_ops(docker_url, test_schema):
     commit_id_result_all = client.diff(current_commit, new_commit)
     data_version_result_all = client.diff(data_version, new_data_version)
     assert result.content == result_patch.content
-    assert public_result.content == result_patch.content
     assert commit_id_result.content == result_patch.content
     assert commit_id_result2.content == result_patch.content
     assert data_version_result.content == result_patch.content
@@ -476,16 +465,7 @@ def test_diff_ops(docker_url, test_schema):
     assert client.patch(
         {"@id": "Person/Jane", "@type": "Person", "name": "Jane"}, result_patch
     ) == {"@id": "Person/Jane", "@type": "Person", "name": "Janine"}
-    assert public_patch.patch(
-        {"@id": "Person/Jane", "@type": "Person", "name": "Jane"}, result_patch
-    ) == {"@id": "Person/Jane", "@type": "Person", "name": "Janine"}
     assert client.patch(jane, result_patch) == {
-        "@id": "Person/Jane",
-        "@type": "Person",
-        "name": "Janine",
-        "age": 18,
-    }
-    assert public_patch.patch(jane, result_patch) == {
         "@id": "Person/Jane",
         "@type": "Person",
         "name": "Janine",
@@ -545,6 +525,10 @@ def test_diff_ops_no_auth(test_schema, terminusx_token):
     # assert client.patch(test_schema, result) == my_schema.to_dict()
 
 
+@pytest.mark.skipif(
+    os.environ.get("TERMINUSDB_TEST_JWT") is None,
+    reason="JWT testing not enabled. Set TERMINUSDB_TEST_JWT=1 to enable JWT tests."
+)
 def test_jwt(docker_url_jwt):
     # create client
     url = docker_url_jwt[0]
