@@ -185,6 +185,7 @@ def test_local_happy_path(docker_url, test_csv):
         assert f"{testdb} deleted." in result.output
 
 
+@pytest.mark.skip(reason="Cloud infrastructure no longer operational")
 @pytest.mark.skipif(
     os.environ.get("TERMINUSX_TOKEN") is None, reason="TerminusX token does not exist"
 )

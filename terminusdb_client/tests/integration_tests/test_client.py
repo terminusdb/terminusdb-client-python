@@ -489,6 +489,7 @@ def test_diff_ops(docker_url, test_schema):
     assert my_schema.to_dict() != test_schema.to_dict()
 
 
+@pytest.mark.skip(reason="Cloud infrastructure no longer operational")
 @pytest.mark.skipif(
     os.environ.get("TERMINUSX_TOKEN") is None, reason="TerminusX token does not exist"
 )
@@ -560,6 +561,7 @@ def test_jwt(docker_url_jwt):
     assert "test_happy_path" not in client.list_databases()
 
 
+@pytest.mark.skip(reason="Cloud infrastructure no longer operational")
 @pytest.mark.skipif(
     os.environ.get("TERMINUSX_TOKEN") is None, reason="TerminusX token does not exist"
 )
@@ -580,6 +582,7 @@ def test_terminusx(terminusx_token):
     assert testdb not in client.list_databases()
 
 
+@pytest.mark.skip(reason="Cloud infrastructure no longer operational")
 @pytest.mark.skipif(
     os.environ.get("TERMINUSX_TOKEN") is None, reason="TerminusX token does not exist"
 )
