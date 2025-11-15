@@ -1,7 +1,5 @@
 """Unit tests for Client initialization"""
-import pytest
 from terminusdb_client.client import Client
-from terminusdb_client.errors import InterfaceError
 
 
 class TestClientInitialization:
@@ -29,9 +27,9 @@ class TestClientInitialization:
         client1 = Client("http://localhost:6363")
         client1.team = "test_team"
         client1.db = "test_db"
-        
+
         client2 = client1.copy()
-        
+
         assert client2.server_url == client1.server_url
         assert client2.team == client1.team
         assert client2.db == client1.db
@@ -42,9 +40,9 @@ class TestClientInitialization:
         """Test modifications to copied client don't affect original"""
         client1 = Client("http://localhost:6363")
         client1.team = "team1"
-        
+
         client2 = client1.copy()
         client2.team = "team2"
-        
+
         assert client1.team == "team1"
         assert client2.team == "team2"
