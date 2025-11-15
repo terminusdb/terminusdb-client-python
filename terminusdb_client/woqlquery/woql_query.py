@@ -2240,6 +2240,32 @@ class WOQLQuery:
         self._cursor["uri"] = self._clean_node_value(uri)
         return self
 
+    def random_idgen(self, prefix, uri):
+        """Generates a unique ID with cryptographically secure random suffix (alias for idgen_random).
+
+        This is an alias for idgen_random() for compatibility with older code.
+        Uses base64 encoding to generate 16-character random IDs that are
+        guaranteed to be unique across executions.
+
+        Parameters
+        ----------
+        prefix : str
+            A prefix for the IDs to be generated (e.g. "Person/")
+        uri : str
+            Variable name or output target for the generated ID
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or executed
+
+        Examples
+        -------
+        >>> WOQLQuery().random_idgen("Person/", "v:person_id").execute(client)
+        {'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': ['person_id'], 'bindings': [{'person_id': 'Person/aB3dEf9GhI2jK4lM'}], 'deletes': 0, 'inserts': 0, 'transaction_retry_count': 0}
+        """
+        return self.idgen_random(prefix, uri)
+
     def upper(self, left, right):
         """Changes a string to upper-case - input is in left, output in right
 
