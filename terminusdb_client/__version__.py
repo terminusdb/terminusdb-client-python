@@ -1,7 +1,7 @@
 __title__ = "terminusdb-client"
 __description__ = "TerminusDB client library for accessing the Terminus DB API"
 __url__ = ""
-__version__ = "11.0.0"
+__version__ = "11.1.0"
 __build__ = 00
 __author__ = "TerminusDB group"
 __author_email__ = "team@terminusdb.com"
