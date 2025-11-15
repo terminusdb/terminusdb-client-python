@@ -29,7 +29,7 @@ graph all through a simple document API, with full git-for-data version control.
 ## Requirements
 
 - [TerminusDB v11.1](https://github.com/terminusdb/terminusdb-server)
-- [Python >=3.8](https://www.python.org/downloads)
+- [Python >=3.9](https://www.python.org/downloads)
 
 ## Release Notes and Previous Versions
 

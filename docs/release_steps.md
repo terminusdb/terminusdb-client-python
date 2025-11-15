@@ -24,6 +24,13 @@ git push origin main --tags
 
 ## Details
 
+### Create tag manually
+
+```bash
+git tag -s v11.1.0 -m "Release v11.1.0"
+git push origin main --tags
+```
+
 ### What bumpversion updates
 - `terminusdb_client/__version__.py`
 - `pyproject.toml`
@@ -31,7 +38,7 @@ git push origin main --tags
 
 ### Automated deployment
 Pushing a tag triggers GitHub Actions to:
-- Run tests (Python 3.8-3.12)
+- Run tests (Python 3.9-3.12)
 - Build with Poetry
 - Publish to PyPI
 
