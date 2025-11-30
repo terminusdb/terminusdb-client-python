@@ -4,7 +4,6 @@ Unit tests for WOQL slice operator
 Tests the Python client binding for slice(input_list, result, start, end=None)
 """
 
-import pytest
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 from .woqljson.woqlSliceJson import WOQL_SLICE_JSON

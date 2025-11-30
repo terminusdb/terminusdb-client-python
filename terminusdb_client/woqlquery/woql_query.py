@@ -2494,7 +2494,7 @@ class WOQLQuery:
 
     def slice(self, input_list, result, start, end=None):
         """
-        Extracts a contiguous subsequence from a list, following JavaScript's slice() semantics.
+        Extracts a contiguous subsequence from a list, following slice() semantics.
 
         Parameters
         ----------
