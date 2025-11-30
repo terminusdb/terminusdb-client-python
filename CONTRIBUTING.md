@@ -6,7 +6,11 @@ Thanks for interested to contribute to TerminusDB Client, to get started, fork t
 
 Make sure you have Python>=3.9 installed. We use [pipenv](https://pipenv-fork.readthedocs.io/en/latest/) for dev environment, to install pipenv:
 
-`pip3 install pipenv --upgrade`
+```
+python3 -m venv venv
+source venv/bin/activate
+pip3 install pipenv --upgrade
+```
 
 [Fork and clone](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) this repo, then in your local repo:
 

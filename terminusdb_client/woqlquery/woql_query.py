@@ -2492,6 +2492,54 @@ class WOQLQuery:
         self._cursor["sum"] = self._clean_data_value(output)
         return self
 
+    def slice(self, input_list, result, start, end=None):
+        """
+        Extracts a contiguous subsequence from a list, following JavaScript's slice() semantics.
+
+        Parameters
+        ----------
+        input_list : list or str
+            A list of values or a variable representing a list
+        result : str
+            A variable that stores the sliced result
+        start : int or str
+            The start index (0-based, supports negative indices)
+        end : int or str, optional
+            The end index (exclusive). If omitted, takes the rest of the list
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+
+        Examples
+        --------
+        >>> WOQLQuery().slice(["a", "b", "c", "d"], "v:Result", 1, 3)  # ["b", "c"]
+        >>> WOQLQuery().slice(["a", "b", "c", "d"], "v:Result", -2)    # ["c", "d"]
+        """
+        if input_list and input_list == "args":
+            return ["list", "result", "start", "end"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "Slice"
+        self._cursor["list"] = self._data_list(input_list)
+        self._cursor["result"] = self._clean_data_value(result)
+        if isinstance(start, int):
+            self._cursor["start"] = self._clean_data_value(
+                {"@type": "xsd:integer", "@value": start}
+            )
+        else:
+            self._cursor["start"] = self._clean_data_value(start)
+        # end is optional
+        if end is not None:
+            if isinstance(end, int):
+                self._cursor["end"] = self._clean_data_value(
+                    {"@type": "xsd:integer", "@value": end}
+                )
+            else:
+                self._cursor["end"] = self._clean_data_value(end)
+        return self
+
     def start(self, start, query=None):
         """Specifies that the start of the query returned
 
