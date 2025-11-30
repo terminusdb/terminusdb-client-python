@@ -13,12 +13,12 @@ class TestWOQLSlice:
     """Test cases for the slice operator"""
 
     def test_basic_slice(self):
-        """AC-1: Basic slicing - slice([a,b,c,d], result, 1, 3) returns [b,c]"""
+        """Basic slicing - slice([a,b,c,d], result, 1, 3) returns [b,c]"""
         woql_object = WOQLQuery().slice(["a", "b", "c", "d"], "v:Result", 1, 3)
         assert woql_object.to_dict() == WOQL_SLICE_JSON["basicSlice"]
 
     def test_negative_indices(self):
-        """AC-3: Negative indices - slice([a,b,c,d], result, -2, -1) returns [c]"""
+        """Negative indices - slice([a,b,c,d], result, -2, -1) returns [c]"""
         woql_object = WOQLQuery().slice(["a", "b", "c", "d"], "v:Result", -2, -1)
         assert woql_object.to_dict() == WOQL_SLICE_JSON["negativeIndices"]
 
@@ -38,7 +38,7 @@ class TestWOQLSlice:
         assert woql_object.to_dict() == WOQL_SLICE_JSON["variableIndices"]
 
     def test_empty_list(self):
-        """AC-6: Empty list - slice([], result, 0, 1) returns []"""
+        """Empty list - slice([], result, 0, 1) returns []"""
         woql_object = WOQLQuery().slice([], "v:Result", 0, 1)
         assert woql_object.to_dict() == WOQL_SLICE_JSON["emptyList"]
 
@@ -59,7 +59,7 @@ class TestWOQLSlice:
         assert result["and"][1]["@type"] == "Slice"
 
     def test_single_element_slice(self):
-        """AC-2: Single element - slice([a,b,c,d], result, 1, 2) returns [b]"""
+        """Single element - slice([a,b,c,d], result, 1, 2) returns [b]"""
         woql_object = WOQLQuery().slice(["a", "b", "c", "d"], "v:Result", 1, 2)
         result = woql_object.to_dict()
         assert result["@type"] == "Slice"
@@ -67,7 +67,7 @@ class TestWOQLSlice:
         assert result["end"]["data"]["@value"] == 2
 
     def test_full_range(self):
-        """AC-7: Full range - slice([a,b,c,d], result, 0, 4) returns [a,b,c,d]"""
+        """Full range - slice([a,b,c,d], result, 0, 4) returns [a,b,c,d]"""
         woql_object = WOQLQuery().slice(["a", "b", "c", "d"], "v:Result", 0, 4)
         result = woql_object.to_dict()
         assert result["@type"] == "Slice"
