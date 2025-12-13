@@ -563,6 +563,109 @@ class Client:
             raise ValueError("max_history needs to be non-negative.")
         return self.log(count=max_history)
 
+    def get_document_history(
+        self,
+        doc_id: str,
+        team: Optional[str] = None,
+        db: Optional[str] = None,
+        start: int = 0,
+        count: int = -1,
+        created: bool = False,
+        updated: bool = False,
+    ) -> list:
+        """Get the commit history for a specific document
+
+        Returns the history of changes made to a document, ordered backwards
+        in time from the most recent change. Only commits where the specified
+        document was created, modified, or deleted are included.
+
+        Parameters
+        ----------
+        doc_id : str
+            The document ID (IRI) to retrieve history for (e.g., "Person/alice")
+        team : str, optional
+            The team from which the database is. Defaults to the class property.
+        db : str, optional
+            The database. Defaults to the class property.
+        start : int, optional
+            Starting index for pagination. Defaults to 0.
+        count : int, optional
+            Maximum number of history entries to return. Defaults to -1 (all).
+        created : bool, optional
+            If True, return only the creation time. Defaults to False.
+        updated : bool, optional
+            If True, return only the last update time. Defaults to False.
+
+        Raises
+        ------
+        InterfaceError
+            If the client is not connected to a database
+        DatabaseError
+            If the API request fails or document is not found
+
+        Returns
+        -------
+        list
+            List of history entry dictionaries containing commit information
+            for the specified document:
+            ```
+            [
+              {
+                "author": "admin",
+                "identifier": "tbn15yq6rw1l4e9bgboyu3vwcoxgri5",
+                "message": "Updated document",
+                "timestamp": datetime.datetime(2023, 4, 6, 19, 1, 14, 324928)
+              },
+              {
+                "author": "admin",
+                "identifier": "3v3naa8jrt8612dg5zryu4vjqwa2w9s",
+                "message": "Created document",
+                "timestamp": datetime.datetime(2023, 4, 6, 19, 0, 47, 406387)
+              }
+            ]
+            ```
+
+        Example
+        -------
+        >>> from terminusdb_client import Client
+        >>> client = Client("http://127.0.0.1:6363")
+        >>> client.connect(db="example_db")
+        >>> history = client.get_document_history("Person/Jane")
+        >>> print(f"Document modified {len(history)} times")
+        >>> print(f"Last change by: {history[0]['author']}")
+        """
+        self._check_connection(check_db=(not team or not db))
+        team = team if team else self.team
+        db = db if db else self.db
+
+        params = {
+            'id': doc_id,
+            'start': start,
+            'count': count,
+        }
+
+        if created:
+            params['created'] = created
+        if updated:
+            params['updated'] = updated
+
+        result = self._session.get(
+            f"{self.api}/history/{team}/{db}",
+            params=params,
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+
+        history = json.loads(_finish_response(result))
+
+        # Post-process timestamps from Unix timestamp to datetime objects
+        if isinstance(history, list):
+            for entry in history:
+                if 'timestamp' in entry and isinstance(entry['timestamp'], (int, float)):
+                    entry['timestamp'] = datetime.fromtimestamp(entry['timestamp'])
+
+        return history
+
     def _get_current_commit(self):
         descriptor = self.db
         if self.branch:
