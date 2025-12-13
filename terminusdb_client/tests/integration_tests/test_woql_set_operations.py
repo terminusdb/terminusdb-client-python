@@ -8,6 +8,7 @@ These tests verify the new set operations:
 - set_member
 - list_to_set
 """
+
 import time
 
 import pytest
@@ -22,8 +23,10 @@ def extract_values(result_list):
     """Extract raw values from a list of typed literals."""
     if not result_list:
         return []
-    return [item["@value"] if isinstance(item, dict) and "@value" in item else item
-            for item in result_list]
+    return [
+        item["@value"] if isinstance(item, dict) and "@value" in item else item
+        for item in result_list
+    ]
 
 
 class TestWOQLSetOperations:
@@ -35,14 +38,14 @@ class TestWOQLSetOperations:
         self.client = Client(docker_url, user_agent=test_user_agent)
         self.client.connect()
         self.db_name = "test_woql_set_operations"
-        
+
         # Create database for tests
         if self.db_name in self.client.list_databases():
             self.client.delete_database(self.db_name)
         self.client.create_database(self.db_name)
-        
+
         yield
-        
+
         # Cleanup
         self.client.delete_database(self.db_name)
 
@@ -51,9 +54,9 @@ class TestWOQLSetOperations:
         query = WOQLQuery().woql_and(
             WOQLQuery().eq("v:ListA", [1, 2, 3, 4]),
             WOQLQuery().eq("v:ListB", [2, 4]),
-            WOQLQuery().set_difference("v:ListA", "v:ListB", "v:Diff")
+            WOQLQuery().set_difference("v:ListA", "v:ListB", "v:Diff"),
         )
-        
+
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
         assert extract_values(result["bindings"][0]["Diff"]) == [1, 3]
@@ -63,9 +66,9 @@ class TestWOQLSetOperations:
         query = WOQLQuery().woql_and(
             WOQLQuery().eq("v:ListA", [1, 2]),
             WOQLQuery().eq("v:ListB", [1, 2, 3]),
-            WOQLQuery().set_difference("v:ListA", "v:ListB", "v:Diff")
+            WOQLQuery().set_difference("v:ListA", "v:ListB", "v:Diff"),
         )
-        
+
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
         assert result["bindings"][0]["Diff"] == []
@@ -75,9 +78,9 @@ class TestWOQLSetOperations:
         query = WOQLQuery().woql_and(
             WOQLQuery().eq("v:ListA", []),
             WOQLQuery().eq("v:ListB", [1]),
-            WOQLQuery().set_difference("v:ListA", "v:ListB", "v:Diff")
+            WOQLQuery().set_difference("v:ListA", "v:ListB", "v:Diff"),
         )
-        
+
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
         assert result["bindings"][0]["Diff"] == []
@@ -87,9 +90,9 @@ class TestWOQLSetOperations:
         query = WOQLQuery().woql_and(
             WOQLQuery().eq("v:ListA", [1, 2, 3]),
             WOQLQuery().eq("v:ListB", [2, 3, 4]),
-            WOQLQuery().set_intersection("v:ListA", "v:ListB", "v:Common")
+            WOQLQuery().set_intersection("v:ListA", "v:ListB", "v:Common"),
         )
-        
+
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
         assert extract_values(result["bindings"][0]["Common"]) == [2, 3]
@@ -99,9 +102,9 @@ class TestWOQLSetOperations:
         query = WOQLQuery().woql_and(
             WOQLQuery().eq("v:ListA", [1, 2]),
             WOQLQuery().eq("v:ListB", [3, 4]),
-            WOQLQuery().set_intersection("v:ListA", "v:ListB", "v:Common")
+            WOQLQuery().set_intersection("v:ListA", "v:ListB", "v:Common"),
         )
-        
+
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
         assert result["bindings"][0]["Common"] == []
@@ -111,9 +114,9 @@ class TestWOQLSetOperations:
         query = WOQLQuery().woql_and(
             WOQLQuery().eq("v:ListA", [1, 2]),
             WOQLQuery().eq("v:ListB", [2, 3]),
-            WOQLQuery().set_union("v:ListA", "v:ListB", "v:All")
+            WOQLQuery().set_union("v:ListA", "v:ListB", "v:All"),
         )
-        
+
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
         assert extract_values(result["bindings"][0]["All"]) == [1, 2, 3]
@@ -123,9 +126,9 @@ class TestWOQLSetOperations:
         query = WOQLQuery().woql_and(
             WOQLQuery().eq("v:ListA", [1, 1, 2]),
             WOQLQuery().eq("v:ListB", [2, 2]),
-            WOQLQuery().set_union("v:ListA", "v:ListB", "v:All")
+            WOQLQuery().set_union("v:ListA", "v:ListB", "v:All"),
         )
-        
+
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
         assert extract_values(result["bindings"][0]["All"]) == [1, 2]
@@ -133,20 +136,18 @@ class TestWOQLSetOperations:
     def test_set_member_success(self):
         """Test set_member succeeds for element in set."""
         query = WOQLQuery().woql_and(
-            WOQLQuery().eq("v:MySet", [1, 2, 3]),
-            WOQLQuery().set_member(2, "v:MySet")
+            WOQLQuery().eq("v:MySet", [1, 2, 3]), WOQLQuery().set_member(2, "v:MySet")
         )
-        
+
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
 
     def test_set_member_failure(self):
         """Test set_member fails for element not in set."""
         query = WOQLQuery().woql_and(
-            WOQLQuery().eq("v:MySet", [1, 2, 3]),
-            WOQLQuery().set_member(5, "v:MySet")
+            WOQLQuery().eq("v:MySet", [1, 2, 3]), WOQLQuery().set_member(5, "v:MySet")
         )
-        
+
         result = self.client.query(query)
         assert len(result["bindings"]) == 0
 
@@ -154,9 +155,9 @@ class TestWOQLSetOperations:
         """Test list_to_set removes duplicates and sorts."""
         query = WOQLQuery().woql_and(
             WOQLQuery().eq("v:MyList", [3, 1, 2, 1]),
-            WOQLQuery().list_to_set("v:MyList", "v:MySet")
+            WOQLQuery().list_to_set("v:MyList", "v:MySet"),
         )
-        
+
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
         assert extract_values(result["bindings"][0]["MySet"]) == [1, 2, 3]
@@ -165,19 +166,19 @@ class TestWOQLSetOperations:
         """Test set operations handle large sets efficiently."""
         list_a = list(range(1000))
         list_b = list(range(500, 1500))
-        
+
         query = WOQLQuery().woql_and(
             WOQLQuery().eq("v:ListA", list_a),
             WOQLQuery().eq("v:ListB", list_b),
-            WOQLQuery().set_difference("v:ListA", "v:ListB", "v:Diff")
+            WOQLQuery().set_difference("v:ListA", "v:ListB", "v:Diff"),
         )
-        
+
         start_time = time.time()
         result = self.client.query(query)
         elapsed = time.time() - start_time
-        
+
         assert len(result["bindings"]) == 1
         assert len(result["bindings"][0]["Diff"]) == 500
-        
+
         # Should complete in under 1 second with O(n log n) algorithm
         assert elapsed < 1.0
