@@ -2426,6 +2426,135 @@ class WOQLQuery:
         self._cursor["list"] = self._value_list(mem_list)
         return self
 
+    def set_difference(self, list_a, list_b, result):
+        """Computes the set difference between two lists (elements in list_a but not in list_b)
+
+        Parameters
+        ----------
+        list_a : str or list
+            First list or variable
+        list_b : str or list
+            Second list or variable
+        result : str
+            Variable to store the result
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if list_a and list_a == "args":
+            return ["list_a", "list_b", "result"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "SetDifference"
+        self._cursor["list_a"] = self._value_list(list_a)
+        self._cursor["list_b"] = self._value_list(list_b)
+        self._cursor["result"] = self._value_list(result)
+        return self
+
+    def set_intersection(self, list_a, list_b, result):
+        """Computes the set intersection of two lists (elements in both list_a and list_b)
+
+        Parameters
+        ----------
+        list_a : str or list
+            First list or variable
+        list_b : str or list
+            Second list or variable
+        result : str
+            Variable to store the result
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if list_a and list_a == "args":
+            return ["list_a", "list_b", "result"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "SetIntersection"
+        self._cursor["list_a"] = self._value_list(list_a)
+        self._cursor["list_b"] = self._value_list(list_b)
+        self._cursor["result"] = self._value_list(result)
+        return self
+
+    def set_union(self, list_a, list_b, result):
+        """Computes the set union of two lists (all unique elements from both lists)
+
+        Parameters
+        ----------
+        list_a : str or list
+            First list or variable
+        list_b : str or list
+            Second list or variable
+        result : str
+            Variable to store the result
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if list_a and list_a == "args":
+            return ["list_a", "list_b", "result"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "SetUnion"
+        self._cursor["list_a"] = self._value_list(list_a)
+        self._cursor["list_b"] = self._value_list(list_b)
+        self._cursor["result"] = self._value_list(result)
+        return self
+
+    def set_member(self, element, set_list):
+        """Checks if an element is a member of a set (efficient O(log n) lookup)
+
+        Parameters
+        ----------
+        element : any
+            Element to check
+        set_list : str or list
+            Set (list) to check membership in
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if element and element == "args":
+            return ["element", "set"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "SetMember"
+        self._cursor["element"] = self._clean_object(element)
+        self._cursor["set"] = self._value_list(set_list)
+        return self
+
+    def list_to_set(self, input_list, result_set):
+        """Converts a list to a set (removes duplicates and sorts)
+
+        Parameters
+        ----------
+        input_list : str or list
+            Input list or variable
+        result_set : str
+            Variable to store the resulting set
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if input_list and input_list == "args":
+            return ["list", "set"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "ListToSet"
+        self._cursor["list"] = self._value_list(input_list)
+        self._cursor["set"] = self._value_list(result_set)
+        return self
+
     def concat(self, concat_list, result):
         """Concatenates the list of variables into a string and saves the result in v
 

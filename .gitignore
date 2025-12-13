@@ -35,6 +35,7 @@ terminusdb_client_coverage/
 *~
 
 venv/
+.venv/
 
 # due to using tox and pytest
 .tox
