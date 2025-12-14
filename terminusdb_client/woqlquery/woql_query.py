@@ -411,8 +411,8 @@ class WOQLQuery:
                 obj["node"] = user_obj
         elif type(user_obj) is list:
             elts = []
-            for obj in user_obj:
-                elts.append(self._clean_object(obj))
+            for item in user_obj:
+                elts.append(self._clean_object(item))
             return elts
         elif isinstance(user_obj, Var):
             return self._expand_value_variable(user_obj)
@@ -1510,10 +1510,14 @@ class WOQLQuery:
     def file(self, fpath, opts=None):
         """Provides details of a file source in a JSON format that includes a URL property
 
+        Note: CSV files can no longer be read from the filesystem. Only files submitted
+        as part of the request can be processed. Use remote() for URLs or submit files
+        via the API.
+
         Parameters
         ----------
-        fpath : dict
-            file data source in a JSON format
+        fpath : dict or str
+            file data source in a JSON format or file path
         opts : input options
             optional
 
@@ -1523,7 +1527,7 @@ class WOQLQuery:
             query object that can be chained and/or execute
         Example
         -------
-        To load a local csv file:
+        To reference a file (must be submitted with request):
         >>> WOQLQuery().file("/app/local_files/my.csv")
         See Also
         --------
@@ -1537,8 +1541,10 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "QueryResource"
-        fpath["@type"] = "Source"
-        self._cursor["source"] = fpath
+        if isinstance(fpath, str):
+            self._cursor["source"] = {"@type": "Source", "file": fpath}
+        else:
+            self._cursor["source"] = fpath
         self._cursor["format"] = "csv"
         if opts:
             self._cursor["options"] = opts
@@ -1600,21 +1606,45 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "QueryResource"
-        uri["@type"] = "Source"
-        self._cursor["source"] = uri
+        if isinstance(uri, dict):
+            uri["@type"] = "Source"
+            self._cursor["source"] = uri
+        else:
+            self._cursor["source"] = {"@type": "Source", "url": uri}
         self._cursor["format"] = "csv"
         if opts:
             self._cursor["options"] = opts
         return self
 
     def post(self, fpath, opts=None):
+        """Specifies a file to be posted as part of the request for processing.
+
+        Note: CSV files can no longer be read from the filesystem. Only files submitted
+        as part of the request can be processed. This method should be used with files
+        that are uploaded via the API.
+
+        Parameters
+        ----------
+        fpath : str or dict
+            file path/identifier or dict with file details
+        opts : dict, optional
+            additional options for file processing
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         if fpath and fpath == "args":
             return ["source", "format", "options"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "QueryResource"
-        fpath["@type"] = "Source"
-        self._cursor["source"] = fpath
+        if isinstance(fpath, dict):
+            fpath["@type"] = "Source"
+            self._cursor["source"] = fpath
+        else:
+            self._cursor["source"] = {"@type": "Source", "post": fpath}
         self._cursor["format"] = "csv"
         if opts:
             self._cursor["options"] = opts
