@@ -13,7 +13,8 @@ def is_local_server_running():
     """Check if local TerminusDB server is running at http://127.0.0.1:6363"""
     try:
         response = requests.get("http://127.0.0.1:6363", timeout=2)
-        # Server responds with 404 for root path, which means it's running
+        # Server responds with 200 (success) or 404 (not found but server is up)
+        # 401 (unauthorized) also indicates server is running but needs auth
         return response.status_code in [200, 404]
     except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
         return False
@@ -73,7 +74,9 @@ def docker_url_jwt(pytestconfig):
 
     # Check if JWT server is already running (port 6367)
     if is_jwt_server_running():
-        print("\n✓ Using existing JWT Docker TerminusDB server at http://127.0.0.1:6367")
+        print(
+            "\n✓ Using existing JWT Docker TerminusDB server at http://127.0.0.1:6367"
+        )
         yield ("http://127.0.0.1:6367", jwt_token)
         return  # Don't clean up - server was already running
 
@@ -128,7 +131,9 @@ def docker_url_jwt(pytestconfig):
 
         if seconds_waited > MAX_CONTAINER_STARTUP_TIME:
             clean_up_container()
-            raise RuntimeError(f"JWT Container was too slow to startup (waited {MAX_CONTAINER_STARTUP_TIME}s)")
+            raise RuntimeError(
+                f"JWT Container was too slow to startup (waited {MAX_CONTAINER_STARTUP_TIME}s)"
+            )
 
     yield (test_url, jwt_token)
     clean_up_container()
@@ -145,9 +150,15 @@ def docker_url(pytestconfig):
     """
     # Check if local test server is already running (port 6363)
     if is_local_server_running():
-        print("\n✓ Using existing local TerminusDB test server at http://127.0.0.1:6363")
-        print("⚠️  WARNING: Local server should be started with TERMINUSDB_AUTOLOGIN=true")
-        print("   Or use: TERMINUSDB_SERVER_AUTOLOGIN=true ./tests/terminusdb-test-server.sh restart")
+        print(
+            "\n✓ Using existing local TerminusDB test server at http://127.0.0.1:6363"
+        )
+        print(
+            "⚠️  WARNING: Local server should be started with TERMINUSDB_AUTOLOGIN=true"
+        )
+        print(
+            "   Or use: TERMINUSDB_SERVER_AUTOLOGIN=true ./tests/terminusdb-test-server.sh restart"
+        )
         yield "http://127.0.0.1:6363"
         return  # Don't clean up - server was already running
 
@@ -200,7 +211,9 @@ def docker_url(pytestconfig):
                 response = requests.get(test_url)
                 # Server responds with 404 for root path, which means it's running
                 assert response.status_code in [200, 404]
-                print(f"✓ Docker container started successfully after {seconds_waited}s")
+                print(
+                    f"✓ Docker container started successfully after {seconds_waited}s"
+                )
                 break
             except (requests.exceptions.ConnectionError, AssertionError):
                 pass
@@ -210,7 +223,9 @@ def docker_url(pytestconfig):
 
         if seconds_waited > MAX_CONTAINER_STARTUP_TIME:
             clean_up_container()
-            raise RuntimeError(f"Container was too slow to startup (waited {MAX_CONTAINER_STARTUP_TIME}s)")
+            raise RuntimeError(
+                f"Container was too slow to startup (waited {MAX_CONTAINER_STARTUP_TIME}s)"
+            )
 
     yield test_url
     clean_up_container()
