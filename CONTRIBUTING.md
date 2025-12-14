@@ -4,23 +4,58 @@ Thanks for interested to contribute to TerminusDB Client, to get started, fork t
 
 ## Setting up dev environment 💻
 
-Make sure you have Python>=3.9 installed. We use [pipenv](https://pipenv-fork.readthedocs.io/en/latest/) for dev environment, to install pipenv:
+Make sure you have Python>=3.9 and <3.13 installed.
 
+[Fork and clone](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) this repo, then set up your development environment using one of the methods below.
+
+### Option 1: Using venv (recommended)
+
+Create and activate a virtual environment:
+
+```bash
+# Create venv with Python 3.12 (or any version 3.9-3.12)
+python3.12 -m venv .venv
+
+# Activate the virtual environment
+source .venv/bin/activate  # On macOS/Linux
+# .venv\Scripts\activate   # On Windows
+
+# Install the package in editable mode with dev dependencies
+pip install -e ".[dev]"
+
+# Install pytest for running tests
+pip install pytest
 ```
-python3 -m venv venv
-source venv/bin/activate
-pip3 install pipenv --upgrade
+
+### Option 2: Using pipenv
+
+We also support [pipenv](https://pipenv-fork.readthedocs.io/en/latest/) for dev environment:
+
+```bash
+pip install pipenv --upgrade
+pipenv install --dev --pre
 ```
 
-[Fork and clone](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) this repo, then in your local repo:
+Or simply run `make init`.
 
-`pipenv install --dev --pre` or `make init`
+To "editable" install the local Terminus Client Python:
 
-To “editable” install the local Terminus Client Python:
+`pip install -e .`
 
-`pip3 install -e .`
+### Running a local TerminusDB server
 
-**to be able to run integration tests, local installation of docker is required**
+**To run integration tests, you need either Docker or a local TerminusDB server.**
+
+For integration tests, you can either:
+
+1. **Use Docker** (automatic): Tests will automatically start a Docker container if no server is detected
+2. **Use a local server**: Start the TerminusDB test server from the main terminusdb repository:
+   ```bash
+   cd /path/to/terminusdb
+   ./tests/terminusdb-test-server.sh start
+   ```
+
+The test configuration will automatically detect and use an available server.
 
 We use [shed](https://pypi.org/project/shed/) to lint our code. Although you can do it manually by running `shed`, we highly recommend setting up the pre-commit hook to do the linting automatically.
 
