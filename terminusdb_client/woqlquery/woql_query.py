@@ -411,9 +411,10 @@ class WOQLQuery:
                 obj["node"] = user_obj
         elif type(user_obj) is list:
             elts = []
-            for obj in user_obj:
-                elts.append(self._clean_object(obj))
-            return elts
+            for item in user_obj:
+                elts.append(self._clean_object(item))
+            obj["list"] = elts
+            return obj
         elif isinstance(user_obj, Var):
             return self._expand_value_variable(user_obj)
         elif isinstance(user_obj, Doc):
