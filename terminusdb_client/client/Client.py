@@ -643,7 +643,6 @@ class Client:
             'start': start,
             'count': count,
         }
-
         if created:
             params['created'] = created
         if updated:

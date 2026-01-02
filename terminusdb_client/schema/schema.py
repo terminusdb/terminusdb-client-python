@@ -98,7 +98,7 @@ def _check_mismatch_type(prop, prop_value, prop_type):
                 f"Property {prop} should be of type {prop_type_id} but got value of type {prop_value_id}"
             )
     else:
-        if prop_type == int:
+        if prop_type is int:
             prop_value = int(prop_value)
         # TODO: This is now broken
         # check_type(prop, prop_value, prop_type)
@@ -224,7 +224,7 @@ class DocumentTemplate(metaclass=TerminusClass):
     def __setattr__(self, name, value):
         if name[0] != "_" and value is not None:
             correct_type = self._annotations.get(name)
-            if correct_type == int:
+            if correct_type is int:
                 try:
                     value = int(value)
                 except ValueError:
