@@ -745,6 +745,6 @@ def test_get_document_history_with_created_updated(mocked_get, mocked_head):
     # Get the last call to get (should be our get_document_history call)
     last_call = client._session.get.call_args_list[-1]
     assert last_call[0][0] == "http://localhost:6363/api/history/admin/myDBName"
-    assert last_call[1]["params"] == {"id": "Person/Jane", "start": 0, "count": -1, "created": True, "updated": True}
+    assert last_call[1]["params"] == {"id": "Person/Jane", "start": 0, "count": 10, "created": True, "updated": True}
     assert last_call[1]["headers"] == {"user-agent": f"terminusdb-client-python/{__version__}"}
     assert last_call[1]["auth"] == ("admin", "root")

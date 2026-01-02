@@ -569,7 +569,7 @@ class Client:
         team: Optional[str] = None,
         db: Optional[str] = None,
         start: int = 0,
-        count: int = -1,
+        count: int = 10,
         created: bool = False,
         updated: bool = False,
     ) -> list:
@@ -590,7 +590,7 @@ class Client:
         start : int, optional
             Starting index for pagination. Defaults to 0.
         count : int, optional
-            Maximum number of history entries to return. Defaults to -1 (all).
+            Maximum number of history entries to return. Defaults to 10.
         created : bool, optional
             If True, return only the creation time. Defaults to False.
         updated : bool, optional
