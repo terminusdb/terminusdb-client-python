@@ -2787,6 +2787,49 @@ class WOQLQuery:
             self._cursor["length"] = self._varj(var_len)
         return self
 
+    def slice(self, input_list, result_var, start, end=None):
+        """Slice
+        Extracts a sublist from a list given start and end indices.
+
+        Parameters
+        ----------
+        input_list : list or str
+            The input list or variable containing a list
+        result_var : str
+            Variable to bind the resulting slice
+        start : int or str
+            Start index (0-based, supports negative indices)
+        end : int or str, optional
+            End index (exclusive). If not provided, slices to end of list.
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+
+        Examples
+        --------
+        >>> WOQLQuery().slice(["a", "b", "c", "d"], "v:result", 1, 3)  # result = ["b", "c"]
+        >>> WOQLQuery().slice("v:my_list", "v:result", 0, 2)  # first two elements
+        """
+        if input_list and input_list == "args":
+            return ["list", "result", "start", "end"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "Slice"
+        self._cursor["list"] = self._data_list(input_list)
+        self._cursor["result"] = self._clean_data_value(result_var)
+        if isinstance(start, int):
+            self._cursor["start"] = self._clean_object(start, "xsd:integer")
+        else:
+            self._cursor["start"] = self._clean_data_value(start)
+        if end is not None:
+            if isinstance(end, int):
+                self._cursor["end"] = self._clean_object(end, "xsd:integer")
+            else:
+                self._cursor["end"] = self._clean_data_value(end)
+        return self
+
     def woql_not(self, query=None):
         """Creates a logical NOT of the arguments
 
