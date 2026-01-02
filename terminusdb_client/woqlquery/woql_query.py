@@ -3378,3 +3378,591 @@ class WOQLQuery:
         if len(vars_tuple) == 1:
             vars_tuple = vars_tuple[0]
         return vars_tuple
+
+    # =========================================================================
+    # RDF List Operations
+    # =========================================================================
+
+    def rdflist_list(self, cons_subject, list_var):
+        """Collect all rdf:List elements into a single array.
+
+        Uses group_by to collect all values in order (path queries return in hop-count order).
+
+        Parameters
+        ----------
+        cons_subject : str
+            Variable or IRI of the list cons cell (rdf:List head)
+        list_var : str
+            Variable to bind the resulting list values array
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+
+        Examples
+        --------
+        >>> query = WOQLQuery().woql_and(
+        ...     WOQLQuery().triple("doc:Project/1", "tasks", "v:list_head"),
+        ...     WOQLQuery().rdflist_list("v:list_head", "v:all_tasks")
+        ... )
+        """
+        cell_var = "v:_rdflist_cell"
+        value_var = "v:_rdflist_value"
+
+        return WOQLQuery().group_by(
+            [],
+            [value_var],
+            list_var,
+            WOQLQuery().woql_and(
+                WOQLQuery().path(cons_subject, "rdf:rest*", cell_var),
+                WOQLQuery().triple(cell_var, "rdf:first", value_var),
+            ),
+        )
+
+    def rdflist_peek(self, cons_subject, value_var):
+        """Get the first element of an rdf:List (peek operation).
+
+        Works as generator (binds value) or matcher (checks if first element matches).
+
+        Parameters
+        ----------
+        cons_subject : str
+            Variable or IRI of the list cons cell
+        value_var : str
+            Variable to bind the first value
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        return WOQLQuery().woql_and(
+            WOQLQuery().triple(cons_subject, "rdf:type", "rdf:List"),
+            WOQLQuery().triple(cons_subject, "rdf:first", value_var),
+        )
+
+    def rdflist_last(self, cons_subject, value_var):
+        """Get the last element of an rdf:List.
+
+        Traverses to the final cons cell (whose rdf:rest is rdf:nil) and gets its rdf:first.
+
+        Parameters
+        ----------
+        cons_subject : str
+            Variable or IRI of the list cons cell
+        value_var : str
+            Variable to bind the last value
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        return WOQLQuery().woql_and(
+            WOQLQuery().triple(cons_subject, "rdf:type", "rdf:List"),
+            WOQLQuery().path(cons_subject, "rdf:rest*", "v:_last_cell"),
+            WOQLQuery().triple("v:_last_cell", "rdf:rest", "rdf:nil"),
+            WOQLQuery().triple("v:_last_cell", "rdf:first", value_var),
+        )
+
+    def rdflist_member(self, cons_subject, value):
+        """Traverse an rdf:List and yield each element as a separate binding.
+
+        Works in two modes:
+        - Generator: If value is unbound, yields one binding per list element
+        - Matcher: If value is bound, succeeds only if value is a member of the list
+
+        Parameters
+        ----------
+        cons_subject : str
+            Variable or IRI of the list cons cell (rdf:List head)
+        value : str
+            Variable to bind each value, or value to check membership
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        return WOQLQuery().woql_and(
+            WOQLQuery().triple(cons_subject, "rdf:type", "rdf:List"),
+            WOQLQuery().path(cons_subject, "rdf:rest*", "v:_member_cell"),
+            WOQLQuery().triple("v:_member_cell", "rdf:first", value),
+        )
+
+    def rdflist_length(self, cons_subject, length_var):
+        """Get the length of an rdf:List.
+
+        Uses path query to traverse all rest links and count them.
+
+        Parameters
+        ----------
+        cons_subject : str
+            Variable or IRI of the list cons cell
+        length_var : str
+            Variable to bind the length
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        return WOQLQuery().woql_and(
+            WOQLQuery().triple(cons_subject, "rdf:type", "rdf:List"),
+            WOQLQuery().path(cons_subject, "rdf:rest*", "rdf:nil", "v:_length_path"),
+            WOQLQuery().length("v:_length_path", length_var),
+        )
+
+    def rdflist_pop(self, cons_subject, value_var):
+        """Pop the first element from an rdf:List in-place.
+
+        Removes the first element and promotes the second element to head position.
+        The list head IRI remains unchanged - the second cons cell is removed.
+
+        Parameters
+        ----------
+        cons_subject : str
+            Variable or IRI of the list cons cell
+        value_var : str
+            Variable to bind the popped value
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        second_cons_var = "v:_pop_second_cons"
+        new_first_var = "v:_pop_new_first"
+        new_rest_var = "v:_pop_new_rest"
+
+        return WOQLQuery().woql_and(
+            WOQLQuery().triple(cons_subject, "rdf:first", value_var),
+            WOQLQuery().triple(cons_subject, "rdf:rest", second_cons_var),
+            WOQLQuery().triple(second_cons_var, "rdf:first", new_first_var),
+            WOQLQuery().triple(second_cons_var, "rdf:rest", new_rest_var),
+            WOQLQuery().delete_triple(second_cons_var, "rdf:type", "rdf:List"),
+            WOQLQuery().delete_triple(second_cons_var, "rdf:first", new_first_var),
+            WOQLQuery().delete_triple(second_cons_var, "rdf:rest", new_rest_var),
+            WOQLQuery().delete_triple(cons_subject, "rdf:first", value_var),
+            WOQLQuery().delete_triple(cons_subject, "rdf:rest", second_cons_var),
+            WOQLQuery().add_triple(cons_subject, "rdf:first", new_first_var),
+            WOQLQuery().add_triple(cons_subject, "rdf:rest", new_rest_var),
+        )
+
+    def rdflist_push(self, cons_subject, value):
+        """Push a new element to the front of an rdf:List in-place.
+
+        Modifies the existing cons cell: moves old first value to a new cons cell,
+        sets new value as rdf:first, and links to the new cons as rdf:rest.
+        The list head IRI remains unchanged.
+
+        Parameters
+        ----------
+        cons_subject : str
+            Variable or IRI of the list cons cell
+        value : str
+            Value to push to the front
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        old_first_var = "v:_push_old_first"
+        old_rest_var = "v:_push_old_rest"
+        new_cons_var = "v:_push_new_cons"
+
+        return WOQLQuery().woql_and(
+            WOQLQuery().triple(cons_subject, "rdf:first", old_first_var),
+            WOQLQuery().triple(cons_subject, "rdf:rest", old_rest_var),
+            WOQLQuery().idgen_random("terminusdb://data/Cons/", new_cons_var),
+            WOQLQuery().add_triple(new_cons_var, "rdf:type", "rdf:List"),
+            WOQLQuery().add_triple(new_cons_var, "rdf:first", old_first_var),
+            WOQLQuery().add_triple(new_cons_var, "rdf:rest", old_rest_var),
+            WOQLQuery().delete_triple(cons_subject, "rdf:first", old_first_var),
+            WOQLQuery().delete_triple(cons_subject, "rdf:rest", old_rest_var),
+            WOQLQuery().add_triple(cons_subject, "rdf:first", value),
+            WOQLQuery().add_triple(cons_subject, "rdf:rest", new_cons_var),
+        )
+
+    def rdflist_append(self, cons_subject, value, new_cell="v:_append_new_cell"):
+        """Append an element to the end of an rdf:List.
+
+        Traverses to the last cell and adds new cell there.
+
+        Parameters
+        ----------
+        cons_subject : str
+            Variable or IRI of the list head
+        value : str
+            Value to append
+        new_cell : str, optional
+            Variable to bind the new cell
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        return WOQLQuery().woql_and(
+            WOQLQuery().triple(cons_subject, "rdf:type", "rdf:List"),
+            WOQLQuery().path(cons_subject, "rdf:rest*", "v:_last_cell"),
+            WOQLQuery().triple("v:_last_cell", "rdf:rest", "rdf:nil"),
+            WOQLQuery().idgen_random("terminusdb://data/Cons/", new_cell),
+            WOQLQuery().delete_triple("v:_last_cell", "rdf:rest", "rdf:nil"),
+            WOQLQuery().add_triple("v:_last_cell", "rdf:rest", new_cell),
+            WOQLQuery().add_triple(new_cell, "rdf:type", "rdf:List"),
+            WOQLQuery().add_triple(new_cell, "rdf:first", value),
+            WOQLQuery().add_triple(new_cell, "rdf:rest", "rdf:nil"),
+        )
+
+    def rdflist_clear(self, cons_subject, new_list_var):
+        """Delete all cons cells of an rdf:List and return rdf:nil as the new list value.
+
+        Since a cons cell cannot become rdf:nil, this deletes all cells and binds
+        rdf:nil to a variable so the caller can update the reference to the list.
+
+        Parameters
+        ----------
+        cons_subject : str
+            Variable or IRI of the list head
+        new_list_var : str
+            Variable to bind rdf:nil (the empty list)
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        cell_var = "v:_clear_cell"
+        cell_first_var = "v:_clear_cell_first"
+        cell_rest_var = "v:_clear_cell_rest"
+        head_first_var = "v:_clear_head_first"
+        head_rest_var = "v:_clear_head_rest"
+
+        return WOQLQuery().woql_and(
+            WOQLQuery().eq(new_list_var, "rdf:nil"),
+            WOQLQuery().opt(
+                WOQLQuery().woql_and(
+                    WOQLQuery().path(cons_subject, "rdf:rest+", cell_var),
+                    WOQLQuery().triple(cell_var, "rdf:type", "rdf:List"),
+                    WOQLQuery().triple(cell_var, "rdf:first", cell_first_var),
+                    WOQLQuery().triple(cell_var, "rdf:rest", cell_rest_var),
+                    WOQLQuery().delete_triple(cell_var, "rdf:type", "rdf:List"),
+                    WOQLQuery().delete_triple(cell_var, "rdf:first", cell_first_var),
+                    WOQLQuery().delete_triple(cell_var, "rdf:rest", cell_rest_var),
+                )
+            ),
+            WOQLQuery().triple(cons_subject, "rdf:type", "rdf:List"),
+            WOQLQuery().triple(cons_subject, "rdf:first", head_first_var),
+            WOQLQuery().triple(cons_subject, "rdf:rest", head_rest_var),
+            WOQLQuery().delete_triple(cons_subject, "rdf:type", "rdf:List"),
+            WOQLQuery().delete_triple(cons_subject, "rdf:first", head_first_var),
+            WOQLQuery().delete_triple(cons_subject, "rdf:rest", head_rest_var),
+        )
+
+    def rdflist_insert(self, cons_subject, position, value, new_node_var="v:_insert_new_node"):
+        """Insert a value at a specific position in an rdf:List.
+
+        Parameters
+        ----------
+        cons_subject : str
+            Variable or IRI of the list head
+        position : int
+            Position to insert at (0-indexed)
+        value : str
+            Value to insert
+        new_node_var : str, optional
+            Variable to bind the new node
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if position < 0:
+            raise ValueError("rdflist_insert requires position >= 0.")
+
+        if position == 0:
+            old_first_var = "v:_insert_old_first"
+            old_rest_var = "v:_insert_old_rest"
+
+            return WOQLQuery().woql_and(
+                WOQLQuery().triple(cons_subject, "rdf:first", old_first_var),
+                WOQLQuery().triple(cons_subject, "rdf:rest", old_rest_var),
+                WOQLQuery().idgen("list_node", [old_first_var, cons_subject], new_node_var),
+                WOQLQuery().add_triple(new_node_var, "rdf:type", "rdf:List"),
+                WOQLQuery().add_triple(new_node_var, "rdf:first", old_first_var),
+                WOQLQuery().add_triple(new_node_var, "rdf:rest", old_rest_var),
+                WOQLQuery().delete_triple(cons_subject, "rdf:first", old_first_var),
+                WOQLQuery().delete_triple(cons_subject, "rdf:rest", old_rest_var),
+                WOQLQuery().add_triple(cons_subject, "rdf:first", value),
+                WOQLQuery().add_triple(cons_subject, "rdf:rest", new_node_var),
+            )
+
+        pred_node_var = "v:_insert_pred_node"
+        old_rest_var = "v:_insert_old_rest"
+        rest_count = position - 1
+
+        if rest_count == 0:
+            find_predecessor = WOQLQuery().eq(pred_node_var, cons_subject)
+        else:
+            path_pattern = f"rdf:rest{{{rest_count},{rest_count}}}"
+            find_predecessor = WOQLQuery().path(cons_subject, path_pattern, pred_node_var)
+
+        return WOQLQuery().woql_and(
+            find_predecessor,
+            WOQLQuery().triple(pred_node_var, "rdf:rest", old_rest_var),
+            WOQLQuery().idgen("list_node", [value, pred_node_var], new_node_var),
+            WOQLQuery().delete_triple(pred_node_var, "rdf:rest", old_rest_var),
+            WOQLQuery().add_triple(pred_node_var, "rdf:rest", new_node_var),
+            WOQLQuery().add_triple(new_node_var, "rdf:type", "rdf:List"),
+            WOQLQuery().add_triple(new_node_var, "rdf:first", value),
+            WOQLQuery().add_triple(new_node_var, "rdf:rest", old_rest_var),
+        )
+
+    def rdflist_drop(self, cons_subject, position):
+        """Drop/remove a single element from an rdf:List at a specific position.
+
+        Parameters
+        ----------
+        cons_subject : str
+            Variable or IRI of the list head
+        position : int
+            Position of element to remove (0-indexed)
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if position < 0:
+            raise ValueError("rdflist_drop requires position >= 0.")
+
+        if position == 0:
+            old_first_var = "v:_drop_old_first"
+            rest_node_var = "v:_drop_rest_node"
+            next_first_var = "v:_drop_next_first"
+            next_rest_var = "v:_drop_next_rest"
+
+            return WOQLQuery().woql_and(
+                WOQLQuery().triple(cons_subject, "rdf:first", old_first_var),
+                WOQLQuery().triple(cons_subject, "rdf:rest", rest_node_var),
+                WOQLQuery().triple(rest_node_var, "rdf:first", next_first_var),
+                WOQLQuery().triple(rest_node_var, "rdf:rest", next_rest_var),
+                WOQLQuery().delete_triple(rest_node_var, "rdf:type", "rdf:List"),
+                WOQLQuery().delete_triple(rest_node_var, "rdf:first", next_first_var),
+                WOQLQuery().delete_triple(rest_node_var, "rdf:rest", next_rest_var),
+                WOQLQuery().delete_triple(cons_subject, "rdf:first", old_first_var),
+                WOQLQuery().delete_triple(cons_subject, "rdf:rest", rest_node_var),
+                WOQLQuery().add_triple(cons_subject, "rdf:first", next_first_var),
+                WOQLQuery().add_triple(cons_subject, "rdf:rest", next_rest_var),
+            )
+
+        pred_node_var = "v:_drop_pred_node"
+        drop_node_var = "v:_drop_node"
+        drop_first_var = "v:_drop_first"
+        drop_rest_var = "v:_drop_rest"
+        rest_count = position - 1
+
+        if rest_count == 0:
+            find_predecessor = WOQLQuery().eq(pred_node_var, cons_subject)
+        else:
+            path_pattern = f"rdf:rest{{{rest_count},{rest_count}}}"
+            find_predecessor = WOQLQuery().path(cons_subject, path_pattern, pred_node_var)
+
+        return WOQLQuery().woql_and(
+            find_predecessor,
+            WOQLQuery().triple(pred_node_var, "rdf:rest", drop_node_var),
+            WOQLQuery().triple(drop_node_var, "rdf:first", drop_first_var),
+            WOQLQuery().triple(drop_node_var, "rdf:rest", drop_rest_var),
+            WOQLQuery().delete_triple(drop_node_var, "rdf:type", "rdf:List"),
+            WOQLQuery().delete_triple(drop_node_var, "rdf:first", drop_first_var),
+            WOQLQuery().delete_triple(drop_node_var, "rdf:rest", drop_rest_var),
+            WOQLQuery().delete_triple(pred_node_var, "rdf:rest", drop_node_var),
+            WOQLQuery().add_triple(pred_node_var, "rdf:rest", drop_rest_var),
+        )
+
+    def rdflist_swap(self, cons_subject, pos_a, pos_b):
+        """Swap elements at two positions in an rdf:List by exchanging their rdf:first values.
+
+        Parameters
+        ----------
+        cons_subject : str
+            Variable or IRI of the list head
+        pos_a : int
+            First position (0-indexed)
+        pos_b : int
+            Second position (0-indexed)
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if pos_a < 0 or pos_b < 0:
+            raise ValueError("rdflist_swap requires positions >= 0.")
+
+        if pos_a == pos_b:
+            return WOQLQuery().triple(cons_subject, "rdf:type", "rdf:List")
+
+        node_a_var = "v:_swap_node_a"
+        node_b_var = "v:_swap_node_b"
+        value_a_var = "v:_swap_value_a"
+        value_b_var = "v:_swap_value_b"
+
+        if pos_a == 0:
+            find_node_a = WOQLQuery().eq(node_a_var, cons_subject)
+        else:
+            find_node_a = WOQLQuery().path(cons_subject, f"rdf:rest{{{pos_a},{pos_a}}}", node_a_var)
+
+        if pos_b == 0:
+            find_node_b = WOQLQuery().eq(node_b_var, cons_subject)
+        else:
+            find_node_b = WOQLQuery().path(cons_subject, f"rdf:rest{{{pos_b},{pos_b}}}", node_b_var)
+
+        return WOQLQuery().woql_and(
+            find_node_a,
+            find_node_b,
+            WOQLQuery().triple(node_a_var, "rdf:first", value_a_var),
+            WOQLQuery().triple(node_b_var, "rdf:first", value_b_var),
+            WOQLQuery().delete_triple(node_a_var, "rdf:first", value_a_var),
+            WOQLQuery().delete_triple(node_b_var, "rdf:first", value_b_var),
+            WOQLQuery().add_triple(node_a_var, "rdf:first", value_b_var),
+            WOQLQuery().add_triple(node_b_var, "rdf:first", value_a_var),
+        )
+
+    def rdflist_empty(self, list_var):
+        """Create an empty rdf:List (just rdf:nil).
+
+        Parameters
+        ----------
+        list_var : str
+            Variable to bind to rdf:nil
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        return WOQLQuery().eq(list_var, "rdf:nil")
+
+    def rdflist_is_empty(self, cons_subject):
+        """Check if an rdf:List is empty (equals rdf:nil).
+
+        Parameters
+        ----------
+        cons_subject : str
+            Variable or IRI to check
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        return WOQLQuery().eq(cons_subject, "rdf:nil")
+
+    def rdflist_slice(self, cons_subject, start, end, result_var):
+        """Extract a slice of an rdf:List (range of elements) as an array.
+
+        Parameters
+        ----------
+        cons_subject : str
+            Variable or IRI of the list head
+        start : int
+            Start index (inclusive), must be >= 0
+        end : int
+            End index (exclusive), must be >= 0
+        result_var : str
+            Variable to bind the array of sliced values
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if start < 0 or end < 0:
+            raise ValueError("rdflist_slice: negative indices not supported")
+
+        if start >= end:
+            return WOQLQuery().eq(result_var, [])
+
+        node_var = "v:_slice_node"
+        value_var = "v:_slice_value"
+
+        if start == 0 and end == 1:
+            find_nodes = WOQLQuery().eq(node_var, cons_subject)
+        elif start == 0:
+            find_nodes = WOQLQuery().path(cons_subject, f"rdf:rest{{0,{end - 1}}}", node_var)
+        else:
+            find_nodes = WOQLQuery().path(cons_subject, f"rdf:rest{{{start},{end - 1}}}", node_var)
+
+        return WOQLQuery().group_by(
+            [],
+            [value_var],
+            result_var,
+            WOQLQuery().woql_and(
+                find_nodes,
+                WOQLQuery().triple(node_var, "rdf:first", value_var),
+            ),
+        )
+
+    def rdflist_reverse(self, cons_subject):
+        """Reverse an rdf:List in-place by swapping rdf:first values across nodes.
+
+        This implementation:
+        1. Collects all values into a list via group_by (single traversal)
+        2. For each node position, calculates the reversed position
+        3. Uses slice + member to get the value at the reversed position
+        4. Rewrites the rdf:first value
+
+        Parameters
+        ----------
+        cons_subject : str
+            Variable or IRI of the list to reverse
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        node_var = "v:_rev_node"
+        path_var = "v:_rev_path"
+        pos_var = "v:_rev_pos"
+        old_value_var = "v:_rev_old_value"
+        len_var = "v:_rev_len"
+        all_values_var = "v:_rev_all_values"
+        rev_pos_var = "v:_rev_rev_pos"
+        rev_pos_plus1_var = "v:_rev_rev_pos_plus1"
+        single_val_list_var = "v:_rev_single_val_list"
+        new_value_var = "v:_rev_new_value"
+
+        return WOQLQuery().woql_and(
+            WOQLQuery().rdflist_length(cons_subject, len_var),
+            WOQLQuery().group_by(
+                [],
+                ["v:_rev_collect_value"],
+                all_values_var,
+                WOQLQuery().woql_and(
+                    WOQLQuery().path(cons_subject, "rdf:rest*", "v:_rev_collect_node"),
+                    WOQLQuery().triple(
+                        "v:_rev_collect_node", "rdf:first", "v:_rev_collect_value"
+                    ),
+                ),
+            ),
+            WOQLQuery().path(cons_subject, "rdf:rest*", node_var, path_var),
+            WOQLQuery().length(path_var, pos_var),
+            WOQLQuery().triple(node_var, "rdf:first", old_value_var),
+            WOQLQuery().eval(
+                WOQLQuery().minus(WOQLQuery().minus(len_var, 1), pos_var),
+                rev_pos_var,
+            ),
+            WOQLQuery().eval(WOQLQuery().plus(rev_pos_var, 1), rev_pos_plus1_var),
+            WOQLQuery().slice(
+                all_values_var, single_val_list_var, rev_pos_var, rev_pos_plus1_var
+            ),
+            WOQLQuery().member(new_value_var, single_val_list_var),
+            WOQLQuery().delete_triple(node_var, "rdf:first", old_value_var),
+            WOQLQuery().add_triple(node_var, "rdf:first", new_value_var),
+        )
