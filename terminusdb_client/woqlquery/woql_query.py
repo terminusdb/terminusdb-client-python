@@ -333,11 +333,10 @@ class WOQLQuery:
 
     def _arop(self, arg):
         """Wraps arithmetic operators in the appropriate json-ld"""
-        if type(arg) is dict:
-            if hasattr(arg, "to_dict"):
-                return arg.to_dict()
-            else:
-                return arg
+        if hasattr(arg, "to_dict"):
+            return arg.to_dict()
+        elif type(arg) is dict:
+            return arg
         var = self._clean_arithmetic_value(arg, "xsd:decimal")
         return var
 
