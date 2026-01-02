@@ -5,6 +5,8 @@
 # converage file
 cov.xml
 
+.venv
+
 .mypy_cache/
 
 .pytest_cache/

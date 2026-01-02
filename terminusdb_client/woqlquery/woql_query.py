@@ -3057,7 +3057,7 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "GroupBy"
-        if not type(group_vars) is list:
+        if type(group_vars) is not list:
             group_vars = [group_vars]
         self._cursor["group_by"] = self._raw_var_list(group_vars)
         self._cursor["template"] = self._clean_object(template)

@@ -242,7 +242,7 @@ def _create_script(obj_list):
                         result_obj.script += f"    {value} = ()\n"
                     else:
                         result_obj.script += (
-                            f"    {value.replace(' ','_')} = '{value}'\n"
+                            f"    {value.replace(' ', '_')} = '{value}'\n"
                         )
             if obj.get("@documentation"):
                 result_obj.add_docstring(obj)
@@ -469,7 +469,7 @@ def importcsv(
                 converted_type = class_name
             else:
                 converted_type = np_to_buildin[dtype.type]
-                if converted_type == object:
+                if converted_type is object:
                     converted_type = str  # pandas treats all string as objects
                 converted_type = wt.to_woql_type(converted_type)
 
