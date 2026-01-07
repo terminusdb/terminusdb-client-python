@@ -1,4 +1,5 @@
 """Unit tests for GraphType enum"""
+
 from terminusdb_client.client import GraphType
 
 
@@ -22,5 +23,5 @@ class TestGraphType:
 
     def test_graphtype_values(self):
         """Test all GraphType enum values exist"""
-        assert hasattr(GraphType, 'INSTANCE')
-        assert hasattr(GraphType, 'SCHEMA')
+        assert hasattr(GraphType, "INSTANCE")
+        assert hasattr(GraphType, "SCHEMA")

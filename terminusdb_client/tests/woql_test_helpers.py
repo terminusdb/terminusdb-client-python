@@ -3,6 +3,7 @@
 This module provides standardized mocks and assertion helpers to verify
 that WOQLQuery methods generate correct JSON-LD structures.
 """
+
 from unittest.mock import Mock
 
 
@@ -19,42 +20,53 @@ class WOQLTestHelpers:
     @staticmethod
     def assert_query_type(query, expected_type):
         """Assert that query has the expected @type."""
-        assert query._query.get("@type") == expected_type, \
-            f"Expected @type={expected_type}, got {query._query.get('@type')}"
+        assert (
+            query._query.get("@type") == expected_type
+        ), f"Expected @type={expected_type}, got {query._query.get('@type')}"
 
     @staticmethod
     def assert_has_key(query, key):
         """Assert that query has a specific key."""
-        assert key in query._query, \
-            f"Expected key '{key}' in query, got keys: {list(query._query.keys())}"
+        assert (
+            key in query._query
+        ), f"Expected key '{key}' in query, got keys: {list(query._query.keys())}"
 
     @staticmethod
     def assert_key_value(query, key, expected_value):
         """Assert that query has a key with expected value."""
         actual = query._query.get(key)
-        assert actual == expected_value, \
-            f"Expected {key}={expected_value}, got {actual}"
+        assert (
+            actual == expected_value
+        ), f"Expected {key}={expected_value}, got {actual}"
 
     @staticmethod
     def assert_is_variable(obj, expected_name=None):
         """Assert that an object is a variable structure."""
         assert isinstance(obj, dict), f"Expected dict, got {type(obj)}"
-        assert obj.get("@type") in ["Value", "NodeValue", "DataValue", "ArithmeticValue"], \
-            f"Expected variable type, got {obj.get('@type')}"
+        assert obj.get("@type") in [
+            "Value",
+            "NodeValue",
+            "DataValue",
+            "ArithmeticValue",
+        ], f"Expected variable type, got {obj.get('@type')}"
         assert "variable" in obj, f"Expected 'variable' key in {obj}"
         if expected_name:
-            assert obj["variable"] == expected_name, \
-                f"Expected variable name '{expected_name}', got '{obj['variable']}'"
+            assert (
+                obj["variable"] == expected_name
+            ), f"Expected variable name '{expected_name}', got '{obj['variable']}'"
 
     @staticmethod
     def assert_is_node(obj, expected_node=None):
         """Assert that an object is a node structure."""
         assert isinstance(obj, dict), f"Expected dict, got {type(obj)}"
-        assert "node" in obj or obj.get("@type") in ["Value", "NodeValue"], \
-            f"Expected node structure, got {obj}"
+        assert "node" in obj or obj.get("@type") in [
+            "Value",
+            "NodeValue",
+        ], f"Expected node structure, got {obj}"
         if expected_node and "node" in obj:
-            assert obj["node"] == expected_node, \
-                f"Expected node '{expected_node}', got '{obj['node']}'"
+            assert (
+                obj["node"] == expected_node
+            ), f"Expected node '{expected_node}', got '{obj['node']}'"
 
     @staticmethod
     def assert_is_data_value(obj, expected_type=None, expected_value=None):
@@ -65,11 +77,13 @@ class WOQLTestHelpers:
         assert "@type" in data, f"Expected '@type' in data: {data}"
         assert "@value" in data, f"Expected '@value' in data: {data}"
         if expected_type:
-            assert data["@type"] == expected_type, \
-                f"Expected type '{expected_type}', got '{data['@type']}'"
+            assert (
+                data["@type"] == expected_type
+            ), f"Expected type '{expected_type}', got '{data['@type']}'"
         if expected_value is not None:
-            assert data["@value"] == expected_value, \
-                f"Expected value '{expected_value}', got '{data['@value']}'"
+            assert (
+                data["@value"] == expected_value
+            ), f"Expected value '{expected_value}', got '{data['@value']}'"
 
     @staticmethod
     def get_query_dict(query):
@@ -77,7 +91,9 @@ class WOQLTestHelpers:
         return query._query
 
     @staticmethod
-    def assert_triple_structure(query, check_subject=True, check_predicate=True, check_object=True):
+    def assert_triple_structure(
+        query, check_subject=True, check_predicate=True, check_object=True
+    ):
         """Assert that query has proper triple structure."""
         WOQLTestHelpers.assert_query_type(query, "Triple")
         if check_subject:
@@ -102,10 +118,13 @@ class WOQLTestHelpers:
         WOQLTestHelpers.assert_query_type(query, "And")
         WOQLTestHelpers.assert_has_key(query, "and")
         and_list = query._query["and"]
-        assert isinstance(and_list, list), f"Expected 'and' to be list, got {type(and_list)}"
+        assert isinstance(
+            and_list, list
+        ), f"Expected 'and' to be list, got {type(and_list)}"
         if expected_count is not None:
-            assert len(and_list) == expected_count, \
-                f"Expected {expected_count} items in 'and', got {len(and_list)}"
+            assert (
+                len(and_list) == expected_count
+            ), f"Expected {expected_count} items in 'and', got {len(and_list)}"
 
     @staticmethod
     def assert_or_structure(query, expected_count=None):
@@ -113,10 +132,13 @@ class WOQLTestHelpers:
         WOQLTestHelpers.assert_query_type(query, "Or")
         WOQLTestHelpers.assert_has_key(query, "or")
         or_list = query._query["or"]
-        assert isinstance(or_list, list), f"Expected 'or' to be list, got {type(or_list)}"
+        assert isinstance(
+            or_list, list
+        ), f"Expected 'or' to be list, got {type(or_list)}"
         if expected_count is not None:
-            assert len(or_list) == expected_count, \
-                f"Expected {expected_count} items in 'or', got {len(or_list)}"
+            assert (
+                len(or_list) == expected_count
+            ), f"Expected {expected_count} items in 'or', got {len(or_list)}"
 
     @staticmethod
     def assert_select_structure(query):

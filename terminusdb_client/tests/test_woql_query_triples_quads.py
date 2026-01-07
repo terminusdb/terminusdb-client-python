@@ -1,10 +1,12 @@
 """Tests for WOQL triple and quad methods using standardized helpers."""
+
 import datetime
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 from terminusdb_client.tests.woql_test_helpers import WOQLTestHelpers as H
 
 
 # Added/Removed Triple Tests
+
 
 def test_added_triple_basic():
     """Test added_triple() creates proper AddedTriple structure."""
@@ -44,6 +46,7 @@ def test_removed_triple_with_strings():
 
 
 # Quad Tests
+
 
 def test_quad_basic():
     """Test quad() creates proper Triple with graph."""
@@ -145,6 +148,7 @@ def test_removed_quad_invalid_graph():
 
 
 # Type Conversion Helper Tests
+
 
 def test_string_helper():
     """Test string() helper creates proper xsd:string."""
@@ -272,6 +276,7 @@ def test_iri_helper():
 
 # Subsumption and Equality Tests
 
+
 def test_sub_basic():
     """Test sub() creates proper Subsumption structure."""
     query = WOQLQuery().sub("owl:Thing", "Person")
@@ -367,6 +372,7 @@ def test_eq_args_introspection():
 
 
 # Chaining Tests
+
 
 def test_chaining_added_triple():
     """Test chaining added_triple() calls."""

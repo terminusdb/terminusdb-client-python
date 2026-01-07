@@ -1,4 +1,5 @@
 """Tests for WOQLQuery class methods in woql_query.py."""
+
 from terminusdb_client.woqlquery.woql_query import WOQLQuery, Var
 
 
@@ -34,17 +35,17 @@ def test_woqlquery_aliases():
     query = WOQLQuery()
 
     # Check aliases exist
-    assert hasattr(query, 'subsumption')
-    assert hasattr(query, 'equals')
-    assert hasattr(query, 'substring')
-    assert hasattr(query, 'update')
-    assert hasattr(query, 'delete')
-    assert hasattr(query, 'read')
-    assert hasattr(query, 'insert')
-    assert hasattr(query, 'optional')
-    assert hasattr(query, 'idgenerator')
-    assert hasattr(query, 'concatenate')
-    assert hasattr(query, 'typecast')
+    assert hasattr(query, "subsumption")
+    assert hasattr(query, "equals")
+    assert hasattr(query, "substring")
+    assert hasattr(query, "update")
+    assert hasattr(query, "delete")
+    assert hasattr(query, "read")
+    assert hasattr(query, "insert")
+    assert hasattr(query, "optional")
+    assert hasattr(query, "idgenerator")
+    assert hasattr(query, "concatenate")
+    assert hasattr(query, "typecast")
 
 
 def test_woqlquery_add_operator():
@@ -131,46 +132,32 @@ def test_contains_update_check_true_direct():
 
 def test_contains_update_check_in_consequent():
     """Test _contains_update_check detects updates in consequent."""
-    query = WOQLQuery({
-        "@type": "When",
-        "consequent": {"@type": "DeleteTriple"}
-    })
+    query = WOQLQuery({"@type": "When", "consequent": {"@type": "DeleteTriple"}})
 
     assert query._contains_update_check() is True
 
 
 def test_contains_update_check_in_nested_query():
     """Test _contains_update_check detects updates in nested query."""
-    query = WOQLQuery({
-        "@type": "Select",
-        "query": {"@type": "UpdateObject"}
-    })
+    query = WOQLQuery({"@type": "Select", "query": {"@type": "UpdateObject"}})
 
     assert query._contains_update_check() is True
 
 
 def test_contains_update_check_in_and():
     """Test _contains_update_check detects updates in And clause."""
-    query = WOQLQuery({
-        "@type": "And",
-        "and": [
-            {"@type": "Triple"},
-            {"@type": "AddQuad"}
-        ]
-    })
+    query = WOQLQuery(
+        {"@type": "And", "and": [{"@type": "Triple"}, {"@type": "AddQuad"}]}
+    )
 
     assert query._contains_update_check() is True
 
 
 def test_contains_update_check_in_or():
     """Test _contains_update_check detects updates in Or clause."""
-    query = WOQLQuery({
-        "@type": "Or",
-        "or": [
-            {"@type": "Triple"},
-            {"@type": "DeleteObject"}
-        ]
-    })
+    query = WOQLQuery(
+        {"@type": "Or", "or": [{"@type": "Triple"}, {"@type": "DeleteObject"}]}
+    )
 
     assert query._contains_update_check() is True
 

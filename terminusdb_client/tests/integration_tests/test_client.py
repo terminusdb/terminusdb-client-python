@@ -14,7 +14,7 @@ test_user_agent = "terminusdb-client-python-tests"
 
 
 def test_not_ok():
-    client = Client('http://localhost:6363')
+    client = Client("http://localhost:6363")
     not client.ok()
 
 
@@ -112,7 +112,7 @@ def test_add_get_remove_org(docker_url):
     # test create db
     client.create_organization("testOrg")
     org = client.get_organization("testOrg")
-    assert org['name'] == 'testOrg'
+    assert org["name"] == "testOrg"
     client.delete_organization("testOrg")
     with pytest.raises(DatabaseError):
         # The org shouldn't exist anymore
@@ -124,8 +124,8 @@ def test_diff_object(docker_url):
     client = Client(docker_url, user_agent=test_user_agent)
     # test create db
     client.connect()
-    diff = client.diff_object({'test': 'wew'}, {'test': 'wow'})
-    assert diff == {'test': {'@before': 'wew', '@after': 'wow', '@op': 'SwapValue'}}
+    diff = client.diff_object({"test": "wew"}, {"test": "wow"})
+    assert diff == {"test": {"@before": "wew", "@after": "wow", "@op": "SwapValue"}}
 
 
 def test_class_frame(docker_url):
@@ -135,13 +135,13 @@ def test_class_frame(docker_url):
     client.create_database(db_name)
     client.connect(db=db_name)
     # Add a philosopher schema
-    schema = {"@type": "Class",
-              "@id": "Philosopher",
-              "name": "xsd:string"
-              }
+    schema = {"@type": "Class", "@id": "Philosopher", "name": "xsd:string"}
     # Add schema and Socrates
     client.insert_document(schema, graph_type=GraphType.SCHEMA)
-    assert client.get_class_frame("Philosopher") == {'@type': 'Class', 'name': 'xsd:string'}
+    assert client.get_class_frame("Philosopher") == {
+        "@type": "Class",
+        "name": "xsd:string",
+    }
 
 
 def test_woql_substr(docker_url):
@@ -151,17 +151,16 @@ def test_woql_substr(docker_url):
     client.create_database(db_name)
     client.connect(db=db_name)
     # Add a philosopher schema
-    schema = {"@type": "Class",
-              "@id": "Philosopher",
-              "name": "xsd:string"
-              }
+    schema = {"@type": "Class", "@id": "Philosopher", "name": "xsd:string"}
     # Add schema and Socrates
     client.insert_document(schema, graph_type="schema")
     client.insert_document({"name": "Socrates"})
     result = client.query(
-        WOQLQuery().triple('v:Philosopher', '@schema:name', 'v:Name')
-        .substr('v:Name', 3, 'v:Substring', 0, 'v:After'))
-    assert result['bindings'][0]['Substring']['@value'] == 'Soc'
+        WOQLQuery()
+        .triple("v:Philosopher", "@schema:name", "v:Name")
+        .substr("v:Name", 3, "v:Substring", 0, "v:After")
+    )
+    assert result["bindings"][0]["Substring"]["@value"] == "Soc"
 
 
 def test_diff_apply_version(docker_url):
@@ -171,10 +170,7 @@ def test_diff_apply_version(docker_url):
     client.create_database(db_name)
     client.connect(db=db_name)
     # Add a philosopher schema
-    schema = {"@type": "Class",
-              "@id": "Philosopher",
-              "name": "xsd:string"
-              }
+    schema = {"@type": "Class", "@id": "Philosopher", "name": "xsd:string"}
     # Add schema and Socrates
     client.insert_document(schema, graph_type="schema")
     client.insert_document({"name": "Socrates"})
@@ -189,11 +185,11 @@ def test_diff_apply_version(docker_url):
 
     diff = client.diff_version("main", "changes")
     assert len(diff) == 2
-    assert diff[0]['@insert']['name'] == 'Plato'
-    assert diff[1]['@insert']['name'] == 'Aristotle'
+    assert diff[0]["@insert"]["name"] == "Plato"
+    assert diff[1]["@insert"]["name"] == "Aristotle"
 
     # Apply the differences to main with apply
-    client.apply("main", "changes", branch='main')
+    client.apply("main", "changes", branch="main")
 
     # Diff again
     diff_again = client.diff_version("main", "changes")
@@ -208,7 +204,7 @@ def test_log(docker_url):
     db_name = "testDB" + str(random())
     client.create_database(db_name, team="admin")
     log = client.log(team="admin", db=db_name)
-    assert log[0]['@type'] == 'InitialCommit'
+    assert log[0]["@type"] == "InitialCommit"
 
 
 def test_get_document_history(docker_url):
@@ -226,7 +222,7 @@ def test_get_document_history(docker_url):
         "@type": "Class",
         "@id": "Person",
         "name": "xsd:string",
-        "age": "xsd:integer"
+        "age": "xsd:integer",
     }
     client.insert_document(schema, graph_type=GraphType.SCHEMA)
 
@@ -249,14 +245,14 @@ def test_get_document_history(docker_url):
     # Assertions
     assert isinstance(history, list)
     assert len(history) >= 3  # At least insert and two updates
-    assert all('timestamp' in entry for entry in history)
-    assert all(isinstance(entry['timestamp'], dt.datetime) for entry in history)
-    assert all('author' in entry for entry in history)
-    assert all('message' in entry for entry in history)
-    assert all('identifier' in entry for entry in history)
+    assert all("timestamp" in entry for entry in history)
+    assert all(isinstance(entry["timestamp"], dt.datetime) for entry in history)
+    assert all("author" in entry for entry in history)
+    assert all("message" in entry for entry in history)
+    assert all("identifier" in entry for entry in history)
 
     # Verify messages are in the history (order may vary)
-    messages = [entry['message'] for entry in history]
+    messages = [entry["message"] for entry in history]
     assert "Created Person/Jane" in messages
     assert "Updated Person/Jane name and age" in messages
     assert "Updated Person/Jane age" in messages
@@ -282,14 +278,14 @@ def test_get_triples(docker_url):
     client.create_database(db_name, team="admin")
     client.connect(db=db_name)
     # Add a philosopher schema
-    schema = {"@type": "Class",
-              "@id": "Philosopher",
-              "name": "xsd:string"
-              }
+    schema = {"@type": "Class", "@id": "Philosopher", "name": "xsd:string"}
     # Add schema and Socrates
     client.insert_document(schema, graph_type="schema")
-    schema_triples = client.get_triples(graph_type='schema')
-    assert "<schema#Philosopher>\n  a sys:Class ;\n  <schema#name> xsd:string ." in schema_triples
+    schema_triples = client.get_triples(graph_type="schema")
+    assert (
+        "<schema#Philosopher>\n  a sys:Class ;\n  <schema#name> xsd:string ."
+        in schema_triples
+    )
 
 
 def test_update_triples(docker_url):
@@ -321,7 +317,7 @@ def test_update_triples(docker_url):
     db_name = "testDB" + str(random())
     client.create_database(db_name, team="admin")
     client.connect(db=db_name)
-    client.update_triples(graph_type='schema', content=ttl, commit_msg="Update triples")
+    client.update_triples(graph_type="schema", content=ttl, commit_msg="Update triples")
     client.insert_document({"name": "Socrates"})
     assert len(list(client.get_all_documents())) == 1
 
@@ -355,7 +351,7 @@ def test_insert_triples(docker_url):
     db_name = "testDB" + str(random())
     client.create_database(db_name, team="admin")
     client.connect(db=db_name)
-    client.insert_triples(graph_type='schema', content=ttl, commit_msg="Insert triples")
+    client.insert_triples(graph_type="schema", content=ttl, commit_msg="Insert triples")
     client.insert_document({"name": "Socrates"})
     assert len(list(client.get_all_documents())) == 1
 
@@ -366,9 +362,9 @@ def test_get_database(docker_url):
     db_name = "testDB" + str(random())
     client.create_database(db_name, team="admin")
     db = client.get_database(db_name)
-    assert db['name'] == db_name
-    db_with_team = client.get_database(db_name, team='admin')
-    assert db_with_team['name'] == db_name
+    assert db["name"] == db_name
+    db_with_team = client.get_database(db_name, team="admin")
+    assert db_with_team["name"] == db_name
     with pytest.raises(DatabaseError):
         client.get_database("DOES_NOT_EXISTDB")
 
@@ -398,30 +394,42 @@ def test_get_organization_user_databases(docker_url):
     client.create_database(db_name2, team=org_name)
 
     # BEFORE grant: verify our specific databases are NOT accessible to admin user
-    databases_before = client.get_organization_user_databases(org=org_name, username="admin")
-    db_names_before = {db['name'] for db in databases_before}
-    assert db_name not in db_names_before, f"{db_name} should not be accessible before capability grant"
-    assert db_name2 not in db_names_before, f"{db_name2} should not be accessible before capability grant"
+    databases_before = client.get_organization_user_databases(
+        org=org_name, username="admin"
+    )
+    db_names_before = {db["name"] for db in databases_before}
+    assert (
+        db_name not in db_names_before
+    ), f"{db_name} should not be accessible before capability grant"
+    assert (
+        db_name2 not in db_names_before
+    ), f"{db_name2} should not be accessible before capability grant"
 
     # Grant capabilities to admin user for the organization
     capability_change = {
         "operation": "grant",
         "scope": f"Organization/{org_name}",
         "user": "User/admin",
-        "roles": [
-            "Role/admin"
-        ]
+        "roles": ["Role/admin"],
     }
     client.change_capabilities(capability_change)
 
     # AFTER grant: verify our specific databases ARE accessible to admin user
-    databases_after = client.get_organization_user_databases(org=org_name, username="admin")
-    db_names_after = {db['name'] for db in databases_after}
+    databases_after = client.get_organization_user_databases(
+        org=org_name, username="admin"
+    )
+    db_names_after = {db["name"] for db in databases_after}
     # Check both our databases are now accessible (order not guaranteed)
-    assert db_name in db_names_after, f"{db_name} should be accessible after capability grant"
-    assert db_name2 in db_names_after, f"{db_name2} should be accessible after capability grant"
+    assert (
+        db_name in db_names_after
+    ), f"{db_name} should be accessible after capability grant"
+    assert (
+        db_name2 in db_names_after
+    ), f"{db_name2} should be accessible after capability grant"
     # Verify admin team database does NOT appear in organization results
-    assert db_name + "admin" not in db_names_after, f"{db_name}admin should not appear in {org_name} results"
+    assert (
+        db_name + "admin" not in db_names_after
+    ), f"{db_name}admin should not appear in {org_name} results"
 
 
 def test_has_database(docker_url):
@@ -454,7 +462,7 @@ def test_add_get_remove_user(docker_url):
     # test create db
     client.add_user("test", "randomPassword")
     user = client.get_user("test")
-    assert user['name'] == 'test'
+    assert user["name"] == "test"
     client.delete_user("test")
     with pytest.raises(DatabaseError):
         user = client.get_user("test")
@@ -465,12 +473,8 @@ def test_patch(docker_url):
     client = Client(docker_url, user_agent=test_user_agent)
     client.connect(user="admin", team="admin")
     client.create_database("patch")
-    schema = [{"@id" : "Person",
-               "@type" : "Class",
-               "name" : "xsd:string"}]
-    instance = [{"@type" : "Person",
-                 "@id" : "Person/Jane",
-                 "name" : "Jane"}]
+    schema = [{"@id": "Person", "@type": "Class", "name": "xsd:string"}]
+    instance = [{"@type": "Person", "@id": "Person/Jane", "name": "Jane"}]
     client.insert_document(schema, graph_type="schema")
     client.insert_document(instance)
 
@@ -479,10 +483,8 @@ def test_patch(docker_url):
     )
 
     client.patch_resource(patch)
-    doc = client.get_document('Person/Jane')
-    assert doc == {"@type" : "Person",
-                   "@id" : "Person/Jane",
-                   "name" : "Janine"}
+    doc = client.get_document("Person/Jane")
+    assert doc == {"@type": "Person", "@id": "Person/Jane", "name": "Janine"}
     client.delete_database("patch", "admin")
 
 
@@ -605,7 +607,7 @@ def test_diff_ops_no_auth(test_schema, terminusx_token):
 
 @pytest.mark.skipif(
     os.environ.get("TERMINUSDB_TEST_JWT") is None,
-    reason="JWT testing not enabled. Set TERMINUSDB_TEST_JWT=1 to enable JWT tests."
+    reason="JWT testing not enabled. Set TERMINUSDB_TEST_JWT=1 to enable JWT tests.",
 )
 def test_jwt(docker_url_jwt):
     # create client
@@ -631,8 +633,10 @@ def test_jwt(docker_url_jwt):
 )
 def test_terminusx(terminusx_token):
     testdb = (
-        "test_happy_" + str(dt.datetime.now()).replace(" ", "") + "_" + str(random())
-    ).replace(":", "_").replace(".", "")
+        ("test_happy_" + str(dt.datetime.now()).replace(" ", "") + "_" + str(random()))
+        .replace(":", "_")
+        .replace(".", "")
+    )
     endpoint = "https://cloud-dev.terminusdb.com/TerminusDBTest/"
     client = Client(endpoint, user_agent=test_user_agent)
     client.connect(use_token=True, team="TerminusDBTest")
@@ -652,8 +656,10 @@ def test_terminusx(terminusx_token):
 )
 def test_terminusx_crazy_path(terminusx_token):
     testdb = (
-        "test_crazy" + str(dt.datetime.now()).replace(" ", "") + "_" + str(random())
-    ).replace(":", "_").replace(".", "")
+        ("test_crazy" + str(dt.datetime.now()).replace(" ", "") + "_" + str(random()))
+        .replace(":", "_")
+        .replace(".", "")
+    )
     endpoint = "https://cloud-dev.terminusdb.com/TerminusDBTest/"
     client = Client(endpoint, user_agent=test_user_agent)
     client.connect(use_token=True, team="TerminusDBTest")
