@@ -242,7 +242,7 @@ def _create_script(obj_list):
                         result_obj.script += f"    {value} = ()\n"
                     else:
                         result_obj.script += (
-                            f"    {value.replace(' ','_')} = '{value}'\n"
+                            f"    {value.replace(' ', '_')} = '{value}'\n"
                         )
             if obj.get("@documentation"):
                 result_obj.add_docstring(obj)

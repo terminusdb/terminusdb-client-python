@@ -16,12 +16,12 @@ def test_db(client):
     """Create and cleanup a test database."""
     import time
     db_name = f"test_prefix_{int(time.time() * 1000)}"
-    
+
     client.create_database(db_name, label="Test Prefix DB", description="Database for testing prefix operations")
     client.connect(db=db_name)
-    
+
     yield db_name
-    
+
     # Cleanup
     try:
         client.delete_database(db_name)
@@ -42,10 +42,10 @@ class TestPrefixManagement:
     def test_add_prefix_duplicate(self, client, test_db):
         """Test that adding duplicate prefix fails."""
         client.add_prefix("ex", "http://example.org/")
-        
+
         with pytest.raises(Exception) as exc_info:
             client.add_prefix("ex", "http://example.com/")
-        
+
         # Should get 400 error with PrefixAlreadyExists
         assert exc_info.value.response.status_code == 400
 
@@ -53,14 +53,14 @@ class TestPrefixManagement:
         """Test that invalid IRI is rejected."""
         with pytest.raises(Exception) as exc_info:
             client.add_prefix("ex", "not-a-valid-uri")
-        
+
         assert exc_info.value.response.status_code == 400
 
     def test_add_prefix_reserved(self, client, test_db):
         """Test that reserved prefix names are rejected."""
         with pytest.raises(Exception) as exc_info:
             client.add_prefix("@custom", "http://example.org/")
-        
+
         assert exc_info.value.response.status_code == 400
 
     def test_get_prefix_success(self, client, test_db):
@@ -73,17 +73,17 @@ class TestPrefixManagement:
         """Test that getting non-existent prefix fails."""
         with pytest.raises(Exception) as exc_info:
             client.get_prefix("nonexistent")
-        
+
         assert exc_info.value.response.status_code == 404
 
     def test_update_prefix_success(self, client, test_db):
         """Test updating an existing prefix."""
         client.add_prefix("ex", "http://example.org/")
         result = client.update_prefix("ex", "http://example.com/")
-        
+
         assert result["api:status"] == "api:success"
         assert result["api:prefix_uri"] == "http://example.com/"
-        
+
         # Verify the update
         uri = client.get_prefix("ex")
         assert uri == "http://example.com/"
@@ -92,7 +92,7 @@ class TestPrefixManagement:
         """Test that updating non-existent prefix fails."""
         with pytest.raises(Exception) as exc_info:
             client.update_prefix("nonexistent", "http://example.org/")
-        
+
         assert exc_info.value.response.status_code == 404
 
     def test_upsert_prefix_create(self, client, test_db):
@@ -105,7 +105,7 @@ class TestPrefixManagement:
         """Test upsert updates prefix if it already exists."""
         client.add_prefix("ex", "http://example.org/")
         result = client.upsert_prefix("ex", "http://example.com/")
-        
+
         assert result["api:status"] == "api:success"
         assert result["api:prefix_uri"] == "http://example.com/"
 
@@ -114,7 +114,7 @@ class TestPrefixManagement:
         client.add_prefix("ex", "http://example.org/")
         result = client.delete_prefix("ex")
         assert result["api:status"] == "api:success"
-        
+
         # Verify deletion
         with pytest.raises(Exception) as exc_info:
             client.get_prefix("ex")
@@ -124,12 +124,12 @@ class TestPrefixManagement:
         """Test that deleting non-existent prefix fails."""
         with pytest.raises(Exception) as exc_info:
             client.delete_prefix("nonexistent")
-        
+
         assert exc_info.value.response.status_code == 404
 
     def test_delete_prefix_reserved(self, client, test_db):
         """Test that deleting reserved prefix fails."""
         with pytest.raises(Exception) as exc_info:
             client.delete_prefix("@base")
-        
+
         assert exc_info.value.response.status_code == 400
