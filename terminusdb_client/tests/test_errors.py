@@ -1,4 +1,5 @@
 """Tests for errors.py module."""
+
 import json
 from unittest.mock import Mock
 from terminusdb_client.errors import (
@@ -8,7 +9,7 @@ from terminusdb_client.errors import (
     OperationalError,
     AccessDeniedError,
     APIError,
-    InvalidURIError
+    InvalidURIError,
 )
 
 
@@ -32,7 +33,7 @@ def test_interface_error_string_representation():
     message = "Connection failed"
     error = InterfaceError(message)
 
-    assert hasattr(error, 'message')
+    assert hasattr(error, "message")
     assert error.message == message
 
 
@@ -55,7 +56,7 @@ def test_database_error_with_json_api_message():
     mock_response.headers = {"content-type": "application/json"}
     mock_response.json.return_value = {
         "api:message": "Database operation failed",
-        "details": "Additional context"
+        "details": "Additional context",
     }
     mock_response.status_code = 400
 
@@ -72,9 +73,7 @@ def test_database_error_with_vio_message():
     mock_response.text = "Error response"
     mock_response.headers = {"content-type": "application/json"}
     mock_response.json.return_value = {
-        "api:error": {
-            "vio:message": "Validation failed"
-        }
+        "api:error": {"vio:message": "Validation failed"}
     }
     mock_response.status_code = 422
 
@@ -89,9 +88,7 @@ def test_database_error_with_unknown_json():
     mock_response = Mock()
     mock_response.text = "Error response"
     mock_response.headers = {"content-type": "application/json"}
-    mock_response.json.return_value = {
-        "unknown_field": "some value"
-    }
+    mock_response.json.return_value = {"unknown_field": "some value"}
     mock_response.status_code = 500
 
     error = DatabaseError(mock_response)
@@ -185,10 +182,7 @@ def test_database_error_json_formatting():
     mock_response = Mock()
     mock_response.text = "Error"
     mock_response.headers = {"content-type": "application/json"}
-    error_data = {
-        "api:message": "Error message",
-        "code": "ERR_001"
-    }
+    error_data = {"api:message": "Error message", "code": "ERR_001"}
     mock_response.json.return_value = error_data
     mock_response.status_code = 400
 
@@ -201,11 +195,7 @@ def test_database_error_json_formatting():
 
 def test_all_error_classes_are_exceptions():
     """Test that all error classes inherit from Exception."""
-    errors = [
-        Error(),
-        InterfaceError("test"),
-        InvalidURIError()
-    ]
+    errors = [Error(), InterfaceError("test"), InvalidURIError()]
 
     for error in errors:
         assert isinstance(error, Exception)

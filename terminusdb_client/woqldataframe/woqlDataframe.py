@@ -7,7 +7,8 @@ from ..errors import InterfaceError
 
 def result_to_df(all_records, keepid=False, max_embed_dep=0, client=None):
     """Turn result documents into pandas DataFrame, all documents should be the same type.
-       If max_embed_dep > 0, a client needs to be provided to get objects to embed in DataFrame."""
+    If max_embed_dep > 0, a client needs to be provided to get objects to embed in DataFrame.
+    """
     try:
         pd = import_module("pandas")
     except ImportError:

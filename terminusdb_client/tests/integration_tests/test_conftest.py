@@ -1,4 +1,5 @@
 """Unit tests for conftest.py helper functions"""
+
 from unittest.mock import patch, Mock
 import requests
 
@@ -12,7 +13,7 @@ from .conftest import (
 class TestServerDetection:
     """Test server detection helper functions"""
 
-    @patch('terminusdb_client.tests.integration_tests.conftest.requests.get')
+    @patch("terminusdb_client.tests.integration_tests.conftest.requests.get")
     def test_local_server_running_200(self, mock_get):
         """Test local server detection returns True for HTTP 200"""
         mock_response = Mock()
@@ -22,7 +23,7 @@ class TestServerDetection:
         assert is_local_server_running() is True
         mock_get.assert_called_once_with("http://127.0.0.1:6363", timeout=2)
 
-    @patch('terminusdb_client.tests.integration_tests.conftest.requests.get')
+    @patch("terminusdb_client.tests.integration_tests.conftest.requests.get")
     def test_local_server_running_404(self, mock_get):
         """Test local server detection returns True for HTTP 404"""
         mock_response = Mock()
@@ -31,21 +32,21 @@ class TestServerDetection:
 
         assert is_local_server_running() is True
 
-    @patch('terminusdb_client.tests.integration_tests.conftest.requests.get')
+    @patch("terminusdb_client.tests.integration_tests.conftest.requests.get")
     def test_local_server_not_running_connection_error(self, mock_get):
         """Test local server detection returns False on connection error"""
         mock_get.side_effect = requests.exceptions.ConnectionError()
 
         assert is_local_server_running() is False
 
-    @patch('terminusdb_client.tests.integration_tests.conftest.requests.get')
+    @patch("terminusdb_client.tests.integration_tests.conftest.requests.get")
     def test_local_server_not_running_timeout(self, mock_get):
         """Test local server detection returns False on timeout"""
         mock_get.side_effect = requests.exceptions.Timeout()
 
         assert is_local_server_running() is False
 
-    @patch('terminusdb_client.tests.integration_tests.conftest.requests.get')
+    @patch("terminusdb_client.tests.integration_tests.conftest.requests.get")
     def test_docker_server_running_200(self, mock_get):
         """Test Docker server detection returns True for HTTP 200"""
         mock_response = Mock()
@@ -55,7 +56,7 @@ class TestServerDetection:
         assert is_docker_server_running() is True
         mock_get.assert_called_once_with("http://127.0.0.1:6366", timeout=2)
 
-    @patch('terminusdb_client.tests.integration_tests.conftest.requests.get')
+    @patch("terminusdb_client.tests.integration_tests.conftest.requests.get")
     def test_docker_server_running_404(self, mock_get):
         """Test Docker server detection returns True for HTTP 404"""
         mock_response = Mock()
@@ -64,14 +65,14 @@ class TestServerDetection:
 
         assert is_docker_server_running() is True
 
-    @patch('terminusdb_client.tests.integration_tests.conftest.requests.get')
+    @patch("terminusdb_client.tests.integration_tests.conftest.requests.get")
     def test_docker_server_not_running(self, mock_get):
         """Test Docker server detection returns False on connection error"""
         mock_get.side_effect = requests.exceptions.ConnectionError()
 
         assert is_docker_server_running() is False
 
-    @patch('terminusdb_client.tests.integration_tests.conftest.requests.get')
+    @patch("terminusdb_client.tests.integration_tests.conftest.requests.get")
     def test_jwt_server_running_200(self, mock_get):
         """Test JWT server detection returns True for HTTP 200"""
         mock_response = Mock()
@@ -81,7 +82,7 @@ class TestServerDetection:
         assert is_jwt_server_running() is True
         mock_get.assert_called_once_with("http://127.0.0.1:6367", timeout=2)
 
-    @patch('terminusdb_client.tests.integration_tests.conftest.requests.get')
+    @patch("terminusdb_client.tests.integration_tests.conftest.requests.get")
     def test_jwt_server_running_404(self, mock_get):
         """Test JWT server detection returns True for HTTP 404"""
         mock_response = Mock()
@@ -90,7 +91,7 @@ class TestServerDetection:
 
         assert is_jwt_server_running() is True
 
-    @patch('terminusdb_client.tests.integration_tests.conftest.requests.get')
+    @patch("terminusdb_client.tests.integration_tests.conftest.requests.get")
     def test_jwt_server_not_running(self, mock_get):
         """Test JWT server detection returns False on connection error"""
         mock_get.side_effect = requests.exceptions.ConnectionError()

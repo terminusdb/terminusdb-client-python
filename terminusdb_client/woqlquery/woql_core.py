@@ -156,7 +156,7 @@ def _copy_dict(orig, rollup=None):
             query = _copy_dict(part, rollup)
             if query:
                 nuj[key] = query
-        elif hasattr(part, 'to_dict'):
+        elif hasattr(part, "to_dict"):
             nuj[key] = part.to_dict()
         else:
             nuj[key] = part

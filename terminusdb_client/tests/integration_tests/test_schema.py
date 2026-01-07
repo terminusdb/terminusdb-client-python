@@ -312,9 +312,9 @@ def test_repeated_object_load(docker_url, test_schema):
     client.insert_document(
         schema, commit_msg="I am checking in the schema", graph_type="schema"
     )
-    [country_id] = client.insert_document({"@type" : "Country",
-                                           "name" : "Romania",
-                                           "perimeter" : []})
+    [country_id] = client.insert_document(
+        {"@type": "Country", "name": "Romania", "perimeter": []}
+    )
     obj = client.get_document(country_id)
     schema.import_objects(obj)
     obj2 = client.get_document(country_id)
@@ -329,10 +329,13 @@ def test_key_change_raises_exception(docker_url, test_schema):
     client.insert_document(
         schema, commit_msg="I am checking in the schema", graph_type="schema"
     )
-    [country_id] = client.insert_document({"@type" : "Country",
-                                           "name" : "Romania",
-                                           "perimeter" : []})
+    [country_id] = client.insert_document(
+        {"@type": "Country", "name": "Romania", "perimeter": []}
+    )
     obj = client.get_document(country_id)
     local_obj = schema.import_objects(obj)
-    with pytest.raises(ValueError, match=r"name has been used to generate the id, hence cannot be changed."):
+    with pytest.raises(
+        ValueError,
+        match=r"name has been used to generate the id, hence cannot be changed.",
+    ):
         local_obj.name = "France"

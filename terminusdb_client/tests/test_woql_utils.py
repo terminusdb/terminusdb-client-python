@@ -1,4 +1,5 @@
 """Tests for woql_utils.py module."""
+
 from datetime import datetime
 from unittest.mock import Mock
 import pytest
@@ -10,7 +11,7 @@ from terminusdb_client.woql_utils import (
     _clean_list,
     _clean_dict,
     _dt_list,
-    _dt_dict
+    _dt_dict,
 )
 from terminusdb_client.errors import DatabaseError
 
@@ -37,7 +38,7 @@ def test_result2stream_with_whitespace():
 
 def test_result2stream_empty():
     """Test _result2stream with empty string."""
-    result = ''
+    result = ""
     stream = list(_result2stream(result))
 
     assert len(stream) == 0
@@ -125,11 +126,7 @@ def test_clean_list_with_datetime():
 def test_clean_list_nested():
     """Test _clean_list with nested structures."""
     dt = datetime(2025, 1, 1)
-    obj = [
-        "string",
-        {"key": dt},
-        [1, 2, dt]
-    ]
+    obj = ["string", {"key": dt}, [1, 2, dt]]
 
     result = _clean_list(obj)
 
@@ -141,11 +138,7 @@ def test_clean_list_nested():
 def test_clean_dict_with_datetime():
     """Test _clean_dict converts datetime to isoformat."""
     dt = datetime(2025, 1, 1, 12, 0, 0)
-    obj = {
-        "date": dt,
-        "name": "test",
-        "count": 42
-    }
+    obj = {"date": dt, "name": "test", "count": 42}
 
     result = _clean_dict(obj)
 
@@ -157,11 +150,7 @@ def test_clean_dict_with_datetime():
 def test_clean_dict_nested():
     """Test _clean_dict with nested structures."""
     dt = datetime(2025, 1, 1)
-    obj = {
-        "name": "test",
-        "nested": {"date": dt},
-        "list": [1, dt, "string"]
-    }
+    obj = {"name": "test", "nested": {"date": dt}, "list": [1, dt, "string"]}
 
     result = _clean_dict(obj)
 
@@ -172,10 +161,7 @@ def test_clean_dict_nested():
 
 def test_clean_dict_with_iterable():
     """Test _clean_dict handles iterables correctly."""
-    obj = {
-        "tuple": (1, 2, 3),
-        "list": [4, 5, 6]
-    }
+    obj = {"tuple": (1, 2, 3), "list": [4, 5, 6]}
 
     result = _clean_dict(obj)
 
@@ -197,11 +183,7 @@ def test_dt_list_parses_isoformat():
 
 def test_dt_list_nested():
     """Test _dt_list with nested structures."""
-    obj = [
-        "2025-01-01",
-        {"date": "2025-01-01T10:00:00"},
-        ["2025-01-01", "text"]
-    ]
+    obj = ["2025-01-01", {"date": "2025-01-01T10:00:00"}, ["2025-01-01", "text"]]
 
     result = _dt_list(obj)
 
@@ -216,11 +198,7 @@ def test_dt_list_nested():
 
 def test_dt_dict_parses_isoformat():
     """Test _dt_dict converts ISO format strings to datetime."""
-    obj = {
-        "created": "2025-01-01T12:00:00",
-        "name": "test",
-        "invalid": "not a date"
-    }
+    obj = {"created": "2025-01-01T12:00:00", "name": "test", "invalid": "not a date"}
 
     result = _dt_dict(obj)
 
@@ -235,7 +213,7 @@ def test_dt_dict_nested():
     obj = {
         "name": "test",
         "nested": {"date": "2025-01-01"},
-        "list": ["2025-01-01T10:00:00", 123]
+        "list": ["2025-01-01T10:00:00", 123],
     }
 
     result = _dt_dict(obj)
@@ -248,10 +226,7 @@ def test_dt_dict_nested():
 
 def test_dt_dict_with_iterable():
     """Test _dt_dict handles iterables with dates."""
-    obj = {
-        "dates": ["2025-01-01", "2025-01-02"],
-        "mixed": ["2025-01-01", "text", 123]
-    }
+    obj = {"dates": ["2025-01-01", "2025-01-02"], "mixed": ["2025-01-01", "text", 123]}
 
     result = _dt_dict(obj)
 
@@ -264,10 +239,7 @@ def test_dt_dict_with_iterable():
 def test_clean_list_handles_dict_items():
     """Test _clean_list correctly identifies objects with items() method."""
     dt = datetime(2025, 1, 1)
-    obj = [
-        {"key1": "value1"},
-        {"key2": dt}
-    ]
+    obj = [{"key1": "value1"}, {"key2": dt}]
 
     result = _clean_list(obj)
 
@@ -277,10 +249,7 @@ def test_clean_list_handles_dict_items():
 
 def test_dt_list_handles_dict_items():
     """Test _dt_list correctly processes nested dicts."""
-    obj = [
-        {"date": "2025-01-01"},
-        {"name": "test"}
-    ]
+    obj = [{"date": "2025-01-01"}, {"name": "test"}]
 
     result = _dt_list(obj)
 

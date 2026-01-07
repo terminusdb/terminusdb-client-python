@@ -1,5 +1,6 @@
 """Client.py
 Client is the Python public API for TerminusDB"""
+
 import base64
 import copy
 import gzip
@@ -33,26 +34,27 @@ from ..woqlquery.woql_query import WOQLQuery
 
 class WoqlResult:
     """Iterator for streaming WOQL results."""
+
     def __init__(self, lines):
         preface = json.loads(next(lines))
-        if not ('@type' in preface and preface['@type'] == 'PrefaceRecord'):
+        if not ("@type" in preface and preface["@type"] == "PrefaceRecord"):
             raise DatabaseError(response=preface)
         self.preface = preface
         self.postscript = {}
         self.lines = lines
 
     def _check_error(self, document):
-        if ('@type' in document):
-            if document['@type'] == 'Binding':
+        if "@type" in document:
+            if document["@type"] == "Binding":
                 return document
-            if document['@type'] == 'PostscriptRecord':
+            if document["@type"] == "PostscriptRecord":
                 self.postscript = document
                 raise StopIteration()
 
         raise DatabaseError(response=document)
 
     def variable_names(self):
-        return self.preface['names']
+        return self.preface["names"]
 
     def __iter__(self):
         return self
@@ -154,8 +156,9 @@ class Patch:
 
 class GraphType(str, Enum):
     """Type of graph"""
-    INSTANCE = 'instance'
-    SCHEMA = 'schema'
+
+    INSTANCE = "instance"
+    SCHEMA = "schema"
 
 
 class Client:
@@ -397,7 +400,8 @@ class Client:
     def close(self) -> None:
         """Undo connect and close the connection.
 
-        The connection will be unusable from this point forward; an Error (or subclass) exception will be raised if any operation is attempted with the connection, unless connect is call again."""
+        The connection will be unusable from this point forward; an Error (or subclass) exception will be raised if any operation is attempted with the connection, unless connect is call again.
+        """
         self._connected = False
 
     def _check_connection(self, check_db=True) -> None:
@@ -465,17 +469,17 @@ class Client:
         if not self._connected:
             return self._connected
         req = self._session.get(
-            self.api + "/ok",
-            headers=self._default_headers,
-            timeout=6
+            self.api + "/ok", headers=self._default_headers, timeout=6
         )
         return req.status_code == 200
 
-    def log(self,
-            team: Optional[str] = None,
-            db: Optional[str] = None,
-            start: int = 0,
-            count: int = -1):
+    def log(
+        self,
+        team: Optional[str] = None,
+        db: Optional[str] = None,
+        start: int = 0,
+        count: int = -1,
+    ):
         """Get commit history of a database
         Parameters
         ----------
@@ -510,14 +514,14 @@ class Client:
         db = db if db else self.db
         result = self._session.get(
             f"{self.api}/log/{team}/{db}",
-            params={'start': start, 'count': count},
+            params={"start": start, "count": count},
             headers=self._default_headers,
             auth=self._auth(),
         )
         commits = json.loads(_finish_response(result))
         for commit in commits:
-            commit['timestamp'] = datetime.fromtimestamp(commit['timestamp'])
-            commit['commit'] = commit['identifier']  # For backwards compat.
+            commit["timestamp"] = datetime.fromtimestamp(commit["timestamp"])
+            commit["commit"] = commit["identifier"]  # For backwards compat.
         return commits
 
     def get_commit_history(self, max_history: int = 500) -> list:
@@ -639,14 +643,14 @@ class Client:
         db = db if db else self.db
 
         params = {
-            'id': doc_id,
-            'start': start,
-            'count': count,
+            "id": doc_id,
+            "start": start,
+            "count": count,
         }
         if created:
-            params['created'] = created
+            params["created"] = created
         if updated:
-            params['updated'] = updated
+            params["updated"] = updated
 
         result = self._session.get(
             f"{self.api}/history/{team}/{db}",
@@ -660,24 +664,26 @@ class Client:
         # Post-process timestamps from Unix timestamp to datetime objects
         if isinstance(history, list):
             for entry in history:
-                if 'timestamp' in entry and isinstance(entry['timestamp'], (int, float)):
-                    entry['timestamp'] = datetime.fromtimestamp(entry['timestamp'])
+                if "timestamp" in entry and isinstance(
+                    entry["timestamp"], (int, float)
+                ):
+                    entry["timestamp"] = datetime.fromtimestamp(entry["timestamp"])
 
         return history
 
     def _get_current_commit(self):
         descriptor = self.db
         if self.branch:
-            descriptor = f'{descriptor}/local/branch/{self.branch}'
+            descriptor = f"{descriptor}/local/branch/{self.branch}"
         commit = self.log(team=self.team, db=descriptor, count=1)[0]
-        return commit['identifier']
+        return commit["identifier"]
 
     def _get_target_commit(self, step):
         descriptor = self.db
         if self.branch:
-            descriptor = f'{descriptor}/local/branch/{self.branch}'
+            descriptor = f"{descriptor}/local/branch/{self.branch}"
         commit = self.log(team=self.team, db=descriptor, count=1, start=step)[0]
-        return commit['identifier']
+        return commit["identifier"]
 
     def get_all_branches(self, get_data_version=False):
         """Get all the branches available in the database."""
@@ -1105,7 +1111,9 @@ class Client:
         )
         return json.loads(_finish_response(result))
 
-    def update_triples(self, graph_type: GraphType, content: str, commit_msg: str) -> None:
+    def update_triples(
+        self, graph_type: GraphType, content: str, commit_msg: str
+    ) -> None:
         """Updates the contents of the specified graph with the triples encoded in turtle format.
            Replaces the entire graph contents
 
@@ -1124,9 +1132,10 @@ class Client:
             if the client does not connect to a database
         """
         self._check_connection()
-        params = {"commit_info": self._generate_commit(commit_msg),
-                  "turtle": content,
-                  }
+        params = {
+            "commit_info": self._generate_commit(commit_msg),
+            "turtle": content,
+        }
         result = self._session.post(
             self._triples_url(graph_type),
             headers=self._default_headers,
@@ -1155,9 +1164,7 @@ class Client:
             if the client does not connect to a database
         """
         self._check_connection()
-        params = {"commit_info": self._generate_commit(commit_msg),
-                  "turtle": content
-                  }
+        params = {"commit_info": self._generate_commit(commit_msg), "turtle": content}
         result = self._session.put(
             self._triples_url(graph_type),
             headers=self._default_headers,
@@ -1318,9 +1325,15 @@ class Client:
         iterable
             Stream of dictionaries
         """
-        return self.get_all_documents(graph_type, skip, count,
-                                      as_list, get_data_version,
-                                      doc_type=doc_type, **kwargs)
+        return self.get_all_documents(
+            graph_type,
+            skip,
+            count,
+            as_list,
+            get_data_version,
+            doc_type=doc_type,
+            **kwargs,
+        )
 
     def get_all_documents(
         self,
@@ -1361,11 +1374,14 @@ class Client:
         """
         add_args = ["prefixed", "unfold"]
         self._check_connection()
-        payload = _args_as_payload({"graph_type": graph_type,
-                                    "skip": skip,
-                                    "type": doc_type,
-                                    "count": count,
-                                    })
+        payload = _args_as_payload(
+            {
+                "graph_type": graph_type,
+                "skip": skip,
+                "type": doc_type,
+                "count": count,
+            }
+        )
         for the_arg in add_args:
             if the_arg in kwargs:
                 payload[the_arg] = kwargs[the_arg]
@@ -1463,7 +1479,7 @@ class Client:
         commit_msg: Optional[str] = None,
         last_data_version: Optional[str] = None,
         compress: Union[str, int] = 1024,
-        raw_json: bool = False
+        raw_json: bool = False,
     ) -> None:
         """Inserts the specified document(s)
 
@@ -1766,7 +1782,11 @@ class Client:
             return True
         except DatabaseError as exception:
             body = exception.error_obj
-            if exception.status_code == 404 and "api:error" in body and body["api:error"]["@type"] == "api:DocumentNotFound":
+            if (
+                exception.status_code == 404
+                and "api:error" in body
+                and body["api:error"]["@type"] == "api:DocumentNotFound"
+            ):
                 return False
             raise exception
 
@@ -1851,7 +1871,7 @@ class Client:
             headers=headers,
             json=query_obj,
             auth=self._auth(),
-            stream=streaming
+            stream=streaming,
         )
 
         if streaming:
@@ -1986,9 +2006,11 @@ class Client:
 
         return json.loads(_finish_response(result))
 
-    def fetch(self, remote_id: str,
-              remote_auth: Optional[dict] = None,
-              ) -> dict:
+    def fetch(
+        self,
+        remote_id: str,
+        remote_auth: Optional[dict] = None,
+    ) -> dict:
         """Fetch the branch from a remote repo
 
         Parameters
@@ -2062,7 +2084,13 @@ class Client:
             "message": message,
         }
         if self._remote_auth_dict or remote_auth:
-            headers = {'Authorization-Remote' : self._generate_remote_header(remote_auth) if remote_auth else self._remote_auth()}
+            headers = {
+                "Authorization-Remote": (
+                    self._generate_remote_header(remote_auth)
+                    if remote_auth
+                    else self._remote_auth()
+                )
+            }
         headers.update(self._default_headers)
 
         result = self._session.post(
@@ -2299,12 +2327,9 @@ class Client:
             new_doc = self._conv_to_dict(document)
         return new_doc
 
-    def apply(self,
-              before_version,
-              after_version,
-              branch=None,
-              message=None,
-              author=None):
+    def apply(
+        self, before_version, after_version, branch=None, message=None, author=None
+    ):
         """Diff two different commits and apply changes on branch
 
         Parameters
@@ -2349,8 +2374,7 @@ class Client:
                 self._session.post(
                     self._diff_url(),
                     headers=self._default_headers,
-                    json={'before': before_object,
-                          'after': after_object},
+                    json={"before": before_object, "after": after_object},
                     auth=self._auth(),
                 )
             )
@@ -2372,8 +2396,10 @@ class Client:
                 self._session.post(
                     self._diff_url(),
                     headers=self._default_headers,
-                    json={'before_data_version': before_version,
-                          'after_data_version': after_version},
+                    json={
+                        "before_data_version": before_version,
+                        "after_data_version": after_version,
+                    },
                     auth=self._auth(),
                 )
             )
@@ -2415,7 +2441,8 @@ class Client:
         >>> client = Client("http://127.0.0.1:6363/")
         >>> client.connect(user="admin", key="root", team="admin", db="some_db")
         >>> result = client.diff({ "@id" : "Person/Jane", "@type" : "Person", "name" : "Jane"}, { "@id" : "Person/Jane", "@type" : "Person", "name" : "Janine"})
-        >>> result.to_json = '{ "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'"""
+        >>> result.to_json = '{ "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'
+        """
 
         request_dict = {}
         for key, item in {"before": before, "after": after}.items():
@@ -2542,9 +2569,9 @@ class Client:
         commit_info = self._generate_commit(message, author)
         request_dict = {
             "patch": patch.content,
-            "message" : commit_info["message"],
-            "author" : commit_info["author"],
-            "match_final_state" : match_final_state
+            "message": commit_info["message"],
+            "author": commit_info["author"],
+            "match_final_state": match_final_state,
         }
         patch_url = self._branch_base("patch", branch)
 
@@ -2559,8 +2586,11 @@ class Client:
         return json.loads(result)
 
     def clonedb(
-            self, clone_source: str, newid: str, description: Optional[str] = None,
-            remote_auth: Optional[dict] = None
+        self,
+        clone_source: str,
+        newid: str,
+        description: Optional[str] = None,
+        remote_auth: Optional[dict] = None,
     ) -> None:
         """Clone a remote repository and create a local copy.
 
@@ -2590,7 +2620,13 @@ class Client:
             description = f"New database {newid}"
 
         if self._remote_auth_dict or remote_auth:
-            headers = {'Authorization-Remote' : self._generate_remote_header(remote_auth) if remote_auth else self._remote_auth()}
+            headers = {
+                "Authorization-Remote": (
+                    self._generate_remote_header(remote_auth)
+                    if remote_auth
+                    else self._remote_auth()
+                )
+            }
         headers.update(self._default_headers)
         rc_args = {"remote_url": clone_source, "label": newid, "comment": description}
 
@@ -2655,13 +2691,13 @@ class Client:
             return f"Token {token}"
 
     def _generate_remote_header(self, remote_auth: dict):
-        key_type = remote_auth['type']
-        key = remote_auth['key']
-        if key_type == 'http_basic':
-            username = remote_auth['username']
-            http_basic_creds = base64.b64encode(f"{username}:{key}".encode('utf-8'))
+        key_type = remote_auth["type"]
+        key = remote_auth["key"]
+        if key_type == "http_basic":
+            username = remote_auth["username"]
+            http_basic_creds = base64.b64encode(f"{username}:{key}".encode("utf-8"))
             return f"Basic {http_basic_creds}"
-        elif key_type == 'token':
+        elif key_type == "token":
             return f"Token {key}"
         # JWT is the only key type remaining
         return f"Bearer {key}"
@@ -2745,7 +2781,9 @@ class Client:
         )
         return json.loads(_finish_response(result))
 
-    def get_organization_user_databases(self, org: str, username: str) -> Optional[dict]:
+    def get_organization_user_databases(
+        self, org: str, username: str
+    ) -> Optional[dict]:
         """
         Returns the databases available to a user which are inside an organization
 
@@ -3363,7 +3401,9 @@ class Client:
         """Get URL for prefix operations"""
         base = self._db_base("prefix")
         if self._db == "_system":
-            return base if prefix_name is None else f"{base}/{urlparse.quote(prefix_name)}"
+            return (
+                base if prefix_name is None else f"{base}/{urlparse.quote(prefix_name)}"
+            )
         # For regular databases, include repo and branch
         base = self._branch_base("prefix")
         return base if prefix_name is None else f"{base}/{urlparse.quote(prefix_name)}"

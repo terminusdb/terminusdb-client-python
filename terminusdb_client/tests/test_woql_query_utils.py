@@ -1,4 +1,5 @@
 """Tests for WOQLQuery utility methods."""
+
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 
@@ -39,13 +40,7 @@ def test_find_last_subject_in_and():
     """Test _find_last_subject finds subject in And clause."""
     query = WOQLQuery()
     triple = {"@type": "Triple", "subject": "v:Y"}
-    json_obj = {
-        "@type": "And",
-        "and": [
-            {"@type": "Other"},
-            triple
-        ]
-    }
+    json_obj = {"@type": "And", "and": [{"@type": "Other"}, triple]}
 
     result = query._find_last_subject(json_obj)
 
@@ -56,13 +51,7 @@ def test_find_last_subject_in_or():
     """Test _find_last_subject finds subject in Or clause."""
     query = WOQLQuery()
     triple = {"@type": "Triple", "subject": "v:Z"}
-    json_obj = {
-        "@type": "Or",
-        "or": [
-            {"@type": "Other"},
-            triple
-        ]
-    }
+    json_obj = {"@type": "Or", "or": [{"@type": "Other"}, triple]}
 
     result = query._find_last_subject(json_obj)
 
@@ -73,10 +62,7 @@ def test_find_last_subject_in_nested_query():
     """Test _find_last_subject finds subject in nested query."""
     query = WOQLQuery()
     triple = {"@type": "Triple", "subject": "v:A"}
-    json_obj = {
-        "@type": "Select",
-        "query": triple
-    }
+    json_obj = {"@type": "Select", "query": triple}
 
     result = query._find_last_subject(json_obj)
 
@@ -98,10 +84,7 @@ def test_find_last_subject_reverse_order():
     query = WOQLQuery()
     first = {"@type": "Triple", "subject": "v:First"}
     last = {"@type": "Triple", "subject": "v:Last"}
-    json_obj = {
-        "@type": "And",
-        "and": [first, last]
-    }
+    json_obj = {"@type": "And", "and": [first, last]}
 
     result = query._find_last_subject(json_obj)
 
@@ -116,7 +99,7 @@ def test_find_last_property_with_object_property():
         "@type": "Triple",
         "subject": "v:X",
         "predicate": "rdf:type",
-        "object": "owl:ObjectProperty"
+        "object": "owl:ObjectProperty",
     }
 
     result = query._find_last_property(json_obj)
@@ -131,7 +114,7 @@ def test_find_last_property_with_datatype_property():
         "@type": "Triple",
         "subject": "v:X",
         "predicate": "rdf:type",
-        "object": "owl:DatatypeProperty"
+        "object": "owl:DatatypeProperty",
     }
 
     result = query._find_last_property(json_obj)
@@ -146,7 +129,7 @@ def test_find_last_property_with_domain():
         "@type": "Triple",
         "subject": "v:X",
         "predicate": "rdfs:domain",
-        "object": "v:Y"
+        "object": "v:Y",
     }
 
     result = query._find_last_property(json_obj)
@@ -161,7 +144,7 @@ def test_find_last_property_with_range():
         "@type": "Triple",
         "subject": "v:X",
         "predicate": "rdfs:range",
-        "object": "xsd:string"
+        "object": "xsd:string",
     }
 
     result = query._find_last_property(json_obj)
@@ -176,15 +159,9 @@ def test_find_last_property_in_and():
         "@type": "Triple",
         "subject": "v:X",
         "predicate": "rdfs:domain",
-        "object": "v:Y"
+        "object": "v:Y",
     }
-    json_obj = {
-        "@type": "And",
-        "and": [
-            {"@type": "Other"},
-            prop_triple
-        ]
-    }
+    json_obj = {"@type": "And", "and": [{"@type": "Other"}, prop_triple]}
 
     result = query._find_last_property(json_obj)
 
@@ -194,18 +171,8 @@ def test_find_last_property_in_and():
 def test_find_last_property_in_or():
     """Test _find_last_property finds property in Or clause."""
     query = WOQLQuery()
-    prop_triple = {
-        "@type": "Triple",
-        "subject": "v:X",
-        "object": "owl:ObjectProperty"
-    }
-    json_obj = {
-        "@type": "Or",
-        "or": [
-            {"@type": "Other"},
-            prop_triple
-        ]
-    }
+    prop_triple = {"@type": "Triple", "subject": "v:X", "object": "owl:ObjectProperty"}
+    json_obj = {"@type": "Or", "or": [{"@type": "Other"}, prop_triple]}
 
     result = query._find_last_property(json_obj)
 
@@ -219,12 +186,9 @@ def test_find_last_property_in_nested_query():
         "@type": "Triple",
         "subject": "v:X",
         "predicate": "rdfs:range",
-        "object": "v:Y"
+        "object": "v:Y",
     }
-    json_obj = {
-        "@type": "Select",
-        "query": prop_triple
-    }
+    json_obj = {"@type": "Select", "query": prop_triple}
 
     result = query._find_last_property(json_obj)
 
@@ -238,7 +202,7 @@ def test_find_last_property_not_found():
         "@type": "Triple",
         "subject": "v:X",
         "predicate": "someOther:predicate",
-        "object": "v:Y"
+        "object": "v:Y",
     }
 
     result = query._find_last_property(json_obj)
@@ -340,14 +304,7 @@ def test_find_last_subject_deeply_nested():
     triple = {"@type": "Triple", "subject": "v:Deep"}
     json_obj = {
         "@type": "And",
-        "and": [
-            {
-                "@type": "Or",
-                "or": [
-                    {"@type": "Select", "query": triple}
-                ]
-            }
-        ]
+        "and": [{"@type": "Or", "or": [{"@type": "Select", "query": triple}]}],
     }
 
     result = query._find_last_subject(json_obj)
@@ -362,18 +319,11 @@ def test_find_last_property_deeply_nested():
         "@type": "Triple",
         "subject": "v:X",
         "predicate": "rdfs:domain",
-        "object": "v:Y"
+        "object": "v:Y",
     }
     json_obj = {
         "@type": "And",
-        "and": [
-            {
-                "@type": "Or",
-                "or": [
-                    {"@type": "Select", "query": triple}
-                ]
-            }
-        ]
+        "and": [{"@type": "Or", "or": [{"@type": "Select", "query": triple}]}],
     }
 
     result = query._find_last_property(json_obj)

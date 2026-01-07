@@ -1,9 +1,11 @@
 """Tests for WOQL query builder methods using standardized helpers."""
+
 from terminusdb_client.woqlquery.woql_query import WOQLQuery, Var
 from terminusdb_client.tests.woql_test_helpers import WOQLTestHelpers as H
 
 
 # Basic Query Builders
+
 
 def test_triple_basic():
     """Test triple() creates proper Triple structure."""
@@ -287,6 +289,7 @@ def test_execute_with_commit():
 
 # Chaining Tests
 
+
 def test_chaining_triple_and_triple():
     """Test chaining multiple triple() calls."""
     query = WOQLQuery().triple("v:X", "rdf:type", "Person")
@@ -319,6 +322,7 @@ def test_operators_return_self():
 
 
 # Edge Cases
+
 
 def test_select_with_empty_list():
     """Test select() explicitly with empty list."""
@@ -364,6 +368,7 @@ def test_triple_with_string_object():
 
 
 # Args Introspection Tests
+
 
 def test_using_args_introspection():
     """Test using() returns args list when called with 'args'."""

@@ -1,4 +1,5 @@
 """Tests for WOQLQuery cleaning and expansion methods."""
+
 import datetime
 from terminusdb_client.woqlquery.woql_query import WOQLQuery, Var, Doc
 

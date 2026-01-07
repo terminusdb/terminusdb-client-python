@@ -707,26 +707,59 @@ class TestTripleBuilderChainer:
         }
 
     def test_doc(self):
-        result = WOQLQuery().insert_document(
-            Doc({"@type": "Car", "wheels": 4})
-        )
-        assert result.to_dict() == {'@type': 'InsertDocument', 'document': {'@type': 'Value', 'dictionary': {'@type': 'DictionaryTemplate', 'data': [{'@type': 'FieldValuePair', 'field': '@type', 'value': {'@type': 'Value', 'data': {'@type': 'xsd:string', '@value': 'Car'}}}, {'@type': 'FieldValuePair', 'field': 'wheels', 'value': {'@type': 'Value', 'data': {'@type': 'xsd:integer', '@value': 4}}}]}}}
+        result = WOQLQuery().insert_document(Doc({"@type": "Car", "wheels": 4}))
+        assert result.to_dict() == {
+            "@type": "InsertDocument",
+            "document": {
+                "@type": "Value",
+                "dictionary": {
+                    "@type": "DictionaryTemplate",
+                    "data": [
+                        {
+                            "@type": "FieldValuePair",
+                            "field": "@type",
+                            "value": {
+                                "@type": "Value",
+                                "data": {"@type": "xsd:string", "@value": "Car"},
+                            },
+                        },
+                        {
+                            "@type": "FieldValuePair",
+                            "field": "wheels",
+                            "value": {
+                                "@type": "Value",
+                                "data": {"@type": "xsd:integer", "@value": 4},
+                            },
+                        },
+                    ],
+                },
+            },
+        }
 
     def test_var(self):
-        result = WOQLQuery().insert_document(
-            Doc({"@type": "Car", "wheels": Var("v")})
-        )
+        result = WOQLQuery().insert_document(Doc({"@type": "Car", "wheels": Var("v")}))
 
         assert result.to_dict() == {
-            '@type': 'InsertDocument',
-            'document': {'@type': 'Value',
-                         'dictionary': {'@type': 'DictionaryTemplate',
-                                        'data': [{'@type': 'FieldValuePair',
-                                                  'field': '@type',
-                                                  'value': {'@type': 'Value',
-                                                            'data': {'@type': 'xsd:string',
-                                                                     '@value': 'Car'}}},
-                                                 {'@type': 'FieldValuePair',
-                                                  'field': 'wheels',
-                                                  'value': {'@type': 'Value',
-                                                            'variable': 'v'}}]}}}
+            "@type": "InsertDocument",
+            "document": {
+                "@type": "Value",
+                "dictionary": {
+                    "@type": "DictionaryTemplate",
+                    "data": [
+                        {
+                            "@type": "FieldValuePair",
+                            "field": "@type",
+                            "value": {
+                                "@type": "Value",
+                                "data": {"@type": "xsd:string", "@value": "Car"},
+                            },
+                        },
+                        {
+                            "@type": "FieldValuePair",
+                            "field": "wheels",
+                            "value": {"@type": "Value", "variable": "v"},
+                        },
+                    ],
+                },
+            },
+        }
