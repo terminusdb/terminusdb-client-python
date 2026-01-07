@@ -23,6 +23,9 @@ pytest-cov = "*"
 pytest-mock = "*"
 pytest-xdist = "*"
 flake8 = "*"
+sphinx-rtd-theme = "^3.0.2"
+sphinx-autodoc-typehints = "^2.0"
+sphinx-click = "^5.0"
 
 [tool.poetry.scripts]
 tdbpy = "terminusdb_client.scripts.scripts:tdbpy"
