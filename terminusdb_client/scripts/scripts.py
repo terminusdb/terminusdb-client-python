@@ -8,10 +8,9 @@ import sys
 from importlib import import_module
 
 import click
+import terminusdb_client.woqlschema.woql_schema as woqlschema
 from shed import shed
 from tqdm import tqdm
-
-import terminusdb_client.woqlschema.woql_schema as woqlschema
 
 from .. import woql_type as wt
 from ..client.Client import Client
@@ -215,10 +214,8 @@ def _create_script(obj_list):
         print_script += '"""\n'
     for obj_str in dir(woqlschema):
         obj = eval(f"woqlschema.{obj_str}")  # noqa: S307
-        if (
-            isinstance(obj, woqlschema.TerminusClass)
-            or isinstance(obj, enum.EnumMeta)
-            or isinstance(obj, type(woqlschema.TerminusKey))
+        if isinstance(
+            obj, (woqlschema.TerminusClass, enum.EnumMeta, type(woqlschema.TerminusKey))
         ):
             import_objs.append(obj_str)
     print_script += "from typing import List, Optional, Set\n"
@@ -353,7 +350,7 @@ def commit(message):
     )
     for obj_str in dir(schema_plan):
         obj = eval(f"schema_plan.{obj_str}")  # noqa: S307
-        if isinstance(obj, woqlschema.TerminusClass) or isinstance(obj, enum.EnumMeta):
+        if isinstance(obj, (woqlschema.TerminusClass, enum.EnumMeta)):
             if obj_str not in ["DocumentTemplate", "EnumTemplate", "TaggedUnion"]:
                 schema_obj.add_obj(obj.__name__, obj)
     if message is None:
@@ -469,7 +466,7 @@ def importcsv(
                 converted_type = class_name
             else:
                 converted_type = np_to_buildin[dtype.type]
-                if converted_type == object:
+                if converted_type is object:
                     converted_type = str  # pandas treats all string as objects
                 converted_type = wt.to_woql_type(converted_type)
 
@@ -647,7 +644,8 @@ def exportcsv(class_obj, keepid, maxdep, filename=None):
 def alldocs(schema, type_, query, head, export, keepid, maxdep, filename=None):
     """Get all documents in the database, use --schema to specify schema, --type to select type and -q to make queries (e.g. -q date=2021-07-01)
 
-    If using --type and not --schema, can export using -e with options: --keepid, --maxdep and --filename"""
+    If using --type and not --schema, can export using -e with options: --keepid, --maxdep and --filename
+    """
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
     settings.update(status)

@@ -124,10 +124,11 @@ The project includes a `dev` script that provides the following commands:
 |--------|-------------|
 | `poetry run dev init-dev` | Initialize development environment |
 | `poetry run dev install-dev` | Install package in editable mode |
-| `poetry run dev format` | Format code with shed |
-| `poetry run dev lint` | Run linting checks (read-only) |
+| `poetry run dev format` | Format code with black and ruff |
+| `poetry run dev lint` | Run flake8 linting (read-only) |
 | `poetry run dev lint-fix` | Run linting and fix issues automatically |
 | `poetry run dev flake8` | Run flake8 linting only |
+| `poetry run dev ruff` | Run ruff linting only |
 | `poetry run dev check` | Run all static analysis checks |
 | `poetry run dev test` | Run unit tests |
 | `poetry run dev test-unit` | Run unit tests with coverage |

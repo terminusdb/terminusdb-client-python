@@ -4,12 +4,18 @@ Development scripts for TerminusDB Python Client.
 These scripts provide centralized development commands through Poetry.
 """
 
+import glob
 import os
 import shutil
 import subprocess
 import sys
 from pathlib import Path
 
+# Constants
+PYTHON_CLIENT_DIR = "terminusdb_client/"
+RUNNING_FLAKE8_MSG = "Running flake8..."
+RUNNING_RUFF_MSG = "Running ruff..."
+RUFF_WARNING_MSG = "⚠️  Ruff found some issues it couldn't fix automatically:\n   Run 'poetry run dev ruff' to see all issues"
 # Constants for pytest arguments
 PYTEST_TB_SHORT = "--tb=short"
 PYTEST_COV = "--cov=terminusdb_client"
@@ -56,75 +62,64 @@ def install():
 
 
 def format():
-    """Format code with shed."""
+    """Format code with black and ruff (no auto-commits)."""
     print("Formatting code...")
-    run_command(["poetry", "run", "shed"])
+    # Find all Python files and format them
+    python_files = glob.glob("terminusdb_client/**/*.py", recursive=True)
+    if python_files:
+        # Run black for formatting
+        print("Running black...")
+        run_command(["poetry", "run", "black"] + python_files)
+        # Run ruff for import sorting and other fixes (ignore unfixed errors)
+        print(RUNNING_RUFF_MSG)
+        try:
+            run_command(["poetry", "run", "ruff", "check", "--fix", PYTHON_CLIENT_DIR])
+        except subprocess.CalledProcessError:
+            print(RUFF_WARNING_MSG)
+    else:
+        print("No Python files found to format.")
 
 
 def lint():
     """Run linting checks (read-only)."""
     print("Running linting checks...")
 
-    # Check code formatting with shed
-    print("Checking code formatting with shed...")
-    temp_dir = Path("/tmp/terminusdb-lint-check")
-    temp_dir.mkdir(exist_ok=True)
-
-    try:
-        # Copy code to temp directory
-        src_dir = Path("terminusdb_client")
-        if src_dir.exists():
-            shutil.copytree(src_dir, temp_dir / src_dir.name, dirs_exist_ok=True)
-
-        # Initialize git repo in temp directory if not exists
-        subprocess.run(["git", "init"], cwd=temp_dir, capture_output=True)
-        subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=temp_dir, capture_output=True)
-        subprocess.run(["git", "config", "user.name", "Test User"], cwd=temp_dir, capture_output=True)
-        subprocess.run(["git", "add", "."], cwd=temp_dir, capture_output=True)
-        subprocess.run(["git", "commit", "-m", "initial"], cwd=temp_dir, capture_output=True)
-
-        # Run shed in temp directory
-        subprocess.run(
-            ["poetry", "run", "shed"],
-            cwd=temp_dir,
-            capture_output=True
-        )
-
-        # Check if any files were modified
-        git_result = subprocess.run(
-            ["git", "status", "--porcelain"],
-            cwd=temp_dir,
-            capture_output=True,
-            text=True
-        )
-
-        if git_result.returncode != 0 or git_result.stdout.strip():
-            print("❌ Code formatting issues found. Run 'poetry run dev lint-fix' to fix.")
-            sys.exit(1)
-        else:
-            print("✅ Code formatting is correct.")
-    finally:
-        # Clean up
-        shutil.rmtree(temp_dir, ignore_errors=True)
-
     # Run flake8
-    print("Running flake8...")
+    print(RUNNING_FLAKE8_MSG)
     run_command(["poetry", "run", "flake8", "terminusdb_client"])
 
 
 def flake8():
     """Run flake8 linting only."""
-    print("Running flake8...")
+    print(RUNNING_FLAKE8_MSG)
     run_command(["poetry", "run", "flake8", "terminusdb_client"])
+
+
+def ruff():
+    """Run ruff linting only."""
+    print(RUNNING_RUFF_MSG)
+    run_command(["poetry", "run", "ruff", "check", PYTHON_CLIENT_DIR])
 
 
 def lint_fix():
     """Run linting and fix issues automatically."""
     print("Running linting fixes...")
 
-    # Format code with shed
-    print("Fixing code formatting with shed...")
-    run_command(["poetry", "run", "shed"])
+    # Format code with black and ruff
+    print("Fixing code formatting...")
+    python_files = glob.glob("terminusdb_client/**/*.py", recursive=True)
+    if python_files:
+        # Run black for formatting
+        print("Running black...")
+        run_command(["poetry", "run", "black"] + python_files)
+        # Run ruff for import sorting and other fixes
+        print(RUNNING_RUFF_MSG)
+        try:
+            run_command(["poetry", "run", "ruff", "check", "--fix", PYTHON_CLIENT_DIR])
+        except subprocess.CalledProcessError:
+            print(RUFF_WARNING_MSG)
+    else:
+        print("No Python files found to format.")
 
     print("✅ Linting fixes completed!")
     print("Note: Some issues (like flake8 violations) may need manual fixes.")
@@ -253,19 +248,36 @@ def pr():
     # 1. Clean
     clean()
 
-    # 2. Format
-    format()
+    # 2. Check formatting (don't fix)
+    print("\nChecking code formatting...")
+    try:
+        run_command(["poetry", "run", "black", "--check", "--diff", "terminusdb_client/"])
+        print("✅ Black formatting is correct.")
+    except subprocess.CalledProcessError:
+        print("❌ Black formatting issues found.")
+        print("   Run 'poetry run dev format' to fix formatting issues")
+        sys.exit(1)
 
     # 3. Lint
     lint()
+    
+    # 4. Check ruff for any remaining issues
+    print("\nChecking for ruff issues...")
+    try:
+        run_command(["poetry", "run", "ruff", "check", PYTHON_CLIENT_DIR])
+        print("✅ No ruff issues found.")
+    except subprocess.CalledProcessError:
+        print("❌ Ruff issues found. Please fix them manually.")
+        print("   Run 'poetry run dev ruff' to see all issues")
+        sys.exit(1)
 
-    # 4. Run all tests
+    # 5. Run all tests
     test_all()
 
     print("\nAll PR preparation checks completed successfully!")
     print("\nSummary of checks performed:")
-    print("  ✓ Code formatted with shed")
-    print("  ✓ Linting passed (flake8, shed check)")
+    print("  ✓ Code formatting is correct (black, ruff)")
+    print("  ✓ Linting passed (flake8, ruff check)")
     print("  ✓ All tests passed (unit + integration)")
     print("  ✓ Coverage report generated")
     print("\nYour PR is ready for submission!")
@@ -279,10 +291,11 @@ def main():
         print("\nAvailable commands:")
         print("  init-dev      - Initialize development environment")
         print("  install-dev   - Install package in editable mode")
-        print("  format        - Format code with shed")
-        print("  lint          - Run linting checks (read-only)")
+        print("  format        - Format code with black and ruff")
+        print("  lint          - Run flake8 linting (read-only)")
         print("  lint-fix      - Run linting and fix issues automatically")
         print("  flake8        - Run flake8 linting only")
+        print("  ruff          - Run ruff linting only")
         print("  check         - Run all static analysis checks")
         print("  test          - Run unit tests")
         print("  test-unit     - Run unit tests only")
@@ -302,10 +315,11 @@ def main():
         print("\nAvailable commands:")
         print("  init-dev      - Initialize development environment")
         print("  install-dev   - Install package in editable mode")
-        print("  format        - Format code with shed")
-        print("  lint          - Run linting checks (read-only)")
+        print("  format        - Format code with black and ruff")
+        print("  lint          - Run flake8 linting (read-only)")
         print("  lint-fix      - Run linting and fix issues automatically")
         print("  flake8        - Run flake8 linting only")
+        print("  ruff          - Run ruff linting only")
         print("  check         - Run all static analysis checks")
         print("  test          - Run unit tests")
         print("  test-unit     - Run unit tests only")
@@ -326,6 +340,7 @@ def main():
         "lint": lint,
         "lint-fix": lint_fix,
         "flake8": flake8,
+        "ruff": ruff,
         "check": check,
         "test": test,
         "test-unit": test_unit,
