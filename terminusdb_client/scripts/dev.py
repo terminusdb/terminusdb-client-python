@@ -26,7 +26,18 @@ PYTEST_COV_XML = "--cov-report=xml:cov.xml"
 def run_command(cmd, cwd=None, check=True):
     """Run a shell command and return the result."""
     print(f"Running: {' '.join(cmd)}")
-    return subprocess.run(cmd, cwd=cwd, check=check)
+    try:
+        result = subprocess.run(cmd, cwd=cwd, check=check, capture_output=True, text=True)
+        if result.stdout:
+            print(result.stdout)
+        return result
+    except subprocess.CalledProcessError as e:
+        if e.stdout:
+            print(e.stdout)
+        if e.stderr:
+            print(e.stderr, file=sys.stderr)
+        # Re-raise with a cleaner message
+        raise SystemExit(1)
 
 
 def init():
