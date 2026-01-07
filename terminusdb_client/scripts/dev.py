@@ -213,6 +213,24 @@ def docs():
         os.chdir("..")
 
 
+def docs_json():
+    """Generate docs.json for documentation site."""
+    print("Generating docs.json...")
+    script_path = Path(".github/insert_docs.py")
+    if not script_path.exists():
+        print(f"Error: {script_path} not found")
+        sys.exit(1)
+    result = subprocess.run(
+        [sys.executable, str(script_path)],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    with open("docs.json", "w") as f:
+        f.write(result.stdout)
+    print("Generated docs.json successfully")
+
+
 def tox():
     """Run tox for isolated testing."""
     print("Running tox...")
@@ -313,6 +331,7 @@ def main():
         print("  test-integration - Run integration tests")
         print("  test-all      - Run all tests (unit + integration)")
         print("  docs          - Build documentation")
+        print("  docs-json     - Generate docs.json for documentation site")
         print("  tox           - Run tox for isolated testing")
         print("  clean         - Clean build artifacts")
         print("  pr            - Run all PR preparation checks")
@@ -337,6 +356,7 @@ def main():
         print("  test-integration - Run integration tests")
         print("  test-all      - Run all tests (unit + integration)")
         print("  docs          - Build documentation")
+        print("  docs-json     - Generate docs.json for documentation site")
         print("  tox           - Run tox for isolated testing")
         print("  clean         - Clean build artifacts")
         print("  pr            - Run all PR preparation checks")
@@ -358,6 +378,7 @@ def main():
         "test-integration": test_integration,
         "test-all": test_all,
         "docs": docs,
+        "docs-json": docs_json,
         "tox": tox,
         "clean": clean,
         "pr": pr,

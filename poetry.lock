@@ -1057,7 +1057,7 @@ version = "1.9.0"
 description = "Sphinx extension to support docstrings in Numpy format"
 optional = false
 python-versions = ">=3.9"
-groups = ["main"]
+groups = ["main", "dev"]
 markers = "python_version < \"3.11\""
 files = [
     {file = "numpydoc-1.9.0-py3-none-any.whl", hash = "sha256:8a2983b2d62bfd0a8c470c7caa25e7e0c3d163875cdec12a8a1034020a9d1135"},
@@ -1074,7 +1074,7 @@ version = "1.10.0"
 description = "Sphinx extension to support docstrings in Numpy format"
 optional = false
 python-versions = ">=3.10"
-groups = ["main"]
+groups = ["main", "dev"]
 markers = "python_version >= \"3.11\""
 files = [
     {file = "numpydoc-1.10.0-py3-none-any.whl", hash = "sha256:3149da9874af890bcc2a82ef7aae5484e5aa81cb2778f08e3c307ba6d963721b"},
@@ -2131,4 +2131,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9.0,<3.13"
-content-hash = "ca123f4186f481f1fae7d6f5e24098aa93c7d404cce6ee442e0cf83a573efb85"
+content-hash = "7e20e9fb18c1d9b019113c272854a5b2a35d486b1ac47c45ace89d5413fa8324"
