@@ -271,7 +271,7 @@ def pr():
 
     # 3. Lint
     lint()
-    
+
     # 4. Check ruff for any remaining issues
     print("\nChecking for ruff issues...")
     try:
