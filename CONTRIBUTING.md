@@ -2,51 +2,143 @@
 
 Thanks for interested to contribute to TerminusDB Client, to get started, fork this repo and follow the [instruction setting up dev environment](#setting-up-dev-environment-). If you don't have idea where to start, you can look for [`good first issue`](https://github.com/terminusdb/terminusdb-client-python/contribute) or [`help wanted`](https://github.com/terminusdb/terminusdb-client-python/issues?q=is:open+is:issue+label:"help+wanted") label at issues. All pull request should follow the [Pull Request Format Guideline](#pull-request-format-guideline-) and pull request (PR) that involving coding should come with [tests](#writing-tests-and-testing-) and [documentations](#writing-documentation-).
 
+## Quick Start (Python + Poetry) 🚀
+
+If you have Python 3.9+ installed, here's the fastest way to get started:
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/terminusdb/terminusdb-client-python.git
+cd terminusdb-client-python
+
+# 2. Create and activate a virtual environment with Python 3.9+
+python3.9 -m venv .venv  # or python3.10, python3.11, python3.12
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# 3. Install Poetry (if not already installed)
+pip install poetry
+
+# 4. Install dependencies and set up development environment
+poetry install --with dev
+
+# 5. Install pre-commit hooks (optional, requires Python 3.10+)
+# If you have Python 3.10+, you can install pre-commit:
+# poetry add --group dev pre-commit && poetry run pre-commit install
+
+# 6. Install the package in editable mode
+poetry run dev install-dev
+
+# 7. Run tests to verify everything works
+poetry run dev test
+
+# 8. Get help with available commands
+poetry run dev --help
+```
+
+**Important**: This project requires Python 3.9 or higher. If you're using Python 3.8, please upgrade to Python 3.9+ before proceeding.
+
+That's it! You're now ready to start contributing. See [Poetry Scripts Reference](#poetry-scripts-reference-) for all available commands.
+
 ## Setting up dev environment 💻
 
-Make sure you have Python>=3.9 installed. We use [pipenv](https://pipenv-fork.readthedocs.io/en/latest/) for dev environment, to install pipenv:
+Make sure you have Python>=3.9 installed. We use [Poetry](https://python-poetry.org/) for dependency management.
 
-`pip3 install pipenv --upgrade`
+### Using Poetry (Recommended)
 
-[Fork and clone](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) this repo, then in your local repo:
+1. [Fork and clone](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) this repo
 
-`pipenv install --dev --pre` or `make init`
+2. Create and activate a virtual environment:
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   ```
 
-To “editable” install the local Terminus Client Python:
+3. Install Poetry and dependencies:
+   ```bash
+   pip install poetry
+   poetry install --with dev
+   ```
 
-`pip3 install -e .`
+4. Install the package in editable mode:
+   ```bash
+   poetry run dev install-dev
+   ```
 
-**to be able to run integration tests, local installation of docker is required**
+**To run integration tests, Docker must be installed locally.**
 
-We use [shed](https://pypi.org/project/shed/) to lint our code. Although you can do it manually by running `shed`, we highly recommend setting up the pre-commit hook to do the linting automatically.
+We use [shed](https://pypi.org/project/shed/) to lint our code. You can run it manually with `poetry run dev lint`, or set up a pre-commit hook (requires Python 3.10+):
 
-To install the pre-commit hook:
-
-`pre-commit install`
+```bash
+poetry add --group dev pre-commit
+poetry run pre-commit install
+```
 
 ## Writing tests and testing ✅
 
-We are using [pytest](https://docs.pytest.org/en/latest/) for testing. All tests are stored in `/tests`
+We are using [pytest](https://docs.pytest.org/en/latest/) for testing. All tests are stored in `terminusdb_client/tests/`.
 
-We also use tox to run tests in a virtual environment, we recommend running `tox` for the first time before you make any changes. This is to initialize the tox environments (or do it separately by `tox -e deps`) and make sure all tests pass initially.
+### Using Poetry Scripts (Recommended)
 
-To run the unittests without integration tests:
+```bash
+# Format your code
+poetry run dev format
 
-`pytest terminusdb_client/tests/ --ignore=terminusdb_client/tests/integration_tests/`
+# Run linting (read-only, just checks)
+poetry run dev lint
 
-To run all tests including integration tests:
+# Run flake8 only
+poetry run dev flake8
 
-`tox -e test`
+# Fix linting issues automatically
+poetry run dev lint-fix
 
-To run all checks and auto formatting:
+# Run all tests
+poetry run dev test-all
 
-`tox -e check`
+# Prepare your PR (runs format, lint, and all tests)
+poetry run dev pr
+```
 
-To run all tests and checks:
+### Using tox (Alternative)
 
-`tox`
+You can also use tox to run tests in an isolated environment:
 
-**please make sure `tox` passes before making PR**
+```bash
+# Run all tests
+tox -e test
+
+# Run all checks and auto formatting
+tox -e check
+
+# Run everything
+tox
+```
+
+**Please make sure all tests pass before making a PR.**
+
+## Poetry Scripts Reference 📋
+
+The project includes a `dev` script that provides the following commands:
+
+| Command | Description |
+|--------|-------------|
+| `poetry run dev init-dev` | Initialize development environment |
+| `poetry run dev install-dev` | Install package in editable mode |
+| `poetry run dev format` | Format code with shed |
+| `poetry run dev lint` | Run linting checks (read-only) |
+| `poetry run dev lint-fix` | Run linting and fix issues automatically |
+| `poetry run dev flake8` | Run flake8 linting only |
+| `poetry run dev check` | Run all static analysis checks |
+| `poetry run dev test` | Run unit tests |
+| `poetry run dev test-unit` | Run unit tests with coverage |
+| `poetry run dev test-integration` | Run integration tests |
+| `poetry run dev test-all` | Run all tests |
+| `poetry run dev docs` | Build documentation |
+| `poetry run dev tox` | Run tox for isolated testing |
+| `poetry run dev clean` | Clean build artifacts |
+| `poetry run dev pr` | Run all PR preparation checks |
+
+Run `poetry run dev --help` to see all available commands.
 
 ## Writing Documentation 📖
 
