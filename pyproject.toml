@@ -17,7 +17,7 @@ tqdm = "*"
 click = ">=8.0"
 shed = "*"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = ">= 3"
 pytest-cov = "*"
 pytest-mock = "*"
