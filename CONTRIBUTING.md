@@ -44,39 +44,58 @@ That's it! You're now ready to start contributing. See [Poetry Scripts Reference
 
 ## Setting up dev environment 💻
 
-Make sure you have Python>=3.9 installed. We use [Poetry](https://python-poetry.org/) for dependency management.
+Make sure you have Python>=3.9 and <3.13 installed.
 
-### Using Poetry (Recommended)
+[Fork and clone](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) this repo, then set up your development environment using one of the methods below.
 
-1. [Fork and clone](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) this repo
+### Option 1: Using venv (recommended)
 
-2. Create and activate a virtual environment:
+Create and activate a virtual environment:
+
+```bash
+# Create venv with Python 3.12 (or any version 3.9-3.12)
+python3.12 -m venv .venv
+
+# Activate the virtual environment
+source .venv/bin/activate  # On macOS/Linux
+# .venv\Scripts\activate   # On Windows
+
+# Install the package in editable mode with dev dependencies
+pip install -e ".[dev]"
+
+# Install pytest for running tests
+pip install pytest
+```
+
+### Option 2: Using pipenv
+
+We also support [pipenv](https://pipenv-fork.readthedocs.io/en/latest/) for dev environment:
+
+```bash
+pip install pipenv --upgrade
+pipenv install --dev --pre
+```
+
+Or simply run `make init`.
+
+To "editable" install the local Terminus Client Python:
+
+`pip install -e .`
+
+### Running a local TerminusDB server
+
+**To run integration tests, you need either Docker or a local TerminusDB server.**
+
+For integration tests, you can either:
+
+1. **Use Docker** (automatic): Tests will automatically start a Docker container if no server is detected
+2. **Use a local server**: Start the TerminusDB test server from the main terminusdb repository:
    ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   cd /path/to/terminusdb
+   ./tests/terminusdb-test-server.sh start
    ```
 
-3. Install Poetry and dependencies:
-   ```bash
-   pip install poetry
-   poetry install --with dev
-   ```
-
-4. Install the package in editable mode:
-   ```bash
-   poetry run dev install-dev
-   ```
-
-5. Start TerminusDB server (required for integration tests):
-   ```bash
-   docker run --pull always -d -p 127.0.0.1:6363:6363 -v terminusdb_storage:/app/terminusdb/storage --name terminusdb terminusdb/terminusdb-server:v12
-   ```
-   
-   To stop the server when done:
-   ```bash
-   docker stop terminusdb
-   docker rm terminusdb
-   ```
+The test configuration will automatically detect and use an available server.
 
 **To run integration tests, Docker must be installed locally.**
 

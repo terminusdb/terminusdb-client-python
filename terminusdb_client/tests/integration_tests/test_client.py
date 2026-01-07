@@ -211,6 +211,70 @@ def test_log(docker_url):
     assert log[0]['@type'] == 'InitialCommit'
 
 
+def test_get_document_history(docker_url):
+    # Create client
+    client = Client(docker_url, user_agent=test_user_agent)
+    client.connect()
+
+    # Create test database
+    db_name = "testDB" + str(random())
+    client.create_database(db_name, team="admin")
+    client.connect(db=db_name)
+
+    # Add a schema
+    schema = {
+        "@type": "Class",
+        "@id": "Person",
+        "name": "xsd:string",
+        "age": "xsd:integer"
+    }
+    client.insert_document(schema, graph_type=GraphType.SCHEMA)
+
+    # Insert a document
+    person = {"@type": "Person", "@id": "Person/Jane", "name": "Jane", "age": 30}
+    client.insert_document(person, commit_msg="Created Person/Jane")
+
+    # Update the document to create history
+    person["name"] = "Jane Doe"
+    person["age"] = 31
+    client.update_document(person, commit_msg="Updated Person/Jane name and age")
+
+    # Update again
+    person["age"] = 32
+    client.update_document(person, commit_msg="Updated Person/Jane age")
+
+    # Get document history
+    history = client.get_document_history("Person/Jane")
+
+    # Assertions
+    assert isinstance(history, list)
+    assert len(history) >= 3  # At least insert and two updates
+    assert all('timestamp' in entry for entry in history)
+    assert all(isinstance(entry['timestamp'], dt.datetime) for entry in history)
+    assert all('author' in entry for entry in history)
+    assert all('message' in entry for entry in history)
+    assert all('identifier' in entry for entry in history)
+
+    # Verify messages are in the history (order may vary)
+    messages = [entry['message'] for entry in history]
+    assert "Created Person/Jane" in messages
+    assert "Updated Person/Jane name and age" in messages
+    assert "Updated Person/Jane age" in messages
+
+    # Test with pagination
+    paginated_history = client.get_document_history("Person/Jane", start=0, count=2)
+    assert len(paginated_history) == 2
+
+    # Test with team/db override
+    history_override = client.get_document_history(
+        "Person/Jane", team="admin", db=db_name
+    )
+    assert len(history_override) == len(history)
+
+    # Cleanup
+    client.delete_database(db_name, "admin")
+
+
 def test_get_triples(docker_url):
     client = Client(docker_url, user_agent=test_user_agent, team="admin")
     client.connect()

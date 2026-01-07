@@ -411,8 +411,8 @@ class WOQLQuery:
                 obj["node"] = user_obj
         elif type(user_obj) is list:
             elts = []
-            for obj in user_obj:
-                elts.append(self._clean_object(obj))
+            for item in user_obj:
+                elts.append(self._clean_object(item))
             return elts
         elif isinstance(user_obj, Var):
             return self._expand_value_variable(user_obj)
@@ -1510,10 +1510,14 @@ class WOQLQuery:
     def file(self, fpath, opts=None):
         """Provides details of a file source in a JSON format that includes a URL property
 
+        Note: CSV files can no longer be read from the filesystem. Only files submitted
+        as part of the request can be processed. Use remote() for URLs or submit files
+        via the API.
+
         Parameters
         ----------
-        fpath : dict
-            file data source in a JSON format
+        fpath : dict or str
+            file data source in a JSON format or file path
         opts : input options
             optional
 
@@ -1523,7 +1527,7 @@ class WOQLQuery:
             query object that can be chained and/or execute
         Example
         -------
-        To load a local csv file:
+        To reference a file (must be submitted with request):
         >>> WOQLQuery().file("/app/local_files/my.csv")
         See Also
         --------
@@ -1537,8 +1541,10 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "QueryResource"
-        fpath["@type"] = "Source"
-        self._cursor["source"] = fpath
+        if isinstance(fpath, str):
+            self._cursor["source"] = {"@type": "Source", "file": fpath}
+        else:
+            self._cursor["source"] = fpath
         self._cursor["format"] = "csv"
         if opts:
             self._cursor["options"] = opts
@@ -1600,21 +1606,45 @@ class WOQLQuery:
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "QueryResource"
-        uri["@type"] = "Source"
-        self._cursor["source"] = uri
+        if isinstance(uri, dict):
+            uri["@type"] = "Source"
+            self._cursor["source"] = uri
+        else:
+            self._cursor["source"] = {"@type": "Source", "url": uri}
         self._cursor["format"] = "csv"
         if opts:
             self._cursor["options"] = opts
         return self
 
     def post(self, fpath, opts=None):
+        """Specifies a file to be posted as part of the request for processing.
+
+        Note: CSV files can no longer be read from the filesystem. Only files submitted
+        as part of the request can be processed. This method should be used with files
+        that are uploaded via the API.
+
+        Parameters
+        ----------
+        fpath : str or dict
+            file path/identifier or dict with file details
+        opts : dict, optional
+            additional options for file processing
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
         if fpath and fpath == "args":
             return ["source", "format", "options"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "QueryResource"
-        fpath["@type"] = "Source"
-        self._cursor["source"] = fpath
+        if isinstance(fpath, dict):
+            fpath["@type"] = "Source"
+            self._cursor["source"] = fpath
+        else:
+            self._cursor["source"] = {"@type": "Source", "post": fpath}
         self._cursor["format"] = "csv"
         if opts:
             self._cursor["options"] = opts
@@ -2426,6 +2456,135 @@ class WOQLQuery:
         self._cursor["list"] = self._value_list(mem_list)
         return self
 
+    def set_difference(self, list_a, list_b, result):
+        """Computes the set difference between two lists (elements in list_a but not in list_b)
+
+        Parameters
+        ----------
+        list_a : str or list
+            First list or variable
+        list_b : str or list
+            Second list or variable
+        result : str
+            Variable to store the result
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if list_a and list_a == "args":
+            return ["list_a", "list_b", "result"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "SetDifference"
+        self._cursor["list_a"] = self._value_list(list_a)
+        self._cursor["list_b"] = self._value_list(list_b)
+        self._cursor["result"] = self._value_list(result)
+        return self
+
+    def set_intersection(self, list_a, list_b, result):
+        """Computes the set intersection of two lists (elements in both list_a and list_b)
+
+        Parameters
+        ----------
+        list_a : str or list
+            First list or variable
+        list_b : str or list
+            Second list or variable
+        result : str
+            Variable to store the result
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if list_a and list_a == "args":
+            return ["list_a", "list_b", "result"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "SetIntersection"
+        self._cursor["list_a"] = self._value_list(list_a)
+        self._cursor["list_b"] = self._value_list(list_b)
+        self._cursor["result"] = self._value_list(result)
+        return self
+
+    def set_union(self, list_a, list_b, result):
+        """Computes the set union of two lists (all unique elements from both lists)
+
+        Parameters
+        ----------
+        list_a : str or list
+            First list or variable
+        list_b : str or list
+            Second list or variable
+        result : str
+            Variable to store the result
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if list_a and list_a == "args":
+            return ["list_a", "list_b", "result"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "SetUnion"
+        self._cursor["list_a"] = self._value_list(list_a)
+        self._cursor["list_b"] = self._value_list(list_b)
+        self._cursor["result"] = self._value_list(result)
+        return self
+
+    def set_member(self, element, set_list):
+        """Checks if an element is a member of a set (efficient O(log n) lookup)
+
+        Parameters
+        ----------
+        element : any
+            Element to check
+        set_list : str or list
+            Set (list) to check membership in
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if element and element == "args":
+            return ["element", "set"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "SetMember"
+        self._cursor["element"] = self._clean_object(element)
+        self._cursor["set"] = self._value_list(set_list)
+        return self
+
+    def list_to_set(self, input_list, result_set):
+        """Converts a list to a set (removes duplicates and sorts)
+
+        Parameters
+        ----------
+        input_list : str or list
+            Input list or variable
+        result_set : str
+            Variable to store the resulting set
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if input_list and input_list == "args":
+            return ["list", "set"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "ListToSet"
+        self._cursor["list"] = self._value_list(input_list)
+        self._cursor["set"] = self._value_list(result_set)
+        return self
+
     def concat(self, concat_list, result):
         """Concatenates the list of variables into a string and saves the result in v
 
@@ -2517,6 +2676,54 @@ class WOQLQuery:
         self._cursor["@type"] = "Sum"
         self._cursor["list"] = self._data_list(user_input)
         self._cursor["sum"] = self._clean_data_value(output)
+        return self
+
+    def slice(self, input_list, result, start, end=None):
+        """
+        Extracts a contiguous subsequence from a list, following slice() semantics.
+
+        Parameters
+        ----------
+        input_list : list or str
+            A list of values or a variable representing a list
+        result : str
+            A variable that stores the sliced result
+        start : int or str
+            The start index (0-based, supports negative indices)
+        end : int or str, optional
+            The end index (exclusive). If omitted, takes the rest of the list
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+
+        Examples
+        --------
+        >>> WOQLQuery().slice(["a", "b", "c", "d"], "v:Result", 1, 3)  # ["b", "c"]
+        >>> WOQLQuery().slice(["a", "b", "c", "d"], "v:Result", -2)    # ["c", "d"]
+        """
+        if input_list and input_list == "args":
+            return ["list", "result", "start", "end"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "Slice"
+        self._cursor["list"] = self._data_list(input_list)
+        self._cursor["result"] = self._clean_data_value(result)
+        if isinstance(start, int):
+            self._cursor["start"] = self._clean_data_value(
+                {"@type": "xsd:integer", "@value": start}
+            )
+        else:
+            self._cursor["start"] = self._clean_data_value(start)
+        # end is optional
+        if end is not None:
+            if isinstance(end, int):
+                self._cursor["end"] = self._clean_data_value(
+                    {"@type": "xsd:integer", "@value": end}
+                )
+            else:
+                self._cursor["end"] = self._clean_data_value(end)
         return self
 
     def start(self, start, query=None):

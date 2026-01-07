@@ -25,7 +25,6 @@ nonPositiveInteger = NewType('nonPositiveInteger', int)  # noqa: N816
 nonNegativeInteger = NewType('nonNegativeInteger', int)  # noqa: N816
 base64Binary = NewType('base64Binary', str)  # noqa: N816
 hexBinary = NewType('hexBinary', str)  # noqa: N816
-anyURI = NewType('anyURI', str)  # noqa: N816
 language = NewType('language', str)
 normalizedString = NewType('normalizedString', str)  # noqa: N816
 token = NewType('token', str)

@@ -712,3 +712,39 @@ def test_get_user(mocked_requests):
         auth=("admin", "root"),
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
     )
+
+
+@mock.patch.object(requests.Session, 'head', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
+def test_get_document_history(mocked_get, mocked_head):
+    client = Client(
+        "http://localhost:6363", user="admin", key="root", team="admin"
+    )
+    client.connect(db="myDBName")
+
+    client.get_document_history("Person/Jane", start=0, count=10)
+
+    # Get the last call to get (should be our get_document_history call)
+    last_call = client._session.get.call_args_list[-1]
+    assert last_call[0][0] == "http://localhost:6363/api/history/admin/myDBName"
+    assert last_call[1]["params"] == {"id": "Person/Jane", "start": 0, "count": 10}
+    assert last_call[1]["headers"] == {"user-agent": f"terminusdb-client-python/{__version__}"}
+    assert last_call[1]["auth"] == ("admin", "root")
+
+
+@mock.patch.object(requests.Session, 'head', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
+def test_get_document_history_with_created_updated(mocked_get, mocked_head):
+    client = Client(
+        "http://localhost:6363", user="admin", key="root", team="admin"
+    )
+    client.connect(db="myDBName")
+
+    client.get_document_history("Person/Jane", created=True, updated=True)
+
+    # Get the last call to get (should be our get_document_history call)
+    last_call = client._session.get.call_args_list[-1]
+    assert last_call[0][0] == "http://localhost:6363/api/history/admin/myDBName"
+    assert last_call[1]["params"] == {"id": "Person/Jane", "start": 0, "count": 10, "created": True, "updated": True}
+    assert last_call[1]["headers"] == {"user-agent": f"terminusdb-client-python/{__version__}"}
+    assert last_call[1]["auth"] == ("admin", "root")
