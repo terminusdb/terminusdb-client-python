@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "terminusdb-client"
-version = "11.1.0"
+version = "12.0.3"
 description = "Python client for Terminus DB"
 authors = ["TerminusDB group"]
 license = "Apache Software License"
@@ -17,15 +17,20 @@ tqdm = "*"
 click = ">=8.0"
 shed = "*"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = ">= 3"
 pytest-cov = "*"
 pytest-mock = "*"
 pytest-xdist = "*"
 flake8 = "*"
+sphinx-rtd-theme = "^3.0.2"
+sphinx-autodoc-typehints = "^2.0"
+sphinx-click = "^5.0"
+numpydoc = "^1.5"
 
 [tool.poetry.scripts]
 tdbpy = "terminusdb_client.scripts.scripts:tdbpy"
+dev = "terminusdb_client.scripts.dev:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

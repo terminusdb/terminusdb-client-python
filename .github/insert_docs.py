@@ -54,4 +54,4 @@ application = {
          }
     ]}
 
-print(json.dumps(application))
+print(json.dumps(application, indent=2))

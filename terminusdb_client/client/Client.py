@@ -772,7 +772,177 @@ class Client:
             headers=self._default_headers,
             auth=self._auth(),
         )
-        return json.loads(_finish_response(result))
+        result.raise_for_status()
+        return result.json()
+
+    def get_prefix(self, prefix_name: str) -> str:
+        """Get a single prefix IRI by name.
+
+        Parameters
+        ----------
+        prefix_name : str
+            The prefix name to retrieve.
+
+        Returns
+        -------
+        str
+            The IRI (namespace URL) this prefix expands to.
+
+        Raises
+        ------
+        DatabaseError
+            If the prefix does not exist (404) or other API error.
+
+        Examples
+        --------
+        >>> client.get_prefix("schema")
+        'http://schema.org/'
+        """
+        self._check_connection()
+        result = self._session.get(
+            self._prefix_url(prefix_name),
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        result.raise_for_status()
+        return result.json()["api:prefix_uri"]
+
+    def add_prefix(self, prefix_name: str, uri: str) -> dict:
+        """Add a new prefix mapping.
+
+        Parameters
+        ----------
+        prefix_name : str
+            The prefix name to create (must follow NCName rules).
+        uri : str
+            The IRI (namespace URL) this prefix expands to.
+
+        Returns
+        -------
+        dict
+            API response with status and details.
+
+        Raises
+        ------
+        DatabaseError
+            If prefix already exists or validation fails.
+
+        Examples
+        --------
+        >>> client.add_prefix("ex", "http://example.org/")
+        {'@type': 'api:PrefixAddResponse', 'api:status': 'api:success', ...}
+        """
+        self._check_connection()
+        result = self._session.post(
+            self._prefix_url(prefix_name),
+            json={"uri": uri},
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        result.raise_for_status()
+        return result.json()
+
+    def update_prefix(self, prefix_name: str, uri: str) -> dict:
+        """Update an existing prefix mapping.
+
+        Parameters
+        ----------
+        prefix_name : str
+            The prefix name to update.
+        uri : str
+            The new IRI for this prefix.
+
+        Returns
+        -------
+        dict
+            API response with status and details.
+
+        Raises
+        ------
+        DatabaseError
+            If prefix does not exist (404) or validation fails.
+
+        Examples
+        --------
+        >>> client.update_prefix("ex", "http://example.com/")
+        {'@type': 'api:PrefixUpdateResponse', 'api:status': 'api:success', ...}
+        """
+        self._check_connection()
+        result = self._session.put(
+            self._prefix_url(prefix_name),
+            json={"uri": uri},
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        result.raise_for_status()
+        return result.json()
+
+    def upsert_prefix(self, prefix_name: str, uri: str) -> dict:
+        """Create or update a prefix mapping (upsert).
+
+        Parameters
+        ----------
+        prefix_name : str
+            The prefix name.
+        uri : str
+            The IRI for this prefix.
+
+        Returns
+        -------
+        dict
+            API response with status and details.
+
+        Raises
+        ------
+        DatabaseError
+            If validation fails.
+
+        Examples
+        --------
+        >>> client.upsert_prefix("ex", "http://example.org/")
+        {'@type': 'api:PrefixUpdateResponse', 'api:status': 'api:success', ...}
+        """
+        self._check_connection()
+        result = self._session.put(
+            self._prefix_url(prefix_name) + "?create=true",
+            json={"uri": uri},
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        result.raise_for_status()
+        return result.json()
+
+    def delete_prefix(self, prefix_name: str) -> dict:
+        """Delete a prefix mapping.
+
+        Parameters
+        ----------
+        prefix_name : str
+            The prefix name to delete.
+
+        Returns
+        -------
+        dict
+            API response with status.
+
+        Raises
+        ------
+        DatabaseError
+            If prefix does not exist (404) or is reserved.
+
+        Examples
+        --------
+        >>> client.delete_prefix("ex")
+        {'@type': 'api:PrefixDeleteResponse', 'api:status': 'api:success', ...}
+        """
+        self._check_connection()
+        result = self._session.delete(
+            self._prefix_url(prefix_name),
+            headers=self._default_headers,
+            auth=self._auth(),
+        )
+        result.raise_for_status()
+        return result.json()
 
     def create_database(
         self,
@@ -3188,3 +3358,12 @@ class Client:
 
     def _db_url(self):
         return self._db_base("db")
+
+    def _prefix_url(self, prefix_name: Optional[str] = None):
+        """Get URL for prefix operations"""
+        base = self._db_base("prefix")
+        if self._db == "_system":
+            return base if prefix_name is None else f"{base}/{urlparse.quote(prefix_name)}"
+        # For regular databases, include repo and branch
+        base = self._branch_base("prefix")
+        return base if prefix_name is None else f"{base}/{urlparse.quote(prefix_name)}"

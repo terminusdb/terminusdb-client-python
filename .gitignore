@@ -2,7 +2,10 @@
 /requirements-dev.txt
 /requirements.txt
 
-# converage file
+# Generated documentation JSON
+docs.json
+
+# coverage file
 cov.xml
 
 .venv
