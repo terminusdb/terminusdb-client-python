@@ -28,10 +28,13 @@ poetry install --with dev
 # 6. Install the package in editable mode
 poetry run dev install-dev
 
-# 7. Run tests to verify everything works
+# 7. Start TerminusDB server (for integration tests)
+docker run --pull always -d -p 127.0.0.1:6363:6363 -v terminusdb_storage:/app/terminusdb/storage --name terminusdb terminusdb/terminusdb-server:v12
+
+# 8. Run tests to verify everything works
 poetry run dev test
 
-# 8. Get help with available commands
+# 9. Get help with available commands
 poetry run dev --help
 ```
 
@@ -62,6 +65,17 @@ Make sure you have Python>=3.9 installed. We use [Poetry](https://python-poetry.
 4. Install the package in editable mode:
    ```bash
    poetry run dev install-dev
+   ```
+
+5. Start TerminusDB server (required for integration tests):
+   ```bash
+   docker run --pull always -d -p 127.0.0.1:6363:6363 -v terminusdb_storage:/app/terminusdb/storage --name terminusdb terminusdb/terminusdb-server:v12
+   ```
+   
+   To stop the server when done:
+   ```bash
+   docker stop terminusdb
+   docker rm terminusdb
    ```
 
 **To run integration tests, Docker must be installed locally.**
