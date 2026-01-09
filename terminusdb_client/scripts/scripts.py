@@ -19,7 +19,9 @@ from ..woqldataframe.woqlDataframe import result_to_df
 from ..woqlschema.woql_schema import WOQLSchema
 
 
-def _df_to_schema(class_name, df, np, embedded=None, id_col=None, na_mode=None, keys=None):
+def _df_to_schema(
+    class_name, df, np, embedded=None, id_col=None, na_mode=None, keys=None
+):
     """Convert a pandas DataFrame to a TerminusDB schema class definition.
 
     Args:
@@ -41,9 +43,7 @@ def _df_to_schema(class_name, df, np, embedded=None, id_col=None, na_mode=None, 
 
     class_dict = {"@type": "Class", "@id": class_name}
     np_to_builtin = {
-        v: getattr(builtins, k)
-        for k, v in np.sctypeDict.items()
-        if k in vars(builtins)
+        v: getattr(builtins, k) for k, v in np.sctypeDict.items() if k in vars(builtins)
     }
     np_to_builtin[np.datetime64] = dt.datetime
 
@@ -512,7 +512,15 @@ def importcsv(
                 converted_col = col.lower().replace(" ", "_").replace(".", "_")
                 df.rename(columns={col: converted_col}, inplace=True)
             if not has_schema:
-                class_dict = _df_to_schema(class_name, df, np, embedded=embedded, id_col=id_, na_mode=na, keys=keys)
+                class_dict = _df_to_schema(
+                    class_name,
+                    df,
+                    np,
+                    embedded=embedded,
+                    id_col=id_,
+                    na_mode=na,
+                    keys=keys,
+                )
                 if message is None:
                     schema_msg = f"Schema object insert/ update with {csv_file} by Python client."
                 else:

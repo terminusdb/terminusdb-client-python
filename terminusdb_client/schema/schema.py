@@ -86,7 +86,11 @@ def _check_cycling(class_obj: "TerminusClass"):
         mro_names = [obj.__name__ for obj in class_obj.__mro__]
         for prop_type in class_obj._annotations.values():
             # Handle both string annotations and type objects
-            type_name = prop_type if isinstance(prop_type, str) else getattr(prop_type, '__name__', str(prop_type))
+            type_name = (
+                prop_type
+                if isinstance(prop_type, str)
+                else getattr(prop_type, "__name__", str(prop_type))
+            )
             if type_name in mro_names:
                 raise RecursionError(f"Embbding {prop_type} cause recursions.")
 

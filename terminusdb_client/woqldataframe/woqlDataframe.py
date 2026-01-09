@@ -75,7 +75,9 @@ def _embed_obj(df, maxdep, pd, keepid, all_existing_class, class_obj, client):
     ):
         return finish_df
     else:
-        return _embed_obj(finish_df, maxdep - 1, pd, keepid, all_existing_class, class_obj, client)
+        return _embed_obj(
+            finish_df, maxdep - 1, pd, keepid, all_existing_class, class_obj, client
+        )
 
 
 def result_to_df(all_records, keepid=False, max_embed_dep=0, client=None):
@@ -111,5 +113,7 @@ def result_to_df(all_records, keepid=False, max_embed_dep=0, client=None):
             raise InterfaceError(
                 f"{class_obj} not found in database ({client.db}) schema.'"
             )
-        df = _embed_obj(df, max_embed_dep, pd, keepid, all_existing_class, class_obj, client)
+        df = _embed_obj(
+            df, max_embed_dep, pd, keepid, all_existing_class, class_obj, client
+        )
     return df
