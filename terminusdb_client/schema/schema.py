@@ -85,7 +85,7 @@ def _check_cycling(class_obj: "TerminusClass"):
     if hasattr(class_obj, "_subdocument"):
         mro_names = [obj.__name__ for obj in class_obj.__mro__]
         for prop_type in class_obj._annotations.values():
-            if str(prop_type) in mro_names:
+            if prop_type.__name__ in mro_names:
                 raise RecursionError(f"Embbding {prop_type} cause recursions.")
 
 
@@ -100,8 +100,8 @@ def _check_mismatch_type(prop, prop_value, prop_type):
     else:
         if prop_type is int:
             prop_value = int(prop_value)
-        # TODO: This is now broken
-        # check_type(prop, prop_value, prop_type)
+        check_type(prop, prop_value, prop_type)
+    return prop_value
 
 
 def _check_missing_prop(doc_obj: "DocumentTemplate"):
