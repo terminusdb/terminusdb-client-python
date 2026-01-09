@@ -126,9 +126,9 @@ class TestWOQLJSONOperations:
         """Test _clean_data_value with variable string."""
         query = WOQLQuery()
         result = query._clean_data_value("v:test")
-        # Variable strings are wrapped as Value with variable
+        # Variable strings are expanded via _expand_data_variable
         assert "variable" in result
-        assert result["@type"] == "Value"
+        assert result["@type"] == "DataValue"
     
     def test_clean_data_value_with_string_and_target(self):
         """Test _clean_data_value with string and explicit target."""
