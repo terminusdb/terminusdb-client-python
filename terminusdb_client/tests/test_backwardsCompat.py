@@ -9,7 +9,7 @@ import requests
 from terminusdb_client.woqlclient import WOQLClient
 
 
-@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, "get", side_effect=mocked_request_success)
 def test_connection(mocked_requests):
     client = WOQLClient("http://localhost:6363")
 

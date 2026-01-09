@@ -27,7 +27,9 @@ def run_command(cmd, cwd=None, check=True):
     """Run a shell command and return the result."""
     print(f"Running: {' '.join(cmd)}")
     try:
-        result = subprocess.run(cmd, cwd=cwd, check=check, capture_output=True, text=True)
+        result = subprocess.run(
+            cmd, cwd=cwd, check=check, capture_output=True, text=True
+        )
         if result.stdout:
             print(result.stdout)
         return result
@@ -304,7 +306,9 @@ def pr():
     # 2. Check formatting (don't fix)
     print("\nChecking code formatting...")
     try:
-        run_command(["poetry", "run", "black", "--check", "--diff", "terminusdb_client/"])
+        run_command(
+            ["poetry", "run", "black", "--check", "--diff", "terminusdb_client/"]
+        )
         print("✅ Black formatting is correct.")
     except subprocess.CalledProcessError:
         print("❌ Black formatting issues found.")

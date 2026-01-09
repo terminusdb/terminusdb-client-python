@@ -75,6 +75,7 @@ class Team(EnumTemplate):
 
 class Role(EnumTemplate):
     "Test Enum in a set"
+
     _schema = my_schema
     Admin = ()
     Read = ()

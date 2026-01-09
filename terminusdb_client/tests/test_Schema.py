@@ -198,35 +198,29 @@ def test_embedded_object(test_schema):
             street="test",
             country=Country(name="Republic of Ireland"),
         ),
-        friend_of={Person(
-            name="Katy",
-            age=51
-        )}
+        friend_of={Person(name="Katy", age=51)},
     )
     client = Client("http://127.0.0.1:6366")
-    result = client._convert_document(gavin, 'instance')
+    result = client._convert_document(gavin, "instance")
     # Finds the internal object and splays it out properly
-    assert (len(result) == 2)
+    assert len(result) == 2
 
 
 def test_person_sys_json():
     schema_json = {
         "@id": "PersonJSONTest",
-        "@key": {
-            "@type": "Random"
-        },
+        "@key": {"@type": "Random"},
         "@type": "Class",
-        "metadata": {
-            "@class": "sys:JSON",
-            "@type": "Optional"
-        }
+        "metadata": {"@class": "sys:JSON", "@type": "Optional"},
     }
     schema = Schema()
     test_result = schema._construct_class(schema_json)
-    result = {'@id': 'PersonJSONTest',
-              '@key': {'@type': 'Random'},
-              '@type': 'Class',
-              'metadata': {'@class': 'sys:JSON', '@type': 'Optional'}}
+    result = {
+        "@id": "PersonJSONTest",
+        "@key": {"@type": "Random"},
+        "@type": "Class",
+        "metadata": {"@class": "sys:JSON", "@type": "Optional"},
+    }
     assert test_result._to_dict() == result
 
 
@@ -324,10 +318,10 @@ def test_datetime():
     assert new_obj.duration == delta
 
 
-@mock.patch.object(requests.Session, 'head', side_effect=mocked_request_success)
-@mock.patch.object(requests.Session, 'get', side_effect=mocked_request_success)
-@mock.patch.object(requests.Session, 'post', side_effect=mocked_request_success)
-@mock.patch.object(requests.Session, 'put', side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, "head", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, "get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, "post", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, "put", side_effect=mocked_request_success)
 def test_compress_data(patched, patched2, patched3, patched4):
     datetime_obj = dt.datetime(2019, 5, 18, 15, 17, 8, 132263)
     delta = dt.timedelta(
@@ -457,6 +451,7 @@ def test_from_json_schema():
 
 class AnEnum(EnumTemplate):
     "An enum"
+
     _schema = Schema()
     Foo = ()
     Bar = ()

@@ -1,9 +1,11 @@
 """Tests for advanced WOQL query methods using standardized helpers."""
+
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 from terminusdb_client.tests.woql_test_helpers import WOQLTestHelpers as H
 
 
 # Optional Query Tests
+
 
 def test_opt_basic():
     """Test opt() creates proper Optional structure."""
@@ -30,6 +32,7 @@ def test_opt_args_introspection():
 
 
 # Result Control Tests
+
 
 def test_limit_basic():
     """Test limit() creates proper Limit structure."""
@@ -136,6 +139,7 @@ def test_order_by_args_introspection():
 
 # Document Operations Tests
 
+
 def test_insert_document_basic():
     """Test insert_document() creates proper InsertDocument structure."""
     query = WOQLQuery().insert_document({"@type": "Person", "name": "Alice"})
@@ -170,7 +174,9 @@ def test_insert_document_args_introspection():
 
 def test_update_document_basic():
     """Test update_document() creates proper UpdateDocument structure."""
-    query = WOQLQuery().update_document({"@id": "Person/Alice", "name": "Alice Updated"})
+    query = WOQLQuery().update_document(
+        {"@id": "Person/Alice", "name": "Alice Updated"}
+    )
 
     H.assert_query_type(query, "UpdateDocument")
     H.assert_has_key(query, "document")
@@ -251,6 +257,7 @@ def test_read_document_args_introspection():
 
 # Substring Test
 
+
 def test_substr_basic():
     """Test substr() creates proper Substring structure."""
     query = WOQLQuery().substr("test string", 4, "v:Substr", before=0, after=6)
@@ -290,6 +297,7 @@ def test_substr_args_introspection():
 
 # Once Test
 
+
 def test_once_basic():
     """Test once() creates proper Once structure."""
     query = WOQLQuery().once()
@@ -316,6 +324,7 @@ def test_once_args_introspection():
 
 # woql_not Test
 
+
 def test_woql_not_basic():
     """Test woql_not() creates proper Not structure."""
     query = WOQLQuery().woql_not()
@@ -341,6 +350,7 @@ def test_woql_not_args_introspection():
 
 
 # Chaining Tests
+
 
 def test_chaining_limit_and_order():
     """Test chaining limit() with order_by()."""
@@ -373,6 +383,7 @@ def test_pagination_pattern():
 
 
 # Update Operations Chaining
+
 
 def test_insert_then_read():
     """Test chaining insert_document() and read_document()."""

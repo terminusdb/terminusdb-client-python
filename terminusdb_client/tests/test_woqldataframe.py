@@ -1,4 +1,5 @@
 """Tests for woqldataframe/woqlDataframe.py module."""
+
 import pytest
 from unittest.mock import MagicMock, patch, call
 from terminusdb_client.woqldataframe.woqlDataframe import result_to_df, _expand_df, _embed_obj
@@ -7,7 +8,9 @@ from terminusdb_client.errors import InterfaceError
 
 def test_result_to_df_requires_pandas():
     """Test that result_to_df raises ImportError when pandas is not available."""
-    with patch('terminusdb_client.woqldataframe.woqlDataframe.import_module') as mock_import:
+    with patch(
+        "terminusdb_client.woqldataframe.woqlDataframe.import_module"
+    ) as mock_import:
         mock_import.side_effect = ImportError("No module named 'pandas'")
 
         with pytest.raises(ImportError) as exc_info:
@@ -20,9 +23,14 @@ def test_result_to_df_requires_pandas():
 def test_result_to_df_requires_client_with_max_embed():
     """Test that result_to_df raises ValueError when max_embed_dep > 0 without client."""
     mock_pd = MagicMock()
-    mock_pd.DataFrame.return_value.from_records.return_value = mock_pd.DataFrame.return_value
+    mock_pd.DataFrame.return_value.from_records.return_value = (
+        mock_pd.DataFrame.return_value
+    )
 
-    with patch('terminusdb_client.woqldataframe.woqlDataframe.import_module', return_value=mock_pd):
+    with patch(
+        "terminusdb_client.woqldataframe.woqlDataframe.import_module",
+        return_value=mock_pd,
+    ):
         with pytest.raises(ValueError) as exc_info:
             result_to_df([{"@id": "test", "@type": "Test"}], max_embed_dep=1)
 
@@ -38,12 +46,14 @@ def test_result_to_df_multiple_types_error():
     mock_df.__getitem__.return_value.unique.return_value = ["Type1", "Type2"]
     mock_pd.DataFrame.return_value.from_records.return_value = mock_df
 
-    with patch('terminusdb_client.woqldataframe.woqlDataframe.import_module', return_value=mock_pd):
+    with patch(
+        "terminusdb_client.woqldataframe.woqlDataframe.import_module",
+        return_value=mock_pd,
+    ):
         with pytest.raises(ValueError) as exc_info:
-            result_to_df([
-                {"@id": "test1", "@type": "Type1"},
-                {"@id": "test2", "@type": "Type2"}
-            ])
+            result_to_df(
+                [{"@id": "test1", "@type": "Type1"}, {"@id": "test2", "@type": "Type2"}]
+            )
 
         assert "multiple type" in str(exc_info.value).lower()
 
@@ -64,12 +74,15 @@ def test_result_to_df_class_not_in_schema():
     mock_client.get_existing_classes.return_value = {"KnownClass": {}}
     mock_client.db = "testdb"
 
-    with patch('terminusdb_client.woqldataframe.woqlDataframe.import_module', return_value=mock_pd):
+    with patch(
+        "terminusdb_client.woqldataframe.woqlDataframe.import_module",
+        return_value=mock_pd,
+    ):
         with pytest.raises(InterfaceError) as exc_info:
             result_to_df(
                 [{"@id": "test1", "@type": "UnknownClass"}],
                 max_embed_dep=1,
-                client=mock_client
+                client=mock_client,
             )
 
         assert "UnknownClass" in str(exc_info.value)
@@ -89,10 +102,13 @@ def test_result_to_df_basic_conversion():
 
     mock_pd.DataFrame.return_value.from_records.return_value = mock_df
 
-    with patch('terminusdb_client.woqldataframe.woqlDataframe.import_module', return_value=mock_pd):
-        result = result_to_df([
-            {"@id": "Person/Jane", "@type": "Person", "name": "Jane"}
-        ])
+    with patch(
+        "terminusdb_client.woqldataframe.woqlDataframe.import_module",
+        return_value=mock_pd,
+    ):
+        result = result_to_df(
+            [{"@id": "Person/Jane", "@type": "Person", "name": "Jane"}]
+        )
 
         # Should return the DataFrame
         assert result is not None
@@ -109,10 +125,13 @@ def test_result_to_df_with_keepid():
 
     mock_pd.DataFrame.return_value.from_records.return_value = mock_df
 
-    with patch('terminusdb_client.woqldataframe.woqlDataframe.import_module', return_value=mock_pd):
-        result = result_to_df([
-            {"@id": "Person/Jane", "@type": "Person", "name": "Jane"}
-        ], keepid=True)
+    with patch(
+        "terminusdb_client.woqldataframe.woqlDataframe.import_module",
+        return_value=mock_pd,
+    ):
+        result = result_to_df(
+            [{"@id": "Person/Jane", "@type": "Person", "name": "Jane"}], keepid=True
+        )
 
         # Should return the DataFrame
         assert result is not None
@@ -129,13 +148,16 @@ def test_result_to_df_requires_client_for_embedding():
     mock_df.__getitem__.return_value.unique.return_value = ["Person"]
     mock_pd.DataFrame.return_value.from_records.return_value = mock_df
 
-    with patch('terminusdb_client.woqldataframe.woqlDataframe.import_module', return_value=mock_pd):
+    with patch(
+        "terminusdb_client.woqldataframe.woqlDataframe.import_module",
+        return_value=mock_pd,
+    ):
         # This tests the ValueError raised at line 18-21
         with pytest.raises(ValueError) as exc_info:
             result_to_df(
                 [{"@id": "Person/Jane", "@type": "Person"}],
                 max_embed_dep=2,  # Requires client
-                client=None  # But no client provided
+                client=None,  # But no client provided
             )
 
         assert "client need to be provide" in str(exc_info.value)
@@ -160,14 +182,19 @@ def test_result_to_df_expand_nested_json():
 
     mock_pd.DataFrame.return_value.from_records.return_value = mock_df
 
-    with patch('terminusdb_client.woqldataframe.woqlDataframe.import_module', return_value=mock_pd):
-        result = result_to_df([
-            {
-                "@id": "Person/Jane",
-                "@type": "Person",
-                "address": {"@id": "Address/1", "street": "Main St"}
-            }
-        ])
+    with patch(
+        "terminusdb_client.woqldataframe.woqlDataframe.import_module",
+        return_value=mock_pd,
+    ):
+        result = result_to_df(
+            [
+                {
+                    "@id": "Person/Jane",
+                    "@type": "Person",
+                    "address": {"@id": "Address/1", "street": "Main St"},
+                }
+            ]
+        )
 
         # json_normalize should be called for expansion
         assert mock_pd.json_normalize.called

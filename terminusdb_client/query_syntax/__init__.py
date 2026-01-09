@@ -1,1 +1,1 @@
-from .query_syntax import * # noqa
+from .query_syntax import *  # noqa
