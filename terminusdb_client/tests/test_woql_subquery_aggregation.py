@@ -317,7 +317,55 @@ class TestWOQLAggregationEdgeCases:
         assert result is query
         assert query._query.get("@type") == "Count"
     
-
+    # @pytest.mark.skip(reason="""BLOCKED: Lines 852-853 in woql_query.py - edge case not covered
+        
+    #     PROBLEM: Lines 852-853 handle initialization of the "and" array when woql_and()
+    #     is called on a query that already has @type="And" but no "and" key yet.
+        
+    #     This is an edge case that occurs when:
+    #     1. A query's cursor is manually set to {"@type": "And"} without an "and" array
+    #     2. Then woql_and() is called to add queries
+        
+    #     The code checks: if "and" not in self._cursor:
+    #     Then initializes: self._cursor["and"] = []
+        
+    #     This edge case is difficult to trigger through normal API usage because:
+    #     - woql_and() always sets both @type and initializes the "and" array
+    #     - The only way to get @type="And" without "and" is through manual manipulation
+        
+    #     RECOMMENDATION: This is defensive programming for an edge case that shouldn't
+    #     occur in normal usage. Consider either:
+    #     1. Remove this check if it's truly unreachable through the public API
+    #     2. Add internal validation to prevent this state
+    #     3. Document this as defensive code and accept the uncovered lines
+    #     """)
+    def test_woql_and_with_uninitialized_and_array(self):
+        """Test woql_and() when cursor has @type='And' but no 'and' array.
+        
+        This tests lines 852-853 which defensively initialize the "and" array
+        if it doesn't exist. This edge case occurs when the cursor is manually
+        manipulated to have @type="And" without the corresponding "and" array.
+        
+        This is a TDD test showing the CORRECT expected behavior for this edge case.
+        """
+        query = WOQLQuery()
+        
+        # Manually create the edge case: @type="And" but no "and" array
+        # This simulates corrupted state or manual cursor manipulation
+        query._cursor["@type"] = "And"
+        # Deliberately NOT setting query._cursor["and"] = []
+        
+        # Now call woql_and() with a query - should initialize "and" array
+        q1 = WOQLQuery().triple("v:X", "rdf:type", "schema:Person")
+        result = query.woql_and(q1)
+        
+        # Should have initialized the "and" array and added the query
+        assert result is query
+        assert query._cursor["@type"] == "And"
+        assert "and" in query._cursor
+        assert isinstance(query._cursor["and"], list)
+        assert len(query._cursor["and"]) == 1
+        assert query._cursor["and"][0]["@type"] == "Triple"
 
 class TestWOQLSubqueryAggregationIntegration:
     """Test integration of subqueries with aggregation."""
