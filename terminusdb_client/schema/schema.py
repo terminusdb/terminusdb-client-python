@@ -341,9 +341,9 @@ class DocumentTemplate(metaclass=TerminusClass):
                     # object properties
                     if hasattr(the_item, "_embedded_rep"):
                         ref_obj = the_item._embedded_rep()
-                        if '@ref' in ref_obj:
-                            references[ref_obj['@ref']] = the_item
-                        elif '@id' in ref_obj:
+                        if "@ref" in ref_obj:
+                            references[ref_obj["@ref"]] = the_item
+                        elif "@id" in ref_obj:
                             pass
                         else:
                             (sub_item, refs) = ref_obj
@@ -357,9 +357,9 @@ class DocumentTemplate(metaclass=TerminusClass):
                             # inner is object properties
                             if hasattr(sub_item, "_embedded_rep"):
                                 ref_obj = sub_item._embedded_rep()
-                                if '@ref' in ref_obj:
-                                    references[ref_obj['@ref']] = sub_item
-                                elif '@id' in ref_obj:
+                                if "@ref" in ref_obj:
+                                    references[ref_obj["@ref"]] = sub_item
+                                elif "@id" in ref_obj:
                                     pass
                                 else:
                                     (sub_item, refs) = ref_obj
@@ -752,7 +752,10 @@ class Schema:
             commit_msg = "Schema object insert/ update by Python client."
         if full_replace:
             client.insert_document(
-                self, commit_msg=commit_msg, graph_type=GraphType.SCHEMA, full_replace=True
+                self,
+                commit_msg=commit_msg,
+                graph_type=GraphType.SCHEMA,
+                full_replace=True,
             )
         else:
             client.update_document(
@@ -1013,4 +1016,5 @@ class Schema:
     def copy(self):
         return deepcopy(self)
 
-WOQLSchema = Schema # noqa
+
+WOQLSchema = Schema  # noqa

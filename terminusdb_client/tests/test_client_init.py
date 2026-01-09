@@ -1,4 +1,5 @@
 """Unit tests for Client initialization"""
+
 from terminusdb_client.client import Client
 
 

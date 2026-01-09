@@ -1,4 +1,5 @@
 """Tests for basic woql_query.py classes and functions."""
+
 from terminusdb_client.woqlquery.woql_query import Var, Vars, Doc, SHORT_NAME_MAPPING
 
 
@@ -54,7 +55,7 @@ def test_doc_with_string():
 
     assert result == {
         "@type": "Value",
-        "data": {"@type": "xsd:string", "@value": "test string"}
+        "data": {"@type": "xsd:string", "@value": "test string"},
     }
 
 
@@ -65,11 +66,11 @@ def test_doc_with_bool():
 
     assert doc_true.to_dict() == {
         "@type": "Value",
-        "data": {"@type": "xsd:boolean", "@value": True}
+        "data": {"@type": "xsd:boolean", "@value": True},
     }
     assert doc_false.to_dict() == {
         "@type": "Value",
-        "data": {"@type": "xsd:boolean", "@value": False}
+        "data": {"@type": "xsd:boolean", "@value": False},
     }
 
 
@@ -79,10 +80,7 @@ def test_doc_with_int():
 
     result = doc.to_dict()
 
-    assert result == {
-        "@type": "Value",
-        "data": {"@type": "xsd:integer", "@value": 42}
-    }
+    assert result == {"@type": "Value", "data": {"@type": "xsd:integer", "@value": 42}}
 
 
 def test_doc_with_float():
@@ -93,7 +91,7 @@ def test_doc_with_float():
 
     assert result == {
         "@type": "Value",
-        "data": {"@type": "xsd:decimal", "@value": 3.14}
+        "data": {"@type": "xsd:decimal", "@value": 3.14},
     }
 
 
@@ -118,7 +116,7 @@ def test_doc_with_list():
     # Check first element
     assert result["list"][0] == {
         "@type": "Value",
-        "data": {"@type": "xsd:integer", "@value": 1}
+        "data": {"@type": "xsd:integer", "@value": 1},
     }
 
 
@@ -129,10 +127,7 @@ def test_doc_with_var():
 
     result = doc.to_dict()
 
-    assert result == {
-        "@type": "Value",
-        "variable": "myVar"
-    }
+    assert result == {"@type": "Value", "variable": "myVar"}
 
 
 def test_doc_with_dict():
@@ -150,7 +145,7 @@ def test_doc_with_dict():
     name_pair = next(p for p in result["dictionary"]["data"] if p["field"] == "name")
     assert name_pair["value"] == {
         "@type": "Value",
-        "data": {"@type": "xsd:string", "@value": "Alice"}
+        "data": {"@type": "xsd:string", "@value": "Alice"},
     }
 
 
@@ -165,10 +160,7 @@ def test_doc_str():
 
 def test_doc_nested_structures():
     """Test Doc with nested list and dict."""
-    doc = Doc({
-        "list": [1, 2, 3],
-        "nested": {"inner": "value"}
-    })
+    doc = Doc({"list": [1, 2, 3], "nested": {"inner": "value"}})
 
     result = doc.to_dict()
 
@@ -208,7 +200,7 @@ def test_doc_with_empty_dict():
 
     assert result == {
         "@type": "Value",
-        "dictionary": {"@type": "DictionaryTemplate", "data": []}
+        "dictionary": {"@type": "DictionaryTemplate", "data": []},
     }
 
 
@@ -225,15 +217,17 @@ def test_doc_with_nested_var():
 def test_doc_with_mixed_types():
     """Test Doc with various mixed types in dict."""
     var = Var("status")
-    doc = Doc({
-        "id": 1,
-        "name": "Test",
-        "active": True,
-        "score": 95.5,
-        "status": var,
-        "tags": ["a", "b"],
-        "metadata": None
-    })
+    doc = Doc(
+        {
+            "id": 1,
+            "name": "Test",
+            "active": True,
+            "score": 95.5,
+            "status": var,
+            "tags": ["a", "b"],
+            "metadata": None,
+        }
+    )
 
     result = doc.to_dict()
 

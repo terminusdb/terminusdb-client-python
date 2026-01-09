@@ -1,4 +1,5 @@
 """Unit tests for idgen_random WOQL method"""
+
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 
@@ -27,9 +28,11 @@ class TestIdgenRandom:
 
     def test_idgen_random_chaining(self):
         """Test idgen_random can be chained with other operations"""
-        woql = (WOQLQuery()
-                .triple("v:Person", "rdf:type", "@schema:Person")
-                .idgen_random("Person/", "v:PersonID"))
+        woql = (
+            WOQLQuery()
+            .triple("v:Person", "rdf:type", "@schema:Person")
+            .idgen_random("Person/", "v:PersonID")
+        )
 
         result = woql.to_dict()
         assert result["@type"] == "And"
@@ -39,9 +42,11 @@ class TestIdgenRandom:
 
     def test_idgen_random_multiple_calls(self):
         """Test multiple idgen_random calls in same query"""
-        woql = (WOQLQuery()
-                .idgen_random("Person/", "v:PersonID")
-                .idgen_random("Order/", "v:OrderID"))
+        woql = (
+            WOQLQuery()
+            .idgen_random("Person/", "v:PersonID")
+            .idgen_random("Order/", "v:OrderID")
+        )
 
         result = woql.to_dict()
         assert result["@type"] == "And"
@@ -73,10 +78,12 @@ class TestIdgenRandom:
 
     def test_idgen_random_in_query_chain(self):
         """Test idgen_random in complex query chain"""
-        woql = (WOQLQuery()
-                .triple("v:Person", "rdf:type", "@schema:Person")
-                .idgen_random("Person/", "v:PersonID")
-                .triple("v:PersonID", "@schema:name", "v:Name"))
+        woql = (
+            WOQLQuery()
+            .triple("v:Person", "rdf:type", "@schema:Person")
+            .idgen_random("Person/", "v:PersonID")
+            .triple("v:PersonID", "@schema:name", "v:Name")
+        )
 
         result = woql.to_dict()
         assert result["@type"] == "And"

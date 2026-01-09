@@ -1,4 +1,5 @@
 """Integration tests for prefix management operations."""
+
 import time
 
 import pytest
@@ -19,7 +20,11 @@ def test_db(prefix_client):
     """Create and cleanup a test database."""
     db_name = f"test_prefix_{int(time.time() * 1000)}"
 
-    prefix_client.create_database(db_name, label="Test Prefix DB", description="Database for testing prefix operations")
+    prefix_client.create_database(
+        db_name,
+        label="Test Prefix DB",
+        description="Database for testing prefix operations",
+    )
     prefix_client.connect(db=db_name)
 
     yield db_name
