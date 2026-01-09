@@ -351,7 +351,7 @@ class WOQLQuery:
 
     def _data_value_list(self, target_list):
         """DEPRECATED: Dead code - never called anywhere in the codebase.
-        
+
         Use _value_list() instead. This method will be removed in a future release.
         """
         dvl = []

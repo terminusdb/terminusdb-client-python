@@ -7,12 +7,12 @@ from ..errors import InterfaceError
 
 def _expand_df(df, pd, keepid):
     """Expand nested JSON objects in DataFrame columns.
-    
+
     Args:
         df: pandas DataFrame to expand
         pd: pandas module reference
         keepid: whether to keep @id columns
-    
+
     Returns:
         DataFrame with nested objects expanded into separate columns
     """
@@ -37,7 +37,7 @@ def _expand_df(df, pd, keepid):
 
 def _embed_obj(df, maxdep, pd, keepid, all_existing_class, class_obj, client):
     """Recursively embed object references in DataFrame.
-    
+
     Args:
         df: pandas DataFrame to process
         maxdep: maximum recursion depth
@@ -46,7 +46,7 @@ def _embed_obj(df, maxdep, pd, keepid, all_existing_class, class_obj, client):
         all_existing_class: dict of class definitions from schema
         class_obj: the class type of the documents
         client: TerminusDB client for fetching documents
-    
+
     Returns:
         DataFrame with object references replaced by their document content
     """
