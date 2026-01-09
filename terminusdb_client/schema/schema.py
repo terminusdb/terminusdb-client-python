@@ -53,7 +53,7 @@ class TerminusKey:
             elif isinstance(keys, list):
                 self._keys = keys
             else:
-                ValueError(f"keys need to be either str or list but got {keys}")
+                raise ValueError(f"keys need to be either str or list but got {keys}")
 
 
 class HashKey(TerminusKey):
