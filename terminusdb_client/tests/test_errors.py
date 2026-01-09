@@ -233,13 +233,13 @@ class TestAPIError:
         # These lines are in the APIError.__init__ method
 
         # We need to mock the parent constructor to avoid the response issue
-        with patch.object(DatabaseError, '__init__', return_value=None):
+        with patch.object(DatabaseError, "__init__", return_value=None):
             # Now we can create APIError normally
             api_error = APIError(
                 message="Test error message",
                 err_obj={"error": "details"},
                 status_code=400,
-                url="https://example.com/api"
+                url="https://example.com/api",
             )
 
             # Verify the attributes were set (lines 117-120)
@@ -270,14 +270,9 @@ class TestAPIError:
     def test_api_error_with_minimal_params(self):
         """Test APIError with minimal parameters"""
         # Mock the parent constructor to avoid the response issue
-        with patch.object(DatabaseError, '__init__', return_value=None):
+        with patch.object(DatabaseError, "__init__", return_value=None):
             # Test with None values (covers edge cases)
-            api_error = APIError(
-                message=None,
-                err_obj=None,
-                status_code=None,
-                url=None
-            )
+            api_error = APIError(message=None, err_obj=None, status_code=None, url=None)
 
             assert api_error.message is None
             assert api_error.error_obj is None

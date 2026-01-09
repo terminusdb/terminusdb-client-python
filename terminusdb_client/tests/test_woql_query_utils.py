@@ -1,4 +1,5 @@
 """Tests for WOQLQuery utility methods."""
+
 from terminusdb_client.woqlquery.woql_query import WOQLQuery, Var
 
 
@@ -346,9 +347,18 @@ def test_data_list_with_strings():
     # Each item in the list is wrapped in a DataValue by _clean_data_value
     assert result["@type"] == "DataValue"
     assert len(result["list"]) == 3
-    assert result["list"][0] == {"@type": "DataValue", "data": {"@type": "xsd:string", "@value": "item1"}}
-    assert result["list"][1] == {"@type": "DataValue", "data": {"@type": "xsd:string", "@value": "item2"}}
-    assert result["list"][2] == {"@type": "DataValue", "data": {"@type": "xsd:string", "@value": "item3"}}
+    assert result["list"][0] == {
+        "@type": "DataValue",
+        "data": {"@type": "xsd:string", "@value": "item1"},
+    }
+    assert result["list"][1] == {
+        "@type": "DataValue",
+        "data": {"@type": "xsd:string", "@value": "item2"},
+    }
+    assert result["list"][2] == {
+        "@type": "DataValue",
+        "data": {"@type": "xsd:string", "@value": "item3"},
+    }
     assert isinstance(result, dict)
 
 
@@ -370,7 +380,10 @@ def test_data_list_with_var_objects():
 
     # Var objects are converted to DataValue type by _expand_data_variable
     assert result["list"][0] == {"@type": "DataValue", "variable": "x"}
-    assert result["list"][1] == {"@type": "DataValue", "data": {"@type": "xsd:string", "@value": "string"}}
+    assert result["list"][1] == {
+        "@type": "DataValue",
+        "data": {"@type": "xsd:string", "@value": "string"},
+    }
     assert result["list"][2] == {"@type": "DataValue", "variable": "y"}
 
 
@@ -387,11 +400,23 @@ def test_data_list_with_mixed_objects():
 
     # Check structure
     assert result["@type"] == "DataValue"
-    assert result["list"][0] == {"@type": "DataValue", "data": {"@type": "xsd:string", "@value": "string"}}
-    assert result["list"][1] == {"@type": "DataValue", "data": {"@type": "xsd:integer", "@value": 123}}
+    assert result["list"][0] == {
+        "@type": "DataValue",
+        "data": {"@type": "xsd:string", "@value": "string"},
+    }
+    assert result["list"][1] == {
+        "@type": "DataValue",
+        "data": {"@type": "xsd:integer", "@value": 123},
+    }
     assert result["list"][2] == nested_dict  # Dicts are returned as-is
-    assert result["list"][3] == {"@type": "DataValue", "data": {"@type": "xsd:boolean", "@value": True}}
-    assert result["list"][4] == {"@type": "DataValue", "data": {"@type": "xsd:string", "@value": "None"}}
+    assert result["list"][3] == {
+        "@type": "DataValue",
+        "data": {"@type": "xsd:boolean", "@value": True},
+    }
+    assert result["list"][4] == {
+        "@type": "DataValue",
+        "data": {"@type": "xsd:string", "@value": "None"},
+    }
 
 
 def test_data_list_with_empty_list():
@@ -455,7 +480,10 @@ def test_value_list_with_list():
     # Strings become Value nodes
     assert result[0] == {"@type": "Value", "node": "item1"}
     # Numbers become Value nodes with data
-    assert result[1] == {"@type": "Value", "data": {"@type": "xsd:integer", "@value": 123}}
+    assert result[1] == {
+        "@type": "Value",
+        "data": {"@type": "xsd:integer", "@value": 123},
+    }
     # Dicts are returned as-is
     assert result[2] == {"key": "value"}
 
@@ -511,7 +539,10 @@ def test_arop_with_non_dict():
 
     # Test with string - becomes DataValue since it's not a variable
     result = query._arop("test")
-    assert result == {"@type": "ArithmeticValue", "data": {"@type": "xsd:decimal", "@value": "test"}}
+    assert result == {
+        "@type": "ArithmeticValue",
+        "data": {"@type": "xsd:decimal", "@value": "test"},
+    }
 
     # Test with Var - variable strings need "v:" prefix
     result = query._arop("v:x")
@@ -520,11 +551,17 @@ def test_arop_with_non_dict():
     # Test with Var object - gets converted to string representation
     var = Var("y")
     result = query._arop(var)
-    assert result == {"@type": "ArithmeticValue", "data": {"@type": "xsd:string", "@value": "y"}}
+    assert result == {
+        "@type": "ArithmeticValue",
+        "data": {"@type": "xsd:string", "@value": "y"},
+    }
 
     # Test with number
     result = query._arop(42)
-    assert result == {"@type": "ArithmeticValue", "data": {"@type": "xsd:decimal", "@value": 42}}
+    assert result == {
+        "@type": "ArithmeticValue",
+        "data": {"@type": "xsd:decimal", "@value": 42},
+    }
 
 
 # Tests for _vlist method (Task 2 continued)
@@ -641,14 +678,14 @@ def test_clean_data_value_with_unknown_type():
     # Unknown types are converted to string and wrapped in DataValue
     assert result == {
         "@type": "DataValue",
-        "data": {"@type": "xsd:string", "@value": "custom_object"}
+        "data": {"@type": "xsd:string", "@value": "custom_object"},
     }
 
     # Test with list (another unknown type)
     result = query._clean_data_value([1, 2, 3])
     assert result == {
         "@type": "DataValue",
-        "data": {"@type": "xsd:string", "@value": "[1, 2, 3]"}
+        "data": {"@type": "xsd:string", "@value": "[1, 2, 3]"},
     }
 
 
@@ -668,14 +705,14 @@ def test_clean_arithmetic_value_with_unknown_type():
     # Unknown types are converted to string and wrapped in ArithmeticValue
     assert result == {
         "@type": "ArithmeticValue",
-        "data": {"@type": "xsd:string", "@value": "custom_arithmetic"}
+        "data": {"@type": "xsd:string", "@value": "custom_arithmetic"},
     }
 
     # Test with set (another unknown type)
     result = query._clean_arithmetic_value({1, 2, 3})
     assert result == {
         "@type": "ArithmeticValue",
-        "data": {"@type": "xsd:string", "@value": "{1, 2, 3}"}
+        "data": {"@type": "xsd:string", "@value": "{1, 2, 3}"},
     }
 
 
@@ -686,17 +723,11 @@ def test_clean_node_value_with_unknown_type():
 
     # Test with a number (non-str, non-Var, non-dict)
     result = query._clean_node_value(123)
-    assert result == {
-        "@type": "NodeValue",
-        "node": 123
-    }
+    assert result == {"@type": "NodeValue", "node": 123}
 
     # Test with a list
     result = query._clean_node_value([1, 2, 3])
-    assert result == {
-        "@type": "NodeValue",
-        "node": [1, 2, 3]
-    }
+    assert result == {"@type": "NodeValue", "node": [1, 2, 3]}
 
     # Test with a custom object
     class CustomObject:
@@ -704,10 +735,7 @@ def test_clean_node_value_with_unknown_type():
 
     custom_obj = CustomObject()
     result = query._clean_node_value(custom_obj)
-    assert result == {
-        "@type": "NodeValue",
-        "node": custom_obj
-    }
+    assert result == {"@type": "NodeValue", "node": custom_obj}
 
 
 # Tests for _clean_graph method
@@ -970,6 +998,7 @@ def test_literal_type_methods():
 
     # Test datetime method
     import datetime as dt
+
     test_datetime = dt.datetime(2023, 1, 1, 12, 0, 0)
 
     # Test datetime with datetime object
@@ -1057,15 +1086,20 @@ def test_string_operations():
 
     # Test substr with default parameters
     query = WOQLQuery()
-    query.substr("v:FullString", 10, "test")  # substring parameter provided, length used as is
+    query.substr(
+        "v:FullString", 10, "test"
+    )  # substring parameter provided, length used as is
 
     # Test substr when substring is empty
     # When substring is falsy (empty string), it uses length as substring
     query = WOQLQuery()
-    query.substr("v:FullString", "test", None)  # None substring should trigger the default logic
+    query.substr(
+        "v:FullString", "test", None
+    )  # None substring should trigger the default logic
 
     # Test update_object deprecated method
     import warnings
+
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
         query.update_object({"type": "Person", "name": "John"})
@@ -1109,6 +1143,7 @@ def test_document_operations():
 
     # Test delete_object deprecated method
     import warnings
+
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
         query.delete_object("doc:person1")

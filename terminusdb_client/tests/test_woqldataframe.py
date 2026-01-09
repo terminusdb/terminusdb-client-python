@@ -1,8 +1,12 @@
 """Tests for woqldataframe/woqlDataframe.py module."""
 
 import pytest
-from unittest.mock import MagicMock, patch, call
-from terminusdb_client.woqldataframe.woqlDataframe import result_to_df, _expand_df, _embed_obj
+from unittest.mock import MagicMock, patch
+from terminusdb_client.woqldataframe.woqlDataframe import (
+    result_to_df,
+    _expand_df,
+    _embed_obj,
+)
 from terminusdb_client.errors import InterfaceError
 
 
@@ -221,15 +225,25 @@ def test_result_to_df_expand_df_exception_handling():
     # Make json_normalize raise exception for second call
     mock_pd.json_normalize.side_effect = [
         mock_expanded,  # Works for "name"
-        Exception("Invalid data")  # Fails for "invalid_col"
+        Exception("Invalid data"),  # Fails for "invalid_col"
     ]
 
     mock_pd.DataFrame.return_value.from_records.return_value = mock_df
 
-    with patch('terminusdb_client.woqldataframe.woqlDataframe.import_module', return_value=mock_pd):
-        result = result_to_df([
-            {"@id": "1", "@type": "Person", "name": {"@id": "1", "street": "Main St"}, "invalid_col": "bad"}
-        ])
+    with patch(
+        "terminusdb_client.woqldataframe.woqlDataframe.import_module",
+        return_value=mock_pd,
+    ):
+        result = result_to_df(
+            [
+                {
+                    "@id": "1",
+                    "@type": "Person",
+                    "name": {"@id": "1", "street": "Main St"},
+                    "invalid_col": "bad",
+                }
+            ]
+        )
 
         assert result is not None
 
@@ -245,17 +259,9 @@ def test_result_to_df_embed_obj_with_nested_properties():
 
     # Mock classes with nested structure
     all_existing_class = {
-        "Person": {
-            "address": "Address",
-            "name": "xsd:string"
-        },
-        "Address": {
-            "street": "xsd:string",
-            "city": "City"
-        },
-        "City": {
-            "name": "xsd:string"
-        }
+        "Person": {"address": "Address", "name": "xsd:string"},
+        "Address": {"street": "xsd:string", "city": "City"},
+        "City": {"name": "xsd:string"},
     }
 
     # Simulate the logic from lines 52-56
@@ -274,7 +280,11 @@ def test_result_to_df_embed_obj_with_nested_properties():
     # Test that it correctly identifies this as not an object property
     assert prop_type.startswith("xsd:")
     assert prop_type != class_obj
-    assert all_existing_class[prop_type].get("@type") != "Enum" if prop_type in all_existing_class else True
+    assert (
+        all_existing_class[prop_type].get("@type") != "Enum"
+        if prop_type in all_existing_class
+        else True
+    )
 
 
 def test_result_to_df_embed_obj_with_xsd_type():
@@ -320,12 +330,7 @@ def test_result_to_df_embed_obj_with_enum_type():
 
     prop_type = "Status"
     class_obj = "Person"
-    all_existing_class = {
-        "Status": {
-            "@type": "Enum",
-            "values": ["ACTIVE", "INACTIVE"]
-        }
-    }
+    all_existing_class = {"Status": {"@type": "Enum", "values": ["ACTIVE", "INACTIVE"]}}
 
     # This is the condition from lines 58-62
     should_skip = (
@@ -344,11 +349,7 @@ def test_result_to_df_embed_obj_applies_get_document():
 
     prop_type = "Address"
     class_obj = "Person"
-    all_existing_class = {
-        "Address": {
-            "street": "xsd:string"
-        }
-    }
+    all_existing_class = {"Address": {"street": "xsd:string"}}
 
     # This is the condition from lines 58-63
     should_process = (
@@ -381,10 +382,15 @@ def test_result_to_df_embed_obj_returns_early_for_maxdep_zero():
 
     mock_pd.DataFrame.return_value.from_records.return_value = mock_df
 
-    with patch('terminusdb_client.woqldataframe.woqlDataframe.import_module', return_value=mock_pd):
-        result = result_to_df([
-            {"@id": "person1", "@type": "Person", "name": "John"}
-        ], max_embed_dep=0, client=mock_client)
+    with patch(
+        "terminusdb_client.woqldataframe.woqlDataframe.import_module",
+        return_value=mock_pd,
+    ):
+        result = result_to_df(
+            [{"@id": "person1", "@type": "Person", "name": "John"}],
+            max_embed_dep=0,
+            client=mock_client,
+        )
 
         # Should return early without calling get_document
         assert not mock_client.get_document.called
@@ -400,7 +406,7 @@ class TestEmbedObjCoverage:
         maxdep = 0
 
         # This is the condition from line 46-47
-        should_return_early = (maxdep == 0)
+        should_return_early = maxdep == 0
 
         assert should_return_early is True
 
@@ -409,19 +415,13 @@ class TestEmbedObjCoverage:
         # Test the logic from lines 52-56
 
         all_existing_class = {
-            'Person': {
-                'name': 'xsd:string',
-                'address': 'Address'
-            },
-            'Address': {
-                'street': 'xsd:string',
-                'city': 'xsd:string'
-            }
+            "Person": {"name": "xsd:string", "address": "Address"},
+            "Address": {"street": "xsd:string", "city": "xsd:string"},
         }
 
-        class_obj = 'Person'
-        col = 'address.street'
-        col_comp = col.split('.')
+        class_obj = "Person"
+        col = "address.street"
+        col_comp = col.split(".")
 
         # This is the logic being tested
         prop_type = class_obj
@@ -429,26 +429,22 @@ class TestEmbedObjCoverage:
             prop_type = all_existing_class[prop_type][comp]
 
         # Verify the type resolution
-        assert prop_type == 'xsd:string'
+        assert prop_type == "xsd:string"
 
     def test_embed_obj_applies_get_document_logic(self):
         """Test embed_obj applies get_document to object properties"""
         # Test the condition from lines 58-63
 
-        prop_type = 'Address'
-        class_obj = 'Person'
-        all_existing_class = {
-            'Address': {
-                'street': 'xsd:string'
-            }
-        }
+        prop_type = "Address"
+        class_obj = "Person"
+        all_existing_class = {"Address": {"street": "xsd:string"}}
 
         # This is the condition from lines 58-63
         should_process = (
             isinstance(prop_type, str)
-            and not prop_type.startswith('xsd:')
+            and not prop_type.startswith("xsd:")
             and prop_type != class_obj
-            and all_existing_class[prop_type].get('@type') != 'Enum'
+            and all_existing_class[prop_type].get("@type") != "Enum"
         )
 
         assert should_process is True
@@ -458,13 +454,12 @@ class TestEmbedObjCoverage:
         """Test embed_obj makes recursive call when columns change"""
         # Test the condition from lines 65-71
 
-        original_columns = ['col1', 'col2']
-        expanded_columns = ['col1', 'col2', 'col3']  # Different columns
+        original_columns = ["col1", "col2"]
+        expanded_columns = ["col1", "col2", "col3"]  # Different columns
 
         # Check if columns are the same
-        columns_same = (
-            len(expanded_columns) == len(original_columns)
-            and all(c1 == c2 for c1, c2 in zip(expanded_columns, original_columns))
+        columns_same = len(expanded_columns) == len(original_columns) and all(
+            c1 == c2 for c1, c2 in zip(expanded_columns, original_columns)
         )
 
         # Since columns changed, recursion should happen
@@ -485,28 +480,19 @@ class TestEmbedObjCoverage:
 
         # Setup mock classes
         all_existing_class = {
-            "Person": {
-                "name": "xsd:string",
-                "address": "Address"
-            },
-            "Address": {
-                "street": "xsd:string"
-            }
+            "Person": {"name": "xsd:string", "address": "Address"},
+            "Address": {"street": "xsd:string"},
         }
         mock_client.get_existing_classes.return_value = all_existing_class
         mock_client.db = "testdb"
 
         # Test with max_embed_dep=0 to test early return
-        test_data = [
-            {
-                "@id": "person1",
-                "@type": "Person",
-                "name": "John"
-            }
-        ]
+        test_data = [{"@id": "person1", "@type": "Person", "name": "John"}]
 
         # Mock pandas
-        with patch('terminusdb_client.woqldataframe.woqlDataframe.import_module') as mock_import:
+        with patch(
+            "terminusdb_client.woqldataframe.woqlDataframe.import_module"
+        ) as mock_import:
             mock_pd = MagicMock()
 
             # Create a mock DataFrame
@@ -516,7 +502,9 @@ class TestEmbedObjCoverage:
 
             # Mock DataFrame operations
             mock_pd.DataFrame = MagicMock()
-            mock_pd.DataFrame.return_value.from_records = MagicMock(return_value=mock_df)
+            mock_pd.DataFrame.return_value.from_records = MagicMock(
+                return_value=mock_df
+            )
 
             # Set up the import mock
             mock_import.return_value = mock_pd
@@ -546,10 +534,9 @@ class TestExpandDfDirect:
         """Test _expand_df expands nested objects with @id"""
         import pandas as pd
 
-        df = pd.DataFrame([{
-            "name": "John",
-            "address": {"@id": "addr1", "street": "Main St"}
-        }])
+        df = pd.DataFrame(
+            [{"name": "John", "address": {"@id": "addr1", "street": "Main St"}}]
+        )
         result = _expand_df(df, pd, keepid=False)
 
         # Address column should be expanded into address.street
@@ -560,10 +547,9 @@ class TestExpandDfDirect:
         """Test _expand_df keeps @id when keepid=True"""
         import pandas as pd
 
-        df = pd.DataFrame([{
-            "name": "John",
-            "address": {"@id": "addr1", "street": "Main St"}
-        }])
+        df = pd.DataFrame(
+            [{"name": "John", "address": {"@id": "addr1", "street": "Main St"}}]
+        )
         result = _expand_df(df, pd, keepid=True)
 
         # Should keep @id column as address.@id
@@ -605,7 +591,7 @@ class TestEmbedObjDirect:
 
         all_existing_class = {
             "Person": {"name": "xsd:string", "address": "Address"},
-            "Address": {"street": "xsd:string"}
+            "Address": {"street": "xsd:string"},
         }
 
         result = _embed_obj(df, 1, pd, False, all_existing_class, "Person", mock_client)
@@ -621,9 +607,7 @@ class TestEmbedObjDirect:
         df = pd.DataFrame([{"name": "John"}])
         mock_client = MagicMock()
 
-        all_existing_class = {
-            "Person": {"name": "xsd:string"}
-        }
+        all_existing_class = {"Person": {"name": "xsd:string"}}
 
         result = _embed_obj(df, 1, pd, False, all_existing_class, "Person", mock_client)
 
@@ -637,9 +621,7 @@ class TestEmbedObjDirect:
         df = pd.DataFrame([{"name": "John", "friend": "person2"}])
         mock_client = MagicMock()
 
-        all_existing_class = {
-            "Person": {"name": "xsd:string", "friend": "Person"}
-        }
+        all_existing_class = {"Person": {"name": "xsd:string", "friend": "Person"}}
 
         result = _embed_obj(df, 1, pd, False, all_existing_class, "Person", mock_client)
 
@@ -655,7 +637,7 @@ class TestEmbedObjDirect:
 
         all_existing_class = {
             "Person": {"name": "xsd:string", "status": "Status"},
-            "Status": {"@type": "Enum", "values": ["ACTIVE", "INACTIVE"]}
+            "Status": {"@type": "Enum", "values": ["ACTIVE", "INACTIVE"]},
         }
 
         result = _embed_obj(df, 1, pd, False, all_existing_class, "Person", mock_client)
@@ -682,7 +664,7 @@ class TestEmbedObjDirect:
         all_existing_class = {
             "Person": {"name": "xsd:string", "address": "Address"},
             "Address": {"street": "xsd:string", "city": "City"},
-            "City": {"name": "xsd:string"}
+            "City": {"name": "xsd:string"},
         }
 
         result = _embed_obj(df, 1, pd, False, all_existing_class, "Person", mock_client)
@@ -712,7 +694,7 @@ class TestEmbedObjDirect:
 
         all_existing_class = {
             "Person": {"name": "xsd:string", "address": "Address"},
-            "Address": {"street": "xsd:string"}
+            "Address": {"street": "xsd:string"},
         }
 
         result = _embed_obj(df, 2, pd, False, all_existing_class, "Person", mock_client)
@@ -739,7 +721,7 @@ class TestEmbedObjDirect:
 
         all_existing_class = {
             "Person": {"name": "xsd:string", "address": "Address"},
-            "Address": {"street": "xsd:string"}
+            "Address": {"street": "xsd:string"},
         }
 
         result = _embed_obj(df, 1, pd, False, all_existing_class, "Person", mock_client)
@@ -755,7 +737,7 @@ def test_result_to_df_with_embed_obj_full_path():
 
     all_existing_class = {
         "Person": {"name": "xsd:string", "address": "Address"},
-        "Address": {"street": "xsd:string"}
+        "Address": {"street": "xsd:string"},
     }
     mock_client.get_existing_classes.return_value = all_existing_class
     mock_client.db = "testdb"

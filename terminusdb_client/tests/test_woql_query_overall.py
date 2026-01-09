@@ -1,9 +1,8 @@
 """Additional tests for WOQL Query to improve coverage"""
-import json
+
 import pytest
 from unittest.mock import Mock
 from terminusdb_client.woqlquery.woql_query import WOQLQuery, Var, Doc
-from terminusdb_client.errors import InterfaceError
 
 
 class TestWOQLQueryCoverage:
@@ -197,7 +196,7 @@ class TestWOQLQueryCoverage:
             "@type": "Column",
             "indicator": {"@type": "Indicator", "index": 0},
             "variable": "test",
-            "type": "xsd:string"
+            "type": "xsd:string",
         }
         assert result == expected
 
@@ -206,7 +205,7 @@ class TestWOQLQueryCoverage:
         expected = {
             "@type": "Column",
             "indicator": {"@type": "Indicator", "name": "name"},
-            "variable": "test"
+            "variable": "test",
         }
         assert result == expected
 
@@ -245,8 +244,8 @@ class TestWOQLQueryCoverage:
                 "@type": "Triple",
                 "subject": {"@type": "NodeValue", "variable": "S"},
                 "predicate": {"@type": "NodeValue", "node": "rdf:type"},
-                "object": {"@type": "Value", "variable": "O"}
-            }
+                "object": {"@type": "Value", "variable": "O"},
+            },
         }
         assert result == expected
 
@@ -259,15 +258,15 @@ class TestWOQLQueryCoverage:
                     "@type": "Triple",
                     "subject": {"@type": "Value", "variable": "S"},
                     "predicate": "rdf:type",
-                    "object": {"@type": "Value", "variable": "O"}
+                    "object": {"@type": "Value", "variable": "O"},
                 },
                 {
                     "@type": "Triple",
                     "subject": {"@type": "Value", "variable": "S"},
                     "predicate": "rdfs:label",
-                    "object": {"@type": "Value", "variable": "L"}
-                }
-            ]
+                    "object": {"@type": "Value", "variable": "L"},
+                },
+            ],
         }
         wq = WOQLQuery()
         wq.from_dict(query_dict)
@@ -282,10 +281,7 @@ class TestWOQLQueryCoverage:
             def query(self, query):
                 return {
                     "api:status": "api:failure",
-                    "api:error": {
-                        "@type": "api:Error",
-                        "message": "Test error"
-                    }
+                    "api:error": {"@type": "api:Error", "message": "Test error"},
                 }
 
         client = MockClient()
@@ -329,7 +325,7 @@ class TestWOQLQueryCoverage:
         expected_insert = {
             "@type": "InsertDocument",
             "document": data,
-            "identifier": {"@type": "NodeValue", "node": "Person"}
+            "identifier": {"@type": "NodeValue", "node": "Person"},
         }
         assert result == expected_insert
 
@@ -340,7 +336,7 @@ class TestWOQLQueryCoverage:
         expected_update = {
             "@type": "UpdateDocument",
             "document": data,
-            "identifier": {"@type": "NodeValue", "node": "Person"}
+            "identifier": {"@type": "NodeValue", "node": "Person"},
         }
         assert result == expected_update
 
@@ -350,7 +346,7 @@ class TestWOQLQueryCoverage:
         result = wq.to_dict()
         expected_delete = {
             "@type": "DeleteDocument",
-            "identifier": {"@type": "NodeValue", "node": "Person"}
+            "identifier": {"@type": "NodeValue", "node": "Person"},
         }
         assert result == expected_delete
 
@@ -361,7 +357,7 @@ class TestWOQLQueryCoverage:
         expected_read = {
             "@type": "ReadDocument",
             "document": {"@type": "Value", "variable": "result"},
-            "identifier": {"@type": "NodeValue", "node": "Person"}
+            "identifier": {"@type": "NodeValue", "node": "Person"},
         }
         assert result == expected_read
 
@@ -374,7 +370,7 @@ class TestWOQLQueryCoverage:
             "@type": "Path",
             "subject": {"@type": "NodeValue", "variable": "person"},
             "pattern": {"@type": "PathPredicate", "predicate": "friend_of"},
-            "object": {"@type": "Value", "variable": "friend"}
+            "object": {"@type": "Value", "variable": "friend"},
         }
         assert result == expected
 
@@ -388,7 +384,7 @@ class TestWOQLQueryCoverage:
         expected_size = {
             "@type": "Size",
             "resource": "schema",
-            "size": {"@type": "Value", "variable": "size"}
+            "size": {"@type": "Value", "variable": "size"},
         }
         assert result == expected_size
 
@@ -399,7 +395,7 @@ class TestWOQLQueryCoverage:
         expected_count = {
             "@type": "TripleCount",
             "resource": "schema",
-            "triple_count": {"@type": "Value", "variable": "count"}
+            "triple_count": {"@type": "Value", "variable": "count"},
         }
         assert result == expected_count
 
@@ -414,7 +410,7 @@ class TestWOQLQueryCoverage:
             "@type": "Triple",
             "subject": {"@type": "NodeValue", "variable": "s"},
             "predicate": {"@type": "NodeValue", "variable": "Predicate"},
-            "object": {"@type": "Value", "variable": "Object"}
+            "object": {"@type": "Value", "variable": "Object"},
         }
         assert result == expected_star
 
@@ -426,7 +422,7 @@ class TestWOQLQueryCoverage:
             "@type": "Triple",
             "subject": {"@type": "NodeValue", "variable": "s"},
             "predicate": {"@type": "NodeValue", "node": "rdf:type"},
-            "object": {"@type": "Value", "variable": "Object"}
+            "object": {"@type": "Value", "variable": "Object"},
         }
         assert result == expected_all
 
@@ -437,7 +433,7 @@ class TestWOQLQueryCoverage:
         result = wq.to_dict()
         expected = {
             "@type": "Comment",
-            "comment": {"@type": "xsd:string", "@value": "Test comment"}
+            "comment": {"@type": "xsd:string", "@value": "Test comment"},
         }
         assert result == expected
 
@@ -498,11 +494,8 @@ class TestWOQLQueryCoverage:
         result = wq.to_dict()
         expected_remote = {
             "@type": "QueryResource",
-            "source": {
-                "@type": "Source",
-                "url": "http://example.com"
-            },
-            "format": "csv"
+            "source": {"@type": "Source", "url": "http://example.com"},
+            "format": "csv",
         }
         assert result == expected_remote
 
@@ -512,11 +505,8 @@ class TestWOQLQueryCoverage:
         result = wq.to_dict()
         expected_post = {
             "@type": "QueryResource",
-            "source": {
-                "@type": "Source",
-                "post": "http://example.com/api"
-            },
-            "format": "csv"
+            "source": {"@type": "Source", "post": "http://example.com/api"},
+            "format": "csv",
         }
         assert result == expected_post
 
@@ -527,7 +517,7 @@ class TestWOQLQueryCoverage:
         expected_eval = {
             "@type": "Eval",
             "expression": "v:x + v:y",
-            "result": {"@type": "ArithmeticValue", "variable": "result"}
+            "result": {"@type": "ArithmeticValue", "variable": "result"},
         }
         assert result == expected_eval
 
@@ -558,12 +548,16 @@ class TestWOQLQueryCoverage:
         input_list = ["v:item1", "v:item2", "literal_value"]
         result = wq._expand_value_variable(input_list)
         # _expand_value_variable wraps lists in a Value node
-        assert result == {"@type": "Value", "node": ["v:item1", "v:item2", "literal_value"]}
+        assert result == {
+            "@type": "Value",
+            "node": ["v:item1", "v:item2", "literal_value"],
+        }
 
     def test_expand_value_variable_with_var_object(self):
         """Test _expand_value_variable with Var object"""
         wq = WOQLQuery()
         from terminusdb_client.woqlquery.woql_query import Var
+
         var = Var("test")
         result = wq._expand_value_variable(var)
         assert result == {"@type": "Value", "variable": "test"}
@@ -575,7 +569,7 @@ class TestWOQLQueryCoverage:
         expected = {
             "@type": "Column",
             "indicator": {"@type": "Indicator", "index": 0},
-            "variable": "name"
+            "variable": "name",
         }
         assert result == expected
 
@@ -586,7 +580,7 @@ class TestWOQLQueryCoverage:
         expected = {
             "@type": "Column",
             "indicator": {"@type": "Indicator", "name": "column_name"},
-            "variable": "name"
+            "variable": "name",
         }
         assert result == expected
 
@@ -598,7 +592,7 @@ class TestWOQLQueryCoverage:
             "@type": "Column",
             "indicator": {"@type": "Indicator", "name": "column_name"},
             "variable": "name",
-            "type": "xsd:string"
+            "type": "xsd:string",
         }
         assert result == expected
 
@@ -620,6 +614,7 @@ class TestWOQLQueryCoverage:
         """Test _raw_var with Var object"""
         wq = WOQLQuery()
         from terminusdb_client.woqlquery.woql_query import Var
+
         var = Var("test_var")
         result = wq._raw_var(var)
         assert result == "test_var"
@@ -640,6 +635,7 @@ class TestWOQLQueryCoverage:
         """Test _varj method with Var object"""
         wq = WOQLQuery()
         from terminusdb_client.woqlquery.woql_query import Var
+
         var = Var("test")
         result = wq._varj(var)
         assert result == {"@type": "Value", "variable": "test"}
@@ -667,7 +663,9 @@ class TestWOQLQueryCoverage:
     def test_from_json(self):
         """Test from_json method"""
         wq = WOQLQuery()
-        json_str = '{"@type": "Triple", "subject": {"@type": "NodeValue", "variable": "s"}}'
+        json_str = (
+            '{"@type": "Triple", "subject": {"@type": "NodeValue", "variable": "s"}}'
+        )
         wq.from_json(json_str)
         assert wq._query["@type"] == "Triple"
         assert wq._query["subject"]["variable"] == "s"

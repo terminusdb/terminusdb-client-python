@@ -1,6 +1,13 @@
 """Test edge cases and error handling for WOQL Query components."""
-import pytest
-from terminusdb_client.woqlquery.woql_query import WOQLQuery, Var, Vars, Doc, SHORT_NAME_MAPPING, UPDATE_OPERATORS
+
+from terminusdb_client.woqlquery.woql_query import (
+    WOQLQuery,
+    Var,
+    Vars,
+    Doc,
+    SHORT_NAME_MAPPING,
+    UPDATE_OPERATORS,
+)
 
 
 class TestVarEdgeCases:
@@ -10,10 +17,7 @@ class TestVarEdgeCases:
         """Test Var.to_dict method returns correct structure."""
         var = Var("test_var")
         result = var.to_dict()
-        assert result == {
-            "@type": "Value",
-            "variable": "test_var"
-        }
+        assert result == {"@type": "Value", "variable": "test_var"}
 
     def test_var_str_representation(self):
         """Test Var string representation."""
@@ -103,16 +107,18 @@ class TestDocEdgeCases:
 
     def test_doc_complex_nested_structure(self):
         """Test Doc with complex nested structure."""
-        doc = Doc({
-            "level1": {
-                "level2": [1, 2, {"level3": Var("deep_var")}]
-            },
-            "list_of_dicts": [{"a": 1}, {"b": 2}]
-        })
+        doc = Doc(
+            {
+                "level1": {"level2": [1, 2, {"level3": Var("deep_var")}]},
+                "list_of_dicts": [{"a": 1}, {"b": 2}],
+            }
+        )
         result = doc.to_dict()
         assert result["@type"] == "Value"
         # Verify structure is preserved
-        level1_pair = next(p for p in result["dictionary"]["data"] if p["field"] == "level1")
+        level1_pair = next(
+            p for p in result["dictionary"]["data"] if p["field"] == "level1"
+        )
         assert level1_pair["value"]["dictionary"]["@type"] == "DictionaryTemplate"
 
 

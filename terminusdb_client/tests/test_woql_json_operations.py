@@ -1,4 +1,5 @@
 """Test JSON and document operations for WOQL Query."""
+
 import datetime as dt
 from terminusdb_client.woqlquery.woql_query import WOQLQuery, Var, Doc
 
@@ -189,11 +190,8 @@ class TestWOQLJSONOperations:
         complex_obj = {
             "name": "Test Object",
             "values": [1, 2.5, True, None],
-            "nested": {
-                "inner": "value",
-                "list": [{"a": 1}, {"b": 2}]
-            },
-            "var_ref": Var("reference")
+            "nested": {"inner": "value", "list": [{"a": 1}, {"b": 2}]},
+            "var_ref": Var("reference"),
         }
 
         # Clean the object
@@ -208,14 +206,16 @@ class TestWOQLJSONOperations:
     def test_document_embedding_in_query(self):
         """Test embedding documents within queries."""
         query = WOQLQuery()
-        doc = Doc({
-            "title": "Test Document",
-            "content": "This is a test",
-            "metadata": {
-                "created": dt.date(2023, 1, 1),
-                "tags": ["test", "document"]
+        doc = Doc(
+            {
+                "title": "Test Document",
+                "content": "This is a test",
+                "metadata": {
+                    "created": dt.date(2023, 1, 1),
+                    "tags": ["test", "document"],
+                },
             }
-        })
+        )
 
         # Use document in triple
         query.triple("doc_id", "schema:content", doc)

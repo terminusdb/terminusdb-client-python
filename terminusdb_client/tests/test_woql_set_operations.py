@@ -1,5 +1,5 @@
 """Tests for WOQL set and list operations."""
-import pytest
+
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 
@@ -178,11 +178,7 @@ class TestWOQLSetDifferenceOperations:
     def test_set_difference_basic(self):
         """Test set_difference with two lists."""
         query = WOQLQuery()
-        result = query.set_difference(
-            ["a", "b", "c"],
-            ["b", "c", "d"],
-            "v:Result"
-        )
+        result = query.set_difference(["a", "b", "c"], ["b", "c", "d"], "v:Result")
 
         assert result is query
         assert query._cursor["@type"] == "SetDifference"
@@ -197,11 +193,7 @@ class TestWOQLSetIntersectionOperations:
     def test_set_intersection_basic(self):
         """Test set_intersection with two lists."""
         query = WOQLQuery()
-        result = query.set_intersection(
-            ["a", "b", "c"],
-            ["b", "c", "d"],
-            "v:Result"
-        )
+        result = query.set_intersection(["a", "b", "c"], ["b", "c", "d"], "v:Result")
 
         assert result is query
         assert query._cursor["@type"] == "SetIntersection"
@@ -216,11 +208,7 @@ class TestWOQLSetUnionOperations:
     def test_set_union_basic(self):
         """Test set_union with two lists."""
         query = WOQLQuery()
-        result = query.set_union(
-            ["a", "b", "c"],
-            ["b", "c", "d"],
-            "v:Result"
-        )
+        result = query.set_union(["a", "b", "c"], ["b", "c", "d"], "v:Result")
 
         assert result is query
         assert query._cursor["@type"] == "SetUnion"

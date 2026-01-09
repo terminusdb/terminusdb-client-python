@@ -163,13 +163,19 @@ class TestPhraseParser:
         """Test path star"""
         tokens = ["parentOf", "*"]
         result = _phrase_parser(tokens)
-        assert result == {"@type": "PathStar", "star": {"@type": "PathPredicate", "predicate": "parentOf"}}
+        assert result == {
+            "@type": "PathStar",
+            "star": {"@type": "PathPredicate", "predicate": "parentOf"},
+        }
 
     def test_path_plus(self):
         """Test path plus"""
         tokens = ["parentOf", "+"]
         result = _phrase_parser(tokens)
-        assert result == {"@type": "PathPlus", "plus": {"@type": "PathPredicate", "predicate": "parentOf"}}
+        assert result == {
+            "@type": "PathPlus",
+            "plus": {"@type": "PathPredicate", "predicate": "parentOf"},
+        }
 
     def test_path_times(self):
         """Test path times with {n,m}"""
@@ -179,7 +185,7 @@ class TestPhraseParser:
             "@type": "PathTimes",
             "from": 1,
             "to": 3,
-            "times": {"@type": "PathPredicate", "predicate": "parentOf"}
+            "times": {"@type": "PathPredicate", "predicate": "parentOf"},
         }
 
     def test_path_times_error_no_comma(self):
@@ -298,6 +304,7 @@ class TestCopyDict:
 
     def test_copy_with_query_tuple(self):
         """Test copying with query as tuple"""
+
         class MockQuery:
             def to_dict(self):
                 return {"@type": "Query", "select": "x"}
@@ -333,6 +340,7 @@ class TestCopyDict:
 
     def test_copy_with_to_dict_object(self):
         """Test copying object with to_dict method"""
+
         class MockObj:
             def to_dict(self):
                 return {"converted": True}

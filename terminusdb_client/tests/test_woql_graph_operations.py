@@ -1,6 +1,7 @@
 """Test graph operations for WOQL Query."""
+
 import pytest
-from terminusdb_client.woqlquery.woql_query import WOQLQuery, Var
+from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 
 class TestWOQLGraphModification:
@@ -32,7 +33,9 @@ class TestWOQLGraphModification:
         # Should wrap with And
         assert query._query.get("@type") == "And"
 
-    @pytest.mark.skip(reason="BLOCKED: Bug in woql_query.py lines 1123-1124 - calls append on WOQLQuery")
+    @pytest.mark.skip(
+        reason="BLOCKED: Bug in woql_query.py lines 1123-1124 - calls append on WOQLQuery"
+    )
     def test_removed_quad_with_args_subject(self):
         """Test removed_quad with 'args' as subject.
 
@@ -90,7 +93,9 @@ class TestWOQLGraphModification:
         # Should wrap with And
         assert query._query.get("@type") == "And"
 
-    @pytest.mark.skip(reason="BLOCKED: Bug in woql_query.py lines 1087-1088 - calls append on WOQLQuery")
+    @pytest.mark.skip(
+        reason="BLOCKED: Bug in woql_query.py lines 1087-1088 - calls append on WOQLQuery"
+    )
     def test_added_quad_with_args_subject(self):
         """Test added_quad with 'args' as subject.
 
@@ -108,7 +113,9 @@ class TestWOQLGraphModification:
 class TestWOQLGraphQueries:
     """Test graph query operations."""
 
-    @pytest.mark.skip(reason="BLOCKED: Bug in woql_query.py line 3226 - calls missing _set_context method")
+    @pytest.mark.skip(
+        reason="BLOCKED: Bug in woql_query.py line 3226 - calls missing _set_context method"
+    )
     def test_graph_method_basic(self):
         """Test basic graph method usage.
 
@@ -121,7 +128,9 @@ class TestWOQLGraphQueries:
         with pytest.raises(AttributeError):
             query.graph("my_graph")
 
-    @pytest.mark.skip(reason="BLOCKED: Bug in woql_query.py line 3226 - calls missing _set_context method")
+    @pytest.mark.skip(
+        reason="BLOCKED: Bug in woql_query.py line 3226 - calls missing _set_context method"
+    )
     def test_graph_with_subquery(self):
         """Test graph method with subquery.
 
@@ -132,7 +141,9 @@ class TestWOQLGraphQueries:
         with pytest.raises(AttributeError):
             query.graph("my_graph")
 
-    @pytest.mark.skip(reason="BLOCKED: Bug in woql_query.py line 3226 - calls missing _set_context method")
+    @pytest.mark.skip(
+        reason="BLOCKED: Bug in woql_query.py line 3226 - calls missing _set_context method"
+    )
     def test_multiple_graph_operations(self):
         """Test chaining multiple graph operations.
 

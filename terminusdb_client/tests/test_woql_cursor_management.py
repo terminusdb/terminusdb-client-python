@@ -1,6 +1,7 @@
 """Test cursor management and state tracking for WOQL Query."""
+
 import datetime as dt
-from terminusdb_client.woqlquery.woql_query import WOQLQuery, Var
+from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 
 class TestWOQLCursorManagement:
@@ -204,7 +205,9 @@ class TestWOQLCursorManagement:
         nested = q1.__and__(q2).__or__(q3)
 
         assert nested._query.get("@type") == "Or"
-        assert "and" in nested._query.get("or")[0]  # The 'and' is inside the 'or' structure
+        assert (
+            "and" in nested._query.get("or")[0]
+        )  # The 'and' is inside the 'or' structure
         assert "or" in nested._query
 
     def test_cursor_consistency_after_complex_query(self):
@@ -217,8 +220,12 @@ class TestWOQLCursorManagement:
 
         # Cursor should be at the last operation
         assert query._cursor["@type"] == "Subsumption"  # SubClassOf maps to Subsumption
-        assert query._cursor["parent"]["node"] == "type"  # parent is wrapped as NodeValue
-        assert query._cursor["child"]["node"] == "rdfs:subClassOf"  # child is wrapped as NodeValue
+        assert (
+            query._cursor["parent"]["node"] == "type"
+        )  # parent is wrapped as NodeValue
+        assert (
+            query._cursor["child"]["node"] == "rdfs:subClassOf"
+        )  # child is wrapped as NodeValue
 
         # Overall query structure should be preserved
         assert "@type" in query._query

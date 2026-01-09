@@ -1,4 +1,5 @@
 """Test schema validation and related operations for WOQL Query."""
+
 import pytest
 from terminusdb_client.woqlquery.woql_query import WOQLQuery, Var
 
@@ -16,8 +17,16 @@ class TestWOQLSchemaValidation:
                 return {
                     "bindings": [
                         {"S": "schema:Person", "P": "rdf:type", "O": "owl:Class"},
-                        {"S": "schema:name", "P": "rdf:type", "O": "owl:DatatypeProperty"},
-                        {"S": "_:blank", "P": "rdf:type", "O": "owl:Class"},  # Should be ignored
+                        {
+                            "S": "schema:name",
+                            "P": "rdf:type",
+                            "O": "owl:DatatypeProperty",
+                        },
+                        {
+                            "S": "_:blank",
+                            "P": "rdf:type",
+                            "O": "owl:Class",
+                        },  # Should be ignored
                     ]
                 }
 
@@ -55,8 +64,16 @@ class TestWOQLSchemaValidation:
                 return {
                     "bindings": [
                         {"S": "nocolon", "P": "rdf:type", "O": "owl:Class"},  # No colon
-                        {"S": "empty:", "P": "rdf:type", "O": "owl:Class"},  # Empty after colon
-                        {"S": ":empty", "P": "rdf:type", "O": "owl:Class"},  # Empty before colon
+                        {
+                            "S": "empty:",
+                            "P": "rdf:type",
+                            "O": "owl:Class",
+                        },  # Empty after colon
+                        {
+                            "S": ":empty",
+                            "P": "rdf:type",
+                            "O": "owl:Class",
+                        },  # Empty before colon
                     ]
                 }
 
@@ -123,7 +140,8 @@ class TestWOQLSchemaValidation:
         assert "query" in query._cursor
         assert result is query
 
-    @pytest.mark.skip(reason="""BLOCKED: Bug in woql_query.py line 784 - unreachable validation logic
+    @pytest.mark.skip(
+        reason="""BLOCKED: Bug in woql_query.py line 784 - unreachable validation logic
 
         BUG ANALYSIS:
         Line 784: if queries != [] and not queries:
@@ -150,7 +168,8 @@ class TestWOQLSchemaValidation:
         FIX REQUIRED:
         Replace line 784 with: if not queries:
         This will catch None, empty list, and other falsy values before processing.
-        """)
+        """
+    )
     def test_select_with_no_arguments_should_raise_error(self):
         """Test that select() with no arguments raises ValueError.
 
@@ -167,7 +186,9 @@ class TestWOQLSchemaValidation:
 
         # Test: No arguments at all should raise ValueError
         # Currently FAILS because line 784 validation is unreachable
-        with pytest.raises(ValueError, match="Select must be given a list of variable names"):
+        with pytest.raises(
+            ValueError, match="Select must be given a list of variable names"
+        ):
             query.select()
 
     def test_select_with_empty_list(self):

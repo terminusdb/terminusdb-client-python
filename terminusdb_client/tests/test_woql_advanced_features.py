@@ -1,6 +1,7 @@
 """Test advanced query features for WOQL Query."""
+
 import pytest
-from terminusdb_client.woqlquery.woql_query import WOQLQuery, Var
+from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 
 class TestWOQLAdvancedFiltering:
@@ -170,7 +171,9 @@ class TestWOQLSubqueryOperations:
         assert result is query
         assert query._cursor.get("@type") == "Distinct"
 
-    @pytest.mark.skip(reason="BLOCKED: Bug in woql_query.py line 903 - needs investigation")
+    @pytest.mark.skip(
+        reason="BLOCKED: Bug in woql_query.py line 903 - needs investigation"
+    )
     def test_subquery_with_limit_offset(self):
         """Test subquery with limit and offset.
 

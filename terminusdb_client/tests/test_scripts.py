@@ -12,14 +12,17 @@ from ..errors import InterfaceError
 # Direct unit tests for _df_to_schema function
 # ============================================================================
 
+
 class MockDtype:
     """Helper class to mock pandas dtype with a type attribute"""
+
     def __init__(self, dtype_type):
         self.type = dtype_type
 
 
 class MockDtypes(dict):
     """Helper class to mock DataFrame.dtypes that behaves like a dict"""
+
     pass
 
 
@@ -27,7 +30,11 @@ def test_df_to_schema_basic():
     """Test basic schema generation from DataFrame"""
     mock_np = MagicMock()
     # Keys must be builtin names, values are the numpy types that map to them
-    mock_np.sctypeDict.items.return_value = [("int", int), ("str", str), ("float", float)]
+    mock_np.sctypeDict.items.return_value = [
+        ("int", int),
+        ("str", str),
+        ("float", float),
+    ]
     mock_np.datetime64 = "datetime64"
 
     mock_df = MagicMock()
@@ -49,11 +56,9 @@ def test_df_to_schema_with_id_column():
     mock_np.datetime64 = "datetime64"
 
     mock_df = MagicMock()
-    dtypes = MockDtypes({
-        "id": MockDtype(str),
-        "name": MockDtype(str),
-        "age": MockDtype(int)
-    })
+    dtypes = MockDtypes(
+        {"id": MockDtype(str), "name": MockDtype(str), "age": MockDtype(int)}
+    )
     mock_df.dtypes = dtypes
 
     result = _df_to_schema("Person", mock_df, mock_np, id_col="id")
@@ -75,7 +80,9 @@ def test_df_to_schema_with_optional_na():
     dtypes = MockDtypes({"name": MockDtype(str), "age": MockDtype(int)})
     mock_df.dtypes = dtypes
 
-    result = _df_to_schema("Person", mock_df, mock_np, na_mode="optional", keys=["name"])
+    result = _df_to_schema(
+        "Person", mock_df, mock_np, na_mode="optional", keys=["name"]
+    )
 
     assert result["@type"] == "Class"
     assert result["@id"] == "Person"
@@ -129,17 +136,23 @@ def test_df_to_schema_with_datetime():
 def test_df_to_schema_all_options():
     """Test schema generation with all options combined"""
     mock_np = MagicMock()
-    mock_np.sctypeDict.items.return_value = [("int", int), ("str", str), ("float", float)]
+    mock_np.sctypeDict.items.return_value = [
+        ("int", int),
+        ("str", str),
+        ("float", float),
+    ]
     mock_np.datetime64 = "datetime64"
 
     mock_df = MagicMock()
-    dtypes = MockDtypes({
-        "id": MockDtype(str),
-        "name": MockDtype(str),
-        "age": MockDtype(int),
-        "salary": MockDtype(float),
-        "department": MockDtype(str)
-    })
+    dtypes = MockDtypes(
+        {
+            "id": MockDtype(str),
+            "name": MockDtype(str),
+            "age": MockDtype(int),
+            "salary": MockDtype(float),
+            "department": MockDtype(str),
+        }
+    )
     mock_df.dtypes = dtypes
 
     result = _df_to_schema(
@@ -149,7 +162,7 @@ def test_df_to_schema_all_options():
         embedded=["department"],
         id_col="id",
         na_mode="optional",
-        keys=["name"]
+        keys=["name"],
     )
 
     assert result["@type"] == "Class"
@@ -171,6 +184,7 @@ def test_df_to_schema_all_options():
 # ============================================================================
 # CLI tests
 # ============================================================================
+
 
 def test_startproject():
     runner = CliRunner()
@@ -221,7 +235,9 @@ def test_startproject():
     """Test project creation"""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(scripts.startproject, input="mydb\nhttp://127.0.0.1:6363/\n")
+        result = runner.invoke(
+            scripts.startproject, input="mydb\nhttp://127.0.0.1:6363/\n"
+        )
 
         assert result.exit_code == 0
         assert os.path.exists("config.json")
@@ -238,7 +254,10 @@ def test_startproject_with_team():
     """Test project creation with custom team and token"""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(scripts.startproject, input="mydb\nhttp://example.com/\nteam1\ny\ny\nTOKEN123\n")
+        result = runner.invoke(
+            scripts.startproject,
+            input="mydb\nhttp://example.com/\nteam1\ny\ny\nTOKEN123\n",
+        )
 
         assert result.exit_code == 0
         assert os.path.exists("config.json")
@@ -255,7 +274,9 @@ def test_startproject_remote_server():
     """Test project creation with remote server"""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(scripts.startproject, input="mydb\nhttp://example.com/\nteam1\nn\n")
+        result = runner.invoke(
+            scripts.startproject, input="mydb\nhttp://example.com/\nteam1\nn\n"
+        )
 
         assert result.exit_code == 0
         assert os.path.exists("config.json")
@@ -273,15 +294,19 @@ def test_startproject_remote_server_no_token():
     """Test project creation with remote server but no token setup"""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(scripts.startproject, input="mydb\nhttp://example.com\nteam1\ny\nn\n")
+        result = runner.invoke(
+            scripts.startproject, input="mydb\nhttp://example.com\nteam1\ny\nn\n"
+        )
 
         assert result.exit_code == 0
-        assert "Please make sure you have set up TERMINUSDB_ACCESS_TOKEN" in result.output
+        assert (
+            "Please make sure you have set up TERMINUSDB_ACCESS_TOKEN" in result.output
+        )
 
 
 def test_load_settings_empty_config():
     """Test _load_settings with empty config"""
-    with patch("builtins.open", mock_open(read_data='{}')):
+    with patch("builtins.open", mock_open(read_data="{}")):
         with patch("json.load", return_value={}):
             try:
                 scripts._load_settings()
@@ -292,7 +317,9 @@ def test_load_settings_empty_config():
 
 def test_load_settings_missing_item():
     """Test _load_settings with missing required item"""
-    with patch("builtins.open", mock_open(read_data='{"endpoint": "http://127.0.0.1:6363/"}')):
+    with patch(
+        "builtins.open", mock_open(read_data='{"endpoint": "http://127.0.0.1:6363/"}')
+    ):
         with patch("json.load", return_value={"endpoint": "http://127.0.0.1:6363/"}):
             try:
                 scripts._load_settings()
@@ -316,16 +343,22 @@ def test_connect_defaults():
 
 def test_connect_create_db_with_branch():
     """Test _connect creating database with non-main branch"""
-    settings = {"endpoint": "http://127.0.0.1:6363/", "database": "test", "branch": "dev"}
+    settings = {
+        "endpoint": "http://127.0.0.1:6363/",
+        "database": "test",
+        "branch": "dev",
+    }
     mock_client = MagicMock()
     mock_client.connect.side_effect = [
         InterfaceError("Database 'test' does not exist"),
-        None  # Second call succeeds
+        None,  # Second call succeeds
     ]
 
     with patch("builtins.open", mock_open()):
         with patch("json.dump"):
-            with patch("terminusdb_client.scripts.scripts.Client", return_value=mock_client):
+            with patch(
+                "terminusdb_client.scripts.scripts.Client", return_value=mock_client
+            ):
                 _, msg = scripts._connect(settings)
                 assert mock_client.create_database.called
                 assert "created" in msg
@@ -339,7 +372,7 @@ def test_create_script_parent_string():
         {"@documentation": {"@title": "Test Schema"}},
         {"@id": "Parent1", "@type": "Class"},
         {"@id": "Child1", "@type": "Class", "@inherits": "Parent1"},
-        {"@id": "Child2", "@type": "Class", "@inherits": "Parent1"}
+        {"@id": "Child2", "@type": "Class", "@inherits": "Parent1"},
     ]
 
     result = scripts._create_script(obj_list)
@@ -365,7 +398,7 @@ def test_sync_with_schema():
     mock_client.db = "testdb"
     mock_client.get_all_documents.return_value = [
         {"@id": "Class1", "@type": "Class"},
-        {"@id": "Class2", "@type": "Class"}
+        {"@id": "Class2", "@type": "Class"},
     ]
 
     with patch("terminusdb_client.scripts.scripts.shed") as mock_shed:
@@ -389,7 +422,10 @@ def test_branch_delete_nonexistent():
         mock_client = MagicMock()
         mock_client.get_all_branches.return_value = [{"name": "main"}, {"name": "dev"}]
 
-        with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
+        with patch(
+            "terminusdb_client.scripts.scripts._connect",
+            return_value=(mock_client, "Connected"),
+        ):
             # Use -d option for delete
             result = runner.invoke(scripts.tdbpy, ["branch", "-d", "nonexistent"])
 
@@ -410,7 +446,10 @@ def test_branch_create():
         mock_client = MagicMock()
         mock_client.create_branch.return_value = None
 
-        with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
+        with patch(
+            "terminusdb_client.scripts.scripts._connect",
+            return_value=(mock_client, "Connected"),
+        ):
             # Pass branch name as argument to create
             result = runner.invoke(scripts.tdbpy, ["branch", "new_branch"])
 
@@ -432,7 +471,10 @@ def test_reset_hard():
         mock_client = MagicMock()
         mock_client.reset.return_value = None
 
-        with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
+        with patch(
+            "terminusdb_client.scripts.scripts._connect",
+            return_value=(mock_client, "Connected"),
+        ):
             # Hard reset is the default (no --soft flag)
             result = runner.invoke(scripts.tdbpy, ["reset", "ref123"])
 
@@ -454,9 +496,14 @@ def test_alldocs_no_type():
             json.dump({"branch": "main", "ref": None}, f)
 
         mock_client = MagicMock()
-        mock_client.get_all_documents.return_value = [{"@id": "doc1", "@type": "Person"}]
+        mock_client.get_all_documents.return_value = [
+            {"@id": "doc1", "@type": "Person"}
+        ]
 
-        with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
+        with patch(
+            "terminusdb_client.scripts.scripts._connect",
+            return_value=(mock_client, "Connected"),
+        ):
             result = runner.invoke(scripts.tdbpy, ["alldocs"])
 
             assert result.exit_code == 0
@@ -476,9 +523,14 @@ def test_alldocs_with_head():
             json.dump({"branch": "main", "ref": None}, f)
 
         mock_client = MagicMock()
-        mock_client.get_all_documents.return_value = [{"@id": "doc1", "@type": "Person"}]
+        mock_client.get_all_documents.return_value = [
+            {"@id": "doc1", "@type": "Person"}
+        ]
 
-        with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
+        with patch(
+            "terminusdb_client.scripts.scripts._connect",
+            return_value=(mock_client, "Connected"),
+        ):
             # Use --head instead of --limit
             result = runner.invoke(scripts.tdbpy, ["alldocs", "--head", "10"])
 
@@ -500,16 +552,23 @@ def test_commit_command():
 
         # Create a minimal schema.py
         with open("schema.py", "w") as f:
-            f.write('''"""\nTitle: Test Schema\nDescription: A test schema\nAuthors: John Doe, Jane Smith\n"""\nfrom terminusdb_client.woqlschema import TerminusClass\n\nclass Person(TerminusClass):\n    name: str\n''')
+            f.write(
+                '''"""\nTitle: Test Schema\nDescription: A test schema\nAuthors: John Doe, Jane Smith\n"""\nfrom terminusdb_client.woqlschema import TerminusClass\n\nclass Person(TerminusClass):\n    name: str\n'''
+            )
 
         mock_client = MagicMock()
 
-        with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
+        with patch(
+            "terminusdb_client.scripts.scripts._connect",
+            return_value=(mock_client, "Connected"),
+        ):
             with patch("terminusdb_client.scripts.scripts.WOQLSchema") as mock_schema:
                 mock_schema_obj = MagicMock()
                 mock_schema.return_value = mock_schema_obj
 
-                result = runner.invoke(scripts.tdbpy, ["commit", "--message", "Test commit"])
+                result = runner.invoke(
+                    scripts.tdbpy, ["commit", "--message", "Test commit"]
+                )
 
                 assert result.exit_code == 0
                 mock_schema.assert_called_once()
@@ -531,11 +590,16 @@ def test_commit_command_without_message():
 
         # Create a schema.py without documentation
         with open("schema.py", "w") as f:
-            f.write('''from terminusdb_client.woqlschema import TerminusClass\n\nclass Person(TerminusClass):\n    name: str\n''')
+            f.write(
+                """from terminusdb_client.woqlschema import TerminusClass\n\nclass Person(TerminusClass):\n    name: str\n"""
+            )
 
         mock_client = MagicMock()
 
-        with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
+        with patch(
+            "terminusdb_client.scripts.scripts._connect",
+            return_value=(mock_client, "Connected"),
+        ):
             with patch("terminusdb_client.scripts.scripts.WOQLSchema") as mock_schema:
                 mock_schema_obj = MagicMock()
                 mock_schema.return_value = mock_schema_obj
@@ -563,7 +627,10 @@ def test_deletedb_command():
         mock_client = MagicMock()
         mock_client.team = "admin"  # Set the team attribute
 
-        with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
+        with patch(
+            "terminusdb_client.scripts.scripts._connect",
+            return_value=(mock_client, "Connected"),
+        ):
             with patch("click.confirm", return_value=True):
                 result = runner.invoke(scripts.tdbpy, ["deletedb"])
 
@@ -591,7 +658,10 @@ def test_deletedb_command_cancelled():
 
         mock_client = MagicMock()
 
-        with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
+        with patch(
+            "terminusdb_client.scripts.scripts._connect",
+            return_value=(mock_client, "Connected"),
+        ):
             with patch("click.confirm", return_value=False):
                 result = runner.invoke(scripts.tdbpy, ["deletedb"])
 
@@ -617,17 +687,20 @@ def test_log_command():
                 "commit": "abc123",
                 "author": "John Doe",
                 "timestamp": "2023-01-01T12:00:00Z",
-                "message": "Initial commit"
+                "message": "Initial commit",
             },
             {
                 "commit": "def456",
                 "author": "Jane Smith",
                 "timestamp": "2023-01-02T12:00:00Z",
-                "message": "Add Person class"
-            }
+                "message": "Add Person class",
+            },
         ]
 
-        with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
+        with patch(
+            "terminusdb_client.scripts.scripts._connect",
+            return_value=(mock_client, "Connected"),
+        ):
             result = runner.invoke(scripts.tdbpy, ["log"])
 
             assert result.exit_code == 0
@@ -667,22 +740,39 @@ def test_importcsv_with_id_and_keys():
         mock_reader = MagicMock()
         mock_reader.__iter__.return_value = iter([mock_df])
 
-        with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
+        with patch(
+            "terminusdb_client.scripts.scripts._connect",
+            return_value=(mock_client, "Connected"),
+        ):
             with patch("pandas.read_csv", return_value=mock_reader):
-                with patch("terminusdb_client.scripts.scripts.import_module") as mock_import:
+                with patch(
+                    "terminusdb_client.scripts.scripts.import_module"
+                ) as mock_import:
                     mock_pd = MagicMock()
                     mock_pd.read_csv.return_value = mock_reader
                     mock_np = MagicMock()
-                    mock_np.sctypeDict.items.return_value = [("int64", int), ("object", str)]
-                    mock_import.side_effect = lambda name: {"pandas": mock_pd, "numpy": mock_np}[name]
+                    mock_np.sctypeDict.items.return_value = [
+                        ("int64", int),
+                        ("object", str),
+                    ]
+                    mock_import.side_effect = lambda name: {
+                        "pandas": mock_pd,
+                        "numpy": mock_np,
+                    }[name]
 
-                    result = runner.invoke(scripts.tdbpy, [
-                        "importcsv",
-                        "test.csv",
-                        "Age", "ID",  # keys
-                        "--id", "ID",
-                        "--na", "optional"
-                    ])
+                    result = runner.invoke(
+                        scripts.tdbpy,
+                        [
+                            "importcsv",
+                            "test.csv",
+                            "Age",
+                            "ID",  # keys
+                            "--id",
+                            "ID",
+                            "--na",
+                            "optional",
+                        ],
+                    )
 
                     assert result.exit_code == 0
                     assert "specified ids" in result.output
@@ -701,9 +791,16 @@ def test_branch_list():
             json.dump({"branch": "main", "ref": None}, f)
 
         mock_client = MagicMock()
-        mock_client.get_all_branches.return_value = [{"name": "main"}, {"name": "dev"}, {"name": "feature1"}]
+        mock_client.get_all_branches.return_value = [
+            {"name": "main"},
+            {"name": "dev"},
+            {"name": "feature1"},
+        ]
 
-        with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
+        with patch(
+            "terminusdb_client.scripts.scripts._connect",
+            return_value=(mock_client, "Connected"),
+        ):
             # No arguments lists branches
             result = runner.invoke(scripts.tdbpy, ["branch"])
 
@@ -756,13 +853,28 @@ def test_query_with_export():
 
         mock_client = MagicMock()
 
-        with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
-            with patch("terminusdb_client.scripts.scripts.result_to_df") as mock_result_to_df:
+        with patch(
+            "terminusdb_client.scripts.scripts._connect",
+            return_value=(mock_client, "Connected"),
+        ):
+            with patch(
+                "terminusdb_client.scripts.scripts.result_to_df"
+            ) as mock_result_to_df:
                 mock_df = MagicMock()
                 mock_df.to_csv = MagicMock()
                 mock_result_to_df.return_value = mock_df
 
-                result = runner.invoke(scripts.tdbpy, ["alldocs", "--type", "Person", "--export", "--filename", "output.csv"])
+                result = runner.invoke(
+                    scripts.tdbpy,
+                    [
+                        "alldocs",
+                        "--type",
+                        "Person",
+                        "--export",
+                        "--filename",
+                        "output.csv",
+                    ],
+                )
 
                 assert result.exit_code == 0
                 mock_df.to_csv.assert_called_once_with("output.csv", index=False)
@@ -783,18 +895,36 @@ def test_query_with_type_conversion():
         mock_client = MagicMock()
         mock_client.get_all_documents.return_value = []
         mock_client.get_existing_classes.return_value = {
-            "Person": {"name": "xsd:string", "age": "xsd:integer", "active": "xsd:boolean"}
+            "Person": {
+                "name": "xsd:string",
+                "age": "xsd:integer",
+                "active": "xsd:boolean",
+            }
         }
         mock_client.get_document.return_value = {
             "name": "xsd:string",
             "age": "xsd:integer",
-            "active": "xsd:boolean"
+            "active": "xsd:boolean",
         }
         mock_client.query_document.return_value = []
 
-        with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
+        with patch(
+            "terminusdb_client.scripts.scripts._connect",
+            return_value=(mock_client, "Connected"),
+        ):
             # Use name property which exists in schema
-            result = runner.invoke(scripts.tdbpy, ["alldocs", "--type", "Person", "--query", "name=John", "--query", 'active="true"'])
+            result = runner.invoke(
+                scripts.tdbpy,
+                [
+                    "alldocs",
+                    "--type",
+                    "Person",
+                    "--query",
+                    "name=John",
+                    "--query",
+                    'active="true"',
+                ],
+            )
 
             assert result.exit_code == 0
             # Check that the query was called
@@ -814,7 +944,10 @@ def test_branch_delete_current():
         mock_client = MagicMock()
         mock_client.get_all_branches.return_value = [{"name": "main"}, {"name": "dev"}]
 
-        with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
+        with patch(
+            "terminusdb_client.scripts.scripts._connect",
+            return_value=(mock_client, "Connected"),
+        ):
             result = runner.invoke(scripts.tdbpy, ["branch", "-d", "main"])
 
             assert result.exit_code != 0
@@ -834,7 +967,10 @@ def test_branch_list():
         mock_client = MagicMock()
         mock_client.get_all_branches.return_value = [{"name": "main"}, {"name": "dev"}]
 
-        with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
+        with patch(
+            "terminusdb_client.scripts.scripts._connect",
+            return_value=(mock_client, "Connected"),
+        ):
             result = runner.invoke(scripts.tdbpy, ["branch"])
 
             assert result.exit_code == 0
@@ -854,7 +990,10 @@ def test_branch_create():
 
         mock_client = MagicMock()
 
-        with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
+        with patch(
+            "terminusdb_client.scripts.scripts._connect",
+            return_value=(mock_client, "Connected"),
+        ):
             result = runner.invoke(scripts.tdbpy, ["branch", "newbranch"])
 
             assert result.exit_code == 0
@@ -873,9 +1012,15 @@ def test_checkout_new_branch():
             json.dump({"branch": "main"}, f)
 
         mock_client = MagicMock()
-        mock_client.get_all_branches.return_value = [{"name": "main"}, {"name": "newbranch"}]
+        mock_client.get_all_branches.return_value = [
+            {"name": "main"},
+            {"name": "newbranch"},
+        ]
 
-        with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
+        with patch(
+            "terminusdb_client.scripts.scripts._connect",
+            return_value=(mock_client, "Connected"),
+        ):
             result = runner.invoke(scripts.tdbpy, ["checkout", "newbranch", "-b"])
 
             assert result.exit_code == 0
@@ -895,10 +1040,14 @@ def test_reset_soft():
 
         mock_client = MagicMock()
         mock_client.get_commit_history.return_value = [
-            {"commit": "abc123"}, {"commit": "def456"}
+            {"commit": "abc123"},
+            {"commit": "def456"},
         ]
 
-        with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
+        with patch(
+            "terminusdb_client.scripts.scripts._connect",
+            return_value=(mock_client, "Connected"),
+        ):
             result = runner.invoke(scripts.tdbpy, ["reset", "abc123", "--soft"])
 
             assert result.exit_code == 0
@@ -917,7 +1066,10 @@ def test_reset_hard():
 
         mock_client = MagicMock()
 
-        with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
+        with patch(
+            "terminusdb_client.scripts.scripts._connect",
+            return_value=(mock_client, "Connected"),
+        ):
             result = runner.invoke(scripts.tdbpy, ["reset", "abc123"])
 
             assert result.exit_code == 0
@@ -937,7 +1089,10 @@ def test_reset_to_newest():
 
         mock_client = MagicMock()
 
-        with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
+        with patch(
+            "terminusdb_client.scripts.scripts._connect",
+            return_value=(mock_client, "Connected"),
+        ):
             result = runner.invoke(scripts.tdbpy, ["reset"])
 
             assert result.exit_code == 0
@@ -952,7 +1107,9 @@ def test_config_value_parsing():
         with open("config.json", "w") as f:
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
 
-        result = runner.invoke(scripts.tdbpy, ["config", "number=123", "float=45.6", "string=hello"])
+        result = runner.invoke(
+            scripts.tdbpy, ["config", "number=123", "float=45.6", "string=hello"]
+        )
 
         assert result.exit_code == 0
         with open("config.json") as f:

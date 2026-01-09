@@ -226,9 +226,7 @@ def test_dt_dict_nested():
 
 def test_dt_dict_with_iterable():
     """Test _dt_dict handles iterables with dates."""
-    obj = {
-        "dates": ["2025-01-01T10:00:00", 123]
-    }
+    obj = {"dates": ["2025-01-01T10:00:00", 123]}
 
     result = _dt_dict(obj)
 
@@ -238,6 +236,7 @@ def test_dt_dict_with_iterable():
 
 def test_dt_dict_handles_unmatched_types():
     """Test _dt_dict handles items that don't match any special type."""
+
     class CustomType:
         def __init__(self, value):
             self.value = value
@@ -247,7 +246,7 @@ def test_dt_dict_handles_unmatched_types():
         "number": 42,
         "none": None,
         "boolean": True,
-        "float": 3.14
+        "float": 3.14,
     }
 
     result = _dt_dict(obj)
@@ -285,6 +284,7 @@ def test_dt_list_handles_dict_items():
 
 def test_clean_dict_handles_unmatched_types():
     """Test _clean_dict handles items that don't match any special type."""
+
     class CustomType:
         def __init__(self, value):
             self.value = value
@@ -294,7 +294,7 @@ def test_clean_dict_handles_unmatched_types():
         "number": 42,
         "string": "regular string",
         "none": None,
-        "boolean": True
+        "boolean": True,
     }
 
     result = _clean_dict(obj)

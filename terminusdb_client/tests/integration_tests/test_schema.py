@@ -168,7 +168,9 @@ def test_getting_and_deleting_cheuk(schema_test_db):
     cheuk_setup.friend_of = {cheuk_setup}
     cheuk_setup.member_of = Team.IT
 
-    client.insert_document([cheuk_setup], commit_msg="Setup for test_getting_and_deleting_cheuk")
+    client.insert_document(
+        [cheuk_setup], commit_msg="Setup for test_getting_and_deleting_cheuk"
+    )
 
     # Test: Load and verify
     new_schema = WOQLSchema()
@@ -194,7 +196,9 @@ def test_insert_cheuk_again(schema_test_db):
     uk_setup = Country()
     uk_setup.name = "UK Test 2"
     uk_setup.perimeter = []
-    client.insert_document([uk_setup], commit_msg="Setup country for test_insert_cheuk_again")
+    client.insert_document(
+        [uk_setup], commit_msg="Setup country for test_insert_cheuk_again"
+    )
 
     # Test: Load country and create employee
     new_schema = WOQLSchema()
@@ -248,7 +252,10 @@ def test_insert_cheuk_again(schema_test_db):
         if item.get("@type") == "Country" and item.get("name") == "UK Test 2":
             assert item["perimeter"]
             found_country = True
-        elif item.get("@type") == "Employee" and item.get("@id") == "Employee/cheuk_test_2":
+        elif (
+            item.get("@type") == "Employee"
+            and item.get("@id") == "Employee/cheuk_test_2"
+        ):
             assert item["address_of"]["postal_code"] == "A12 345"
             assert item["address_of"]["street"] == "123 Abc Street"
             assert item["name"] == "Cheuk Test 2"
@@ -300,7 +307,9 @@ def test_get_data_version(schema_test_db):
     cheuk.member_of = Team.IT
     cheuk._id = "cheuk_test_3"
 
-    client.insert_document([location, uk, cheuk], commit_msg="Setup for test_get_data_version")
+    client.insert_document(
+        [location, uk, cheuk], commit_msg="Setup for test_get_data_version"
+    )
     result, version = client.get_all_branches(get_data_version=True)
     assert version
     result, version = client.get_all_documents(
@@ -425,9 +434,9 @@ def test_repeated_object_load(docker_url, test_schema):
         client.insert_document(
             schema, commit_msg="I am checking in the schema", graph_type="schema"
         )
-        [country_id] = client.insert_document({"@type" : "Country",
-                                               "name" : "Romania",
-                                               "perimeter" : []})
+        [country_id] = client.insert_document(
+            {"@type": "Country", "name": "Romania", "perimeter": []}
+        )
         obj = client.get_document(country_id)
         schema.import_objects(obj)
         obj2 = client.get_document(country_id)
@@ -446,12 +455,15 @@ def test_key_change_raises_exception(docker_url, test_schema):
         client.insert_document(
             schema, commit_msg="I am checking in the schema", graph_type="schema"
         )
-        [country_id] = client.insert_document({"@type" : "Country",
-                                               "name" : "Romania",
-                                               "perimeter" : []})
+        [country_id] = client.insert_document(
+            {"@type": "Country", "name": "Romania", "perimeter": []}
+        )
         obj = client.get_document(country_id)
         local_obj = schema.import_objects(obj)
-        with pytest.raises(ValueError, match=r"name has been used to generate the id, hence cannot be changed."):
+        with pytest.raises(
+            ValueError,
+            match=r"name has been used to generate the id, hence cannot be changed.",
+        ):
             local_obj.name = "France"
     finally:
         client.delete_database(db_name)

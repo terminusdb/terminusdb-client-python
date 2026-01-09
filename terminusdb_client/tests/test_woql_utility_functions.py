@@ -1,6 +1,6 @@
 """Test utility functions for WOQL Query."""
-import pytest
-from terminusdb_client.woqlquery.woql_query import WOQLQuery, Var
+
+from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 
 class TestWOQLSetOperations:

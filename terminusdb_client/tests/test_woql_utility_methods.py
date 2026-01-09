@@ -1,5 +1,5 @@
 """Tests for WOQL utility and helper methods."""
-import pytest
+
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 
@@ -16,7 +16,7 @@ class TestWOQLFindLastSubject:
                 "query": {
                     "subject": "schema:Person",
                     "predicate": "rdf:type",
-                    "object": "owl:Class"
+                    "object": "owl:Class",
                 }
             }
         ]
@@ -25,7 +25,9 @@ class TestWOQLFindLastSubject:
         result = query._find_last_subject(query._cursor)
 
         # Should find the subject from the query_list
-        assert result is not None or result is None  # Method may return None if structure doesn't match
+        assert (
+            result is not None or result is None
+        )  # Method may return None if structure doesn't match
 
 
 class TestWOQLSameEntry:
@@ -43,10 +45,7 @@ class TestWOQLSameEntry:
         """Test _same_entry with dict and string."""
         query = WOQLQuery()
         # Tests lines 3272-3273
-        result = query._same_entry(
-            {"node": "test"},
-            "test"
-        )
+        result = query._same_entry({"node": "test"}, "test")
 
         assert isinstance(result, bool)
 
@@ -54,10 +53,7 @@ class TestWOQLSameEntry:
         """Test _same_entry with string and dict."""
         query = WOQLQuery()
         # Tests lines 3274-3275
-        result = query._same_entry(
-            "test",
-            {"node": "test"}
-        )
+        result = query._same_entry("test", {"node": "test"})
 
         assert isinstance(result, bool)
 
@@ -128,7 +124,7 @@ class TestWOQLTripleBuilderContext:
         query._triple_builder_context = {
             "subject": "schema:Person",
             "graph": "schema",
-            "action": "triple"
+            "action": "triple",
         }
 
         # Verify context is set

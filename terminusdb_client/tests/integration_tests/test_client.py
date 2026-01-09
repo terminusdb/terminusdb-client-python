@@ -397,39 +397,53 @@ def test_get_organization_user_databases(docker_url):
         client.create_database(db_name2, team=org_name)
 
         # BEFORE grant: verify our specific databases are NOT accessible to admin user
-        databases_before = client.get_organization_user_databases(org=org_name, username="admin")
-        db_names_before = {db['name'] for db in databases_before}
-        assert db_name not in db_names_before, f"{db_name} should not be accessible before capability grant"
-        assert db_name2 not in db_names_before, f"{db_name2} should not be accessible before capability grant"
+        databases_before = client.get_organization_user_databases(
+            org=org_name, username="admin"
+        )
+        db_names_before = {db["name"] for db in databases_before}
+        assert (
+            db_name not in db_names_before
+        ), f"{db_name} should not be accessible before capability grant"
+        assert (
+            db_name2 not in db_names_before
+        ), f"{db_name2} should not be accessible before capability grant"
 
         # Grant capabilities to admin user for the organization
         capability_change = {
             "operation": "grant",
             "scope": f"Organization/{org_name}",
             "user": "User/admin",
-            "roles": [
-                "Role/admin"
-            ]
+            "roles": ["Role/admin"],
         }
         client.change_capabilities(capability_change)
 
         # AFTER grant: verify our specific databases ARE accessible to admin user
-        databases_after = client.get_organization_user_databases(org=org_name, username="admin")
-        db_names_after = {db['name'] for db in databases_after}
+        databases_after = client.get_organization_user_databases(
+            org=org_name, username="admin"
+        )
+        db_names_after = {db["name"] for db in databases_after}
         # Check both our databases are now accessible (order not guaranteed)
-        assert db_name in db_names_after, f"{db_name} should be accessible after capability grant"
-        assert db_name2 in db_names_after, f"{db_name2} should be accessible after capability grant"
+        assert (
+            db_name in db_names_after
+        ), f"{db_name} should be accessible after capability grant"
+        assert (
+            db_name2 in db_names_after
+        ), f"{db_name2} should be accessible after capability grant"
         # Verify admin team database does NOT appear in organization results
-        assert admin_db_name not in db_names_after, f"{admin_db_name} should not appear in {org_name} results"
+        assert (
+            admin_db_name not in db_names_after
+        ), f"{admin_db_name} should not appear in {org_name} results"
     finally:
         # Cleanup: revoke capability, delete databases, delete org
         try:
-            client.change_capabilities({
-                "operation": "revoke",
-                "scope": f"Organization/{org_name}",
-                "user": "User/admin",
-                "roles": ["Role/admin"]
-            })
+            client.change_capabilities(
+                {
+                    "operation": "revoke",
+                    "scope": f"Organization/{org_name}",
+                    "user": "User/admin",
+                    "roles": ["Role/admin"],
+                }
+            )
         except Exception:
             pass
         try:

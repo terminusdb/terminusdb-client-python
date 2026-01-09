@@ -1,4 +1,5 @@
 """Tests for woql_type.py"""
+
 import datetime as dt
 from enum import Enum
 from typing import ForwardRef, List, Optional, Set
@@ -174,6 +175,7 @@ class TestToWoqlType:
 
     def test_to_woql_optional_without_name(self):
         """Test Optional type without _name to cover line 89"""
+
         # Create a type that looks like Optional but has no _name
         class FakeOptional:
             __module__ = "typing"
@@ -186,6 +188,7 @@ class TestToWoqlType:
 
     def test_to_woql_enum_type(self):
         """Test Enum type"""
+
         class TestEnum(Enum):
             A = "a"
             B = "b"
@@ -194,11 +197,15 @@ class TestToWoqlType:
 
     def test_to_woql_unknown_type(self):
         """Test unknown type fallback"""
+
         class CustomClass:
             pass
 
         result = to_woql_type(CustomClass)
-        assert result == "<class 'terminusdb_client.tests.test_woql_type.TestToWoqlType.test_to_woql_unknown_type.<locals>.CustomClass'>"
+        assert (
+            result
+            == "<class 'terminusdb_client.tests.test_woql_type.TestToWoqlType.test_to_woql_unknown_type.<locals>.CustomClass'>"
+        )
 
 
 class TestFromWoqlType:
@@ -208,8 +215,9 @@ class TestFromWoqlType:
         """Test List type conversion"""
         # As object - returns ForwardRef for basic types
         from typing import ForwardRef
+
         result = from_woql_type({"@type": "List", "@class": "xsd:string"})
-        assert result == List[ForwardRef('str')]
+        assert result == List[ForwardRef("str")]
 
         # As string
         result = from_woql_type({"@type": "List", "@class": "xsd:string"}, as_str=True)
@@ -219,8 +227,9 @@ class TestFromWoqlType:
         """Test Set type conversion"""
         # As object - returns ForwardRef for basic types
         from typing import ForwardRef
+
         result = from_woql_type({"@type": "Set", "@class": "xsd:integer"})
-        assert result == Set[ForwardRef('int')]
+        assert result == Set[ForwardRef("int")]
 
         # As string
         result = from_woql_type({"@type": "Set", "@class": "xsd:integer"}, as_str=True)
@@ -230,11 +239,14 @@ class TestFromWoqlType:
         """Test Optional type conversion"""
         # As object - returns ForwardRef for basic types
         from typing import ForwardRef
+
         result = from_woql_type({"@type": "Optional", "@class": "xsd:boolean"})
-        assert result == Optional[ForwardRef('bool')]
+        assert result == Optional[ForwardRef("bool")]
 
         # As string
-        result = from_woql_type({"@type": "Optional", "@class": "xsd:boolean"}, as_str=True)
+        result = from_woql_type(
+            {"@type": "Optional", "@class": "xsd:boolean"}, as_str=True
+        )
         assert result == "Optional[bool]"
 
     def test_from_woql_invalid_dict_type(self):

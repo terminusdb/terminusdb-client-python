@@ -1,4 +1,5 @@
 """Tests for woql_test_helpers"""
+
 import pytest
 from terminusdb_client.tests.woql_test_helpers import WOQLTestHelpers, helpers
 from terminusdb_client.woqlquery.woql_query import WOQLQuery
@@ -19,7 +20,7 @@ class TestWOQLTestHelpers:
     def test_create_mock_client(self):
         """Test create_mock_client method"""
         client = WOQLTestHelpers.create_mock_client()
-        assert hasattr(client, 'query')
+        assert hasattr(client, "query")
         result = client.query({})
         assert result == {"@type": "api:WoqlResponse"}
 
@@ -202,7 +203,9 @@ class TestWOQLTestHelpers:
         query = WOQLQuery()
         query.triple("v:s", "rdf:type", "v:o")
         # Should not raise
-        WOQLTestHelpers.assert_triple_structure(query, check_subject=False, check_object=False)
+        WOQLTestHelpers.assert_triple_structure(
+            query, check_subject=False, check_object=False
+        )
 
     def test_assert_quad_structure(self):
         """Test assert_quad_structure method"""
@@ -212,7 +215,7 @@ class TestWOQLTestHelpers:
             "subject": {"@type": "NodeValue", "variable": "s"},
             "predicate": {"@type": "NodeValue", "node": "rdf:type"},
             "object": {"@type": "Value", "variable": "o"},
-            "graph": "graph"
+            "graph": "graph",
         }
         # Should not raise
         WOQLTestHelpers.assert_quad_structure(query)
@@ -247,10 +250,13 @@ class TestWOQLTestHelpers:
         query._query = {
             "@type": "And",
             "and": [
-                {"@type": "Triple", "subject": {"@type": "NodeValue", "variable": "s"},
-                 "predicate": {"@type": "NodeValue", "node": "rdf:type"},
-                 "object": {"@type": "Value", "variable": "o"}}
-            ]
+                {
+                    "@type": "Triple",
+                    "subject": {"@type": "NodeValue", "variable": "s"},
+                    "predicate": {"@type": "NodeValue", "node": "rdf:type"},
+                    "object": {"@type": "Value", "variable": "o"},
+                }
+            ],
         }
         # The actual count is 1, we expect 2, so it should raise
         with pytest.raises(AssertionError, match="Expected 2 items in 'and'"):
@@ -262,10 +268,13 @@ class TestWOQLTestHelpers:
         query._query = {
             "@type": "Or",
             "or": [
-                {"@type": "Triple", "subject": {"@type": "NodeValue", "variable": "s"},
-                 "predicate": {"@type": "NodeValue", "node": "rdf:type"},
-                 "object": {"@type": "Value", "variable": "o"}}
-            ]
+                {
+                    "@type": "Triple",
+                    "subject": {"@type": "NodeValue", "variable": "s"},
+                    "predicate": {"@type": "NodeValue", "node": "rdf:type"},
+                    "object": {"@type": "Value", "variable": "o"},
+                }
+            ],
         }
         # Should not raise
         WOQLTestHelpers.assert_or_structure(query)
@@ -276,13 +285,19 @@ class TestWOQLTestHelpers:
         query._query = {
             "@type": "Or",
             "or": [
-                {"@type": "Triple", "subject": {"@type": "NodeValue", "variable": "s"},
-                 "predicate": {"@type": "NodeValue", "node": "rdf:type"},
-                 "object": {"@type": "Value", "variable": "o"}},
-                {"@type": "Triple", "subject": {"@type": "NodeValue", "variable": "s2"},
-                 "predicate": {"@type": "NodeValue", "node": "rdf:type"},
-                 "object": {"@type": "Value", "variable": "o2"}}
-            ]
+                {
+                    "@type": "Triple",
+                    "subject": {"@type": "NodeValue", "variable": "s"},
+                    "predicate": {"@type": "NodeValue", "node": "rdf:type"},
+                    "object": {"@type": "Value", "variable": "o"},
+                },
+                {
+                    "@type": "Triple",
+                    "subject": {"@type": "NodeValue", "variable": "s2"},
+                    "predicate": {"@type": "NodeValue", "node": "rdf:type"},
+                    "object": {"@type": "Value", "variable": "o2"},
+                },
+            ],
         }
         # Should not raise
         WOQLTestHelpers.assert_or_structure(query, expected_count=2)
@@ -300,10 +315,13 @@ class TestWOQLTestHelpers:
         query._query = {
             "@type": "Or",
             "or": [
-                {"@type": "Triple", "subject": {"@type": "NodeValue", "variable": "s"},
-                 "predicate": {"@type": "NodeValue", "node": "rdf:type"},
-                 "object": {"@type": "Value", "variable": "o"}}
-            ]
+                {
+                    "@type": "Triple",
+                    "subject": {"@type": "NodeValue", "variable": "s"},
+                    "predicate": {"@type": "NodeValue", "node": "rdf:type"},
+                    "object": {"@type": "Value", "variable": "o"},
+                }
+            ],
         }
         with pytest.raises(AssertionError, match="Expected 2 items in 'or'"):
             WOQLTestHelpers.assert_or_structure(query, expected_count=2)
@@ -313,10 +331,19 @@ class TestWOQLTestHelpers:
         query = WOQLQuery()
         query._query = {
             "@type": "Select",
-            "variables": [{"@type": "Column", "indicator": {"@type": "Indicator", "name": "v:x"}, "variable": "x"}],
-            "query": {"@type": "Triple", "subject": {"@type": "NodeValue", "variable": "s"},
-                      "predicate": {"@type": "NodeValue", "node": "rdf:type"},
-                      "object": {"@type": "Value", "variable": "o"}}
+            "variables": [
+                {
+                    "@type": "Column",
+                    "indicator": {"@type": "Indicator", "name": "v:x"},
+                    "variable": "x",
+                }
+            ],
+            "query": {
+                "@type": "Triple",
+                "subject": {"@type": "NodeValue", "variable": "s"},
+                "predicate": {"@type": "NodeValue", "node": "rdf:type"},
+                "object": {"@type": "Value", "variable": "o"},
+            },
         }
         # Should not raise
         WOQLTestHelpers.assert_select_structure(query)
@@ -334,9 +361,12 @@ class TestWOQLTestHelpers:
         query = WOQLQuery()
         query._query = {
             "@type": "Optional",
-            "query": {"@type": "Triple", "subject": {"@type": "NodeValue", "variable": "s"},
-                      "predicate": {"@type": "NodeValue", "node": "rdf:type"},
-                      "object": {"@type": "Value", "variable": "o"}}
+            "query": {
+                "@type": "Triple",
+                "subject": {"@type": "NodeValue", "variable": "s"},
+                "predicate": {"@type": "NodeValue", "node": "rdf:type"},
+                "object": {"@type": "Value", "variable": "o"},
+            },
         }
         # Should not raise
         WOQLTestHelpers.assert_optional_structure(query)
@@ -357,7 +387,7 @@ class TestWOQLTestHelpers:
         query = WOQLQuery()
         query._query = {
             "@type": "Test",
-            "dict_value": {"@type": "InnerType", "other": "value"}
+            "dict_value": {"@type": "InnerType", "other": "value"},
         }
         WOQLTestHelpers.print_query_structure(query)
         captured = capsys.readouterr()
@@ -368,10 +398,7 @@ class TestWOQLTestHelpers:
     def test_print_query_structure_with_list_value(self, capsys):
         """Test print_query_structure with list value"""
         query = WOQLQuery()
-        query._query = {
-            "@type": "Test",
-            "list_value": ["item1", "item2", "item3"]
-        }
+        query._query = {"@type": "Test", "list_value": ["item1", "item2", "item3"]}
         WOQLTestHelpers.print_query_structure(query)
         captured = capsys.readouterr()
         assert "Query type: Test" in captured.out
@@ -380,10 +407,7 @@ class TestWOQLTestHelpers:
     def test_print_query_structure_with_simple_value(self, capsys):
         """Test print_query_structure with simple value"""
         query = WOQLQuery()
-        query._query = {
-            "@type": "Test",
-            "simple": "value"
-        }
+        query._query = {"@type": "Test", "simple": "value"}
         WOQLTestHelpers.print_query_structure(query)
         captured = capsys.readouterr()
         assert "Query type: Test" in captured.out

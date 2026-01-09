@@ -1,5 +1,5 @@
 """Extended edge case tests for WOQL query functionality."""
-import pytest
+
 from terminusdb_client.woqlquery.woql_query import WOQLQuery, Var, Doc, Vars
 
 

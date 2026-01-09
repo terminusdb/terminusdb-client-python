@@ -1,5 +1,5 @@
 """Test type system operations for WOQL Query."""
-import pytest
+
 from terminusdb_client.woqlquery.woql_query import WOQLQuery, Var
 
 

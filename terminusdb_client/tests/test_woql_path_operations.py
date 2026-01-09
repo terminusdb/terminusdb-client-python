@@ -1,4 +1,5 @@
 """Test path operations for WOQL Query."""
+
 import pytest
 from terminusdb_client.woqlquery.woql_query import WOQLQuery, Var
 
@@ -6,7 +7,9 @@ from terminusdb_client.woqlquery.woql_query import WOQLQuery, Var
 class TestWOQLPathOperations:
     """Test path-related operations and utilities."""
 
-    @pytest.mark.skip(reason="This method is deprecated and dead code - it is never called anywhere in the codebase.")
+    @pytest.mark.skip(
+        reason="This method is deprecated and dead code - it is never called anywhere in the codebase."
+    )
     def test_data_value_list_with_various_types(self):
         """Test _data_value_list with various item types.
 
@@ -99,7 +102,9 @@ class TestWOQLPathOperations:
         query.added_triple("s", "p", "o", opt=True)
         # When opt=True, it wraps with Optional but creates a Triple inside
         assert query._query.get("@type") == "Optional"
-        assert "Triple" in str(query._query)  # The inner query is Triple, not AddedTriple
+        assert "Triple" in str(
+            query._query
+        )  # The inner query is Triple, not AddedTriple
         assert "subject" in query._cursor
         assert "predicate" in query._cursor
         assert "object" in query._cursor
@@ -128,7 +133,9 @@ class TestWOQLPathOperations:
         query.removed_triple("s", "p", "o", opt=True)
         # When opt=True, it wraps with Optional but creates a Triple inside
         assert query._query.get("@type") == "Optional"
-        assert "Triple" in str(query._query)  # The inner query is Triple, not RemovedTriple
+        assert "Triple" in str(
+            query._query
+        )  # The inner query is Triple, not RemovedTriple
         assert "subject" in query._cursor
         assert "predicate" in query._cursor
         assert "object" in query._cursor
@@ -177,7 +184,9 @@ class TestWOQLPathOperations:
         # Should wrap with and
         assert query._query.get("@type") == "And"
 
-    @pytest.mark.skip(reason="Not implemented - args introspection feature disabled in JS client")
+    @pytest.mark.skip(
+        reason="Not implemented - args introspection feature disabled in JS client"
+    )
     def test_quad_with_special_args_subject(self):
         """Test quad with 'args' parameter for introspection.
 

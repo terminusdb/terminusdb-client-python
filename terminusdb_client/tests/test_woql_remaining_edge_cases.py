@@ -1,5 +1,5 @@
 """Tests for remaining WOQL edge cases to increase coverage."""
-import pytest
+
 from terminusdb_client.woqlquery.woql_query import WOQLQuery, Var
 
 

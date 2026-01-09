@@ -1,5 +1,5 @@
 """Test subquery and aggregation operations for WOQL Query."""
-import pytest
+
 from terminusdb_client.woqlquery.woql_query import WOQLQuery, Var
 
 

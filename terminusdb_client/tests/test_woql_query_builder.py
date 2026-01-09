@@ -1,4 +1,5 @@
 """Test query builder methods for WOQL Query."""
+
 import pytest
 from terminusdb_client.woqlquery.woql_query import WOQLQuery, Var
 
@@ -12,7 +13,7 @@ class TestWOQLQueryBuilder:
         result = query.woql_not()
         assert isinstance(result, WOQLQuery)
         # Note: woql_not modifies the query in place, so we check the type
-        assert hasattr(result, '_query')
+        assert hasattr(result, "_query")
 
     def test_add_sub_query_with_dict(self):
         """Test _add_sub_query with dictionary parameter."""
@@ -48,24 +49,14 @@ class TestWOQLQueryBuilder:
     def test_contains_update_check_with_consequent(self):
         """Test _contains_update_check checks consequent field."""
         query = WOQLQuery()
-        test_json = {
-            "@type": "Query",
-            "consequent": {
-                "@type": "DeleteTriple"
-            }
-        }
+        test_json = {"@type": "Query", "consequent": {"@type": "DeleteTriple"}}
         result = query._contains_update_check(test_json)
         assert result is True
 
     def test_contains_update_check_with_query(self):
         """Test _contains_update_check checks query field."""
         query = WOQLQuery()
-        test_json = {
-            "@type": "Query",
-            "query": {
-                "@type": "UpdateObject"
-            }
-        }
+        test_json = {"@type": "Query", "query": {"@type": "UpdateObject"}}
         result = query._contains_update_check(test_json)
         assert result is True
 
@@ -74,10 +65,7 @@ class TestWOQLQueryBuilder:
         query = WOQLQuery()
         test_json = {
             "@type": "Query",
-            "and": [
-                {"@type": "Triple"},
-                {"@type": "AddQuad"}
-            ]
+            "and": [{"@type": "Triple"}, {"@type": "AddQuad"}],
         }
         result = query._contains_update_check(test_json)
         assert result is True
@@ -87,10 +75,7 @@ class TestWOQLQueryBuilder:
         query = WOQLQuery()
         test_json = {
             "@type": "Query",
-            "or": [
-                {"@type": "Triple"},
-                {"@type": "DeleteQuad"}
-            ]
+            "or": [{"@type": "Triple"}, {"@type": "DeleteQuad"}],
         }
         result = query._contains_update_check(test_json)
         assert result is True
@@ -125,10 +110,7 @@ class TestWOQLQueryBuilder:
     def test_wfrom_with_format_and_header(self):
         """Test _wfrom method with format and header options."""
         query = WOQLQuery()
-        opts = {
-            "format": "csv",
-            "format_header": True
-        }
+        opts = {"format": "csv", "format_header": True}
         result = query._wfrom(opts)
 
         assert query._cursor["format"]["format_type"]["@value"] == "csv"
@@ -157,7 +139,10 @@ class TestWOQLQueryBuilder:
 
         # Create an actual dict with to_dict method attached
         test_dict = {"@type": "ArithmeticValue", "data": {"@value": "mock"}}
-        test_dict["to_dict"] = lambda: {"@type": "ArithmeticValue", "data": {"@value": "mock"}}
+        test_dict["to_dict"] = lambda: {
+            "@type": "ArithmeticValue",
+            "data": {"@value": "mock"},
+        }
 
         result = query._arop(test_dict)
         # Since type(arg) is dict and it has to_dict, it returns the dict as-is
@@ -192,7 +177,9 @@ class TestWOQLQueryBuilder:
         for item in result:
             assert isinstance(item, dict)
 
-    @pytest.mark.skip(reason="This method is deprecated and dead code - it is never called anywhere in the codebase.")
+    @pytest.mark.skip(
+        reason="This method is deprecated and dead code - it is never called anywhere in the codebase."
+    )
     def test_data_value_list_with_mixed_items(self):
         """Test _data_value_list with mixed item types.
 

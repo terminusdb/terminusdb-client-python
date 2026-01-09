@@ -2,9 +2,8 @@
 
 import pytest
 import json
-from io import StringIO, TextIOWrapper
-from typing import Optional, Set, Union, List
-from enum import Enum
+from io import StringIO
+from typing import Optional, Set, List
 
 from terminusdb_client.schema.schema import (
     TerminusKey,
@@ -16,15 +15,12 @@ from terminusdb_client.schema.schema import (
     _check_mismatch_type,
     _check_missing_prop,
     _check_and_fix_custom_id,
-    TerminusClass,
     DocumentTemplate,
     TaggedUnion,
     EnumTemplate,
     WOQLSchema,
     transform_enum_dict,
-    _EnumDict
 )
-from terminusdb_client.woql_type import datetime_to_woql
 
 
 class TestTerminusKey:
@@ -63,6 +59,7 @@ class TestCheckCycling:
 
     def test_no_cycling_normal(self):
         """Test normal class without cycling"""
+
         class Normal(DocumentTemplate):
             name: str
 
@@ -80,11 +77,14 @@ class TestCheckCycling:
         TestClass._annotations = {"self_ref": TestClass}
 
         # Should raise RecursionError for self-referencing class
-        with pytest.raises(RecursionError, match="Embbding.*TestClass.*cause recursions"):
+        with pytest.raises(
+            RecursionError, match="Embbding.*TestClass.*cause recursions"
+        ):
             _check_cycling(TestClass)
 
     def test_no_subdocument_attribute(self):
         """Test class without _subdocument attribute"""
+
         class NoSubdoc:
             pass
 
@@ -97,6 +97,7 @@ class TestCheckMismatchType:
 
     def test_custom_to_dict_method(self):
         """Test with object that has custom _to_dict method"""
+
         class CustomType:
             @classmethod
             def _to_dict(cls):
@@ -128,6 +129,7 @@ class TestCheckMismatchType:
 
     def test_check_mismatch_with_custom_to_dict(self):
         """Test _check_mismatch_type with objects that have _to_dict"""
+
         class CustomType:
             @classmethod
             def _to_dict(cls):
@@ -139,7 +141,9 @@ class TestCheckMismatchType:
                 return {"@id": "WrongType"}
 
         # Should raise when types don't match
-        with pytest.raises(ValueError, match="Property prop should be of type CustomType"):
+        with pytest.raises(
+            ValueError, match="Property prop should be of type CustomType"
+        ):
             _check_mismatch_type("prop", WrongType(), CustomType)
 
     def test_bool_type_validation(self):
@@ -150,6 +154,7 @@ class TestCheckMismatchType:
     def test_optional_type_handling(self):
         """Test Optional type handling"""
         from typing import Optional
+
         # Should not raise
         _check_mismatch_type("prop", "value", Optional[str])
 
@@ -159,6 +164,7 @@ class TestCheckMissingProp:
 
     def test_check_missing_prop_normal(self):
         """Test normal object with all properties"""
+
         class Doc(DocumentTemplate):
             name: str
 
@@ -193,6 +199,7 @@ class TestCheckMissingProp:
 
     def test_check_missing_prop_with_wrong_type(self):
         """Test property with wrong type"""
+
         class Doc(DocumentTemplate):
             age: int
 
@@ -241,6 +248,7 @@ class TestAbstractClass:
 
     def test_abstract_class_instantiation_error(self):
         """Test TypeError when instantiating abstract class"""
+
         class AbstractDoc(DocumentTemplate):
             _abstract = True
             name: str
@@ -250,6 +258,7 @@ class TestAbstractClass:
 
     def test_abstract_bool_conversion(self):
         """Test _abstract with non-bool value"""
+
         class AbstractDoc(DocumentTemplate):
             _abstract = "yes"  # Not a bool, should be truthy
             name: str
@@ -263,6 +272,7 @@ class TestDocumentTemplate:
 
     def test_int_conversion_error(self):
         """Test TypeError when int conversion fails"""
+
         class Doc(DocumentTemplate):
             age: int
 
@@ -272,6 +282,7 @@ class TestDocumentTemplate:
 
     def test_get_instances_cleanup_dead_refs(self):
         """Test get_instances cleans up dead references"""
+
         class Doc(DocumentTemplate):
             name: str
 
@@ -294,6 +305,7 @@ class TestDocumentTemplate:
 
     def test_to_dict_with_tagged_union(self):
         """Test _to_dict with TaggedUnion inheritance"""
+
         class Base(DocumentTemplate):
             type: str
 
@@ -319,6 +331,7 @@ class TestDocumentTemplate:
 
     def test_to_dict_with_inheritance_chain(self):
         """Test _to_dict with inheritance chain"""
+
         class GrandParent(DocumentTemplate):
             grand_field: str
 
@@ -340,8 +353,10 @@ class TestDocumentTemplate:
 
     def test_to_dict_with_documentation(self):
         """Test _to_dict includes documentation"""
+
         class Doc(DocumentTemplate):
             """Test documentation"""
+
             name: str
 
         result = Doc._to_dict()
@@ -351,6 +366,7 @@ class TestDocumentTemplate:
 
     def test_to_dict_with_base_attribute(self):
         """Test _to_dict with inheritance using @inherits"""
+
         class BaseDoc(DocumentTemplate):
             base_field: str
 
@@ -365,6 +381,7 @@ class TestDocumentTemplate:
 
     def test_to_dict_with_subdocument(self):
         """Test _to_dict with _subdocument list"""
+
         class Doc(DocumentTemplate):
             name: str
             _subdocument = []
@@ -376,6 +393,7 @@ class TestDocumentTemplate:
 
     def test_to_dict_with_abstract(self):
         """Test _to_dict with _abstract True"""
+
         class Doc(DocumentTemplate):
             name: str
             _abstract = True
@@ -386,6 +404,7 @@ class TestDocumentTemplate:
 
     def test_to_dict_with_hashkey(self):
         """Test _to_dict with HashKey"""
+
         class Doc(DocumentTemplate):
             name: str
             _key = HashKey(["name"])
@@ -393,13 +412,11 @@ class TestDocumentTemplate:
         result = Doc._to_dict()
 
         # HashKey uses @fields, not @keys
-        assert result.get("@key") == {
-            "@type": "Hash",
-            "@fields": ["name"]
-        }
+        assert result.get("@key") == {"@type": "Hash", "@fields": ["name"]}
 
     def test_id_setter_custom_id_not_allowed(self):
         """Test _id setter raises when custom_id not allowed"""
+
         class Doc(DocumentTemplate):
             name: str
             _key = HashKey(["name"])  # Not RandomKey, so custom id not allowed
@@ -411,6 +428,7 @@ class TestDocumentTemplate:
 
     def test_key_field_change_error(self):
         """Test ValueError when trying to change key field"""
+
         # This test demonstrates that with RandomKey, there are no key fields
         # So changing id doesn't raise an error
         class Doc(DocumentTemplate):
@@ -430,6 +448,7 @@ class TestDocumentTemplate:
 
     def test_custom_id_not_allowed(self):
         """Test ValueError when custom id not allowed"""
+
         class SubDoc(DocumentTemplate):
             _subdocument = []
             name: str
@@ -439,6 +458,7 @@ class TestDocumentTemplate:
 
     def test_tagged_union_to_dict(self):
         """Test TaggedUnion _to_dict type"""
+
         class UnionDoc(TaggedUnion):
             option1: str
             option2: int
@@ -448,6 +468,7 @@ class TestDocumentTemplate:
 
     def test_inheritance_chain(self):
         """Test inheritance chain with multiple parents"""
+
         class GrandParent(DocumentTemplate):
             grand_prop: str
 
@@ -465,6 +486,7 @@ class TestEmbeddedRep:
 
     def test_embedded_rep_normal(self):
         """Test normal embedded representation returns @ref"""
+
         class Doc(DocumentTemplate):
             name: str
 
@@ -477,6 +499,7 @@ class TestEmbeddedRep:
 
     def test_embedded_rep_with_subdocument(self):
         """Test _embedded_rep with _subdocument returns tuple"""
+
         class Doc(DocumentTemplate):
             name: str
             _subdocument = []
@@ -494,6 +517,7 @@ class TestEmbeddedRep:
 
     def test_embedded_rep_with_id(self):
         """Test _embedded_rep with _id present"""
+
         class Doc(DocumentTemplate):
             name: str
 
@@ -505,6 +529,7 @@ class TestEmbeddedRep:
 
     def test_embedded_rep_with_ref(self):
         """Test _embedded_rep returning @ref"""
+
         class Doc(DocumentTemplate):
             name: str
 
@@ -520,6 +545,7 @@ class TestObjToDict:
 
     def test_obj_to_dict_nested_objects(self):
         """Test _obj_to_dict with nested DocumentTemplate objects"""
+
         class Address(DocumentTemplate):
             street: str
             city: str
@@ -543,6 +569,7 @@ class TestObjToDict:
 
     def test_obj_to_dict_with_collections(self):
         """Test _obj_to_dict with list/set of DocumentTemplate objects"""
+
         class Item(DocumentTemplate):
             name: str
             _subdocument = []
@@ -555,10 +582,7 @@ class TestObjToDict:
         item1 = Item(name="item1")
         item2 = Item(name="item2")
 
-        container = Container(
-            items=[item1, item2],
-            tags={"tag1", "tag2"}
-        )
+        container = Container(items=[item1, item2], tags={"tag1", "tag2"})
 
         result, references = container._obj_to_dict()
 
@@ -577,11 +601,7 @@ class TestWOQLSchemaConstruct:
         schema = WOQLSchema()
 
         # Add a class to the schema
-        class_dict = {
-            "@type": "Class",
-            "@id": "Person",
-            "name": "xsd:string"
-        }
+        class_dict = {"@type": "Class", "@id": "Person", "name": "xsd:string"}
 
         # First construction
         person1 = schema._construct_class(class_dict)
@@ -600,7 +620,7 @@ class TestWOQLSchemaConstruct:
         schema._all_existing_classes["Person"] = {
             "@type": "Class",
             "@id": "Person",
-            "name": "xsd:string"
+            "name": "xsd:string",
         }
 
         # Construct from schema.object
@@ -620,10 +640,12 @@ class TestWOQLSchemaConstruct:
         class_dict = {
             "@type": "Class",
             "@id": "Person",
-            "address": "NonExistent"  # This type doesn't exist
+            "address": "NonExistent",  # This type doesn't exist
         }
 
-        with pytest.raises(RuntimeError, match="NonExistent not exist in database schema"):
+        with pytest.raises(
+            RuntimeError, match="NonExistent not exist in database schema"
+        ):
             schema._construct_class(class_dict)
 
     def test_construct_set_type(self):
@@ -633,10 +655,7 @@ class TestWOQLSchemaConstruct:
         class_dict = {
             "@type": "Class",
             "@id": "Container",
-            "items": {
-                "@type": "Set",
-                "@class": "xsd:string"
-            }
+            "items": {"@type": "Set", "@class": "xsd:string"},
         }
 
         container = schema._construct_class(class_dict)
@@ -652,10 +671,7 @@ class TestWOQLSchemaConstruct:
         class_dict = {
             "@type": "Class",
             "@id": "Container",
-            "items": {
-                "@type": "List",
-                "@class": "xsd:integer"
-            }
+            "items": {"@type": "List", "@class": "xsd:integer"},
         }
 
         container = schema._construct_class(class_dict)
@@ -671,10 +687,7 @@ class TestWOQLSchemaConstruct:
         class_dict = {
             "@type": "Class",
             "@id": "Person",
-            "middle_name": {
-                "@type": "Optional",
-                "@class": "xsd:string"
-            }
+            "middle_name": {"@type": "Optional", "@class": "xsd:string"},
         }
 
         person = schema._construct_class(class_dict)
@@ -690,25 +703,19 @@ class TestWOQLSchemaConstruct:
         class_dict = {
             "@type": "Class",
             "@id": "Person",
-            "invalid_field": {
-                "@type": "InvalidType"
-            }
+            "invalid_field": {"@type": "InvalidType"},
         }
 
-        with pytest.raises(RuntimeError, match="is not in the right format for TerminusDB type"):
+        with pytest.raises(
+            RuntimeError, match="is not in the right format for TerminusDB type"
+        ):
             schema._construct_class(class_dict)
 
     def test_construct_valuehash_key(self):
         """Test _construct_class with ValueHashKey"""
         schema = WOQLSchema()
 
-        class_dict = {
-            "@type": "Class",
-            "@id": "Person",
-            "@key": {
-                "@type": "ValueHash"
-            }
-        }
+        class_dict = {"@type": "Class", "@id": "Person", "@key": {"@type": "ValueHash"}}
 
         person = schema._construct_class(class_dict)
 
@@ -723,10 +730,7 @@ class TestWOQLSchemaConstruct:
         class_dict = {
             "@type": "Class",
             "@id": "Person",
-            "@key": {
-                "@type": "Lexical",
-                "@fields": ["name", "email"]
-            }
+            "@key": {"@type": "Lexical", "@fields": ["name", "email"]},
         }
 
         person = schema._construct_class(class_dict)
@@ -744,12 +748,12 @@ class TestWOQLSchemaConstruct:
         class_dict = {
             "@type": "Class",
             "@id": "Person",
-            "@key": {
-                "@type": "InvalidKey"
-            }
+            "@key": {"@type": "InvalidKey"},
         }
 
-        with pytest.raises(RuntimeError, match="is not in the right format for TerminusDB key"):
+        with pytest.raises(
+            RuntimeError, match="is not in the right format for TerminusDB key"
+        ):
             schema._construct_class(class_dict)
 
 
@@ -761,11 +765,7 @@ class TestWOQLSchemaConstructObject:
         schema = WOQLSchema()
 
         # Add a class with datetime field
-        class_dict = {
-            "@type": "Class",
-            "@id": "Event",
-            "timestamp": "xsd:dateTime"
-        }
+        class_dict = {"@type": "Class", "@id": "Event", "timestamp": "xsd:dateTime"}
         event_class = schema._construct_class(class_dict)
         schema.add_obj("Event", event_class)
 
@@ -773,7 +773,7 @@ class TestWOQLSchemaConstructObject:
         obj_dict = {
             "@type": "Event",
             "@id": "event1",
-            "timestamp": "2023-01-01T00:00:00Z"
+            "timestamp": "2023-01-01T00:00:00Z",
         }
 
         event = schema._construct_object(obj_dict)
@@ -791,18 +791,9 @@ class TestWOQLSchemaConstructObject:
         class_dict = {
             "@type": "Class",
             "@id": "Container",
-            "items": {
-                "@type": "List",
-                "@class": "xsd:string"
-            },
-            "tags": {
-                "@type": "Set",
-                "@class": "xsd:string"
-            },
-            "optional_field": {
-                "@type": "Optional",
-                "@class": "xsd:string"
-            }
+            "items": {"@type": "List", "@class": "xsd:string"},
+            "tags": {"@type": "Set", "@class": "xsd:string"},
+            "optional_field": {"@type": "Optional", "@class": "xsd:string"},
         }
         container_class = schema._construct_class(class_dict)
         schema.add_obj("Container", container_class)
@@ -813,7 +804,7 @@ class TestWOQLSchemaConstructObject:
             "@id": "container1",
             "items": ["item1", "item2"],
             "tags": ["tag1", "tag2"],
-            "optional_field": "optional_value"
+            "optional_field": "optional_value",
         }
 
         container = schema._construct_object(obj_dict)
@@ -835,13 +826,13 @@ class TestWOQLSchemaConstructObject:
             "@id": "Address",
             "street": "xsd:string",
             "city": "xsd:string",
-            "_subdocument": []
+            "_subdocument": [],
         }
         person_dict = {
             "@type": "Class",
             "@id": "Person",
             "name": "xsd:string",
-            "address": "Address"
+            "address": "Address",
         }
 
         address_class = schema._construct_class(address_dict)
@@ -860,8 +851,8 @@ class TestWOQLSchemaConstructObject:
                 "@type": "Address",
                 "@id": "address1",
                 "street": "123 Main",
-                "city": "NYC"
-            }
+                "city": "NYC",
+            },
         }
 
         person = schema._construct_object(obj_dict)
@@ -881,13 +872,13 @@ class TestWOQLSchemaConstructObject:
             "@type": "Class",
             "@id": "Address",
             "street": "xsd:string",
-            "city": "xsd:string"
+            "city": "xsd:string",
         }
         person_dict = {
             "@type": "Class",
             "@id": "Person",
             "name": "xsd:string",
-            "address": "Address"
+            "address": "Address",
         }
 
         address_class = schema._construct_class(address_dict)
@@ -902,9 +893,7 @@ class TestWOQLSchemaConstructObject:
             "@type": "Person",
             "@id": "person1",
             "name": "John",
-            "address": {
-                "@id": "address1"
-            }
+            "address": {"@id": "address1"},
         }
 
         person = schema._construct_object(obj_dict)
@@ -920,30 +909,18 @@ class TestWOQLSchemaConstructObject:
         schema = WOQLSchema()
 
         # Add enum class
-        enum_dict = {
-            "@type": "Enum",
-            "@id": "Status",
-            "@value": ["ACTIVE", "INACTIVE"]
-        }
+        enum_dict = {"@type": "Enum", "@id": "Status", "@value": ["ACTIVE", "INACTIVE"]}
         status_class = schema._construct_class(enum_dict)
         schema.add_obj("Status", status_class)
         schema._all_existing_classes["Status"] = enum_dict
 
         # Add class with enum field
-        task_dict = {
-            "@type": "Class",
-            "@id": "Task",
-            "status": "Status"
-        }
+        task_dict = {"@type": "Class", "@id": "Task", "status": "Status"}
         task_class = schema._construct_class(task_dict)
         schema.add_obj("Task", task_class)
 
         # Construct object with enum
-        obj_dict = {
-            "@type": "Task",
-            "@id": "task1",
-            "status": "ACTIVE"
-        }
+        obj_dict = {"@type": "Task", "@id": "task1", "status": "ACTIVE"}
 
         task = schema._construct_object(obj_dict)
 
@@ -956,10 +933,7 @@ class TestWOQLSchemaConstructObject:
         schema = WOQLSchema()
 
         # Try to construct object with non-existent type
-        obj_dict = {
-            "@type": "NonExistent",
-            "@id": "obj1"
-        }
+        obj_dict = {"@type": "NonExistent", "@id": "obj1"}
 
         with pytest.raises(ValueError, match="NonExistent is not in current schema"):
             schema._construct_object(obj_dict)
@@ -990,7 +964,9 @@ class TestAddEnumClass:
         schema = WOQLSchema()
 
         # Add enum with spaces in values
-        enum_class = schema.add_enum_class("Priority", ["High Priority", "Low Priority"])
+        enum_class = schema.add_enum_class(
+            "Priority", ["High Priority", "Low Priority"]
+        )
 
         # Check enum values (spaces should be replaced with underscores in keys)
         assert enum_class.high_priority.value == "High Priority"
@@ -1024,7 +1000,7 @@ class TestWOQLSchemaMethods:
         client = Mock()
         client._get_prefixes.return_value = {
             "@schema": "http://schema.org",
-            "@base": "http://example.com"
+            "@base": "http://example.com",
         }
         client.update_document = MagicMock()
 
@@ -1059,8 +1035,10 @@ class TestWOQLSchemaMethods:
 
         # Check insert_document was called
         client.insert_document.assert_called_once_with(
-            schema, commit_msg="Schema object insert/ update by Python client.",
-            graph_type=GraphType.SCHEMA, full_replace=True
+            schema,
+            commit_msg="Schema object insert/ update by Python client.",
+            graph_type=GraphType.SCHEMA,
+            full_replace=True,
         )
 
     def test_from_db_select_filter(self):
@@ -1074,7 +1052,7 @@ class TestWOQLSchemaMethods:
         client.get_all_documents.return_value = [
             {"@id": "Person", "@type": "Class", "name": "xsd:string"},
             {"@id": "Address", "@type": "Class", "street": "xsd:string"},
-            {"@type": "@context", "@schema": "http://schema.org"}
+            {"@type": "@context", "@schema": "http://schema.org"},
         ]
 
         # Load with select filter
@@ -1091,11 +1069,7 @@ class TestWOQLSchemaMethods:
         schema = WOQLSchema()
 
         # Add a class first
-        class_dict = {
-            "@type": "Class",
-            "@id": "Person",
-            "name": "xsd:string"
-        }
+        class_dict = {"@type": "Class", "@id": "Person", "name": "xsd:string"}
         person_class = schema._construct_class(class_dict)
         schema.add_obj("Person", person_class)
         schema._all_existing_classes["Person"] = class_dict
@@ -1103,7 +1077,7 @@ class TestWOQLSchemaMethods:
         # Import list of objects
         obj_list = [
             {"@type": "Person", "@id": "person1", "name": "John"},
-            {"@type": "Person", "@id": "person2", "name": "Jane"}
+            {"@type": "Person", "@id": "person2", "name": "Jane"},
         ]
 
         result = schema.import_objects(obj_list)
@@ -1120,11 +1094,7 @@ class TestWOQLSchemaMethods:
         schema = WOQLSchema()
 
         # Create class dict with self-reference
-        class_dict = {
-            "@type": "Class",
-            "@id": "Node",
-            "parent": "Node"
-        }
+        class_dict = {"@type": "Class", "@id": "Node", "parent": "Node"}
 
         # Should raise RuntimeError for self-dependency or not embedded
         with pytest.raises(RuntimeError):
@@ -1135,16 +1105,8 @@ class TestWOQLSchemaMethods:
         schema = WOQLSchema()
 
         # Add classes
-        address_dict = {
-            "@type": "Class",
-            "@id": "Address",
-            "street": "xsd:string"
-        }
-        person_dict = {
-            "@type": "Class",
-            "@id": "Person",
-            "address": "Address"
-        }
+        address_dict = {"@type": "Class", "@id": "Address", "street": "xsd:string"}
+        person_dict = {"@type": "Class", "@id": "Person", "address": "Address"}
 
         address_class = schema._construct_class(address_dict)
         schema.add_obj("Address", address_class)
@@ -1173,8 +1135,8 @@ class TestWOQLSchemaMethods:
             "status": {
                 "@type": "Enum",
                 "@id": "Status",
-                "@value": ["ACTIVE", "INACTIVE"]
-            }
+                "@value": ["ACTIVE", "INACTIVE"],
+            },
         }
 
         # Get JSON schema directly from class dict
@@ -1193,18 +1155,9 @@ class TestWOQLSchemaMethods:
         class_dict = {
             "@type": "Class",
             "@id": "Container",
-            "items": {
-                "@type": "List",
-                "@class": "xsd:string"
-            },
-            "tags": {
-                "@type": "Set",
-                "@class": "xsd:string"
-            },
-            "optional_field": {
-                "@type": "Optional",
-                "@class": "xsd:string"
-            }
+            "items": {"@type": "List", "@class": "xsd:string"},
+            "tags": {"@type": "Set", "@class": "xsd:string"},
+            "optional_field": {"@type": "Optional", "@class": "xsd:string"},
         }
         container_class = schema._construct_class(class_dict)
         schema.add_obj("Container", container_class)
@@ -1237,6 +1190,7 @@ class TestEnumTransform:
 
     def test_transform_enum_dict_basic(self):
         """Test transform_enum_dict basic functionality"""
+
         # Create a simple dict that mimics enum behavior
         class SimpleDict(dict):
             pass
@@ -1259,6 +1213,7 @@ class TestEnumTemplate:
 
     def test_enum_template_no_values(self):
         """Test EnumTemplate _to_dict without values"""
+
         class EmptyEnum(EnumTemplate):
             pass
 
@@ -1284,10 +1239,12 @@ class TestWOQLSchema:
         class_dict = {
             "@id": "Child",
             "@type": "Class",
-            "@inherits": ["NonExistentParent"]
+            "@inherits": ["NonExistentParent"],
         }
 
-        with pytest.raises(RuntimeError, match="NonExistentParent not exist in database schema"):
+        with pytest.raises(
+            RuntimeError, match="NonExistentParent not exist in database schema"
+        ):
             schema._construct_class(class_dict)
 
     def test_construct_class_enum_no_value(self):
@@ -1296,7 +1253,7 @@ class TestWOQLSchema:
 
         class_dict = {
             "@id": "MyEnum",
-            "@type": "Enum"
+            "@type": "Enum",
             # Missing @value
         }
 
@@ -1329,11 +1286,9 @@ class TestWOQLSchema:
         # Note: _instances is managed by the metaclass
 
         # Update with new params
-        updated = schema._construct_object({
-            "@type": "MyClass",
-            "@id": "instance123",
-            "name": "updated"
-        })
+        updated = schema._construct_object(
+            {"@type": "MyClass", "@id": "instance123", "name": "updated"}
+        )
 
         assert updated.name == "updated"
 
@@ -1346,17 +1301,24 @@ class TestDateTimeConversions:
         schema = WOQLSchema()
 
         # First add the class to schema
-        class_dict = {"@id": "TestClass", "@type": "Class", "datetime_field": "xsd:dateTime"}
+        class_dict = {
+            "@id": "TestClass",
+            "@type": "Class",
+            "datetime_field": "xsd:dateTime",
+        }
         schema._construct_class(class_dict)
 
         # Test dateTime - use the internal method
-        result = schema._construct_object({
-            "@type": "TestClass",
-            "@id": "test",
-            "datetime_field": "2023-01-01T00:00:00Z"
-        })
+        result = schema._construct_object(
+            {
+                "@type": "TestClass",
+                "@id": "test",
+                "datetime_field": "2023-01-01T00:00:00Z",
+            }
+        )
         # The datetime is converted to datetime object
         import datetime
+
         assert result.datetime_field == datetime.datetime(2023, 1, 1, 0, 0)
 
 
@@ -1380,7 +1342,7 @@ class TestJSONSchema:
         file_obj = StringIO(json_content)
 
         # Need to load the JSON first
-        import json
+
         json_dict = json.load(file_obj)
 
         schema.from_json_schema("TestClass", json_dict)
@@ -1402,12 +1364,7 @@ class TestJSONSchema:
 
         # Test through from_json_schema with pipe mode
         json_dict = {
-            "properties": {
-                "test_prop": {
-                    "type": "string",
-                    "format": "date-time"
-                }
-            }
+            "properties": {"test_prop": {"type": "string", "format": "date-time"}}
         }
 
         # This will call convert_property internally
@@ -1431,20 +1388,16 @@ class TestJSONSchema:
             }
         }
 
-        with pytest.raises(RuntimeError, match="subdocument test_prop not in proper format"):
+        with pytest.raises(
+            RuntimeError, match="subdocument test_prop not in proper format"
+        ):
             schema.from_json_schema("TestClass", json_dict, pipe=True)
 
     def test_convert_property_ref_not_in_defs(self):
         """Test convert_property with $ref not in defs"""
         schema = WOQLSchema()
 
-        json_dict = {
-            "properties": {
-                "test_prop": {
-                    "$ref": "#/definitions/MissingType"
-                }
-            }
-        }
+        json_dict = {"properties": {"test_prop": {"$ref": "#/definitions/MissingType"}}}
 
         with pytest.raises(RuntimeError, match="MissingType not found in defs"):
             schema.from_json_schema("TestClass", json_dict, pipe=True)
@@ -1457,11 +1410,7 @@ class TestToJSONSchema:
         """Test to_json_schema with dict input for embedded object"""
         schema = WOQLSchema()
 
-        class_dict = {
-            "@id": "TestClass",
-            "@type": "Class",
-            "embedded": "EmbeddedClass"
-        }
+        class_dict = {"@id": "TestClass", "@type": "Class", "embedded": "EmbeddedClass"}
 
         with pytest.raises(RuntimeError, match="EmbeddedClass not embedded in input"):
             schema.to_json_schema(class_dict)
