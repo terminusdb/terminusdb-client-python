@@ -6,7 +6,25 @@ from terminusdb_client.woqlquery.woql_query import WOQLQuery, Var
 class TestWOQLPathOperations:
     """Test path-related operations and utilities."""
     
-
+    @pytest.skip("This method is deprecated and dead code - it is never called anywhere in the codebase.")
+    def test_data_value_list_with_various_types(self):
+        """Test _data_value_list with various item types.
+        
+        DEPRECATED: This method is dead code - it is never called anywhere in the
+        codebase. The similar method _value_list() is used instead throughout the
+        client. This test and the method will be removed in a future release.
+        """
+        query = WOQLQuery()
+        items = ["string", 42, True, None]
+        
+        result = query._data_value_list(items)
+        
+        assert isinstance(result, list)
+        assert len(result) == 4
+        # Each item should be converted to DataValue format
+        for item in result:
+            assert isinstance(item, dict)
+            assert "@type" in item
     
     def test_clean_subject_with_var(self):
         """Test _clean_subject with Var object."""

@@ -352,7 +352,7 @@ class WOQLQuery:
     def _data_value_list(self, target_list):
         dvl = []
         for item in target_list:
-            o = self.clean_data_value(item)
+            o = self._clean_data_value(item)
             dvl.append(o)
         return dvl
 
