@@ -64,6 +64,7 @@ omit = [
     "terminusdb_client/tests/*",
     "terminusdb_client/test_*",
     "terminusdb_client/scripts/dev.py",
+    "*/__main__.py",
 ]
 
 [tool.isort]
