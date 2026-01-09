@@ -390,38 +390,68 @@ def test_get_organization_user_databases(docker_url):
     client.connect()
     db_name = "testDB" + str(random())
     db_name2 = "testDB" + str(random())
-    org_name = "testOrg235091"
-    # Add DB in admin org to make sure they don't appear in other team
-    client.create_database(db_name + "admin", team="admin")
-    client.create_organization(org_name)
-    client.create_database(db_name, team=org_name)
-    client.create_database(db_name2, team=org_name)
+    org_name = "pyclient_test_xk7q_org"
+    admin_db_name = db_name + "admin"
 
-    # BEFORE grant: verify our specific databases are NOT accessible to admin user
-    databases_before = client.get_organization_user_databases(org=org_name, username="admin")
-    db_names_before = {db['name'] for db in databases_before}
-    assert db_name not in db_names_before, f"{db_name} should not be accessible before capability grant"
-    assert db_name2 not in db_names_before, f"{db_name2} should not be accessible before capability grant"
+    try:
+        # Add DB in admin org to make sure they don't appear in other team
+        client.create_database(admin_db_name, team="admin")
+        client.create_organization(org_name)
+        client.create_database(db_name, team=org_name)
+        client.create_database(db_name2, team=org_name)
 
-    # Grant capabilities to admin user for the organization
-    capability_change = {
-        "operation": "grant",
-        "scope": f"Organization/{org_name}",
-        "user": "User/admin",
-        "roles": [
-            "Role/admin"
-        ]
-    }
-    client.change_capabilities(capability_change)
+        # BEFORE grant: verify our specific databases are NOT accessible to admin user
+        databases_before = client.get_organization_user_databases(org=org_name, username="admin")
+        db_names_before = {db['name'] for db in databases_before}
+        assert db_name not in db_names_before, f"{db_name} should not be accessible before capability grant"
+        assert db_name2 not in db_names_before, f"{db_name2} should not be accessible before capability grant"
 
-    # AFTER grant: verify our specific databases ARE accessible to admin user
-    databases_after = client.get_organization_user_databases(org=org_name, username="admin")
-    db_names_after = {db['name'] for db in databases_after}
-    # Check both our databases are now accessible (order not guaranteed)
-    assert db_name in db_names_after, f"{db_name} should be accessible after capability grant"
-    assert db_name2 in db_names_after, f"{db_name2} should be accessible after capability grant"
-    # Verify admin team database does NOT appear in organization results
-    assert db_name + "admin" not in db_names_after, f"{db_name}admin should not appear in {org_name} results"
+        # Grant capabilities to admin user for the organization
+        capability_change = {
+            "operation": "grant",
+            "scope": f"Organization/{org_name}",
+            "user": "User/admin",
+            "roles": [
+                "Role/admin"
+            ]
+        }
+        client.change_capabilities(capability_change)
+
+        # AFTER grant: verify our specific databases ARE accessible to admin user
+        databases_after = client.get_organization_user_databases(org=org_name, username="admin")
+        db_names_after = {db['name'] for db in databases_after}
+        # Check both our databases are now accessible (order not guaranteed)
+        assert db_name in db_names_after, f"{db_name} should be accessible after capability grant"
+        assert db_name2 in db_names_after, f"{db_name2} should be accessible after capability grant"
+        # Verify admin team database does NOT appear in organization results
+        assert admin_db_name not in db_names_after, f"{admin_db_name} should not appear in {org_name} results"
+    finally:
+        # Cleanup: revoke capability, delete databases, delete org
+        try:
+            client.change_capabilities({
+                "operation": "revoke",
+                "scope": f"Organization/{org_name}",
+                "user": "User/admin",
+                "roles": ["Role/admin"]
+            })
+        except Exception:
+            pass
+        try:
+            client.delete_database(db_name, team=org_name)
+        except Exception:
+            pass
+        try:
+            client.delete_database(db_name2, team=org_name)
+        except Exception:
+            pass
+        try:
+            client.delete_organization(org_name)
+        except Exception:
+            pass
+        try:
+            client.delete_database(admin_db_name, team="admin")
+        except Exception:
+            pass
 
 
 def test_has_database(docker_url):
@@ -488,69 +518,76 @@ def test_patch(docker_url):
 
 def test_diff_ops(docker_url, test_schema):
     # create client and db
+    db_name = "pyclient_test_xk7q_diff_ops"
     client = Client(docker_url, user_agent=test_user_agent)
     client.connect(user="admin", team="admin")
-    client.create_database("test_diff_ops")
-    # NOTE: Public API endpoints (jsondiff/jsonpatch) no longer exist
-    # Testing authenticated diff/patch only
-    result_patch = Patch(
-        json='{"@id": "Person/Jane", "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'
-    )
-    result = client.diff(
-        {"@id": "Person/Jane", "@type": "Person", "name": "Jane"},
-        {"@id": "Person/Jane", "@type": "Person", "name": "Janine"},
-    )
-    assert result.content == result_patch.content
+    client.create_database(db_name)
+    try:
+        # NOTE: Public API endpoints (jsondiff/jsonpatch) no longer exist
+        # Testing authenticated diff/patch only
+        result_patch = Patch(
+            json='{"@id": "Person/Jane", "name" : { "@op" : "SwapValue", "@before" : "Jane", "@after": "Janine" }}'
+        )
+        result = client.diff(
+            {"@id": "Person/Jane", "@type": "Person", "name": "Jane"},
+            {"@id": "Person/Jane", "@type": "Person", "name": "Janine"},
+        )
+        assert result.content == result_patch.content
 
-    Person = test_schema.object.get("Person")
-    jane = Person(
-        _id="Jane",
-        name="Jane",
-        age=18,
-    )
-    janine = Person(
-        _id="Jane",
-        name="Janine",
-        age=18,
-    )
-    result = client.diff(jane, janine)
-    # test commit_id and data_version with after obj
-    test_schema.commit(client)
-    jane_id = client.insert_document(jane)[0]
-    data_version = client.get_document(jane_id, get_data_version=True)[-1]
-    current_commit = client._get_current_commit()
-    commit_id_result = client.diff(current_commit, janine, document_id=jane_id)
-    data_version_result = client.diff(data_version, janine, document_id=jane_id)
-    # test commit_id and data_version both before and after
-    client.update_document(janine)
-    new_data_version = client.get_document(jane_id, get_data_version=True)[-1]
-    new_commit = client._get_current_commit()
-    commit_id_result2 = client.diff(current_commit, new_commit, document_id=jane_id)
-    data_version_result2 = client.diff(
-        data_version, new_data_version, document_id=jane_id
-    )
-    # test all diff commit_id and data_version
-    commit_id_result_all = client.diff(current_commit, new_commit)
-    data_version_result_all = client.diff(data_version, new_data_version)
-    assert result.content == result_patch.content
-    assert commit_id_result.content == result_patch.content
-    assert commit_id_result2.content == result_patch.content
-    assert data_version_result.content == result_patch.content
-    assert data_version_result2.content == result_patch.content
-    assert commit_id_result_all.content == [result_patch.content]
-    assert data_version_result_all.content == [result_patch.content]
-    assert client.patch(
-        {"@id": "Person/Jane", "@type": "Person", "name": "Jane"}, result_patch
-    ) == {"@id": "Person/Jane", "@type": "Person", "name": "Janine"}
-    assert client.patch(jane, result_patch) == {
-        "@id": "Person/Jane",
-        "@type": "Person",
-        "name": "Janine",
-        "age": 18,
-    }
-    my_schema = test_schema.copy()
-    my_schema.object.pop("Employee")
-    assert my_schema.to_dict() != test_schema.to_dict()
+        Person = test_schema.object.get("Person")
+        jane = Person(
+            _id="Jane",
+            name="Jane",
+            age=18,
+        )
+        janine = Person(
+            _id="Jane",
+            name="Janine",
+            age=18,
+        )
+        result = client.diff(jane, janine)
+        # test commit_id and data_version with after obj
+        test_schema.commit(client)
+        jane_id = client.insert_document(jane)[0]
+        data_version = client.get_document(jane_id, get_data_version=True)[-1]
+        current_commit = client._get_current_commit()
+        commit_id_result = client.diff(current_commit, janine, document_id=jane_id)
+        data_version_result = client.diff(data_version, janine, document_id=jane_id)
+        # test commit_id and data_version both before and after
+        client.update_document(janine)
+        new_data_version = client.get_document(jane_id, get_data_version=True)[-1]
+        new_commit = client._get_current_commit()
+        commit_id_result2 = client.diff(current_commit, new_commit, document_id=jane_id)
+        data_version_result2 = client.diff(
+            data_version, new_data_version, document_id=jane_id
+        )
+        # test all diff commit_id and data_version
+        commit_id_result_all = client.diff(current_commit, new_commit)
+        data_version_result_all = client.diff(data_version, new_data_version)
+        assert result.content == result_patch.content
+        assert commit_id_result.content == result_patch.content
+        assert commit_id_result2.content == result_patch.content
+        assert data_version_result.content == result_patch.content
+        assert data_version_result2.content == result_patch.content
+        assert commit_id_result_all.content == [result_patch.content]
+        assert data_version_result_all.content == [result_patch.content]
+        assert client.patch(
+            {"@id": "Person/Jane", "@type": "Person", "name": "Jane"}, result_patch
+        ) == {"@id": "Person/Jane", "@type": "Person", "name": "Janine"}
+        assert client.patch(jane, result_patch) == {
+            "@id": "Person/Jane",
+            "@type": "Person",
+            "name": "Janine",
+            "age": 18,
+        }
+        my_schema = test_schema.copy()
+        my_schema.object.pop("Employee")
+        assert my_schema.to_dict() != test_schema.to_dict()
+    finally:
+        try:
+            client.delete_database(db_name)
+        except Exception:
+            pass
 
 
 @pytest.mark.skip(reason="Cloud infrastructure no longer operational")

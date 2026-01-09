@@ -9,14 +9,36 @@ from terminusdb_client.woqlschema.woql_schema import DocumentTemplate, WOQLSchem
 test_user_agent = "terminusdb-client-python-tests"
 
 
-def test_create_schema(docker_url, test_schema):
-    my_schema = test_schema
+# Static prefix for test databases - unique enough to avoid clashes with real databases
+TEST_DB_PREFIX = "pyclient_test_xk7q_"
+
+
+def unique_db_name(prefix):
+    """Generate a unique database name with static test prefix to avoid conflicts."""
+    return f"{TEST_DB_PREFIX}{prefix}"
+
+
+@pytest.fixture(scope="module")
+def schema_test_db(docker_url, test_schema):
+    """Create a shared test database for schema tests that need it."""
+    db_name = unique_db_name("test_schema_docapi")
     client = Client(docker_url, user_agent=test_user_agent)
     client.connect()
-    client.create_database("test_docapi")
+    client.create_database(db_name)
     client.insert_document(
-        my_schema, commit_msg="I am checking in the schema", graph_type="schema"
+        test_schema, commit_msg="I am checking in the schema", graph_type="schema"
     )
+    yield db_name, client, test_schema
+    # Cleanup
+    try:
+        client.delete_database(db_name)
+    except Exception:
+        pass
+
+
+def test_create_schema(schema_test_db):
+    db_name, client, my_schema = schema_test_db
+    client.connect(db=db_name)
     result = client.get_all_documents(graph_type="schema")
     for item in result:
         if "@id" in item:
@@ -37,30 +59,34 @@ def test_create_schema(docker_url, test_schema):
 
 def test_create_schema2(docker_url, test_schema):
     my_schema = test_schema
+    db_name = unique_db_name("test_schema2")
     client = Client(docker_url, user_agent=test_user_agent)
     client.connect()
-    client.create_database("test_docapi2")
-    my_schema.commit(client, "I am checking in the schema")
-    result = client.get_all_documents(graph_type="schema")
-    for item in result:
-        if "@id" in item:
-            assert item["@id"] in [
-                "Employee",
-                "Person",
-                "Address",
-                "Team",
-                "Country",
-                "Coordinate",
-                "Role",
-            ]
-        elif "@type" in item:
-            assert item["@type"] == "@context"
-        else:
-            raise AssertionError()
+    client.create_database(db_name)
+    try:
+        my_schema.commit(client, "I am checking in the schema")
+        result = client.get_all_documents(graph_type="schema")
+        for item in result:
+            if "@id" in item:
+                assert item["@id"] in [
+                    "Employee",
+                    "Person",
+                    "Address",
+                    "Team",
+                    "Country",
+                    "Coordinate",
+                    "Role",
+                ]
+            elif "@type" in item:
+                assert item["@type"] == "@context"
+            else:
+                raise AssertionError()
+    finally:
+        client.delete_database(db_name)
 
 
-def test_insert_cheuk(docker_url, test_schema):
-    my_schema = test_schema
+def test_insert_cheuk(schema_test_db):
+    db_name, client, my_schema = schema_test_db
     Country = my_schema.object.get("Country")
     Address = my_schema.object.get("Address")
     Employee = my_schema.object.get("Employee")
@@ -86,8 +112,7 @@ def test_insert_cheuk(docker_url, test_schema):
     cheuk.friend_of = {cheuk}
     cheuk.member_of = Team.IT
 
-    client = Client(docker_url, user_agent=test_user_agent)
-    client.connect(db="test_docapi")
+    client.connect(db=db_name)
     with pytest.raises(ValueError) as error:
         client.insert_document(home)
         assert str(error.value) == "Subdocument cannot be added directly"
@@ -110,11 +135,11 @@ def test_insert_cheuk(docker_url, test_schema):
             raise AssertionError()
 
 
-def test_getting_and_deleting_cheuk(docker_url):
+def test_getting_and_deleting_cheuk(schema_test_db):
+    db_name, client, _ = schema_test_db
     assert "cheuk" not in globals()
     assert "cheuk" not in locals()
-    client = Client(docker_url, user_agent=test_user_agent)
-    client.connect(db="test_docapi")
+    client.connect(db=db_name)
     new_schema = WOQLSchema()
     new_schema.from_db(client)
     cheuk = new_schema.import_objects(
@@ -131,9 +156,9 @@ def test_getting_and_deleting_cheuk(docker_url):
     assert client.get_documents_by_type("Employee", as_list=True) == []
 
 
-def test_insert_cheuk_again(docker_url, test_schema):
-    client = Client(docker_url, user_agent=test_user_agent)
-    client.connect(db="test_docapi")
+def test_insert_cheuk_again(schema_test_db):
+    db_name, client, test_schema = schema_test_db
+    client.connect(db=db_name)
     new_schema = WOQLSchema()
     new_schema.from_db(client)
     uk = new_schema.import_objects(client.get_document("Country/United%20Kingdom"))
@@ -195,9 +220,9 @@ def test_insert_cheuk_again(docker_url, test_schema):
             raise AssertionError()
 
 
-def test_get_data_version(docker_url):
-    client = Client(docker_url, user_agent=test_user_agent)
-    client.connect(db="test_docapi")
+def test_get_data_version(schema_test_db):
+    db_name, client, _ = schema_test_db
+    client.connect(db=db_name)
     result, version = client.get_all_branches(get_data_version=True)
     assert version
     result, version = client.get_all_documents(
@@ -276,11 +301,15 @@ def test_datetime_backend(docker_url):
         weeks=2,
     )
     test_obj = CheckDatetime(datetime=datetime_obj, duration=delta)
+    db_name = unique_db_name("test_datetime")
     client = Client(docker_url, user_agent=test_user_agent)
     client.connect()
-    client.create_database("test_datetime")
-    client.insert_document(CheckDatetime, graph_type="schema")
-    client.insert_document(test_obj)
+    client.create_database(db_name)
+    try:
+        client.insert_document(CheckDatetime, graph_type="schema")
+        client.insert_document(test_obj)
+    finally:
+        client.delete_database(db_name)
 
 
 def test_compress_data(docker_url):
@@ -295,44 +324,56 @@ def test_compress_data(docker_url):
         weeks=2,
     )
     test_obj = [CheckDatetime(datetime=datetime_obj, duration=delta) for _ in range(10)]
+    db_name = unique_db_name("test_compress")
     client = Client(docker_url, user_agent=test_user_agent)
     client.connect()
-    client.create_database("test_compress_data")
-    client.insert_document(CheckDatetime, graph_type="schema")
-    client.insert_document(test_obj, compress=0)
-    test_obj2 = client.get_all_documents(as_list=True)
-    assert len(test_obj2) == 10
+    client.create_database(db_name)
+    try:
+        client.insert_document(CheckDatetime, graph_type="schema")
+        client.insert_document(test_obj, compress=0)
+        test_obj2 = client.get_all_documents(as_list=True)
+        assert len(test_obj2) == 10
+    finally:
+        client.delete_database(db_name)
 
 
 def test_repeated_object_load(docker_url, test_schema):
     schema = test_schema
+    db_name = unique_db_name("test_repeated_load")
     client = Client(docker_url, user_agent=test_user_agent)
     client.connect()
-    client.create_database("test_repeated_load")
-    client.insert_document(
-        schema, commit_msg="I am checking in the schema", graph_type="schema"
-    )
-    [country_id] = client.insert_document({"@type" : "Country",
-                                           "name" : "Romania",
-                                           "perimeter" : []})
-    obj = client.get_document(country_id)
-    schema.import_objects(obj)
-    obj2 = client.get_document(country_id)
-    schema.import_objects(obj2)
+    client.create_database(db_name)
+    try:
+        client.insert_document(
+            schema, commit_msg="I am checking in the schema", graph_type="schema"
+        )
+        [country_id] = client.insert_document({"@type" : "Country",
+                                               "name" : "Romania",
+                                               "perimeter" : []})
+        obj = client.get_document(country_id)
+        schema.import_objects(obj)
+        obj2 = client.get_document(country_id)
+        schema.import_objects(obj2)
+    finally:
+        client.delete_database(db_name)
 
 
 def test_key_change_raises_exception(docker_url, test_schema):
     schema = test_schema
+    db_name = unique_db_name("test_key_change")
     client = Client(docker_url, user_agent=test_user_agent)
     client.connect()
-    client.create_database("test_repeated_load_fails")
-    client.insert_document(
-        schema, commit_msg="I am checking in the schema", graph_type="schema"
-    )
-    [country_id] = client.insert_document({"@type" : "Country",
-                                           "name" : "Romania",
-                                           "perimeter" : []})
-    obj = client.get_document(country_id)
-    local_obj = schema.import_objects(obj)
-    with pytest.raises(ValueError, match=r"name has been used to generate the id, hence cannot be changed."):
-        local_obj.name = "France"
+    client.create_database(db_name)
+    try:
+        client.insert_document(
+            schema, commit_msg="I am checking in the schema", graph_type="schema"
+        )
+        [country_id] = client.insert_document({"@type" : "Country",
+                                               "name" : "Romania",
+                                               "perimeter" : []})
+        obj = client.get_document(country_id)
+        local_obj = schema.import_objects(obj)
+        with pytest.raises(ValueError, match=r"name has been used to generate the id, hence cannot be changed."):
+            local_obj.name = "France"
+    finally:
+        client.delete_database(db_name)

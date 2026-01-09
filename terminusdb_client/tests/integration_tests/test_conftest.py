@@ -20,7 +20,7 @@ class TestServerDetection:
         mock_get.return_value = mock_response
 
         assert is_local_server_running() is True
-        mock_get.assert_called_once_with("http://127.0.0.1:6363", timeout=2)
+        mock_get.assert_called_once_with("http://127.0.0.1:6363/api/", timeout=2)
 
     @patch('terminusdb_client.tests.integration_tests.conftest.requests.get')
     def test_local_server_running_404(self, mock_get):
@@ -53,7 +53,7 @@ class TestServerDetection:
         mock_get.return_value = mock_response
 
         assert is_docker_server_running() is True
-        mock_get.assert_called_once_with("http://127.0.0.1:6366", timeout=2)
+        mock_get.assert_called_once_with("http://127.0.0.1:6366/api/", timeout=2)
 
     @patch('terminusdb_client.tests.integration_tests.conftest.requests.get')
     def test_docker_server_running_404(self, mock_get):
@@ -79,7 +79,7 @@ class TestServerDetection:
         mock_get.return_value = mock_response
 
         assert is_jwt_server_running() is True
-        mock_get.assert_called_once_with("http://127.0.0.1:6367", timeout=2)
+        mock_get.assert_called_once_with("http://127.0.0.1:6367/api/", timeout=2)
 
     @patch('terminusdb_client.tests.integration_tests.conftest.requests.get')
     def test_jwt_server_running_404(self, mock_get):
