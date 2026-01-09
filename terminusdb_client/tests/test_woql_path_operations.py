@@ -159,7 +159,32 @@ class TestWOQLPathOperations:
         # Should wrap with and
         assert query._query.get("@type") == "And"
     
-
+    @pytest.mark.skip(reason="Not implemented - args introspection feature disabled in JS client")
+    def test_quad_with_special_args_subject(self):
+        """Test quad with 'args' parameter for introspection.
+        
+        When 'args' is passed as the first parameter, methods should return
+        a list of parameter names for API introspection.
+        
+        Note: JavaScript client has this feature commented out entirely.
+        This test shows what the correct behavior should be if the feature
+        were properly implemented. `quad()`, `added_triple()` and 
+        `removed_quad()` do not implement this. Seems like an early
+        experiment.
+        
+        The implementation should probably look something like this in 
+        WOQLQuery:
+        
+        if sub and sub == "args":
+            return ["subject", "predicate", "object", "graph"]
+        
+        """
+        query = WOQLQuery()
+        
+        # Should return list of parameter names for API introspection
+        result = query.quad("args", None, None, None)
+        
+        assert result == ["subject", "predicate", "object", "graph"]
     
     def test_added_quad_with_optional(self):
         """Test added_quad with optional flag."""
