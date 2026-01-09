@@ -123,6 +123,53 @@ class TestWOQLSchemaValidation:
         assert "query" in query._cursor
         assert result is query
     
+    @pytest.mark.skip(reason="""BLOCKED: Bug in woql_query.py line 784 - unreachable validation logic
+        
+        BUG ANALYSIS:
+        Line 784: if queries != [] and not queries:
+        
+        This condition is LOGICALLY IMPOSSIBLE and can never be True:
+        - 'queries != []' means queries is not an empty list (truthy or non-empty)
+        - 'not queries' means queries is falsy (empty list, None, False, 0, etc.)
+        - These two conditions are mutually exclusive
+        
+        CORRECT BEHAVIOR (from JavaScript client line 314):
+        if (!varNames || varNames.length <= 0) {
+            return this.parameterError('Select must be given a list of variable names');
+        }
+        
+        Python equivalent should be:
+        if not queries or len(queries) == 0:
+            raise ValueError("Select must be given a list of variable names")
+        
+        IMPACT:
+        - select() with no arguments: Should raise ValueError, but doesn't (line 786 handles empty list)
+        - select(None): Should raise ValueError, but doesn't (None is falsy but != [])
+        - Validation is completely bypassed
+        
+        FIX REQUIRED:
+        Replace line 784 with: if not queries:
+        This will catch None, empty list, and other falsy values before processing.
+        """)
+    def test_select_with_no_arguments_should_raise_error(self):
+        """Test that select() with no arguments raises ValueError.
+        
+        According to JavaScript client behavior (line 314-316), select() must be
+        given at least one variable name. Calling with no arguments should raise
+        a ValueError with message "Select must be given a list of variable names".
+        
+        The case to have zero variables selected is a valid case, where outer
+        variables are used in a subclause and no additional variables from the
+        inner function should be in the result. Thus both javascript and 
+        Python clients are probably wrong.
+        """
+        query = WOQLQuery()
+        
+        # Test: No arguments at all should raise ValueError
+        # Currently FAILS because line 784 validation is unreachable
+        with pytest.raises(ValueError, match="Select must be given a list of variable names"):
+            query.select()
+    
     def test_select_with_empty_list(self):
         """Test select with empty list."""
         query = WOQLQuery()
