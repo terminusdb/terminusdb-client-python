@@ -1,7 +1,7 @@
 """Tests for woqldataframe/woqlDataframe.py module."""
 import pytest
 from unittest.mock import MagicMock, patch, call
-from terminusdb_client.woqldataframe.woqlDataframe import result_to_df
+from terminusdb_client.woqldataframe.woqlDataframe import result_to_df, _expand_df, _embed_obj
 from terminusdb_client.errors import InterfaceError
 
 
@@ -364,27 +364,6 @@ def test_result_to_df_embed_obj_returns_early_for_maxdep_zero():
         assert result is not None
 
 
-def test_result_to_df_embed_obj_recursive_call():
-    """Test embed_obj makes recursive call (line 71)."""
-    # Test the recursive logic directly
-    
-    # Simulate the condition check from lines 65-71
-    original_columns = ["col1", "col2"]
-    expanded_columns = ["col1", "col2", "col3"]  # Different columns
-    
-    # Check if columns are the same
-    columns_same = (
-        len(expanded_columns) == len(original_columns)
-        and all(c1 == c2 for c1, c2 in zip(expanded_columns, original_columns))
-    )
-    
-    # Since columns changed, recursion should happen
-    assert not columns_same
-    
-    # This would trigger: return embed_obj(finish_df, maxdep - 1)
-    maxdep = 2
-    new_maxdep = maxdep - 1
-    assert new_maxdep == 1
 
 
 class TestEmbedObjCoverage:
@@ -470,3 +449,299 @@ class TestEmbedObjCoverage:
         maxdep = 2
         new_maxdep = maxdep - 1
         assert new_maxdep == 1
+    
+    def test_embed_obj_full_coverage(self):
+        """Test embed_obj logic to improve coverage of woqlDataframe.py"""
+        # Since embed_obj and expand_df are local functions inside result_to_df,
+        # we can't easily test them directly. Instead, we'll create a test
+        # that exercises result_to_df with different scenarios.
+        
+        mock_client = MagicMock()
+        
+        # Setup mock classes
+        all_existing_class = {
+            "Person": {
+                "name": "xsd:string",
+                "address": "Address"
+            },
+            "Address": {
+                "street": "xsd:string"
+            }
+        }
+        mock_client.get_existing_classes.return_value = all_existing_class
+        mock_client.db = "testdb"
+        
+        # Test with max_embed_dep=0 to test early return
+        test_data = [
+            {
+                "@id": "person1",
+                "@type": "Person",
+                "name": "John"
+            }
+        ]
+        
+        # Mock pandas
+        with patch('terminusdb_client.woqldataframe.woqlDataframe.import_module') as mock_import:
+            mock_pd = MagicMock()
+            
+            # Create a mock DataFrame
+            mock_df = MagicMock()
+            mock_df.columns = ["Document id", "name"]
+            mock_df.__getitem__.return_value.unique.return_value = ["Person"]
+            
+            # Mock DataFrame operations
+            mock_pd.DataFrame = MagicMock()
+            mock_pd.DataFrame.return_value.from_records = MagicMock(return_value=mock_df)
+            
+            # Set up the import mock
+            mock_import.return_value = mock_pd
+            
+            # Test with max_embed_dep=0 (should return early)
+            result = result_to_df(test_data, max_embed_dep=0, client=mock_client)
+            assert result is not None
+            
+            # Verify get_document was not called when max_embed_dep=0
+            assert not mock_client.get_document.called
+
+
+class TestExpandDfDirect:
+    """Direct tests for _expand_df function"""
+    
+    def test_expand_df_with_document_id_column(self):
+        """Test _expand_df skips Document id column"""
+        import pandas as pd
+        
+        df = pd.DataFrame([{"Document id": "doc1", "name": "John"}])
+        result = _expand_df(df, pd, keepid=False)
+        
+        assert "Document id" in result.columns
+        assert "name" in result.columns
+    
+    def test_expand_df_with_nested_object(self):
+        """Test _expand_df expands nested objects with @id"""
+        import pandas as pd
+        
+        df = pd.DataFrame([{
+            "name": "John",
+            "address": {"@id": "addr1", "street": "Main St"}
+        }])
+        result = _expand_df(df, pd, keepid=False)
+        
+        # Address column should be expanded into address.street
+        assert "address" not in result.columns
+        assert "address.street" in result.columns
+    
+    def test_expand_df_with_keepid_true(self):
+        """Test _expand_df keeps @id when keepid=True"""
+        import pandas as pd
+        
+        df = pd.DataFrame([{
+            "name": "John",
+            "address": {"@id": "addr1", "street": "Main St"}
+        }])
+        result = _expand_df(df, pd, keepid=True)
+        
+        # Should keep @id column as address.@id
+        assert "address.@id" in result.columns
+
+
+class TestEmbedObjDirect:
+    """Direct tests for _embed_obj function"""
+    
+    def test_embed_obj_returns_early_when_maxdep_zero(self):
+        """Test _embed_obj returns immediately when maxdep is 0"""
+        import pandas as pd
+        
+        df = pd.DataFrame([{"name": "John", "address": "addr1"}])
+        mock_client = MagicMock()
+        all_existing_class = {"Person": {"name": "xsd:string", "address": "Address"}}
+        
+        result = _embed_obj(df, 0, pd, False, all_existing_class, "Person", mock_client)
+        
+        # Should return the same DataFrame without calling get_document
+        assert result is df
+        assert not mock_client.get_document.called
+    
+    def test_embed_obj_processes_object_properties(self):
+        """Test _embed_obj calls get_document for object properties"""
+        import pandas as pd
+        
+        df = pd.DataFrame([{"name": "John", "address": "addr1"}])
+        mock_client = MagicMock()
+        
+        # Use a real function that pandas can handle
+        call_tracker = []
+        def real_get_document(doc_id):
+            call_tracker.append(doc_id)
+            return "expanded_" + str(doc_id)
+        
+        mock_client.get_document = real_get_document
+        
+        all_existing_class = {
+            "Person": {"name": "xsd:string", "address": "Address"},
+            "Address": {"street": "xsd:string"}
+        }
+        
+        result = _embed_obj(df, 1, pd, False, all_existing_class, "Person", mock_client)
+        
+        # get_document should have been called
+        assert len(call_tracker) > 0
+        assert result is not None
+    
+    def test_embed_obj_skips_xsd_types(self):
+        """Test _embed_obj skips xsd: prefixed types"""
+        import pandas as pd
+        
+        df = pd.DataFrame([{"name": "John"}])
+        mock_client = MagicMock()
+        
+        all_existing_class = {
+            "Person": {"name": "xsd:string"}
+        }
+        
+        result = _embed_obj(df, 1, pd, False, all_existing_class, "Person", mock_client)
+        
+        # get_document should NOT have been called for xsd:string
+        assert not mock_client.get_document.called
+    
+    def test_embed_obj_skips_same_class(self):
+        """Test _embed_obj skips properties of the same class (self-reference)"""
+        import pandas as pd
+        
+        df = pd.DataFrame([{"name": "John", "friend": "person2"}])
+        mock_client = MagicMock()
+        
+        all_existing_class = {
+            "Person": {"name": "xsd:string", "friend": "Person"}
+        }
+        
+        result = _embed_obj(df, 1, pd, False, all_existing_class, "Person", mock_client)
+        
+        # get_document should NOT have been called for same class reference
+        assert not mock_client.get_document.called
+    
+    def test_embed_obj_skips_enum_types(self):
+        """Test _embed_obj skips Enum types"""
+        import pandas as pd
+        
+        df = pd.DataFrame([{"name": "John", "status": "ACTIVE"}])
+        mock_client = MagicMock()
+        
+        all_existing_class = {
+            "Person": {"name": "xsd:string", "status": "Status"},
+            "Status": {"@type": "Enum", "values": ["ACTIVE", "INACTIVE"]}
+        }
+        
+        result = _embed_obj(df, 1, pd, False, all_existing_class, "Person", mock_client)
+        
+        # get_document should NOT have been called for Enum type
+        assert not mock_client.get_document.called
+    
+    def test_embed_obj_handles_nested_properties(self):
+        """Test _embed_obj handles nested property paths like address.city"""
+        import pandas as pd
+        
+        df = pd.DataFrame([{"name": "John", "address.city": "city1"}])
+        mock_client = MagicMock()
+        
+        # Use a real function that pandas can handle
+        call_tracker = []
+        def real_get_document(doc_id):
+            call_tracker.append(doc_id)
+            return "expanded_" + str(doc_id)
+        
+        mock_client.get_document = real_get_document
+        
+        all_existing_class = {
+            "Person": {"name": "xsd:string", "address": "Address"},
+            "Address": {"street": "xsd:string", "city": "City"},
+            "City": {"name": "xsd:string"}
+        }
+        
+        result = _embed_obj(df, 1, pd, False, all_existing_class, "Person", mock_client)
+        
+        # get_document should have been called for the nested city property
+        assert len(call_tracker) > 0
+        assert result is not None
+    
+    def test_embed_obj_recurses_when_columns_change(self):
+        """Test _embed_obj recurses when expand_df adds new columns"""
+        import pandas as pd
+        
+        # Start with a column that will trigger get_document
+        df = pd.DataFrame([{"name": "John", "address": "addr1"}])
+        mock_client = MagicMock()
+        
+        # Use a real function - first call returns a dict that expands
+        call_count = [0]
+        def real_get_document(doc_id):
+            call_count[0] += 1
+            if call_count[0] == 1:
+                return {"@id": "addr1", "street": "Main St"}
+            return "simple_value"
+        
+        mock_client.get_document = real_get_document
+        
+        all_existing_class = {
+            "Person": {"name": "xsd:string", "address": "Address"},
+            "Address": {"street": "xsd:string"}
+        }
+        
+        result = _embed_obj(df, 2, pd, False, all_existing_class, "Person", mock_client)
+        
+        # Should have been called
+        assert call_count[0] > 0
+        assert result is not None
+    
+    def test_embed_obj_returns_when_columns_unchanged(self):
+        """Test _embed_obj returns without recursion when columns are unchanged"""
+        import pandas as pd
+        
+        df = pd.DataFrame([{"name": "John", "address": "addr1"}])
+        mock_client = MagicMock()
+        
+        # Use a real function that returns a simple string
+        call_tracker = []
+        def real_get_document(doc_id):
+            call_tracker.append(doc_id)
+            return "simple_value"
+        
+        mock_client.get_document = real_get_document
+        
+        all_existing_class = {
+            "Person": {"name": "xsd:string", "address": "Address"},
+            "Address": {"street": "xsd:string"}
+        }
+        
+        result = _embed_obj(df, 1, pd, False, all_existing_class, "Person", mock_client)
+        
+        # Should complete without error
+        assert result is not None
+        assert len(call_tracker) > 0
+
+
+def test_result_to_df_with_embed_obj_full_path():
+    """Test result_to_df with max_embed_dep > 0 to cover line 113"""
+    mock_client = MagicMock()
+    
+    all_existing_class = {
+        "Person": {"name": "xsd:string", "address": "Address"},
+        "Address": {"street": "xsd:string"}
+    }
+    mock_client.get_existing_classes.return_value = all_existing_class
+    mock_client.db = "testdb"
+    
+    # Use a real function for get_document
+    def real_get_document(doc_id):
+        return "expanded_" + str(doc_id)
+    
+    mock_client.get_document = real_get_document
+    
+    test_data = [
+        {"@id": "person1", "@type": "Person", "name": "John", "address": "addr1"}
+    ]
+    
+    result = result_to_df(test_data, max_embed_dep=1, client=mock_client)
+    
+    assert result is not None
+    assert "name" in result.columns
