@@ -181,7 +181,18 @@ class TestWOQLCursorManagement:
         assert query._cursor == {}
         assert query._cursor is not query._query
     
-    
+    def test_cursor_tracking_with_update_operations(self):
+        """Test cursor tracking with update operations."""
+        query = WOQLQuery()
+        assert query._contains_update is False
+        
+        # added_triple is a QUERY operation (finds triples added in commits)
+        # It should NOT set _contains_update because it's not writing data
+        query.added_triple("s", "p", "o")
+        assert query._contains_update is False  # Correct - this is a read operation
+        
+        # Cursor should be at the added triple query
+        assert query._cursor["@type"] == "AddedTriple"
     
     def test_nested_cursor_operations(self):
         """Test deeply nested cursor operations."""
