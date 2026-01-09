@@ -57,6 +57,13 @@ junit_family="legacy"
 testpaths = [
    "terminusdb_client/tests/",
 ]
+[tool.coverage.run]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "terminusdb_client/tests/*",
+    "terminusdb_client/test_*",
+]
 
 [tool.isort]
 profile = "black"

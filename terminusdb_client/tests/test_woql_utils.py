@@ -287,3 +287,24 @@ def test_dt_list_handles_dict_items():
     # _dt_list calls _clean_dict on dict items
     assert result[0] == {"date": "2025-01-01"}
     assert result[1] == {"name": "test"}
+
+
+def test_clean_dict_handles_unmatched_types():
+    """Test _clean_dict handles items that don't match any special type."""
+    class CustomType:
+        def __init__(self, value):
+            self.value = value
+    
+    obj = {
+        "custom": CustomType("test"),
+        "number": 42,
+        "string": "regular string"
+    }
+    
+    result = _clean_dict(obj)
+    
+    # Custom type and primitive types should be returned as-is
+    assert isinstance(result["custom"], CustomType)
+    assert result["custom"].value == "test"
+    assert result["number"] == 42
+    assert result["string"] == "regular string"
