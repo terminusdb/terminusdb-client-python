@@ -2,13 +2,125 @@
 import json
 import pytest
 from unittest.mock import Mock
-from terminusdb_client.woqlquery.woql_query import WOQLQuery, Var
+from terminusdb_client.woqlquery.woql_query import WOQLQuery, Var, Doc
 from terminusdb_client.errors import InterfaceError
 
 
 class TestWOQLQueryCoverage:
     """Test cases for uncovered lines in woql_query.py"""
     
+    def test_doc_convert_and_to_dict(self):
+        """Test Doc._convert and to_dict for various value types.
+
+        Covers conversion of primitives, None, lists, Vars, and dicts.
+        """
+        # String
+        d = Doc("hello")
+        assert d.to_dict() == {
+            "@type": "Value",
+            "data": {"@type": "xsd:string", "@value": "hello"},
+        }
+
+        # Boolean
+        d = Doc(True)
+        assert d.to_dict() == {
+            "@type": "Value",
+            "data": {"@type": "xsd:boolean", "@value": True},
+        }
+
+        # Integer
+        d = Doc(42)
+        assert d.to_dict() == {
+            "@type": "Value",
+            "data": {"@type": "xsd:integer", "@value": 42},
+        }
+
+        # Float (stored as decimal)
+        d = Doc(3.14)
+        assert d.to_dict() == {
+            "@type": "Value",
+            "data": {"@type": "xsd:decimal", "@value": 3.14},
+        }
+
+        # None
+        d = Doc({"maybe": None})
+        encoded = d.to_dict()
+        assert encoded["@type"] == "Value"
+        dictionary = encoded["dictionary"]
+        assert dictionary["@type"] == "DictionaryTemplate"
+        # The value for the None field should be encoded as None
+        field_pair = dictionary["data"][0]
+        assert field_pair["field"] == "maybe"
+        assert field_pair["value"] is None
+
+        # List with mixed values
+        d = Doc(["a", 1, False])
+        encoded = d.to_dict()
+        assert encoded["@type"] == "Value"
+        assert "list" in encoded
+        assert len(encoded["list"]) == 3
+
+        # Var instance
+        v = Var("vname")
+        d = Doc(v)
+        assert d.to_dict() == {"@type": "Value", "variable": "vname"}
+
+        # Nested dict
+        d = Doc({"outer": {"inner": 5}})
+        encoded = d.to_dict()
+        assert encoded["@type"] == "Value"
+        dict_tmpl = encoded["dictionary"]
+        assert dict_tmpl["@type"] == "DictionaryTemplate"
+        outer_pair = dict_tmpl["data"][0]
+        assert outer_pair["field"] == "outer"
+        inner_value = outer_pair["value"]
+        assert inner_value["@type"] == "Value"
+        inner_dict_tmpl = inner_value["dictionary"]
+        assert inner_dict_tmpl["@type"] == "DictionaryTemplate"
+
+    def test_doc_str_uses_original_dictionary(self):
+        """Test Doc.__str__ returns the original dictionary string representation."""
+        payload = {"k": "v"}
+        d = Doc(payload)
+        assert str(d) == str(payload)
+
+    def test_vars_helper_creates_var_instances(self):
+        """Test that vars() creates Var instances with expected names."""
+        wq = WOQLQuery()
+        v1, v2, v3 = wq.vars("a", "b", "c")
+        assert isinstance(v1, Var)
+        assert isinstance(v2, Var)
+        assert isinstance(v3, Var)
+        assert str(v1) == "a"
+        assert str(v2) == "b"
+        assert str(v3) == "c"
+
+    def test_init_uses_short_name_mapping_and_aliases(self):
+        """Test WOQLQuery initialisation sets context and alias methods."""
+        # Default init
+        wq = WOQLQuery()
+        # _vocab should be initialised from SHORT_NAME_MAPPING (at least check a few keys)
+        for key in ("type", "string", "boolean"):
+            assert key in wq._vocab
+
+        # Aliases should delegate to the expected methods (bound methods are not identical
+        # objects on each access, so compare underlying functions)
+        assert wq.update.__func__ is wq.update_document.__func__
+        assert wq.delete.__func__ is wq.delete_document.__func__
+        assert wq.read.__func__ is wq.read_document.__func__
+        assert wq.insert.__func__ is wq.insert_document.__func__
+        assert wq.optional.__func__ is wq.opt.__func__
+        assert wq.idgenerator.__func__ is wq.idgen.__func__
+        assert wq.concatenate.__func__ is wq.concat.__func__
+        assert wq.typecast.__func__ is wq.cast.__func__
+
+        # Initial query/cursor state when passing a pre-existing query dict
+        initial = {"@type": "And", "and": []}
+        wq2 = WOQLQuery(query=initial)
+        # _query should be the same object, and _cursor should reference it
+        assert wq2._query is initial
+        assert wq2._cursor is initial
+
     def test_varj_method(self):
         """Test _varj method"""
         wq = WOQLQuery()
