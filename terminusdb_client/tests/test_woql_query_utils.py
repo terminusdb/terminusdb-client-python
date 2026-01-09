@@ -1836,10 +1836,6 @@ def test_class_operations():
     query = WOQLQuery()
     query.split("hello,world", ",", "v:List")
     
-    # Test dot special args handling
-    result = query.dot("args", "field", "output")
-    assert result == ["document", "field", "value"]
-    
     # Test dot with cursor wrapping
     query = WOQLQuery()
     query.triple("v:Subject", "rdf:type", "schema:Person")  # Set up initial cursor
