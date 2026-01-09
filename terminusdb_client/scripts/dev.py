@@ -205,6 +205,30 @@ def test_all():
     )
 
 
+def coverage():
+    """Run tests with coverage and generate HTML report."""
+    print("Running tests with coverage...")
+    run_command(
+        [
+            "poetry",
+            "run",
+            "python",
+            "-m",
+            "pytest",
+            "terminusdb_client/tests/",
+            PYTEST_TB_SHORT,
+            PYTEST_COV,
+            PYTEST_COV_TERM,
+            PYTEST_COV_XML,
+            "--cov-report=html:htmlcov",
+        ]
+    )
+    print("\n✅ Coverage report generated!")
+    print("   - Terminal: see above")
+    print("   - XML: cov.xml")
+    print("   - HTML: htmlcov/index.html")
+
+
 def docs():
     """Build documentation."""
     print("Building documentation...")
@@ -334,6 +358,7 @@ def main():
         print("  test-unit     - Run unit tests only")
         print("  test-integration - Run integration tests")
         print("  test-all      - Run all tests (unit + integration)")
+        print("  coverage      - Run tests with coverage report (terminal + HTML)")
         print("  docs          - Build documentation")
         print("  docs-json     - Generate docs.json for documentation site")
         print("  tox           - Run tox for isolated testing")
@@ -359,6 +384,7 @@ def main():
         print("  test-unit     - Run unit tests only")
         print("  test-integration - Run integration tests")
         print("  test-all      - Run all tests (unit + integration)")
+        print("  coverage      - Run tests with coverage report (terminal + HTML)")
         print("  docs          - Build documentation")
         print("  docs-json     - Generate docs.json for documentation site")
         print("  tox           - Run tox for isolated testing")
@@ -381,6 +407,7 @@ def main():
         "test-unit": test_unit,
         "test-integration": test_integration,
         "test-all": test_all,
+        "coverage": coverage,
         "docs": docs,
         "docs-json": docs_json,
         "tox": tox,
