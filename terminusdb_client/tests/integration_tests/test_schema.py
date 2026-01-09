@@ -140,23 +140,23 @@ def test_getting_and_deleting_cheuk(schema_test_db):
     assert "cheuk" not in globals()
     assert "cheuk" not in locals()
     client.connect(db=db_name)
-    
+
     # Set up: Create test data first
     Country = test_schema.object.get("Country")
     Address = test_schema.object.get("Address")
     Employee = test_schema.object.get("Employee")
     Role = test_schema.object.get("Role")
     Team = test_schema.object.get("Team")
-    
+
     uk = Country()
     uk.name = "UK Test 1"
     uk.perimeter = []
-    
+
     home = Address()
     home.street = "123 Abc Street"
     home.country = uk
     home.postal_code = "A12 345"
-    
+
     cheuk_setup = Employee()
     cheuk_setup.permisstion = {Role.Admin, Role.Read}
     cheuk_setup.address_of = home
@@ -167,9 +167,9 @@ def test_getting_and_deleting_cheuk(schema_test_db):
     cheuk_setup.managed_by = cheuk_setup
     cheuk_setup.friend_of = {cheuk_setup}
     cheuk_setup.member_of = Team.IT
-    
+
     client.insert_document([cheuk_setup], commit_msg="Setup for test_getting_and_deleting_cheuk")
-    
+
     # Test: Load and verify
     new_schema = WOQLSchema()
     new_schema.from_db(client)
@@ -188,14 +188,14 @@ def test_getting_and_deleting_cheuk(schema_test_db):
 def test_insert_cheuk_again(schema_test_db):
     db_name, client, test_schema = schema_test_db
     client.connect(db=db_name)
-    
+
     # Set up: Create Country first
     Country = test_schema.object.get("Country")
     uk_setup = Country()
     uk_setup.name = "UK Test 2"
     uk_setup.perimeter = []
     client.insert_document([uk_setup], commit_msg="Setup country for test_insert_cheuk_again")
-    
+
     # Test: Load country and create employee
     new_schema = WOQLSchema()
     new_schema.from_db(client)
@@ -243,7 +243,7 @@ def test_insert_cheuk_again(schema_test_db):
     found_country = False
     found_employee = False
     found_coordinate = False
-    
+
     for item in result:
         if item.get("@type") == "Country" and item.get("name") == "UK Test 2":
             assert item["perimeter"]
@@ -259,7 +259,7 @@ def test_insert_cheuk_again(schema_test_db):
         elif item.get("@type") == "Coordinate" and item.get("x") == -0.7:
             assert item["y"] == 51.3
             found_coordinate = True
-    
+
     assert found_country, "UK Test 2 country not found"
     assert found_employee, "cheuk_test_2 employee not found"
     assert found_coordinate, "Coordinate not found"
@@ -268,7 +268,7 @@ def test_insert_cheuk_again(schema_test_db):
 def test_get_data_version(schema_test_db):
     db_name, client, test_schema = schema_test_db
     client.connect(db=db_name)
-    
+
     # Set up: Create test employee for data version tests
     Country = test_schema.object.get("Country")
     Address = test_schema.object.get("Address")
@@ -276,19 +276,19 @@ def test_get_data_version(schema_test_db):
     Role = test_schema.object.get("Role")
     Team = test_schema.object.get("Team")
     Coordinate = test_schema.object.get("Coordinate")
-    
+
     uk = Country()
     uk.name = "UK Test 3"
     uk.perimeter = []
-    
+
     home = Address()
     home.street = "123 Abc Street"
     home.country = uk
     home.postal_code = "A12 345"
-    
+
     location = Coordinate(x=0.7, y=51.3)
     uk.perimeter = [location]
-    
+
     cheuk = Employee()
     cheuk.permisstion = {Role.Admin, Role.Read}
     cheuk.address_of = home
@@ -299,7 +299,7 @@ def test_get_data_version(schema_test_db):
     cheuk.friend_of = {cheuk}
     cheuk.member_of = Team.IT
     cheuk._id = "cheuk_test_3"
-    
+
     client.insert_document([location, uk, cheuk], commit_msg="Setup for test_get_data_version")
     result, version = client.get_all_branches(get_data_version=True)
     assert version

@@ -263,7 +263,7 @@ def test_dt_dict_handles_unmatched_types():
     class CustomType:
         def __init__(self, value):
             self.value = value
-    
+
     obj = {
         "custom": CustomType("test"),
         "number": 42,
@@ -316,7 +316,7 @@ def test_clean_dict_handles_unmatched_types():
     class CustomType:
         def __init__(self, value):
             self.value = value
-    
+
     obj = {
         "custom": CustomType("test"),
         "number": 42,
@@ -324,9 +324,9 @@ def test_clean_dict_handles_unmatched_types():
         "none": None,
         "boolean": True
     }
-    
+
     result = _clean_dict(obj)
-    
+
     # Custom type and primitive types should be returned as-is
     assert isinstance(result["custom"], CustomType)
     assert result["custom"].value == "test"

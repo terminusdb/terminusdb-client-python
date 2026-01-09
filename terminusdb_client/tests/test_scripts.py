@@ -29,13 +29,13 @@ def test_df_to_schema_basic():
     # Keys must be builtin names, values are the numpy types that map to them
     mock_np.sctypeDict.items.return_value = [("int", int), ("str", str), ("float", float)]
     mock_np.datetime64 = "datetime64"
-    
+
     mock_df = MagicMock()
     dtypes = MockDtypes({"name": MockDtype(str), "age": MockDtype(int)})
     mock_df.dtypes = dtypes
-    
+
     result = _df_to_schema("Person", mock_df, mock_np)
-    
+
     assert result["@type"] == "Class"
     assert result["@id"] == "Person"
     assert "name" in result
@@ -47,7 +47,7 @@ def test_df_to_schema_with_id_column():
     mock_np = MagicMock()
     mock_np.sctypeDict.items.return_value = [("int", int), ("str", str)]
     mock_np.datetime64 = "datetime64"
-    
+
     mock_df = MagicMock()
     dtypes = MockDtypes({
         "id": MockDtype(str),
@@ -55,9 +55,9 @@ def test_df_to_schema_with_id_column():
         "age": MockDtype(int)
     })
     mock_df.dtypes = dtypes
-    
+
     result = _df_to_schema("Person", mock_df, mock_np, id_col="id")
-    
+
     assert result["@type"] == "Class"
     assert result["@id"] == "Person"
     assert "id" in result
@@ -70,13 +70,13 @@ def test_df_to_schema_with_optional_na():
     mock_np = MagicMock()
     mock_np.sctypeDict.items.return_value = [("int", int), ("str", str)]
     mock_np.datetime64 = "datetime64"
-    
+
     mock_df = MagicMock()
     dtypes = MockDtypes({"name": MockDtype(str), "age": MockDtype(int)})
     mock_df.dtypes = dtypes
-    
+
     result = _df_to_schema("Person", mock_df, mock_np, na_mode="optional", keys=["name"])
-    
+
     assert result["@type"] == "Class"
     assert result["@id"] == "Person"
     # name is a key, so it should not be optional
@@ -91,13 +91,13 @@ def test_df_to_schema_with_embedded():
     mock_np = MagicMock()
     mock_np.sctypeDict.items.return_value = [("int", int), ("str", str)]
     mock_np.datetime64 = "datetime64"
-    
+
     mock_df = MagicMock()
     dtypes = MockDtypes({"name": MockDtype(str), "address": MockDtype(str)})
     mock_df.dtypes = dtypes
-    
+
     result = _df_to_schema("Person", mock_df, mock_np, embedded=["address"])
-    
+
     assert result["@type"] == "Class"
     assert result["@id"] == "Person"
     assert result["name"] == "xsd:string"
@@ -108,17 +108,17 @@ def test_df_to_schema_with_embedded():
 def test_df_to_schema_with_datetime():
     """Test schema generation with datetime column"""
     import datetime as dt
-    
+
     mock_np = MagicMock()
     mock_np.sctypeDict.items.return_value = [("int", int), ("str", str)]
     mock_np.datetime64 = dt.datetime  # Map datetime64 to datetime.datetime
-    
+
     mock_df = MagicMock()
     dtypes = MockDtypes({"name": MockDtype(str), "created_at": MockDtype(dt.datetime)})
     mock_df.dtypes = dtypes
-    
+
     result = _df_to_schema("Person", mock_df, mock_np)
-    
+
     assert result["@type"] == "Class"
     assert result["@id"] == "Person"
     assert "name" in result
@@ -131,7 +131,7 @@ def test_df_to_schema_all_options():
     mock_np = MagicMock()
     mock_np.sctypeDict.items.return_value = [("int", int), ("str", str), ("float", float)]
     mock_np.datetime64 = "datetime64"
-    
+
     mock_df = MagicMock()
     dtypes = MockDtypes({
         "id": MockDtype(str),
@@ -141,7 +141,7 @@ def test_df_to_schema_all_options():
         "department": MockDtype(str)
     })
     mock_df.dtypes = dtypes
-    
+
     result = _df_to_schema(
         "Employee",
         mock_df,
@@ -151,7 +151,7 @@ def test_df_to_schema_all_options():
         na_mode="optional",
         keys=["name"]
     )
-    
+
     assert result["@type"] == "Class"
     assert result["@id"] == "Employee"
     # id column - not optional
@@ -222,11 +222,11 @@ def test_startproject():
     runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(scripts.startproject, input="mydb\nhttp://127.0.0.1:6363/\n")
-        
+
         assert result.exit_code == 0
         assert os.path.exists("config.json")
         assert os.path.exists(".TDB")
-        
+
         with open("config.json") as f:
             config = json.load(f)
             assert config["database"] == "mydb"
@@ -239,10 +239,10 @@ def test_startproject_with_team():
     runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(scripts.startproject, input="mydb\nhttp://example.com/\nteam1\ny\ny\nTOKEN123\n")
-        
+
         assert result.exit_code == 0
         assert os.path.exists("config.json")
-        
+
         with open("config.json") as f:
             config = json.load(f)
             assert config["database"] == "mydb"
@@ -256,17 +256,17 @@ def test_startproject_remote_server():
     runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(scripts.startproject, input="mydb\nhttp://example.com/\nteam1\nn\n")
-        
+
         assert result.exit_code == 0
         assert os.path.exists("config.json")
-        
+
         with open("config.json") as f:
             config = json.load(f)
             assert config["database"] == "mydb"
             assert config["endpoint"] == "http://example.com/"
             assert config["team"] == "team1"
             # When user answers 'n' to token question, use JWT token is False
-            assert config.get("use JWT token") == False
+            assert config.get("use JWT token") is False
 
 
 def test_startproject_remote_server_no_token():
@@ -274,7 +274,7 @@ def test_startproject_remote_server_no_token():
     runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(scripts.startproject, input="mydb\nhttp://example.com\nteam1\ny\nn\n")
-        
+
         assert result.exit_code == 0
         assert "Please make sure you have set up TERMINUSDB_ACCESS_TOKEN" in result.output
 
@@ -305,7 +305,7 @@ def test_connect_defaults():
     """Test _connect with default team and branch"""
     settings = {"endpoint": "http://127.0.0.1:6363/", "database": "test"}
     mock_client = MagicMock()
-    
+
     with patch("terminusdb_client.scripts.scripts.Client", return_value=mock_client):
         _, _ = scripts._connect(settings)
         # Should use default team and branch
@@ -322,7 +322,7 @@ def test_connect_create_db_with_branch():
         InterfaceError("Database 'test' does not exist"),
         None  # Second call succeeds
     ]
-    
+
     with patch("builtins.open", mock_open()):
         with patch("json.dump"):
             with patch("terminusdb_client.scripts.scripts.Client", return_value=mock_client):
@@ -341,7 +341,7 @@ def test_create_script_parent_string():
         {"@id": "Child1", "@type": "Class", "@inherits": "Parent1"},
         {"@id": "Child2", "@type": "Class", "@inherits": "Parent1"}
     ]
-    
+
     result = scripts._create_script(obj_list)
     # The result should contain the class definitions
     assert "class Parent1(DocumentTemplate):" in result
@@ -354,7 +354,7 @@ def test_sync_empty_schema():
     mock_client = MagicMock()
     mock_client.db = "testdb"
     mock_client.get_all_documents.return_value = []
-    
+
     result = scripts._sync(mock_client)
     assert "schema is empty" in result
 
@@ -367,11 +367,11 @@ def test_sync_with_schema():
         {"@id": "Class1", "@type": "Class"},
         {"@id": "Class2", "@type": "Class"}
     ]
-    
+
     with patch("terminusdb_client.scripts.scripts.shed") as mock_shed:
         with patch("builtins.open", mock_open()):
             mock_shed.return_value = "formatted schema"
-            
+
             result = scripts._sync(mock_client)
             assert "schema.py is updated" in result
 
@@ -385,14 +385,14 @@ def test_branch_delete_nonexistent():
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
         with open(".TDB", "w") as f:
             json.dump({"branch": "main", "ref": None}, f)
-        
+
         mock_client = MagicMock()
         mock_client.get_all_branches.return_value = [{"name": "main"}, {"name": "dev"}]
-        
+
         with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
             # Use -d option for delete
             result = runner.invoke(scripts.tdbpy, ["branch", "-d", "nonexistent"])
-            
+
             assert result.exit_code != 0
             assert "does not exist" in str(result.exception)
 
@@ -406,14 +406,14 @@ def test_branch_create():
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
         with open(".TDB", "w") as f:
             json.dump({"branch": "main", "ref": None}, f)
-        
+
         mock_client = MagicMock()
         mock_client.create_branch.return_value = None
-        
+
         with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
             # Pass branch name as argument to create
             result = runner.invoke(scripts.tdbpy, ["branch", "new_branch"])
-            
+
             assert result.exit_code == 0
             mock_client.create_branch.assert_called_with("new_branch")
             assert "created" in result.output
@@ -428,14 +428,14 @@ def test_reset_hard():
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
         with open(".TDB", "w") as f:
             json.dump({"branch": "main", "ref": "current"}, f)
-        
+
         mock_client = MagicMock()
         mock_client.reset.return_value = None
-        
+
         with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
             # Hard reset is the default (no --soft flag)
             result = runner.invoke(scripts.tdbpy, ["reset", "ref123"])
-            
+
             assert result.exit_code == 0
             mock_client.reset.assert_called_with("ref123")
             assert "Hard reset" in result.output
@@ -448,17 +448,17 @@ def test_alldocs_no_type():
         # Create config.json
         with open("config.json", "w") as f:
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
-        
+
         # Create .TDB file
         with open(".TDB", "w") as f:
             json.dump({"branch": "main", "ref": None}, f)
-        
+
         mock_client = MagicMock()
         mock_client.get_all_documents.return_value = [{"@id": "doc1", "@type": "Person"}]
-        
+
         with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
             result = runner.invoke(scripts.tdbpy, ["alldocs"])
-            
+
             assert result.exit_code == 0
             mock_client.get_all_documents.assert_called_with(count=None)
 
@@ -470,18 +470,18 @@ def test_alldocs_with_head():
         # Create config.json
         with open("config.json", "w") as f:
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
-        
+
         # Create .TDB file
         with open(".TDB", "w") as f:
             json.dump({"branch": "main", "ref": None}, f)
-        
+
         mock_client = MagicMock()
         mock_client.get_all_documents.return_value = [{"@id": "doc1", "@type": "Person"}]
-        
+
         with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
             # Use --head instead of --limit
             result = runner.invoke(scripts.tdbpy, ["alldocs", "--head", "10"])
-            
+
             assert result.exit_code == 0
             mock_client.get_all_documents.assert_called_with(count=10)
 
@@ -493,24 +493,24 @@ def test_commit_command():
         # Create config.json
         with open("config.json", "w") as f:
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
-        
+
         # Create .TDB file
         with open(".TDB", "w") as f:
             json.dump({"branch": "main", "ref": None}, f)
-        
+
         # Create a minimal schema.py
         with open("schema.py", "w") as f:
             f.write('''"""\nTitle: Test Schema\nDescription: A test schema\nAuthors: John Doe, Jane Smith\n"""\nfrom terminusdb_client.woqlschema import TerminusClass\n\nclass Person(TerminusClass):\n    name: str\n''')
-        
+
         mock_client = MagicMock()
-        
+
         with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
             with patch("terminusdb_client.scripts.scripts.WOQLSchema") as mock_schema:
                 mock_schema_obj = MagicMock()
                 mock_schema.return_value = mock_schema_obj
-                
+
                 result = runner.invoke(scripts.tdbpy, ["commit", "--message", "Test commit"])
-                
+
                 assert result.exit_code == 0
                 mock_schema.assert_called_once()
                 # WOQLSchema should be called and commit invoked
@@ -524,24 +524,24 @@ def test_commit_command_without_message():
         # Create config.json
         with open("config.json", "w") as f:
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
-        
+
         # Create .TDB file
         with open(".TDB", "w") as f:
             json.dump({"branch": "main", "ref": None}, f)
-        
+
         # Create a schema.py without documentation
         with open("schema.py", "w") as f:
             f.write('''from terminusdb_client.woqlschema import TerminusClass\n\nclass Person(TerminusClass):\n    name: str\n''')
-        
+
         mock_client = MagicMock()
-        
+
         with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
             with patch("terminusdb_client.scripts.scripts.WOQLSchema") as mock_schema:
                 mock_schema_obj = MagicMock()
                 mock_schema.return_value = mock_schema_obj
-                
+
                 result = runner.invoke(scripts.tdbpy, ["commit"])
-                
+
                 assert result.exit_code == 0
                 mock_schema.assert_called_once()
                 # Schema without docstring should have None for metadata
@@ -555,21 +555,21 @@ def test_deletedb_command():
         # Create config.json
         with open("config.json", "w") as f:
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
-        
+
         # Create .TDB file
         with open(".TDB", "w") as f:
             json.dump({"branch": "dev", "ref": "ref123"}, f)
-        
+
         mock_client = MagicMock()
         mock_client.team = "admin"  # Set the team attribute
-        
+
         with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
             with patch("click.confirm", return_value=True):
                 result = runner.invoke(scripts.tdbpy, ["deletedb"])
-                
+
                 assert result.exit_code == 0
                 mock_client.delete_database.assert_called_once_with("test", "admin")
-                
+
                 # Check that .TDB file was reset
                 with open(".TDB") as f:
                     tdb_content = json.load(f)
@@ -584,17 +584,17 @@ def test_deletedb_command_cancelled():
         # Create config.json
         with open("config.json", "w") as f:
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
-        
+
         # Create .TDB file
         with open(".TDB", "w") as f:
             json.dump({"branch": "dev", "ref": "ref123"}, f)
-        
+
         mock_client = MagicMock()
-        
+
         with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
             with patch("click.confirm", return_value=False):
                 result = runner.invoke(scripts.tdbpy, ["deletedb"])
-                
+
                 assert result.exit_code == 0
                 mock_client.delete_database.assert_not_called()
 
@@ -606,11 +606,11 @@ def test_log_command():
         # Create config.json
         with open("config.json", "w") as f:
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
-        
+
         # Create .TDB file
         with open(".TDB", "w") as f:
             json.dump({"branch": "main", "ref": None}, f)
-        
+
         mock_client = MagicMock()
         mock_client.get_commit_history.return_value = [
             {
@@ -626,10 +626,10 @@ def test_log_command():
                 "message": "Add Person class"
             }
         ]
-        
+
         with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
             result = runner.invoke(scripts.tdbpy, ["log"])
-            
+
             assert result.exit_code == 0
             mock_client.get_commit_history.assert_called_once()
             assert "commit abc123" in result.output
@@ -644,29 +644,29 @@ def test_importcsv_with_id_and_keys():
         # Create a simple CSV file
         with open("test.csv", "w") as f:
             f.write("Name,Age,ID\nJohn,30,1\nJane,25,2\n")
-        
+
         # Create config.json
         with open("config.json", "w") as f:
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
-        
+
         # Create .TDB file
         with open(".TDB", "w") as f:
             json.dump({"branch": "main", "ref": None}, f)
-        
+
         mock_client = MagicMock()
         mock_client.get_existing_classes.return_value = []
         mock_client.insert_schema = MagicMock()
         mock_client.update_document = MagicMock()
-        
+
         mock_df = MagicMock()
         mock_df.isna.return_value.any.return_value = False
         mock_df.columns = ["Name", "Age", "ID"]
         mock_df.dtypes = {"Name": "object", "Age": "int64", "ID": "int64"}
         mock_df.to_dict.return_value = [{"Name": "John", "Age": 30, "ID": 1}]
-        
+
         mock_reader = MagicMock()
         mock_reader.__iter__.return_value = iter([mock_df])
-        
+
         with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
             with patch("pandas.read_csv", return_value=mock_reader):
                 with patch("terminusdb_client.scripts.scripts.import_module") as mock_import:
@@ -675,7 +675,7 @@ def test_importcsv_with_id_and_keys():
                     mock_np = MagicMock()
                     mock_np.sctypeDict.items.return_value = [("int64", int), ("object", str)]
                     mock_import.side_effect = lambda name: {"pandas": mock_pd, "numpy": mock_np}[name]
-                    
+
                     result = runner.invoke(scripts.tdbpy, [
                         "importcsv",
                         "test.csv",
@@ -683,7 +683,7 @@ def test_importcsv_with_id_and_keys():
                         "--id", "ID",
                         "--na", "optional"
                     ])
-                    
+
                     assert result.exit_code == 0
                     assert "specified ids" in result.output
 
@@ -695,18 +695,18 @@ def test_branch_list():
         # Create config.json
         with open("config.json", "w") as f:
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
-        
+
         # Create .TDB file
         with open(".TDB", "w") as f:
             json.dump({"branch": "main", "ref": None}, f)
-        
+
         mock_client = MagicMock()
         mock_client.get_all_branches.return_value = [{"name": "main"}, {"name": "dev"}, {"name": "feature1"}]
-        
+
         with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
             # No arguments lists branches
             result = runner.invoke(scripts.tdbpy, ["branch"])
-            
+
             assert result.exit_code == 0
             assert "main" in result.output
             assert "dev" in result.output
@@ -719,21 +719,21 @@ def test_importcsv_missing_pandas():
         # Create config.json
         with open("config.json", "w") as f:
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
-        
+
         # Create .TDB file
         with open(".TDB", "w") as f:
             json.dump({"branch": "main", "ref": None}, f)
-        
+
         # Create a CSV file
         with open("test.csv", "w") as f:
             f.write("Name,Age\nJohn,30\n")
-        
+
         with patch("terminusdb_client.scripts.scripts.import_module") as mock_import:
             # Simulate ImportError for pandas
             mock_import.side_effect = ImportError("No module named 'pandas'")
-            
+
             result = runner.invoke(scripts.tdbpy, ["importcsv", "test.csv"])
-            
+
             assert result.exit_code != 0
             assert "Library 'pandas' is required" in str(result.exception)
 
@@ -749,21 +749,21 @@ def test_query_with_export():
         # Create config.json
         with open("config.json", "w") as f:
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
-        
+
         # Create .TDB file
         with open(".TDB", "w") as f:
             json.dump({"branch": "main", "ref": None}, f)
-        
+
         mock_client = MagicMock()
-        
+
         with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
             with patch("terminusdb_client.scripts.scripts.result_to_df") as mock_result_to_df:
                 mock_df = MagicMock()
                 mock_df.to_csv = MagicMock()
                 mock_result_to_df.return_value = mock_df
-                
+
                 result = runner.invoke(scripts.tdbpy, ["alldocs", "--type", "Person", "--export", "--filename", "output.csv"])
-                
+
                 assert result.exit_code == 0
                 mock_df.to_csv.assert_called_once_with("output.csv", index=False)
 
@@ -775,27 +775,27 @@ def test_query_with_type_conversion():
         # Create config.json
         with open("config.json", "w") as f:
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
-        
+
         # Create .TDB file
         with open(".TDB", "w") as f:
             json.dump({"branch": "main", "ref": None}, f)
-        
+
         mock_client = MagicMock()
         mock_client.get_all_documents.return_value = []
         mock_client.get_existing_classes.return_value = {
             "Person": {"name": "xsd:string", "age": "xsd:integer", "active": "xsd:boolean"}
         }
         mock_client.get_document.return_value = {
-            "name": "xsd:string", 
-            "age": "xsd:integer", 
+            "name": "xsd:string",
+            "age": "xsd:integer",
             "active": "xsd:boolean"
         }
         mock_client.query_document.return_value = []
-        
+
         with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
             # Use name property which exists in schema
             result = runner.invoke(scripts.tdbpy, ["alldocs", "--type", "Person", "--query", "name=John", "--query", 'active="true"'])
-            
+
             assert result.exit_code == 0
             # Check that the query was called
             mock_client.query_document.assert_called_once()
@@ -810,13 +810,13 @@ def test_branch_delete_current():
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
         with open(".TDB", "w") as f:
             json.dump({"branch": "main"}, f)
-        
+
         mock_client = MagicMock()
         mock_client.get_all_branches.return_value = [{"name": "main"}, {"name": "dev"}]
-        
+
         with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
             result = runner.invoke(scripts.tdbpy, ["branch", "-d", "main"])
-            
+
             assert result.exit_code != 0
             assert "Cannot delete main which is current branch" in str(result.exception)
 
@@ -830,13 +830,13 @@ def test_branch_list():
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
         with open(".TDB", "w") as f:
             json.dump({"branch": "main"}, f)
-        
+
         mock_client = MagicMock()
         mock_client.get_all_branches.return_value = [{"name": "main"}, {"name": "dev"}]
-        
+
         with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
             result = runner.invoke(scripts.tdbpy, ["branch"])
-            
+
             assert result.exit_code == 0
             assert "* main" in result.output
             assert "  dev" in result.output
@@ -851,12 +851,12 @@ def test_branch_create():
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
         with open(".TDB", "w") as f:
             json.dump({"branch": "main"}, f)
-        
+
         mock_client = MagicMock()
-        
+
         with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
             result = runner.invoke(scripts.tdbpy, ["branch", "newbranch"])
-            
+
             assert result.exit_code == 0
             assert "Branch 'newbranch' created" in result.output
             mock_client.create_branch.assert_called_once_with("newbranch")
@@ -871,13 +871,13 @@ def test_checkout_new_branch():
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
         with open(".TDB", "w") as f:
             json.dump({"branch": "main"}, f)
-        
+
         mock_client = MagicMock()
         mock_client.get_all_branches.return_value = [{"name": "main"}, {"name": "newbranch"}]
-        
+
         with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
             result = runner.invoke(scripts.tdbpy, ["checkout", "newbranch", "-b"])
-            
+
             assert result.exit_code == 0
             assert "Branch 'newbranch' created, checked out" in result.output
             assert mock_client.create_branch.called
@@ -892,15 +892,15 @@ def test_reset_soft():
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
         with open(".TDB", "w") as f:
             json.dump({"branch": "main", "ref": "oldcommit"}, f)
-        
+
         mock_client = MagicMock()
         mock_client.get_commit_history.return_value = [
             {"commit": "abc123"}, {"commit": "def456"}
         ]
-        
+
         with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
             result = runner.invoke(scripts.tdbpy, ["reset", "abc123", "--soft"])
-            
+
             assert result.exit_code == 0
             assert "Soft reset to commit abc123" in result.output
 
@@ -914,12 +914,12 @@ def test_reset_hard():
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
         with open(".TDB", "w") as f:
             json.dump({"branch": "main", "ref": "oldcommit"}, f)
-        
+
         mock_client = MagicMock()
-        
+
         with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
             result = runner.invoke(scripts.tdbpy, ["reset", "abc123"])
-            
+
             assert result.exit_code == 0
             assert "Hard reset to commit abc123" in result.output
             mock_client.reset.assert_called_with("abc123")
@@ -934,12 +934,12 @@ def test_reset_to_newest():
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
         with open(".TDB", "w") as f:
             json.dump({"branch": "main", "ref": "oldcommit"}, f)
-        
+
         mock_client = MagicMock()
-        
+
         with patch("terminusdb_client.scripts.scripts._connect", return_value=(mock_client, "Connected")):
             result = runner.invoke(scripts.tdbpy, ["reset"])
-            
+
             assert result.exit_code == 0
             assert "Reset head to newest commit" in result.output
 
@@ -951,9 +951,9 @@ def test_config_value_parsing():
         # Create config.json
         with open("config.json", "w") as f:
             json.dump({"endpoint": "http://127.0.0.1:6363/", "database": "test"}, f)
-        
+
         result = runner.invoke(scripts.tdbpy, ["config", "number=123", "float=45.6", "string=hello"])
-        
+
         assert result.exit_code == 0
         with open("config.json") as f:
             config = json.load(f)
