@@ -300,8 +300,10 @@ class TestDocumentTemplate:
         # Call get_instances which should clean up dead refs
         instances = list(Doc.get_instances())
 
-        # Should only have live instances
-        assert all(inst is not None for inst in instances)
+        # Should have fewer instances after cleanup
+        assert len(instances) < initial_count
+        # doc1 should still be alive
+        assert doc1 in instances
 
     def test_to_dict_with_tagged_union(self):
         """Test _to_dict with TaggedUnion inheritance"""
@@ -318,7 +320,7 @@ class TestDocumentTemplate:
             _subdocument = []
 
         # Create tagged union
-        union = TaggedUnion(Base, [ChildA, ChildB])
+        TaggedUnion(Base, [ChildA, ChildB])
 
         # Create instance of child
         child = ChildA(type="A", field_a="value")
@@ -478,7 +480,7 @@ class TestDocumentTemplate:
         class Child(Parent):
             child_prop: str
 
-        result = Child._to_dict()
+        Child._to_dict()
 
 
 class TestEmbeddedRep:
@@ -631,7 +633,7 @@ class TestWOQLSchemaConstruct:
         assert isinstance(person, type)
         assert person.__name__ == "Person"
         assert hasattr(person, "__annotations__")
-        assert person.__annotations__["name"] == str
+        assert person.__annotations__["name"] is str
 
     def test_construct_nonexistent_type_error(self):
         """Test _construct_class RuntimeError for non-existent type"""

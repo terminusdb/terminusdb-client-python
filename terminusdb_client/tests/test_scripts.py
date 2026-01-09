@@ -231,8 +231,8 @@ def test_startproject():
         )
 
 
-def test_startproject():
-    """Test project creation"""
+def test_startproject_basic():
+    """Test basic project creation"""
     runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(
@@ -954,7 +954,7 @@ def test_branch_delete_current():
             assert "Cannot delete main which is current branch" in str(result.exception)
 
 
-def test_branch_list():
+def test_branch_list_with_current_marked():
     """Test branch listing with current branch marked"""
     runner = CliRunner()
     with runner.isolated_filesystem():
@@ -978,7 +978,7 @@ def test_branch_list():
             assert "  dev" in result.output
 
 
-def test_branch_create():
+def test_branch_create_new():
     """Test creating a new branch"""
     runner = CliRunner()
     with runner.isolated_filesystem():
@@ -1054,7 +1054,7 @@ def test_reset_soft():
             assert "Soft reset to commit abc123" in result.output
 
 
-def test_reset_hard():
+def test_reset_hard_to_commit():
     """Test hard reset to a commit"""
     runner = CliRunner()
     with runner.isolated_filesystem():

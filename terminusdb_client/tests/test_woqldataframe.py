@@ -609,7 +609,7 @@ class TestEmbedObjDirect:
 
         all_existing_class = {"Person": {"name": "xsd:string"}}
 
-        result = _embed_obj(df, 1, pd, False, all_existing_class, "Person", mock_client)
+        _embed_obj(df, 1, pd, False, all_existing_class, "Person", mock_client)
 
         # get_document should NOT have been called for xsd:string
         assert not mock_client.get_document.called
@@ -623,7 +623,7 @@ class TestEmbedObjDirect:
 
         all_existing_class = {"Person": {"name": "xsd:string", "friend": "Person"}}
 
-        result = _embed_obj(df, 1, pd, False, all_existing_class, "Person", mock_client)
+        _embed_obj(df, 1, pd, False, all_existing_class, "Person", mock_client)
 
         # get_document should NOT have been called for same class reference
         assert not mock_client.get_document.called
@@ -640,7 +640,7 @@ class TestEmbedObjDirect:
             "Status": {"@type": "Enum", "values": ["ACTIVE", "INACTIVE"]},
         }
 
-        result = _embed_obj(df, 1, pd, False, all_existing_class, "Person", mock_client)
+        _embed_obj(df, 1, pd, False, all_existing_class, "Person", mock_client)
 
         # get_document should NOT have been called for Enum type
         assert not mock_client.get_document.called

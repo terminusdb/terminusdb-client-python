@@ -257,10 +257,10 @@ class TestFromWoqlType:
 
     def test_from_woql_basic_string_types(self):
         """Test basic string type conversions"""
-        assert from_woql_type("xsd:string") == str
-        assert from_woql_type("xsd:boolean") == bool
-        assert from_woql_type("xsd:double") == float
-        assert from_woql_type("xsd:integer") == int
+        assert from_woql_type("xsd:string") is str
+        assert from_woql_type("xsd:boolean") is bool
+        assert from_woql_type("xsd:double") is float
+        assert from_woql_type("xsd:integer") is int
 
         # As string
         assert from_woql_type("xsd:string", as_str=True) == "str"

@@ -542,8 +542,8 @@ class TestWOQLQueryCoverage:
         # immediately returns empty dict when called directly
         assert result == {}
 
-    def test_expand_value_variable_with_list(self):
-        """Test _expand_value_variable with list input"""
+    def test_expand_value_variable_with_list_wrapping(self):
+        """Test _expand_value_variable with list input wrapping"""
         wq = WOQLQuery()
         input_list = ["v:item1", "v:item2", "literal_value"]
         result = wq._expand_value_variable(input_list)
