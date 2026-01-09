@@ -6,7 +6,7 @@ from terminusdb_client.woqlquery.woql_query import WOQLQuery, Var
 class TestWOQLPathOperations:
     """Test path-related operations and utilities."""
     
-    @pytest.skip("This method is deprecated and dead code - it is never called anywhere in the codebase.")
+    @pytest.mark.skip(reason="This method is deprecated and dead code - it is never called anywhere in the codebase.")
     def test_data_value_list_with_various_types(self):
         """Test _data_value_list with various item types.
         
