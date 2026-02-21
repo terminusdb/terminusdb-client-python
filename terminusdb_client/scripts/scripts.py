@@ -461,6 +461,7 @@ def importcsv(
             if k in vars(builtins)
         }
         np_to_buildin[np.datetime64] = dt.datetime
+        np_to_buildin[str] = str
         for col, dtype in dict(df.dtypes).items():
             if embedded and col in embedded:
                 converted_type = class_name
