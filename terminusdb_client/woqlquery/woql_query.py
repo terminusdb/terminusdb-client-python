@@ -2438,6 +2438,36 @@ class WOQLQuery:
         self._cursor["y_end"] = self._clean_object(y_end)
         return self
 
+    def interval(self, start, end, interval_val):
+        """Constructs or deconstructs a half-open xdd:dateTimeInterval [start, end).
+
+        Bidirectional: given start+end computes interval, given interval
+        extracts start+end.
+
+        Parameters
+        ----------
+        start : str or dict
+            inclusive start date
+        end : str or dict
+            exclusive end date
+        interval_val : str or dict
+            the xdd:dateTimeInterval value
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if start is None or end is None or interval_val is None:
+            raise ValueError("Interval takes three parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "Interval"
+        self._cursor["start"] = self._clean_object(start)
+        self._cursor["end"] = self._clean_object(end)
+        self._cursor["interval"] = self._clean_object(interval_val)
+        return self
+
     def day_after(self, date, next_date):
         """Computes the calendar day after the given date. Bidirectional.
 
