@@ -2296,6 +2296,109 @@ class WOQLQuery:
             self._cursor["count"] = self._clean_object(count)
         return self
 
+    def month_start_date(self, year_month, date):
+        """Computes the first day of the month for a given xsd:gYearMonth.
+
+        Parameters
+        ----------
+        year_month : str or dict
+            a gYearMonth value (e.g. 2024-01) or variable
+        date : str or dict
+            the resulting xsd:date or variable
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if year_month is None or date is None:
+            raise ValueError("MonthStartDate takes two parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "MonthStartDate"
+        self._cursor["year_month"] = self._clean_object(year_month)
+        self._cursor["date"] = self._clean_object(date)
+        return self
+
+    def month_end_date(self, year_month, date):
+        """Computes the last day of the month for a given xsd:gYearMonth.
+        Handles leap years correctly.
+
+        Parameters
+        ----------
+        year_month : str or dict
+            a gYearMonth value (e.g. 2024-02) or variable
+        date : str or dict
+            the resulting xsd:date or variable
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if year_month is None or date is None:
+            raise ValueError("MonthEndDate takes two parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "MonthEndDate"
+        self._cursor["year_month"] = self._clean_object(year_month)
+        self._cursor["date"] = self._clean_object(date)
+        return self
+
+    def month_start_dates(self, date, start, end):
+        """Generator: produces every first-of-month date in [start, end).
+
+        Parameters
+        ----------
+        date : str
+            variable for the generated first-of-month date
+        start : str or dict
+            the inclusive start date
+        end : str or dict
+            the exclusive end date
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if date is None or start is None or end is None:
+            raise ValueError("MonthStartDates takes three parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "MonthStartDates"
+        self._cursor["date"] = self._clean_object(date)
+        self._cursor["start"] = self._clean_object(start)
+        self._cursor["end"] = self._clean_object(end)
+        return self
+
+    def month_end_dates(self, date, start, end):
+        """Generator: produces every last-of-month date in [start, end).
+
+        Parameters
+        ----------
+        date : str
+            variable for the generated last-of-month date
+        start : str or dict
+            the inclusive start date
+        end : str or dict
+            the exclusive end date
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if date is None or start is None or end is None:
+            raise ValueError("MonthEndDates takes three parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "MonthEndDates"
+        self._cursor["date"] = self._clean_object(date)
+        self._cursor["start"] = self._clean_object(start)
+        self._cursor["end"] = self._clean_object(end)
+        return self
+
     def opt(self, query=None):
         """The Query in the Optional argument is specified as optional
 
