@@ -2576,6 +2576,85 @@ class WOQLQuery:
         self._cursor["previous"] = self._clean_object(previous)
         return self
 
+    def weekday(self, date, weekday):
+        """Computes the ISO 8601 weekday number (Monday=1, Sunday=7) for a date.
+        Accepts xsd:date or xsd:dateTime. Date must be ground.
+
+        Parameters
+        ----------
+        date : str or dict
+            the input date or dateTime
+        weekday : str or int
+            the ISO weekday number (1=Monday, 7=Sunday)
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if date is None or weekday is None:
+            raise ValueError("Weekday takes two parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "Weekday"
+        self._cursor["date"] = self._clean_object(date)
+        self._cursor["weekday"] = self._clean_object(weekday)
+        return self
+
+    def weekday_sunday_start(self, date, weekday):
+        """Computes the US-convention weekday number (Sunday=1, Saturday=7) for a date.
+        Accepts xsd:date or xsd:dateTime. Date must be ground.
+
+        Parameters
+        ----------
+        date : str or dict
+            the input date or dateTime
+        weekday : str or int
+            the US weekday number (1=Sunday, 7=Saturday)
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if date is None or weekday is None:
+            raise ValueError("WeekdaySundayStart takes two parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "WeekdaySundayStart"
+        self._cursor["date"] = self._clean_object(date)
+        self._cursor["weekday"] = self._clean_object(weekday)
+        return self
+
+    def iso_week(self, date, year, week):
+        """Computes the ISO 8601 week-numbering year and week number for a date.
+        Accepts xsd:date or xsd:dateTime. Date must be ground.
+        The ISO year may differ from the calendar year at year boundaries.
+
+        Parameters
+        ----------
+        date : str or dict
+            the input date or dateTime
+        year : str or int
+            the ISO week-numbering year
+        week : str or int
+            the ISO week number (1-53)
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if date is None or year is None or week is None:
+            raise ValueError("IsoWeek takes three parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "IsoWeek"
+        self._cursor["date"] = self._clean_object(date)
+        self._cursor["year"] = self._clean_object(year)
+        self._cursor["week"] = self._clean_object(week)
+        return self
+
     def opt(self, query=None):
         """The Query in the Optional argument is specified as optional
 
