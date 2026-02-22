@@ -2655,6 +2655,36 @@ class WOQLQuery:
         self._cursor["week"] = self._clean_object(week)
         return self
 
+    def date_duration(self, start, end, duration):
+        """Tri-directional duration arithmetic for dates and dateTimes.
+        Given any two of start, end, and duration, computes the third.
+        Uses EOM preservation: last day of month maps to last day of target month.
+        Accepts xsd:date or xsd:dateTime for start/end, xsd:duration for duration.
+
+        Parameters
+        ----------
+        start : str or dict
+            the start date or dateTime
+        end : str or dict
+            the end date or dateTime
+        duration : str or dict
+            the xsd:duration between start and end
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if start is None or end is None or duration is None:
+            raise ValueError("DateDuration takes three parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "DateDuration"
+        self._cursor["start"] = self._clean_object(start)
+        self._cursor["end"] = self._clean_object(end)
+        self._cursor["duration"] = self._clean_object(duration)
+        return self
+
     def opt(self, query=None):
         """The Query in the Optional argument is specified as optional
 
