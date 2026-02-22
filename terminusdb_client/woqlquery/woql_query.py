@@ -2399,6 +2399,45 @@ class WOQLQuery:
         self._cursor["end"] = self._clean_object(end)
         return self
 
+    def interval_relation(self, relation, x_start, x_end, y_start, y_end):
+        """Allen's Interval Algebra: classifies or validates the relationship
+        between two half-open intervals [x_start, x_end) and [y_start, y_end).
+
+        When relation is a string, validates that the named relation holds.
+        When relation is a variable, classifies which of the 13 Allen
+        relations holds (deterministic).
+
+        Parameters
+        ----------
+        relation : str or dict
+            relation name (e.g. "before") or variable for classification
+        x_start : str or dict
+            inclusive start of interval X
+        x_end : str or dict
+            exclusive end of interval X
+        y_start : str or dict
+            inclusive start of interval Y
+        y_end : str or dict
+            exclusive end of interval Y
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if (relation is None or x_start is None or x_end is None
+                or y_start is None or y_end is None):
+            raise ValueError("IntervalRelation takes five parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "IntervalRelation"
+        self._cursor["relation"] = self._clean_object(relation)
+        self._cursor["x_start"] = self._clean_object(x_start)
+        self._cursor["x_end"] = self._clean_object(x_end)
+        self._cursor["y_start"] = self._clean_object(y_start)
+        self._cursor["y_end"] = self._clean_object(y_end)
+        return self
+
     def opt(self, query=None):
         """The Query in the Optional argument is specified as optional
 
