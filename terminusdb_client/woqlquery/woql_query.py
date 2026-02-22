@@ -2232,6 +2232,34 @@ class WOQLQuery:
         self._cursor["right"] = self._clean_object(right)
         return self
 
+    def in_range(self, value, start, end):
+        """Tests whether a value falls within a half-open range [start, end).
+        Succeeds if start <= value < end.
+
+        Parameters
+        ----------
+        value : str or number
+            the value to test
+        start : str or number
+            the inclusive lower bound
+        end : str or number
+            the exclusive upper bound
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if value is None or start is None or end is None:
+            raise ValueError("InRange takes three parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "InRange"
+        self._cursor["value"] = self._clean_object(value)
+        self._cursor["start"] = self._clean_object(start)
+        self._cursor["end"] = self._clean_object(end)
+        return self
+
     def opt(self, query=None):
         """The Query in the Optional argument is specified as optional
 
