@@ -2438,6 +2438,54 @@ class WOQLQuery:
         self._cursor["y_end"] = self._clean_object(y_end)
         return self
 
+    def day_after(self, date, next_date):
+        """Computes the calendar day after the given date. Bidirectional.
+
+        Parameters
+        ----------
+        date : str or dict
+            the input date
+        next_date : str or dict
+            the next calendar day
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if date is None or next_date is None:
+            raise ValueError("DayAfter takes two parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "DayAfter"
+        self._cursor["date"] = self._clean_object(date)
+        self._cursor["next"] = self._clean_object(next_date)
+        return self
+
+    def day_before(self, date, previous):
+        """Computes the calendar day before the given date. Bidirectional.
+
+        Parameters
+        ----------
+        date : str or dict
+            the input date
+        previous : str or dict
+            the previous calendar day
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if date is None or previous is None:
+            raise ValueError("DayBefore takes two parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "DayBefore"
+        self._cursor["date"] = self._clean_object(date)
+        self._cursor["previous"] = self._clean_object(previous)
+        return self
+
     def opt(self, query=None):
         """The Query in the Optional argument is specified as optional
 
