@@ -2260,6 +2260,42 @@ class WOQLQuery:
         self._cursor["end"] = self._clean_object(end)
         return self
 
+    def sequence(self, value, start, end, step=None, count=None):
+        """Generates a sequence of values in the half-open range [start, end).
+        When value is unbound, produces each value via backtracking.
+
+        Parameters
+        ----------
+        value : str or number
+            the generated sequence value (or variable)
+        start : str or number
+            the inclusive start of the sequence
+        end : str or number
+            the exclusive end of the sequence
+        step : str or number, optional
+            increment per step
+        count : str or number, optional
+            total count (validates if bound, unifies if unbound)
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if value is None or start is None or end is None:
+            raise ValueError("Sequence takes at least three parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "Sequence"
+        self._cursor["value"] = self._clean_object(value)
+        self._cursor["start"] = self._clean_object(start)
+        self._cursor["end"] = self._clean_object(end)
+        if step is not None:
+            self._cursor["step"] = self._clean_object(step)
+        if count is not None:
+            self._cursor["count"] = self._clean_object(count)
+        return self
+
     def opt(self, query=None):
         """The Query in the Optional argument is specified as optional
 
