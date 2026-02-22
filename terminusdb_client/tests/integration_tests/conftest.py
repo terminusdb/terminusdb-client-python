@@ -12,20 +12,17 @@ MAX_CONTAINER_STARTUP_TIME = 120  # Increased from 30 to 120 seconds for slower 
 def is_local_server_running():
     """Check if local TerminusDB server is running at http://127.0.0.1:6363"""
     try:
-        response = requests.get("http://127.0.0.1:6363", timeout=2)
-        # Server responds with 200 (success) or 404 (not found but server is up)
-        # 401 (unauthorized) also indicates server is running but needs auth
-        return response.status_code in [200, 404]
+        response = requests.get("http://127.0.0.1:6363/api/ok", timeout=2)
+        return response.status_code == 200
     except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
         return False
 
 
 def is_docker_server_running():
-    """Check if Docker TerminusDB server is already running at http://127.0.0.1:6366"""
+    """Check if Docker TerminusDB server is already running at http://127.0.0.1:6363"""
     try:
-        response = requests.get("http://127.0.0.1:6366", timeout=2)
-        # Server responds with 404 for root path, which means it's running
-        return response.status_code in [200, 404]
+        response = requests.get("http://127.0.0.1:6363/api/ok", timeout=2)
+        return response.status_code == 200
     except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
         return False
 
@@ -143,33 +140,19 @@ def docker_url_jwt(pytestconfig):
 def docker_url(pytestconfig):
     """
     Provides a TerminusDB server URL for integration tests.
-    Prefers local test server if running, otherwise starts Docker container.
-
-    NOTE: This fixture returns just the URL. Tests expect AUTOLOGIN mode (no authentication).
-    If using local server with authentication, use TERMINUSDB_AUTOLOGIN=true when starting it.
+    Uses port 6363 with admin:root authentication by default.
+    Prefers an already-running server, otherwise starts a Docker container.
     """
-    # Check if local test server is already running (port 6363)
+    # Check if a server is already running (port 6363)
     if is_local_server_running():
         print(
-            "\n✓ Using existing local TerminusDB test server at http://127.0.0.1:6363"
-        )
-        print(
-            "⚠️  WARNING: Local server should be started with TERMINUSDB_AUTOLOGIN=true"
-        )
-        print(
-            "   Or use: TERMINUSDB_SERVER_AUTOLOGIN=true ./tests/terminusdb-test-server.sh restart"
+            "\n✓ Using existing TerminusDB server at http://127.0.0.1:6363"
         )
         yield "http://127.0.0.1:6363"
         return  # Don't clean up - server was already running
 
-    # Check if Docker container is already running (port 6366)
-    if is_docker_server_running():
-        print("\n✓ Using existing Docker TerminusDB server at http://127.0.0.1:6366")
-        yield "http://127.0.0.1:6366"
-        return  # Don't clean up - server was already running
-
     # No server found, start Docker container
-    print("\n⚠ No server found, starting Docker container with AUTOLOGIN...")
+    print("\n⚠ No server found, starting Docker container...")
     pytestconfig.getoption("docker_compose")
     output = subprocess.run(
         [
@@ -185,7 +168,7 @@ def docker_url(pytestconfig):
     if output.returncode != 0:
         raise RuntimeError(output.stderr)
 
-    test_url = "http://127.0.0.1:6366"
+    test_url = "http://127.0.0.1:6363"
     is_server_started = False
 
     seconds_waited = 0

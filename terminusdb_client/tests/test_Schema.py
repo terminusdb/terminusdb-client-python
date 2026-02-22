@@ -200,7 +200,7 @@ def test_embedded_object(test_schema):
         ),
         friend_of={Person(name="Katy", age=51)},
     )
-    client = Client("http://127.0.0.1:6366")
+    client = Client("http://127.0.0.1:6363")
     result = client._convert_document(gavin, "instance")
     # Finds the internal object and splays it out properly
     assert len(result) == 2
@@ -334,11 +334,11 @@ def test_compress_data(patched, patched2, patched3, patched4):
         weeks=2,
     )
     test_obj = [CheckDatetime(datetime=datetime_obj, duration=delta) for _ in range(10)]
-    client = Client("http://127.0.0.1:6366")
+    client = Client("http://127.0.0.1:6363")
     client.connect(db="test_compress_data")
     client.insert_document(test_obj, compress=0)
     client._session.post.assert_called_once_with(
-        "http://127.0.0.1:6366/api/document/admin/test_compress_data/local/branch/main",
+        "http://127.0.0.1:6363/api/document/admin/test_compress_data/local/branch/main",
         auth=("admin", "root"),
         headers={
             "user-agent": f"terminusdb-client-python/{__version__}",
@@ -357,7 +357,7 @@ def test_compress_data(patched, patched2, patched3, patched4):
     client._session.post.reset_mock()
     client.insert_document(test_obj, compress="never")
     client._session.post.assert_called_once_with(
-        "http://127.0.0.1:6366/api/document/admin/test_compress_data/local/branch/main",
+        "http://127.0.0.1:6363/api/document/admin/test_compress_data/local/branch/main",
         auth=("admin", "root"),
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
         params={
@@ -371,7 +371,7 @@ def test_compress_data(patched, patched2, patched3, patched4):
     )
     client.replace_document(test_obj, compress=0)
     client._session.put.assert_called_once_with(
-        "http://127.0.0.1:6366/api/document/admin/test_compress_data/local/branch/main",
+        "http://127.0.0.1:6363/api/document/admin/test_compress_data/local/branch/main",
         auth=("admin", "root"),
         headers={
             "user-agent": f"terminusdb-client-python/{__version__}",
@@ -390,7 +390,7 @@ def test_compress_data(patched, patched2, patched3, patched4):
     client._session.put.reset_mock()
     client.replace_document(test_obj, compress="never")
     client._session.put.assert_called_once_with(
-        "http://127.0.0.1:6366/api/document/admin/test_compress_data/local/branch/main",
+        "http://127.0.0.1:6363/api/document/admin/test_compress_data/local/branch/main",
         auth=("admin", "root"),
         headers={"user-agent": f"terminusdb-client-python/{__version__}"},
         params={
