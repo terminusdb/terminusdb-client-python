@@ -2470,6 +2470,60 @@ class WOQLQuery:
         self._cursor["y"] = self._clean_object(y)
         return self
 
+    def range_min(self, input_list, result):
+        """Find the minimum value in a list using the standard ordering.
+
+        Works with any comparable types: numbers, dates, strings.
+        Empty list produces no bindings.
+
+        Parameters
+        ----------
+        input_list : list or str or dict
+            the list of values to search
+        result : str or dict
+            variable or value for the minimum
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if input_list is None or result is None:
+            raise ValueError("RangeMin takes two parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "RangeMin"
+        self._cursor["list"] = self._clean_object(input_list)
+        self._cursor["result"] = self._clean_object(result)
+        return self
+
+    def range_max(self, input_list, result):
+        """Find the maximum value in a list using the standard ordering.
+
+        Works with any comparable types: numbers, dates, strings.
+        Empty list produces no bindings.
+
+        Parameters
+        ----------
+        input_list : list or str or dict
+            the list of values to search
+        result : str or dict
+            variable or value for the maximum
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if input_list is None or result is None:
+            raise ValueError("RangeMax takes two parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "RangeMax"
+        self._cursor["list"] = self._clean_object(input_list)
+        self._cursor["result"] = self._clean_object(result)
+        return self
+
     def interval(self, start, end, interval_val):
         """Constructs or deconstructs a half-open xdd:dateTimeInterval [start, end).
 
