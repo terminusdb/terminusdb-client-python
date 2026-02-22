@@ -2438,6 +2438,38 @@ class WOQLQuery:
         self._cursor["y_end"] = self._clean_object(y_end)
         return self
 
+    def interval_relation_typed(self, relation, x, y):
+        """Allen's Interval Algebra on xdd:dateTimeInterval values.
+
+        Classifies or validates the temporal relationship between two
+        interval values. When relation is ground, validates that the named
+        relation holds. When relation is a variable, determines which of the
+        13 Allen relations holds (deterministic).
+
+        Parameters
+        ----------
+        relation : str or dict
+            relation name (e.g. "before") or variable for classification
+        x : str or dict
+            first xdd:dateTimeInterval value
+        y : str or dict
+            second xdd:dateTimeInterval value
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if relation is None or x is None or y is None:
+            raise ValueError("IntervalRelationTyped takes three parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "IntervalRelationTyped"
+        self._cursor["relation"] = self._clean_object(relation)
+        self._cursor["x"] = self._clean_object(x)
+        self._cursor["y"] = self._clean_object(y)
+        return self
+
     def interval(self, start, end, interval_val):
         """Constructs or deconstructs a half-open xdd:dateTimeInterval [start, end).
 
