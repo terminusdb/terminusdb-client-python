@@ -2143,9 +2143,9 @@ class WOQLQuery:
 
         Parameters
         ----------
-        left : str
+        left : str or number
             first variable to compare
-        right : str
+        right : str or number
             second variable to compare
 
         Returns
@@ -2155,6 +2155,8 @@ class WOQLQuery:
         """
         if left and left == "args":
             return ["left", "right"]
+        if left is None or right is None:
+            raise ValueError("Less takes two parameters")
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Less"
@@ -2167,9 +2169,9 @@ class WOQLQuery:
 
         Parameters
         ----------
-        left : str
+        left : str or number
             first variable to compare
-        right : str
+        right : str or number
             second variable to compare
 
         Returns
@@ -2177,11 +2179,55 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        if left and left == "args":
-            return ["left", "right"]
+        if left is None or right is None:
+            raise ValueError("Greater takes two parameters")
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Greater"
+        self._cursor["left"] = self._clean_object(left)
+        self._cursor["right"] = self._clean_object(right)
+        return self
+
+    def gte(self, left, right):
+        """Compares two values using greater-than-or-equal ordering.
+        Parameters
+        ----------
+        left : str or number
+            the greater or equal value
+        right : str or number
+            the lesser or equal value
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if left is None or right is None:
+            raise ValueError("Gte takes two parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "Gte"
+        self._cursor["left"] = self._clean_object(left)
+        self._cursor["right"] = self._clean_object(right)
+        return self
+
+    def lte(self, left, right):
+        """Compares two values using less-than-or-equal ordering.
+        Parameters
+        ----------
+        left : str or number
+            the lesser or equal value
+        right : str or number
+            the greater or equal value
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if left is None or right is None:
+            raise ValueError("Lte takes two parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "Lte"
         self._cursor["left"] = self._clean_object(left)
         self._cursor["right"] = self._clean_object(right)
         return self
