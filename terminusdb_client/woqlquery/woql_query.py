@@ -2468,6 +2468,66 @@ class WOQLQuery:
         self._cursor["interval"] = self._clean_object(interval_val)
         return self
 
+    def interval_start_duration(self, start, duration, interval_val):
+        """Relates an xdd:dateTimeInterval to its start endpoint and precise xsd:duration.
+
+        Bidirectional: given interval extracts start+duration, given
+        start+duration computes interval.
+
+        Parameters
+        ----------
+        start : str or dict
+            inclusive start date or dateTime
+        duration : str or dict
+            the xsd:duration between start and end
+        interval_val : str or dict
+            the xdd:dateTimeInterval value
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if start is None or duration is None or interval_val is None:
+            raise ValueError("IntervalStartDuration takes three parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "IntervalStartDuration"
+        self._cursor["start"] = self._clean_object(start)
+        self._cursor["duration"] = self._clean_object(duration)
+        self._cursor["interval"] = self._clean_object(interval_val)
+        return self
+
+    def interval_duration_end(self, duration, end, interval_val):
+        """Relates an xdd:dateTimeInterval to its end endpoint and precise xsd:duration.
+
+        Bidirectional: given interval extracts duration+end, given
+        duration+end computes interval.
+
+        Parameters
+        ----------
+        duration : str or dict
+            the xsd:duration between start and end
+        end : str or dict
+            exclusive end date or dateTime
+        interval_val : str or dict
+            the xdd:dateTimeInterval value
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if duration is None or end is None or interval_val is None:
+            raise ValueError("IntervalDurationEnd takes three parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "IntervalDurationEnd"
+        self._cursor["duration"] = self._clean_object(duration)
+        self._cursor["end"] = self._clean_object(end)
+        self._cursor["interval"] = self._clean_object(interval_val)
+        return self
+
     def day_after(self, date, next_date):
         """Computes the calendar day after the given date. Bidirectional.
 
