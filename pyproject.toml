@@ -1,10 +1,14 @@
 [tool.poetry]
-name = "terminusdb-client"
-version = "12.0.3"
-description = "Python client for Terminus DB"
-authors = ["TerminusDB group"]
+name = "terminusdb"
+version = "12.0.0"
+description = "Terminus DB Python client"
+authors = ["TerminusDB group", "DFRNT AB"]
 license = "Apache Software License"
 readme = "README.md"
+packages = [
+    {include = "terminusdb_client"},
+    {include = "terminusdb"},
+]
 
 [tool.poetry.dependencies]
 python = ">=3.9.0,<3.13"

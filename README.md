@@ -8,8 +8,8 @@
 [![Reddit](https://img.shields.io/reddit/subreddit-subscribers/TerminusDB?style=social)](https://www.reddit.com/r/TerminusDB/)
 [![Twitter](https://img.shields.io/twitter/follow/terminusdb?color=skyblue&label=Follow%20on%20Twitter&logo=twitter&style=flat)](https://twitter.com/TerminusDB)
 
-[![release version](https://img.shields.io/pypi/v/terminusdb-client.svg?logo=pypi)](https://pypi.python.org/pypi/terminusdb-client/)
-[![downloads](https://img.shields.io/pypi/dm/terminusdb-client.svg?logo=pypi)](https://pypi.python.org/pypi/terminusdb-client/)
+[![release version](https://img.shields.io/pypi/v/terminusdb.svg?logo=pypi)](https://pypi.python.org/pypi/terminusdb/)
+[![downloads](https://img.shields.io/pypi/dm/terminusdb.svg?logo=pypi)](https://pypi.python.org/pypi/terminusdb/)
 
 [![build status](https://img.shields.io/github/workflow/status/terminusdb/terminusdb-client-python/Python%20package?logo=github)](https://github.com/terminusdb/terminusdb-client-python/actions)
 [![documentation](https://img.shields.io/github/deployments/terminusdb/terminusdb-client-python/github-pages?label=documentation&logo=github)](https://terminusdb.org/docs/python)
@@ -17,6 +17,10 @@
 [![license](https://img.shields.io/github/license/terminusdb/terminusdb-client-python?color=pink&logo=apache)](https://github.com/terminusdb/terminusdb-client-python/blob/main/LICENSE)
 
 > Python client for TerminusDB and TerminusCMS.
+
+> **Migrating from `terminusdb-client`?** This package was formerly known as
+> `terminusdb-client`. Simply install `terminusdb` instead — both `import terminusdb`
+> and `import terminusdb_client` continue to work, so no code changes are required.
 
 [**TerminusDB**][terminusdb] is an [open-source][terminusdb-repo] graph database
 and document store. It allows you to link JSON documents in a powerful knowledge
@@ -28,26 +32,26 @@ graph all through a simple document API, with full git-for-data version control.
 
 ## Requirements
 
-- [TerminusDB v11.1](https://github.com/terminusdb/terminusdb-server)
+- [TerminusDB v12](https://github.com/terminusdb/terminusdb-server)
 - [Python >=3.9](https://www.python.org/downloads)
 
 ## Release Notes and Previous Versions
 
-TerminusDB Client v11.1 works with TerminusDB v11.1 and the [DFRNT cloud service](https://dfrnt.com). Please check the [Release Notes](RELEASE_NOTES.md) to find out what has changed.
+TerminusDB Client v12 works with TerminusDB v12 onwards and the [DFRNT cloud service](https://dfrnt.com). Please check the [Release Notes](RELEASE_NOTES.md) to find out what has changed.
 
 ## Installation
 -  TerminusDB Client can be downloaded from PyPI using pip:
-`python -m pip install terminusdb-client`
+`python -m pip install terminusdb`
 
 This only includes the core Python Client (Client) and WOQLQuery.
 
 If you want to use woqlDataframe or the import and export CSV function in the Scaffolding CLI tool:
 
-`python -m pip install terminusdb-client[dataframe]`
+`python -m pip install terminusdb[dataframe]`
 
 *if you are installing from `zsh` you have to quote the argument like this:*
 
-`python -m pip install 'terminusdb-client[dataframe]'`
+`python -m pip install 'terminusdb[dataframe]'`
 
 - Install from source:
 
@@ -66,11 +70,13 @@ If you want to use woqlDataframe or the import and export CSV function in the Sc
 Connect to local host
 
 ```Python
-from terminusdb_client import Client
+from terminusdb import Client
 
 client = Client("http://127.0.0.1:6363/")
 client.connect()
 ```
+
+The previous import path `from terminusdb_client import Client` also continues to work.
 
 Connect to TerminusDB in the cloud
 
@@ -78,7 +84,7 @@ Connect to TerminusDB in the cloud
 
 
 ```Python
-from terminusdb_client import Client
+from terminusdb import Client
 
 team="MyTeam"
 client = Client(f"https://studio.dfrnt.com/api/hosted/{team}/")
@@ -94,7 +100,7 @@ client.create_database("MyDatabase")
 #### Create a schema
 
 ```Python
-from terminusdb_client.schema import Schema, DocumentTemplate, RandomKey
+from terminusdb.schema import Schema, DocumentTemplate, RandomKey
 
 my_schema = Schema()
 
