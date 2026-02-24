@@ -13,10 +13,9 @@ from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 
 @pytest.fixture(scope="module")
-def select_empty_db():
+def select_empty_db(docker_url):
     """Create a client and test database for select empty tests."""
-    # Use local server at 6363 (started with TERMINUSDB_AUTOLOGIN=true)
-    client = Client("http://127.0.0.1:6363")
+    client = Client(docker_url)
     client.connect()
 
     db_name = "db__test_select_empty"
