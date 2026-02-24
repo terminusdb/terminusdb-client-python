@@ -5,6 +5,7 @@ Tests that select() with no arguments is valid and works correctly.
 This is needed for patterns like localize() where we want to hide
 all inner variables while still executing the inner query.
 """
+
 import pytest
 
 from terminusdb_client import Client
@@ -17,17 +18,17 @@ def select_empty_db():
     # Use local server at 6363 (started with TERMINUSDB_AUTOLOGIN=true)
     client = Client("http://127.0.0.1:6363")
     client.connect()
-    
+
     db_name = "db__test_select_empty"
-    
+
     # Create test database if it doesn't exist
     if db_name not in client.list_databases():
         client.create_database(db_name)
     else:
         client.connect(db=db_name)
-    
+
     yield client
-    
+
     # Cleanup
     try:
         client.delete_database(db_name, "admin")
@@ -50,9 +51,7 @@ class TestWOQLSelectEmpty:
         # 2. Execute successfully on server
         # 3. Return bindings with no variables (empty dicts)
 
-        query = WOQLQuery().select(
-            WOQLQuery().eq("v:X", WOQLQuery().string("test"))
-        )
+        query = WOQLQuery().select(WOQLQuery().eq("v:X", WOQLQuery().string("test")))
 
         result = self.client.query(query)
 
@@ -105,7 +104,9 @@ class TestWOQLSelectEmpty:
             WOQLQuery().select(
                 WOQLQuery().woql_and(
                     WOQLQuery().eq("v:Inner", WOQLQuery().string("hidden")),
-                    WOQLQuery().eq("v:Inner_Shared_Value", WOQLQuery().string("visible")),
+                    WOQLQuery().eq(
+                        "v:Inner_Shared_Value", WOQLQuery().string("visible")
+                    ),
                     # Use both variables to ensure query executes
                     WOQLQuery().eq("v:Outer", "v:Inner_Shared_Value"),
                 )
@@ -147,15 +148,19 @@ class TestWOQLSelectEmpty:
         # Two separate localized blocks use the same internal variable name (v:temp)
         # but bind it to different values - proving they don't interfere
 
-        localized1, v1 = WOQLQuery().localize({
-            "result": "v:result1",
-            "temp": None,  # local variable - same name in both blocks
-        })
+        localized1, v1 = WOQLQuery().localize(
+            {
+                "result": "v:result1",
+                "temp": None,  # local variable - same name in both blocks
+            }
+        )
 
-        localized2, v2 = WOQLQuery().localize({
-            "result": "v:result2",
-            "temp": None,  # local variable - same name, different scope
-        })
+        localized2, v2 = WOQLQuery().localize(
+            {
+                "result": "v:result2",
+                "temp": None,  # local variable - same name, different scope
+            }
+        )
 
         query = WOQLQuery().woql_and(
             # First localized block: temp = "first", result1 = temp
