@@ -1,4 +1,3 @@
-import builtins
 import datetime as dt
 import enum
 import json
@@ -439,7 +438,6 @@ def importcsv(
         embedded = [x.lower().replace(" ", "_") for x in embedded]
     try:
         pd = import_module("pandas")
-        np = import_module("numpy")
     except ImportError:
         raise ImportError(
             "Library 'pandas' is required to import csv, either install 'pandas' or install woqlDataframe requirements as follows: python -m pip install -U terminus-client-python[dataframe]"
@@ -455,19 +453,27 @@ def importcsv(
 
     def _df_to_schema(class_name, df):
         class_dict = {"@type": "Class", "@id": class_name}
-        np_to_buildin = {
-            v: getattr(builtins, k)
-            for k, v in np.sctypeDict.items()
-            if k in vars(builtins)
-        }
-        np_to_buildin[np.datetime64] = dt.datetime
         for col, dtype in dict(df.dtypes).items():
             if embedded and col in embedded:
                 converted_type = class_name
             else:
-                converted_type = np_to_buildin[dtype.type]
-                if converted_type is object:
-                    converted_type = str  # pandas treats all string as objects
+                # Map pandas/numpy dtype to Python type
+                # Uses dtype.kind for compatibility with numpy 2.0+ and pandas 3.0+
+                dtype_kind = getattr(dtype, "kind", "O")
+                if dtype.type is str or dtype_kind in ("U", "O", "S", "T"):
+                    converted_type = str
+                elif dtype_kind in ("i", "u"):
+                    converted_type = int
+                elif dtype_kind == "f":
+                    converted_type = float
+                elif dtype_kind == "b":
+                    converted_type = bool
+                elif dtype_kind == "M":
+                    converted_type = dt.datetime
+                elif dtype_kind == "m":
+                    converted_type = dt.timedelta
+                else:
+                    converted_type = str
                 converted_type = wt.to_woql_type(converted_type)
 
             if id_ and col == id_:
