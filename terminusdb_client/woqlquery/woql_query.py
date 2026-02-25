@@ -1009,6 +1009,240 @@ class WOQLQuery:
         self._cursor["object"] = self._clean_object(obj)
         return self
 
+    def triple_slice(self, sub, pred, obj, low, high):
+        """Creates a triple pattern matching rule for [S, P, O] with a half-open
+        value range [low, high) on the object. Returns triples whose typed object
+        value falls within the specified range.
+
+        Parameters
+        ----------
+        sub : str
+            Subject, has to be a node (URI) or variable
+        pred : str
+            Predicate, can be variable (prefix with "v:") or node
+        obj : str
+            Object, can be variable or node or value
+        low : object
+            The inclusive lower bound as a typed value
+        high : object
+            The exclusive upper bound as a typed value
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "TripleSlice"
+        self._cursor["subject"] = self._clean_subject(sub)
+        self._cursor["predicate"] = self._clean_predicate(pred)
+        self._cursor["object"] = self._clean_object(obj)
+        self._cursor["low"] = self._clean_object(low)
+        self._cursor["high"] = self._clean_object(high)
+        return self
+
+    def quad_slice(self, sub, pred, obj, low, high, graph):
+        """Creates a triple pattern matching rule for [S, P, O, G] with a half-open
+        value range [low, high) on the object and an explicit graph selector.
+
+        Parameters
+        ----------
+        sub : str
+            Subject, has to be a node (URI) or variable
+        pred : str
+            Predicate, can be variable (prefix with "v:") or node
+        obj : str
+            Object, can be variable or node or value
+        low : object
+            The inclusive lower bound as a typed value
+        high : object
+            The exclusive upper bound as a typed value
+        graph : str
+            Graph resource identifier (e.g. 'instance' or 'schema')
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        self.triple_slice(sub, pred, obj, low, high)
+        self._cursor["graph"] = self._clean_graph(graph)
+        return self
+
+    def triple_slice_rev(self, sub, pred, obj, low, high):
+        """Creates a triple pattern matching rule for [S, P, O] with a half-open
+        value range [low, high) on the object, returning results in reverse
+        (descending) object order. Same semantics as triple_slice but iterates
+        from highest to lowest value.
+
+        Parameters
+        ----------
+        sub : str
+            Subject, has to be a node (URI) or variable
+        pred : str
+            Predicate, can be variable (prefix with "v:") or node
+        obj : str
+            Object, can be variable or node or value
+        low : object
+            The inclusive lower bound as a typed value
+        high : object
+            The exclusive upper bound as a typed value
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "TripleSliceRev"
+        self._cursor["subject"] = self._clean_subject(sub)
+        self._cursor["predicate"] = self._clean_predicate(pred)
+        self._cursor["object"] = self._clean_object(obj)
+        self._cursor["low"] = self._clean_object(low)
+        self._cursor["high"] = self._clean_object(high)
+        return self
+
+    def quad_slice_rev(self, sub, pred, obj, low, high, graph):
+        """Creates a triple pattern matching rule for [S, P, O, G] with a half-open
+        value range [low, high) on the object in reverse order, with an explicit
+        graph selector.
+
+        Parameters
+        ----------
+        sub : str
+            Subject, has to be a node (URI) or variable
+        pred : str
+            Predicate, can be variable (prefix with "v:") or node
+        obj : str
+            Object, can be variable or node or value
+        low : object
+            The inclusive lower bound as a typed value
+        high : object
+            The exclusive upper bound as a typed value
+        graph : str
+            Graph resource identifier (e.g. 'instance' or 'schema')
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        self.triple_slice_rev(sub, pred, obj, low, high)
+        self._cursor["graph"] = self._clean_graph(graph)
+        return self
+
+    def triple_next(self, sub, pred, obj, next_val):
+        """Finds the next object value after a reference for a given subject-predicate pair.
+        When object is bound and next is free, finds the smallest next > object.
+        When next is bound and object is free, finds the largest object < next.
+
+        Parameters
+        ----------
+        sub : str
+            Subject, has to be a node (URI) or variable
+        pred : str
+            Predicate, can be variable (prefix with "v:") or node
+        obj : str
+            Object value or variable
+        next_val : object
+            Next object value or variable
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "TripleNext"
+        self._cursor["subject"] = self._clean_subject(sub)
+        self._cursor["predicate"] = self._clean_predicate(pred)
+        self._cursor["object"] = self._clean_object(obj)
+        self._cursor["next"] = self._clean_object(next_val)
+        return self
+
+    def quad_next(self, sub, pred, obj, next_val, graph):
+        """Finds the next object value with an explicit graph selector.
+
+        Parameters
+        ----------
+        sub : str
+            Subject, has to be a node (URI) or variable
+        pred : str
+            Predicate, can be variable (prefix with "v:") or node
+        obj : str
+            Object value or variable
+        next_val : object
+            Next object value or variable
+        graph : str
+            Graph resource identifier (e.g. 'instance' or 'schema')
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        self.triple_next(sub, pred, obj, next_val)
+        self._cursor["graph"] = self._clean_graph(graph)
+        return self
+
+    def triple_previous(self, sub, pred, obj, prev_val):
+        """Finds the previous object value before a reference for a given subject-predicate pair.
+        When object is bound and previous is free, finds the largest previous < object.
+        When previous is bound and object is free, finds the smallest object > previous.
+
+        Parameters
+        ----------
+        sub : str
+            Subject, has to be a node (URI) or variable
+        pred : str
+            Predicate, can be variable (prefix with "v:") or node
+        obj : str
+            Object value or variable
+        prev_val : object
+            Previous object value or variable
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "TriplePrevious"
+        self._cursor["subject"] = self._clean_subject(sub)
+        self._cursor["predicate"] = self._clean_predicate(pred)
+        self._cursor["object"] = self._clean_object(obj)
+        self._cursor["previous"] = self._clean_object(prev_val)
+        return self
+
+    def quad_previous(self, sub, pred, obj, prev_val, graph):
+        """Finds the previous object value with an explicit graph selector.
+
+        Parameters
+        ----------
+        sub : str
+            Subject, has to be a node (URI) or variable
+        pred : str
+            Predicate, can be variable (prefix with "v:") or node
+        obj : str
+            Object value or variable
+        prev_val : object
+            Previous object value or variable
+        graph : str
+            Graph resource identifier (e.g. 'instance' or 'schema')
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        self.triple_previous(sub, pred, obj, prev_val)
+        self._cursor["graph"] = self._clean_graph(graph)
+        return self
+
     def added_triple(self, sub, pred, obj, opt=False):
         """Creates a triple pattern matching rule for the triple [S, P, O] (Subject, Predicate, Object) added to the current commit.
 
@@ -3462,7 +3696,7 @@ class WOQLQuery:
         """Build a localized scope for variables to prevent leaking local variables to outer scope.
 
         Returns a tuple (localized_fn, v) where:
-        - localized_fn: function that wraps queries with select("") and eq() bindings
+        - localized_fn: function that wraps queries with select() (empty variable list) and eq() bindings
         - v: VarsUnique object with unique variable names for use in the inner query
 
         Parameters with non-None values are bound from outer scope via eq().
@@ -3492,7 +3726,7 @@ class WOQLQuery:
         v = VarsUnique(*param_names)
 
         def localized_fn(query=None):
-            # Create eq bindings for outer parameters OUTSIDE select("")
+            # Create eq bindings for outer parameters OUTSIDE select()
             # This ensures outer parameters are visible in query results
             outer_eq_bindings = []
             for param_name in param_names:
@@ -3506,17 +3740,17 @@ class WOQLQuery:
                         outer_eq_bindings.append(
                             WOQLQuery().eq(outer_value, outer_value)
                         )
-                    # Bind the unique variable to the outer parameter OUTSIDE the select("")
+                    # Bind the unique variable to the outer parameter OUTSIDE the select()
                     outer_eq_bindings.append(
                         WOQLQuery().eq(getattr(v, param_name), outer_value)
                     )
 
             if query is not None:
-                # Functional mode: wrap query in select(""), then add outer eq bindings
+                # Functional mode: wrap query in select() with empty variable list
                 localized_query = WOQLQuery().select(query)
 
                 if outer_eq_bindings:
-                    # Wrap: eq(outer) AND select("") { query }
+                    # Wrap: eq(outer) AND select() { query }
                     return WOQLQuery().woql_and(*outer_eq_bindings, localized_query)
                 return localized_query
 
