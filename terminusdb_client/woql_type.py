@@ -74,7 +74,7 @@ CONVERT_TYPE = {
 }
 
 
-def to_woql_type(input_type: type):
+def to_woql_type(input_type):
     if input_type in CONVERT_TYPE:
         return CONVERT_TYPE[input_type]
     elif hasattr(input_type, "__module__") and input_type.__module__ == "typing":
