@@ -2083,14 +2083,13 @@ class Client:
             "author": author,
             "message": message,
         }
+        headers = {}
         if self._remote_auth_dict or remote_auth:
-            headers = {
-                "Authorization-Remote": (
-                    self._generate_remote_header(remote_auth)
-                    if remote_auth
-                    else self._remote_auth()
-                )
-            }
+            headers["Authorization-Remote"] = (
+                self._generate_remote_header(remote_auth)
+                if remote_auth
+                else self._remote_auth()
+            )
         headers.update(self._default_headers)
 
         result = self._session.post(
@@ -2619,14 +2618,13 @@ class Client:
         if description is None:
             description = f"New database {newid}"
 
+        headers = {}
         if self._remote_auth_dict or remote_auth:
-            headers = {
-                "Authorization-Remote": (
-                    self._generate_remote_header(remote_auth)
-                    if remote_auth
-                    else self._remote_auth()
-                )
-            }
+            headers["Authorization-Remote"] = (
+                self._generate_remote_header(remote_auth)
+                if remote_auth
+                else self._remote_auth()
+            )
         headers.update(self._default_headers)
         rc_args = {"remote_url": clone_source, "label": newid, "comment": description}
 
