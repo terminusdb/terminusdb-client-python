@@ -12,10 +12,11 @@ MAX_CONTAINER_STARTUP_TIME = 120  # Increased from 30 to 120 seconds for slower 
 def is_local_server_running():
     """Check if local TerminusDB server is running at http://127.0.0.1:6363"""
     try:
-        response = requests.get("http://127.0.0.1:6363", timeout=2)
-        # Server responds with 200 (success) or 404 (not found but server is up)
-        # 401 (unauthorized) also indicates server is running but needs auth
-        return response.status_code in [200, 404]
+        response = requests.get(
+            "http://127.0.0.1:6363", timeout=2, allow_redirects=False
+        )
+        # Any HTTP response means the server is running
+        return response.status_code in [200, 302, 401, 404]
     except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
         return False
 
@@ -23,9 +24,11 @@ def is_local_server_running():
 def is_docker_server_running():
     """Check if Docker TerminusDB server is already running at http://127.0.0.1:6366"""
     try:
-        response = requests.get("http://127.0.0.1:6366", timeout=2)
-        # Server responds with 404 for root path, which means it's running
-        return response.status_code in [200, 404]
+        response = requests.get(
+            "http://127.0.0.1:6366", timeout=2, allow_redirects=False
+        )
+        # Any HTTP response means the server is running
+        return response.status_code in [200, 302, 401, 404]
     except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
         return False
 
@@ -33,9 +36,11 @@ def is_docker_server_running():
 def is_jwt_server_running():
     """Check if JWT Docker TerminusDB server is already running at http://127.0.0.1:6367"""
     try:
-        response = requests.get("http://127.0.0.1:6367", timeout=2)
-        # Server responds with 404 for root path, which means it's running
-        return response.status_code in [200, 404]
+        response = requests.get(
+            "http://127.0.0.1:6367", timeout=2, allow_redirects=False
+        )
+        # Any HTTP response means the server is running
+        return response.status_code in [200, 302, 401, 404]
     except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
         return False
 
