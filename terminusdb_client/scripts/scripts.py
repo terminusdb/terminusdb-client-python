@@ -18,6 +18,53 @@ from ..woqldataframe.woqlDataframe import result_to_df
 from ..woqlschema.woql_schema import WOQLSchema
 
 
+def _df_to_schema(
+    class_name, df, np, embedded=None, id_col=None, na_mode=None, keys=None
+):
+    """Convert a pandas DataFrame to a TerminusDB schema class definition.
+
+    Args:
+        class_name: Name of the schema class to create
+        df: pandas DataFrame with columns to convert
+        np: numpy module reference
+        embedded: List of column names to treat as embedded references
+        id_col: Column name to use as document ID
+        na_mode: NA handling mode ('error', 'skip', or 'optional')
+        keys: List of column names to use as keys
+
+    Returns:
+        dict: Schema class definition dictionary
+    """
+    if keys is None:
+        keys = []
+    if embedded is None:
+        embedded = []
+
+    class_dict = {"@type": "Class", "@id": class_name}
+    np_to_builtin = {
+        v: getattr(builtins, k) for k, v in np.sctypeDict.items() if k in vars(builtins)
+    }
+    np_to_builtin[np.datetime64] = dt.datetime
+
+    for col, dtype in dict(df.dtypes).items():
+        if embedded and col in embedded:
+            converted_type = class_name
+        else:
+            converted_type = np_to_builtin.get(dtype.type, object)
+            if converted_type is object:
+                converted_type = str  # pandas treats all strings as objects
+            converted_type = wt.to_woql_type(converted_type)
+
+        if id_col and col == id_col:
+            class_dict[col] = converted_type
+        elif na_mode == "optional" and col not in keys:
+            class_dict[col] = {"@type": "Optional", "@class": converted_type}
+        else:
+            class_dict[col] = converted_type
+
+    return class_dict
+
+
 @click.group()
 def tdbpy():
     pass
@@ -505,7 +552,15 @@ def importcsv(
                 converted_col = col.lower().replace(" ", "_").replace(".", "_")
                 df.rename(columns={col: converted_col}, inplace=True)
             if not has_schema:
-                class_dict = _df_to_schema(class_name, df)
+                class_dict = _df_to_schema(
+                    class_name,
+                    df,
+                    np,
+                    embedded=embedded,
+                    id_col=id_,
+                    na_mode=na,
+                    keys=keys,
+                )
                 if message is None:
                     schema_msg = f"Schema object insert/ update with {csv_file} by Python client."
                 else:
