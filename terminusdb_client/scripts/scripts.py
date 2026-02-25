@@ -486,6 +486,7 @@ def importcsv(
         embedded = [x.lower().replace(" ", "_") for x in embedded]
     try:
         pd = import_module("pandas")
+        np = import_module("numpy")
     except ImportError:
         raise ImportError(
             "Library 'pandas' is required to import csv, either install 'pandas' or install woqlDataframe requirements as follows: python -m pip install -U terminus-client-python[dataframe]"
