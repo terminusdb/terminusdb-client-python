@@ -3109,6 +3109,34 @@ class WOQLQuery:
         self._cursor["grouped"] = self._clean_object(output)
         return self._add_sub_query(groupquery)
 
+    def collect(self, template, into, query=None):
+        """Collects all solutions of a sub-query into a list.
+
+        Completes the list/binding symmetry alongside member:
+        - Member: List -> Bindings (destructure)
+        - Collect: Bindings -> List (gather)
+
+        Parameters
+        ----------
+        template : str or list
+            A variable or list of variables specifying what to collect from each solution
+        into : str
+            Variable that will be bound to the collected list
+        query : WOQLQuery, optional
+            The query whose solutions will be collected
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "Collect"
+        self._cursor["template"] = self._clean_object(template)
+        self._cursor["into"] = self._clean_object(into)
+        return self._add_sub_query(query)
+
     def true(self):
         """Sets true for cursor type.
 
