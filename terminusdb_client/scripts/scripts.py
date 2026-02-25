@@ -486,7 +486,6 @@ def importcsv(
         embedded = [x.lower().replace(" ", "_") for x in embedded]
     try:
         pd = import_module("pandas")
-        np = import_module("numpy")
     except ImportError:
         raise ImportError(
             "Library 'pandas' is required to import csv, either install 'pandas' or install woqlDataframe requirements as follows: python -m pip install -U terminus-client-python[dataframe]"
@@ -500,6 +499,48 @@ def importcsv(
     # "not schema" make it always False if adding the schema option
     has_schema = not schema and class_name in client.get_existing_classes()
 
+    def _df_to_schema(class_name, df):
+        class_dict = {"@type": "Class", "@id": class_name}
+        for col, dtype in dict(df.dtypes).items():
+            if embedded and col in embedded:
+                converted_type = class_name
+            else:
+                # Map pandas/numpy dtype to Python type
+                # Uses dtype.kind for compatibility with numpy 2.0+ and pandas 3.0+
+                dtype_kind = getattr(dtype, "kind", "O")
+                if dtype.type is str or dtype_kind in ("U", "O", "S", "T"):
+                    converted_type = str
+                elif dtype_kind in ("i", "u"):
+                    converted_type = int
+                elif dtype_kind == "f":
+                    converted_type = float
+                elif dtype_kind == "b":
+                    converted_type = bool
+                elif dtype_kind == "M":
+                    converted_type = dt.datetime
+                elif dtype_kind == "m":
+                    converted_type = dt.timedelta
+                else:
+                    converted_type = str
+                converted_type = wt.to_woql_type(converted_type)
+
+            if id_ and col == id_:
+                class_dict[col] = converted_type
+            elif na == "optional" and col not in keys:
+                class_dict[col] = {"@type": "Optional", "@class": converted_type}
+            else:
+                class_dict[col] = converted_type
+        # if id_ is not None:
+        #     pass  # don't need key if id is specified
+        # elif keys:
+        #     class_dict["@key"] = {"@type": "Random"}
+        # elif na == "optional":
+        #     # have to use random key cause keys will be optional
+        #     class_dict["@key"] = {"@type": "Random"}
+        # else:
+        #     class_dict["@key"] = {"@type": "Random"}
+        return class_dict
+
     with pd.read_csv(csv_file, sep=sep, chunksize=chunksize, dtype=dtype) as reader:
         for df in tqdm(reader):
             if any(df.isna().any()) and na == "error":
@@ -512,15 +553,7 @@ def importcsv(
                 converted_col = col.lower().replace(" ", "_").replace(".", "_")
                 df.rename(columns={col: converted_col}, inplace=True)
             if not has_schema:
-                class_dict = _df_to_schema(
-                    class_name,
-                    df,
-                    np,
-                    embedded=embedded,
-                    id_col=id_,
-                    na_mode=na,
-                    keys=keys,
-                )
+                class_dict = _df_to_schema(class_name, df)
                 if message is None:
                     schema_msg = f"Schema object insert/ update with {csv_file} by Python client."
                 else:
