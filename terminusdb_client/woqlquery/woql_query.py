@@ -2425,8 +2425,13 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
-        if (relation is None or x_start is None or x_end is None
-                or y_start is None or y_end is None):
+        if (
+            relation is None
+            or x_start is None
+            or x_end is None
+            or y_start is None
+            or y_end is None
+        ):
             raise ValueError("IntervalRelation takes five parameters")
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()

@@ -43,17 +43,26 @@ class TestIntervalRelationTypedSerialization:
     def test_raises_on_none_relation(self):
         """Raises ValueError when relation is None."""
         import pytest
-        with pytest.raises(ValueError, match="IntervalRelationTyped takes three parameters"):
+
+        with pytest.raises(
+            ValueError, match="IntervalRelationTyped takes three parameters"
+        ):
             WOQLQuery().interval_relation_typed(None, "v:x", "v:y")
 
     def test_raises_on_none_x(self):
         """Raises ValueError when x is None."""
         import pytest
-        with pytest.raises(ValueError, match="IntervalRelationTyped takes three parameters"):
+
+        with pytest.raises(
+            ValueError, match="IntervalRelationTyped takes three parameters"
+        ):
             WOQLQuery().interval_relation_typed("v:rel", None, "v:y")
 
     def test_raises_on_none_y(self):
         """Raises ValueError when y is None."""
         import pytest
-        with pytest.raises(ValueError, match="IntervalRelationTyped takes three parameters"):
+
+        with pytest.raises(
+            ValueError, match="IntervalRelationTyped takes three parameters"
+        ):
             WOQLQuery().interval_relation_typed("v:rel", "v:x", None)

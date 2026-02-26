@@ -68,17 +68,20 @@ class TestDateDurationSerialization:
     def test_raises_on_none_start(self):
         """Raises ValueError when start is None."""
         import pytest
+
         with pytest.raises(ValueError, match="DateDuration takes three parameters"):
             WOQLQuery().date_duration(None, "v:e", "v:d")
 
     def test_raises_on_none_end(self):
         """Raises ValueError when end is None."""
         import pytest
+
         with pytest.raises(ValueError, match="DateDuration takes three parameters"):
             WOQLQuery().date_duration("v:s", None, "v:d")
 
     def test_raises_on_none_duration(self):
         """Raises ValueError when duration is None."""
         import pytest
+
         with pytest.raises(ValueError, match="DateDuration takes three parameters"):
             WOQLQuery().date_duration("v:s", "v:e", None)
