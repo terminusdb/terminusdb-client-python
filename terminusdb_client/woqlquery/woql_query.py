@@ -2381,9 +2381,9 @@ class WOQLQuery:
 
         Parameters
         ----------
-        left : str
+        left : str or number
             first variable to compare
-        right : str
+        right : str or number
             second variable to compare
 
         Returns
@@ -2393,6 +2393,8 @@ class WOQLQuery:
         """
         if left and left == "args":
             return ["left", "right"]
+        if left is None or right is None:
+            raise ValueError("Less takes two parameters")
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Less"
@@ -2405,9 +2407,9 @@ class WOQLQuery:
 
         Parameters
         ----------
-        left : str
+        left : str or number
             first variable to compare
-        right : str
+        right : str or number
             second variable to compare
 
         Returns
@@ -2417,11 +2419,601 @@ class WOQLQuery:
         """
         if left and left == "args":
             return ["left", "right"]
+        if left is None or right is None:
+            raise ValueError("Greater takes two parameters")
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "Greater"
         self._cursor["left"] = self._clean_object(left)
         self._cursor["right"] = self._clean_object(right)
+        return self
+
+    def gte(self, left, right):
+        """Compares two values using greater-than-or-equal ordering.
+        Parameters
+        ----------
+        left : str or number
+            the greater or equal value
+        right : str or number
+            the lesser or equal value
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if left is None or right is None:
+            raise ValueError("Gte takes two parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "Gte"
+        self._cursor["left"] = self._clean_object(left)
+        self._cursor["right"] = self._clean_object(right)
+        return self
+
+    def lte(self, left, right):
+        """Compares two values using less-than-or-equal ordering.
+        Parameters
+        ----------
+        left : str or number
+            the lesser or equal value
+        right : str or number
+            the greater or equal value
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if left is None or right is None:
+            raise ValueError("Lte takes two parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "Lte"
+        self._cursor["left"] = self._clean_object(left)
+        self._cursor["right"] = self._clean_object(right)
+        return self
+
+    def in_range(self, value, start, end):
+        """Tests whether a value falls within a half-open range [start, end).
+        Succeeds if start <= value < end.
+
+        Parameters
+        ----------
+        value : str or number
+            the value to test
+        start : str or number
+            the inclusive lower bound
+        end : str or number
+            the exclusive upper bound
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if value is None or start is None or end is None:
+            raise ValueError("InRange takes three parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "InRange"
+        self._cursor["value"] = self._clean_object(value)
+        self._cursor["start"] = self._clean_object(start)
+        self._cursor["end"] = self._clean_object(end)
+        return self
+
+    def sequence(self, value, start, end, step=None, count=None):
+        """Generates a sequence of values in the half-open range [start, end).
+        When value is unbound, produces each value via backtracking.
+
+        Parameters
+        ----------
+        value : str or number
+            the generated sequence value (or variable)
+        start : str or number
+            the inclusive start of the sequence
+        end : str or number
+            the exclusive end of the sequence
+        step : str or number, optional
+            increment per step
+        count : str or number, optional
+            total count (validates if bound, unifies if unbound)
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if value is None or start is None or end is None:
+            raise ValueError("Sequence takes at least three parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "Sequence"
+        self._cursor["value"] = self._clean_object(value)
+        self._cursor["start"] = self._clean_object(start)
+        self._cursor["end"] = self._clean_object(end)
+        if step is not None:
+            self._cursor["step"] = self._clean_object(step)
+        if count is not None:
+            self._cursor["count"] = self._clean_object(count)
+        return self
+
+    def month_start_date(self, year_month, date):
+        """Computes the first day of the month for a given xsd:gYearMonth.
+
+        Parameters
+        ----------
+        year_month : str or dict
+            a gYearMonth value (e.g. 2024-01) or variable
+        date : str or dict
+            the resulting xsd:date or variable
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if year_month is None or date is None:
+            raise ValueError("MonthStartDate takes two parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "MonthStartDate"
+        self._cursor["year_month"] = self._clean_object(year_month)
+        self._cursor["date"] = self._clean_object(date)
+        return self
+
+    def month_end_date(self, year_month, date):
+        """Computes the last day of the month for a given xsd:gYearMonth.
+        Handles leap years correctly.
+
+        Parameters
+        ----------
+        year_month : str or dict
+            a gYearMonth value (e.g. 2024-02) or variable
+        date : str or dict
+            the resulting xsd:date or variable
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if year_month is None or date is None:
+            raise ValueError("MonthEndDate takes two parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "MonthEndDate"
+        self._cursor["year_month"] = self._clean_object(year_month)
+        self._cursor["date"] = self._clean_object(date)
+        return self
+
+    def month_start_dates(self, date, start, end):
+        """Generator: produces every first-of-month date in [start, end).
+
+        Parameters
+        ----------
+        date : str
+            variable for the generated first-of-month date
+        start : str or dict
+            the inclusive start date
+        end : str or dict
+            the exclusive end date
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if date is None or start is None or end is None:
+            raise ValueError("MonthStartDates takes three parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "MonthStartDates"
+        self._cursor["date"] = self._clean_object(date)
+        self._cursor["start"] = self._clean_object(start)
+        self._cursor["end"] = self._clean_object(end)
+        return self
+
+    def month_end_dates(self, date, start, end):
+        """Generator: produces every last-of-month date in [start, end).
+
+        Parameters
+        ----------
+        date : str
+            variable for the generated last-of-month date
+        start : str or dict
+            the inclusive start date
+        end : str or dict
+            the exclusive end date
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if date is None or start is None or end is None:
+            raise ValueError("MonthEndDates takes three parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "MonthEndDates"
+        self._cursor["date"] = self._clean_object(date)
+        self._cursor["start"] = self._clean_object(start)
+        self._cursor["end"] = self._clean_object(end)
+        return self
+
+    def interval_relation(self, relation, x_start, x_end, y_start, y_end):
+        """Allen's Interval Algebra: classifies or validates the relationship
+        between two half-open intervals [x_start, x_end) and [y_start, y_end).
+
+        When relation is a string, validates that the named relation holds.
+        When relation is a variable, classifies which of the 13 Allen
+        relations holds (deterministic).
+
+        Parameters
+        ----------
+        relation : str or dict
+            relation name (e.g. "before") or variable for classification
+        x_start : str or dict
+            inclusive start of interval X
+        x_end : str or dict
+            exclusive end of interval X
+        y_start : str or dict
+            inclusive start of interval Y
+        y_end : str or dict
+            exclusive end of interval Y
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if (
+            relation is None
+            or x_start is None
+            or x_end is None
+            or y_start is None
+            or y_end is None
+        ):
+            raise ValueError("IntervalRelation takes five parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "IntervalRelation"
+        self._cursor["relation"] = self._clean_object(relation)
+        self._cursor["x_start"] = self._clean_object(x_start)
+        self._cursor["x_end"] = self._clean_object(x_end)
+        self._cursor["y_start"] = self._clean_object(y_start)
+        self._cursor["y_end"] = self._clean_object(y_end)
+        return self
+
+    def interval_relation_typed(self, relation, x, y):
+        """Allen's Interval Algebra on xdd:dateTimeInterval values.
+
+        Classifies or validates the temporal relationship between two
+        interval values. When relation is ground, validates that the named
+        relation holds. When relation is a variable, determines which of the
+        13 Allen relations holds (deterministic).
+
+        Parameters
+        ----------
+        relation : str or dict
+            relation name (e.g. "before") or variable for classification
+        x : str or dict
+            first xdd:dateTimeInterval value
+        y : str or dict
+            second xdd:dateTimeInterval value
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if relation is None or x is None or y is None:
+            raise ValueError("IntervalRelationTyped takes three parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "IntervalRelationTyped"
+        self._cursor["relation"] = self._clean_object(relation)
+        self._cursor["x"] = self._clean_object(x)
+        self._cursor["y"] = self._clean_object(y)
+        return self
+
+    def range_min(self, input_list, result):
+        """Find the minimum value in a list using the standard ordering.
+
+        Works with any comparable types: numbers, dates, strings.
+        Empty list produces no bindings.
+
+        Parameters
+        ----------
+        input_list : list or str or dict
+            the list of values to search
+        result : str or dict
+            variable or value for the minimum
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if input_list is None or result is None:
+            raise ValueError("RangeMin takes two parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "RangeMin"
+        self._cursor["list"] = self._clean_object(input_list)
+        self._cursor["result"] = self._clean_object(result)
+        return self
+
+    def range_max(self, input_list, result):
+        """Find the maximum value in a list using the standard ordering.
+
+        Works with any comparable types: numbers, dates, strings.
+        Empty list produces no bindings.
+
+        Parameters
+        ----------
+        input_list : list or str or dict
+            the list of values to search
+        result : str or dict
+            variable or value for the maximum
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if input_list is None or result is None:
+            raise ValueError("RangeMax takes two parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "RangeMax"
+        self._cursor["list"] = self._clean_object(input_list)
+        self._cursor["result"] = self._clean_object(result)
+        return self
+
+    def interval(self, start, end, interval_val):
+        """Constructs or deconstructs a half-open xdd:dateTimeInterval [start, end).
+
+        Bidirectional: given start+end computes interval, given interval
+        extracts start+end.
+
+        Parameters
+        ----------
+        start : str or dict
+            inclusive start date
+        end : str or dict
+            exclusive end date
+        interval_val : str or dict
+            the xdd:dateTimeInterval value
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if start is None or end is None or interval_val is None:
+            raise ValueError("Interval takes three parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "Interval"
+        self._cursor["start"] = self._clean_object(start)
+        self._cursor["end"] = self._clean_object(end)
+        self._cursor["interval"] = self._clean_object(interval_val)
+        return self
+
+    def interval_start_duration(self, start, duration, interval_val):
+        """Relates an xdd:dateTimeInterval to its start endpoint and precise xsd:duration.
+
+        Bidirectional: given interval extracts start+duration, given
+        start+duration computes interval.
+
+        Parameters
+        ----------
+        start : str or dict
+            inclusive start date or dateTime
+        duration : str or dict
+            the xsd:duration between start and end
+        interval_val : str or dict
+            the xdd:dateTimeInterval value
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if start is None or duration is None or interval_val is None:
+            raise ValueError("IntervalStartDuration takes three parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "IntervalStartDuration"
+        self._cursor["start"] = self._clean_object(start)
+        self._cursor["duration"] = self._clean_object(duration)
+        self._cursor["interval"] = self._clean_object(interval_val)
+        return self
+
+    def interval_duration_end(self, duration, end, interval_val):
+        """Relates an xdd:dateTimeInterval to its end endpoint and precise xsd:duration.
+
+        Bidirectional: given interval extracts duration+end, given
+        duration+end computes interval.
+
+        Parameters
+        ----------
+        duration : str or dict
+            the xsd:duration between start and end
+        end : str or dict
+            exclusive end date or dateTime
+        interval_val : str or dict
+            the xdd:dateTimeInterval value
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if duration is None or end is None or interval_val is None:
+            raise ValueError("IntervalDurationEnd takes three parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "IntervalDurationEnd"
+        self._cursor["duration"] = self._clean_object(duration)
+        self._cursor["end"] = self._clean_object(end)
+        self._cursor["interval"] = self._clean_object(interval_val)
+        return self
+
+    def day_after(self, date, next_date):
+        """Computes the calendar day after the given date. Bidirectional.
+
+        Parameters
+        ----------
+        date : str or dict
+            the input date
+        next_date : str or dict
+            the next calendar day
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if date is None or next_date is None:
+            raise ValueError("DayAfter takes two parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "DayAfter"
+        self._cursor["date"] = self._clean_object(date)
+        self._cursor["next"] = self._clean_object(next_date)
+        return self
+
+    def day_before(self, date, previous):
+        """Computes the calendar day before the given date. Bidirectional.
+
+        Parameters
+        ----------
+        date : str or dict
+            the input date
+        previous : str or dict
+            the previous calendar day
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if date is None or previous is None:
+            raise ValueError("DayBefore takes two parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "DayBefore"
+        self._cursor["date"] = self._clean_object(date)
+        self._cursor["previous"] = self._clean_object(previous)
+        return self
+
+    def weekday(self, date, weekday):
+        """Computes the ISO 8601 weekday number (Monday=1, Sunday=7) for a date.
+        Accepts xsd:date or xsd:dateTime. Date must be ground.
+
+        Parameters
+        ----------
+        date : str or dict
+            the input date or dateTime
+        weekday : str or int
+            the ISO weekday number (1=Monday, 7=Sunday)
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if date is None or weekday is None:
+            raise ValueError("Weekday takes two parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "Weekday"
+        self._cursor["date"] = self._clean_object(date)
+        self._cursor["weekday"] = self._clean_object(weekday)
+        return self
+
+    def weekday_sunday_start(self, date, weekday):
+        """Computes the US-convention weekday number (Sunday=1, Saturday=7) for a date.
+        Accepts xsd:date or xsd:dateTime. Date must be ground.
+
+        Parameters
+        ----------
+        date : str or dict
+            the input date or dateTime
+        weekday : str or int
+            the US weekday number (1=Sunday, 7=Saturday)
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if date is None or weekday is None:
+            raise ValueError("WeekdaySundayStart takes two parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "WeekdaySundayStart"
+        self._cursor["date"] = self._clean_object(date)
+        self._cursor["weekday"] = self._clean_object(weekday)
+        return self
+
+    def iso_week(self, date, year, week):
+        """Computes the ISO 8601 week-numbering year and week number for a date.
+        Accepts xsd:date or xsd:dateTime. Date must be ground.
+        The ISO year may differ from the calendar year at year boundaries.
+
+        Parameters
+        ----------
+        date : str or dict
+            the input date or dateTime
+        year : str or int
+            the ISO week-numbering year
+        week : str or int
+            the ISO week number (1-53)
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if date is None or year is None or week is None:
+            raise ValueError("IsoWeek takes three parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "IsoWeek"
+        self._cursor["date"] = self._clean_object(date)
+        self._cursor["year"] = self._clean_object(year)
+        self._cursor["week"] = self._clean_object(week)
+        return self
+
+    def date_duration(self, start, end, duration):
+        """Tri-directional duration arithmetic for dates and dateTimes.
+        Given any two of start, end, and duration, computes the third.
+        Uses EOM preservation: last day of month maps to last day of target month.
+        Accepts xsd:date or xsd:dateTime for start/end, xsd:duration for duration.
+
+        Parameters
+        ----------
+        start : str or dict
+            the start date or dateTime
+        end : str or dict
+            the end date or dateTime
+        duration : str or dict
+            the xsd:duration between start and end
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if start is None or end is None or duration is None:
+            raise ValueError("DateDuration takes three parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "DateDuration"
+        self._cursor["start"] = self._clean_object(start)
+        self._cursor["end"] = self._clean_object(end)
+        self._cursor["duration"] = self._clean_object(duration)
         return self
 
     def opt(self, query=None):

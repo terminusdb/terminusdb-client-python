@@ -12,6 +12,65 @@ from terminusdb_client.woqlquery.woql_query import WOQLQuery
 
 test_user_agent = "terminusdb-client-python-tests"
 
+_CLIENT_TEST_DBS = ["test_diff_ops"]
+_CLIENT_TEST_ORGS = ["testOrg235091"]
+
+
+@pytest.fixture(scope="module", autouse=True)
+def cleanup_client_resources(docker_url):
+    """Delete stale databases and organizations before the module and clean up after."""
+    client = Client(docker_url, user_agent=test_user_agent)
+    client.connect()
+
+    def _cleanup():
+        for db in _CLIENT_TEST_DBS:
+            try:
+                client.delete_database(db)
+            except Exception:
+                pass
+        for org in _CLIENT_TEST_ORGS:
+            # Ensure admin has access so we can list and delete databases
+            try:
+                client.change_capabilities(
+                    {
+                        "operation": "grant",
+                        "scope": f"Organization/{org}",
+                        "user": "User/admin",
+                        "roles": ["Role/admin"],
+                    }
+                )
+            except Exception:
+                pass
+            try:
+                dbs = client.get_organization_user_databases(org=org, username="admin")
+                for db in dbs:
+                    try:
+                        client.delete_database(db["name"], team=org)
+                    except Exception:
+                        pass
+            except Exception:
+                pass
+            # Revoke capabilities before deleting org
+            try:
+                client.change_capabilities(
+                    {
+                        "operation": "revoke",
+                        "scope": f"Organization/{org}",
+                        "user": "User/admin",
+                        "roles": ["Role/admin"],
+                    }
+                )
+            except Exception:
+                pass
+            try:
+                client.delete_organization(org)
+            except Exception:
+                pass
+
+    _cleanup()
+    yield
+    _cleanup()
+
 
 def test_not_ok():
     client = Client("http://localhost:6363")

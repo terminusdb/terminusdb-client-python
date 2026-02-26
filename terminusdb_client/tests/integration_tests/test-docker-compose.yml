@@ -9,21 +9,27 @@ services:
     hostname: terminusdb-server
     tty: true
     ports:
-      - 6366:6366
+      - 6363:6363
     environment:
       - TERMINUSDB_SERVER_NAME=http://127.0.0.1
-      - TERMINUSDB_SERVER_PORT=6366
+      - TERMINUSDB_SERVER_PORT=6363
 
       # There are multiple ways to configure TerminusDB security through
       # environment variables. Several reasonable options are included below.
       # Uncomment the option you decide on and comment out others.
       # Don't forget to change the default password!
 
-      # Security Option 1 (default): Assumes TerminusDB is only accessible from
+      # Security Option 1 (default): Use a password for the login 
+      - TERMINUSDB_ADMIN_PASS=root
+      - TERMINUSDB_AUTOLOGIN=false
+      - TERMINUSDB_SERVER_PORT=6363
+      - TERMINUSDB_HTTPS_ENABLED=false
+
+      # Security Option 2: Assumes TerminusDB is only accessible from
       # the machine it's running on and all access to port 6363 is considered
       # authorized.
-      - TERMINUSDB_HTTPS_ENABLED=false
-      - TERMINUSDB_AUTOLOGIN=true
+      # - TERMINUSDB_HTTPS_ENABLED=false
+      # - TERMINUSDB_AUTOLOGIN=true
 
       # Security Option 2: TerminusDB is set up behind a TLS-terminating reverse
       # proxy with admin authentication provided by password.

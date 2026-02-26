@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "terminusdb"
-version = "12.0.4"
-description = "Terminus DB Python client"
+version = "12.0.5"
+description = "TerminusDB Python client"
 authors = ["TerminusDB group", "DFRNT AB"]
 license = "Apache Software License"
 readme = "README.md"

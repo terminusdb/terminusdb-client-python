@@ -19,11 +19,11 @@ class TestServerDetection:
         mock_get.return_value = Mock()
 
         assert is_local_server_running() is True
-        mock_get.assert_called_once_with("http://127.0.0.1:6363/api/", timeout=2)
+        mock_get.assert_called_once_with("http://127.0.0.1:6363/api/ok", timeout=2)
 
     @patch("terminusdb_client.tests.integration_tests.conftest.requests.get")
-    def test_local_server_running_401(self, mock_get):
-        """Test local server detection returns True for HTTP 401 (unauthorized)"""
+    def test_local_server_running_not_200(self, mock_get):
+        """Test local server detection returns True for non-200 status (server is running)"""
         mock_response = Mock()
         mock_response.status_code = 401
         mock_get.return_value = mock_response
@@ -50,11 +50,11 @@ class TestServerDetection:
         mock_get.return_value = Mock()
 
         assert is_docker_server_running() is True
-        mock_get.assert_called_once_with("http://127.0.0.1:6366/api/", timeout=2)
+        mock_get.assert_called_once_with("http://127.0.0.1:6363/api/ok", timeout=2)
 
     @patch("terminusdb_client.tests.integration_tests.conftest.requests.get")
-    def test_docker_server_running_401(self, mock_get):
-        """Test Docker server detection returns True for HTTP 401 (unauthorized)"""
+    def test_docker_server_running_not_200(self, mock_get):
+        """Test Docker server detection returns True for non-200 status (server is running)"""
         mock_response = Mock()
         mock_response.status_code = 401
         mock_get.return_value = mock_response
