@@ -2417,6 +2417,8 @@ class WOQLQuery:
         WOQLQuery object
             query object that can be chained and/or execute
         """
+        if left and left == "args":
+            return ["left", "right"]
         if left is None or right is None:
             raise ValueError("Greater takes two parameters")
         if self._cursor.get("@type"):

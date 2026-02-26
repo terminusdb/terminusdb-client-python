@@ -12,8 +12,9 @@ MAX_CONTAINER_STARTUP_TIME = 120  # Increased from 30 to 120 seconds for slower 
 def is_local_server_running():
     """Check if local TerminusDB server is running at http://127.0.0.1:6363"""
     try:
-        response = requests.get("http://127.0.0.1:6363/api/ok", timeout=2)
-        return response.status_code == 200
+        requests.get("http://127.0.0.1:6363/api/ok", timeout=2)
+        # Any HTTP response means server is running
+        return True
     except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
         return False
 
@@ -21,8 +22,9 @@ def is_local_server_running():
 def is_docker_server_running():
     """Check if Docker TerminusDB server is already running at http://127.0.0.1:6363"""
     try:
-        response = requests.get("http://127.0.0.1:6363/api/ok", timeout=2)
-        return response.status_code == 200
+        requests.get("http://127.0.0.1:6363/api/ok", timeout=2)
+        # Any HTTP response means server is running
+        return True
     except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
         return False
 

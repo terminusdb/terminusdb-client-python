@@ -23,12 +23,12 @@ class TestServerDetection:
 
     @patch("terminusdb_client.tests.integration_tests.conftest.requests.get")
     def test_local_server_running_not_200(self, mock_get):
-        """Test local server detection returns False for non-200 status"""
+        """Test local server detection returns True for non-200 status (server is running)"""
         mock_response = Mock()
         mock_response.status_code = 401
         mock_get.return_value = mock_response
 
-        assert is_local_server_running() is False
+        assert is_local_server_running() is True
 
     @patch("terminusdb_client.tests.integration_tests.conftest.requests.get")
     def test_local_server_not_running_connection_error(self, mock_get):
@@ -54,12 +54,12 @@ class TestServerDetection:
 
     @patch("terminusdb_client.tests.integration_tests.conftest.requests.get")
     def test_docker_server_running_not_200(self, mock_get):
-        """Test Docker server detection returns False for non-200 status"""
+        """Test Docker server detection returns True for non-200 status (server is running)"""
         mock_response = Mock()
         mock_response.status_code = 401
         mock_get.return_value = mock_response
 
-        assert is_docker_server_running() is False
+        assert is_docker_server_running() is True
 
     @patch("terminusdb_client.tests.integration_tests.conftest.requests.get")
     def test_docker_server_not_running(self, mock_get):
