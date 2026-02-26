@@ -1,10 +1,14 @@
 [tool.poetry]
-name = "terminusdb-client"
+name = "terminusdb"
 version = "12.0.5"
-description = "Python client for Terminus DB"
-authors = ["TerminusDB group"]
+description = "TerminusDB Python client"
+authors = ["TerminusDB group", "DFRNT AB"]
 license = "Apache Software License"
 readme = "README.md"
+packages = [
+    {include = "terminusdb_client"},
+    {include = "terminusdb"},
+]
 
 [tool.poetry.dependencies]
 python = ">=3.9.0,<3.13"
@@ -12,7 +16,7 @@ requests = "^2.31.0"
 numpy = ">= 1.13.0"
 numpydoc = "*"
 pandas = ">= 0.23.0"
-typeguard = "~2.13.3"
+typeguard = "^4.0.0"
 tqdm = "*"
 click = ">=8.0"
 shed = "*"
@@ -56,6 +60,11 @@ doctest_optionflags = [
 junit_family="legacy"
 testpaths = [
    "terminusdb_client/tests/",
+]
+[tool.coverage.run]
+omit = [
+    "terminusdb_client/scripts/dev.py",
+    "*/__main__.py",
 ]
 
 [tool.isort]

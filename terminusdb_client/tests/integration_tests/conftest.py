@@ -30,9 +30,9 @@ def is_docker_server_running():
 def is_jwt_server_running():
     """Check if JWT Docker TerminusDB server is already running at http://127.0.0.1:6367"""
     try:
-        response = requests.get("http://127.0.0.1:6367", timeout=2)
-        # Server responds with 404 for root path, which means it's running
-        return response.status_code in [200, 404]
+        requests.get("http://127.0.0.1:6367/api/", timeout=2)
+        # Any HTTP response means server is running
+        return True
     except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
         return False
 
