@@ -145,9 +145,7 @@ def docker_url(pytestconfig):
     """
     # Check if a server is already running (port 6363)
     if is_local_server_running():
-        print(
-            "\n✓ Using existing TerminusDB server at http://127.0.0.1:6363"
-        )
+        print("\n✓ Using existing TerminusDB server at http://127.0.0.1:6363")
         yield "http://127.0.0.1:6363"
         return  # Don't clean up - server was already running
 

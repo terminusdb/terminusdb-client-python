@@ -8,6 +8,33 @@ from terminusdb_client.woqlschema.woql_schema import DocumentTemplate, WOQLSchem
 
 test_user_agent = "terminusdb-client-python-tests"
 
+_SCHEMA_TEST_DBS = [
+    "test_docapi",
+    "test_docapi2",
+    "test_datetime",
+    "test_compress_data",
+    "test_repeated_load",
+    "test_repeated_load_fails",
+]
+
+
+@pytest.fixture(scope="module", autouse=True)
+def cleanup_schema_databases(docker_url):
+    """Delete stale databases before the module and clean up after."""
+    client = Client(docker_url, user_agent=test_user_agent)
+    client.connect()
+    for db in _SCHEMA_TEST_DBS:
+        try:
+            client.delete_database(db)
+        except Exception:
+            pass
+    yield
+    for db in _SCHEMA_TEST_DBS:
+        try:
+            client.delete_database(db)
+        except Exception:
+            pass
+
 
 def test_create_schema(docker_url, test_schema):
     my_schema = test_schema
