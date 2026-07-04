@@ -8,7 +8,7 @@ from numpydoc.docscrape import FunctionDoc, ClassDoc
 def parameter_to_document(param):
     return {'@type': 'Parameter', 'type': param.type, 'name': param.name, 'summary': "\n".join(param.desc)}
 
-classes_to_scan = ['Client']#, 'WOQLQuery']
+classes_to_scan = ['Client', 'WOQLQuery']
 classes = []
 
 for name, obj in inspect.getmembers(terminusdb_client):
