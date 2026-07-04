@@ -1480,6 +1480,8 @@ class Client:
         last_data_version: Optional[str] = None,
         compress: Union[str, int] = 1024,
         raw_json: bool = False,
+        merge_repeats: bool = False,
+        overwrite: bool = False,
     ) -> None:
         """Inserts the specified document(s)
 
@@ -1499,6 +1501,10 @@ class Client:
             If it is an integer, size of the data larger than this (in bytes) will be compress with gzip in the request (assume encoding as UTF-8, 0 = always compress). If it is `never` it will never compress the data.
         raw_json : bool
             Update as raw json
+        merge_repeats : bool
+            If True, duplicate document IDs in the same request are silently accepted instead of causing an error.
+        overwrite : bool
+            If True, existing documents with the same ID will be overwritten instead of causing an error. This enables upsert behavior.
 
         Raises
         ------
@@ -1518,6 +1524,8 @@ class Client:
         else:
             params["full_replace"] = "false"
         params["raw_json"] = "true" if raw_json else "false"
+        params["merge_repeats"] = "true" if merge_repeats else "false"
+        params["overwrite"] = "true" if overwrite else "false"
 
         headers = self._default_headers.copy()
         if last_data_version is not None:
@@ -1587,6 +1595,7 @@ class Client:
         compress: Union[str, int] = 1024,
         create: bool = False,
         raw_json: bool = False,
+        merge_repeats: bool = False,
     ) -> dict:
         """Updates the specified document(s)
 
@@ -1606,6 +1615,8 @@ class Client:
             Create the document if it does not yet exist.
         raw_json : bool
             Update as raw json
+        merge_repeats : bool
+            If True, duplicate document IDs in the same request are silently accepted instead of causing an error.
 
         Raises
         ------
@@ -1617,6 +1628,7 @@ class Client:
         params["graph_type"] = graph_type
         params["create"] = "true" if create else "false"
         params["raw_json"] = "true" if raw_json else "false"
+        params["merge_repeats"] = "true" if merge_repeats else "false"
 
         headers = self._default_headers.copy()
         if last_data_version is not None:
@@ -1667,6 +1679,7 @@ class Client:
         commit_msg: Optional[str] = None,
         last_data_version: Optional[str] = None,
         compress: Union[str, int] = 1024,
+        merge_repeats: bool = False,
     ) -> None:
         """Updates the specified document(s). Add the document if not existed.
 
@@ -1682,6 +1695,8 @@ class Client:
             Last version before the update, used to check if the document has been changed unknowingly
         compress : str or int
             If it is an integer, size of the data larger than this (in bytes) will be compress with gzip in the request (assume encoding as UTF-8, 0 = always compress). If it is `never` it will never compress the data.
+        merge_repeats : bool
+            If True, duplicate document IDs in the same request are silently accepted instead of causing an error.
 
         Raises
         ------
@@ -1689,7 +1704,8 @@ class Client:
             if the client does not connect to a database
         """
         self.replace_document(
-            document, graph_type, commit_msg, last_data_version, compress, True
+            document, graph_type, commit_msg, last_data_version, compress, True,
+            merge_repeats=merge_repeats,
         )
 
     def delete_document(
