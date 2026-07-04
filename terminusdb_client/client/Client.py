@@ -2379,7 +2379,9 @@ class Client:
             )
         )
 
-    def diff_version(self, before_version, after_version):
+    def diff_version(
+        self, before_version, after_version, unfold: bool = True
+    ):
         """Diff two different versions. Can either be a branch or a commit
 
         Parameters
@@ -2388,6 +2390,10 @@ class Client:
             Commit or branch of the before version to compare
         after_version : string
             Commit or branch of the after version to compare
+        unfold : bool, optional
+            Expand subdocuments inline when retrieving documents from the
+            specified versions. Defaults to ``True``; set to ``False`` to
+            compare folded documents by reference.
         """
         self._check_connection(check_db=False)
         return json.loads(
@@ -2398,6 +2404,7 @@ class Client:
                     json={
                         "before_data_version": before_version,
                         "after_data_version": after_version,
+                        "unfold": unfold,
                     },
                     auth=self._auth(),
                 )
@@ -2423,12 +2430,20 @@ class Client:
             List["DocumentTemplate"],  # noqa:F821
         ],
         document_id: Union[str, None] = None,
+        unfold: bool = True,
     ):
         """DEPRECATED
 
         Perform diff on 2 set of document(s), result in a Patch object.
 
         Do not connect when using public API.
+
+        Parameters
+        ----------
+        unfold : bool, optional
+            Expand subdocuments inline when retrieving documents from commits
+            or branches. Only used when ``before`` or ``after`` is a version
+            reference. Defaults to ``True``.
 
         Returns
         -------
@@ -2461,6 +2476,9 @@ class Client:
                 raise ValueError(
                     "`document_id` can only be used in conjusction with a data version or commit ID as `before`, not a document object"
                 )
+        if isinstance(before, str) or isinstance(after, str):
+            request_dict["unfold"] = unfold
+
         if self._connected:
             result = _finish_response(
                 self._session.post(
