@@ -80,6 +80,12 @@ class RandomKey(TerminusKey):
     at_type = "Random"
 
 
+class UuidV7Key(TerminusKey):
+    """Generating ID with UUID v7 (RFC 9562); accepts any IRI as @id"""
+
+    at_type = "UuidV7"
+
+
 def _check_cycling(class_obj: "TerminusClass"):
     """Helper function to check if the embedded subdocument is cycling"""
     if hasattr(class_obj, "_subdocument"):
@@ -170,7 +176,7 @@ class TerminusClass(type):
         if "_subdocument" in nmspc:
             allow_custom_id = False
         elif "_key" in nmspc:
-            if nmspc.get("_key").__class__ == RandomKey:
+            if nmspc.get("_key").__class__ in (RandomKey, UuidV7Key):
                 allow_custom_id = True
             else:
                 allow_custom_id = False
@@ -306,6 +312,9 @@ class DocumentTemplate(metaclass=TerminusClass):
         if hasattr(self, "_backend_id") and self._backend_id:
             return self._backend_id
         if hasattr(self, "_custom_id") and self._custom_id:
+            if self._key.__class__ == UuidV7Key:
+                # UuidV7 accepts any IRI as @id; do not prefix or quote it
+                return self._custom_id
             return _check_and_fix_custom_id(str(self.__class__), self._custom_id)
         else:
             return None
@@ -595,6 +604,8 @@ class Schema:
                 key_type = value.get("@type")
                 if key_type and key_type == "Random":
                     attributedict["_key"] = RandomKey()
+                elif key_type and key_type == "UuidV7":
+                    attributedict["_key"] = UuidV7Key()
                 elif key_type and key_type == "ValueHash":
                     attributedict["_key"] = ValueHashKey()
                 elif key_type and key_type == "Lexical":
