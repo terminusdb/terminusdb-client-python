@@ -11,6 +11,7 @@ from terminusdb_client.schema.schema import (
     LexicalKey,
     ValueHashKey,
     RandomKey,
+    UuidV7Key,
     _check_cycling,
     _check_mismatch_type,
     _check_missing_prop,
@@ -52,6 +53,11 @@ class TestTerminusKey:
         """Test RandomKey creation"""
         rk = RandomKey()
         assert rk.at_type == "Random"
+
+    def test_uuid_v7_key_creation(self):
+        """Test UuidV7Key creation"""
+        uk = UuidV7Key()
+        assert uk.at_type == "UuidV7"
 
 
 class TestCheckCycling:
@@ -427,6 +433,17 @@ class TestDocumentTemplate:
 
         with pytest.raises(ValueError, match="Customized id is not allowed"):
             doc._id = "custom_id"
+
+    def test_id_setter_custom_id_allowed_uuid_v7(self):
+        """Test _id setter allows custom id with UuidV7Key"""
+
+        class Doc(DocumentTemplate):
+            name: str
+            _key = UuidV7Key()  # UuidV7 accepts arbitrary @id
+
+        doc = Doc(name="test")
+        doc._id = "https://linked.art/example/object/47"
+        assert doc._id == "https://linked.art/example/object/47"
 
     def test_key_field_change_error(self):
         """Test ValueError when trying to change key field"""
