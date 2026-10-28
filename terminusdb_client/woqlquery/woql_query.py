@@ -4035,26 +4035,131 @@ class WOQLQuery:
         self._cursor["size"] = self._varj(size)
         return self
 
-    def triple_count(self, graph, triple_count):
-        """Sets the given triple count and size for cursor.
+    def triple_count(self, graph_or_sub, pred_or_count=None, obj=None, count=None, graph=None):
+        """Counts matching triples without enumerating them.
+
+        With two arguments, counts all triples of the contents of the resource
+        identified by ``graph_or_sub``. With four or five arguments, counts the
+        triples matching a partial [subject, predicate, object] pattern using
+        the store's indexes; unbound positions act as wildcards and the
+        optional ``graph`` selects which graph is counted.
 
         Parameters
         ----------
-        graph: Graph which needs to be set as resource
-        triple_count: Triple count which needs to be set
+        graph_or_sub : str
+            Resource identifier in the two-argument form, or the subject
+            (node URI or variable) in the pattern form
+        pred_or_count : str
+            The count variable in the two-argument form, or the predicate
+            (node or variable) in the pattern form
+        obj : str or object, optional
+            Object in the pattern form (node, variable or literal)
+        count : str or int or Var, optional
+            The variable to bind the count to, or an integer literal
+        graph : str, optional
+            Graph resource identifier in the pattern form
 
         Returns
         -------
         WOQLQuery object
                     query object that can be chained and/or execute
         """
-        if graph and graph == "args":
+        if graph_or_sub and graph_or_sub == "args":
             return ["resource", "triple_count"]
         if self._cursor.get("@type"):
             self._wrap_cursor_with_and()
         self._cursor["@type"] = "TripleCount"
-        self._cursor["resource"] = self._clean_graph(graph)
-        self._cursor["triple_count"] = self._varj(triple_count)
+        if obj is None and count is None and graph is None:
+            self._cursor["resource"] = self._clean_graph(graph_or_sub)
+            self._cursor["count"] = self._varj(pred_or_count)
+        else:
+            if count is None:
+                raise ValueError(
+                    "triple_count takes two parameters (resource, count) or four to five parameters (subject, predicate, object, count, [graph])"
+                )
+            self._cursor["subject"] = self._clean_subject(graph_or_sub)
+            self._cursor["predicate"] = self._clean_predicate(pred_or_count)
+            self._cursor["object"] = self._clean_object(obj)
+            self._cursor["count"] = (
+                self._clean_object(count)
+                if type(count) is int
+                else self._varj(count)
+            )
+            if graph:
+                self._cursor["graph"] = self._clean_graph(graph)
+        return self
+
+    def triple_range_count(self, sub, pred, low, high, count):
+        """Counts the triples whose typed object value falls within the
+        half-open range [low, high), optionally restricted by subject and
+        predicate, without enumerating them. The count is computed from the
+        store's indexes.
+
+        Parameters
+        ----------
+        sub : str
+            Subject, has to be a node (URI) or variable
+        pred : str
+            Predicate, can be variable (prefix with "v:") or node
+        low : object
+            The inclusive lower bound as a typed value
+        high : object
+            The exclusive upper bound as a typed value
+        count : str or int or Var
+            The variable to bind the count to, or an integer literal
+
+        Returns
+        -------
+        WOQLQuery object
+                    query object that can be chained and/or execute
+        """
+        if sub and sub == "args":
+            return ["subject", "predicate", "low", "high", "count"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "TripleRangeCount"
+        self._cursor["subject"] = self._clean_subject(sub)
+        self._cursor["predicate"] = self._clean_predicate(pred)
+        self._cursor["low"] = self._clean_object(low)
+        self._cursor["high"] = self._clean_object(high)
+        self._cursor["count"] = (
+            self._clean_object(count)
+            if type(count) is int
+            else self._varj(count)
+        )
+        return self
+
+    def quad_range_count(self, sub, pred, low, high, count, graph):
+        """Same as triple_range_count but with an explicit graph selector.
+
+        Parameters
+        ----------
+        sub : str
+            Subject, has to be a node (URI) or variable
+        pred : str
+            Predicate, can be variable (prefix with "v:") or node
+        low : object
+            The inclusive lower bound as a typed value
+        high : object
+            The exclusive upper bound as a typed value
+        count : str or int or Var
+            The variable to bind the count to, or an integer literal
+        graph : str
+            Graph resource identifier (e.g. 'instance' or 'schema')
+
+        Returns
+        -------
+        WOQLQuery object
+                    query object that can be chained and/or execute
+        """
+        arguments = self.triple_range_count(sub, pred, low, high, count)
+        if sub and sub == "args":
+            return arguments.append("graph")
+        if not graph:
+            raise ValueError(
+                "quad_range_count takes six parameters, the last should be a graph filter"
+            )
+        self._cursor["graph"] = self._clean_graph(graph)
         return self
 
     def star(self, graph=None, subj=None, pred=None, obj=None):

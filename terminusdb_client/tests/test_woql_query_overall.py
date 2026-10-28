@@ -395,9 +395,84 @@ class TestWOQLQueryCoverage:
         expected_count = {
             "@type": "TripleCount",
             "resource": "schema",
-            "triple_count": {"@type": "Value", "variable": "count"},
+            "count": {"@type": "Value", "variable": "count"},
         }
         assert result == expected_count
+
+    def test_triple_count_pattern(self):
+        """Test the pattern form of triple_count"""
+        wq = WOQLQuery()
+        wq.triple_count("v:s", "rdf:type", "scm:Person", "v:count")
+        result = wq.to_dict()
+        expected = {
+            "@type": "TripleCount",
+            "subject": {"@type": "NodeValue", "variable": "s"},
+            "predicate": {"@type": "NodeValue", "node": "rdf:type"},
+            "object": {"@type": "Value", "node": "scm:Person"},
+            "count": {"@type": "Value", "variable": "count"},
+        }
+        assert result == expected
+
+    def test_triple_count_pattern_with_graph(self):
+        """Test the pattern form of triple_count with a graph selector"""
+        wq = WOQLQuery()
+        wq.triple_count("v:s", "rdf:type", "scm:Person", "v:count", "schema/main")
+        result = wq.to_dict()
+        assert result["@type"] == "TripleCount"
+        assert result["graph"] == "schema/main"
+        assert result["subject"] == {"@type": "NodeValue", "variable": "s"}
+
+    def test_triple_count_bound_count(self):
+        """Test the pattern form of triple_count with a bound count"""
+        wq = WOQLQuery()
+        wq.triple_count("v:s", "rdf:type", "scm:Person", 3)
+        result = wq.to_dict()
+        assert result["count"] == {
+            "@type": "Value",
+            "data": {"@type": "xsd:integer", "@value": 3},
+        }
+
+    def test_triple_range_count(self):
+        """Test triple_range_count serialization"""
+        wq = WOQLQuery()
+        wq.triple_range_count(
+            "v:s",
+            "age",
+            wq.literal(10, "integer"),
+            wq.literal(18, "integer"),
+            "v:count",
+        )
+        result = wq.to_dict()
+        expected = {
+            "@type": "TripleRangeCount",
+            "subject": {"@type": "NodeValue", "variable": "s"},
+            "predicate": {"@type": "NodeValue", "node": "age"},
+            "low": {
+                "@type": "Value",
+                "data": {"@type": "xsd:integer", "@value": 10},
+            },
+            "high": {
+                "@type": "Value",
+                "data": {"@type": "xsd:integer", "@value": 18},
+            },
+            "count": {"@type": "Value", "variable": "count"},
+        }
+        assert result == expected
+
+    def test_quad_range_count(self):
+        """Test quad_range_count serialization"""
+        wq = WOQLQuery()
+        wq.quad_range_count(
+            "v:s",
+            "age",
+            wq.literal(10, "integer"),
+            wq.literal(18, "integer"),
+            "v:count",
+            "instance/main",
+        )
+        result = wq.to_dict()
+        assert result["@type"] == "TripleRangeCount"
+        assert result["graph"] == "instance/main"
 
     def test_star_all_methods(self):
         """Test star and all methods"""
@@ -704,7 +779,7 @@ class TestWOQLQueryCoverage:
         result = wq.to_dict()
         assert result["@type"] == "TripleCount"
         assert result["resource"] == "v:graph"
-        assert result["triple_count"] == {"@type": "Value", "variable": "count"}
+        assert result["count"] == {"@type": "Value", "variable": "count"}
 
     def test_star_with_all_parameters(self):
         """Test star method with all parameters"""

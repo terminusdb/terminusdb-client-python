@@ -1360,7 +1360,10 @@ class Client:
         get_data_version : bool
             If the version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.
         kwargs :
-            Additional boolean flags for retriving. Currently avaliable: "prefixed", "unfold"
+            Additional boolean flags for retriving. Currently avaliable: "prefixed", "unfold", "counted".
+            With counted=True the response is a count object
+            ``{"@type": "api:DocumentCountResponse", "api:count": <int>}``
+            instead of a document stream, and skip/count are ignored.
 
         Raises
         ------
@@ -1372,7 +1375,7 @@ class Client:
         iterable
             Stream of dictionaries
         """
-        add_args = ["prefixed", "unfold"]
+        add_args = ["prefixed", "unfold", "counted"]
         self._check_connection()
         payload = _args_as_payload(
             {
