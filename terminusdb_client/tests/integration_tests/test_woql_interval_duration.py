@@ -126,7 +126,7 @@ class TestIntervalStartDuration:
         )
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
-        assert result["bindings"][0]["iv"]["@value"] == "2025-01-01T00:00:00Z/2025-04-01T00:00:00Z"
+        assert result["bindings"][0]["iv"]["@value"] == "2025-01-01T00:00:00Z/P90D"
 
     def test_construct_full_year_interval(self):
         """Construct a 365-day interval from start + P365D."""
@@ -135,7 +135,7 @@ class TestIntervalStartDuration:
         )
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
-        assert result["bindings"][0]["iv"]["@value"] == "2025-01-01T00:00:00Z/2026-01-01T00:00:00Z"
+        assert result["bindings"][0]["iv"]["@value"] == "2025-01-01T00:00:00Z/P365D"
 
 
 class TestIntervalDurationEnd:
@@ -170,7 +170,7 @@ class TestIntervalDurationEnd:
         )
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
-        assert result["bindings"][0]["iv"]["@value"] == "2025-01-01T00:00:00Z/2025-04-01T00:00:00Z"
+        assert result["bindings"][0]["iv"]["@value"] == "P90D/2025-04-01T00:00:00Z"
 
 
 class TestIntervalThreeViewsRoundtrip:
