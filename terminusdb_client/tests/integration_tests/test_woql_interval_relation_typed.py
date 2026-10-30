@@ -42,7 +42,7 @@ class TestIntervalRelationTypedValidation:
     def test_meets(self):
         """Q1 meets Q2."""
         query = WOQLQuery().interval_relation_typed(
-            rel("meets"), iv("2024-01-01/2024-04-01"), iv("2024-04-01/2024-07-01")
+            rel("meets"), iv("2024-01-01/2024-03-31"), iv("2024-04-01/2024-06-30")
         )
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
@@ -50,7 +50,7 @@ class TestIntervalRelationTypedValidation:
     def test_meets_rejected_with_gap(self):
         """Gap between intervals fails meets."""
         query = WOQLQuery().interval_relation_typed(
-            rel("meets"), iv("2024-01-01/2024-04-01"), iv("2024-05-01/2024-07-01")
+            rel("meets"), iv("2024-01-01/2024-03-31"), iv("2024-05-01/2024-07-01")
         )
         result = self.client.query(query)
         assert len(result["bindings"]) == 0
@@ -105,7 +105,7 @@ class TestIntervalRelationTypedClassification:
     def test_classifies_meets(self):
         """Adjacent intervals classified as meets."""
         query = WOQLQuery().interval_relation_typed(
-            "v:rel", iv("2024-01-01/2024-04-01"), iv("2024-04-01/2024-07-01")
+            "v:rel", iv("2024-01-01/2024-03-31"), iv("2024-04-01/2024-06-30")
         )
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
