@@ -70,7 +70,7 @@ class TestIntervalDateTimeEndpoints:
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
         assert (
-            result["bindings"][0]["iv"]["@value"] == "2025-01-01/2025-04-01T12:00:00Z"
+            result["bindings"][0]["iv"]["@value"] == "2025-01-01T00:00:00Z/2025-04-01T12:00:00Z"
         )
 
     def test_deconstruct_datetime_interval(self):
@@ -101,11 +101,12 @@ class TestIntervalStartDuration:
     def test_extract_start_and_duration_from_date_interval(self):
         """Extract start + P90D duration from a 90-day interval."""
         query = WOQLQuery().interval_start_duration(
-            "v:s", "v:d", dti("2025-01-01/2025-04-01")
+            "v:s", "v:d", dti("2025-01-01/2025-03-31")
         )
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
-        assert result["bindings"][0]["s"]["@value"] == "2025-01-01"
+        assert result["bindings"][0]["s"]["@type"] == "xsd:dateTime"
+        assert result["bindings"][0]["s"]["@value"] == "2025-01-01T00:00:00Z"
         assert result["bindings"][0]["d"]["@value"] == "P90D"
 
     def test_extract_sub_day_duration_from_datetime_interval(self):
@@ -125,7 +126,7 @@ class TestIntervalStartDuration:
         )
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
-        assert result["bindings"][0]["iv"]["@value"] == "2025-01-01/2025-04-01"
+        assert result["bindings"][0]["iv"]["@value"] == "2025-01-01T00:00:00Z/P90D"
 
     def test_construct_full_year_interval(self):
         """Construct a 365-day interval from start + P365D."""
@@ -134,7 +135,7 @@ class TestIntervalStartDuration:
         )
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
-        assert result["bindings"][0]["iv"]["@value"] == "2025-01-01/2026-01-01"
+        assert result["bindings"][0]["iv"]["@value"] == "2025-01-01T00:00:00Z/P365D"
 
 
 class TestIntervalDurationEnd:
@@ -154,21 +155,22 @@ class TestIntervalDurationEnd:
     def test_extract_duration_and_end_from_interval(self):
         """Extract P90D + end date from a 90-day interval."""
         query = WOQLQuery().interval_duration_end(
-            "v:d", "v:e", dti("2025-01-01/2025-04-01")
+            "v:d", "v:e", dti("2025-01-01/2025-03-31")
         )
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
-        assert result["bindings"][0]["e"]["@value"] == "2025-04-01"
+        assert result["bindings"][0]["e"]["@type"] == "xsd:dateTime"
+        assert result["bindings"][0]["e"]["@value"] == "2025-04-01T00:00:00Z"
         assert result["bindings"][0]["d"]["@value"] == "P90D"
 
     def test_construct_interval_from_duration_and_end(self):
         """Construct [Jan 1, Apr 1) from P90D + end date."""
         query = WOQLQuery().interval_duration_end(
-            dur("P90D"), dat("2025-04-01"), "v:iv"
+            dur("P90D"), dat("2025-03-31"), "v:iv"
         )
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
-        assert result["bindings"][0]["iv"]["@value"] == "2025-01-01/2025-04-01"
+        assert result["bindings"][0]["iv"]["@value"] == "P90D/2025-04-01T00:00:00Z"
 
 
 class TestIntervalThreeViewsRoundtrip:
@@ -187,7 +189,7 @@ class TestIntervalThreeViewsRoundtrip:
 
     def test_three_views_agree(self):
         """start/end, start/duration, and duration/end all agree."""
-        iv = dti("2025-01-01/2025-04-01")
+        iv = dti("2025-01-01/2025-03-31")
         query = WOQLQuery().woql_and(
             WOQLQuery().interval("v:s1", "v:e1", iv),
             WOQLQuery().interval_start_duration("v:s2", "v:d2", iv),
