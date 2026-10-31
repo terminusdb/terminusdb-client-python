@@ -145,6 +145,11 @@ def docker_url(pytestconfig):
     Uses port 6363 with admin:root authentication by default.
     Prefers an already-running server, otherwise starts a Docker container.
     """
+    override = os.environ.get("TERMINUSDB_TEST_URL")
+    if override:
+        yield override
+        return
+
     # Check if a server is already running (port 6363)
     if is_local_server_running():
         print("\n✓ Using existing TerminusDB server at http://127.0.0.1:6363")
