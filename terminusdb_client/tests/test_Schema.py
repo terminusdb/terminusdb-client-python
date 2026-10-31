@@ -351,6 +351,8 @@ def test_compress_data(patched, patched2, patched3, patched4):
             "graph_type": "instance",
             "full_replace": "false",
             "raw_json": "false",
+            "merge_repeats": "false",
+            "overwrite": "false",
         },
         data=ANY,
     )
@@ -366,6 +368,8 @@ def test_compress_data(patched, patched2, patched3, patched4):
             "graph_type": "instance",
             "full_replace": "false",
             "raw_json": "false",
+            "merge_repeats": "false",
+            "overwrite": "false",
         },
         json=ANY,
     )
@@ -384,6 +388,7 @@ def test_compress_data(patched, patched2, patched3, patched4):
             "graph_type": "instance",
             "create": "false",
             "raw_json": "false",
+            "merge_repeats": "false",
         },
         data=ANY,
     )
@@ -399,6 +404,7 @@ def test_compress_data(patched, patched2, patched3, patched4):
             "graph_type": "instance",
             "create": "false",
             "raw_json": "false",
+            "merge_repeats": "false",
         },
         json=ANY,
     )
