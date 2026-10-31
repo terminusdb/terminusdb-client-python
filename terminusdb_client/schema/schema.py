@@ -179,6 +179,8 @@ class TerminusClass(type):
 
         # _abstract should not be inherited
         cls._abstract = nmspc.get("_abstract")
+        # _unfoldable should not be inherited
+        cls._unfoldable = nmspc.get("_unfoldable")
         cls._instances = set()
 
         def init(obj, *args, **kwargs):
@@ -288,6 +290,8 @@ class DocumentTemplate(metaclass=TerminusClass):
             result["@key"] = {"@type": "Random"}
         if hasattr(cls, "_abstract") and cls._abstract is not None:
             result["@abstract"] = cls._abstract
+        if hasattr(cls, "_unfoldable") and cls._unfoldable is not None:
+            result["@unfoldable"] = cls._unfoldable
         if hasattr(cls, "_key") and not hasattr(cls, "_subdocument"):
             if hasattr(cls._key, "_keys"):
                 result["@key"] = {
@@ -591,6 +595,8 @@ class Schema:
                 attributedict["_subdocument"] = value
             elif key == "@abstract":
                 attributedict["_abstract"] = value
+            elif key == "@unfoldable":
+                attributedict["_unfoldable"] = value
             elif key == "@key":
                 key_type = value.get("@type")
                 if key_type and key_type == "Random":

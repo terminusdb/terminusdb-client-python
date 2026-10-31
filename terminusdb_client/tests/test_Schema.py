@@ -35,6 +35,20 @@ class ChildAbs(Abstract):
     # _abstract = False
 
 
+class Unfoldable(DocumentTemplate):
+    """This is unfoldable class"""
+
+    _schema = Schema()
+    _unfoldable = []
+    name: str
+
+
+class ChildUnf(Unfoldable):
+    """Child of unfoldable class, should not be unfoldable by default"""
+
+    # _unfoldable = False
+
+
 class TypeCheck(DocumentTemplate):
     """For checking instance types"""
 
@@ -110,6 +124,34 @@ def test_abstract_class_child():
     assert it_ok_to_create.name == "It's ok"
     assert ChildAbs._abstract is None
     assert "@abstract" not in ChildAbs._to_dict()
+
+
+def test_unfoldable_class():
+    it_ok_to_create = Unfoldable(name="It's ok")
+    assert it_ok_to_create.name == "It's ok"
+    assert Unfoldable._unfoldable == []
+    assert Unfoldable._to_dict().get("@unfoldable") == []
+
+
+def test_unfoldable_class_child():
+    it_ok_to_create = ChildUnf(name="It's ok")
+    assert it_ok_to_create.name == "It's ok"
+    assert ChildUnf._unfoldable is None
+    assert "@unfoldable" not in ChildUnf._to_dict()
+
+
+def test_construct_class_with_unfoldable():
+    schema_json = {
+        "@id": "UnfoldableDoc",
+        "@type": "Class",
+        "@unfoldable": [],
+        "@key": {"@type": "Random"},
+        "name": "xsd:string",
+    }
+    schema = Schema()
+    test_result = schema._construct_class(schema_json)
+    assert test_result._unfoldable == []
+    assert test_result._to_dict() == schema_json
 
 
 @pytest.mark.skip(reason="relaxing type checking")

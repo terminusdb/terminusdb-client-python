@@ -404,6 +404,17 @@ class TestDocumentTemplate:
 
         assert result.get("@abstract") is True
 
+    def test_to_dict_with_unfoldable(self):
+        """Test _to_dict with _unfoldable list"""
+
+        class Doc(DocumentTemplate):
+            name: str
+            _unfoldable = []
+
+        result = Doc._to_dict()
+
+        assert result.get("@unfoldable") == []
+
     def test_to_dict_with_hashkey(self):
         """Test _to_dict with HashKey"""
 
