@@ -1463,7 +1463,13 @@ class Client:
 
             document = self._unseen(seen)
 
-        return list(seen.values()) + objects
+        docs = list(seen.values()) + objects
+        if graph_type != "schema":
+            for doc in docs:
+                doc_id = isinstance(doc, dict) and doc.get("@id")
+                if doc_id and "/" not in doc_id and doc.get("@type"):
+                    doc["@id"] = f"{doc['@type']}/{doc_id}"
+        return docs
 
     def insert_document(
         self,
@@ -1651,7 +1657,9 @@ class Client:
         if isinstance(all_docs, list):
             for idx, item in enumerate(all_docs):
                 if hasattr(item, "_obj_to_dict") and not hasattr(item, "_backend_id"):
-                    item._backend_id = result[idx][len("terminusdb:///data/") :]
+                    item._backend_id = result[idx].removeprefix(
+                        "terminusdb:///data/"
+                    )
         return result
 
     def update_document(
@@ -2451,12 +2459,9 @@ class Client:
                 request_dict[key] = self._convert_diff_document(item)
         if document_id is not None:
             if "before_data_version" in request_dict:
-                if document_id[: len("terminusdb:///data")] == "terminusdb:///data":
-                    request_dict["document_id"] = document_id
-                else:
-                    raise ValueError(
-                        f"Valid document id starts with `terminusdb:///data`, but got {document_id}"
-                    )
+                if document_id[: len("terminusdb:///data")] != "terminusdb:///data":
+                    document_id = f"terminusdb:///data/{document_id}"
+                request_dict["document_id"] = document_id
             else:
                 raise ValueError(
                     "`document_id` can only be used in conjusction with a data version or commit ID as `before`, not a document object"
