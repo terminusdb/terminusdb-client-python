@@ -579,6 +579,39 @@ def test_patch(docker_url):
     client.delete_database("patch", "admin")
 
 
+def test_patch_with_capture_ref(docker_url):
+    client = Client(docker_url, user_agent=test_user_agent)
+    client.connect(user="admin", team="admin")
+    client.create_database("patch_ref")
+    schema = [
+        {
+            "@id": "Person",
+            "@type": "Class",
+            "name": "xsd:string",
+            "friend": {"@type": "Optional", "@class": "Person"},
+        }
+    ]
+    client.insert_document(schema, graph_type="schema")
+
+    setup_patch = Patch(
+        json='[{"@op":"Insert","@insert":{"@id":"Person/Charlie","@type":"Person","name":"Charlie"}}]'
+    )
+    client.patch_resource(setup_patch, message="insert Charlie")
+
+    patch = Patch(
+        json='['
+        '{"@op":"Insert","@insert":{"@id":"Person/Alice","@type":"Person","@capture":"PersonA","name":"Alice","friend":{"@ref":"PersonB"}}},'
+        '{"@op":"Insert","@insert":{"@id":"Person/Bob","@type":"Person","@capture":"PersonB","name":"Bob","friend":{"@ref":"PersonA"}}},'
+        '{"@id":"Person/Charlie","friend":{"@op":"SwapValue","@before":null,"@after":{"@ref":"PersonA"}}}'
+        ']'
+    )
+    client.patch_resource(patch, message="swap Charlie friend with ref")
+
+    doc = client.get_document("Person/Charlie")
+    assert doc["friend"] == "Person/Alice"
+    client.delete_database("patch_ref", "admin")
+
+
 def test_diff_ops(docker_url, test_schema):
     # create client and db
     db_name = "pyclient_test_xk7q_diff_ops"

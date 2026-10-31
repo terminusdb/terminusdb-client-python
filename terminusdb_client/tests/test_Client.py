@@ -725,3 +725,23 @@ def test_get_document_history_with_created_updated(mocked_get, mocked_head):
         "user-agent": f"terminusdb-client-python/{__version__}"
     }
     assert last_call[1]["auth"] == ("admin", "root")
+
+
+def test_convert_document_expands_unprefixed_id():
+    client = Client("http://localhost:6363")
+    docs = client._convert_document(
+        [{"@id": "abc123", "@type": "Coordinate", "x": 0.7}], GraphType.INSTANCE
+    )
+    assert docs[0]["@id"] == "Coordinate/abc123"
+
+
+def test_convert_document_keeps_prefixed_and_schema_ids():
+    client = Client("http://localhost:6363")
+    docs = client._convert_document(
+        [{"@id": "Coordinate/abc123", "@type": "Coordinate"}], GraphType.INSTANCE
+    )
+    assert docs[0]["@id"] == "Coordinate/abc123"
+    docs = client._convert_document(
+        [{"@id": "Coordinate", "@type": "Class"}], "schema"
+    )
+    assert docs[0]["@id"] == "Coordinate"
