@@ -49,6 +49,20 @@ class ChildUnf(Unfoldable):
     # _unfoldable = False
 
 
+class Shared(DocumentTemplate):
+    """This is shared class"""
+
+    _schema = Schema()
+    _shared = []
+    name: str
+
+
+class ChildShared(Shared):
+    """Child of shared class, should not be shared by default"""
+
+    # _shared = False
+
+
 class TypeCheck(DocumentTemplate):
     """For checking instance types"""
 
@@ -151,6 +165,38 @@ def test_construct_class_with_unfoldable():
     schema = Schema()
     test_result = schema._construct_class(schema_json)
     assert test_result._unfoldable == []
+    assert test_result._to_dict() == schema_json
+
+
+def test_shared_class():
+    it_ok_to_create = Shared(name="It's ok")
+    assert it_ok_to_create.name == "It's ok"
+    assert Shared._shared == []
+    class_dict = Shared._to_dict()
+    assert class_dict.get("@shared") == []
+    # shared documents are regular documents: they keep their key
+    assert class_dict.get("@key") == {"@type": "Random"}
+    assert "@subdocument" not in class_dict
+
+
+def test_shared_class_child():
+    it_ok_to_create = ChildShared(name="It's ok")
+    assert it_ok_to_create.name == "It's ok"
+    assert ChildShared._shared is None
+    assert "@shared" not in ChildShared._to_dict()
+
+
+def test_construct_class_with_shared():
+    schema_json = {
+        "@id": "SharedDoc",
+        "@type": "Class",
+        "@shared": [],
+        "@key": {"@type": "Random"},
+        "name": "xsd:string",
+    }
+    schema = Schema()
+    test_result = schema._construct_class(schema_json)
+    assert test_result._shared == []
     assert test_result._to_dict() == schema_json
 
 

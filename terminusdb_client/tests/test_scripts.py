@@ -394,6 +394,18 @@ def test_create_script_unfoldable():
     assert "_unfoldable = []" in result
 
 
+def test_create_script_shared():
+    """Test _create_script emitting _shared for @shared classes"""
+    obj_list = [
+        {"@documentation": {"@title": "Test Schema"}},
+        {"@id": "SharedDoc", "@type": "Class", "@shared": []},
+    ]
+
+    result = scripts._create_script(obj_list)
+    assert "class SharedDoc(DocumentTemplate):" in result
+    assert "_shared = []" in result
+
+
 def test_sync_empty_schema():
     """Test _sync with empty schema"""
     mock_client = MagicMock()

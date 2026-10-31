@@ -415,6 +415,17 @@ class TestDocumentTemplate:
 
         assert result.get("@unfoldable") == []
 
+    def test_to_dict_with_shared(self):
+        """Test _to_dict with _shared list"""
+
+        class Doc(DocumentTemplate):
+            name: str
+            _shared = []
+
+        result = Doc._to_dict()
+
+        assert result.get("@shared") == []
+
     def test_to_dict_with_hashkey(self):
         """Test _to_dict with HashKey"""
 
