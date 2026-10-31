@@ -2550,6 +2550,18 @@ class Client:
     ):
         """Apply the patch object to the given resource
 
+        The patch array accepts field-level patches, Insert operations
+        ({"@op":"Insert","@insert":{...}}), and Delete operations
+        ({"@op":"Delete","@delete":{"@id":"..."}} or
+        {"@op":"Delete","@delete":"Document/ID"}). Insert and Delete
+        use the same format as the diff endpoint output, enabling a
+        diff→filter→patch workflow. Insert requires @id to be present.
+
+        Insert operations support @capture and @ref for cross-referencing
+        documents within a single patch transaction. Field-level SwapValue
+        operations also support @ref in @before/@after to reference captures
+        from same-transaction inserts.
+
         Do not connect when using public API.
 
         Returns
