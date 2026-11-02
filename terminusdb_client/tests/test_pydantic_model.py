@@ -10,6 +10,8 @@ from typing import Annotated, List, Optional, Set, Union
 
 import pytest
 
+pytest.importorskip("pydantic", reason="requires terminusdb[pydantic]")
+
 from terminusdb_client.schema.pydantic import (
     Array,
     TerminusModel,

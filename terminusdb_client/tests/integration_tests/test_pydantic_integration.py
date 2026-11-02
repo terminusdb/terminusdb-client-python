@@ -2,6 +2,8 @@ import datetime as dt
 
 import pytest
 
+pytest.importorskip("pydantic", reason="requires terminusdb[pydantic]")
+
 from terminusdb_client.client.Client import Client
 from terminusdb_client.schema.pydantic import (
     PydanticSchema,

@@ -3,6 +3,10 @@
 from unittest.mock import Mock
 from typing import Optional
 
+import pytest
+
+pytest.importorskip("pydantic", reason="requires terminusdb[pydantic]")
+
 from terminusdb_client.schema.pydantic import (
     PydanticSchema,
     TerminusModel,

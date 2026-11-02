@@ -7,6 +7,8 @@ from typing import List, Optional, Set
 
 import pytest
 
+pytest.importorskip("pydantic", reason="requires terminusdb[pydantic]")
+
 from terminusdb_client.schema.pydantic import PydanticSchema, TerminusModel
 from terminusdb_client.schema.schema import LexicalKey
 

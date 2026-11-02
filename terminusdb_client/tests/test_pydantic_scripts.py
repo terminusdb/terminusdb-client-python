@@ -4,6 +4,10 @@ tdbpy check/sync/commit wiring."""
 import types
 from unittest.mock import Mock
 
+import pytest
+
+pytest.importorskip("pydantic", reason="requires terminusdb[pydantic]")
+
 from terminusdb_client.schema.pydantic import (
     PydanticSchema,
     TerminusModel,
