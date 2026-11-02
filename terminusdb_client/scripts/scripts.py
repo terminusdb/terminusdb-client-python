@@ -326,14 +326,236 @@ def _create_script(obj_list):
     return print_script
 
 
-def _sync(client):
+_PY_KEY_CLASSES = {
+    "Lexical": "LexicalKey",
+    "Hash": "HashKey",
+    "ValueHash": "ValueHashKey",
+    "Random": "RandomKey",
+    "UuidV7": "UuidV7Key",
+}
+
+_PY_BASES = {"DocumentTemplate": "TerminusModel", "TaggedUnion": "TerminusUnion"}
+
+
+def _enum_member_name(value):
+    name = "".join(c if c.isalnum() or c == "_" else "_" for c in value)
+    if not name.isidentifier() or (name and name[0].isdigit()):
+        name = "value_" + name
+    return name
+
+
+def _pydantic_spec_src(spec, used_keys, used_types):
+    """Render a TerminusDB property spec as a pydantic field annotation.
+
+    Returns (annotation_source, default_source_or_None).
+    """
+    if isinstance(spec, str):
+        if spec == "sys:Unit":
+            return ("Optional[None]", "None")
+        src = wt.from_woql_type(spec, skip_convert_error=True, as_str=True)
+        if src.startswith("'"):
+            return (src, None)  # class-name forward reference
+        if src == "dict":
+            return ("dict", None)
+        if hasattr(wt, src):
+            used_types.add(src)
+        return (src, None)
+    if not isinstance(spec, dict):
+        raise RuntimeError(f"{spec} is not a TerminusDB property spec")
+
+    spec = dict(spec)
+    unfold = spec.pop("@unfold", None)
+    cardinality = {}
+    for key in ("@cardinality", "@min_cardinality", "@max_cardinality"):
+        if key in spec:
+            cardinality[key] = spec.pop(key)
+
+    spec_type = spec.get("@type")
+    inner = spec.get("@class")
+    if inner is None:
+        raise RuntimeError(f"{spec} is not a TerminusDB property spec")
+    inner_src, _ = _pydantic_spec_src(inner, used_keys, used_types)
+
+    if spec_type == "Optional":
+        src, default = f"Optional[{inner_src}]", "None"
+    elif spec_type == "Set":
+        src, default = f"Set[{inner_src}]", None
+    elif spec_type in ("Cardinality",):
+        src, default = f"Set[{inner_src}]", None
+        cardinality = {**spec, **cardinality}
+    elif spec_type == "List":
+        src, default = f"List[{inner_src}]", None
+    elif spec_type == "Array":
+        dims = spec.get("@dimensions", 1)
+        wrapped = inner_src
+        for _ in range(dims):
+            wrapped = f"list[{wrapped}]"
+        src, default = f"Annotated[{wrapped}, Array]", None
+    else:
+        raise RuntimeError(f"{spec} is not a TerminusDB property spec")
+
+    if unfold:
+        src = f"Annotated[{src}, Unfold]"
+    if cardinality:
+        lo = cardinality.get("@min_cardinality", cardinality.get("@cardinality"))
+        hi = cardinality.get("@max_cardinality", cardinality.get("@cardinality"))
+        params = []
+        if lo is not None:
+            params.append(f"min_length={lo}")
+        if hi is not None:
+            params.append(f"max_length={hi}")
+        default = f"Field({', '.join(params)})"
+    return (src, default)
+
+
+def _create_pydantic_script(obj_list):
+    """Emit a pydantic-model schema.py from schema documents."""
+    obj_list = list(obj_list)
+    context = obj_list.pop(0) if obj_list and obj_list[0].get("@type") == "@context" else None
+
+    used_keys, used_types, result_list = set(), set(), []
+    print_script = (
+        "####\n"
+        "# This is the script for storing the schema of your TerminusDB\n"
+        "# database for your project.\n"
+        "# Use 'terminusdb commit' to commit changes to the database and\n"
+        "# use 'terminusdb sync' to change this file according to\n"
+        "# the exsisting database schema\n"
+        "####\n"
+    )
+    if context is not None:
+        documentation = context.get("@documentation") or {}
+        print_script += '"""\n'
+        if documentation.get("@title"):
+            print_script += "Title: " + documentation["@title"] + "\n"
+        if documentation.get("@description"):
+            print_script += "Description: " + documentation["@description"] + "\n"
+        if documentation.get("@authors"):
+            print_script += "Authors: " + ", ".join(documentation["@authors"]) + "\n"
+        print_script += '"""\n'
+
+    for obj in obj_list:
+        if not obj.get("@id"):
+            continue
+        obj_id, obj_type = obj["@id"], obj.get("@type")
+        script = ""
+        if obj_type == "Enum":
+            script = f"class {obj_id}(TerminusEnum):\n"
+            for value in obj.get("@value", []):
+                script += f'    {_enum_member_name(value)} = "{value}"\n'
+        elif obj_type == "Foreign":
+            script = f"class {obj_id}(TerminusModel):\n    _foreign = True\n"
+        else:
+            if obj_type == "TaggedUnion":
+                bases = ["TerminusUnion"]
+            else:
+                parents = obj.get("@inherits")
+                if parents:
+                    if isinstance(parents, str):
+                        parents = [parents]
+                    bases = [_PY_BASES.get(p, p) for p in parents]
+                else:
+                    bases = ["TerminusModel"]
+            script = f"class {obj_id}({', '.join(bases)}):\n"
+            prop_docs = {}
+            if obj.get("@documentation"):
+                doc = obj["@documentation"]
+                if doc.get("@comment"):
+                    script += f'    """{doc["@comment"]}"""\n'
+                prop_docs = doc.get("@properties") or {}
+            if obj.get("@subdocument") is not None:
+                script += "    _subdocument = []\n"
+            elif obj.get("@key"):
+                key = obj["@key"]
+                key_name = _PY_KEY_CLASSES.get(key.get("@type"))
+                if key_name is None:
+                    raise RuntimeError(f"{key} is not a TerminusDB key type")
+                used_keys.add(key_name)
+                if key.get("@fields"):
+                    script += f"    _key = {key_name}({key['@fields']!r})\n"
+                else:
+                    script += f"    _key = {key_name}()\n"
+            if obj.get("@abstract") is not None:
+                script += "    _abstract = []\n"
+            if obj.get("@shared") is not None:
+                script += "    _shared = True\n"
+            if obj.get("@unfoldable") is not None:
+                script += "    _unfoldable = True\n"
+            if obj.get("@base") is not None:
+                script += f'    _base = "{obj["@base"]}"\n'
+            if obj.get("@metadata") is not None:
+                script += f"    _metadata = {obj['@metadata']!r}\n"
+            field_lines = ""
+            for key, value in obj.items():
+                if key[0] == "@":
+                    continue
+                src, default = _pydantic_spec_src(value, used_keys, used_types)
+                line = f"    {key}: {src}"
+                descr = prop_docs.get(key)
+                if descr is not None:
+                    if default == "None":
+                        default = f'Field(default=None, description={descr!r})'
+                    elif default is None:
+                        default = f'Field(description={descr!r})'
+                    else:  # Field(...) for cardinality: append description
+                        default = default[:-1] + f', description={descr!r})'
+                if default is not None:
+                    line += f" = {default}"
+                field_lines += line + "\n"
+            if field_lines:
+                script += field_lines
+            elif obj_type == "Class":
+                script += "    pass\n"
+        # ordering bookkeeping: parents must print before children
+        entry = {"name": obj_id, "script": script}
+        if obj_type == "Class" and obj.get("@inherits"):
+            parents = obj["@inherits"]
+            entry["parents"] = [parents] if isinstance(parents, str) else list(parents)
+        else:
+            entry["parents"] = []
+        result_list.append(entry)
+
+    body = ""
+    printed = []
+    while result_list:
+        entry = result_list.pop(0)
+        if all(p in printed or p not in {e["name"] for e in result_list + [entry]}
+               for p in entry["parents"]):
+            body += entry["script"] + "\n"
+            printed.append(entry["name"])
+        else:
+            result_list.append(entry)
+
+    imports = "from typing import Annotated, List, Optional, Set\n"
+    if "Field(" in body:
+        imports += "from pydantic import Field\n"
+    imports += (
+        "from terminusdb_client.schema.pydantic import "
+        "Array, TerminusEnum, TerminusModel, TerminusUnion, Unfold\n"
+    )
+    if used_keys:
+        imports += (
+            f"from terminusdb_client.schema import {', '.join(sorted(used_keys))}\n"
+        )
+    if used_types:
+        imports += (
+            f"from terminusdb_client.woql_type import {', '.join(sorted(used_types))}\n"
+        )
+    print_script += imports + body
+    return print_script
+
+
+def _sync(client, model_backend="template"):
     # all_existing_obj = client.get_all_documents(graph_type="schema")
     # all_obj_list = []
     # for obj in all_existing_obj:
     #     all_obj_list.append(obj)
     all_obj_list = client.get_all_documents(graph_type="schema", as_list=True)
     if len(all_obj_list) > 1:
-        print_script = _create_script(all_obj_list)
+        if model_backend == "pydantic":
+            print_script = _create_pydantic_script(all_obj_list)
+        else:
+            print_script = _create_script(all_obj_list)
         print_script = shed(source_code=print_script)
         file = open("schema.py", "w")
         file.write(print_script)
@@ -344,15 +566,28 @@ def _sync(client):
 
 
 @click.command()
-def sync():
+@click.option(
+    "--format",
+    "fmt",
+    type=click.Choice(["template", "pydantic"]),
+    default=None,
+    help="Model backend for the generated schema.py",
+)
+def sync(fmt):
     """Pull the current schema plan in database to schema.py"""
     settings = _load_settings()
     status = _load_settings(".TDB", check=[])
     settings.update(status)
-    settings["database"]
+    backend = fmt or settings.get("model_backend") or "template"
+    if fmt is not None and fmt != settings.get("model_backend"):
+        with open("config.json") as fp:
+            stored = json.load(fp)
+        stored["model_backend"] = fmt
+        with open("config.json", "w") as outfile:
+            json.dump(stored, outfile, sort_keys=True, indent=4)
     client, msg = _connect(settings, new_db=False)
     click.echo(msg)
-    click.echo(_sync(client))
+    click.echo(_sync(client, backend))
 
 
 @click.command()
@@ -400,10 +635,65 @@ def commit(message):
         if isinstance(obj, (woqlschema.TerminusClass, enum.EnumMeta)):
             if obj_str not in ["DocumentTemplate", "EnumTemplate", "TaggedUnion"]:
                 schema_obj.add_obj(obj.__name__, obj)
+        elif _is_terminus_model(obj):
+            schema_obj.add_obj(obj.__name__, obj)
     if message is None:
         message = "Schema updated by Python client."
     schema_obj.commit(client, commit_msg=message, full_replace=True)
     click.echo(f"{database} schema updated.")
+
+
+def _is_terminus_model(obj):
+    try:
+        from ..schema.pydantic import TerminusModel
+    except ImportError:
+        return False
+    return (
+        isinstance(obj, type)
+        and issubclass(obj, TerminusModel)
+        and obj not in (TerminusModel,)
+    )
+
+
+@click.command()
+@click.option(
+    "--ignore-docs",
+    is_flag=True,
+    help="Ignore @documentation differences when comparing schemas",
+)
+def check(ignore_docs):
+    """Diff schema.py against the database schema. Exit 1 on drift."""
+    settings = _load_settings()
+    status = _load_settings(".TDB", check=[])
+    settings.update(status)
+    client, msg = _connect(settings, new_db=False)
+    click.echo(msg)
+    sys.path.append(os.getcwd())
+    try:
+        schema_plan = __import__("schema", globals(), locals(), [], 0)
+    except ModuleNotFoundError:
+        click.echo("No schema.py found in the current directory.")
+        raise SystemExit(2)
+    schema_obj = WOQLSchema()
+    found = False
+    for obj_str in dir(schema_plan):
+        obj = eval(f"schema_plan.{obj_str}")  # noqa: S307
+        if isinstance(obj, (woqlschema.TerminusClass, enum.EnumMeta)):
+            if obj_str not in ["DocumentTemplate", "EnumTemplate", "TaggedUnion"]:
+                schema_obj.add_obj(obj.__name__, obj)
+                found = True
+        elif _is_terminus_model(obj):
+            schema_obj.add_obj(obj.__name__, obj)
+            found = True
+    if not found:
+        click.echo("No schema classes found in schema.py.")
+        raise SystemExit(2)
+    lines = schema_obj.diff(client, ignore_docs=ignore_docs)
+    if lines:
+        for line in lines:
+            click.echo(line)
+        raise SystemExit(1)
+    click.echo("schema.py is in sync with the database schema.")
 
 
 @click.command()
@@ -978,6 +1268,7 @@ def config(set_config, delete):
 tdbpy.add_command(startproject)
 tdbpy.add_command(sync)
 tdbpy.add_command(commit)
+tdbpy.add_command(check)
 tdbpy.add_command(deletedb)
 tdbpy.add_command(importcsv)
 tdbpy.add_command(exportcsv)
