@@ -1422,7 +1422,7 @@ class Client:
             return obj.to_dict()
         elif hasattr(obj, "_to_dict"):
             if hasattr(obj, "_isinstance") and obj._isinstance:
-                if hasattr(obj.__class__, "_subdocument"):
+                if getattr(obj.__class__, "_subdocument", None) is not None:
                     raise ValueError("Subdocument cannot be added directly")
                 (d, refs) = obj._obj_to_dict()
                 # merge all refs
@@ -1453,7 +1453,7 @@ class Client:
                         "Inserting Schema object into non-schema graph."
                     )
                 item_dict = self._conv_to_dict(item)
-                if hasattr(item, "_capture"):
+                if getattr(item, "_capture", None) is not None:
                     seen[item._capture] = item_dict
                 else:
                     if isinstance(item_dict, list):
@@ -1582,7 +1582,9 @@ class Client:
         result = json.loads(_finish_response(result))
         if isinstance(all_docs, list):
             for idx, item in enumerate(all_docs):
-                if hasattr(item, "_obj_to_dict") and not hasattr(item, "_backend_id"):
+                if hasattr(item, "_obj_to_dict") and getattr(
+                    item, "_backend_id", None
+                ) is None:
                     item._backend_id = result[idx]
         return result
 
@@ -1668,7 +1670,9 @@ class Client:
         result = json.loads(_finish_response(result))
         if isinstance(all_docs, list):
             for idx, item in enumerate(all_docs):
-                if hasattr(item, "_obj_to_dict") and not hasattr(item, "_backend_id"):
+                if hasattr(item, "_obj_to_dict") and getattr(
+                    item, "_backend_id", None
+                ) is None:
                     item._backend_id = result[idx].removeprefix(
                         "terminusdb:///data/"
                     )
