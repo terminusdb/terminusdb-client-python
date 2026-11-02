@@ -81,8 +81,7 @@ class RandomKey(TerminusKey):
 
 
 class UuidV7Key(TerminusKey):
-    """Generating ID with RFC 9562 UUID v7"""
-
+    """Generating ID with UUID v7 (RFC 9562); accepts any IRI as @id"""
     at_type = "UuidV7"
 
 
@@ -176,7 +175,7 @@ class TerminusClass(type):
         if "_subdocument" in nmspc:
             allow_custom_id = False
         elif "_key" in nmspc:
-            if nmspc.get("_key").__class__ == RandomKey:
+            if nmspc.get("_key").__class__ in (RandomKey, UuidV7Key):
                 allow_custom_id = True
             else:
                 allow_custom_id = False
@@ -185,6 +184,10 @@ class TerminusClass(type):
 
         # _abstract should not be inherited
         cls._abstract = nmspc.get("_abstract")
+        # _unfoldable should not be inherited
+        cls._unfoldable = nmspc.get("_unfoldable")
+        # _shared should not be inherited
+        cls._shared = nmspc.get("_shared")
         cls._instances = set()
 
         def init(obj, *args, **kwargs):
@@ -294,6 +297,10 @@ class DocumentTemplate(metaclass=TerminusClass):
             result["@key"] = {"@type": "Random"}
         if hasattr(cls, "_abstract") and cls._abstract is not None:
             result["@abstract"] = cls._abstract
+        if hasattr(cls, "_unfoldable") and cls._unfoldable is not None:
+            result["@unfoldable"] = cls._unfoldable
+        if hasattr(cls, "_shared") and cls._shared is not None:
+            result["@shared"] = cls._shared
         if hasattr(cls, "_key") and not hasattr(cls, "_subdocument"):
             if hasattr(cls._key, "_keys"):
                 result["@key"] = {
@@ -312,6 +319,9 @@ class DocumentTemplate(metaclass=TerminusClass):
         if hasattr(self, "_backend_id") and self._backend_id:
             return self._backend_id
         if hasattr(self, "_custom_id") and self._custom_id:
+            if self._key.__class__ == UuidV7Key:
+                # UuidV7 accepts any IRI as @id; do not prefix or quote it
+                return self._custom_id
             return _check_and_fix_custom_id(str(self.__class__), self._custom_id)
         else:
             return None
@@ -602,10 +612,16 @@ class Schema:
                 attributedict["_subdocument"] = value
             elif key == "@abstract":
                 attributedict["_abstract"] = value
+            elif key == "@unfoldable":
+                attributedict["_unfoldable"] = value
+            elif key == "@shared":
+                attributedict["_shared"] = value
             elif key == "@key":
                 key_type = value.get("@type")
                 if key_type and key_type == "Random":
                     attributedict["_key"] = RandomKey()
+                elif key_type and key_type == "UuidV7":
+                    attributedict["_key"] = UuidV7Key()
                 elif key_type and key_type == "ValueHash":
                     attributedict["_key"] = ValueHashKey()
                 elif key_type and key_type == "Lexical":

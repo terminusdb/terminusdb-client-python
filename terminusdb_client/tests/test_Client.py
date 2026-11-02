@@ -745,3 +745,182 @@ def test_convert_document_keeps_prefixed_and_schema_ids():
         [{"@id": "Coordinate", "@type": "Class"}], "schema"
     )
     assert docs[0]["@id"] == "Coordinate"
+
+
+@mock.patch.object(requests.Session, "head", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, "get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, "post", side_effect=mocked_request_success)
+def test_diff_version(mocked_post, mocked_get, mocked_head):
+    client = Client("http://localhost:6363", user="admin", key="root", team="admin")
+    client.connect(db="myDBName")
+
+    client.diff_version("main", "changes")
+
+    client._session.post.assert_called_once_with(
+        "http://localhost:6363/api/diff/admin/myDBName/local/branch/main",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+        json={
+            "before_data_version": "main",
+            "after_data_version": "changes",
+            "unfold": True,
+        },
+    )
+
+
+@mock.patch.object(requests.Session, "head", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, "get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, "post", side_effect=mocked_request_success)
+def test_diff_version_folded(mocked_post, mocked_get, mocked_head):
+    client = Client("http://localhost:6363", user="admin", key="root", team="admin")
+    client.connect(db="myDBName")
+
+    client.diff_version("main", "changes", unfold=False)
+
+    client._session.post.assert_called_once_with(
+        "http://localhost:6363/api/diff/admin/myDBName/local/branch/main",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+        json={
+            "before_data_version": "main",
+            "after_data_version": "changes",
+            "unfold": False,
+        },
+    )
+
+
+@mock.patch.object(requests.Session, "head", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, "get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, "post", side_effect=mocked_request_success)
+def test_diff_versions(mocked_post, mocked_get, mocked_head):
+    client = Client("http://localhost:6363", user="admin", key="root", team="admin")
+    client.connect(db="myDBName")
+
+    result = client.diff("main", "changes")
+
+    client._session.post.assert_called_once_with(
+        "http://localhost:6363/api/diff/admin/myDBName/local/branch/main",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+        json={
+            "before_data_version": "main",
+            "after_data_version": "changes",
+            "unfold": True,
+        },
+    )
+    assert result.content is not None
+
+
+@mock.patch.object(requests.Session, "head", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, "get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, "post", side_effect=mocked_request_success)
+def test_diff_versions_folded(mocked_post, mocked_get, mocked_head):
+    client = Client("http://localhost:6363", user="admin", key="root", team="admin")
+    client.connect(db="myDBName")
+
+    client.diff("main", "changes", unfold=False)
+
+    client._session.post.assert_called_once_with(
+        "http://localhost:6363/api/diff/admin/myDBName/local/branch/main",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+        json={
+            "before_data_version": "main",
+            "after_data_version": "changes",
+            "unfold": False,
+        },
+    )
+
+
+@mock.patch.object(requests.Session, "head", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, "get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, "post", side_effect=mocked_request_success)
+def test_diff_version_and_document(mocked_post, mocked_get, mocked_head):
+    client = Client("http://localhost:6363", user="admin", key="root", team="admin")
+    client.connect(db="myDBName")
+    janine = {"@id": "Person/Janine", "@type": "Person", "name": "Janine"}
+
+    client.diff("main", janine)
+
+    client._session.post.assert_called_once_with(
+        "http://localhost:6363/api/diff/admin/myDBName/local/branch/main",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+        json={
+            "before_data_version": "main",
+            "after": janine,
+            "unfold": True,
+        },
+    )
+
+
+@mock.patch.object(requests.Session, "head", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, "get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, "post", side_effect=mocked_request_success)
+def test_diff_documents_no_unfold(mocked_post, mocked_get, mocked_head):
+    client = Client("http://localhost:6363", user="admin", key="root", team="admin")
+    client.connect(db="myDBName")
+    jane = {"@id": "Person/Jane", "@type": "Person", "name": "Jane"}
+    janine = {"@id": "Person/Jane", "@type": "Person", "name": "Janine"}
+
+    client.diff(jane, janine)
+
+    client._session.post.assert_called_once_with(
+        "http://localhost:6363/api/diff/admin/myDBName/local/branch/main",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+        json={"before": jane, "after": janine},
+    )
+
+
+@mock.patch.object(requests.Session, "head", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, "get", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, "post", side_effect=mocked_request_success)
+def test_diff_document_id(mocked_post, mocked_get, mocked_head):
+    client = Client("http://localhost:6363", user="admin", key="root", team="admin")
+    client.connect(db="myDBName")
+    janine = {"@id": "Person/Jane", "@type": "Person", "name": "Janine"}
+
+    client.diff("commit123", janine, document_id="Person/Jane")
+
+    client._session.post.assert_called_once_with(
+        "http://localhost:6363/api/diff/admin/myDBName/local/branch/main",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+        json={
+            "before_data_version": "commit123",
+            "after": janine,
+            "document_id": "terminusdb:///data/Person/Jane",
+            "unfold": True,
+        },
+    )
+
+
+@mock.patch.object(requests, "post", side_effect=mocked_request_success)
+def test_diff_no_connection(mocked_post):
+    client = Client("http://localhost:6363")
+
+    result = client.diff("main", "changes")
+
+    mocked_post.assert_called_once_with(
+        "http://localhost:6363",
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+        json={
+            "before_data_version": "main",
+            "after_data_version": "changes",
+            "unfold": True,
+        },
+    )
+    assert result.content is not None
+
+
+@mock.patch.object(requests.Session, "head", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, "get", side_effect=mocked_request_success)
+def test_diff_document_id_invalid(mocked_get, mocked_head):
+    client = Client("http://localhost:6363", user="admin", key="root", team="admin")
+    client.connect(db="myDBName")
+    jane = {"@id": "Person/Jane", "@type": "Person", "name": "Jane"}
+    janine = {"@id": "Person/Jane", "@type": "Person", "name": "Janine"}
+
+    with pytest.raises(ValueError):
+        client.diff(jane, janine, document_id="Person/Jane")
