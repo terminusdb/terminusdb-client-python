@@ -222,6 +222,53 @@ def test_woql_substr(docker_url):
     assert result["bindings"][0]["Substring"]["@value"] == "Soc"
 
 
+def test_woql_triple_relation(docker_url):
+    client = Client(docker_url, user_agent=test_user_agent)
+    client.connect()
+    db_name = "relations" + str(random())
+    client.create_database(db_name)
+    client.connect(db=db_name)
+    schema = {
+        "@type": "Class",
+        "@id": "Event",
+        "interval": "xdd:dateTimeInterval",
+    }
+    client.insert_document(schema, graph_type="schema")
+    client.insert_document(
+        [
+            {
+                "@type": "Event",
+                "@id": "Event/ev-2025-Q1",
+                "interval": {
+                    "@type": "xdd:dateTimeInterval",
+                    "@value": "2025-01-01T00:00:00Z/2025-04-01T00:00:00Z",
+                },
+            },
+            {
+                "@type": "Event",
+                "@id": "Event/ev-2025-Q2",
+                "interval": {
+                    "@type": "xdd:dateTimeInterval",
+                    "@value": "2025-04-01T00:00:00Z/2025-07-01T00:00:00Z",
+                },
+            },
+        ]
+    )
+    result = client.query(
+        WOQLQuery().triple_relation(
+            "v:doc",
+            "@schema:interval",
+            "v:iv",
+            "meets",
+            {
+                "@type": "xdd:dateTimeInterval",
+                "@value": "2025-04-01T00:00:00Z/2025-07-01T00:00:00Z",
+            },
+        )
+    )
+    assert [b["doc"] for b in result["bindings"]] == ["Event/ev-2025-Q1"]
+
+
 def test_diff_apply_version(docker_url):
     client = Client(docker_url, user_agent=test_user_agent)
     client.connect()
