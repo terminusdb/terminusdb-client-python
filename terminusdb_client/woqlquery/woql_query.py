@@ -3805,7 +3805,7 @@ class WOQLQuery:
         self._cursor["count"] = self._clean_data_value(countvar)
         return self._add_sub_query(query)
 
-    def cast(self, val, user_type, result, literal_type=None):
+    def cast(self, val, user_type, result, literal_type=None, prefixes=None):
         """Changes the type of va to type and saves the return in vb
 
         Parameters
@@ -3819,6 +3819,11 @@ class WOQLQuery:
         literal_type: str, optional
             literal type of`val`, can be used to treat `val` as a literal rather than an object or variable in the WOQL query.
             If literal type is "owl:Thing" or "node", `val` will be treated as object in the graph
+        prefixes : dict or str or Var, optional
+            prefix map used to expand or contract expanded names
+            (xsd:QName, xbrl:SQName) during the cast. A plain dict is sent
+            as a literal map; a "v:" string or Var is a variable bound
+            elsewhere (e.g. via dot on a stored namespaces dict).
 
         Returns
         -------
@@ -3829,9 +3834,13 @@ class WOQLQuery:
             if (literal_type == "owl:Thing" or literal_type == "node") and isinstance(
                 val, str
             ):
-                return self.cast({"@type": "Value", "node": val}, user_type, result)
+                return self.cast(
+                    {"@type": "Value", "node": val}, user_type, result, prefixes=prefixes
+                )
             else:
-                return self.cast(self.literal(val, literal_type), user_type, result)
+                return self.cast(
+                    self.literal(val, literal_type), user_type, result, prefixes=prefixes
+                )
         if val and val == "args":
             return ["value", "type", "result"]
         if self._cursor.get("@type"):
@@ -3840,6 +3849,11 @@ class WOQLQuery:
         self._cursor["value"] = self._clean_object(val)
         self._cursor["type"] = self._clean_node_value(user_type)
         self._cursor["result"] = self._clean_object(result)
+        if prefixes is not None:
+            if type(prefixes) is dict and "@type" not in prefixes:
+                self._cursor["prefixes"] = {"@type": "Value", "data": prefixes}
+            else:
+                self._cursor["prefixes"] = self._clean_object(prefixes)
         return self
 
     def type_of(self, value, vtype):

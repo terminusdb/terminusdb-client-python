@@ -264,6 +264,36 @@ class TestWoqlQueries:
         woql_object = WOQLQuery().cast("v:Duration", "xsd:integer", "v:Duration_Cast")
         assert woql_object.to_dict() == WOQL_CAST_JSON
 
+    def test_cast_method_prefixes_dict(self):
+        woql_object = WOQLQuery().cast(
+            "v:QName_str",
+            "xsd:QName",
+            "v:QName_val",
+            prefixes={"eg": "http://example.org/ns#"},
+        )
+        json_obj = woql_object.to_dict()
+        assert json_obj["prefixes"] == {
+            "@type": "Value",
+            "data": {"eg": "http://example.org/ns#"},
+        }
+
+    def test_cast_method_prefixes_var(self):
+        woql_object = WOQLQuery().cast(
+            "v:QName_str",
+            "xsd:QName",
+            "v:QName_val",
+            prefixes="v:Namespaces",
+        )
+        json_obj = woql_object.to_dict()
+        assert json_obj["prefixes"] == {
+            "@type": "Value",
+            "variable": "Namespaces",
+        }
+
+    def test_cast_method_no_prefixes(self):
+        woql_object = WOQLQuery().cast("v:Duration", "xsd:integer", "v:Duration_Cast")
+        assert "prefixes" not in woql_object.to_dict()
+
     def test_cast_method_literal(self):
         woql_object1 = WOQLQuery().cast(
             "1", "xsd:integer", "v:Duration_Cast", literal_type="integer"
