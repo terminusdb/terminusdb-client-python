@@ -67,6 +67,33 @@ class TestWoqlQueries:
         assert woql_object.to_dict() == json_obj
         assert woql_object_chain.to_dict() == json_obj
 
+    def test_triple_relation_method(self):
+        woql_object = WOQLQuery().triple_relation(
+            "v:doc",
+            "scm:interval",
+            "v:iv",
+            "meets",
+            {"@type": "xdd:dateTimeInterval", "@value": "2025-01-01/2025-04-01"},
+        )
+        json_obj = {
+            "@type": "TripleRelation",
+            "subject": {"@type": "NodeValue", "variable": "doc"},
+            "predicate": {"@type": "NodeValue", "node": "scm:interval"},
+            "object": {"@type": "Value", "variable": "iv"},
+            "relation": {
+                "@type": "DataValue",
+                "data": {"@type": "xsd:string", "@value": "meets"},
+            },
+            "value": {
+                "@type": "DataValue",
+                "data": {
+                    "@type": "xdd:dateTimeInterval",
+                    "@value": "2025-01-01/2025-04-01",
+                },
+            },
+        }
+        assert woql_object.to_dict() == json_obj
+
     def test_woql_and_method(self):
         woql_object = WOQLQuery().woql_and(
             WOQLQuery().triple("a", "b", "c"), WOQLQuery().triple("1", "2", "3")

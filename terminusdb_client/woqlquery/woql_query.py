@@ -2715,6 +2715,45 @@ class WOQLQuery:
         self._cursor["y"] = self._clean_object(y)
         return self
 
+    def triple_relation(self, sub, pred, obj, relation, value):
+        """Finds triples whose object stands in a typed relation to a
+        reference value.
+
+        Supports the thirteen Allen interval relations on
+        xdd:dateTimeInterval objects; instant objects (xsd:dateTime)
+        compare as zero-duration points. An instant at a meeting boundary
+        belongs to the interval it starts.
+
+        Parameters
+        ----------
+        sub : str
+            Subject, has to be a node (URI) or variable
+        pred : str
+            Predicate, can be variable (prefix with "v:") or node
+        obj : str or dict
+            The interval or instant object or a variable
+        relation : str or dict
+            relation name (e.g. "during", "meets")
+        value : str or dict
+            the reference interval or instant literal
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or execute
+        """
+        if relation is None or value is None:
+            raise ValueError("TripleRelation takes five parameters")
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "TripleRelation"
+        self._cursor["subject"] = self._clean_subject(sub)
+        self._cursor["predicate"] = self._clean_predicate(pred)
+        self._cursor["object"] = self._clean_object(obj)
+        self._cursor["relation"] = self._clean_data_value(relation)
+        self._cursor["value"] = self._clean_data_value(value)
+        return self
+
     def range_min(self, input_list, result):
         """Find the minimum value in a list using the standard ordering.
 
