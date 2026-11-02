@@ -67,6 +67,33 @@ class TestWoqlQueries:
         assert woql_object.to_dict() == json_obj
         assert woql_object_chain.to_dict() == json_obj
 
+    def test_triple_relation_method(self):
+        woql_object = WOQLQuery().triple_relation(
+            "v:doc",
+            "scm:interval",
+            "v:iv",
+            "meets",
+            {"@type": "xdd:dateTimeInterval", "@value": "2025-01-01/2025-04-01"},
+        )
+        json_obj = {
+            "@type": "TripleRelation",
+            "subject": {"@type": "NodeValue", "variable": "doc"},
+            "predicate": {"@type": "NodeValue", "node": "scm:interval"},
+            "object": {"@type": "Value", "variable": "iv"},
+            "relation": {
+                "@type": "DataValue",
+                "data": {"@type": "xsd:string", "@value": "meets"},
+            },
+            "value": {
+                "@type": "DataValue",
+                "data": {
+                    "@type": "xdd:dateTimeInterval",
+                    "@value": "2025-01-01/2025-04-01",
+                },
+            },
+        }
+        assert woql_object.to_dict() == json_obj
+
     def test_woql_and_method(self):
         woql_object = WOQLQuery().woql_and(
             WOQLQuery().triple("a", "b", "c"), WOQLQuery().triple("1", "2", "3")
@@ -236,6 +263,36 @@ class TestWoqlQueries:
     def test_cast_method(self):
         woql_object = WOQLQuery().cast("v:Duration", "xsd:integer", "v:Duration_Cast")
         assert woql_object.to_dict() == WOQL_CAST_JSON
+
+    def test_cast_method_prefixes_dict(self):
+        woql_object = WOQLQuery().cast(
+            "v:QName_str",
+            "xsd:QName",
+            "v:QName_val",
+            prefixes={"eg": "http://example.org/ns#"},
+        )
+        json_obj = woql_object.to_dict()
+        assert json_obj["prefixes"] == {
+            "@type": "Value",
+            "data": {"eg": "http://example.org/ns#"},
+        }
+
+    def test_cast_method_prefixes_var(self):
+        woql_object = WOQLQuery().cast(
+            "v:QName_str",
+            "xsd:QName",
+            "v:QName_val",
+            prefixes="v:Namespaces",
+        )
+        json_obj = woql_object.to_dict()
+        assert json_obj["prefixes"] == {
+            "@type": "Value",
+            "variable": "Namespaces",
+        }
+
+    def test_cast_method_no_prefixes(self):
+        woql_object = WOQLQuery().cast("v:Duration", "xsd:integer", "v:Duration_Cast")
+        assert "prefixes" not in woql_object.to_dict()
 
     def test_cast_method_literal(self):
         woql_object1 = WOQLQuery().cast(
