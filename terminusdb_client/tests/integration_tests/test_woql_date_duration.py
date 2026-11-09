@@ -17,11 +17,6 @@ from terminusdb_client.woqlquery.woql_query import WOQLQuery
 test_user_agent = "terminusdb-client-python-tests"
 
 
-def dat(v):
-    """Build an xsd:date typed literal."""
-    return {"@type": "xsd:date", "@value": v}
-
-
 def dtm(v):
     """Build an xsd:dateTime typed literal."""
     return {"@type": "xsd:dateTime", "@value": v}
@@ -47,25 +42,31 @@ class TestDateDurationComputeDuration:
         self.client.delete_database(self.db_name)
 
     def test_leap_year_91_days(self):
-        """2024-01-01 to 2024-04-01 = P91D (leap year)."""
-        query = WOQLQuery().date_duration(dat("2024-01-01"), dat("2024-04-01"), "v:d")
+        """2024-01-01T00:00:00Z to 2024-04-01T00:00:00Z = P91D (leap year)."""
+        query = WOQLQuery().date_duration(
+            dtm("2024-01-01T00:00:00Z"), dtm("2024-04-01T00:00:00Z"), "v:d"
+        )
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
         assert result["bindings"][0]["d"]["@value"] == "P91D"
 
     def test_non_leap_year_90_days(self):
-        """2025-01-01 to 2025-04-01 = P90D (non-leap year)."""
-        query = WOQLQuery().date_duration(dat("2025-01-01"), dat("2025-04-01"), "v:d")
+        """2025-01-01T00:00:00Z to 2025-04-01T00:00:00Z = P90D (non-leap year)."""
+        query = WOQLQuery().date_duration(
+            dtm("2025-01-01T00:00:00Z"), dtm("2025-04-01T00:00:00Z"), "v:d"
+        )
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
         assert result["bindings"][0]["d"]["@value"] == "P90D"
 
     def test_zero_duration(self):
-        """Same date produces P0D."""
-        query = WOQLQuery().date_duration(dat("2024-01-01"), dat("2024-01-01"), "v:d")
+        """Same instant produces PT0S."""
+        query = WOQLQuery().date_duration(
+            dtm("2024-01-01T00:00:00Z"), dtm("2024-01-01T00:00:00Z"), "v:d"
+        )
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
-        assert result["bindings"][0]["d"]["@value"] == "P0D"
+        assert result["bindings"][0]["d"]["@value"] == "PT0S"
 
     def test_datetime_time_difference(self):
         """dateTime with sub-day difference produces PT9H30M."""
@@ -102,38 +103,48 @@ class TestDateDurationAddition:
 
     def test_jan31_plus_1m_leap(self):
         """Jan 31 + P1M = Feb 29 (leap year EOM)."""
-        query = WOQLQuery().date_duration(dat("2020-01-31"), "v:e", dur("P1M"))
+        query = WOQLQuery().date_duration(
+            dtm("2020-01-31T00:00:00Z"), "v:e", dur("P1M")
+        )
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
-        assert result["bindings"][0]["e"]["@value"] == "2020-02-29"
+        assert result["bindings"][0]["e"]["@value"] == "2020-02-29T00:00:00Z"
 
     def test_jan31_plus_1m_non_leap(self):
         """Jan 31 + P1M = Feb 28 (non-leap year EOM)."""
-        query = WOQLQuery().date_duration(dat("2021-01-31"), "v:e", dur("P1M"))
+        query = WOQLQuery().date_duration(
+            dtm("2021-01-31T00:00:00Z"), "v:e", dur("P1M")
+        )
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
-        assert result["bindings"][0]["e"]["@value"] == "2021-02-28"
+        assert result["bindings"][0]["e"]["@value"] == "2021-02-28T00:00:00Z"
 
     def test_feb29_plus_1m_eom_preservation(self):
         """Feb 29 + P1M = Mar 31 (EOM preservation)."""
-        query = WOQLQuery().date_duration(dat("2020-02-29"), "v:e", dur("P1M"))
+        query = WOQLQuery().date_duration(
+            dtm("2020-02-29T00:00:00Z"), "v:e", dur("P1M")
+        )
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
-        assert result["bindings"][0]["e"]["@value"] == "2020-03-31"
+        assert result["bindings"][0]["e"]["@value"] == "2020-03-31T00:00:00Z"
 
     def test_apr30_plus_1m_eom_preservation(self):
         """Apr 30 + P1M = May 31 (EOM preservation)."""
-        query = WOQLQuery().date_duration(dat("2020-04-30"), "v:e", dur("P1M"))
+        query = WOQLQuery().date_duration(
+            dtm("2020-04-30T00:00:00Z"), "v:e", dur("P1M")
+        )
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
-        assert result["bindings"][0]["e"]["@value"] == "2020-05-31"
+        assert result["bindings"][0]["e"]["@value"] == "2020-05-31T00:00:00Z"
 
     def test_dec31_plus_1m_year_boundary(self):
         """Dec 31 + P1M = Jan 31 next year."""
-        query = WOQLQuery().date_duration(dat("2020-12-31"), "v:e", dur("P1M"))
+        query = WOQLQuery().date_duration(
+            dtm("2020-12-31T00:00:00Z"), "v:e", dur("P1M")
+        )
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
-        assert result["bindings"][0]["e"]["@value"] == "2021-01-31"
+        assert result["bindings"][0]["e"]["@value"] == "2021-01-31T00:00:00Z"
 
 
 class TestDateDurationSubtraction:
@@ -152,24 +163,30 @@ class TestDateDurationSubtraction:
 
     def test_mar31_minus_1m_leap(self):
         """Mar 31 - P1M = Feb 29 (leap year)."""
-        query = WOQLQuery().date_duration("v:s", dat("2020-03-31"), dur("P1M"))
+        query = WOQLQuery().date_duration(
+            "v:s", dtm("2020-03-31T00:00:00Z"), dur("P1M")
+        )
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
-        assert result["bindings"][0]["s"]["@value"] == "2020-02-29"
+        assert result["bindings"][0]["s"]["@value"] == "2020-02-29T00:00:00Z"
 
     def test_mar31_minus_1m_non_leap(self):
         """Mar 31 - P1M = Feb 28 (non-leap year)."""
-        query = WOQLQuery().date_duration("v:s", dat("2021-03-31"), dur("P1M"))
+        query = WOQLQuery().date_duration(
+            "v:s", dtm("2021-03-31T00:00:00Z"), dur("P1M")
+        )
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
-        assert result["bindings"][0]["s"]["@value"] == "2021-02-28"
+        assert result["bindings"][0]["s"]["@value"] == "2021-02-28T00:00:00Z"
 
     def test_jan31_minus_1m_year_boundary(self):
         """Jan 31 - P1M = Dec 31 previous year."""
-        query = WOQLQuery().date_duration("v:s", dat("2021-01-31"), dur("P1M"))
+        query = WOQLQuery().date_duration(
+            "v:s", dtm("2021-01-31T00:00:00Z"), dur("P1M")
+        )
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
-        assert result["bindings"][0]["s"]["@value"] == "2020-12-31"
+        assert result["bindings"][0]["s"]["@value"] == "2020-12-31T00:00:00Z"
 
 
 class TestDateDurationEOMReversibility:
@@ -188,10 +205,12 @@ class TestDateDurationEOMReversibility:
 
     def test_feb29_minus_1m_equals_jan31(self):
         """Feb 29 - P1M = Jan 31 (reverse of Jan 31 + P1M = Feb 29)."""
-        query = WOQLQuery().date_duration("v:s", dat("2020-02-29"), dur("P1M"))
+        query = WOQLQuery().date_duration(
+            "v:s", dtm("2020-02-29T00:00:00Z"), dur("P1M")
+        )
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
-        assert result["bindings"][0]["s"]["@value"] == "2020-01-31"
+        assert result["bindings"][0]["s"]["@value"] == "2020-01-31T00:00:00Z"
 
 
 class TestDateDurationValidation:
@@ -211,7 +230,7 @@ class TestDateDurationValidation:
     def test_consistent_succeeds(self):
         """Consistent start+end+duration returns one binding."""
         query = WOQLQuery().date_duration(
-            dat("2024-01-01"), dat("2024-04-01"), dur("P91D")
+            dtm("2024-01-01T00:00:00Z"), dtm("2024-04-01T00:00:00Z"), dur("P91D")
         )
         result = self.client.query(query)
         assert len(result["bindings"]) == 1
@@ -219,7 +238,7 @@ class TestDateDurationValidation:
     def test_inconsistent_fails(self):
         """Inconsistent start+end+duration returns zero bindings."""
         query = WOQLQuery().date_duration(
-            dat("2024-01-01"), dat("2024-04-01"), dur("P90D")
+            dtm("2024-01-01T00:00:00Z"), dtm("2024-04-01T00:00:00Z"), dur("P90D")
         )
         result = self.client.query(query)
         assert len(result["bindings"]) == 0
