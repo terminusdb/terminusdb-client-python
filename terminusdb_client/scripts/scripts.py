@@ -227,6 +227,12 @@ def _create_script(obj_list):
         def add_abstract(self):
             self.script += "    _abstract = []\n"
 
+        def add_unfoldable(self):
+            self.script += "    _unfoldable = []\n"
+
+        def add_shared(self):
+            self.script += "    _shared = []\n"
+
         def add_docstring(self, obj_dict):
             self.script += '    """'
             if obj_dict["@documentation"].get("@comment"):
@@ -297,6 +303,10 @@ def _create_script(obj_list):
 
             if obj.get("@abstract") is not None:
                 result_obj.add_abstract()
+            if obj.get("@unfoldable") is not None:
+                result_obj.add_unfoldable()
+            if obj.get("@shared") is not None:
+                result_obj.add_shared()
             result_list.append(result_obj)
 
             for key, value in obj.items():
