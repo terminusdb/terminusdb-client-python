@@ -44,6 +44,15 @@ class DatabaseError(Error):
             response from the api call
         """
         super().__init__()
+        if isinstance(response, dict):
+            self.error_obj = response
+            details = json.dumps(response, indent=4, sort_keys=True)
+            msg = response.get("api:message")
+            if not msg and isinstance(response.get("api:error"), dict):
+                msg = response["api:error"].get("vio:message")
+            self.message = (msg + "\n" if msg else "Unknown Error:\n") + details
+            self.status_code = None
+            return
         if not response.text:
             self.message = "Unknown Error - No error message from response."
         elif (
