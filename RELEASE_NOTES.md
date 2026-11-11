@@ -1,4 +1,42 @@
-# TerminusDB Python Client Release Notes
+# TerminusDB Python Client 12.0.9
+
+The 12.0.9 client aligns with the TerminusDB 12.0.x server line and resumes releases on PyPI under the `terminusdb` package name. The intermediate version declarations (12.0.6–12.0.8) were never tagged or released, so this entry covers all changes since v12.0.5.
+
+Headline changes:
+
+* **Upsert-capable document writes.** `insert_document` gains `overwrite` (replace an existing document sharing an `@id` instead of erroring) and `merge_repeats` (tolerate duplicate document IDs within one request); `update_document` gains `merge_repeats` [#472](https://github.com/terminusdb/terminusdb-client-python/pull/472)
+* **Unfolding, end to end.** `diff` gains an `unfold` option, and the Python schema layer supports `@unfold` and `@shared` on document metadata [#471](https://github.com/terminusdb/terminusdb-client-python/pull/471) [#480](https://github.com/terminusdb/terminusdb-client-python/pull/480)
+* **WOQL `triple_relation`** relates a triple's object to a reference value — including the thirteen Allen interval relations on `xdd:dateTimeInterval` — plus custom dict support during typecasting [#481](https://github.com/terminusdb/terminusdb-client-python/pull/481)
+* **Python 3.9 dropped** to clear vulnerable dependency pins; Python 3.10 or later is now required [#478](https://github.com/terminusdb/terminusdb-client-python/pull/478)
+
+## New functionality
+
+* `insert_document`: `overwrite` for upsert behaviour, `merge_repeats` for duplicate IDs in the same request; `update_document`: `merge_repeats` [#472](https://github.com/terminusdb/terminusdb-client-python/pull/472)
+* `unfold` option on the diff endpoint [#471](https://github.com/terminusdb/terminusdb-client-python/pull/471)
+* `@unfold` and `@shared` support in the Python schema layer [#480](https://github.com/terminusdb/terminusdb-client-python/pull/480)
+* WOQL `triple_relation` predicate and custom dict support during typecasting [#481](https://github.com/terminusdb/terminusdb-client-python/pull/481)
+* `WOQLQuery.idgen_uuid_v7` and `UuidV7Key` schema class for time-ordered UUID v7 identifiers [#473](https://github.com/terminusdb/terminusdb-client-python/pull/473)
+* `DocParamsGet` documents the full document GET parameter set [#484](https://github.com/terminusdb/terminusdb-client-python/pull/484)
+
+## Bugfixes
+
+* Accept unprefixed document ids and fix backend id parsing for compressed ids [#479](https://github.com/terminusdb/terminusdb-client-python/pull/479)
+* Fix `pull` and `DatabaseError` bugs; `DatabaseError` now parses dict error responses (`api:message`, `vio:message`) [#484](https://github.com/terminusdb/terminusdb-client-python/pull/484)
+* Interval and `xsd:dateTime` boundary test fixes [#477](https://github.com/terminusdb/terminusdb-client-python/pull/477) [#483](https://github.com/terminusdb/terminusdb-client-python/pull/483)
+* Patch Insert/Delete ops documented with `@capture`/`@ref`, with an added integration test [#476](https://github.com/terminusdb/terminusdb-client-python/pull/476)
+
+## Maintenance
+
+* Align the `pyproject.toml` and `__version__.py` version declarations, which had drifted to 12.0.5 and 12.0.7 respectively [#485](https://github.com/terminusdb/terminusdb-client-python/pull/485)
+* Publish via a dedicated release workflow triggered on GitHub Releases, with tag↔version verification and PyPI trusted publishing
+* Dependency updates: certifi, idna, pygments [#468](https://github.com/terminusdb/terminusdb-client-python/pull/468) [#469](https://github.com/terminusdb/terminusdb-client-python/pull/469) [#475](https://github.com/terminusdb/terminusdb-client-python/pull/475)
+* `Client.py` unit test coverage raised to 95% [#484](https://github.com/terminusdb/terminusdb-client-python/pull/484)
+
+## Deprecations
+
+* Drop Python 3.9 support to clear vulnerable dependency pins [#478](https://github.com/terminusdb/terminusdb-client-python/pull/478)
+
+**Full Changelog**: https://github.com/terminusdb/terminusdb-client-python/compare/v12.0.5...v12.0.9
 
 ## v11.1.0
 
