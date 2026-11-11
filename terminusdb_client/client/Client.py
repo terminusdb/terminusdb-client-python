@@ -1211,10 +1211,13 @@ class Client:
         payload["skip"] = skip
         if count is not None:
             payload["count"] = count
-        add_args = ["prefixed", "minimized", "unfold"]
+        add_args = ["prefixed", "minimized", "unfold", "raw_id", "ids", "id_prefix", "counted", "compress_ids", "xsd", "identifiers", "format"]
         for the_arg in add_args:
             if the_arg in kwargs:
-                payload[the_arg] = kwargs[the_arg]
+                value = kwargs[the_arg]
+                payload[the_arg] = (
+                    str(value).lower() if isinstance(value, bool) else value
+                )
         headers = self._default_headers.copy()
         headers["X-HTTP-Method-Override"] = "GET"
         result = self._session.post(
@@ -1255,7 +1258,7 @@ class Client:
         get_data_version : bool
             If the data version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.
         kwargs :
-            Additional boolean flags for retriving. Currently avaliable: "prefixed", "minimized", "unfold"
+            Additional query parameters forwarded to the GET document endpoint: booleans "prefixed", "minimized", "unfold", "compress_ids", "identifiers", "counted" (returns api:DocumentCountResponse), "raw_id" (returns the server-generated @id for raw sys:JSONDocument inserts, omitted by default since TerminusDB 12.1); strings "id_prefix", "format" ("json", "embedding", "markdown" or "ids"), "xsd" ("1.0" or "1.1"); and "ids" (a list of document ids to retrieve).
 
         Raises
         ------
@@ -1266,12 +1269,15 @@ class Client:
         -------
         dict
         """
-        add_args = ["prefixed", "minimized", "unfold"]
+        add_args = ["prefixed", "minimized", "unfold", "raw_id", "ids", "id_prefix", "counted", "compress_ids", "xsd", "identifiers", "format"]
         self._check_connection()
         payload = {"id": iri_id, "graph_type": graph_type}
         for the_arg in add_args:
             if the_arg in kwargs:
-                payload[the_arg] = kwargs[the_arg]
+                value = kwargs[the_arg]
+                payload[the_arg] = (
+                    str(value).lower() if isinstance(value, bool) else value
+                )
 
         result = self._session.get(
             self._documents_url(),
@@ -1313,7 +1319,7 @@ class Client:
         get_data_version : bool
             If the version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.
         kwargs :
-            Additional boolean flags for retriving. Currently avaliable: "prefixed", "unfold"
+            Additional query parameters forwarded to the GET document endpoint: booleans "prefixed", "minimized", "unfold", "compress_ids", "identifiers", "counted" (returns api:DocumentCountResponse), "raw_id" (returns the server-generated @id for raw sys:JSONDocument inserts, omitted by default since TerminusDB 12.1); strings "id_prefix", "format" ("json", "embedding", "markdown" or "ids"), "xsd" ("1.0" or "1.1"); and "ids" (a list of document ids to retrieve).
 
         Raises
         ------
@@ -1360,7 +1366,7 @@ class Client:
         get_data_version : bool
             If the version of the document(s) should be obtained. If True, the method return the result and the version as a tuple.
         kwargs :
-            Additional boolean flags for retriving. Currently avaliable: "prefixed", "unfold"
+            Additional query parameters forwarded to the GET document endpoint: booleans "prefixed", "minimized", "unfold", "compress_ids", "identifiers", "counted" (returns api:DocumentCountResponse), "raw_id" (returns the server-generated @id for raw sys:JSONDocument inserts, omitted by default since TerminusDB 12.1); strings "id_prefix", "format" ("json", "embedding", "markdown" or "ids"), "xsd" ("1.0" or "1.1"); and "ids" (a list of document ids to retrieve).
 
         Raises
         ------
@@ -1372,7 +1378,7 @@ class Client:
         iterable
             Stream of dictionaries
         """
-        add_args = ["prefixed", "unfold"]
+        add_args = ["prefixed", "minimized", "unfold", "raw_id", "ids", "id_prefix", "counted", "compress_ids", "xsd", "identifiers", "format"]
         self._check_connection()
         payload = _args_as_payload(
             {
@@ -1384,7 +1390,10 @@ class Client:
         )
         for the_arg in add_args:
             if the_arg in kwargs:
-                payload[the_arg] = kwargs[the_arg]
+                value = kwargs[the_arg]
+                payload[the_arg] = (
+                    str(value).lower() if isinstance(value, bool) else value
+                )
         result = self._session.get(
             self._documents_url(),
             headers=self._default_headers,
