@@ -3167,6 +3167,40 @@ class WOQLQuery:
         """
         return self.idgen_random(prefix, uri)
 
+    def idgen_uuid_v7(self, prefix, uri):
+        """Generates a unique ID with a UUID v7 (RFC 9562) suffix.
+
+        UUID v7 identifiers are time-ordered, which works well with the
+        front-loaded encoding of TerminusDB. Matches the server's
+        idgen_uuid_v7/2 predicate and maintains consistency with the
+        JavaScript client.
+
+        Parameters
+        ----------
+        prefix : str
+            A prefix for the IDs to be generated (e.g. "Person/")
+        uri : str
+            Variable name or output target for the generated ID
+
+        Returns
+        -------
+        WOQLQuery object
+            query object that can be chained and/or executed
+
+        Examples
+        -------
+        >>> WOQLQuery().idgen_uuid_v7("Person/", "v:person_id").execute(client)
+        {'@type': 'api:WoqlResponse', 'api:status': 'api:success', 'api:variable_names': ['person_id'], 'bindings': [{'person_id': 'Person/01a120f0-47a7-7f20-9295-b3034d7fc5d3'}], 'deletes': 0, 'inserts': 0, 'transaction_retry_count': 0}
+        """
+        if prefix and prefix == "args":
+            return ["base", "uri"]
+        if self._cursor.get("@type"):
+            self._wrap_cursor_with_and()
+        self._cursor["@type"] = "UuidV7"
+        self._cursor["base"] = self._clean_data_value(prefix)
+        self._cursor["uri"] = self._clean_node_value(uri)
+        return self
+
     def upper(self, left, right):
         """Changes a string to upper-case - input is in left, output in right
 
