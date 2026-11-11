@@ -1214,7 +1214,10 @@ class Client:
         add_args = ["prefixed", "minimized", "unfold", "raw_id", "ids", "id_prefix", "counted", "compress_ids", "xsd", "identifiers", "format"]
         for the_arg in add_args:
             if the_arg in kwargs:
-                payload[the_arg] = kwargs[the_arg]
+                value = kwargs[the_arg]
+                payload[the_arg] = (
+                    str(value).lower() if isinstance(value, bool) else value
+                )
         headers = self._default_headers.copy()
         headers["X-HTTP-Method-Override"] = "GET"
         result = self._session.post(
@@ -1271,7 +1274,10 @@ class Client:
         payload = {"id": iri_id, "graph_type": graph_type}
         for the_arg in add_args:
             if the_arg in kwargs:
-                payload[the_arg] = kwargs[the_arg]
+                value = kwargs[the_arg]
+                payload[the_arg] = (
+                    str(value).lower() if isinstance(value, bool) else value
+                )
 
         result = self._session.get(
             self._documents_url(),
@@ -1384,7 +1390,10 @@ class Client:
         )
         for the_arg in add_args:
             if the_arg in kwargs:
-                payload[the_arg] = kwargs[the_arg]
+                value = kwargs[the_arg]
+                payload[the_arg] = (
+                    str(value).lower() if isinstance(value, bool) else value
+                )
         result = self._session.get(
             self._documents_url(),
             headers=self._default_headers,
