@@ -222,6 +222,53 @@ def test_woql_substr(docker_url):
     assert result["bindings"][0]["Substring"]["@value"] == "Soc"
 
 
+def test_woql_triple_relation(docker_url):
+    client = Client(docker_url, user_agent=test_user_agent)
+    client.connect()
+    db_name = "relations" + str(random())
+    client.create_database(db_name)
+    client.connect(db=db_name)
+    schema = {
+        "@type": "Class",
+        "@id": "Event",
+        "interval": "xdd:dateTimeInterval",
+    }
+    client.insert_document(schema, graph_type="schema")
+    client.insert_document(
+        [
+            {
+                "@type": "Event",
+                "@id": "Event/ev-2025-Q1",
+                "interval": {
+                    "@type": "xdd:dateTimeInterval",
+                    "@value": "2025-01-01T00:00:00Z/2025-04-01T00:00:00Z",
+                },
+            },
+            {
+                "@type": "Event",
+                "@id": "Event/ev-2025-Q2",
+                "interval": {
+                    "@type": "xdd:dateTimeInterval",
+                    "@value": "2025-04-01T00:00:00Z/2025-07-01T00:00:00Z",
+                },
+            },
+        ]
+    )
+    result = client.query(
+        WOQLQuery().triple_relation(
+            "v:doc",
+            "@schema:interval",
+            "v:iv",
+            "meets",
+            {
+                "@type": "xdd:dateTimeInterval",
+                "@value": "2025-04-01T00:00:00Z/2025-07-01T00:00:00Z",
+            },
+        )
+    )
+    assert [b["doc"] for b in result["bindings"]] == ["Event/ev-2025-Q1"]
+
+
 def test_diff_apply_version(docker_url):
     client = Client(docker_url, user_agent=test_user_agent)
     client.connect()
@@ -435,9 +482,10 @@ def test_has_doc(docker_url):
     client.create_database(db_name, team="admin")
     client.connect(db=db_name)
     assert not client.has_doc("THIS_DOCUMENT_DOES_NOT_EXIST")
-    client.insert_document({"test": "test"}, raw_json=True)
-    doc_id = list(client.get_all_documents())[0]["@id"]
-    assert client.has_doc(doc_id)
+    client.insert_document(
+        {"@id": "test_document_has_doc", "test": "test"}, raw_json=True
+    )
+    assert client.has_doc("test_document_has_doc")
 
 
 def test_get_organization_user_databases(docker_url):
