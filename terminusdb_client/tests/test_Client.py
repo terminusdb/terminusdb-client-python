@@ -1404,6 +1404,8 @@ class TestClientWave3:
         client.diff("v1", "v2", document_id="doc/x")
         with pytest.raises(ValueError):
             client.diff({"a": 1}, {"a": 2}, document_id="doc/x")
+
+
 @mock.patch.object(requests.Session, "head", side_effect=mocked_request_success)
 @mock.patch.object(requests.Session, "get", side_effect=mocked_request_success)
 @mock.patch.object(requests.Session, "post", side_effect=mocked_request_success)
