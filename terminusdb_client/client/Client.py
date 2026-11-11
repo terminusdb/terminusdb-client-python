@@ -2009,7 +2009,7 @@ class Client:
         if remote_branch is None:
             remote_branch = self.branch
         if author is None:
-            author = self.author
+            author = self._author
         if message is None:
             message = (
                 f"Pulling from {remote}/{remote_branch} by Python client {__version__}"
