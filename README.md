@@ -59,7 +59,7 @@ If you want to use woqlDataframe or the import and export CSV function in the Sc
 
 ## Demo
 
-![Client Demo gif](https://github.com/terminusdb/terminusdb-web-assets/blob/master/images/terminusdb%20python%20v10%20client%20demo%201.gif)
+![Client Demo gif](https://raw.githubusercontent.com/terminusdb/terminusdb-web-assets/master/images/terminusdb%20python%20v10%20client%20demo%201.gif)
 
 ## Usage
 
@@ -150,7 +150,7 @@ client.delete_database("MyDatabase")
 
 ### Scaffolding CLI tool
 
-![Scaffolding Demo gif](https://github.com/terminusdb/terminusdb-web-assets/blob/master/images/terminusdb%20python%20v10%20scaffolding%20demo%202.gif)
+![Scaffolding Demo gif](https://raw.githubusercontent.com/terminusdb/terminusdb-web-assets/master/images/terminusdb%20python%20v10%20scaffolding%20demo%202.gif)
 
 Start a project in the directory
 
