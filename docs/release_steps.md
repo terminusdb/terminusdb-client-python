@@ -3,8 +3,8 @@
 ## Quick Release
 
 1. Update release notes (`RELEASE_NOTES.md`)
-2. Bump version (bumpversion [patch|minor|major])
-3. Push new tag (`git push origin main --tags`)
+2. Bump version (`bumpversion [patch|minor|major]`) and push `main` with the bump commit
+3. Create a GitHub Release with a `vX.Y.Z` tag — publishing it triggers the release workflow, which verifies the tag matches `pyproject.toml` and deploys to PyPI
 
 ### Bump version (updates files + creates tag)
 
@@ -14,22 +14,13 @@ To not create a tag, use `--no-tag`.
 bumpversion [patch|minor|major]
 ```
 
-### Create and push tag (triggers automated PyPI deployment)
+### Create the release (triggers automated PyPI deployment)
 
-```bash
-git push origin main --tags
-```
+Draft a GitHub Release at https://github.com/terminusdb/terminusdb-client-python/releases/new with a new `vX.Y.Z` tag matching the bumped version, then publish it. The `release.yml` workflow checks that the tag equals `pyproject.toml`'s version and fails otherwise.
 
 **Monitor**: https://github.com/terminusdb/terminusdb-client-python/actions
 
 ## Details
-
-### Create tag manually
-
-```bash
-git tag -s v11.1.0 -m "Release v11.1.0"
-git push origin main --tags
-```
 
 ### What bumpversion updates
 - `terminusdb_client/__version__.py`
@@ -37,10 +28,12 @@ git push origin main --tags
 - `.bumpversion.cfg`
 
 ### Automated deployment
-Pushing a tag triggers GitHub Actions to:
-- Run tests (Python 3.9-3.12)
+Publishing a GitHub Release triggers `.github/workflows/release.yml` to:
+- Verify the release tag matches `pyproject.toml`'s version
 - Build with Poetry
-- Publish to PyPI
+- Publish to PyPI as `terminusdb` via trusted publishing (`id-token`)
+
+PyPI trusted publishing must be registered for the `release.yml` workflow file in the `terminusdb` project settings on PyPI.
 
 ### Manual deployment (if needed)
 ```bash
@@ -55,4 +48,4 @@ poetry publish
 ## Prerequisites
 
 - Install: `pip install bumpversion`
-- PyPI publishing handled via `PYPI_API_TOKEN` secret in GitHub Actions
+- PyPI publishing uses trusted publishing (OIDC) — no API token secret needed

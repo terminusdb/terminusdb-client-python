@@ -1,0 +1,34 @@
+name: Build and release on PyPI
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  setup-build-publish-deploy:
+    name: Setup, Build, Publish, and Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v7
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v7
+      with:
+        python-version: "3.12"
+    - name: Verify release tag matches package version
+      run: |
+        PKG_VERSION=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['tool']['poetry']['version'])")
+        TAG="${GITHUB_REF_NAME#v}"
+        if [ "$PKG_VERSION" != "$TAG" ]; then
+          echo "Release tag ${GITHUB_REF_NAME} does not match pyproject.toml version ${PKG_VERSION}"
+          exit 1
+        fi
+    - name: Build with Poetry
+      run: |
+        pip install poetry
+        poetry build
+    - name: Deploy to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
