@@ -435,9 +435,10 @@ def test_has_doc(docker_url):
     client.create_database(db_name, team="admin")
     client.connect(db=db_name)
     assert not client.has_doc("THIS_DOCUMENT_DOES_NOT_EXIST")
-    client.insert_document({"test": "test"}, raw_json=True)
-    doc_id = list(client.get_all_documents())[0]["@id"]
-    assert client.has_doc(doc_id)
+    client.insert_document(
+        {"@id": "test_document_has_doc", "test": "test"}, raw_json=True
+    )
+    assert client.has_doc("test_document_has_doc")
 
 
 def test_get_organization_user_databases(docker_url):
