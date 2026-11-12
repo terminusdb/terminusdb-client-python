@@ -20,6 +20,10 @@ typeguard = "^4.0.0"
 tqdm = "*"
 click = ">=8.0"
 shed = "*"
+pydantic = { version = ">=2.7,<3", optional = true }
+
+[tool.poetry.extras]
+pydantic = ["pydantic"]
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">= 3"

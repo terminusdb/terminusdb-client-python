@@ -82,7 +82,6 @@ class RandomKey(TerminusKey):
 
 class UuidV7Key(TerminusKey):
     """Generating ID with UUID v7 (RFC 9562); accepts any IRI as @id"""
-
     at_type = "UuidV7"
 
 
@@ -496,6 +495,7 @@ class Schema:
         authors: Optional[List[str]] = None,
         schema_ref=None,
         base_ref=None,
+        metadata: Optional[dict] = None,
     ):
         self.object = {}
         self._all_existing_classes = {}
@@ -504,6 +504,7 @@ class Schema:
         self.authors = authors
         self.schema_ref = schema_ref
         self.base_ref = base_ref
+        self.metadata = metadata
 
     @property
     def context(self):
@@ -518,12 +519,15 @@ class Schema:
         documentation = {"@title": title, "@description": description}
         if self.authors is not None:
             documentation["@authors"] = self.authors
-        return {
+        context = {
             "@type": "@context",
             "@documentation": documentation,
             "@schema": self.schema_ref,
             "@base": self.base_ref,
         }
+        if getattr(self, "metadata", None) is not None:
+            context["@metadata"] = self.metadata
+        return context
 
     @context.setter
     def context(self, value):
@@ -652,6 +656,8 @@ class Schema:
                 self.authors = documentation["@authors"]
         self.base_ref = context_dict.get("@base")
         self.schema_ref = context_dict.get("@schema")
+        if context_dict.get("@metadata") is not None:
+            self.metadata = context_dict["@metadata"]
 
     def _construct_object(self, obj_dict):
         obj_type = obj_dict.get("@type")
@@ -942,6 +948,67 @@ class Schema:
         all_obj = [cls._to_dict() for cls in self.all_obj()]
         all_obj.sort(key=lambda item: item.get("@id"))
         return [self.context] + all_obj
+
+    def diff(self, client: Client, ignore_docs=False):
+        """Compare this schema with the database schema graph.
+
+        Returns a list of diff lines; empty means the schemas match.
+        """
+        import difflib
+
+        server_docs = client.get_all_documents(
+            graph_type=GraphType.SCHEMA, as_list=True
+        )
+        local_docs = self.to_dict()
+
+        def norm(obj):
+            if isinstance(obj, dict):
+                out = {
+                    k: norm(v)
+                    for k, v in sorted(obj.items())
+                    if not (ignore_docs and k == "@documentation")
+                }
+                # Random is the engine default key; an explicit "@key":
+                # {"@type": "Random"} and its absence are equivalent
+                if out.get("@key") == {"@type": "Random"}:
+                    del out["@key"]
+                # the engine emits a lone parent as a string, the client
+                # always emits a list
+                if isinstance(out.get("@inherits"), str):
+                    out["@inherits"] = [out["@inherits"]]
+                return out
+            if isinstance(obj, list):
+                return [norm(v) for v in obj]
+            return obj
+
+        def index(docs):
+            out = {}
+            for doc in docs:
+                out[doc.get("@id") or "__context__"] = doc
+            return out
+
+        local = index(local_docs)
+        server = index(server_docs)
+        lines = []
+        for item in sorted(set(server) - set(local)):
+            lines.append(f"missing locally: {item}")
+        for item in sorted(set(local) - set(server)):
+            lines.append(f"missing on server: {item}")
+        for item in sorted(set(local) & set(server)):
+            a = norm(local[item])
+            b = norm(server[item])
+            if a != b:
+                lines.append(f"{item} differs:")
+                lines += list(
+                    difflib.unified_diff(
+                        json.dumps(b, indent=2, sort_keys=True).splitlines(),
+                        json.dumps(a, indent=2, sort_keys=True).splitlines(),
+                        fromfile=f"server:{item}",
+                        tofile=f"local:{item}",
+                        lineterm="",
+                    )
+                )
+        return lines
 
     def to_json_schema(self, class_object: Union[str, dict]):
         """Return the schema in the json schema (http://json-schema.org/) format as a dictionary for the class object.
