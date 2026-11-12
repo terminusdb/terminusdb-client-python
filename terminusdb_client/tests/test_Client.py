@@ -422,6 +422,31 @@ def test_delete_document(
     )
 
 
+@mock.patch.object(requests.Session, "head", side_effect=mocked_request_success)
+@mock.patch.object(requests.Session, "get", side_effect=mocked_request_success)
+def test_get_json_schema(mocked_requests, mocked_requests2):
+    client = Client("http://localhost:6363", user="admin", key="root", team="admin")
+    client.connect(db="myDBName")
+
+    client.get_json_schema("Person")
+
+    client._session.get.assert_called_with(
+        "http://localhost:6363/api/schema/admin/myDBName/local/branch/main",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+        params={"type": "Person", "format": "jsonschema"},
+    )
+
+    client.get_json_schema()
+
+    client._session.get.assert_called_with(
+        "http://localhost:6363/api/schema/admin/myDBName/local/branch/main",
+        auth=("admin", "root"),
+        headers={"user-agent": f"terminusdb-client-python/{__version__}"},
+        params={"format": "jsonschema"},
+    )
+
+
 @mock.patch.object(requests.Session, "get", side_effect=mocked_request_success)
 @mock.patch.object(requests.Session, "post", side_effect=mocked_request_success)
 def test_add_user(mocked_requests, mocked_requests2):

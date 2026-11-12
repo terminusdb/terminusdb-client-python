@@ -1850,6 +1850,36 @@ class Client:
         )
         return json.loads(_finish_response(result))
 
+    def get_json_schema(self, class_name=None):
+        """Get the JSON Schema (draft-07) document generated server-side for a class, or for every class in the database. Useful for validating documents client-side and for scaffolding typings (e.g. TypeScript interfaces via json-schema-to-typescript).
+
+        Parameters
+        ----------
+        class_name : str, optional
+            Name of the class. If omitted, a single schema document covering every class under "definitions" is returned.
+
+        Returns
+        -------
+        dict
+            Dictionary containing the JSON Schema document
+
+        Examples
+        --------
+        >>> client.get_json_schema("Person")
+        >>> client.get_json_schema()
+        """
+        self._check_connection()
+        opts = {"format": "jsonschema"}
+        if class_name is not None:
+            opts["type"] = class_name
+        result = self._session.get(
+            self._class_frame_url(),
+            headers=self._default_headers,
+            params=opts,
+            auth=self._auth(),
+        )
+        return json.loads(_finish_response(result))
+
     def commit(self):
         """Not implementated: open transactions currently not suportted. Please check back later."""
 

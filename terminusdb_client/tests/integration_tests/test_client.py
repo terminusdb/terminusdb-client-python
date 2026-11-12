@@ -203,6 +203,27 @@ def test_class_frame(docker_url):
     }
 
 
+def test_get_json_schema(docker_url):
+    client = Client(docker_url, user_agent=test_user_agent)
+    client.connect()
+    db_name = "jsonschema" + str(random())
+    client.create_database(db_name)
+    client.connect(db=db_name)
+    schema = {"@type": "Class", "@id": "Philosopher", "name": "xsd:string"}
+    client.insert_document(schema, graph_type=GraphType.SCHEMA)
+
+    result = client.get_json_schema("Philosopher")
+    assert result["$schema"] == "https://json-schema.org/draft-07/schema#"
+    assert result["type"] == "object"
+    assert result["properties"]["name"] == {"type": "string"}
+    assert result["required"] == ["name"]
+
+    all_result = client.get_json_schema()
+    assert all_result["definitions"]["Philosopher"]["properties"]["name"] == {
+        "type": "string"
+    }
+
+
 def test_woql_substr(docker_url):
     client = Client(docker_url, user_agent=test_user_agent)
     client.connect()
